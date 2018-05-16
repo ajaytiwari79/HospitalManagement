@@ -45,6 +45,7 @@ import com.kairos.response.dto.web.client.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
@@ -148,6 +149,8 @@ public class ClientService extends UserBaseService {
     ClientAddressService clientAddressService;
     @Inject
     private ClientExceptionRestClient clientExceptionRestClient;
+    @Inject
+    private ExceptionService exceptionService;
 
     public Client createCitizen(Client client) {
 
@@ -173,19 +176,22 @@ public class ClientService extends UserBaseService {
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Can't find Organization with providedId");
+            exceptionService.dataNotFoundByIdException("exception.client.organisation.notFound");
+
         }
 
         if (clientMinimumDTO != null) {
 
             if (!invalidCPRNumber(clientMinimumDTO.getCprnumber())) {
-                throw new DataNotFoundByIdException("Invalid CPR Number");
+                exceptionService.dataNotFoundByIdException("exception.client.CRPNumber.notFound");
+
             }
 
 
             Client client = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
             if (Optional.ofNullable(client).isPresent() && client.isCitizenDead()) {
-                throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+                exceptionService.duplicateDataException("exception.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
+
             }
 
             if (client != null) {

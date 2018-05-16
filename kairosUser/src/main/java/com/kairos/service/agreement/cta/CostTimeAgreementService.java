@@ -854,7 +854,7 @@ public class CostTimeAgreementService extends UserBaseService {
     public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) throws ExecutionException, InterruptedException {
         OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.InvalidOrganisationSubtype",organizationSubTypeId);
+            exceptionService.dataNotFoundByIdException("exception.InvalidOrganizationSubtype",organizationSubTypeId);
 
         }
         if (checked) {

@@ -92,7 +92,7 @@ public class AccessGroupService extends UserBaseService {
     public AccessGroup updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
         if ( !Optional.ofNullable(accessGrpToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",accessGroupId);
+            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
 
         }
         if( accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId) ){
@@ -215,7 +215,7 @@ public class AccessGroupService extends UserBaseService {
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
-                exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",accessGroupId);
+                exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
 
             }
         }
@@ -276,7 +276,7 @@ public class AccessGroupService extends UserBaseService {
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
-                exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",accessGroupId);
+                exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
 
             }
         }
@@ -501,7 +501,7 @@ public class AccessGroupService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         AccessGroup accessGrpToUpdate = accessGroupRepository.findCountryAccessGroupByIdAndCategory(countryId, accessGroupId, accessGroupDTO.getOrganizationCategory().toString());
         if (! Optional.ofNullable(accessGrpToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",accessGroupId);
+            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
 
         }
         if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
@@ -521,7 +521,7 @@ public class AccessGroupService extends UserBaseService {
     public boolean deleteCountryAccessGroup(long accessGroupId) {
         AccessGroup accessGroupToDelete = accessGroupRepository.findOne(accessGroupId);
         if (! Optional.ofNullable(accessGroupToDelete).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",accessGroupId);
+            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
 
         }
         accessGroupToDelete.setDeleted(true);
@@ -597,7 +597,7 @@ public class AccessGroupService extends UserBaseService {
         }
         Optional<AccessGroup> currentAccessGroup=accessGroupRepository.findById(accessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",accessGroupDTO.getId());
+            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupDTO.getId());
 
         }
         AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
@@ -622,7 +622,7 @@ public class AccessGroupService extends UserBaseService {
         }
         Optional<AccessGroup> currentAccessGroup = accessGroupRepository.findById(countryAccessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.incorrectAcessGroupId",countryAccessGroupDTO.getId());
+            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",countryAccessGroupDTO.getId());
 
         }
         AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());

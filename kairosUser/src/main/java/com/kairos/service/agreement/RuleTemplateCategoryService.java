@@ -1,25 +1,17 @@
 package com.kairos.service.agreement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.AddRuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
-import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
@@ -83,7 +75,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("error.country.id.notExist");
+            exceptionService.dataNotFoundByIdException("exception.country.id.notExist");
 
         }
         return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(countryId, ruleTemplateCategoryType);
@@ -98,11 +90,11 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public boolean deleteRuleTemplateCategory(long countryId, long templateCategoryId) {
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if (ruleTemplateCategory == null) {
-            exceptionService.dataNotFoundByIdException("error.ruleTemplate.category.notExist",templateCategoryId);
+            exceptionService.dataNotFoundByIdException("exception.ruleTemplate.category.notExist",templateCategoryId);
 
         }
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
-            exceptionService.actionNotPermittedException("error.ruleTemplate.category.delete",templateCategoryId);
+            exceptionService.actionNotPermittedException("exception.ruleTemplate.category.delete",templateCategoryId);
 
         }
         if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
@@ -123,22 +115,22 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryService.getCountryById(countryId) == null) {
-            exceptionService.dataNotFoundByIdException("error.country.id.notExist");
+            exceptionService.dataNotFoundByIdException("exception.country.id.notExist");
 
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if(!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()){
-            exceptionService.dataNotFoundByIdException("error.ruleTemplate.category.invalid",templateCategoryId);
+            exceptionService.dataNotFoundByIdException("exception.ruleTemplate.category.invalid",templateCategoryId);
 
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
-           exceptionService.actionNotPermittedException("error.ruleTemplate.category.rename",templateCategoryId);
+           exceptionService.actionNotPermittedException("exception.ruleTemplate.category.rename",templateCategoryId);
 
         }
         if(!ruleTemplateCategory.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())){
             boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
             if(isAlreadyExists){
-                exceptionService.duplicateDataException("error.ruleTemplate.category.alreadyExist",ruleTemplateCategory.getName());
+                exceptionService.duplicateDataException("exception.ruleTemplate.category.alreadyExist",ruleTemplateCategory.getName());
 
             }
         }

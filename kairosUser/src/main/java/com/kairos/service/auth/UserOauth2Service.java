@@ -4,6 +4,7 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserPrincipal;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.HttpRequestHolder;
 import com.kairos.util.OptionalUtility;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +29,8 @@ public class UserOauth2Service implements UserDetailsService {
     private UserService userService;
     @Autowired
     private AccessPageService accessPageService;
-
+    @Inject
+    private ExceptionService exceptionService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
          User user=  userGraphRepository.findByUserNameIgnoreCase(username.toLowerCase());
@@ -41,9 +44,9 @@ public class UserOauth2Service implements UserDetailsService {
             return new UserPrincipal(user,getPermission(user));
         }else{
             // Not found...
-            throw new UsernameNotFoundException(
-                    "User " + username + " not found.");
+            exceptionService.usernameNotFoundException("exception.user.userName.notFound",username);
         }
+       return  null;
     }
 
     private List<GrantedAuthority> getPermission(User user){

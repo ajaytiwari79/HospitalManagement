@@ -1,10 +1,8 @@
 package com.kairos.service.exception;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.custom_exception.*;
 import com.kairos.service.locale.LocaleService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -50,5 +48,14 @@ public class ExceptionService {
     }
     public void illegalArgumentException(String message, Object... params) {
         throw new IllegalArgumentException(convertMessage(message, params));
+    }
+    public void usernameNotFoundException(String message,Object... params) {
+        throw new UsernameNotFoundException(convertMessage(message, params));
+    }
+    public void zipCodeNotFoundException(String message,Object... params) {
+        throw new ZipCodeNotFound(convertMessage(message, params));
+    }
+    public void dataNotMatchedException(String message,Object... params) {
+        throw new DataNotMatchedException(convertMessage(message, params));
     }
 }

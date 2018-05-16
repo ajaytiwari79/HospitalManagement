@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -64,7 +65,8 @@ public class ClientBatchService {
     private ContactAddressGraphRepository contactAddressGraphRepository;
     @Inject
     EnvConfig envConfig;
-
+    @Inject
+    private ExceptionService exceptionService;
     public void updateClientFromExcel(MultipartFile multipartFile) {
 
         int clientUpdated = 0;
@@ -79,7 +81,8 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow");
+
             }
 
             Client client;
@@ -138,7 +141,8 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow");
+
             }
 
             Client client;
@@ -343,18 +347,21 @@ public class ClientBatchService {
 
                     zipCodeDb = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
                     if (zipCodeDb == null) {
-                        throw new InternalError("Zip code not found");
+                        exceptionService.internalServerError("exception.zipCode.notFound");
+
                     }
                     Municipality municipality = municipalityGraphRepository.getMunicipalityByZipCodeId(zipCodeDb.getId());
                     if (municipality == null) {
-                        throw new InternalError("Municpality not found");
+                        exceptionService.internalServerError("exception.municipality.notFound");
+
                     }
 
 
                     Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                     if (geographyData == null) {
                         logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                        throw new InternalError("Geography data not found with provided municipality");
+                        exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+
                     }
                     logger.info("Geography Data: " + geographyData);
 

@@ -1,5 +1,4 @@
 package com.kairos.service.client;
-import com.kairos.custom_exception.ZipCodeNotFound;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ClientTemporaryAddress;
@@ -11,6 +10,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.country.HousingTypeService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
@@ -55,6 +55,8 @@ public class AddressVerificationService {
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
     /*
       By Yasir
       Commented below method as we are no longer using FLS Visitour
@@ -96,7 +98,8 @@ public class AddressVerificationService {
         if(contactAddress.getMunicipalityId() != null){
             Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipalityId());
             if(municipality == null){
-                throw new InternalError("municipality not found");
+                exceptionService.internalServerError("exception.municipality.notFound");
+
             }
             municipalityName = municipality.getName();
         } else {
@@ -104,7 +107,8 @@ public class AddressVerificationService {
         }
 
         if (zipCode == null) {
-            throw new ZipCodeNotFound("Provided ZipCode not exist in database");
+            exceptionService.zipCodeNotFoundException("exception.zipCode.notFound");
+
         }
         logger.info("Verifying with Information \n house: " +
                 contactAddress.getHouseNumber() + "\n City:" +
@@ -173,7 +177,8 @@ public class AddressVerificationService {
                 client.setTemporaryAddress(clientTemporaryAddressList);
                 break;
             default:
-                throw new InternalError("Address type not found");
+                exceptionService.internalServerError("exception.client.addressType.notFound");
+
         }
         clientGraphRepository.save(client);
         return contactAddress;
