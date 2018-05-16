@@ -33,7 +33,8 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaireDetails(Long staffId) {
 
-        String groupString = "{$group:{_id:'$_id', 'name':{'$first':'$name'}, 'submitted':{'$first':'$submitted'}, 'questionAnswerPair': { '$push':'$questionAnswerPair' }}}";
+        String groupString = "{$group:{_id:'$_id', 'name':{'$first':'$name'}, 'submitted':{'$first':'$submitted'}, 'submittedOn':{'$first':'$submittedOn'} "+
+                "'questionAnswerPair': { '$push':'$questionAnswerPair' }}}";
         String sortString = "{$sort:{questionnaireCreatedDate:-1, createdDate:1}}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),

@@ -94,6 +94,8 @@ public class NightWorkerService extends MongoBaseService {
             staffQuestionnaire.setSubmitted(true);
             staffQuestionnaire.setSubmittedOn(DateUtils.getLocalDateFromDate(DateUtils.getDate()));
             answerResponseDTO.setSubmitted(true);
+            answerResponseDTO.setSubmittedOn(staffQuestionnaire.getSubmittedOn());
+
         }
         staffQuestionnaire.setQuestionAnswerPair(ObjectMapperUtils.copyPropertiesOfListByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
         save(staffQuestionnaire);
