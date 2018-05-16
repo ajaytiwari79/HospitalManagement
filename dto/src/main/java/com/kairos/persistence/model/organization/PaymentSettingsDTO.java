@@ -1,21 +1,29 @@
 package com.kairos.persistence.model.organization;
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.hibernate.validator.constraints.Range;
+
+import java.time.DayOfWeek;
 
 /**
  * Created by vipul on 12/4/18.
  */
 public class PaymentSettingsDTO {
     private Long id;
-    private PaidOutFrequencyEnum type;
+    private DayOfWeek weeklyPayDay;
+    private DayOfWeek fornightlyPayDay;
+    private Long lastFornigthtlyPayDate;
     @Range(min = 1l, max = 31L)
-    private Long dateOfPayment;
-    @Range(min = 1l, max = 12L)
-    private Long monthOfPayment;
+    private Long monthlyPayDay;
 
     public PaymentSettingsDTO() {
         // default cons
+    }
+
+    public PaymentSettingsDTO(Long id, DayOfWeek weeklyPayDay, DayOfWeek fornightlyPayDay, Long monthlyPayDay) {
+        this.id = id;
+        this.weeklyPayDay = weeklyPayDay;
+        this.fornightlyPayDay = fornightlyPayDay;
+        this.monthlyPayDay = monthlyPayDay;
     }
 
     public Long getId() {
@@ -26,34 +34,35 @@ public class PaymentSettingsDTO {
         this.id = id;
     }
 
-    public PaidOutFrequencyEnum getType() {
-        return type;
+    public Long getMonthlyPayDay() {
+        return monthlyPayDay;
     }
 
-    public void setType(PaidOutFrequencyEnum type) {
-        this.type = type;
+    public void setMonthlyPayDay(Long monthlyPayDay) {
+        this.monthlyPayDay = monthlyPayDay;
     }
 
-    public Long getDateOfPayment() {
-        return dateOfPayment;
+    public DayOfWeek getWeeklyPayDay() {
+        return weeklyPayDay;
     }
 
-    public void setDateOfPayment(Long dateOfPayment) {
-        this.dateOfPayment = dateOfPayment;
+    public void setWeeklyPayDay(DayOfWeek weeklyPayDay) {
+        this.weeklyPayDay = weeklyPayDay;
     }
 
-    public Long getMonthOfPayment() {
-        return monthOfPayment;
+    public DayOfWeek getFornightlyPayDay() {
+        return fornightlyPayDay;
     }
 
-    public void setMonthOfPayment(Long monthOfPayment) {
-        this.monthOfPayment = monthOfPayment;
+    public void setFornightlyPayDay(DayOfWeek fornightlyPayDay) {
+        this.fornightlyPayDay = fornightlyPayDay;
     }
 
-    public PaymentSettingsDTO(Long id, PaidOutFrequencyEnum type, Long dateOfPayment, Long monthOfPayment) {
-        this.id = id;
-        this.type = type;
-        this.dateOfPayment = dateOfPayment;
-        this.monthOfPayment = monthOfPayment;
+    public Long getLastFornigthtlyPayDate() {
+        return lastFornigthtlyPayDate;
+    }
+
+    public void setLastFornigthtlyPayDate(Long lastFornigthtlyPayDate) {
+        this.lastFornigthtlyPayDate = lastFornigthtlyPayDate;
     }
 }

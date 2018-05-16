@@ -4,9 +4,13 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.Range;
 import org.neo4j.ogm.annotation.Labels;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.springframework.data.annotation.Version;
+
+import java.time.DayOfWeek;
+import java.time.ZonedDateTime;
 
 /**
  * Created by vipul on 12/4/18.
@@ -14,67 +18,52 @@ import org.springframework.data.annotation.Version;
 @NodeEntity
 public class PaymentSettings extends UserBaseEntity {
 
-    private PaidOutFrequencyEnum type;
-    private Long dateOfPayment;
-    private Long monthOfPayment;
+    private DayOfWeek weeklyPayDay;
+    private DayOfWeek fornightlyPayDay;
+    private Long lastFornigthtlyPayDate;
+    @Range(min = 1l, max = 31L)
+    private Long monthlyPayDay;
 
 
     public PaymentSettings() {
         // default cons
     }
 
-    public PaidOutFrequencyEnum getType() {
-        return type;
+    public PaymentSettings(DayOfWeek weeklyPayDay, DayOfWeek fornightlyPayDay, Long monthlyPayDay){
+        this.weeklyPayDay = weeklyPayDay;
+        this.monthlyPayDay = monthlyPayDay;
+        this.fornightlyPayDay = fornightlyPayDay;
     }
 
-    public void setType(PaidOutFrequencyEnum type) {
-        this.type = type;
+    public DayOfWeek getWeeklyPayDay() {
+        return weeklyPayDay;
     }
 
-    public Long getDateOfPayment() {
-        return dateOfPayment;
+    public void setWeeklyPayDay(DayOfWeek weeklyPayDay) {
+        this.weeklyPayDay = weeklyPayDay;
     }
 
-    public void setDateOfPayment(Long dateOfPayment) {
-        this.dateOfPayment = dateOfPayment;
+    public DayOfWeek getFornightlyPayDay() {
+        return fornightlyPayDay;
     }
 
-    public Long getMonthOfPayment() {
-        return monthOfPayment;
+    public void setFornightlyPayDay(DayOfWeek fornightlyPayDay) {
+        this.fornightlyPayDay = fornightlyPayDay;
     }
 
-    public void setMonthOfPayment(Long monthOfPayment) {
-        this.monthOfPayment = monthOfPayment;
-    }
-    
-    public PaymentSettings(PaidOutFrequencyEnum type, Long dateOfPayment, Long monthOfPayment) {
-        this.type = type;
-        this.dateOfPayment = dateOfPayment;
-        this.monthOfPayment = monthOfPayment;
+    public Long getLastFornigthtlyPayDate() {
+        return lastFornigthtlyPayDate;
     }
 
-    public PaymentSettings(PaidOutFrequencyEnum type, Long dateOfPayment) {
-        this.type = type;
-        this.dateOfPayment = dateOfPayment;
+    public void setLastFornigthtlyPayDate(Long lastFornigthtlyPayDate) {
+        this.lastFornigthtlyPayDate = lastFornigthtlyPayDate;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (!(o instanceof PaymentSettings)) return false;
-
-        PaymentSettings that = (PaymentSettings) o;
-
-        return new EqualsBuilder()
-                .append(getType(), that.getType())
-                .isEquals();
+    public Long getMonthlyPayDay() {
+        return monthlyPayDay;
     }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(getType())
-                .toHashCode();
+    public void setMonthlyPayDay(Long monthlyPayDay) {
+        this.monthlyPayDay = monthlyPayDay;
     }
 }
