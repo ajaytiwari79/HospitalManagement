@@ -348,14 +348,14 @@ public class TimeBankCalculationService {
                     ? new TimeBankIntervalDTO(AppConstants.WEEK + " " + weekCount)
                     : new TimeBankIntervalDTO(Month.of(interval.getEnd().getMonthOfYear()).toString().toUpperCase());
             if (interval.getStart().toLocalDate().isBefore(new DateTime().toLocalDate())) {
-                int calculateTimeBankForInterval = calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO,true,dailyTimeBankEntries,true);
+                int calculateTimeBankForInterval = calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO,true,dailyTimeBankEntries,false);
                 timeBankIntervalDTO.setTotalTimeBankMin(-calculateTimeBankForInterval);
                 if (dailyTimeBankEntries != null && !dailyTimeBankEntries.isEmpty()) {
-                   // int totalTimeBank = dailyTimeBankEntries.stream().mapToInt(dailyTimeBankEntry -> dailyTimeBankEntry.getTotalTimeBankMin()).sum();
+                    int totalTimeBank = dailyTimeBankEntries.stream().mapToInt(dailyTimeBankEntry -> dailyTimeBankEntry.getTotalTimeBankMin()).sum();
                     int scheduledMinutes = dailyTimeBankEntries.stream().mapToInt(t -> t.getScheduledMin()).sum();
                     int timebankMinutesAfterCta = dailyTimeBankEntries.stream().mapToInt(t -> t.getTimeBankMinWithCta()).sum();
                     timeBankIntervalDTO.setTotalTimeBankDiff(scheduledMinutes + timebankMinutesAfterCta);
-                    timeBankIntervalDTO.setTotalTimeBankMin((scheduledMinutes + timebankMinutesAfterCta) - calculateTimeBankForInterval);
+                    timeBankIntervalDTO.setTotalTimeBankMin(totalTimeBank - calculateTimeBankForInterval);
                 }
 
             }
@@ -540,7 +540,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftQueryResultWithActivity shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
-                            totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
+                            totalScheduledMin += shift.getScheduledMinutes();
                         }
                     }
                 }
@@ -602,7 +602,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftQueryResultWithActivity shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
-                            totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
+                            totalScheduledMin += shift.getScheduledMinutes();
                         }
                     }
                     scheduleTimeByTimeTypeDTO.setTotalMin(totalScheduledMin);
