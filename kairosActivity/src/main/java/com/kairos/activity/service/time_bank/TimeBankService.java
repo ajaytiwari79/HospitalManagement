@@ -84,6 +84,9 @@ public class TimeBankService extends MongoBaseService {
         unitPositionWithCtaDetailsDTO.setStaffId(shift.getStaffId());
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = new DateTime(shift.getEndDate()).withTimeAtStartOfDay();
+        if(startDate.equals(endDate)){
+            endDate = endDate.plusDays(1);
+        }
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankMongoRepository.findAllByUnitPositionAndDate(unitPositionId, startDate.toDate(), endDate.toDate());
         timeBankMongoRepository.deleteAll(dailyTimeBanks);
         dailyTimeBanks = new ArrayList<>();
