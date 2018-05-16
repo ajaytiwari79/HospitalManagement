@@ -20,7 +20,7 @@ import static com.kairos.activity.constants.ApiConstants.*;
 @Api(API_ORGANIZATION_URL)
 public class PriorityGroupController {
     @Inject
-    PriorityGroupService priorityGroupService;
+    private PriorityGroupService priorityGroupService;
 
     @ApiOperation("Create Priority Group")
     @PostMapping(value = COUNTRY_URL+"/priority_groups")
