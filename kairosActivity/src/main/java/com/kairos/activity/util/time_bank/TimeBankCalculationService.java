@@ -55,16 +55,19 @@ public class TimeBankCalculationService {
             DateTime dateTime = new DateTime().withTimeAtStartOfDay().plusDays(i);
             Interval interval = new Interval(dateTime, dateTime.plusDays(1));
             List<ShiftQueryResultWithActivity> shiftQueryResults = shiftQueryResultMap.get(interval.toString());
-            int totalTimeBank = getTimeBankByInterval(ctaDto, interval, shiftQueryResults, null).getTotalTimeBankMin();
-            calculatedTimeBankByDateDTOS.add(new CalculatedTimeBankByDateDTO(interval.getStart().toLocalDate(), totalTimeBank));
+            //int totalTimeBank = getTimeBankByInterval(ctaDto, interval, shiftQueryResults, null).getTotalTimeBankMin();
+           // calculatedTimeBankByDateDTOS.add(new CalculatedTimeBankByDateDTO(interval.getStart().toLocalDate(), totalTimeBank));
         }
         return calculatedTimeBankByDateDTOS;
     }
 
-    public DailyTimeBankEntry getTimeBankByInterval(UnitPositionWithCtaDetailsDTO ctaDto, Interval interval, List<ShiftQueryResultWithActivity> shifts, DailyTimeBankEntry dailyTimeBankEntry) {
+    public DailyTimeBankEntry getTimeBankByInterval(UnitPositionWithCtaDetailsDTO ctaDto, Interval interval, List<ShiftQueryResultWithActivity> shifts) {
+        DailyTimeBankEntry dailyTimeBank = null;
         if (shifts != null && !shifts.isEmpty()) {
-            calculateDailyTimebank(interval, ctaDto, shifts, dailyTimeBankEntry);
-        } else {
+            dailyTimeBank = new DailyTimeBankEntry(ctaDto.getUnitPositionId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+            shifts = filterSubshifts(shifts);
+            calculateDailyTimebank(interval, ctaDto, shifts, dailyTimeBank);
+        }/* else {
             int dailyContractualMinutes = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? -ctaDto.getContractedMinByWeek() / ctaDto.getWorkingDaysPerWeek() : 0;
             dailyTimeBankEntry.setTotalTimeBankMin(dailyContractualMinutes != 0 ? -dailyContractualMinutes : 0);
             dailyTimeBankEntry.setContractualMin(dailyContractualMinutes);
@@ -73,8 +76,21 @@ public class TimeBankCalculationService {
             dailyTimeBankEntry.setTimeBankMinWithCta(0);
             dailyTimeBankEntry.setStaffId(ctaDto.getStaffId());
             dailyTimeBankEntry.setTimeBankCTADistributionList(getDistribution(ctaDto));
+        }*/
+        return dailyTimeBank;
+    }
+
+    public List<ShiftQueryResultWithActivity> filterSubshifts(List<ShiftQueryResultWithActivity> shifts){
+        List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
+        for (ShiftQueryResultWithActivity shift : shifts) {
+            if (shift.getSubShift() != null && shift.getSubShift().getStartDate() != null) {
+                ShiftQueryResultWithActivity shiftQueryResultWithActivity = new ShiftQueryResultWithActivity(shift.getStartDate(), shift.getEndDate(), shift.getActivity());
+                shiftQueryResultWithActivities.add(shiftQueryResultWithActivity);
+            } else {
+                shiftQueryResultWithActivities.add(shift);
+            }
         }
-        return dailyTimeBankEntry;
+        return shiftQueryResultWithActivities;
     }
 
 
@@ -146,7 +162,7 @@ public class TimeBankCalculationService {
                         int ctaTimeBankMin = 0;
                         if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())))) {
                             if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
-                                if (ruleTemplate.isCalculateScheduledHours()) {
+                                if (ruleTemplate.isCalculateScheduledHours() && interval.contains(shift.getStartDate().getTime())) {
                                     dailyScheduledMin += shift.getScheduledMinutes();
                                     totalDailyTimebank+=dailyScheduledMin;
                                 } else {
@@ -540,7 +556,7 @@ public class TimeBankCalculationService {
                 }
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftQueryResultWithActivity shift : shifts) {
-                        if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
+                        if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                             totalScheduledMin += shift.getScheduledMinutes();
                         }
                     }
@@ -571,7 +587,7 @@ public class TimeBankCalculationService {
                 }
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftQueryResultWithActivity shift : shifts) {
-                        if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
+                        if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                             totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
                         }
                     }
@@ -602,7 +618,7 @@ public class TimeBankCalculationService {
 
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftQueryResultWithActivity shift : shifts) {
-                        if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
+                        if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                             totalScheduledMin += shift.getScheduledMinutes();
                         }
                     }
