@@ -28,7 +28,7 @@ public class ExceptionService {
         return localeService.getMessage(message, params);
     }
 
-    public void dataNotFoundByIdException(String message, Object... params) {
+    public void dataNotFoundByIdException(String message, Object... params) throws DataNotFoundByIdException{
         throw new DataNotFoundByIdException(convertMessage(message, params));
     }
 
@@ -67,5 +67,8 @@ public class ExceptionService {
     }
     public void flsCallException(String message, Object... params) {
         throw new FlsCallException(convertMessage(message, params));
+    }
+    public void dataNotModifiedException(String message, Object... params) {
+        throw new DataNotModifiedException(convertMessage(message, params));
     }
 }
