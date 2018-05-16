@@ -226,9 +226,9 @@ public class ShiftPlanningService {
         return shiftPlanningSolution;
     }
 
-    public ShiftRequestPhasePlanningSolution createShiftPlanningProblem(Long unitId, LocalDate start, LocalDate end){
+    public ShiftRequestPhasePlanningSolution createShiftPlanningProblem(Long unitId,List<LocalDate> dates){
         ShiftRequestPhasePlanningSolution problem= new ShiftRequestPhasePlanningSolution();
-        List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitAndDates(unitId,start,end);
+        List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitAndDates(unitId,dates);
         List<Activity> activities= activityRepository.getActivitiesByUnitId(unitId);
         List<UnitPosition> unitPositions=unitPositionRepository.getAllUnitPositionsByUnit(unitId);
         List<String> staffIds=unitPositions.stream().map(up->up.getStaffId()).collect(Collectors.toList());
@@ -258,14 +258,14 @@ public class ShiftPlanningService {
             activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,true));
             activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,false));
         }
-        List<org.joda.time.LocalDate> dates = JodaTimeUtil.getLocalDates(start, end);
-        Map<org.joda.time.LocalDate, Object[]> matrix=ShiftPlanningUtility.createStaffingLevelMatrix(dates, activityLineIntervals,15, acts);
+        List<org.joda.time.LocalDate> dateList = JodaTimeUtil.getLocalDates(dates);
+        Map<org.joda.time.LocalDate, Object[]> matrix=ShiftPlanningUtility.createStaffingLevelMatrix(dateList, activityLineIntervals,15, acts);
         problem.setStaffingLevelMatrix(new StaffingLevelMatrix(matrix,new int[1]));
         problem.setActivityLineIntervals(activityLineIntervals);
         problem.setEmployees(employees);
-        problem.setShifts(createEmptyShiftsForEmployees(employees,dates));
+        problem.setShifts(createEmptyShiftsForEmployees(employees,dateList));
         problem.setUnitId(unitId);
-        problem.setWeekDates(dates);
+        problem.setWeekDates(dateList);
         problem.setActivitiesIntervalsGroupedPerDay(groupActivityLineIntervals(activityLineIntervals));
         problem.setActivitiesPerDay(perDayActivities);
         return problem;

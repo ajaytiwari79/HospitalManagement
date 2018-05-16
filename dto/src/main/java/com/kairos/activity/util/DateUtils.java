@@ -11,10 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
@@ -421,5 +418,13 @@ public class DateUtils {
      */
     public static DateTime getDateTime(Date date, LocalTime time){
         return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
+    }
+
+    public static List<LocalDate> getDates(LocalDate start, LocalDate end){
+        List<LocalDate> dates= new ArrayList<>();
+        for(LocalDate ld=start;!ld.isAfter(end);ld=ld.plusDays(1)){
+            dates.add(ld);
+        }
+        return dates;
     }
 }

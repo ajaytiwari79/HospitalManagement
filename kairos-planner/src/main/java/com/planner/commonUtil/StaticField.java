@@ -50,4 +50,37 @@ public class StaticField {
 	public final static String SALIENCE = "salience";
 	public final static String DIALECT = "dialect";
 	public final static String JAVA = "java";
+
+
+
+
+
+
+
+
+
+    public static final String DRL_BASE_SRC = "com/kairos/shiftplanning/rules/";
+    public static final String DRL_WTA_BASE_SRC = DRL_BASE_SRC+"wta/";
+	public final static String DRL_AVERAGE_SHEDULED_TIME = DRL_WTA_BASE_SRC+"java";
+	public final static String DRL_CONSECUTIVE_WORKING_PARTOFDAY = DRL_WTA_BASE_SRC+"java";
+	public final static String DRL_DAYS_OFF_IN_PERIOD = DRL_WTA_BASE_SRC+"java";
+	public final static String DRL_NUMBER_OF_PARTOFDAY = DRL_WTA_BASE_SRC+"java";
+	public final static String DRL_SHIFT_LENGTH = DRL_WTA_BASE_SRC+"java";
+	public final static String DRL_NUMBER_OF_SHIFTS_IN_INTERVAL = DRL_WTA_BASE_SRC+"java";
+	public final static String DRL_TIME_BANK = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_VETO_PER_PERIOD = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_DAILY_RESTING_TIME = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_DURATION_BETWEEN_SHIFTS = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_WEEKLY_REST_PERIOD = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_SHORTEST_AND_AVERAGE_DAILY_REST = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_SENIOR_DAYS_PER_YEAR = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_CHILD_CARE_DAYS_CHECK = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_BREAK_IN_SHIFT = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_DAYS_OFF_AFTER_A_SERIES = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_NO_OF_SEQUENCE_SHIFT = DRL_WTA_BASE_SRC+"java";
+    public final static String DRL_EMPLOYEES_WITH_INCREASE_RISK = DRL_WTA_BASE_SRC+"java";
+
+
 }

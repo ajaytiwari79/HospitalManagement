@@ -5,16 +5,7 @@
   <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
   <entityClass>com.kairos.shiftplanning.domain.SkillLineInterval</entityClass>
   <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
-    <!--<entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>-->
-  <!--
-  Intervals on assigned back to null will not reduce shift length if they are in mid of shift and hence causing score corruption, which is fine
-  <environmentMode>FULL_ASSERT</environmentMode>-->
-    <!--<environmentMode>FAST_ASSERT</environmentMode>-->
-    <!--<environmentMode>FULL_ASSERT</environmentMode>-->
   <scoreDirectorFactory>
-      <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning_activityLine.drl</scoreDrl>
-      <scoreDrl>com/kairos/shiftplanning/rules/wtaConstraintsRule.drl</scoreDrl>
-      <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
     <constructionHeuristic>
@@ -65,25 +56,6 @@
             <unimprovedSecondsSpentLimit>60</unimprovedSecondsSpentLimit>
         </termination>
     </localSearch>
-   <!-- <localSearch>
-        <unionMoveSelector>
-            <moveIteratorFactory>
-                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
-            </moveIteratorFactory>
-            <moveIteratorFactory>
-                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
-            </moveIteratorFactory>
-        </unionMoveSelector>
-        <acceptor>
-            <lateAcceptanceSize>6000</lateAcceptanceSize>
-        </acceptor>
-        <forager>
-            <acceptedCountLimit>200</acceptedCountLimit>
-        </forager>
-        <termination>
-            <unimprovedSecondsSpentLimit>20</unimprovedSecondsSpentLimit>
-        </termination>
-    </localSearch>-->
     <termination>
         <secondsSpentLimit>150</secondsSpentLimit>
     </termination>

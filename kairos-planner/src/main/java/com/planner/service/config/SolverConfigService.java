@@ -1,17 +1,16 @@
 package com.planner.service.config;
 
+import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
+import com.planner.commonUtil.StaticField;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class SolverConfigService {
@@ -21,6 +20,64 @@ public class SolverConfigService {
     public void addSolverConfig(Long unitId, SolverConfigDTO solverConfigDTO){
         SolverConfig solverConfig= new SolverConfig(solverConfigDTO.getTemplateTypes(),120,unitId);
         solverConfigRepository.save(solverConfig);
+    }
+
+    public String createShiftPlanningSolverConfig(BigInteger solverConfigId){
+        SolverConfig solverConfig=solverConfigRepository.findByKairosId(solverConfigId).get();
+        List<String> validDrls=new ArrayList<>();
+        for(WTATemplateType wtaTemplateType:solverConfig.getTemplateTypes()){
+            validDrls.add(getDrlPathForTemplateType(wtaTemplateType));
+        }
+
+        return null;
+
+    }
+
+    private String getDrlPathForTemplateType(WTATemplateType wtaTemplateType) {
+        switch (wtaTemplateType){
+            case AVERAGE_SHEDULED_TIME:
+                return StaticField.DRL_AVERAGE_SHEDULED_TIME;
+            case CONSECUTIVE_WORKING_PARTOFDAY:
+                return StaticField.DRL_CONSECUTIVE_WORKING_PARTOFDAY;
+            case DAYS_OFF_IN_PERIOD:
+                return StaticField.DRL_DAYS_OFF_IN_PERIOD;
+            case NUMBER_OF_PARTOFDAY:
+                return StaticField.DRL_NUMBER_OF_PARTOFDAY;
+            case SHIFT_LENGTH:
+                return StaticField.DRL_SHIFT_LENGTH;
+            case NUMBER_OF_SHIFTS_IN_INTERVAL:
+                return StaticField.DRL_NUMBER_OF_SHIFTS_IN_INTERVAL;
+            case TIME_BANK:
+                return StaticField.DRL_TIME_BANK;
+            case VETO_PER_PERIOD:
+                return StaticField.DRL_VETO_PER_PERIOD;
+            case DAILY_RESTING_TIME:
+                return StaticField.DRL_DAILY_RESTING_TIME;
+            case DURATION_BETWEEN_SHIFTS:
+                return StaticField.DRL_DURATION_BETWEEN_SHIFTS;
+            case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
+                return StaticField.DRL_REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
+            case WEEKLY_REST_PERIOD:
+                return StaticField.DRL_WEEKLY_REST_PERIOD;
+            case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
+                return StaticField.DRL_NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
+            case SHORTEST_AND_AVERAGE_DAILY_REST:
+                return StaticField.DRL_SHORTEST_AND_AVERAGE_DAILY_REST;
+            case SENIOR_DAYS_PER_YEAR:
+                return StaticField.DRL_SENIOR_DAYS_PER_YEAR;
+            case CHILD_CARE_DAYS_CHECK:
+                return StaticField.DRL_CHILD_CARE_DAYS_CHECK;
+            case BREAK_IN_SHIFT:
+                return StaticField.DRL_BREAK_IN_SHIFT;
+            case DAYS_OFF_AFTER_A_SERIES:
+                return StaticField.DRL_DAYS_OFF_AFTER_A_SERIES;
+            case NO_OF_SEQUENCE_SHIFT:
+                return StaticField.DRL_NO_OF_SEQUENCE_SHIFT;
+            case EMPLOYEES_WITH_INCREASE_RISK:
+                return StaticField.DRL_EMPLOYEES_WITH_INCREASE_RISK;
+
+            default:return null;
+        }
     }
 
     /*public List<SolverConfigDTO> getAllSolverConfig(Long unitId){
