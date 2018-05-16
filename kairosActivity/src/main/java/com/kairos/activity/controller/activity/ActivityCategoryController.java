@@ -30,11 +30,11 @@ public class ActivityCategoryController {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.updateActivityCategory(countryId, activityCategoryId,name));
 //    }
 
-    @ApiOperation("Delete Activity Category")
-    @DeleteMapping(value = "/country/{countryId}/activityCategory/{activityCategoryId}")
-    ResponseEntity<Map<String, Object>> deleteActivityCategory(@PathVariable Long countryId, @PathVariable BigInteger activityCategoryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.deleteActivityCategory(countryId, activityCategoryId));
-    }
+//    @ApiOperation("Delete Activity Category")
+//    @DeleteMapping(value = "/country/{countryId}/activityCategory/{activityCategoryId}")
+//    ResponseEntity<Map<String, Object>> deleteActivityCategory(@PathVariable Long countryId, @PathVariable BigInteger activityCategoryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.deleteActivityCategory(countryId, activityCategoryId));
+//    }
 
 //    @ApiOperation("Update Activity Category at unit")
 //    @PutMapping(value = "/unit/{unitId}/activityCategory/{activityCategoryId}")
@@ -42,9 +42,9 @@ public class ActivityCategoryController {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.updateActivityCategoryByUnit(unitId, activityCategoryId,name));
 //    }
 
-    @ApiOperation("Delete Activity Category at Unit Level")
-    @DeleteMapping(value = "/unit/{unitId}/activityCategory/{activityCategoryId}")
-    ResponseEntity<Map<String, Object>> deleteActivityCategoryByUnit(@PathVariable Long unitId, @PathVariable BigInteger activityCategoryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.deleteActivityCategoryByUnit(unitId, activityCategoryId));
-    }
+//    @ApiOperation("Delete Activity Category at Unit Level")
+//    @DeleteMapping(value = "/unit/{unitId}/activityCategory/{activityCategoryId}")
+//    ResponseEntity<Map<String, Object>> deleteActivityCategoryByUnit(@PathVariable Long unitId, @PathVariable BigInteger activityCategoryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.deleteActivityCategoryByUnit(unitId, activityCategoryId));
+//    }
 }
