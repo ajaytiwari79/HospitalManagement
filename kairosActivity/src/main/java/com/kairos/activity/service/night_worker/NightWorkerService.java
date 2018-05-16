@@ -39,21 +39,6 @@ public class NightWorkerService extends MongoBaseService {
     StaffQuestionnaireMongoRepository staffQuestionnaireMongoRepository;
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaire(Long unitId, Long staffId){
-//        NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
-        /*if(!Optional.ofNullable(nightWorker).isPresent()){
-            throw new DataNotFoundByIdException("Staff is not a night worker");
-        }*/
-        /*// TODO IF no questionnaire has been added
-        List<QuestionnaireAnswerResponseDTO> questionnaireAnswerResponseDTOS = new ArrayList<QuestionnaireAnswerResponseDTO>();
-        questionnaireAnswerResponseDTOS.addAll(nightWorkerMongoRepository.getNightWorkerQuestionnaireDetails(staffId) );
-        boolean nightWorkerQuestionnaireFormIsEnabled = true;
-        if(Optional.ofNullable(nightWorker).isPresent() && nightWorkerQuestionnaireFormIsEnabled){
-            boolean temp = checkIfNightWorkerQuestionnaireFormIsEnabled(staffId, nightWorker.getQuestionnaireFrequencyInMonths());
-
-            List<QuestionAnswerDTO>  enabledQuestionnaireFormData = nightWorkerMongoRepository.getNightWorkerQuestions();
-            questionnaireAnswerResponseDTOS.add(new QuestionnaireAnswerResponseDTO("Questionnaire", true, enabledQuestionnaireFormData));
-        }
-        return questionnaireAnswerResponseDTOS;*/
         return nightWorkerMongoRepository.getNightWorkerQuestionnaireDetails(staffId);
     }
 
@@ -95,54 +80,19 @@ public class NightWorkerService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);
     }
 
-    public boolean checkIfNightWorkerQuestionnaireFormIsEnabled(Long staffId, int questionnaireFrequencyInMonths){
-        Date lastApplicableDateForQuestionnaire = DateUtils.addMonths(DateUtils.getDate(), questionnaireFrequencyInMonths);
-        return nightWorkerMongoRepository.checkIfNightWorkerQuestionnaireFormIsEnabled(staffId, lastApplicableDateForQuestionnaire);
-    }
-
     public String prepareNameOfQuestionnaireSet(){
         return AppConstants.QUESTIONNAIE_NAME_PREFIX + " " + DateUtils.getDateString(DateUtils.getDate(), "dd_MMM_yyyy");
     }
 
-    /*public QuestionnaireAnswerResponseDTO addNightWorkerQuestionnaire(Long unitId, Long staffId, QuestionnaireAnswerResponseDTO answerResponseDTO){
-
-        NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
-        if(!Optional.ofNullable(nightWorker).isPresent()){
-            throw new DataNotFoundByIdException("Staff is not a night worker");
-        }
-//        List<QuestionAnswerPair> tempQAPair = ObjectMapperUtils.copyProperties(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class);
-        // TODO Validate if questionnaire is being added after valid frequency
-       *//* if(!checkIfNightWorkerQuestionnaireFormIsEnabled(staffId, nightWorker.getQuestionnaireFrequencyInMonths())){
-            throw new DataNotFoundByIdException("Questionnaire for night worker is not enabled yet");
-        }*//*
-
-        StaffQuestionnaire staffQuestionnaire = new StaffQuestionnaire(AppConstants.QUESTIONNAIE_NAME_PREFIX+" "+ ,
-                ObjectMapperUtils.copyPropertiesOfListByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
-        save(staffQuestionnaire);
-        if(Optional.ofNullable(nightWorker.getStaffQuestionnairesId()).isPresent()){
-            nightWorker.getStaffQuestionnairesId().add(staffQuestionnaire.getId());
-        } else {
-            nightWorker.setStaffQuestionnairesId(new ArrayList<BigInteger>() {{
-                add(staffQuestionnaire.getId());
-            }});
-        }
-        save(nightWorker);
-        answerResponseDTO.setId(staffQuestionnaire.getId());
-        answerResponseDTO.setName(staffQuestionnaire.getName());
-        return answerResponseDTO;
-    }*/
-
     public QuestionnaireAnswerResponseDTO updateNightWorkerQuestionnaire(Long unitId, Long staffId, BigInteger questionnaireId, QuestionnaireAnswerResponseDTO answerResponseDTO){
 
-//        NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
-        /*if(!Optional.ofNullable(nightWorker).isPresent()){
-            throw new DataNotFoundByIdException("Staff is not a night worker");
-        }*/
         StaffQuestionnaire staffQuestionnaire = staffQuestionnaireMongoRepository.findByIdAndDeleted(questionnaireId);
 
-        Predicate<QuestionAnswerDTO> predicate = s -> !Optional.ofNullable(s.getAnswer()).isPresent();//s.getAnswer().equals(null);
+        // Predicate to check if any question is unanswere ( null)
+        Predicate<QuestionAnswerDTO> predicate = s -> !Optional.ofNullable(s.getAnswer()).isPresent();
         if(!staffQuestionnaire.isSubmitted() && ! (answerResponseDTO.getQuestionAnswerPair().stream().anyMatch(predicate)) ){
             staffQuestionnaire.setSubmitted(true);
+            staffQuestionnaire.setSubmittedOn(DateUtils.getLocalDateFromDate(DateUtils.getDate()));
             answerResponseDTO.setSubmitted(true);
         }
         staffQuestionnaire.setQuestionAnswerPair(ObjectMapperUtils.copyPropertiesOfListByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
@@ -159,6 +109,7 @@ public class NightWorkerService extends MongoBaseService {
         return staffQuestionnaire;
     }
 
+    // Function will called for scheduled job
     public void createNightWorkerQuestionnaireForStaff(Long staffId){
 
         StaffQuestionnaire staffQuestionnaire = addDefaultStaffQuestionnaire();

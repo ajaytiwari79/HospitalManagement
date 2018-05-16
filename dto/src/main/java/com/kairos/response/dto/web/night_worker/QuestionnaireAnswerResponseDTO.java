@@ -20,6 +20,7 @@ public class QuestionnaireAnswerResponseDTO {
     private String name;
     private List<QuestionAnswerDTO> questionAnswerPair;
     private boolean submitted;
+    private LocalDate submittedOn;
 
     public QuestionnaireAnswerResponseDTO(){
         // default constructor
@@ -60,5 +61,13 @@ public class QuestionnaireAnswerResponseDTO {
 
     public void setSubmitted(boolean submitted) {
         this.submitted = submitted;
+    }
+
+    public LocalDate getSubmittedOn() {
+        return submittedOn;
+    }
+
+    public void setSubmittedOn(LocalDate submittedOn) {
+        this.submittedOn = submittedOn;
     }
 }
