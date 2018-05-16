@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
-import com.kairos.response.dto.web.organizationtype_service_dto.OrganizationTypeAndSubTypeResponseDto;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -91,7 +90,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     @Query("Match (expertise:Expertise{deleted:false})-[:BELONGS_TO]->(country:Country) where id(country)={0}  AND expertise.startDateMillis<={2} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {2}) with expertise, country\n" +
             "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} WITH expertise,country,r\n" +
-            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(country)  with r,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
+            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(clause_tag:Tag)<-[COUNTRY_HAS_TAG]-(country)  with r,expertise, CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as tags\n" +
             "return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as expertise")
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId, Long selectedDateMillis);
 
@@ -154,8 +153,8 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
 
     //bobby
-    @Query("MATCH (n:OrganizationType) where id(n) IN{0}  return  id(n),n.name")
-    List<OrganizationType> getAllOrganizationTypeByIds(Set<Long> orgTypeId);
+    @Query("MATCH (n:OrganizationType) where id(n) IN {0} return id(n) as id,  n.name as name")
+    List<OrganizationBasicResponse> getAllOrganizationTypeByIds(Set<Long> orgTypeId);
     //bobby
 
     @Query("MATCH (n:OrganizationType)  return n")

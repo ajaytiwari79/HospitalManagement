@@ -1,12 +1,18 @@
 package com.kairos.service.processing_activity;
 
+import com.kairos.client.OrganizationTypeRestClient;
+import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
+import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.processing_activity.MasterProcessingActivity;
+import com.kairos.persistance.model.processing_activity.dto.MasterProcessingActivityDto;
 import com.kairos.persistance.repository.processing_activity.MasterProcessingActivityRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,52 +20,66 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
-public class MasterProcessingActivityService  extends MongoBaseService {
+public class MasterProcessingActivityService extends MongoBaseService {
 
 
+    @Inject
+    OrganizationTypeRestClient organizationTypeAndServiceRestClient;
 
-@Inject
-private MasterProcessingActivityRepository masterProcessingActivityRepository;
+    @Inject
+    MasterProcessingActivityRepository masterProcessingActivityRepository;
 
-    public MasterProcessingActivity createMasterProcessingActivity(MasterProcessingActivity   masterProcessingActivity) {
 
-        if (StringUtils.isEmpty(masterProcessingActivity.getDescription())||StringUtils.isEmpty(masterProcessingActivity.getName())) {
-            throw new RequestDataNull("Global asset description and name cannotbe null");
-        } else {
+    @Inject
+    ComparisonUtils comparisonUtils;
 
-            if(masterProcessingActivityRepository.findByName(masterProcessingActivity.getName())!=null)
-            {
-                System.err.println("+++++++++++++++++++++++++++++++++++++");
-                throw new DuplicateDataException("asset for name "+masterProcessingActivity.getName()+" already exists");
-            }
-            MasterProcessingActivity newAsset=new MasterProcessingActivity();
-            List<Long> organizationType, organizationSubType, organizationService, organizationSubService;
-            organizationType = masterProcessingActivity.getOrganisationType();
-            organizationSubType = masterProcessingActivity.getOrganisationSubType();
-            organizationService = masterProcessingActivity.getOrganisationService();
-            organizationSubService = masterProcessingActivity.getOrganisationSubService();
+    public MasterProcessingActivity addMasterProcessingActivity(MasterProcessingActivityDto masterProcessingActivityDto) {
 
-            if (organizationType != null && !organizationType.isEmpty()) {
-                newAsset.setOrganisationType(organizationType);
-            }
-            if (organizationSubType != null && !organizationSubType.isEmpty()) {
-                newAsset.setOrganisationSubType(organizationSubType);
-            }
+        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
+        orgTypeIds = masterProcessingActivityDto.getOrganisationType();
+        orgSubTypeIds = masterProcessingActivityDto.getOrganisationSubType();
+        orgServiceIds = masterProcessingActivityDto.getOrganisationService();
+        orgSubServiceIds = masterProcessingActivityDto.getOrganisationSubService();
+        MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity();
 
-            if (organizationService != null && !organizationService.isEmpty()) {
-                newAsset.setOrganisationService(organizationService);
-            }
+        if (masterProcessingActivityRepository.findByName(masterProcessingActivityDto.getName()) != null) {
+            throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
+        }
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto();
+        requestDto.setOrganizationTypeIds(orgTypeIds);
+        requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
+        requestDto.setOrganizationServiceIds(orgServiceIds);
+        requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
+        OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
-            if (organizationSubService != null && !organizationSubService.isEmpty()) {
-                newAsset.setOrganisationSubService(organizationSubService);
-            }
-            newAsset.setName(masterProcessingActivity.getName());
-            newAsset.setDescription(masterProcessingActivity.getDescription());
-            return save(newAsset);
+        if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
+
+            List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
+            comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
+            masterProcessingActivity.setOrganisationSubType(orgSubTypes);
 
         }
+        if (orgServiceIds != null && orgServiceIds.size() != 0) {
+            List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
+            comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
+            masterProcessingActivity.setOrganisationService(orgServices);
+
+
+        }
+        if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
+            List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
+            comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
+            masterProcessingActivity.setOrganisationSubService(orgSubServices);
+
+        }
+        comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
+        masterProcessingActivity.setOrganisationType(requestResult.getOrganizationTypes());
+        masterProcessingActivity.setName(masterProcessingActivityDto.getName());
+        masterProcessingActivity.setDescription(masterProcessingActivityDto.getDescription());
+        return save(masterProcessingActivity);
 
 
     }
@@ -75,38 +95,55 @@ private MasterProcessingActivityRepository masterProcessingActivityRepository;
     }
 
 
-    public MasterProcessingActivity updateMasterProcessingActivity(BigInteger id, MasterProcessingActivity masterProcessingActivity) {
+    public MasterProcessingActivity updateMasterProcessingActivity(BigInteger id, MasterProcessingActivityDto masterProcessingActivityDto) {
+
+        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
+        orgTypeIds = masterProcessingActivityDto.getOrganisationType();
+        orgSubTypeIds = masterProcessingActivityDto.getOrganisationSubType();
+        orgServiceIds = masterProcessingActivityDto.getOrganisationService();
+        orgSubServiceIds = masterProcessingActivityDto.getOrganisationSubService();
+
         MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
-        } else {
-            List<Long> organizationType, organizationSubType, organizationService, organizationSubService;
-            organizationType = masterProcessingActivity.getOrganisationType();
-            organizationSubType = masterProcessingActivity.getOrganisationSubType();
-            organizationService = masterProcessingActivity.getOrganisationService();
-            organizationSubService = masterProcessingActivity.getOrganisationSubService();
-            if (StringUtils.isEmpty(masterProcessingActivity.getDescription()))
-            {
-                throw new RequestDataNull("description cannot be null");
-            }
-            if (organizationType != null && !organizationType.isEmpty()) {
-                exists.setOrganisationType(organizationType);
-            }
-            if (organizationSubType != null && !organizationSubType.isEmpty()) {
-                exists.setOrganisationSubType(organizationSubType);
-            }
-            if (organizationService != null && !organizationService.isEmpty()) {
-                exists.setOrganisationService(organizationService);
-            }
-            if (organizationSubService != null && !organizationSubService.isEmpty()) {
-                exists.setOrganisationSubService(organizationSubService);
-            }
         }
-        exists.setName(masterProcessingActivity.getName());
-        exists.setDescription(masterProcessingActivity.getDescription());
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto();
+        requestDto.setOrganizationTypeIds(orgTypeIds);
+        requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
+        requestDto.setOrganizationServiceIds(orgServiceIds);
+        requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
+        OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
+
+        if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
+
+            List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
+            comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
+            exists.setOrganisationSubType(orgSubTypes);
+
+        }
+        if (orgServiceIds != null && orgServiceIds.size() != 0) {
+            List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
+            comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
+            exists.setOrganisationService(orgServices);
+
+
+        }
+        if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
+            List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
+            comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
+            exists.setOrganisationSubService(orgSubServices);
+
+        }
+        comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
+        exists.setOrganisationType(requestResult.getOrganizationTypes());
+
+
+        exists.setName(masterProcessingActivityDto.getName());
+        exists.setDescription(masterProcessingActivityDto.getDescription());
         return save(exists);
     }
+
 
     public MasterProcessingActivity getMasterProcessingActivityById(BigInteger id) {
         MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
@@ -121,7 +158,7 @@ private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
     public Boolean deleteMasterProcessingActivity(BigInteger id) {
         MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
-        if (exists==null) {
+        if (exists == null) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         } else
@@ -140,9 +177,6 @@ private MasterProcessingActivityRepository masterProcessingActivityRepository;
             return exists;
 
     }
-
-
-
 
 
 }

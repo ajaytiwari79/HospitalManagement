@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ClauseDto {
 
@@ -22,11 +23,21 @@ public class ClauseDto {
     @NotNull(message = "error.clause.title.cannotbe.null")
     private String description;
 
+    @NotNull(message = "error.message.list.cannot.be.null")
+    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    private Set<Long> organisationType;
 
-    private List<Long> organizationServiceIds;
-    private List<Long> organizationTypeIds;
-    private List<Long> organizationSubServiceIds;
-    private List<Long> organizationSubTypeIds;
+    @NotNull(message = "error.message.list.cannot.be.null")
+    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    private Set <Long> organisationSubType;
+
+    @NotNull(message = "error.message.list.cannot.be.null")
+    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    private Set <Long>organisationService;
+
+    @NotNull(message = "error.message.list.cannot.be.null")
+    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    private Set <Long> organisationSubService;
 
     private List<BigInteger> accountType;
 
@@ -42,20 +53,52 @@ public class ClauseDto {
         return description;
     }
 
-    public List<Long> getOrganizationServiceIds() {
-        return organizationServiceIds;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public List<Long> getOrganizationTypeIds() {
-        return organizationTypeIds;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
-    public List<Long> getOrganizationSubServiceIds() {
-        return organizationSubServiceIds;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public List<Long> getOrganizationSubTypeIds() {
-        return organizationSubTypeIds;
+    public Set<Long> getOrganisationType() {
+        return organisationType;
+    }
+
+    public void setOrganisationType(Set<Long> organisationType) {
+        this.organisationType = organisationType;
+    }
+
+    public Set<Long> getOrganisationSubType() {
+        return organisationSubType;
+    }
+
+    public void setOrganisationSubType(Set<Long> organisationSubType) {
+        this.organisationSubType = organisationSubType;
+    }
+
+    public Set<Long> getOrganisationService() {
+        return organisationService;
+    }
+
+    public void setOrganisationService(Set<Long> organisationService) {
+        this.organisationService = organisationService;
+    }
+
+    public Set<Long> getOrganisationSubService() {
+        return organisationSubService;
+    }
+
+    public void setOrganisationSubService(Set<Long> organisationSubService) {
+        this.organisationSubService = organisationSubService;
+    }
+
+    public void setAccountType(List<BigInteger> accountType) {
+        this.accountType = accountType;
     }
 
     public List<BigInteger> getAccountType() {

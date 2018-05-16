@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
+import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigInteger;
 import java.util.*;
@@ -41,7 +42,7 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping("/add_clause")
-    public ResponseEntity<Object> createClause(@Validated @RequestBody ClauseDto clauseDto) {
+    public ResponseEntity<Object> createClause(@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(clauseDto));
     }
 
@@ -99,7 +100,7 @@ public class ClauseController {
 
     @ApiOperation("update clause description")
     @PutMapping("/update/clause/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) {
+    public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
 
         if (clauseId!=null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(clauseId, clauseDto));

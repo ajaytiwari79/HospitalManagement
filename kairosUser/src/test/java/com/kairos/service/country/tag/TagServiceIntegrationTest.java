@@ -67,7 +67,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Tag>> response = restTemplate.exchange(
-                baseUrl+"/tag",
+                baseUrl+"/clause_tag",
                 HttpMethod.POST, requestBodyData, resTypeReference);
 
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
@@ -93,7 +93,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Tag>> response = restTemplate.exchange(
-                baseUrl+"/tag/"+createdTagId,
+                baseUrl+"/clause_tag/"+createdTagId,
                 HttpMethod.PUT, requestBodyData, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
@@ -109,7 +109,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,Object>>> response = restTemplate.exchange(
-                baseUrl+"/tag",
+                baseUrl+"/clause_tag",
                 HttpMethod.GET, null, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
@@ -132,7 +132,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
-                baseUrl+"/tag/"+createdTagId,
+                baseUrl+"/clause_tag/"+createdTagId,
                 HttpMethod.DELETE, null, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
@@ -150,7 +150,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Tag>> response = restTemplate.exchange(
-                baseUrl+"/tag?type=Organization",
+                baseUrl+"/clause_tag?type=Organization",
                 HttpMethod.POST, requestBodyData, resTypeReference);
 
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
@@ -176,7 +176,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Tag>> response = restTemplate.exchange(
-                baseUrl+"/tag/"+createdOrgTagId+"?type=Organization",
+                baseUrl+"/clause_tag/"+createdOrgTagId+"?type=Organization",
                 HttpMethod.PUT, requestBodyData, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
@@ -197,7 +197,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
-                baseUrl+"/tag/"+createdOrgTagId+"?type=Organization",
+                baseUrl+"/clause_tag/"+createdOrgTagId+"?type=Organization",
                 HttpMethod.DELETE, null, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
@@ -212,7 +212,7 @@ public class TagServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,Object>>> response = restTemplate.exchange(
-                baseUrl+"/tag?type=Organization",
+                baseUrl+"/clause_tag?type=Organization",
                 HttpMethod.GET, null, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||

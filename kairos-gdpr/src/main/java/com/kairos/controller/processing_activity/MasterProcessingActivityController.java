@@ -2,12 +2,14 @@ package com.kairos.controller.processing_activity;
 
 
 import com.kairos.persistance.model.processing_activity.MasterProcessingActivity;
+import com.kairos.persistance.model.processing_activity.dto.MasterProcessingActivityDto;
 import com.kairos.service.processing_activity.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import static com.kairos.constant.ApiConstant.API_MASTER_PROCESSING_ACTIVITY;
 import javax.inject.Inject;
@@ -27,8 +29,8 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "add MasterProcessingActivity asset")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<Object> createMasterProcessingActivity(@RequestBody MasterProcessingActivity processingActivity) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(processingActivity));
+    public ResponseEntity<Object> createMasterProcessingActivity(@Validated  @RequestBody MasterProcessingActivityDto processingActivityDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.addMasterProcessingActivity(processingActivityDto));
     }
 
     @ApiOperation(value = "get all MasterProcessingActivity")
@@ -39,8 +41,8 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable BigInteger id, @RequestBody MasterProcessingActivity processingActivity) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(id, processingActivity));
+    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable BigInteger id, @RequestBody MasterProcessingActivityDto processingActivityDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(id, processingActivityDto));
     }
 
     @ApiOperation(value = "delete MasterProcessingActivity")

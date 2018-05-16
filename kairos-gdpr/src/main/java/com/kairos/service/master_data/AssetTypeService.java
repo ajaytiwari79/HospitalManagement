@@ -21,7 +21,7 @@ public class AssetTypeService extends MongoBaseService {
 
 
     @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
+     AssetTypeMongoRepository assetTypeMongoRepository;
 
 
 

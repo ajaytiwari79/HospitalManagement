@@ -19,13 +19,12 @@ import java.util.Optional;
 @Service
 public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
-@Inject
+    @Inject
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;
 
 
     public OrganizationalSecurityMeasure createOrganizationalSecurityMeasure(String orgSecurityMeasure) {
-        if (StringUtils.isEmpty(orgSecurityMeasure))
-        {
+        if (StringUtils.isEmpty(orgSecurityMeasure)) {
             throw new RequestDataNull("requested orgSecurityMeasure name is null");
 
         }
@@ -42,13 +41,12 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     public List<OrganizationalSecurityMeasure> getAllOrganizationalSecurityMeasure() {
         List<OrganizationalSecurityMeasure> result = organizationalSecurityMeasureMongoRepository.findAll();
-        if (result.size()!=0) {
+        if (result.size() != 0) {
             return result;
 
         } else
             throw new DataNotExists("OrganizationalSecurityMeasure not exist please create purpose ");
     }
-
 
 
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureById(BigInteger id) {
@@ -61,7 +59,6 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
         }
     }
-
 
 
     public Boolean deleteOrganizationalSecurityMeasureById(BigInteger id) {
@@ -77,10 +74,9 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public OrganizationalSecurityMeasure updateOrganizationalSecurityMeasure(BigInteger id,String orgSecurityMeasure) {
+    public OrganizationalSecurityMeasure updateOrganizationalSecurityMeasure(BigInteger id, String orgSecurityMeasure) {
 
-        if (StringUtils.isEmpty(orgSecurityMeasure))
-        {
+        if (StringUtils.isEmpty(orgSecurityMeasure)) {
             throw new RequestDataNull("requested orgSecurityMeasure name is null");
 
         }
@@ -93,10 +89,6 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
         }
     }
-
-
-
-
 
 
 }

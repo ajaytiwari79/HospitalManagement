@@ -68,7 +68,7 @@ public class TagService extends UserBaseService {
             throw new DataNotFoundByIdException("Tag does not exist with id " +tagId );
         }
 
-        /*if(! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
+        /*if(! ( clause_tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
             throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
         }*/
         if( ! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
@@ -126,7 +126,7 @@ public class TagService extends UserBaseService {
         }
         Tag tag = tagGraphRepository.getCountryTag(countryId, tagId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
+            throw new DataNotFoundByIdException("Incorrect clause_tag id " + tagId);
         }
         tag.setDeleted(true);
         save(tag);
@@ -180,7 +180,7 @@ public class TagService extends UserBaseService {
         }
         Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
+            throw new DataNotFoundByIdException("Incorrect clause_tag id " + tagId);
         }
         tag.setDeleted(true);
         save(tag);

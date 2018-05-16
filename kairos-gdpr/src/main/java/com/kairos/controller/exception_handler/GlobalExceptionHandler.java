@@ -1,10 +1,7 @@
 package com.kairos.controller.exception_handler;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.WorkSpaceExistException;
+import com.kairos.custome_exception.*;
 import com.kairos.controller.exception_handler.dto.FieldErrorDTO;
 import com.kairos.controller.exception_handler.dto.ResponseEnvelope;
 import org.springframework.core.annotation.Order;
@@ -68,7 +65,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 }
 
-    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class})
+    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class,OrganizationTypeException.class})
     @ResponseBody
     protected ResponseEntity<Object> duplicateDataException(RuntimeException ex , HttpServletRequest request)
     {

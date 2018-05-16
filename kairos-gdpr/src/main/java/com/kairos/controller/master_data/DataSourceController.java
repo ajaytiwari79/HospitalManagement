@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
 
+import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
 
 
 @RestController
@@ -24,16 +24,13 @@ import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
 public class DataSourceController {
 
 
-
-
     @Inject
     private DataSourceService dataSourceService;
 
 
-
     @ApiOperation("add dataSource")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSource(@RequestBody @Validated DataSource dataSource) {
+    public ResponseEntity<Object> createDataSource(@RequestParam String dataSource) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(dataSource));
 
     }
@@ -64,14 +61,10 @@ public class DataSourceController {
 
     @ApiOperation("update dataSource by id")
     @PutMapping("/update/id/{id}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable BigInteger id, @Valid @RequestBody DataSource dataSource) {
+    public ResponseEntity<Object> updateDataSource(@PathVariable BigInteger id, @RequestParam String dataSource) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(id, dataSource));
 
     }
-
-
-
-
 
 
 }

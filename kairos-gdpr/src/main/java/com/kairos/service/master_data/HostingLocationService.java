@@ -58,7 +58,7 @@ public class HostingLocationService  extends MongoBaseService {
 
         HostingLocation exist = hostingLocationMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             return exist;
 
@@ -71,7 +71,7 @@ public class HostingLocationService  extends MongoBaseService {
 
         HostingLocation exist = hostingLocationMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             hostingLocationMongoRepository.delete(exist);
             return true;
@@ -88,7 +88,7 @@ public class HostingLocationService  extends MongoBaseService {
         }
         HostingLocation exist = hostingLocationMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             exist.setName(hostingLocation);
             return save(exist);

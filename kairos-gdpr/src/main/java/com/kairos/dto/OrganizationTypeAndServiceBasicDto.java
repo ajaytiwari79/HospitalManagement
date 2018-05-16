@@ -1,11 +1,12 @@
-package com.kairos.persistance.model.dto;
-
-public class CustomOrganizationTypeAndServiceDto {
+package com.kairos.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrganizationTypeAndServiceBasicDto {
     private Long id;
     private String name;
-
 
     public Long getId() {
         return id;
@@ -22,8 +23,7 @@ public class CustomOrganizationTypeAndServiceDto {
     public void setName(String name) {
         this.name = name;
     }
-
-    public CustomOrganizationTypeAndServiceDto()
-    {}
+     public OrganizationTypeAndServiceBasicDto()
+     {}
 
 }

@@ -24,12 +24,10 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public TechnicalSecurityMeasure createTechnicalSecurityMeasure(String techSecurityMeasure) {
-        if (StringUtils.isEmpty(techSecurityMeasure))
-        {
+        if (StringUtils.isEmpty(techSecurityMeasure)) {
             throw new RequestDataNull("requested techSecurityMeasure name is null");
 
         }
-
         TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(techSecurityMeasure);
         if (Optional.ofNullable(exist).isPresent()) {
             throw new DuplicateDataException("data already exist for " + techSecurityMeasure);
@@ -55,7 +53,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
         TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
             return exist;
 
@@ -67,7 +65,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
         TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
             technicalSecurityMeasureMongoRepository.delete(exist);
             return true;
@@ -77,15 +75,14 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(BigInteger id, String techSecurityMeasure) {
-        if (StringUtils.isEmpty(techSecurityMeasure))
-        {
+        if (StringUtils.isEmpty(techSecurityMeasure)) {
             throw new RequestDataNull("requested techSecurityMeasure name is null");
 
         }
 
         TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
             exist.setName(techSecurityMeasure);
             return save(exist);

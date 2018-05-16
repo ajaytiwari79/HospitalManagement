@@ -1,15 +1,16 @@
 package com.kairos.service.organization;
 
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.client.dto.gdpr.OrganizationTypeAndServiceRequestDto;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
-import com.kairos.response.dto.web.organizationtype_service_dto.OrganizationServiceResponseDto;
+import com.kairos.response.dto.web.gdpr.OrganizationTypeAndServiceResponseDto;
 import com.kairos.response.dto.web.organizationtype_service_dto.OrganizationTypeAndSubTypeResponseDto;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
@@ -35,6 +36,9 @@ public class OrganizationTypeService extends UserBaseService {
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     CountryGraphRepository countryGraphRepository;
+
+    @Inject
+    OrganizationServiceRepository organizationServiceRepository;
 
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
 
@@ -191,99 +195,33 @@ public class OrganizationTypeService extends UserBaseService {
     }
 
 
-    //bobby getAllOrganizationTypeByIds
-    public Map<Long,OrganizationType> getAllOrganizationTypeByIds(Set<Long> orgTypeId) {
+    //bobby getAllOrganizationTypeAndSubTypesByIds
+    public List<OrganizationBasicResponse> getAllOrganizationTypeByIds(Set<Long> orgTypeId) {
 
-        List<OrganizationType> organizationTypes=organizationTypeGraphRepository.getAllOrganizationTypeByIds(orgTypeId);
-        Map<Long,OrganizationType> gdprOrgTypeAndSubTypes = organizationTypes.stream()
-                .collect(Collectors.toMap(OrganizationType::getId, OrganizationType::basicDetails));
-return gdprOrgTypeAndSubTypes;
-    }
-
-    /*public List<OrganizationType> getAllOrganizationSubTypeByIds(Set<Long> orgTypeId) {
-        return organizationTypeGraphRepository.getAllOrganizationSubTypeByIds(orgTypeId);
-    }
-*/
-
-  /*  //bobby organikzation type and service list and sub service
-    public List<OrganizationTypeAndSubTypeResponseDto> getOrgTypeAndOrgServicesResponseDto() {
-
-        List<OrganizationTypeAndSubTypeResponseDto> OrganizationTypeAndSubTypeResponseDto = new ArrayList<>();
-
-        List<OrganizationType> organizationTypes = organizationTypes();
-        ListIterator<OrganizationType> iterator = organizationTypes.listIterator();
-        while (iterator.hasNext()) {
-            OrganizationType organizationType=iterator.next();
-            OrganizationTypeAndSubTypeResponseDto orgTypeAndServiceDto = new OrganizationTypeAndSubTypeResponseDto();
-            Long orgId = organizationType.getId();
-            orgTypeAndServiceDto.setId(orgId);
-            orgTypeAndServiceDto.setName(organizationType.getName());
-            List<Long> orgSubTypeIds = organizationTypeGraphRepository.getAllOrganizationSubTypeIds(organizationType.getId());
-
-            List<OrganizationTypeAndSubTypeResponseDto> organizationSubTypeList = new ArrayList<>();
-            for (Long orgSubTypeid : orgSubTypeIds) {
-                System.err.println("++++++orgsubType +++++++++++++");
-
-                OrganizationType orgSubType = organizationTypeGraphRepository.getOrganizationSubTypeById(orgId, orgSubTypeid);
-                System.err.println("++++++orgsubType +++++++++++++"+orgSubType.getName());
-                OrganizationTypeAndSubTypeResponseDto orgTypeSubType = new OrganizationTypeAndSubTypeResponseDto();
-                orgTypeSubType.setId(orgSubType.getId());
-                orgTypeSubType.setName(orgSubType.getName());
-                List<OrganizationService> organizationServiceList = organizationTypeGraphRepository.getOrganizationServiceListOnOrganizationSubType(orgSubType.getId());
-                if (organizationServiceList.size() != 0) {
-                    System.err.println("++++++organizationServiceList +++++++++++++"+organizationServiceList);
-                    List<OrganizationServiceResponseDto> OrgServiceListByOrgtanizationSubType = getOrgServiceListByOrgtanizationSubType(organizationServiceList);
-                    orgTypeSubType.setOrganizationServiceList(OrgServiceListByOrgtanizationSubType);
-                }
-                organizationSubTypeList.add(orgTypeSubType);
-
-            }
-            orgTypeAndServiceDto.setOrganizationSubType(organizationSubTypeList);
-            OrganizationTypeAndSubTypeResponseDto.add(orgTypeAndServiceDto);
-
-        }
-        return OrganizationTypeAndSubTypeResponseDto;
-
+        List<OrganizationBasicResponse> organizationTypes = organizationTypeGraphRepository.getAllOrganizationTypeByIds(orgTypeId);
+//        List<OrganizationBasicResponse> organizationServices=organizationServiceRepository.getAllOrganizationServicesByIds(orgTypeId7);
+        return organizationTypes;
     }
 
 
-    public List<OrganizationServiceResponseDto> getOrgServiceListByOrgtanizationSubType(List<OrganizationService> organizationServiceList) {
-        List<OrganizationServiceResponseDto> organiazationServiceList = new ArrayList<>();
-        ListIterator<OrganizationService> iterator = organizationServiceList.listIterator();
-        while (iterator.hasNext()) {
-            System.err.println("++++++serviceList+++++++++++++");
-            OrganizationService  organizationService=(OrganizationService)iterator.next();
-            OrganizationServiceResponseDto organizationServiceResponseDto = new OrganizationServiceResponseDto();
-            if (organizationService!=null) {
-                organizationServiceResponseDto.setId(organizationService.getId());
-            organizationServiceResponseDto.setName(organizationService.getName());
-               *//* OrganizationServiceResponseDto organizationSubServiceResponseDto = new OrganizationServiceResponseDto();
-                organizationSubServiceResponseDto.setId(iterator.next().getId());
-                organizationSubServiceResponseDto.setName(iterator.next().getName());
-*//*
-            }
-            organiazationServiceList.add(organizationServiceResponseDto);
-        }
-
-        return organiazationServiceList;
-    }
-
-
-
-    public List<OrganizationType> organizationTypes() {
-        return organizationTypeGraphRepository.getAllOrganizationTypeByIds();
-    }
-*/
-
-    public List<OrganizationTypeAndSubTypeResponseDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId)
-    {
+    public List<OrganizationTypeAndSubTypeResponseDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId) {
         List<Map> organizationType = organizationTypeGraphRepository.getAllOrganizationTypeAndServiceAndSubServices(countryId);
         List<OrganizationTypeAndSubTypeResponseDto> list = new ArrayList<>();
-        organizationType.forEach(o->{
-            list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"),OrganizationTypeAndSubTypeResponseDto.class));
+        organizationType.forEach(o -> {
+            list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeResponseDto.class));
         });
         return list;
     }
 
+
+    public OrganizationTypeAndServiceResponseDto organizationTypesAndServicesAndSubTypes(OrganizationTypeAndServiceRequestDto requestDto) {
+        OrganizationTypeAndServiceResponseDto responseDtoResult = new OrganizationTypeAndServiceResponseDto();
+        responseDtoResult.setOrganizationTypes(organizationTypeGraphRepository.getAllOrganizationTypeByIds(requestDto.getOrganizationTypeIds()));
+        responseDtoResult.setOrganizationSubTypes(organizationTypeGraphRepository.getAllOrganizationTypeByIds(requestDto.getOrganizationSubTypeIds()));
+        responseDtoResult.setOrganizationServices(organizationServiceRepository.getAllOrganizationServicesByIds(requestDto.getOrganizationServiceIds()));
+        responseDtoResult.setOrganizationSubServices(organizationServiceRepository.getAllOrganizationServicesByIds(requestDto.getOrganizationSubServiceIds()));
+        return responseDtoResult;
+
+    }
 
 }

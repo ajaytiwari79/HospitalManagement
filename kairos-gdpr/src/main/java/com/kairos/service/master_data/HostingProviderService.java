@@ -21,14 +21,12 @@ import java.util.Optional;
 public class HostingProviderService extends MongoBaseService {
 
 
-@Inject
+    @Inject
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
-
     public HostingProvider createHostingProvider(String hostingProvider) {
-        if (StringUtils.isEmpty(hostingProvider))
-        {
+        if (StringUtils.isEmpty(hostingProvider)) {
             throw new RequestDataNull("requested hostingProvider is null");
 
         }
@@ -45,13 +43,12 @@ public class HostingProviderService extends MongoBaseService {
 
     public List<HostingProvider> getAllHostingProvider() {
         List<HostingProvider> result = hostingProviderMongoRepository.findAll();
-        if (result.size()!=0) {
+        if (result.size() != 0) {
             return result;
 
         } else
             throw new DataNotExists("HostingProvider not exist please create purpose ");
     }
-
 
 
     public HostingProvider getHostingProviderById(BigInteger id) {
@@ -64,7 +61,6 @@ public class HostingProviderService extends MongoBaseService {
 
         }
     }
-
 
 
     public Boolean deleteHostingProviderById(BigInteger id) {
@@ -80,10 +76,9 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public HostingProvider updateHostingProvider(BigInteger id,String hostingProvider) {
+    public HostingProvider updateHostingProvider(BigInteger id, String hostingProvider) {
 
-        if (StringUtils.isEmpty(hostingProvider))
-        {
+        if (StringUtils.isEmpty(hostingProvider)) {
             throw new RequestDataNull("requested hostingProvider is null");
 
         }
@@ -96,10 +91,6 @@ public class HostingProviderService extends MongoBaseService {
 
         }
     }
-
-
-
-
 
 
 }

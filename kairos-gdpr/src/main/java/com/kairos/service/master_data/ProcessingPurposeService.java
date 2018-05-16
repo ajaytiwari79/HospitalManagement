@@ -9,6 +9,7 @@ import com.kairos.persistance.model.master_data.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.ProcessingPurposeMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -23,14 +24,17 @@ public class ProcessingPurposeService extends MongoBaseService {
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
 
 
-    public ProcessingPurpose createProcessingPurpose(ProcessingPurpose processingPurpose) {
-        String name = processingPurpose.getName();
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByName(name);
+    public ProcessingPurpose createProcessingPurpose(String processingPurpose) {
+        if (StringUtils.isEmpty(processingPurpose))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByName(processingPurpose);
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data already exist for name " + name);
+            throw new DuplicateDataException("data already exist for name " + processingPurpose);
         } else {
             ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
-            newProcessingPurpose.setName(name);
+            newProcessingPurpose.setName(processingPurpose);
             return save(newProcessingPurpose);
         }
     }
@@ -50,7 +54,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
         ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             return exist;
 
@@ -62,7 +66,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
         ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             processingPurposeMongoRepository.delete(exist);
             return true;
@@ -71,12 +75,17 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public ProcessingPurpose updateProcessingPurpose(BigInteger id, ProcessingPurpose processingPurpose) {
+    public ProcessingPurpose updateProcessingPurpose(BigInteger id, String processingPurpose) {
+
+        if (StringUtils.isEmpty(processingPurpose))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
         ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            exist.setName(processingPurpose.getName());
+            exist.setName(processingPurpose);
             return save(exist);
 
         }

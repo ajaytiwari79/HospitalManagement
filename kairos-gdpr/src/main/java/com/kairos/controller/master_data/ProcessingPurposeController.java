@@ -29,7 +29,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("add pocessing purpose")
     @PostMapping("/add_purpose")
-    public ResponseEntity<Object> createProcessingPurpose(@Valid @RequestBody ProcessingPurpose processingPurpose) {
+    public ResponseEntity<Object> createProcessingPurpose(@RequestParam String  processingPurpose) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(processingPurpose));
 
     }
@@ -60,7 +60,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("update pocessing purpose by id")
     @PutMapping("/update/id/{id}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id, @Valid @RequestBody ProcessingPurpose processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id,@RequestParam String   processingPurpose) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(id, processingPurpose));
 
     }

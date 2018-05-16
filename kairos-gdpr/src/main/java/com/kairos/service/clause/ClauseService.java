@@ -1,10 +1,14 @@
 package com.kairos.service.clause;
 
+import com.kairos.client.OrganizationTypeRestClient;
+import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
+import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.DataNotExists;
 
 import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.clause.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.clause.dto.ClauseDto;
@@ -14,6 +18,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
+import com.kairos.utils.ComparisonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,14 +52,27 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private JackrabbitService jackrabbitService;
 
-    public Clause createClause(ClauseDto clauseDto) {
 
-        List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
-        orgServiceIds = clauseDto.getOrganizationServiceIds();
-        orgTypeIds = clauseDto.getOrganizationTypeIds();
+    @Inject
+    OrganizationTypeRestClient organizationTypeAndServiceRestClient;
+
+    @Inject
+    ComparisonUtils comparisonUtils;
+
+    public Clause createClause(ClauseDto clauseDto) throws RepositoryException {
+
+        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
+        orgTypeIds = clauseDto.getOrganisationType();
+        orgSubTypeIds = clauseDto.getOrganisationSubType();
+        orgServiceIds = clauseDto.getOrganisationService();
+        orgSubServiceIds = clauseDto.getOrganisationSubService();
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto();
+        requestDto.setOrganizationTypeIds(orgTypeIds);
+        requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
+        requestDto.setOrganizationServiceIds(orgServiceIds);
+        requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
+
         List<BigInteger> accountTypeIds = clauseDto.getAccountType();
-        orgSubServiceIds = clauseDto.getOrganizationServiceIds();
-        orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
         List<AccountType> accountTypes;
         List<String> tags = new ArrayList<>();
 
@@ -63,6 +81,7 @@ public class ClauseService extends MongoBaseService {
 
             throw new DuplicateDataException("clause with name title " + clauseDto.getTitle() + " already Exist");
         }
+        OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (Optional.ofNullable(clauseDto.getTags()).isPresent()) {
             tags = new ArrayList<>();
@@ -77,23 +96,35 @@ public class ClauseService extends MongoBaseService {
             throw new RequestDataNull("Accounttype list cannot be  empty");
         }
 
-        clause.setOrganizationServices(orgServiceIds);
-        clause.setOrganizationSubServices(orgSubServiceIds);
-        clause.setOrganizationTypes(orgTypeIds);
-        clause.setOrganizationSubTypes(orgSubTypeIds);
+        if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
+
+            List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
+            comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
+            clause.setOrganisationSubType(orgSubTypes);
+
+        }
+        if (orgServiceIds != null && orgServiceIds.size() != 0) {
+            List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
+            comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
+            clause.setOrganisationService(orgServices);
+
+
+        }
+        if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
+            List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
+            comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
+            clause.setOrganisationSubService(orgSubServices);
+
+        }
+        comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
+        clause.setOrganisationType(requestResult.getOrganizationTypes());
         clause.setAccountTypes(accountTypes);
         clause.setTitle(clauseDto.getTitle());
         clause.setDescription(clauseDto.getDescription());
         clause.setTags(tags);
         clause = save(clause);
-        try {
-            jackrabbitService.addClause(clause);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
+        jackrabbitService.addClause(clause);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         return clause;
     }
@@ -119,16 +150,21 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(BigInteger clauseId, ClauseDto clauseDto) {
+    public Clause updateClause(BigInteger clauseId, ClauseDto clauseDto) throws RepositoryException {
         Clause exists = clauseRepository.findByid(clauseId);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotExists("clause for given id " + clauseId + " not exist");
         } else {
-            List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
-            orgServiceIds = clauseDto.getOrganizationServiceIds();
-            orgTypeIds = clauseDto.getOrganizationTypeIds();
-            orgSubServiceIds = clauseDto.getOrganizationServiceIds();
-            orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
+            Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
+            orgTypeIds = clauseDto.getOrganisationType();
+            orgSubTypeIds = clauseDto.getOrganisationSubType();
+            orgServiceIds = clauseDto.getOrganisationService();
+            orgSubServiceIds = clauseDto.getOrganisationSubService();
+            OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto();
+            requestDto.setOrganizationTypeIds(orgTypeIds);
+            requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
+            requestDto.setOrganizationServiceIds(orgServiceIds);
+            requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
             List<AccountType> accountTypes = new ArrayList<>();
             List<BigInteger> accountTypeIds = clauseDto.getAccountType();
             List<String> tags = new ArrayList<>();
@@ -141,22 +177,33 @@ public class ClauseService extends MongoBaseService {
             } else {
                 throw new RequestDataNull("Accounttype list cannot be  empty");
             }
-            exists.setOrganizationServices(orgServiceIds);
-            exists.setOrganizationSubServices(orgSubServiceIds);
-            exists.setOrganizationTypes(orgTypeIds);
-            exists.setOrganizationSubTypes(orgSubTypeIds);
+            OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
+
+            if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
+
+                List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
+                comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
+                exists.setOrganisationSubType(orgSubTypes);
+            }
+            if (orgServiceIds != null && orgServiceIds.size() != 0) {
+                List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
+                comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
+                exists.setOrganisationService(orgServices);
+
+            }
+            if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
+                List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
+                comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
+                exists.setOrganisationSubService(orgSubServices);
+            }
+            comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
+            exists.setOrganisationType(requestResult.getOrganizationTypes());
             exists.setAccountTypes(accountTypes);
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tags);
             exists.setTitle(clauseDto.getTitle());
-            try {
-                jackrabbitService.clauseVersioning(clauseId, exists);
-            } catch (RepositoryException e) {
-                e.printStackTrace();
+            jackrabbitService.clauseVersioning(clauseId, exists);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
         return save(exists);

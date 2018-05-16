@@ -1,6 +1,7 @@
 package com.kairos.persistance.model.processing_activity;
 
 
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,11 +18,12 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-    private List<Long> organisationType;
+    private List<OrganizationTypeAndServiceBasicDto> organisationType;
 
-    private List <Long> organisationSubType;
-    private List <Long> organisationService;
-    private List <Long> organisationSubService;
+    private List <OrganizationTypeAndServiceBasicDto> organisationSubType;
+    private List <OrganizationTypeAndServiceBasicDto>organisationService;
+    private List <OrganizationTypeAndServiceBasicDto> organisationSubService;
+
 
     public String getName() {
         return name;
@@ -39,35 +41,40 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<Long> getOrganisationType() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganisationType() {
         return organisationType;
     }
 
-    public void setOrganisationType(List<Long> organisationType) {
+    public void setOrganisationType(List<OrganizationTypeAndServiceBasicDto> organisationType) {
         this.organisationType = organisationType;
     }
 
-    public List<Long> getOrganisationSubType() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganisationSubType() {
         return organisationSubType;
     }
 
-    public void setOrganisationSubType(List<Long> organisationSubType) {
+    public void setOrganisationSubType(List<OrganizationTypeAndServiceBasicDto> organisationSubType) {
         this.organisationSubType = organisationSubType;
     }
 
-    public List<Long> getOrganisationService() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganisationService() {
         return organisationService;
     }
 
-    public void setOrganisationService(List<Long> organisationService) {
+    public void setOrganisationService(List<OrganizationTypeAndServiceBasicDto> organisationService) {
         this.organisationService = organisationService;
     }
 
-    public List<Long> getOrganisationSubService() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganisationSubService() {
         return organisationSubService;
     }
 
-    public void setOrganisationSubService(List<Long> organisationSubService) {
+    public void setOrganisationSubService(List<OrganizationTypeAndServiceBasicDto> organisationSubService) {
         this.organisationSubService = organisationSubService;
+    }
+
+    public MasterProcessingActivity()
+    {
+
     }
 }

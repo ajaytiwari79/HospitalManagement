@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.DataSourceMongoRepository;
 
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -25,14 +26,17 @@ public class DataSourceService extends MongoBaseService {
 
 
 
-    public DataSource createDataSource(DataSource dataSource) {
-        String name = dataSource.getName();
-        DataSource exist = dataSourceMongoRepository.findByName(name);
+    public DataSource createDataSource(String dataSource) {
+        if (StringUtils.isEmpty(dataSource))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
+        DataSource exist = dataSourceMongoRepository.findByName(dataSource);
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data already exist for name " + name);
+            throw new DuplicateDataException("data already exist for name " + dataSource);
         } else {
             DataSource newDataSource = new DataSource();
-            newDataSource.setName(name);
+            newDataSource.setName(dataSource);
             return save(newDataSource);
         }
     }
@@ -53,7 +57,7 @@ public class DataSourceService extends MongoBaseService {
 
         DataSource exist = dataSourceMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             return exist;
 
@@ -66,7 +70,7 @@ public class DataSourceService extends MongoBaseService {
 
         DataSource exist = dataSourceMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             dataSourceMongoRepository.delete(exist);
             return true;
@@ -75,12 +79,17 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public DataSource updateDataSource(BigInteger id,DataSource dataSource) {
+    public DataSource updateDataSource(BigInteger id,String dataSource) {
+        if (StringUtils.isEmpty(dataSource))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
+
         DataSource exist = dataSourceMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            exist.setName(dataSource.getName());
+            exist.setName(dataSource);
             return save(exist);
 
         }

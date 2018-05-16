@@ -9,6 +9,7 @@ import com.kairos.persistance.model.master_data.DataSubject;
 import com.kairos.persistance.repository.master_data.DataSubjectMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -22,14 +23,17 @@ public class DataSubjectService extends MongoBaseService {
     @Inject
     private DataSubjectMongoRepository dataSubjectMongoRepository;
 
-    public DataSubject createDataSubject(DataSubject dataSubject) {
-        String name = dataSubject.getName();
-        DataSubject exist = dataSubjectMongoRepository.findByName(name);
+    public DataSubject createDataSubject(String dataSubject) {
+        if (StringUtils.isEmpty(dataSubject))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
+        DataSubject exist = dataSubjectMongoRepository.findByName(dataSubject);
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data already exist for name " + name);
+            throw new DuplicateDataException("data already exist for name " + dataSubject);
         } else {
             DataSubject newDataSubject = new DataSubject();
-            newDataSubject.setName(name);
+            newDataSubject.setName(dataSubject);
             return save(newDataSubject);
         }
     }
@@ -63,7 +67,7 @@ public class DataSubjectService extends MongoBaseService {
 
         DataSubject exist = dataSubjectMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             dataSubjectMongoRepository.delete(exist);
             return true;
@@ -72,12 +76,17 @@ public class DataSubjectService extends MongoBaseService {
     }
 
 
-    public DataSubject updateDataSubject(BigInteger id,DataSubject dataSubject) {
+    public DataSubject updateDataSubject(BigInteger id,String dataSubject) {
+
+        if (StringUtils.isEmpty(dataSubject))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
         DataSubject exist = dataSubjectMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            exist.setName(dataSubject.getName());
+            exist.setName(dataSubject);
             return save(exist);
 
         }

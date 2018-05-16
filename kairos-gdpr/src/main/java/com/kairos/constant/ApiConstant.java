@@ -13,7 +13,7 @@ public final class ApiConstant {
 
 // MasterAsset urls
 
-    public static final String API_ASSET_URL = API_V1 + "/asset";
+    public static final String API_MASTER_ASSET_URL = API_V1 + "/master_asset";
 
 //Global master processing activity
 
@@ -65,7 +65,8 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_proc
     //Technical Security Measure  url
     public static final String API_TECH_SEC_MEASURE_URL = API_V1 + "/technical_security";
 
-
+//clause tag
+public static final String API_CLAUSE_TAG_URL = API_V1 + "/clause/tag";
 
     private ApiConstant() {
     }

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import static com.kairos.constant.ApiConstant.API_DATASUBJECT_URL;
 
+import static com.kairos.constant.ApiConstant.API_DATASUBJECT_URL;
 
 
 @RestController
@@ -27,12 +27,9 @@ public class DataSubjectController {
     private DataSubjectService dataSubjectService;
 
 
-
-
-
     @ApiOperation("add DataSubject")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSubject(@Valid @RequestBody DataSubject dataSubject) {
+    public ResponseEntity<Object> createDataSubject(@RequestParam String dataSubject) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.createDataSubject(dataSubject));
 
     }
@@ -63,11 +60,10 @@ public class DataSubjectController {
 
     @ApiOperation("update DataSubject by id")
     @PutMapping("/update/id/{id}")
-    public ResponseEntity<Object> updateDataSubject(@PathVariable BigInteger id, @Valid @RequestBody DataSubject dataSubject) {
+    public ResponseEntity<Object> updateDataSubject(@PathVariable BigInteger id, @RequestParam String dataSubject) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.updateDataSubject(id, dataSubject));
 
     }
-
 
 
 }

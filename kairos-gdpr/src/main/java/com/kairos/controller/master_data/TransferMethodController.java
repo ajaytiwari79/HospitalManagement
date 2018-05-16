@@ -28,7 +28,7 @@ public class TransferMethodController {
 
     @ApiOperation("add transfer Method ")
     @PostMapping("/add_method")
-    public ResponseEntity<Object> createTransferMethod(@Valid @RequestBody TransferMethod transferMethod) {
+    public ResponseEntity<Object> createTransferMethod(@RequestParam String  transferMethod) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.createTransferMethod(transferMethod));
 
     }
@@ -59,7 +59,7 @@ public class TransferMethodController {
 
     @ApiOperation("update transfer Method by id")
     @PutMapping("/update/id/{id}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable BigInteger id, @Valid @RequestBody TransferMethod transferMethod) {
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable BigInteger id, @RequestParam String transferMethod) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.updateTransferMethod(id, transferMethod));
 
     }

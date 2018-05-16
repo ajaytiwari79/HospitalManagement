@@ -20,14 +20,12 @@ import java.util.Optional;
 public class StorageFormatService extends MongoBaseService {
 
 
-@Inject
-    private StorageFormatMongoRepository  storageFormatMongoRepository ;
-
+    @Inject
+    private StorageFormatMongoRepository storageFormatMongoRepository;
 
 
     public StorageFormat createStorageFormat(String storageFormat) {
-        if (StringUtils.isEmpty(storageFormat))
-        {
+        if (StringUtils.isEmpty(storageFormat)) {
             throw new RequestDataNull("requested storageFormat name is null");
 
         }
@@ -44,7 +42,7 @@ public class StorageFormatService extends MongoBaseService {
 
     public List<StorageFormat> getAllStorageFormat() {
         List<StorageFormat> result = storageFormatMongoRepository.findAll();
-        if (result.size()!=0) {
+        if (result.size() != 0) {
             return result;
 
         } else
@@ -52,12 +50,11 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-
     public StorageFormat getStorageFormatById(BigInteger id) {
 
         StorageFormat exist = storageFormatMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
             return exist;
 
@@ -65,12 +62,11 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-
     public Boolean deleteStorageFormatById(BigInteger id) {
 
         StorageFormat exist = storageFormatMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
             storageFormatMongoRepository.delete(exist);
             return true;
@@ -79,25 +75,20 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat updateStorageFormat(BigInteger id,String storageFormat) {
-        if (StringUtils.isEmpty(storageFormat))
-        {
+    public StorageFormat updateStorageFormat(BigInteger id, String storageFormat) {
+        if (StringUtils.isEmpty(storageFormat)) {
             throw new RequestDataNull("requested storageFormat name is null");
 
         }
         StorageFormat exist = storageFormatMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
             exist.setName(storageFormat);
             return save(exist);
 
         }
     }
-
-
-
-
 
 
 }

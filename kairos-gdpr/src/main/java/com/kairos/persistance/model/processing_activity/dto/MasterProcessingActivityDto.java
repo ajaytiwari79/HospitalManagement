@@ -1,12 +1,12 @@
-package com.kairos.persistance.model.asset.dto;
+package com.kairos.persistance.model.processing_activity.dto;
+
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Set;
 
-public class MasterAssetDto {
+public class MasterProcessingActivityDto {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private  String name;
@@ -77,4 +77,14 @@ public class MasterAssetDto {
     public void setOrganisationSubService(Set<Long> organisationSubService) {
         this.organisationSubService = organisationSubService;
     }
+
+    public MasterProcessingActivityDto()
+    {
+
+    }
 }
+
+
+
+
+

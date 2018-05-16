@@ -4,10 +4,12 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
+import com.kairos.custome_exception.RequestDataNull;
 import com.kairos.persistance.model.master_data.TransferMethod;
 import com.kairos.persistance.repository.master_data.TransferMethodMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -22,14 +24,18 @@ public class TransferMethodService extends MongoBaseService {
     private TransferMethodMongoRepository transferMethodMongoRepository;
 
 
-    public TransferMethod createTransferMethod(TransferMethod transferMethod) {
-        String name = transferMethod.getName();
-        TransferMethod exist = transferMethodMongoRepository.findByName(name);
+    public TransferMethod createTransferMethod(String transferMethod) {
+
+        if (StringUtils.isEmpty(transferMethod))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
+        TransferMethod exist = transferMethodMongoRepository.findByName(transferMethod);
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data already exist for name " + name);
+            throw new DuplicateDataException("data already exist for name " + transferMethod);
         } else {
             TransferMethod newTransferMethod = new TransferMethod();
-            newTransferMethod.setName(name);
+            newTransferMethod.setName(transferMethod);
             return save(newTransferMethod);
 
         }
@@ -64,7 +70,7 @@ public class TransferMethodService extends MongoBaseService {
 
         TransferMethod exist = transferMethodMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
             transferMethodMongoRepository.delete(exist);
             return true;
@@ -73,12 +79,17 @@ public class TransferMethodService extends MongoBaseService {
     }
 
 
-    public TransferMethod updateTransferMethod(BigInteger id,TransferMethod transferMethod) {
+    public TransferMethod updateTransferMethod(BigInteger id,String transferMethod) {
+
+        if (StringUtils.isEmpty(transferMethod))
+        {
+            throw new RequestDataNull("requested dataSource  is null or empty");
+        }
         TransferMethod exist = transferMethodMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+            throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            exist.setName(transferMethod.getName());
+            exist.setName(transferMethod);
             return save(exist);
 
         }
