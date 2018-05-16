@@ -391,6 +391,11 @@ public class DateUtils {
             return dateTime.toString(formatter);
     }
 
+    public static String getDateString(Date date, String dateFormatString){
+        SimpleDateFormat simpleDateFormat =  new SimpleDateFormat(dateFormatString);
+        return simpleDateFormat.format(date);
+    }
+
     public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
     {
         TimeZone fromTimeZone = TimeZone.getTimeZone("UTC");

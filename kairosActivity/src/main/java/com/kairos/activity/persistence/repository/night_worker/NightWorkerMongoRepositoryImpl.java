@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.repository.common.CustomAggregationOperat
 import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
 import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
@@ -32,53 +33,43 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaireDetails(Long staffId) {
 
-//         String groupString = "{$group:{'id':'$_id', 'questionAnswerPair': { '$addToSet': '$questionAnswerPair' }}}";
-        String groupString = "{$group:{_id:'$_id', 'name':{'$first':'$name'}, 'questionAnswerPair': { '$addToSet': '$questionAnswerPair' }}}";
-
+        String groupString = "{$group:{_id:'$_id', 'name':{'$first':'$name'}, 'submitted':{'$first':'$submitted'}, 'submittedOn':{'$first':'$submittedOn'} "+
+                "'questionAnswerPair': { '$push':'$questionAnswerPair' }}}";
+        String sortString = "{$sort:{questionnaireCreatedDate:-1, createdDate:1}}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),
                 project().andExclude("_id").and("staffQuestionnairesId").as("staffQuestionnairesIds"),
                 unwind("staffQuestionnairesIds"),
                 lookup("staffQuestionnaire", "staffQuestionnairesIds", "_id", "staffQuestionnaire"),
                 unwind("staffQuestionnaire"),
-                project().and("staffQuestionnaire.name").as("name").and("staffQuestionnaire._id").as("_id").
+
+                project().and("staffQuestionnaire.name").as("name").
+                        and("staffQuestionnaire.createdAt").as("questionnaireCreatedDate").
+                        and("staffQuestionnaire.submitted").as("submitted").
+                        and("staffQuestionnaire.submittedOn").as("submittedOn").
+                        and("staffQuestionnaire._id").as("_id").
                         and("staffQuestionnaire.questionAnswerPair").as("questionAnswerPair").
                         and("staffQuestionnaire.name").as("name"),
                 unwind("questionAnswerPair"),
                 lookup("nightWorkerQuestion", "questionAnswerPair.questionId", "_id", "questionAnswerPair.question"),
                 unwind("questionAnswerPair.question"),
+
                 project().and("questionAnswerPair.answer").as("questionAnswerPair.answer").
                         and("questionAnswerPair.question.question").as("questionAnswerPair.question").
                         and("questionAnswerPair.question._id").as( "questionAnswerPair.questionId").
-                        and("name").as("name"),
-
+                        and("name").as("name").
+                        and("questionnaireCreatedDate").as("questionnaireCreatedDate").
+                        and("questionAnswerPair.question.createdAt").as("createdDate").
+                        and("submitted").as("submitted").
+                        and("submittedOn").as("submittedOn"),
+                new CustomAggregationOperation(Document.parse(sortString)),
                 new CustomAggregationOperation(Document.parse(groupString))
         );
 
-        AggregationResults<QuestionnaireAnswerResponseDTO> result = mongoTemplate.aggregate (aggregation, NightWorker.class, QuestionnaireAnswerResponseDTO.class);
+        AggregationResults<QuestionnaireAnswerResponseDTO> result = mongoTemplate. aggregate (aggregation, NightWorker.class, QuestionnaireAnswerResponseDTO.class);
         return result.getMappedResults();
     }
 
-    public boolean checkIfNightWorkerQuestionnaireFormIsEnabled(Long staffId, Date date) {
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),
-                project().andExclude("_id").and("staffQuestionnairesId").as("staffQuestionnairesIds"),
-                unwind("staffQuestionnairesIds"),
-                lookup("staffQuestionnaire", "staffQuestionnairesIds", "_id", "staffQuestionnaire"),
-                unwind("staffQuestionnaire"),
-                match(Criteria.where("staffQuestionnaire.deleted").is(false).and("staffQuestionnaire.createdAt").gt(date)),
-                count().as("questionnaireCount")
-        );
-
-        AggregationResults<Map> result = mongoTemplate.aggregate (aggregation, NightWorker.class, Map.class);
-        Map resultData = result.getUniqueMappedResult();
-        if (Optional.ofNullable(resultData).isPresent()) {
-            return ! ((Integer) result.getUniqueMappedResult().get("questionnaireCount") > 0);
-        } else {
-            return true;
-        }
-    }
     public List<QuestionAnswerDTO> getNightWorkerQuestions() {
 
         Aggregation aggregation = Aggregation.newAggregation(
