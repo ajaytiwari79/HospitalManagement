@@ -96,19 +96,19 @@ public class OrganizationTypeController {
     @ApiOperation(value = "Get  Organization Types by set ids")
     @RequestMapping(value = "/organization_type/", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> getAllOrganizationTypeByIds(@RequestBody Set<Long> ids) {
-        List<OrganizationType> response = organizationTypeService.getAllOrganizationTypeByIds(ids);
+        Map<Long,OrganizationType> response = organizationTypeService.getAllOrganizationTypeByIds(ids);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
 
 
 
     //bobby
-    @ApiOperation(value = "Get  Organization Types by set ids")
+    /*@ApiOperation(value = "Get  Organization Types by set ids")
     @RequestMapping(value = "/organization_sub_types/", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> getAllOrganizationSubTypeByIds(@RequestBody Set<Long> ids) {
         List<OrganizationType> response = organizationTypeService.getAllOrganizationSubTypeByIds(ids);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
-    }
+    }*/
 
 //bobby
     @ApiOperation(value = "get organization and services")
@@ -116,4 +116,6 @@ public class OrganizationTypeController {
     ResponseEntity<Map<String, Object>> getOrgTypeAndOrgServicesResponseDto(@PathVariable Long countryId) {
     return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId) );
     }
+
+
 }

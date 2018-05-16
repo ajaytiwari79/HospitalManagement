@@ -192,14 +192,18 @@ public class OrganizationTypeService extends UserBaseService {
 
 
     //bobby getAllOrganizationTypeByIds
-    public List<OrganizationType> getAllOrganizationTypeByIds(Set<Long> orgTypeId) {
-        return organizationTypeGraphRepository.getAllOrganizationTypeByIds(orgTypeId);
+    public Map<Long,OrganizationType> getAllOrganizationTypeByIds(Set<Long> orgTypeId) {
+
+        List<OrganizationType> organizationTypes=organizationTypeGraphRepository.getAllOrganizationTypeByIds(orgTypeId);
+        Map<Long,OrganizationType> gdprOrgTypeAndSubTypes = organizationTypes.stream()
+                .collect(Collectors.toMap(OrganizationType::getId, OrganizationType::basicDetails));
+return gdprOrgTypeAndSubTypes;
     }
 
-    public List<OrganizationType> getAllOrganizationSubTypeByIds(Set<Long> orgTypeId) {
+    /*public List<OrganizationType> getAllOrganizationSubTypeByIds(Set<Long> orgTypeId) {
         return organizationTypeGraphRepository.getAllOrganizationSubTypeByIds(orgTypeId);
     }
-
+*/
 
   /*  //bobby organikzation type and service list and sub service
     public List<OrganizationTypeAndSubTypeResponseDto> getOrgTypeAndOrgServicesResponseDto() {
@@ -280,5 +284,6 @@ public class OrganizationTypeService extends UserBaseService {
         });
         return list;
     }
+
 
 }

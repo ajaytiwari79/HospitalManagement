@@ -8,8 +8,8 @@ public class OrganizationTypeAndSubTypeResponseDto {
     private Long id;
     private String name;
 
-    private List<OrganizationTypeAndSubTypeResponseDto> or_sub_Types;
-    private List<OrganizationServiceResponseDto> services;
+    private List<OrganizationTypeAndSubTypeResponseDto> organizationSubTypes;
+    private List<OrganizationServiceResponseDto> organizationServices;
 
     public Long getId() {
         return id;
@@ -27,20 +27,20 @@ public class OrganizationTypeAndSubTypeResponseDto {
         this.name = name;
     }
 
-    public List<OrganizationTypeAndSubTypeResponseDto> getOr_sub_Types() {
-        return or_sub_Types;
+    public List<OrganizationTypeAndSubTypeResponseDto> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOr_sub_Types(List<OrganizationTypeAndSubTypeResponseDto> or_sub_Types) {
-        this.or_sub_Types = or_sub_Types;
+    public void setOrganizationSubTypes(List<OrganizationTypeAndSubTypeResponseDto> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationServiceResponseDto> getServices() {
-        return services;
+    public List<OrganizationServiceResponseDto> getOrganizationServices() {
+        return organizationServices;
     }
 
-    public void setServices(List<OrganizationServiceResponseDto> services) {
-        this.services = services;
+    public void setOrganizationServices(List<OrganizationServiceResponseDto> organizationServices) {
+        this.organizationServices = organizationServices;
     }
 
     public OrganizationTypeAndSubTypeResponseDto()

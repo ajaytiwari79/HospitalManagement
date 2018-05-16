@@ -38,6 +38,7 @@ public class KairosGdprApplication {
     @Bean
     public Repository repository() throws RepositoryException {
    DB db = new MongoClient("127.0.0.1", 27017).getDB("gdpr");
+   
         DocumentNodeStore ns = new DocumentMK.Builder()/*.setBlobStore((BlobStore)new FileBlobStore("mongorepository_jackrabit/blob"))*/.setMongoDB(db).getNodeStore();
         Repository repo = new Jcr(new Oak(ns)).createRepository();
 return repo;

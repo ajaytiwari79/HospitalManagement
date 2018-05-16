@@ -11,7 +11,7 @@ public final class ApiConstant {
     public static final String API_ORGANIZATION_TYPE = API_ORGANIZATION + "/type";
 
 
-// GlobalAsset urls
+// MasterAsset urls
 
     public static final String API_ASSET_URL = API_V1 + "/asset";
 

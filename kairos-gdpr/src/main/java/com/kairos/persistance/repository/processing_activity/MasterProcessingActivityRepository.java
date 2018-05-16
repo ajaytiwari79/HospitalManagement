@@ -1,6 +1,5 @@
 package com.kairos.persistance.repository.processing_activity;
 
-import com.kairos.persistance.model.asset.GlobalAsset;
 import com.kairos.persistance.model.processing_activity.MasterProcessingActivity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

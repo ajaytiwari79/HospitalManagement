@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -29,7 +30,7 @@ public class OrganizationTypeRestClient {
     private RestTemplate restTemplate;
 
 
-    public List<OrganizationTypeRestClientDto> getOrganizationType(Set<Long> ids) {
+    public Map<Long,OrganizationTypeRestClientDto> getOrganizationType(Set<Long> ids) {
 
         final String baseUrl = RestClientURLUtils.getBaseUrl(true);
         try {
@@ -37,14 +38,14 @@ public class OrganizationTypeRestClient {
             HttpHeaders httpHeaders=new HttpHeaders();
             httpHeaders.add("Authorization",header);
             HttpEntity<Set<Long>> entity=new HttpEntity<>(ids,httpHeaders);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationTypeRestClientDto>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationTypeRestClientDto>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope< Map<Long,OrganizationTypeRestClientDto>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope< Map<Long,OrganizationTypeRestClientDto>>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<List<OrganizationTypeRestClientDto>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope< Map<Long,OrganizationTypeRestClientDto>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/organization_type/",
                             HttpMethod.POST,
                             entity, typeReference);
-            RestTemplateResponseEnvelope<List<OrganizationTypeRestClientDto>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope< Map<Long,OrganizationTypeRestClientDto>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

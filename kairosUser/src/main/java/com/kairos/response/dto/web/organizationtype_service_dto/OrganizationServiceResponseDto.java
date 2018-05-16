@@ -10,7 +10,7 @@ public class OrganizationServiceResponseDto {
 
     private Long id;
     private String name;
-      private List<OrganizationServiceResponseDto>  subservices;
+      private List<OrganizationServiceResponseDto>  organizationSubServices;
 
     public Long getId() {
         return id;
@@ -28,11 +28,11 @@ public class OrganizationServiceResponseDto {
         this.name = name;
     }
 
-    public List<OrganizationServiceResponseDto> getSubservices() {
-        return subservices;
+    public List<OrganizationServiceResponseDto> getOrganizationSubServices() {
+        return organizationSubServices;
     }
 
-    public void setSubservices(List<OrganizationServiceResponseDto> subservices) {
-        this.subservices = subservices;
+    public void setOrganizationSubServices(List<OrganizationServiceResponseDto> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
     }
 }

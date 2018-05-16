@@ -11,6 +11,7 @@ import com.kairos.persistance.model.clause.dto.ClauseDto;
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.jcr.RepositoryException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -42,72 +44,60 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private MongoTemplate mongoTemplate;
 
+    @Inject
+    private JackrabbitService jackrabbitService;
+
     public Clause createClause(ClauseDto clauseDto) {
 
         List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
         orgServiceIds = clauseDto.getOrganizationServiceIds();
         orgTypeIds = clauseDto.getOrganizationTypeIds();
-       List<BigInteger> accountTypeIds = clauseDto.getAccountType();
+        List<BigInteger> accountTypeIds = clauseDto.getAccountType();
         orgSubServiceIds = clauseDto.getOrganizationServiceIds();
         orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
         List<AccountType> accountTypes;
-        List<String> tags =new ArrayList<>();
-       /* List<OrganizationService> organizationServices = new ArrayList<>();
-        List<OrganizationType> organizationTypes = new ArrayList<>();
-        List<OrganizationService> organizationSubServices = new ArrayList<>();
-        List<OrganizationType> organizationSubTypes = new ArrayList<>();*/
-        Clause clause = new Clause();
-        if (clauseRepository.findByTitle(clauseDto.getTitle())!=null)
-        {
+        List<String> tags = new ArrayList<>();
 
-            throw new DuplicateDataException("clause with name title "+clauseDto.getTitle()+" already Exist");
+        Clause clause = new Clause();
+        if (clauseRepository.findByTitle(clauseDto.getTitle()) != null) {
+
+            throw new DuplicateDataException("clause with name title " + clauseDto.getTitle() + " already Exist");
         }
 
-        if (Optional.ofNullable(clauseDto.getTags()).isPresent())
-        {
+        if (Optional.ofNullable(clauseDto.getTags()).isPresent()) {
             tags = new ArrayList<>();
             for (String tag : clauseDto.getTags()) {
                 tags.add(tag);
-            }   }
-            System.err.println("+++++++");
-
-            if (accountTypeIds!=null&&!accountTypeIds.isEmpty()) {
-                accountTypes = accountTypeService.getAccountList(accountTypeIds);
-            } else {
-                throw new RequestDataNull("Accounttype list cannot be  empty");
             }
+        }
 
-            clause.setOrganizationServices(orgServiceIds);
-            clause.setOrganizationSubServices(orgSubServiceIds);
-            clause.setOrganizationTypes(orgTypeIds);
-            clause.setOrganizationSubTypes(orgSubTypeIds);
+        if (accountTypeIds != null && !accountTypeIds.isEmpty()) {
+            accountTypes = accountTypeService.getAccountList(accountTypeIds);
+        } else {
+            throw new RequestDataNull("Accounttype list cannot be  empty");
+        }
 
-            clause.setAccountTypes(accountTypes);
-            clause.setTitle(clauseDto.getTitle());
-            clause.setDescription(clauseDto.getDescription());
-            clause.setTags(tags);
-            return save(clause);
+        clause.setOrganizationServices(orgServiceIds);
+        clause.setOrganizationSubServices(orgSubServiceIds);
+        clause.setOrganizationTypes(orgTypeIds);
+        clause.setOrganizationSubTypes(orgSubTypeIds);
+        clause.setAccountTypes(accountTypes);
+        clause.setTitle(clauseDto.getTitle());
+        clause.setDescription(clauseDto.getDescription());
+        clause.setTags(tags);
+        clause = save(clause);
+        try {
+            jackrabbitService.addClause(clause);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-
+        return clause;
     }
 
-
-    /*public Map<String, Object> getClauseByOrganizationType(String orgTypeName) {
-
-        Map<String, Object> result = new HashMap<>();
-        Boolean isSuccess = false;
-        List<Clause> clauses = clauseRepository.getClauseByOrganizationType(orgTypeName);
-
-        if (clauses != null) {
-            isSuccess = true;
-            result.put("isSuccess", isSuccess);
-            result.put("data", clauses);
-            return result;
-        } else
-            throw new DataNotExists("Clauses not Exist for organizationType" + orgTypeName);
-    }
-*/
 
     public Clause getClauseById(BigInteger id) {
         Clause clause = (Clause) clauseRepository.findByid(id);
@@ -129,41 +119,44 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(BigInteger clauseid, ClauseDto clauseDto) {
-        Clause exists = clauseRepository.findByid(clauseid);
+    public Clause updateClause(BigInteger clauseId, ClauseDto clauseDto) {
+        Clause exists = clauseRepository.findByid(clauseId);
         if (!Optional.ofNullable(exists).isPresent()) {
-            throw new DataNotExists("clause for given id " + clauseid + " not exist");
+            throw new DataNotExists("clause for given id " + clauseId + " not exist");
         } else {
             List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
             orgServiceIds = clauseDto.getOrganizationServiceIds();
             orgTypeIds = clauseDto.getOrganizationTypeIds();
-            List<BigInteger>accountTypeIds = clauseDto.getAccountType();
             orgSubServiceIds = clauseDto.getOrganizationServiceIds();
             orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
             List<AccountType> accountTypes = new ArrayList<>();
-            List<String> tags;
-            if (!Optional.ofNullable(clauseDto).isPresent()) {
-                throw new RequestDataNull("No Data Entered");
-            } else {
-                tags = new ArrayList<>();
-                for (String tag : clauseDto.getTags()) {
-                    tags.add(tag);
-                }
-                if (accountTypeIds!=null&&!accountTypeIds.isEmpty()) {
-                    accountTypes = accountTypeService.getAccountList(accountTypeIds);
-                } else {
-                    throw new RequestDataNull("Accounttype list cannot be  empty");
-                }
-                exists.setOrganizationServices(orgServiceIds);
-                exists.setOrganizationSubServices(orgSubServiceIds);
-                exists.setOrganizationTypes(orgTypeIds);
-                exists.setOrganizationSubTypes(orgSubTypeIds);
+            List<BigInteger> accountTypeIds = clauseDto.getAccountType();
+            List<String> tags = new ArrayList<>();
 
+            for (String tag : clauseDto.getTags()) {
+                tags.add(tag);
             }
+            if (accountTypeIds != null && !accountTypeIds.isEmpty()) {
+                accountTypes = accountTypeService.getAccountList(accountTypeIds);
+            } else {
+                throw new RequestDataNull("Accounttype list cannot be  empty");
+            }
+            exists.setOrganizationServices(orgServiceIds);
+            exists.setOrganizationSubServices(orgSubServiceIds);
+            exists.setOrganizationTypes(orgTypeIds);
+            exists.setOrganizationSubTypes(orgSubTypeIds);
             exists.setAccountTypes(accountTypes);
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tags);
             exists.setTitle(clauseDto.getTitle());
+            try {
+                jackrabbitService.clauseVersioning(clauseId, exists);
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return save(exists);
@@ -184,16 +177,16 @@ public class ClauseService extends MongoBaseService {
             return null;
         } else {
 
-            if (clauseQueryDto.getAccountTypes()!=null) {
+            if (clauseQueryDto.getAccountTypes() != null) {
                 whereQuery = "accountTypes._id";
                 query.addCriteria((Criteria.where(whereQuery).in(clauseQueryDto.getAccountTypes())));
             }
-            if (organizationServices!=null) {
+            if (organizationServices != null) {
                 whereQuery = "organizationServices";
                 query.addCriteria((Criteria.where(whereQuery).in(organizationServices)));
 
             }
-            if (organizationTypes!=null) {
+            if (organizationTypes != null) {
                 whereQuery = "organizationTypes";
                 query.addCriteria((Criteria.where(whereQuery).in(organizationTypes)));
 
@@ -233,7 +226,7 @@ public class ClauseService extends MongoBaseService {
             }
             return clauses;
         } else
-            throw new RequestDataNull("Requested Clauseid are Not null or empty");
+            throw new RequestDataNull("Requested clauseId are Not null or empty");
 
 
     }

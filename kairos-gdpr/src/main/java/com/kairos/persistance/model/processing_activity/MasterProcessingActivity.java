@@ -20,7 +20,7 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     private List<Long> organisationType;
 
     private List <Long> organisationSubType;
-    private List <Long>organisationService;
+    private List <Long> organisationService;
     private List <Long> organisationSubService;
 
     public String getName() {

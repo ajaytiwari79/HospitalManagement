@@ -1,20 +1,21 @@
 package com.kairos.controller.asset;
 
 
-import com.kairos.persistance.model.asset.GlobalAsset;
-import com.kairos.service.asset.GlobalAssetService;
+import com.kairos.persistance.model.asset.MasterAsset;
+import com.kairos.persistance.model.asset.dto.MasterAssetDto;
+import com.kairos.service.asset.MasterAssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 
 import java.math.BigInteger;
-import java.util.Optional;
 
 import static com.kairos.constant.ApiConstant.API_ASSET_URL;
 
@@ -26,37 +27,37 @@ public class AssetController {
 
 
     @Inject
-    private GlobalAssetService globalAssetService;
+    private MasterAssetService masterAssetService;
 
 
-    @ApiOperation(value = "add global asset")
-    @RequestMapping(value = "/global/add_asset", method = RequestMethod.POST)
-    public ResponseEntity<Object> addAsset(@RequestBody GlobalAsset asset) {
-          return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.addAsset(asset));
+    @ApiOperation(value = "add master asset")
+    @RequestMapping(value = "/master/add_asset", method = RequestMethod.POST)
+    public ResponseEntity<Object> addAsset(@Validated  @RequestBody MasterAssetDto masterAsset) {
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.addAsset(masterAsset));
     }
 
-    @ApiOperation(value = "get all asset")
-    @RequestMapping(value = "/global/all", method = RequestMethod.GET)
+    @ApiOperation(value = "get all master asset")
+    @RequestMapping(value = "/master/all", method = RequestMethod.GET)
     public ResponseEntity<Object> getAllAsset() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getAllGlobalAsset());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getAllGlobalAsset());
     }
 
-    @ApiOperation(value = "update asset by id")
-    @PutMapping("/global/update/{id}")
-    public ResponseEntity<Object> updateAsset(@PathVariable BigInteger id, @RequestBody GlobalAsset asset) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.updateAsset(id, asset));
+    @ApiOperation(value = "update master asset by id")
+    @PutMapping("/master/update/{id}")
+    public ResponseEntity<Object> updateAsset(@PathVariable BigInteger id, @RequestBody MasterAsset asset) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateAsset(id, asset));
     }
 
-    @ApiOperation(value = "delete asset")
-    @DeleteMapping("/global/delete/{id}")
+    @ApiOperation(value = "delete master asset")
+    @DeleteMapping("/master/delete/{id}")
     public ResponseEntity<Object> deleteAsset(@PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.deleteAsset(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.deleteAsset(id));
     }
 
-    @ApiOperation(value = "get global asset by id")
-    @GetMapping("/global/id/{id}")
+    @ApiOperation(value = "get master asset by id")
+    @GetMapping("/master/id/{id}")
     public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id, HttpServletRequest httpServletRequest) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getGlobalAssetById(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getGlobalAssetById(id));
     }
 
 

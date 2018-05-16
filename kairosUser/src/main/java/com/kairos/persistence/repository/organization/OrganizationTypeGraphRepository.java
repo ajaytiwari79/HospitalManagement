@@ -154,14 +154,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
 
     //bobby
-    @Query("MATCH (n:OrganizationType) where id(n) IN{0} RETURN n ")
+    @Query("MATCH (n:OrganizationType) where id(n) IN{0}  return  id(n),n.name")
     List<OrganizationType> getAllOrganizationTypeByIds(Set<Long> orgTypeId);
     //bobby
-    @Query("MATCH (n:OrganizationType)-[HAS_SUB_TYPE]->(st:OrganizationType) where id(st) IN{0} return st;")
-    List<OrganizationType>   getAllOrganizationSubTypeByIds(Set<Long> orgTypeId);
 
-
-    //bobby
     @Query("MATCH (n:OrganizationType)  return n")
     List<OrganizationType>   getAllOrganizationTypeByIds();
     //bobby
@@ -172,15 +168,12 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     List<Long>   getAllOrganizationSubTypeIds(Long orgTypeId);
 
     //bobby
-    @Query("match(c:Country) where id(c)=4 \n" +
-            "match(c)-[:BELONGS_TO]-(or:OrganizationType{isEnable:true}) \n" +
-            "optional match(or)-[:HAS_SUB_TYPE]-(ora:OrganizationType{isEnable:true}) \n" +
-            "optional match(ora)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(oras:OrganizationService) \n" +
-            "optional match(oras)-[:ORGANIZATION_SUB_SERVICE]-(sub:OrganizationService) \n" +
-            "with or,ora,oras,sub, {name: oras.name,id:id(oras), subservices: CASE WHEN sub IS NOT NULL THEN collect({id:id(sub),name:sub.name}) ELSE [] END} as service_subService\n" +
-            "with or,ora,{name: ora.name,id:id(ora),services: CASE WHEN service_subService IS NOT NULL THEN collect (service_subService) ELSE [] END} as service_SubService_ORG\n" +
-            "with or,{name: or.name,id:id(or),or_sub_Types: CASE WHEN service_SubService_ORG IS NOT NULL THEN collect (service_SubService_ORG) ELSE [] END} as organizationType\n" +
-            "return organizationType")
+    @Query("match(c:Country) where id(c)={0}  " +
+            "match(c)-[:BELONGS_TO]-(or:OrganizationType{isEnable:true}) " +
+            "optional match(or)-[:HAS_SUB_TYPE]-(ora:OrganizationType{isEnable:true})" +
+            " optional match(ora)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(oras:OrganizationService)" +
+            " optional match(oras)-[:ORGANIZATION_SUB_SERVICE]-(sub:OrganizationService) with or,ora,oras,sub, {name: oras.name,id:id(oras), organizationSubServices: CASE WHEN sub IS NOT NULL THEN collect({id:id(sub),name:sub.name}) ELSE [] END} as service_subService with or,ora,{name: ora.name,id:id(ora)," +
+            "organizationServices: CASE WHEN service_subService IS NOT NULL THEN collect (service_subService) ELSE [] END} as service_SubService_ORG with or,{name: or.name,id:id(or),organizationSubTypes: CASE WHEN service_SubService_ORG IS NOT NULL THEN collect (service_SubService_ORG) ELSE [] END} as organizationType return organizationType")
     List<Map> getAllOrganizationTypeAndServiceAndSubServices(Long countryId);
 
 }
