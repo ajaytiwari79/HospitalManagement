@@ -11,6 +11,7 @@ import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ public class PhaseService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Inject
     private CountryRestClient countryRestClient;
+    @Inject
+    private ExceptionService exceptionService;
 
     public void createDefaultPhase(Long unitId, Long countryId) {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
@@ -60,7 +63,7 @@ public class PhaseService extends MongoBaseService {
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            throw new DataNotFoundByIdException("Can't find unit with provided Id " + unitId);
+            exceptionService.dataNotFoundByIdException("validation.unit.id",unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
@@ -88,7 +91,7 @@ public class PhaseService extends MongoBaseService {
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
         OrganizationDTO unitOrganization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(unitOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid unitId : " + unitId);
+            exceptionService.dataNotFoundByIdException("validation.unit.id",unitId);
         }
         List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.ASC);
         int weekCount = 0;
@@ -116,7 +119,7 @@ public class PhaseService extends MongoBaseService {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
             logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
-            throw new DuplicateDataException("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+           exceptionService.dataNotFoundByIdException("validation.country.phase.sequence",phaseDTO.getCountryId());
         }
         Phase phase = phaseDTO.buildPhaseForCountry();
         phase.setCountryId(countryId);
@@ -138,7 +141,7 @@ public class PhaseService extends MongoBaseService {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
             logger.info("Phase not found in country " + phaseId);
-            throw new DataNotFoundByIdException("Phase not found in country " + phaseId);
+            exceptionService.dataNotFoundByIdException("validation.country.phase.notfound",phaseId);
         }
         phase.setDeleted(true);
         save(phase);
@@ -150,7 +153,7 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
         if (phases.isEmpty()) {
             logger.info("Phase not found in unit " + unitId);
-            throw new DataNotFoundByIdException("Phases are not configured for organization " + unitId);
+            exceptionService.dataNotFoundByIdException("validation.organization.phase.notfound",unitId);
         }
         return getCurrentPhaseInUnitByDate(phases, date);
     }
@@ -199,13 +202,14 @@ public class PhaseService extends MongoBaseService {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
             logger.info("Phase not found in country " + phaseId);
-            throw new DataNotFoundByIdException("Phase not found in country " + phaseId);
+            exceptionService.dataNotFoundByIdException("validation.country.phase.notfound",phaseId);
+
         }
         if (phase.getSequence() != phaseDTO.getSequence()) {
             long phaseInUse = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
             if (phaseInUse > 0) {
                 logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
-                throw new DuplicateDataException("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+                exceptionService.duplicateDataException("validation.country.phase.sequence",phaseDTO.getCountryId());
             }
         }
         // Disable update of name
@@ -240,15 +244,15 @@ public class PhaseService extends MongoBaseService {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
 
         if (organization == null) {
-            throw new DataNotFoundByIdException("Invalid unitId " + unitId);
+            exceptionService.dataNotFoundByIdException("validation.unit.id",unitId);
         }
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
         if (oldPhase == null) {
-            throw new DataNotFoundByIdException("Phase does not Exists Id " + phaseDTO.getId());
+            exceptionService.dataNotFoundByIdException("validation.phase.id.notfound",phaseDTO.getId());
         }
         Phase phase = phaseMongoRepository.findByNameAndDisabled(unitId, phaseDTO.getName(), false);
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
-            throw new ActionNotPermittedException("Phase with name : " + phaseDTO.getName() + " already exists.");
+            exceptionService.actionNotPermittedException("validation.phase.name.alreadyexists",phaseDTO.getName());
         }
         preparePhase(oldPhase, phaseDTO);
         save(oldPhase);

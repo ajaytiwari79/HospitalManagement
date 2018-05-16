@@ -3,6 +3,7 @@ import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.staff.StaffDTO;
 import com.kairos.activity.config.env.EnvConfig;
 import com.kairos.activity.response.dto.TaskAppointmentSuggestionDTO;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.fls_visitour.enums.FlsCallResponse;
 import com.kairos.activity.service.fls_visitour.exceptions.scheduler.SchedulerException;
 import com.kairos.activity.service.fls_visitour.wsclient.FlsClient;
@@ -48,6 +49,8 @@ public class SchedulerImpl implements  Scheduler{
 */
     @Inject
     private EnvConfig envConfig;
+    @Inject
+    private ExceptionService exceptionService;
 
     @Autowired StaffRestClient staffRestClient;
 
@@ -150,17 +153,18 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
 
         CallResponse response = client.createCall(call, flsCredentials);
         int code = response.getCallResult();
+        int VTID=0;
         FlsCallResponse flsCallResponse = FlsCallResponse.getByCode(code);
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
-            throw new SchedulerException(flsCallResponse.message + " : " + response.getInfoText());
+            exceptionService.schedulerException("validation.exception.scheduler",flsCallResponse.message,response.getInfoText());
         }else{
-            int VTID = response.getVTID();
+            VTID = response.getVTID();
             logger.info(String.valueOf(VTID));
             logger.debug("call created do futhure" + flsCallResponse.message);
-            return VTID;
-        }
 
+        }
+        return VTID;
     }
 
     @Override
@@ -187,15 +191,17 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
 
         CallResponse response = client.updateCall(call, flsCredentials);
         int code = response.getCallResult();
+        int VTID=0;
         FlsCallResponse flsCallResponse = FlsCallResponse.getByCode(code);
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
-            throw new SchedulerException(flsCallResponse.message + " : " + response.getInfoText());
-        }else{
-            int VTID = response.getVTID();
-            return VTID;
-        }
+            exceptionService.schedulerException("validation.exception.scheduler",flsCallResponse.message,response.getInfoText());
 
+        }else{
+             VTID = response.getVTID();
+
+        }
+        return VTID;
     }
 
     @Override
@@ -221,15 +227,16 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
         Call call  = flsPayloadService.prepareCallPayload(callMetaData);
         CallResponse response = client.cancelCall(call, flsCredentials);
         int code = response.getCallResult();
+        int VTID=0;
         FlsCallResponse flsCallResponse = FlsCallResponse.getByCode(code);
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
-            throw new SchedulerException(flsCallResponse.message + " : " + response.getInfoText());
+            exceptionService.schedulerException("validation.exception.scheduler",flsCallResponse.message,response.getInfoText());
         }else{
-            int VTID = response.getVTID();
-            return VTID;
-        }
+             VTID = response.getVTID();
 
+        }
+        return VTID;
     }
 
     @Override
@@ -242,7 +249,7 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
             //throw new InternalError(flsCallResponse.message + " : " + response.getInfoText());
-            throw new RuntimeException(flsCallResponse.message + " : " + response.getInfoText());
+exceptionService.runtimeException("validation.exception.runtime",flsCallResponse.message,response.getInfoText());
         }
 
             int VTID = response.getVTID();

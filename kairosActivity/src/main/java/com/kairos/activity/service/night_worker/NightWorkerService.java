@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.night_worker.QuestionAnswerPair;
 import com.kairos.activity.persistence.model.night_worker.StaffQuestionnaire;
 import com.kairos.activity.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
@@ -31,6 +32,8 @@ public class NightWorkerService extends MongoBaseService {
 
     @Inject
     NightWorkerMongoRepository nightWorkerMongoRepository;
+    @Inject
+    ExceptionService exceptionService;
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaire(Long unitId, Long staffId){
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
@@ -61,7 +64,7 @@ public class NightWorkerService extends MongoBaseService {
 
     public void validateNightWorkerGeneralDetails(NightWorkerGeneralResponseDTO nightWorkerDTO){
         if(nightWorkerDTO.getQuestionnaireFrequencyInMonths() <= 0){
-            throw new DataNotFoundByIdException("Invalid questionnaire frequency.");
+            exceptionService.dataNotFoundByIdException("validation.questionnaire.frequency");
         }
     }
 
@@ -96,7 +99,7 @@ public class NightWorkerService extends MongoBaseService {
 
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if(!Optional.ofNullable(nightWorker).isPresent()){
-            throw new DataNotFoundByIdException("Staff is not a night worker");
+            exceptionService.dataNotFoundByIdException("validation.staff.nightworker");
         }
 //        List<QuestionAnswerPair> tempQAPair = ObjectMapperUtils.copyProperties(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class);
         // TODO Validate if questionnaire is being added after valid frequency

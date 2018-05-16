@@ -1,6 +1,8 @@
 package com.kairos.activity.service.exception;
 
 import com.kairos.activity.custom_exception.*;
+import com.kairos.activity.service.fls_visitour.exceptions.scheduler.FlsCallException;
+import com.kairos.activity.service.fls_visitour.exceptions.scheduler.SchedulerException;
 import com.kairos.activity.service.locale.LocaleService;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +55,17 @@ public class ExceptionService {
     public void invalidClientException(String message, Object... params) {
         throw new InvalidClientException(convertMessage(message, params));
     }
+    public void schedulerException(String message, Object... params) {
+        throw new SchedulerException(convertMessage(message, params));
+    }
 
+    public void runtimeException(String message, Object... params) {
+        throw new RuntimeException(convertMessage(message, params));
+    }
+    public void flsCredentialException(String message, Object... params) {
+        throw new FlsCredentialException(convertMessage(message, params));
+    }
+    public void flsCallException(String message, Object... params) {
+        throw new FlsCallException(convertMessage(message, params));
+    }
 }
