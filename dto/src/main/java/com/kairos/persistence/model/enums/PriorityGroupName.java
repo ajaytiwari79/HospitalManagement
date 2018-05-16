@@ -1,4 +1,4 @@
-package com.kairos.activity.enums.PriorityGroup;
+package com.kairos.persistence.model.enums;
 
 public enum PriorityGroupName {
     PRIORITY_GROUP1,

@@ -1,6 +1,6 @@
 package com.kairos.activity.persistence.model.priority_group;
 
-import com.kairos.activity.enums.PriorityGroup.PriorityGroupName;
+import com.kairos.persistence.model.enums.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;

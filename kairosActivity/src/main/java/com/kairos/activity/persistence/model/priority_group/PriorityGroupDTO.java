@@ -1,7 +1,7 @@
 package com.kairos.activity.persistence.model.priority_group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.enums.PriorityGroup.PriorityGroupName;
+import com.kairos.persistence.model.enums.PriorityGroupName;
 
 import java.math.BigInteger;
 

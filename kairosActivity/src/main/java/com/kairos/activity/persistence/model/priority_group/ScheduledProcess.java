@@ -1,6 +1,6 @@
 package com.kairos.activity.persistence.model.priority_group;
 
-import com.kairos.activity.enums.PriorityGroup.DayCheckPeriod;
+import com.kairos.persistence.model.enums.DayCheckPeriod;
 
 import java.time.DayOfWeek;
 import java.util.List;
