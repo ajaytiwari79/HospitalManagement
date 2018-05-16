@@ -1,20 +1,15 @@
 package com.kairos.activity.service.priority_group;
 
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.enums.PriorityGroup.PriorityGroupName;
 import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
-import com.kairos.activity.util.priority_group.PriorityGroupUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,12 +22,10 @@ public class PriorityGroupService extends MongoBaseService {
     private  ExceptionService exceptionService;
 
 
-    public boolean createPriorityGroupForCountry(long countryId) {
-        if(priorityGroupRepository.existsByCountryId(countryId)){
-           exceptionService.duplicateDataException("exception.duplicateData","priority-group");
-        }
-        List<PriorityGroup> priorityGroups =PriorityGroupUtil.getDefaultDataForPriorityGroup(countryId);
-        save(priorityGroups);
+    public boolean createPriorityGroupForCountry(long countryId,PriorityGroupDTO priorityGroupDTO) {
+        PriorityGroup priorityGroup=new PriorityGroup();
+        ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+        save(priorityGroup);
         return true;
     }
 

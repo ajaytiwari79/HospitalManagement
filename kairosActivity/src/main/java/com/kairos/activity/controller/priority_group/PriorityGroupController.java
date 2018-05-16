@@ -25,8 +25,8 @@ public class PriorityGroupController {
     @ApiOperation("Create Priority Group")
     @PostMapping(value = COUNTRY_URL+"/priority_groups")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createPriorityGroup(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.createPriorityGroupForCountry(countryId));
+    public ResponseEntity<Map<String, Object>> createPriorityGroup(@PathVariable Long countryId,@RequestBody PriorityGroupDTO priorityGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.createPriorityGroupForCountry(countryId,priorityGroupDTO));
     }
 
     @ApiOperation("Get all Priority Group based on countryId")
