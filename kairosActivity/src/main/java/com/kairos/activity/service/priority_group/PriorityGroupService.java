@@ -45,10 +45,10 @@ public class PriorityGroupService extends MongoBaseService {
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
+        priorityGroupDTO.setName(priorityGroup.getName());
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         priorityGroup.setId(priorityGroupId);
         priorityGroup.setCountryId(countryId);
-        priorityGroup.setName(priorityGroup.getName());
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
