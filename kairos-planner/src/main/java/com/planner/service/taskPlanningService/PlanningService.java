@@ -41,6 +41,8 @@ public class PlanningService {
     @Autowired private ShiftPlanningService shiftPlanningService;
     @Autowired
     private PathProvider pathProvider;
+    @Autowired
+    private PlannerLauncherService plannerLauncherService;
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
         PlanningProblem planningProblem = (PlanningProblem) planningRepository.findById(id,PlanningProblem.class);
@@ -108,11 +110,15 @@ public class PlanningService {
     }
 
 
-    public PlanningSubmissonResponseDTO submitShiftPlanningproblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
-        SolverConfig solverConfig=solverConfigRepository.findByKairosId(planningSubmissionDTO.getSolverConfigId()).get();
+    public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
         ShiftRequestPhasePlanningSolution problem=shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
         ShiftPlanningUtil.toXml(problem,pathProvider.getProblemXmlpath());
-
+        solverConfigService.createShiftPlanningSolverConfig(planningSubmissionDTO.getSolverConfigId());
+        try {
+            plannerLauncherService.instantiateNewSolver();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return new PlanningSubmissonResponseDTO();
     }
 }

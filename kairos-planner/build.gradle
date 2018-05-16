@@ -43,7 +43,13 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
     maven { url "http://repo.spring.io/release" }
 }
+/*Closure cl = { task -> println ".............I'm $task.project.name" }
+project("optaplanner-shiftplanning"){
+    task jello{
+        println "..........."
 
+    }
+}*/
 
 dependencies {
 	compile project('optaplanner-shiftplanning')

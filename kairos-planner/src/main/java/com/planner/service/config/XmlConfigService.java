@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -19,6 +20,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.util.List;
 
 @Service
 public class XmlConfigService {
@@ -60,4 +62,12 @@ public class XmlConfigService {
         return null;
     }
 
+    public void putElementsInXml(Document baseConfig, List<String> validDrls, String solverConfigDrlParentTag) {
+        Element element=(Element)baseConfig.getElementsByTagName(solverConfigDrlParentTag).item(0);
+        for(String validDrl:validDrls){
+            Element drl=baseConfig.createElement("scoreDrl");
+            drl.setTextContent(validDrl);
+            element.appendChild(drl);
+        }
+    }
 }

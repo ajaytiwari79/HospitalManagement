@@ -251,7 +251,6 @@ public class ShiftPlanningService {
         }
         /*Map<String, ActivityPlannerEntity> activityMap=new HashMap<>();
         acts.forEach(a->activityMap.put(a.getId(),a));*/
-        List<StaffingLevelPlannerEntity> sls= new ArrayList<>();
         List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
         Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities= new HashMap<>();
         for (StaffingLevel staffingLevel:staffingLevels){
@@ -318,23 +317,5 @@ public class ShiftPlanningService {
             }
         }
         return groupedAlis;
-    }
-
-    public Document loadBaseSolverConfigXML(){
-        String filepath = "baseSolverConfig.xml";
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory
-                    .newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse(filepath);
-            return doc;
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

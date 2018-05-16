@@ -10,9 +10,7 @@ import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 
 public class ShiftPlanningUtil {
     private static Logger log= LoggerFactory.getLogger(PlanningService.class);
@@ -42,5 +40,37 @@ public class ShiftPlanningUtil {
         }
         out.write(xmlString);
         out.close();
+    }
+
+    public static void copyFileContent(File baseFile, File file) {
+        FileReader fr=null;
+        FileWriter fw=null;
+        try {
+            fr=new FileReader(baseFile);
+            fw=new FileWriter(file);
+            int b=0;
+            while ((b=fr.read())!=-1){
+                fw.write(b);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (fr != null) {
+                try {
+                    fr.close();
+                } catch(IOException e) {
+                }
+            }
+            if (fw != null) {
+                try {
+                    fw.close();
+                } catch(IOException e) {
+                }
+            }
+        }
+
     }
 }

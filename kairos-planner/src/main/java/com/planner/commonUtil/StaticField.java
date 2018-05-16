@@ -81,6 +81,8 @@ public class StaticField {
     public final static String DRL_DAYS_OFF_AFTER_A_SERIES = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_NO_OF_SEQUENCE_SHIFT = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_EMPLOYEES_WITH_INCREASE_RISK = DRL_WTA_BASE_SRC+"java";
+    public static final String BASE_SOLVER_CONFIG_FIRST_PHASE = "com/kairos/shiftplanning/configuration/BASE_SHIFT_PLANNING_PHASE1_SOLVER.xml";
+    public static final String SOLVER_CONFIG_DRL_PARENT_TAG="scroreDirectorFactory";
 
 
 }

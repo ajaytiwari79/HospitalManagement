@@ -4,15 +4,7 @@ import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
 import com.planner.commonUtil.OptaNotFoundException;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.commonUtil.StaticField;
-import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
-import com.planner.responseDto.config.SolverConfigDTO;
-import com.planner.responseDto.locationDto.OptaLocationDTO;
-import com.planner.service.config.SolverConfigService;
-import com.planner.service.locationService.GraphHopperService;
-import com.planner.service.shiftPlanningService.ShiftPlanningService;
-import com.planner.service.shiftPlanningService.ShiftRequestPhasePlanningSolutionService;
 import com.planner.service.taskPlanningService.PlanningService;
-import com.planner.service.taskPlanningService.TaskPlanningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +20,8 @@ public class PlanningController {
 	private static final Logger log = LoggerFactory.getLogger(PlanningController.class);
 	@Autowired private PlanningService planningService;
 	@RequestMapping(value = "/shiftPlanningXml", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> shiftPlanningXml(@RequestBody PlanningSubmissionDTO planningSubmissionDTO, @PathVariable Long unitId) {
-        planningService.submitShiftPlanningproblem(unitId,planningSubmissionDTO);
+    	ResponseEntity<Map<String, Object>> shiftPlanningXml(@RequestBody PlanningSubmissionDTO planningSubmissionDTO, @PathVariable Long unitId) {
+        planningService.submitShiftPlanningProblem(unitId,planningSubmissionDTO);
 		return ResponseHandler.generateResponse("save Data sucessFully", HttpStatus.ACCEPTED);
 	}
 

@@ -5,9 +5,17 @@ import com.kairos.dto.solverconfig.SolverConfigDTO;
 import com.planner.commonUtil.StaticField;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
+import com.planner.util.wta.ShiftPlanningUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,21 +24,50 @@ import java.util.List;
 public class SolverConfigService {
 
     @Autowired private SolverConfigRepository solverConfigRepository;
+    @Autowired private XmlConfigService xmlConfigService;
+    @Autowired private PathProvider pathProvider;
 
     public void addSolverConfig(Long unitId, SolverConfigDTO solverConfigDTO){
         SolverConfig solverConfig= new SolverConfig(solverConfigDTO.getTemplateTypes(),120,unitId);
         solverConfigRepository.save(solverConfig);
     }
 
-    public String createShiftPlanningSolverConfig(BigInteger solverConfigId){
+    /**
+     * Creates solver config xml at {@link PathProvider} solverConfigPath property based on wta templates for this solver config
+     * @param solverConfigId
+     */
+    public void createShiftPlanningSolverConfig(BigInteger solverConfigId){
         SolverConfig solverConfig=solverConfigRepository.findByKairosId(solverConfigId).get();
         List<String> validDrls=new ArrayList<>();
         for(WTATemplateType wtaTemplateType:solverConfig.getTemplateTypes()){
             validDrls.add(getDrlPathForTemplateType(wtaTemplateType));
         }
+        Document baseConfig= getBaseSolverConfig();
+        xmlConfigService.putElementsInXml(baseConfig,validDrls,StaticField.SOLVER_CONFIG_DRL_PARENT_TAG);
 
-        return null;
-
+    }
+    public Document getBaseSolverConfig(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        Document doc = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+            File baseFile = new File(StaticField.BASE_SOLVER_CONFIG_FIRST_PHASE);
+            File file=new File(pathProvider.getSolverConfigXmlpath());
+            if(file.exists()){
+                file.delete();
+            }
+            file.createNewFile();
+            ShiftPlanningUtil.copyFileContent(baseFile,file);
+            doc = docBuilder.parse(file);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return doc;
     }
 
     private String getDrlPathForTemplateType(WTATemplateType wtaTemplateType) {
