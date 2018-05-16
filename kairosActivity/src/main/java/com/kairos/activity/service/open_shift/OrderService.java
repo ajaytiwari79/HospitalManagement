@@ -13,6 +13,7 @@ import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class OrderService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);
@@ -39,8 +41,11 @@ public class OrderService extends MongoBaseService {
     List<OpenShiftResponseDTO> openShiftResponseDTOs = orderOpenshiftResponseDTO.getOpenshifts();
     ObjectMapperUtils.copyProperties(orderResponseDTO,order);
     save(order);
-    orderResponseDTO.setOrderId(order.getId());
+    orderResponseDTO.setId(order.getId());
     //priorityGroupService.copyPriorityGroupsForOrder(orderResponseDTO.getUnitId(),order.getId());
+       for(OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
+           openShiftResponseDTO.setActivityId(order.getActivityId());
+       }
     openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
 
     return orderOpenshiftResponseDTO;
@@ -48,15 +53,21 @@ public class OrderService extends MongoBaseService {
 
     }
 
-    public OrderResponseDTO updateOrder(OrderResponseDTO orderResponseDTO,BigInteger orderId) {
+    public OrderOpenshiftResponseDTO updateOrder(OrderOpenshiftResponseDTO orderOpenShiftResponseDTO,BigInteger orderId) {
 
+       OrderResponseDTO orderResponseDTO = orderOpenShiftResponseDTO.getOrder();
+       List<OpenShiftResponseDTO> openShiftResponseDTOS = orderOpenShiftResponseDTO.getOpenshifts();
         Order order = orderMongoRepository.findOrderByIdAndEnabled(orderId);
         if(!Optional.ofNullable(order).isPresent()) {
             throw new DataNotFoundByIdException("Order doesn not exist by id"+ orderId);
         }
         ObjectMapperUtils.copyProperties(orderResponseDTO,order);
         save(order);
-        return orderResponseDTO;
+        orderResponseDTO.setId(order.getId());
+        openShiftResponseDTOS = openShiftService.updateOpenShift(openShiftResponseDTOS,orderId);
+        orderOpenShiftResponseDTO.setOrder(orderResponseDTO);
+        orderOpenShiftResponseDTO.setOpenshifts(openShiftResponseDTOS);
+        return orderOpenShiftResponseDTO;
     }
 
     public void deleteOrder(BigInteger orderId) {

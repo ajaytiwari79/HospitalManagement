@@ -1,12 +1,10 @@
 package com.kairos.activity.persistence.model.priority_group;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.enums.PriorityGroup.Priority;
+import com.kairos.activity.enums.PriorityGroup.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroup extends MongoBaseEntity {
     //private ShiftSelectionType shiftSelectionType;
     //private boolean singleLongerShift;
@@ -23,15 +21,16 @@ public class PriorityGroup extends MongoBaseEntity {
     private BigInteger countryParentId;
     private Integer priority;
     private BigInteger orderId;
-
+    private SchedulerProcess schedulerProcess;
+    private PriorityGroupName name;
 
     public PriorityGroup() {
         //Default Constructor
     }
 
-    public PriorityGroup(Integer priority, boolean activated, OpenShiftCancelProcess openShiftCancelProcess, RoundRule roundRule, StaffExcludeFilter staffExcludeFilter,
+    public PriorityGroup(PriorityGroupName name, boolean activated, OpenShiftCancelProcess openShiftCancelProcess, RoundRule roundRule, StaffExcludeFilter staffExcludeFilter,
                          StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
-        this.priority=priority;
+        this.name=name;
         this.activated = activated;
         this.openShiftCancelProcess = openShiftCancelProcess;
         this.roundRule = roundRule;
@@ -107,12 +106,12 @@ public class PriorityGroup extends MongoBaseEntity {
         this.countryParentId = countryParentId;
     }
 
-    public Integer getPriority() {
-        return priority;
+    public PriorityGroupName getName() {
+        return name;
     }
 
-    public void setPriority(Integer priority) {
-        this.priority = priority;
+    public void setName(PriorityGroupName name) {
+        this.name = name;
     }
     public BigInteger getOrderId() {
         return orderId;
@@ -122,6 +121,11 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
+    public SchedulerProcess getSchedulerProcess() {
+        return schedulerProcess;
+    }
 
-
+    public void setSchedulerProcess(SchedulerProcess schedulerProcess) {
+        this.schedulerProcess = schedulerProcess;
+    }
 }

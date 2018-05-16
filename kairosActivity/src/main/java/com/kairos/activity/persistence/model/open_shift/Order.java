@@ -4,6 +4,7 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.response.dto.web.open_shift.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class Order extends MongoBaseEntity {
 
     private Long unitId;
-    private Long activityId;
+    private BigInteger activityId;
     private Long plannedTimeId;
     private Long contactPersonId;
     private String contactPersonMobile;
@@ -21,12 +22,12 @@ public class Order extends MongoBaseEntity {
     private LocalTime toTime;
     private Integer minOpenShiftHours;
     private WeekType weekType;
-    private DayTypeOrder dayType;
+    private List<String> dayType;
     private Long reasonCodeId;
     private String noteForPlanner;
-    private Long experitiseId;
+    private Long expertiseId;
     private List<Long> skillLevel;
-    private Long functionId;
+    private List<Long> functionIds;
     private boolean acuteOrder;
     private StartFrom startFrom;
     private Integer priority;
@@ -34,11 +35,24 @@ public class Order extends MongoBaseEntity {
     private String noteForCandidate;
     private LocalDate deadline;
     private OrderNotificationsCriteriaForPlanner notificationsCriteria;
-    private ShiftAssignmentCriteria siftAssignmentCriteria;
+    private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
+    public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
+        return shiftAssignmentCriteria;
+    }
 
+    public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
+        this.shiftAssignmentCriteria = shiftAssignmentCriteria;
+    }
 
+    public List<String> getDayType() {
+        return dayType;
+    }
+
+    public void setDayType(List<String> dayType) {
+        this.dayType = dayType;
+    }
     public Integer getPriority() {
         return priority;
     }
@@ -52,14 +66,6 @@ public class Order extends MongoBaseEntity {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
-    }
-
-    public Long getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(Long activityId) {
-        this.activityId = activityId;
     }
 
     public Long getPlannedTimeId() {
@@ -134,13 +140,6 @@ public class Order extends MongoBaseEntity {
         this.weekType = weekType;
     }
 
-    public DayTypeOrder getDayType() {
-        return dayType;
-    }
-
-    public void setDayType(DayTypeOrder dayType) {
-        this.dayType = dayType;
-    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
@@ -158,12 +157,12 @@ public class Order extends MongoBaseEntity {
         this.noteForPlanner = noteForPlanner;
     }
 
-    public Long getExperitiseId() {
-        return experitiseId;
+    public Long getExpertiseId() {
+        return expertiseId;
     }
 
-    public void setExperitiseId(Long experitiseId) {
-        this.experitiseId = experitiseId;
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
     }
 
     public List<Long> getSkillLevel() {
@@ -174,13 +173,7 @@ public class Order extends MongoBaseEntity {
         this.skillLevel = skillLevel;
     }
 
-    public Long getFunctionId() {
-        return functionId;
-    }
 
-    public void setFunctionId(Long functionId) {
-        this.functionId = functionId;
-    }
 
     public boolean isAcuteOrder() {
         return acuteOrder;
@@ -232,13 +225,7 @@ public class Order extends MongoBaseEntity {
         this.notificationsCriteria = notificationsCriteria;
     }
 
-    public ShiftAssignmentCriteria getSiftAssignmentCriteria() {
-        return siftAssignmentCriteria;
-    }
 
-    public void setSiftAssignmentCriteria(ShiftAssignmentCriteria siftAssignmentCriteria) {
-        this.siftAssignmentCriteria = siftAssignmentCriteria;
-    }
 
     public BringVehicle getBringVehicle() {
         return bringVehicle;
@@ -255,9 +242,22 @@ public class Order extends MongoBaseEntity {
     public void setDeadlineRule(DeadlineRule deadlineRule) {
         this.deadlineRule = deadlineRule;
     }
+    public BigInteger getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
+    }
 
 
+    public List<Long> getFunctionIds() {
+        return functionIds;
+    }
 
+    public void setFunctionIds(List<Long> functionIds) {
+        this.functionIds = functionIds;
+    }
 
 
 }

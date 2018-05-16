@@ -366,7 +366,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "MATCH (staffFavouriteFilters)-[:" + HAS_FILTER_GROUP + "]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} return staffFavouriteFilters\n")*/
     @Query("MATCH (staff:Staff)-[:"+HAS_FAVOURITE_FILTERS+"]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters \n" +
             "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} \n" +
-            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterDetail) with staffFavouriteFilters, collect({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) as filterDetails\n" +
+            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) with staffFavouriteFilters, collect({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) as filterDetails\n" +
             "return id(staffFavouriteFilters) as id, staffFavouriteFilters.name as name, filterDetails as filtersData")
     List<FavoriteFilterQueryResult> getStaffFavouriteFiltersByStaffAndView(Long staffId, String moduleId);
 
@@ -412,8 +412,15 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "WHERE id(staffFavouriteFilter) = {2} return staffFavouriteFilter")
    StaffFavouriteFilter getStaffFavouriteFiltersOfStaffInOrganizationById(Long userId, Long organizationId, Long staffFavouriteFilterId);
 
-    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:"+FILTER_DETAIL+"]->(filterDetail:FilterDetail) WHERE id(staffFavouriteFilter)={0} \n"+
+    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:"+FILTER_DETAIL+"]->(filterDetail:FilterSelection) WHERE id(staffFavouriteFilter)={0} \n"+
             "DELETE r,filterDetail")
     void detachStaffFavouriteFilterDetails(Long staffFavouriteFilterId);
+
+
+    @Query("match(staff:Staff{deleted:false})-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) return  id(staff) as id, staff.firstName as firstName, " +
+            " staff.lastName as lastName, contactDetail.privatePhone as privatePhone ")
+    List<StaffPersonalDetailDTO> getAllStaffWithMobileNumber(long unitId);
+
+
 
 }

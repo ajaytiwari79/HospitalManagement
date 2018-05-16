@@ -8,21 +8,30 @@ import java.util.List;
 public class OpenShiftResponseDTO {
 
     private LocalDate startDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalTime fromTime;
+    private LocalTime toTime;
     private Integer noOfPersonRequired;
     private List<Long> interestedStaff;
     private List<Long> declinedBy;
     private Long unitId;
     private BigInteger orderId;
-    private BigInteger openShiftId;
+    private BigInteger id;
+    private BigInteger activityId;
 
-    public BigInteger getOpenShiftId() {
-        return openShiftId;
+    public BigInteger getActivityId() {
+        return activityId;
     }
 
-    public void setOpenShiftId(BigInteger openShiftId) {
-        this.openShiftId = openShiftId;
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
 
@@ -53,20 +62,20 @@ public class OpenShiftResponseDTO {
         this.startDate = startDate;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
+    public LocalTime getFromTime() {
+        return fromTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
+    public void setFromTime(LocalTime fromTime) {
+        this.fromTime = fromTime;
     }
 
-    public LocalTime getEndTime() {
-        return endTime;
+    public LocalTime getToTime() {
+        return toTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
+    public void setToTime(LocalTime toTime) {
+        this.toTime = toTime;
     }
 
     public Integer getNoOfPersonRequired() {

@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.activity;
 
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.activity.response.dto.ActivityDTO;
 import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -56,4 +57,10 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
+
+
+//    @Query(value="{unitId:?0,deleted:false}",fields="{ 'balanceSettingsActivityTab' : 1,''}")
+//    List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
+
+
 }

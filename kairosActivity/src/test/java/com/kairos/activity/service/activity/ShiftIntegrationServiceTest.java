@@ -11,6 +11,7 @@ import com.kairos.activity.persistence.repository.common.MongoSequenceRepository
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.enums.shift.ShiftState;
 import org.junit.*;

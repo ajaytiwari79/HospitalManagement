@@ -85,4 +85,12 @@ public class PriorityGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.copyPriorityGroupsForOrder(unitId,orderId));
     }
 
+    @ApiOperation("Get  Priority Group based on priorityGroupId")
+    @GetMapping(value = COUNTRY_URL+"/priority_group/{priorityGroupId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPriorityGroupById(@PathVariable BigInteger priorityGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupById(priorityGroupId));
+    }
+
+
 }
