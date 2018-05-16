@@ -1,9 +1,6 @@
 package com.kairos.activity.service.exception;
 
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
-import com.kairos.activity.custom_exception.InvalidRequestException;
+import com.kairos.activity.custom_exception.*;
 import com.kairos.activity.service.locale.LocaleService;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +43,15 @@ public class ExceptionService {
     }
     public void internalError(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
+    }
+    public void illegalArgumentException(String message, Object... params) {
+        throw new IllegalArgumentException(convertMessage(message, params));
+    }
+    public void timeTypeLinkedException(String message, Object... params) {
+        throw new TimeTypeLinkedException(convertMessage(message, params));
+    }
+    public void invalidClientException(String message, Object... params) {
+        throw new InvalidClientException(convertMessage(message, params));
     }
 
 }
