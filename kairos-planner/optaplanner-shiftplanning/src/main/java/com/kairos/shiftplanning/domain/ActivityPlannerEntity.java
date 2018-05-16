@@ -13,19 +13,19 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@XStreamAlias("Activity")
-public class Activity {
+@XStreamAlias("ActivityPlannerEntity")
+public class ActivityPlannerEntity {
     private static Logger log= LoggerFactory.getLogger(WorkingTimeConstraints.class);
     private String id;
     private List<Skill> skills;
     private int priority;
     private String name;
     private ActivityConstraints activityConstraints;
-    private float activityCost;
     private TimeType timeType;
     private int order;
     private int rank;
-    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order,int rank) {
+    private List<Long> expertises;
+    public ActivityPlannerEntity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
         this.id = id;
         this.skills = skills;
         this.priority = priority;
@@ -33,7 +33,11 @@ public class Activity {
         this.timeType=timeType;
         this.order = order;
         this.rank=rank;
+        this.expertises = expertises;
     }
+    public ActivityPlannerEntity() {
+    }
+
 
     public TimeType getTimeType() {
         return timeType;
@@ -43,13 +47,6 @@ public class Activity {
         this.timeType = timeType;
     }
 
-    public float getActivityCost() {
-        return activityCost;
-    }
-
-    public void setActivityCost(float activityCost) {
-        this.activityCost = activityCost;
-    }
 
     public String getName() {
         return name;
@@ -130,11 +127,9 @@ public class Activity {
         return activityConstraints.getContinousActivityPerShift().checkConstraints(lineInterval);
     }*/
 
-    public Activity() {
-    }
 
     public void breakActivityContraints(ShiftRequestPhase shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, int index) {
-        log.debug("breaking Activity constraint: {}",index);
+        log.debug("breaking ActivityPlannerEntity constraint: {}",index);
         switch (index) {
             /*case 1:
                 activityConstraints.getLongestDuration().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
@@ -186,8 +181,8 @@ public class Activity {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        //Activity activity = (Activity) o;
-        return id.equals(((Activity) o).getId());
+        //ActivityPlannerEntity activity = (ActivityPlannerEntity) o;
+        return id.equals(((ActivityPlannerEntity) o).getId());
 
         /*return new EqualsBuilder()
                 .append(priority, activity.priority)
@@ -207,7 +202,6 @@ public class Activity {
                 .append(priority)
                 .append(name)
                 .append(activityConstraints)
-                .append(activityCost)
                 .toHashCode();
     }
 
@@ -225,5 +219,13 @@ public class Activity {
 
     public void setRank(int rank) {
         this.rank = rank;
+    }
+
+    public List<Long> getExpertises() {
+        return expertises;
+    }
+
+    public void setExpertises(List<Long> expertises) {
+        this.expertises = expertises;
     }
 }
