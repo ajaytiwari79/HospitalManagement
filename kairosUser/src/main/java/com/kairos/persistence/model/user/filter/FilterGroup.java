@@ -3,11 +3,16 @@ package com.kairos.persistence.model.user.filter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.persistence.model.enums.FilterEntityType;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.EnumString;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -22,8 +27,9 @@ public class FilterGroup extends UserBaseEntity {
     @Relationship(type = APPLICABLE_FOR)
     private List<AccessPage> accessPages;
 
-
-    private List<FilterType> filterTypes;
+//    @Property(name = "filterTypes")
+//    @EnumString(FilterEntityType.class)
+    private Set<FilterEntityType> filterTypes;
 
     public FilterGroup(){
         // default constructor
@@ -37,11 +43,11 @@ public class FilterGroup extends UserBaseEntity {
         this.accessPages = accessPages;
     }
 
-    public List<FilterType> getFilterTypes() {
+    public Set<FilterEntityType> getFilterTypes() {
         return filterTypes;
     }
 
-    public void setFilterTypes(List<FilterType> filterTypes) {
+    public void setFilterTypes(Set<FilterEntityType> filterTypes) {
         this.filterTypes = filterTypes;
     }
 }

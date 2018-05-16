@@ -11,7 +11,9 @@ import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
+import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DataNotFoundException;
+import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.TimeType;
@@ -25,11 +27,9 @@ import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
-import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.activity.service.phase.PhaseService;
-import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
@@ -73,18 +73,22 @@ import static org.springframework.http.MediaType.APPLICATION_XML;
 public class ActivityService extends MongoBaseService {
     @Autowired
     private OrganizationRestClient organizationRestClient;
+
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ActivityCategoryRepository activityCategoryRepository;
+
     @Inject
     private ShiftService shiftService;
     @Autowired
     private PhaseService phaseService;
+
     @Inject
     private TagMongoRepository tagMongoRepository;
     @Inject
     private OrganizationActivityService organizationActivityService;
+
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
@@ -95,8 +99,6 @@ public class ActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Inject
-    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -106,7 +108,8 @@ public class ActivityService extends MongoBaseService {
                 findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
 
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.duplicateDataException("exception.duplicateData", "activity", activityDTO.getName());
+            logger.error("ActivityName already exist" + activityDTO.getName());
+            throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId);
@@ -155,7 +158,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, "hours", 1, false);
         activity.setCommunicationActivityTab(communicationActivityTab);
 
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false, false);
+        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false,false);
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
 
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
@@ -165,7 +168,7 @@ public class ActivityService extends MongoBaseService {
 
         SkillActivityTab skillActivityTab = new SkillActivityTab();
         activity.setSkillActivityTab(skillActivityTab);
-        LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
         activity.setLocationActivityTab(locationActivityTab);
 
     }
@@ -213,7 +216,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid activity Id : " + activityId);
         }
 
         long activityCount = shiftService.countByActivityId(activityId);
@@ -229,26 +232,13 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
         logger.info(generalDTO.toString());
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted(generalDTO.getCategoryName(), countryId, false);
-
-        if (activityCategory != null) {
-
-            generalDTO.setCategoryId(activityCategory.getId());
-        } else {
-
-            ActivityCategory category = new ActivityCategory(generalDTO.getCategoryName(), "", countryId);
-            save(category);
-
-            if (category == null) {
-                exceptionService.invalidRequestException("exception.invalidRequest");
-            }
-
-            generalDTO.setCategoryId(category.getId());
-
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            throw new DataNotFoundByIdException("Category Not Available");
         }
         Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            exceptionService.duplicateDataException("exception.duplicateData", "activity");
+            throw new DuplicateDataException("Name already is use " + generalDTO.getName());
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
@@ -277,7 +267,7 @@ public class ActivityService extends MongoBaseService {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid TimeCareActivity Id : " + activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
 
@@ -299,7 +289,7 @@ public class ActivityService extends MongoBaseService {
         PresenceTypeWithTimeTypeDTO presenceType = organizationRestClient.getPresenceTypeAndTimeTypeByCountry(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("TimeCareActivity not found : " + activityId);
         }
         BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsActivityTab, presenceType);
@@ -312,7 +302,7 @@ public class ActivityService extends MongoBaseService {
         BalanceSettingsActivityTab balanceSettingsTab = balanceDTO.buildBalanceSettingsActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(balanceDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", balanceDTO.getActivityId());
+            throw new DataNotFoundByIdException("TimeCareActivity not found : " + balanceDTO.getActivityId());
         }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
@@ -344,7 +334,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", timeCalculationActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("TimeCareActivity not found by Id: " + timeCalculationActivityDTO.getActivityId());
         }
         activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
         save(activity);
@@ -358,7 +348,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(compositeShiftActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", compositeShiftActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("TimeCareActivity not found by Id: " + compositeShiftActivityDTO.getActivityId());
         }
         Set<BigInteger> activityIds = compositeShiftActivityDTO.getActivityList();
         Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(activityIds);
@@ -386,7 +376,7 @@ public class ActivityService extends MongoBaseService {
     public List<ActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (activity == null) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("TimeCareActivity not found by Id : " + activityId);
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
         if (activity.getCompositeActivities() != null) {
@@ -402,7 +392,7 @@ public class ActivityService extends MongoBaseService {
         IndividualPointsActivityTab individualPointsActivityTab = individualPointsDTO.buildIndividualPointsActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(individualPointsDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", individualPointsDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + individualPointsDTO.getActivityId());
         }
         activity.setIndividualPointsActivityTab(individualPointsActivityTab);
         save(activity);
@@ -423,7 +413,7 @@ public class ActivityService extends MongoBaseService {
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(rulesActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", rulesActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + rulesActivityDTO.getActivityId());
         }
         activity.setRulesActivityTab(rulesActivityTab);
         save(activity);
@@ -452,7 +442,7 @@ public class ActivityService extends MongoBaseService {
             notesActivityTab.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         }
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", notesActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + notesActivityDTO.getActivityId());
         }
         activity.setNotesActivityTab(notesActivityTab);
         save(activity);
@@ -473,7 +463,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = communicationActivityDTO.buildSMSReminderActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(communicationActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", communicationActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + communicationActivityDTO.getActivityId());
         }
         activity.setCommunicationActivityTab(communicationActivityTab);
         save(activity);
@@ -486,7 +476,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getCommunicationActivityTab());
         return activityTabsWrapper;
@@ -497,7 +487,7 @@ public class ActivityService extends MongoBaseService {
         BonusActivityTab bonusActivityTab = bonusActivityDTO.buildBonusActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(bonusActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", bonusActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + bonusActivityDTO.getActivityId());
         }
         activity.setBonusActivityTab(bonusActivityTab);
         save(activity);
@@ -508,7 +498,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper getBonusTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getBonusActivityTab());
         return activityTabsWrapper;
@@ -518,7 +508,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO) {
         Activity activity = activityMongoRepository.findOne(new BigInteger(skillActivityDTO.getActivityId().toString()));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", skillActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId" + skillActivityDTO.getActivityId());
         }
         SkillActivityTab skillActivityTab = skillActivityDTO.buildSkillActivityTab();
 
@@ -541,7 +531,7 @@ public class ActivityService extends MongoBaseService {
     public void updateOrgMappingDetailOfActivity(OrganizationMappingActivityDTO organizationMappingActivityDTO) {
         Activity activity = activityMongoRepository.findOne(new BigInteger(organizationMappingActivityDTO.getActivityId().toString()));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", organizationMappingActivityDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId" + organizationMappingActivityDTO.getActivityId());
         }
 
         boolean isSuccess = organizationRestClient.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
@@ -555,8 +545,8 @@ public class ActivityService extends MongoBaseService {
         activity.setLevels(organizationMappingActivityDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingActivityDTO.getEmploymentTypes());
         save(activity);
-        if (activity.getUnitId() != null) {
-            plannerSyncService.publishActivity(activity.getUnitId(), activity, IntegrationOperation.UPDATE);
+        if(activity.getUnitId()!=null){
+            plannerSyncService.publishActivity(activity.getUnitId(),activity,IntegrationOperation.UPDATE);
         }
 
     }
@@ -566,7 +556,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Activity  not found : " + activityId);
         }
         OrganizationMappingActivityDTO organizationMappingActivityDTO = new OrganizationMappingActivityDTO();
         organizationMappingActivityDTO.setOrganizationSubTypes(activity.getOrganizationSubTypes());
@@ -610,7 +600,7 @@ public class ActivityService extends MongoBaseService {
         OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = optaPlannerSettingActivityTabDTO.buildOptaPlannerSettingTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(optaPlannerSettingActivityTabDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", optaPlannerSettingActivityTabDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + optaPlannerSettingActivityTabDTO.getActivityId());
         }
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         save(activity);
@@ -635,7 +625,7 @@ public class ActivityService extends MongoBaseService {
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTabDTO.buildCTAAndWTASettingActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(ctaAndWtaSettingsActivityTabDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", ctaAndWtaSettingsActivityTabDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + ctaAndWtaSettingsActivityTabDTO.getActivityId());
         }
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
         save(activity);
@@ -705,7 +695,7 @@ public class ActivityService extends MongoBaseService {
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
         byte[] bytes = file.getBytes();
         String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
@@ -722,10 +712,10 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
         if (activity.getState().equals(ActivityStateEnum.LIVE)) {
-            exceptionService.actionNotPermittedException("exception.alreadyInUse", "activity");
+            throw new ActionNotPermittedException("activity type is being used in organizations : " + activityId);
         }
 
 
@@ -786,7 +776,7 @@ public class ActivityService extends MongoBaseService {
 
         OrganizationDTO organizationDTO = organizationRestClient.getOrganization(unitId);
         if (organizationDTO == null) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "organization", unitId);
+            throw new DataNotFoundByIdException("Incorrect Organization id");
         }
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory == null) {
@@ -842,7 +832,7 @@ public class ActivityService extends MongoBaseService {
             activity.setRulesActivityTab(rulesActivityTab);
 
             // location settings
-            LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+            LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
             activity.setLocationActivityTab(locationActivityTab);
 
             //Time calculation tab
@@ -951,7 +941,7 @@ public class ActivityService extends MongoBaseService {
     public NotesActivityTab addDocumentInNotesTab(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
         byte[] bytes = file.getBytes();
         String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
@@ -966,10 +956,10 @@ public class ActivityService extends MongoBaseService {
     public Boolean publishActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
-            exceptionService.actionNotPermittedException("exception.alreadyPublished", "activity");
+            throw new ActionNotPermittedException("activity is already published :" + activityId);
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);
@@ -981,11 +971,11 @@ public class ActivityService extends MongoBaseService {
                 findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist " + activityDTO.getName());
-            exceptionService.duplicateDataException("exception.duplicate", "activity");
+            throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+            throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
         }
 
         Activity activityCopied = new Activity();
@@ -1007,7 +997,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateLocationsTabOfActivity(LocationActivityTabDTO locationActivityTabDTO) {
         Activity activity = activityMongoRepository.findOne(locationActivityTabDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", locationActivityTabDTO.getActivityId());
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + locationActivityTabDTO.getActivityId());
         }
         LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getCanBeStartAt(), locationActivityTabDTO.getCanBeEndAt());
         activity.setLocationActivityTab(locationActivityTab);

@@ -18,8 +18,6 @@ public class ResponseConstants {
 
     public static final String INVALID_ACCESS="INVALID_ACCESS";
     public static final String NO_PRIVILEDGE="NO_PRIVILEDGE";
-    public static final String NOT_FOUND ="NOT_FOUND";
-    public static final String NOT_PERMITTED ="NOT_PERMITTED";
 
     /**
      * Default constructor

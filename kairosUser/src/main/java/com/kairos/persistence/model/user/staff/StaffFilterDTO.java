@@ -2,8 +2,10 @@ package com.kairos.persistence.model.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.user.filter.FilterSelection;
+import com.kairos.persistence.model.user.filter.FilterDetail;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ import java.util.List;
 public class StaffFilterDTO {
     private String moduleId;
     private String filterJson;
-    private List<FilterSelection> filtersData;
+    private List<FilterDetail> filtersData;
     private long id;
     private String searchText;
 //    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
@@ -52,11 +54,11 @@ public class StaffFilterDTO {
         this.filterJson = filterJson;
     }
 
-    public List<FilterSelection> getFiltersData() {
+    public List<FilterDetail> getFiltersData() {
         return filtersData;
     }
 
-    public void setFiltersData(List<FilterSelection> filtersData) {
+    public void setFiltersData(List<FilterDetail> filtersData) {
         this.filtersData = filtersData;
     }
 

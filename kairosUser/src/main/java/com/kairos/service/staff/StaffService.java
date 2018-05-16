@@ -5,7 +5,6 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -175,7 +174,6 @@ public class StaffService extends UserBaseService {
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
     private PlannerSyncService plannerSyncService;
-
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -226,11 +224,7 @@ public class StaffService extends UserBaseService {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
 
         if (objectToUpdate == null) {
-            throw new DataNotFoundByIdException("Staff not found");
-        }
-        if(StaffStatusEnum.ACTIVE.equals(objectToUpdate.getCurrentStatus())&&StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus()))
-        {
-            throw new ActionNotPermittedException("Active employee can not be converted to Fictive employee");
+            throw new InternalError("Staff can't null");
         }
         staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
@@ -322,7 +316,7 @@ public class StaffService extends UserBaseService {
             engineerTypes = Collections.emptyList();
         }
         List<Long> organizationServicesIds = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds, DateUtil.getCurrentDateMillis());
+        expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds);
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
         personalInfo.put("expertise", expertise);
@@ -350,11 +344,10 @@ public class StaffService extends UserBaseService {
 
 
         List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
-        staffExpertiseQueryResults.forEach(expertiseQueryResult ->{
-            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
-            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
-        });
-
+//        staffExpertiseQueryResults.forEach(expertiseQueryResult ->{
+//            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
+//            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
+//        });
         map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
         map.put("expertiseWithExperience", staffExpertiseQueryResults);
 
@@ -400,7 +393,7 @@ public class StaffService extends UserBaseService {
         Map<String, Object> map = new HashMap();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 //            staff = getStaffWithBasicInfo(id, allStaffRequired);
-            map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, allStaffRequired, staffFilterDTO));
+            map.put("staffList", staffFilterService.getAllStaffByUnitId( unitId, allStaffRequired, staffFilterDTO));
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
@@ -417,7 +410,7 @@ public class StaffService extends UserBaseService {
         }
 
 
-        if (Optional.ofNullable(staff).isPresent()) {
+        if(Optional.ofNullable(staff).isPresent()){
             map.put("staffList", staff);
         }
 
@@ -550,7 +543,7 @@ public class StaffService extends UserBaseService {
             return null;
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId,DateUtil.getCurrentDateMillis()));
+        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         map.put("myExpertise", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId).stream().map(Expertise::getId).collect(Collectors.toList()));
         return map;
     }
@@ -1008,13 +1001,13 @@ public class StaffService extends UserBaseService {
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
         staff.setGender(user.getGender());
-        plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
+        plannerSyncService.publishStaff(unitId,staff,IntegrationOperation.CREATE);
         return staff;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
-        if (!Optional.ofNullable(user).isPresent()) {
+        if(!Optional.ofNullable(user).isPresent()){
             user = new User();
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
@@ -1027,7 +1020,7 @@ public class StaffService extends UserBaseService {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
-        user.setGender(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE);
+        user.setGender(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1))%2==0?Gender.FEMALE:Gender.MALE);
         user.setLastName(staffCreationDTO.getLastName());
         String defaultPassword = user.getFirstName().trim() + "@kairos";
         user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
@@ -1166,7 +1159,7 @@ public class StaffService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organizationId);
         }
-        if (!Optional.ofNullable(parent).isPresent()) {
+        if(!Optional.ofNullable(parent).isPresent()){
             parent = organization;
         }
 
@@ -1574,10 +1567,10 @@ public class StaffService extends UserBaseService {
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
 
-        if (activityDayTypes != null && !activityDayTypes.isEmpty()) {
+        if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
             List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityDayTypes);
-            if (dayTypes != null && !dayTypes.isEmpty()) {
-                List<DayOfWeek> days = dayTypes.stream().filter(dt -> !dt.isHolidayType()).flatMap(dt -> dt.getValidDays().stream().map(d -> DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
+            if(dayTypes!=null && !dayTypes.isEmpty()){
+                List<DayOfWeek> days = dayTypes.stream().filter(dt->!dt.isHolidayType()).flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
                 staffAdditionalInfoQueryResult.setActivityDayTypes(days);
             }
         }

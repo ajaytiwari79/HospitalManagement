@@ -5,7 +5,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.persistence.model.enums.FilterEntityType;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by prerna on 1/5/18.
@@ -63,28 +64,28 @@ public class StaffFilterService extends UserBaseService{
     ExpertiseGraphRepository expertiseGraphRepository;
 
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId){
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId){
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
 
         FiltersAndFavouriteFiltersDTO filtersAndFavouriteFiltersDTO = new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), unitId),
+                getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), organizationId),
                 getFavouriteFilters(moduleId, staff.getId()));
         return filtersAndFavouriteFiltersDTO;
     }
 
-    public List<FilterSelectionQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper){
-        List<FilterSelectionQueryResult> queryResults = new ArrayList<>();
+    public List<FilterDetailQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper){
+        List<FilterDetailQueryResult> queryResults = new ArrayList<>();
 
         filterData.forEach(filterDetailDTO -> {
-            queryResults.add(objectMapper.convertValue(filterDetailDTO, FilterSelectionQueryResult.class));
+            queryResults.add(objectMapper.convertValue(filterDetailDTO, FilterDetailQueryResult.class));
         });
         return queryResults;
     }
 
-    public List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId){
+    public List<FilterDetailQueryResult> getFilterDetailsByFilterEntity(FilterEntityType filterEntityType, Long countryId, Long unitId){
         ObjectMapper objectMapper =  new ObjectMapper();
-        switch (filterType){
+        switch (filterEntityType){
             case EMPLOYMENT_TYPE: {
                 return getEmploymenTypeFiltersDataByCountry(countryId);
             }
@@ -100,16 +101,15 @@ public class StaffFilterService extends UserBaseService{
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
-            default: throw new InvalidRequestException(filterType.value+" Entity not found");
+            default: throw new InvalidRequestException(filterEntityType.value+" Entity not found");
         }
     }
 
-    public FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId){
-
+    public FilterQueryResult getFilterDataByFilterEntity(FilterEntityType filterEntityType, Long countryId, Long unitId){
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
-        tempFilterDTO.setName(filterType.name());
-        tempFilterDTO.setTitle(filterType.value);
-        tempFilterDTO.setFilterData(getFilterDetailsByFilterType(filterType, countryId, unitId));
+        tempFilterDTO.setName(filterEntityType.name());
+        tempFilterDTO.setTitle(filterEntityType.value);
+        tempFilterDTO.setFilterData(getFilterDetailsByFilterEntity(filterEntityType, countryId, unitId));
         return tempFilterDTO;
     }
 
@@ -119,12 +119,9 @@ public class StaffFilterService extends UserBaseService{
             throw new InvalidRequestException("Filter feature is not enabled for the module");
         }
         List<FilterQueryResult> filterDTOs = new ArrayList<>();
-
-        filterGroup.getFilterTypes().forEach(filterType -> {
-            FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
-            if(tempFilterQueryResult.getFilterData().size() > 0){
-                filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
-            }
+        // TODO refactor to fetch list by stream
+        filterGroup.getFilterTypes().forEach(filterEntityType -> {
+            filterDTOs.add(getFilterDataByFilterEntity(filterEntityType, countryId, unitId));
         });
         return filterDTOs;
     }
@@ -140,9 +137,6 @@ public class StaffFilterService extends UserBaseService{
 
         if(!Optional.ofNullable(staffFilterDTO.getName()).isPresent()){
             throw new InvalidRequestException("Name can not be empty");
-        }
-        if(staffFilterDTO.getFiltersData().isEmpty()){
-            throw new InvalidRequestException("Please select some filters");
         }
         if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithName(staffFilterDTO.getModuleId(), staffFilterDTO.getName())){
             throw new InvalidRequestException("Filter already exists with name : "+staffFilterDTO.getName());
@@ -169,17 +163,13 @@ public class StaffFilterService extends UserBaseService{
         if(!Optional.ofNullable(favouriteFilterDTO.getName()).isPresent()){
             throw new InvalidRequestException("Name can not be empty");
         }
-        if(favouriteFilterDTO.getFiltersData().isEmpty()){
-            throw new InvalidRequestException("Please select some filters");
-        }
         if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithNameExceptId(favouriteFilterDTO.getModuleId(),
                 favouriteFilterDTO.getName(), staffFavouriteFilter.getId())){
             throw new InvalidRequestException("Filter already exists with name : "+favouriteFilterDTO.getName());
         }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
-        List<FilterSelection> filters =  favouriteFilterDTO.getFiltersData();
-        filters.forEach(filterSelection -> {
-            filterSelection.setId(null);});
+        List<FilterDetail> filters =  favouriteFilterDTO.getFiltersData();
+        filters.forEach(filterDetail -> {filterDetail.setId(null);});
         staffFavouriteFilter.setFiltersData(filters);
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         save(staffFavouriteFilter);
@@ -198,18 +188,18 @@ public class StaffFilterService extends UserBaseService{
         return true;
     }
 
-    public List<FilterSelectionQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId){
+    public List<FilterDetailQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId){
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    public Map<FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters){
-        Map<FilterType,List<String>> mapOfFilters = new HashMap<>();
+    public Map<FilterEntityType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterDetail> filters){
+        Map<FilterEntityType,List<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
-        filters.forEach(filterSelection -> {
-            if(!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
-                    filterSelection.getName() ) ){
-                mapOfFilters.put(filterSelection.getName(),filterSelection.getValue() );
+        filters.forEach(filterDetail -> {
+            if(!filterDetail.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
+                    FilterEntityType.valueOf(filterDetail.getName()) ) ){
+                mapOfFilters.put(FilterEntityType.valueOf(filterDetail.getName()) , filterDetail.getValue() );
 
             }
         });

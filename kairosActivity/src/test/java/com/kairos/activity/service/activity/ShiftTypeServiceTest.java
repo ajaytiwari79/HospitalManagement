@@ -9,17 +9,16 @@ import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepos
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
+import com.kairos.activity.response.dto.activity.ActivityTabsWrapper;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.service.phase.PhaseService;
-import com.kairos.activity.service.shift.ShiftService;
-import com.kairos.activity.shift.ShiftPublishDTO;
-import com.kairos.enums.shift.ShiftState;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -49,9 +49,9 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ShiftIntegrationServiceTest {
+public class ShiftTypeServiceTest {
 
-    private final Logger logger = LoggerFactory.getLogger(ShiftIntegrationServiceTest.class);
+    private final Logger logger = LoggerFactory.getLogger(ShiftTypeServiceTest.class);
 
     @Value("${server.host.http.url}")
     private String url;
@@ -75,14 +75,12 @@ public class ShiftIntegrationServiceTest {
     MongoTemplate mongoTemplate;
     @InjectMocks
     ActivityService activityService;
-    static String baseUrlForCountry,baseUrlForUnit;
+    static String baseUrl;
     static BigInteger createdId, createdIdDelete, wtaIdForUpdate;
 
     @Before
     public void setUp() throws Exception {
-        baseUrlForCountry = getBaseUrl(71L, 53L, null);
-        baseUrlForUnit = getBaseUrl(71L, null, 64L);
-
+        baseUrl = getBaseUrl(71L, 53L, null);
 
     }
 
@@ -95,12 +93,12 @@ public class ShiftIntegrationServiceTest {
     public void createActivity() throws Exception {
         ActivityDTO activityDTO = new ActivityDTO("Meeting", "Description of meeting", 53L, "meeting_category", 95L, true);
         HttpEntity<ActivityDTO> requestBodyData = new HttpEntity<>(activityDTO);
-        logger.info("baseUrlForCountry,{}", baseUrlForCountry + "/activity");
+        logger.info("baseUrl,{}", baseUrl + "/activity");
         ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityTagDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityTagDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<ActivityTagDTO>> response = restTemplate.exchange(
-                baseUrlForCountry + "/activity", HttpMethod.POST, requestBodyData, typeReference);
+                baseUrl + "/activity", HttpMethod.POST, requestBodyData, typeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdId = response.getBody().getData().getId();
@@ -140,34 +138,6 @@ public class ShiftIntegrationServiceTest {
     @Ignore
     public void getBalanceSettingsTabOfActivityType() throws Exception {
 
-    }
-
-    @Test
-    public void publishShifts() throws Exception {
-
-        List<BigInteger> shifts = new ArrayList<>();
-        shifts.add(new BigInteger("110"));
-        shifts.add(new BigInteger("109"));
-        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftState.FIXED);
-
-        HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
-
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>>() {
-                };
-        ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> response = restTemplate.exchange(
-                baseUrlForUnit + "/publish_shifts", HttpMethod.PUT, requestBodyData, typeReference);
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-    }
-
-    @Test
-    public void deleteShifts() throws Exception {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrlForUnit + "/shift/" + 109).queryParam("type", "organization");
-        ResponseEntity<String> response = restTemplate.exchange(
-                builder.toUriString(),
-                HttpMethod.DELETE, null, String.class);
-        logger.info("response", response);
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {

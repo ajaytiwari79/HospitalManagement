@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.user.filter;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.FilterType;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.List;
@@ -10,20 +9,20 @@ import java.util.List;
  * Created by prerna on 1/5/18.
  */
 @NodeEntity
-public class FilterSelection extends UserBaseEntity {
+public class FilterDetail extends UserBaseEntity {
 
-    private FilterType name;
+    private String name;
     private List<String> value;
 
-    public FilterSelection(){
+    public FilterDetail(){
         // default constructor
     }
 
-    public FilterType getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(FilterType name) {
+    public void setName(String name) {
         this.name = name;
     }
 

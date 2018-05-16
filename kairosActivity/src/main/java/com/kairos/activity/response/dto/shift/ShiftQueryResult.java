@@ -2,7 +2,6 @@ package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.enums.shift.ShiftState;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -42,7 +41,6 @@ public class ShiftQueryResult {
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private ShiftState shiftState;
 
 
     public int getDurationMinutes() {
@@ -236,14 +234,6 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftState getShiftState() {
-        return shiftState;
-    }
-
-    public void setShiftState(ShiftState shiftState) {
-        this.shiftState = shiftState;
-    }
-
     public ShiftQueryResult(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
         this.name = name;
@@ -262,7 +252,20 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-
+    public ShiftQueryResult(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bid = bid;
+        this.pId = pId;
+        this.bonusTimeBank = bonusTimeBank;
+        this.amount = amount;
+        this.probability = probability;
+        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+        this.remarks = remarks;
+        this.activityId = activityId;
+    }
     public List<ShiftQueryResult> sortShifts(){
         if(Optional.ofNullable(subShifts).isPresent()){
             subShifts.sort((s1,s2)->s1.getStartDate().compareTo(s2.getStartDate()));

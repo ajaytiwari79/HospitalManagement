@@ -545,7 +545,7 @@ public class WTAService extends MongoBaseService {
 
     public WTADefaultDataInfoDTO getDefaultWtaInfo(Long countryId) {
         List<Activity> activities = activityMongoRepository.findByDeletedFalseAndUnitId(countryId);
-        List<ActivityDTO> activityDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activities, ActivityDTO.class);
+        List<ActivityDTO> activityDTOS = ObjectMapperUtils.copyPropertiesByMapper(activities,new ActivityDTO());
         /*activities.forEach(a -> {
             ActivityDTO activityDTO = new ActivityDTO();
             try {

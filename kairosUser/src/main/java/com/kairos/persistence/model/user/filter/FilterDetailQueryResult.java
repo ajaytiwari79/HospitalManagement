@@ -6,12 +6,12 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * Created by prerna on 1/5/18.
  */
 @QueryResult
-public class FilterSelectionQueryResult {
+public class FilterDetailQueryResult {
 
     private String id;
     private String value;
 
-    public FilterSelectionQueryResult(){
+    public FilterDetailQueryResult(){
         // default constructor
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
  * UserBaseService
  */
 @Service
-public class UserBaseService  {
+public class UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -42,13 +42,13 @@ public class UserBaseService  {
         return userBaseRepository.save(entity);
     }
 
-    public <T extends UserBaseEntity> List<T> save(List<T> entities) {
+    public <T extends UserBaseEntity> List<T> save(List<T> entities){
         DateTime dt = new DateTime();
         DateTime utc = dt.withZoneRetainFields(DateTimeZone.forID("Etc/GMT"));
         Date date = utc.toDate();
         logger.info("Utc Time: " + date);
         Long dateTime = date.getTime();
-        entities.forEach(entity -> {
+        entities.forEach(entity->{
             if (entity.getId() == null) {
                 entity.setCreationDate(dateTime);
             }

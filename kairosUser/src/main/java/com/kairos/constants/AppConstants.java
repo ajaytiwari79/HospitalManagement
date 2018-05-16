@@ -6,7 +6,6 @@ package com.kairos.constants;
 public class AppConstants {
     private AppConstants() {
     }
-    public static final String TIMEZONE_UTC = "UTC";
 
     // Request methods
     public static final String GET = "GET";

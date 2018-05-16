@@ -10,7 +10,7 @@ import java.util.List;
 @QueryResult
 public class FilterQueryResult {
     private String name;
-    private List<FilterSelectionQueryResult> filterData;
+    private List<FilterDetailQueryResult> filterData;
     private String title;
 
     public FilterQueryResult(){
@@ -25,11 +25,11 @@ public class FilterQueryResult {
         this.name = name;
     }
 
-    public List<FilterSelectionQueryResult> getFilterData() {
+    public List<FilterDetailQueryResult> getFilterData() {
         return filterData;
     }
 
-    public void setFilterData(List<FilterSelectionQueryResult> filterData) {
+    public void setFilterData(List<FilterDetailQueryResult> filterData) {
         this.filterData = filterData;
     }
 

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.util.DateUtils;
-import com.kairos.enums.shift.ShiftState;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -53,9 +53,9 @@ public class ShiftDTO {
     private LocalDate startLocalDate;
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate endLocalDate;
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:MM")
     private LocalTime startTime;
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:MM")
     private LocalTime endTime;
 
 
@@ -309,7 +309,6 @@ public class ShiftDTO {
         Shift shift = new Shift(this.id, this.name, DateUtils.getDateByLocalDateAndLocalTime(this.startLocalDate,this.startTime), DateUtils.getDateByLocalDateAndLocalTime(this.endLocalDate,this.endTime), this.bid, this.pId, this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shift.setDurationMinutes(this.durationMinutes);
         shift.setScheduledMinutes(this.scheduledMinutes);
-        shift.setShiftState(ShiftState.UNPUBLISHED);
         return shift;
     }
 

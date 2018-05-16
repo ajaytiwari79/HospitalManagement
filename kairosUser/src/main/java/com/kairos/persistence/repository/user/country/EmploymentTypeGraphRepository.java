@@ -1,12 +1,15 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
-import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
+import com.kairos.persistence.model.user.filter.FilterDetailQueryResult;
+import com.kairos.response.dto.web.filter.FilterDetailDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 import static com.kairos.persistence.model.constants.RelationshipConstants.EMPLOYMENT_TYPE_SETTINGS;
@@ -73,7 +76,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
 
         // Get Employment Type data for filters by countryId
         @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} return toString(id(employmentType)) as id, employmentType.name as value")
-        List<FilterSelectionQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
+        List<FilterDetailQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
 
 
 

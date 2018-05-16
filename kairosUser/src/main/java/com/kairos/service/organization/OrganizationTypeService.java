@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 
 import javax.inject.Inject;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +85,8 @@ public class OrganizationTypeService extends UserBaseService {
         }
         return objectList;
     }
+
+
 
 
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
@@ -164,9 +165,8 @@ public class OrganizationTypeService extends UserBaseService {
      * @param orgTypeId
      * @return
      */
-    public List<Map<String, Object>> getExpertise(long countryId, long orgTypeId, String selectedDate) throws ParseException {
-        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId,selectedDateInLong);
+    public List<Map<String, Object>> getExpertise(long countryId, long orgTypeId) {
+        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId);
         return orgTypeExpertiseQueryResult.getExpertise();
     }
 
