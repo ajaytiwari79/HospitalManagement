@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class EmploymentTypeService extends UserBaseService {
     private OrganizationService organizationService;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
-        if(employmentTypeDTO.getName().trim().isEmpty()){
+        if (employmentTypeDTO.getName().trim().isEmpty()) {
             throw new DataNotMatchedException("Name can't be blank");
         }
         Country country = countryGraphRepository.findOne(countryId);
@@ -73,12 +74,12 @@ public class EmploymentTypeService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
 
-        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),-1L);
-        if(isAlreadyExists){
-            throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
+        boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), -1L);
+        if (isAlreadyExists) {
+            throw new DuplicateDataException("EmploymentType already exists: " + employmentTypeDTO.getName().trim());
         }
-        EmploymentType employmentTypeToCreate = new EmploymentType(employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
-                employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency());
+        EmploymentType employmentTypeToCreate = new EmploymentType(employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
+                employmentTypeDTO.isAllowedForShiftPlan(), employmentTypeDTO.isAllowedForFlexPool(), employmentTypeDTO.getEmploymentCategories(), employmentTypeDTO.getPaymentFrequency());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
 
@@ -86,7 +87,7 @@ public class EmploymentTypeService extends UserBaseService {
     }
 
     public EmploymentType updateEmploymentType(long countryId, long employmentTypeId, EmploymentTypeDTO employmentTypeDTO) {
-        if(employmentTypeDTO.getName().trim().isEmpty()){
+        if (employmentTypeDTO.getName().trim().isEmpty()) {
             throw new DataNotMatchedException("Name can't be blank");
         }
         Country country = countryGraphRepository.findOne(countryId, 0);
@@ -97,10 +98,10 @@ public class EmploymentTypeService extends UserBaseService {
         if (employmentTypeToUpdate == null) {
             throw new DataNotFoundByIdException("Incorrect Employment Type id " + employmentTypeId);
         }
-        if(!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())){
-            boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),employmentTypeId);
-            if(isAlreadyExists){
-                throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
+        if (!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())) {
+            boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), employmentTypeId);
+            if (isAlreadyExists) {
+                throw new DuplicateDataException("EmploymentType already exists: " + employmentTypeDTO.getName().trim());
             }
         }
         employmentTypeToUpdate.setName(employmentTypeDTO.getName());
@@ -179,7 +180,7 @@ public class EmploymentTypeService extends UserBaseService {
         // Fetch all mapped settings with employment Type
         List<EmploymentTypeDTO> employmentSettingForOrganization = employmentTypeGraphRepository.getCustomizedEmploymentTypeSettingsForOrganization(countryId, unitId, false);
         List<Long> listOfConfiguredEmploymentTypeIds = new ArrayList<>();
-        for ( EmploymentTypeDTO employmentTypeDTO: employmentSettingForOrganization) {
+        for (EmploymentTypeDTO employmentTypeDTO : employmentSettingForOrganization) {
             listOfConfiguredEmploymentTypeIds.add(employmentTypeDTO.getId());
         }
 
@@ -190,12 +191,13 @@ public class EmploymentTypeService extends UserBaseService {
         return employmentSettingForOrganization;
     }
 
-    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {
+    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId,String selectedDate) throws ParseException {
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
         // set Expertise
-        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
+        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
+        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId,selectedDateInLong));
         //set levels
         organizationMappingDTO.setLevels(countryGraphRepository.getLevelsByCountry(countryId));
         // set regions
