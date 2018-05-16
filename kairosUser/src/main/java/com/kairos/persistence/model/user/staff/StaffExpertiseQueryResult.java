@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by pavan on 7/5/18.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @QueryResult
 public class StaffExpertiseQueryResult {
     private Long id;

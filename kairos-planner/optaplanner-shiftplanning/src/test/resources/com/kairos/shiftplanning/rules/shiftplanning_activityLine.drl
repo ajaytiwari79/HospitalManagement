@@ -5,7 +5,7 @@ import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
-rule "Empty activity line"
+rule "Empty activityPlannerEntity line"
 salience 20
     when
         $shifts:ArrayList() from collect (ShiftRequestPhase(getInterval()!=null));
@@ -16,25 +16,25 @@ salience 20
         scoreHolder.addSoftConstraintMatch(kcontext,  arr[0]*-2 + arr[1]*-1);
 end
 /*
-rule "Unassigned activity interval required"
+rule "Unassigned activityPlannerEntity interval required"
 salience 20
     when
-        ActivityLineInterval(activity.isTypePresence() && shift==null && required)
+        ActivityLineInterval(activityPlannerEntity.isTypePresence() && shift==null && required)
     then
         scoreHolder.addSoftConstraintMatch(kcontext,  - 2);
 end
-rule "Unassigned activity interval"
+rule "Unassigned activityPlannerEntity interval"
 salience 20
     when
-        ActivityLineInterval(activity.isTypePresence() && shift==null && !required)
+        ActivityLineInterval(activityPlannerEntity.isTypePresence() && shift==null && !required)
     then
         scoreHolder.addSoftConstraintMatch(kcontext,  - 1);
 end
 
-rule "Unassigned absence activity interval"
+rule "Unassigned absence activityPlannerEntity interval"
 salience 20
     when
-        ActivityLineInterval(activity.isTypeAbsence() && shift==null && required)
+        ActivityLineInterval(activityPlannerEntity.isTypeAbsence() && shift==null && required)
     then
         scoreHolder.addSoftConstraintMatch(kcontext,  - 96);
 end
