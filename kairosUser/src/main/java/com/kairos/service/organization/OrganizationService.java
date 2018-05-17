@@ -11,6 +11,7 @@ import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
+import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -19,16 +20,21 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactAddressDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -43,6 +49,7 @@ import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepos
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -60,8 +67,8 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
-import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -207,12 +214,22 @@ public class OrganizationService extends UserBaseService {
     @Inject
     StaffService staffService;
     @Inject
-
-    PriorityGroupIntegrationService priorityGroupIntegrationService;
-
+    private PriorityGroupIntegrationService priorityGroupIntegrationService;
+    @Inject
+    private  SkillGraphRepository skillGraphRepository;
+    @Inject
+    private FunctionGraphRepository functionGraphRepository;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject
+    private PresenceTypeRepository presenceTypeRepository;
+    @Inject
     private PlannerSyncService plannerSyncService;
     @Inject
-    CompanyCategoryGraphRepository companyCategoryGraphRepository;
+    private CompanyCategoryGraphRepository companyCategoryGraphRepository;
+
 
 
     public Organization getOrganizationById(long id) {
@@ -1578,11 +1595,28 @@ public class OrganizationService extends UserBaseService {
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
     }
 
+
+    public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId) {
+        Long countryId=organizationGraphRepository.getCountryId(unitId);
+        OrderAndActivityDTO orderAndActivityDTO = priorityGroupIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
+        List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
+        List<Long> organizationServicesIds = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds, DateUtil.getCurrentDateMillis());
+        List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
+        List<PresenceTypeDTO> plannedTypes = presenceTypeRepository.getAllPresenceTypeByCountryId(countryId,false);
+        List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
+        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        OrderDefaultDataWrapper orderDefaultDataWrapper = new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(),orderAndActivityDTO.getActivities(),
+                skills,expertise,staffList,plannedTypes,functions,reasonCodes,dayTypes);
+        return orderDefaultDataWrapper;
+    }
     public Object initialOptaplannerSync(Long organisationId, Long unitId) {
         List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
         plannerSyncService.publishStaff(unitId,staff,IntegrationOperation.CREATE);
         phaseRestClient.initialOptaplannerSync(unitId);
         return null;
+
     }
 }
 

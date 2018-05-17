@@ -18,6 +18,7 @@ public class PriorityGroup extends MongoBaseEntity {
     private BigInteger orderId;
     private ScheduledProcess scheduledProcess;
 
+
     public PriorityGroup() {
         //Default Constructor
     }
