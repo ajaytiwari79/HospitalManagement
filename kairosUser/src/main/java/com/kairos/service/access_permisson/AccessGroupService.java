@@ -79,7 +79,7 @@ public class AccessGroupService extends UserBaseService {
 
             //set default permission of access page while creating access group
             Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
-            setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(),getOrganizationCategory(organization.isUnion(), organization.isKairosHub()));
+            setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(),organizationService.getOrganizationCategory(organization.isUnion(), organization.isKairosHub()));
             return accessGroup;
         } else {
             throw new ActionNotPermittedException("Access Group can be created at Parent Organization");
@@ -110,7 +110,7 @@ public class AccessGroupService extends UserBaseService {
         return true;
     }
 
-    public OrganizationCategory getOrganizationCategory(Boolean isUnion, Boolean isKairosHub){
+    /*public OrganizationCategory getOrganizationCategory(Boolean isUnion, Boolean isKairosHub){
         if(isUnion){
             return OrganizationCategory.UNION;
         } else if(isKairosHub){
@@ -118,7 +118,7 @@ public class AccessGroupService extends UserBaseService {
         } else{
             return OrganizationCategory.ORGANIZATION;
         }
-    }
+    }*/
 
     /**
      * @param organization
@@ -139,7 +139,7 @@ public class AccessGroupService extends UserBaseService {
         Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
         List<AccessGroup> accessGroupList = null;
         if (parent == null) {
-            List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, getOrganizationCategory(organization.isUnion(), organization.isKairosHub()).toString());
+            List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(organization.isUnion(), organization.isKairosHub()).toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroup countryAccessGroup : countryAccessGroups){
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
@@ -549,6 +549,20 @@ public class AccessGroupService extends UserBaseService {
     public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
 
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
+    }
+
+    public List<AccessGroupsByCategoryDTO> getCountryAccessGroupsOfAllcategories(Long countryId) {
+
+        List<AccessGroupsByCategoryDTO> accessGroupsData = new ArrayList<>();
+        accessGroupsData.add( new AccessGroupsByCategoryDTO(OrganizationCategory.HUB,
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.HUB.toString())) );
+
+        accessGroupsData.add( new AccessGroupsByCategoryDTO(OrganizationCategory.ORGANIZATION,
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.ORGANIZATION.toString())) );
+
+        accessGroupsData.add( new AccessGroupsByCategoryDTO(OrganizationCategory.UNION,
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.UNION.toString())) );
+        return accessGroupsData;
     }
 
     /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/

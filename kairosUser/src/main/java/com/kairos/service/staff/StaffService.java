@@ -10,6 +10,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
@@ -1013,14 +1014,14 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData, Long accessGroupId){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
             user = new User();
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
         }
-        createUnitManagerAndEmployment(organizationId, user);
+        createUnitManagerAndEmployment(organizationId, user, accessGroupId);
         return user;
     }
 
@@ -1156,10 +1157,19 @@ public class StaffService extends UserBaseService {
 //        }
     }
 
+    public boolean validateAccessGroupForUnitManager(Long countryId, Long accessGroupId, Long orgId, boolean parentOrganization,
+                                                     OrganizationCategory orgCategory, Boolean isUnion, Boolean isKairosHub){
+        if(parentOrganization){
+            return accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId, organizationService.getOrganizationCategory(isUnion, isKairosHub).toString(), accessGroupId);
+        } else {
+            return accessGroupRepository.isAccessGroupOfOrganizationExists(orgId, accessGroupId);
+        }
+    }
 
-    private void createUnitManagerAndEmployment(Long organizationId, User user) {
+    public void createUnitManagerAndEmployment(Long organizationId, User user, Long accessGroupId) {
 
         Organization organization = organizationGraphRepository.findOne(organizationId);
+        boolean parentOrganization = false;
         Organization parent;
         if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
@@ -1167,7 +1177,8 @@ public class StaffService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organizationId);
         }
-        if (!Optional.ofNullable(parent).isPresent()) {
+        if(!Optional.ofNullable(parent).isPresent()){
+            parentOrganization = true;
             parent = organization;
         }
 
@@ -1186,7 +1197,7 @@ public class StaffService extends UserBaseService {
 
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(parent);
-        AccessGroup accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByRole(parent.getId(), AccessGroupRole.MANAGEMENT.toString()); // findOne(accessGroupId);
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
         }

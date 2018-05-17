@@ -271,6 +271,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {deleted:false}) WHERE id(o)={0} AND ag.role={1} return ag LIMIT 1")
     AccessGroup getAccessGroupOfOrganizationByRole(Long orgId, String role);
 
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} AND id(ag)={2} \n" +
+            "RETURN COUNT(ag)>0")
+    boolean isCountryAccessGroupExistsByOrgCategory(Long countryId, String orgCategory, Long accessGroupId);
+
+    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup) WHERE id(o)={0} AND id(ag)={1} return COUNT(ag)>0")
+    boolean isAccessGroupOfOrganizationExists(long organizationId, Long accessGroupId);
+
     @Query("Match(org:Organization) where id(org) in {0} Match(ag:AccessGroup) where id(ag)={1} \n" +
      "merge(org)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag)")
     void createAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
