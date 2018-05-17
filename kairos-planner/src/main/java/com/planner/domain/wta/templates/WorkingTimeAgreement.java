@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * This is to be moved to submodule thats shared between activity and planner
  */
-@Document
+//@Document
 public class WorkingTimeAgreement extends MongoBaseEntity {
     private String name;
     private String description;

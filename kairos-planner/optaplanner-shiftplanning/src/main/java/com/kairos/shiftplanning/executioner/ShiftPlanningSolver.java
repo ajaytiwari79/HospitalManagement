@@ -326,38 +326,7 @@ public class ShiftPlanningSolver {
 
     }
 
-    public void toXml(Object solution, String fileName) throws Exception {
-        try {
-            //XStream xstream = new XStream();
-            XStream xstream = new XStream(new PureJavaReflectionProvider());
 
-            //assignEmployeeToAvaiability(solution.getEmployees(),true);
-            //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
-            //xstream.setMode(XStream.ID_REFERENCES);
-            xstream.setMode(XStream.ID_REFERENCES);
-            xstream.registerConverter(new JodaTimeConverter());
-            xstream.registerConverter(new JodaLocalTimeConverter());
-            xstream.registerConverter(new JodaLocalDateConverter());
-
-            // xstream.registerConverter(new JodaTimeConverterNoTZ());
-            xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
-            String xmlString = xstream.toXML(solution);
-            writeXml(xmlString, fileName);
-        }catch(Throwable e){
-            log.error("soe:",e);
-            throw e;
-        }
-    }
-    public void writeXml(String xmlString,String fileName){
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new File(BASE_SRC +fileName+".xml"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        out.write(xmlString);
-        out.close();
-    }
 
     public void sendSolutionToKairos(ShiftRequestPhasePlanningSolution solvedSolution){
         List<ShiftDTO> shiftDTOS = getShift(solvedSolution.getShifts());
@@ -417,5 +386,32 @@ public class ShiftPlanningSolver {
         activityLineInterval.setDuration(activityLineInterval.getDuration()+15);
         activityLineIntervals.add(activityLineInterval);
         return activityLineIntervals;
+    }
+    public static void toXml(Object solution, String fileName) {
+        try {
+            XStream xstream = new XStream(new PureJavaReflectionProvider());
+            //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
+            xstream.setMode(XStream.ID_REFERENCES);
+            xstream.registerConverter(new JodaTimeConverter());
+            xstream.registerConverter(new JodaLocalTimeConverter());
+            xstream.registerConverter(new JodaLocalDateConverter());
+            // xstream.registerConverter(new JodaTimeConverterNoTZ());
+            xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
+            String xmlString = xstream.toXML(solution);
+            writeXml(xmlString, fileName);
+        }catch(Throwable e){
+            log.error("soe:",e);
+            throw e;
+        }
+    }
+    public static  void writeXml(String xmlString,String fileName){
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(new File("" +fileName+".xml"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        out.write(xmlString);
+        out.close();
     }
 }

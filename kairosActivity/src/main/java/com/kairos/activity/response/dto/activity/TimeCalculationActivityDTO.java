@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.enums.TimeCalaculationType;
 import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 
 import java.time.DayOfWeek;
@@ -15,8 +16,8 @@ public class TimeCalculationActivityDTO {
 
     private Long activityId;
     private String methodForCalculatingTime;
-    private String fullDayCalculationType;
-    private String fullWeekCalculationType;
+    private TimeCalaculationType fullDayCalculationType;
+    private TimeCalaculationType fullWeekCalculationType;
     private Boolean allowBreakReduction;
     private Long fixedTimeValue;
     private Long monthsToCalculate;
@@ -182,19 +183,19 @@ public class TimeCalculationActivityDTO {
         this.dayTypes = dayTypes;
     }
 
-    public String getFullDayCalculationType() {
+    public TimeCalaculationType getFullDayCalculationType() {
         return fullDayCalculationType;
     }
 
-    public void setFullDayCalculationType(String fullDayCalculationType) {
+    public void setFullDayCalculationType(TimeCalaculationType fullDayCalculationType) {
         this.fullDayCalculationType = fullDayCalculationType;
     }
 
-    public String getFullWeekCalculationType() {
+    public TimeCalaculationType getFullWeekCalculationType() {
         return fullWeekCalculationType;
     }
 
-    public void setFullWeekCalculationType(String fullWeekCalculationType) {
+    public void setFullWeekCalculationType(TimeCalaculationType fullWeekCalculationType) {
         this.fullWeekCalculationType = fullWeekCalculationType;
     }
 }

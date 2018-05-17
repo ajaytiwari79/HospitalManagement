@@ -1,6 +1,6 @@
 package com.planner.repository.activity;
 
-import com.planner.domain.Activity;
+import com.planner.domain.activity.Activity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

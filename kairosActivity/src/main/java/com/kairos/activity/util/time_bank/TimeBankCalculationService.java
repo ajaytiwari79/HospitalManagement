@@ -2,6 +2,7 @@ package com.kairos.activity.util.time_bank;
 
 import com.google.common.collect.Lists;
 import com.kairos.activity.constants.AppConstants;
+import com.kairos.activity.enums.TimeCalaculationType;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
@@ -113,7 +114,7 @@ public class TimeBankCalculationService {
                 break;
 
             case AppConstants.FULL_DAY_CALCULATION:
-                int workingDaysInWeek = (AppConstants.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType()))?1:unitPosition.getWorkingDaysInWeek();
+                int workingDaysInWeek = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType()))?1:unitPosition.getWorkingDaysInWeek();
                 duration = new Double((unitPosition.getFullTimeWeeklyMinutes() / workingDaysInWeek) * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;

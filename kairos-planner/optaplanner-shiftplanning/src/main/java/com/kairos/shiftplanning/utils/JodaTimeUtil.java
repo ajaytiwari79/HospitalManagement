@@ -28,4 +28,12 @@ public class JodaTimeUtil {
 		}
 		return dates;
 	}
+
+	public static List<org.joda.time.LocalDate> getLocalDates(List<LocalDate> dates) {
+		List<org.joda.time.LocalDate> dateList= new ArrayList<>();
+		for(LocalDate ld:dates){
+			dateList.add(new org.joda.time.LocalDate(ld.getYear(),ld.getMonthValue(),ld.getYear()));
+		}
+		return dateList;
+	}
 }

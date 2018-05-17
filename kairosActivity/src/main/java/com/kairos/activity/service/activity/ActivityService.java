@@ -314,6 +314,7 @@ public class ActivityService extends MongoBaseService {
         updateActivityCategory(activity);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
+        activityTabsWrapper.setActivityCategories(activityCategoryRepository.findByCountryId(activity.getCountryId()));
 
         return activityTabsWrapper;
 
