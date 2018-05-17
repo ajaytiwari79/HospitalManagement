@@ -34,6 +34,8 @@ public class GeneralActivityTab implements Serializable {
     private boolean overRuleCtaWta;
 
     private List<TagDTO> tags = new ArrayList<>();
+    private String payrollType;
+    private String payrollSystem;
 
     public GeneralActivityTab() {
     }
@@ -72,7 +74,7 @@ public class GeneralActivityTab implements Serializable {
 
 
     public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String textColor, String description,
-                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,boolean overRuleCtaWta) {
+                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,boolean overRuleCtaWta, String payrollSystem, String payrollType) {
         this.name = name;
         this.code = code;
         this.printoutSymbol = printoutSymbol;
@@ -89,6 +91,8 @@ public class GeneralActivityTab implements Serializable {
         this.ultraShortName=ultraShortName;
 
         this.overRuleCtaWta=overRuleCtaWta;
+        this.payrollSystem = payrollSystem;
+        this.payrollType = payrollType;
     }
 
     public List<TagDTO> getTags() {
@@ -216,5 +220,21 @@ public class GeneralActivityTab implements Serializable {
 
     public void setOverRuleCtaWta(boolean overRuleCtaWta) {
         this.overRuleCtaWta = overRuleCtaWta;
+    }
+
+    public String getPayrollType() {
+        return payrollType;
+    }
+
+    public void setPayrollType(String payrollType) {
+        this.payrollType = payrollType;
+    }
+
+    public String getPayrollSystem() {
+        return payrollSystem;
+    }
+
+    public void setPayrollSystem(String payrollSystem) {
+        this.payrollSystem = payrollSystem;
     }
 }
