@@ -305,7 +305,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={0}\n" +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
-            "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,count(unitPos) as unitPosition\n" +
+            "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,count(unitPos) as unitPosition ORDER BY staff.firstName ASC\n" +
             "return distinct {id:id(staff),name:staff.firstName+\" \"+staff.lastName,city:contactAddress.city, case  when unitPosition > 0 then TRUE else false end as unitPosition ,province:contactAddress.province  ,firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId, age:user.age, gender:user.gender, profilePic:{1} + staff.profilePic, engineerType:id(engineerType)} as data order by data.firstName")
     List<Map<String, Object>> getAllStaffHavingUnitPositionByUnitIdMap(long unitId, String imageUrl);
 
@@ -313,7 +313,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization)" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,unitPos \n" +
-            "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  with engineerType, staff,contactAddress, user ,count(unitPos) as unitPosition \n" +
+            "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  with engineerType, staff,contactAddress, user ,count(unitPos) as unitPosition ORDER BY staff.firstName ASC\n" +
             "return  distinct id(staff) as id,case  when unitPosition > 0 then TRUE else false end as unitPosition , contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, String imageUrl);
 
@@ -366,7 +366,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "MATCH (staffFavouriteFilters)-[:" + HAS_FILTER_GROUP + "]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} return staffFavouriteFilters\n")*/
     @Query("MATCH (staff:Staff)-[:"+HAS_FAVOURITE_FILTERS+"]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters \n" +
             "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} \n" +
-            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterDetail) with staffFavouriteFilters, collect({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) as filterDetails\n" +
+            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) with staffFavouriteFilters, collect({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) as filterDetails\n" +
             "return id(staffFavouriteFilters) as id, staffFavouriteFilters.name as name, filterDetails as filtersData")
     List<FavoriteFilterQueryResult> getStaffFavouriteFiltersByStaffAndView(Long staffId, String moduleId);
 
@@ -412,8 +412,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "WHERE id(staffFavouriteFilter) = {2} return staffFavouriteFilter")
    StaffFavouriteFilter getStaffFavouriteFiltersOfStaffInOrganizationById(Long userId, Long organizationId, Long staffFavouriteFilterId);
 
-    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:"+FILTER_DETAIL+"]->(filterDetail:FilterDetail) WHERE id(staffFavouriteFilter)={0} \n"+
+    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:"+FILTER_DETAIL+"]->(filterDetail:FilterSelection) WHERE id(staffFavouriteFilter)={0} \n"+
             "DELETE r,filterDetail")
     void detachStaffFavouriteFilterDetails(Long staffFavouriteFilterId);
+
+    @Query("Match(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employement)-[:"+BELONGS_TO+"]->(s:Staff) where o.id={0} return s")
+    List<Staff> getAllStaffByUnitId(long unitId);
 
 }

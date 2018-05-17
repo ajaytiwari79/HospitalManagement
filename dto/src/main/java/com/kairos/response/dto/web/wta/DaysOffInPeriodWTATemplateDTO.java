@@ -6,6 +6,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +21,37 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long intervalLength;
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private long daysLimit;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
-    private float recommendedValue;
+    private List<PartOfDay> partOfDays;
     private MinMaxSetting minMaxSetting;
+    private boolean isRestingTimeAllowed;
+    private int restingTime;
 
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    protected float recommendedValue;
+    public boolean isRestingTimeAllowed() {
+        return isRestingTimeAllowed;
+    }
+
+    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
+        isRestingTimeAllowed = restingTimeAllowed;
+    }
+
+    public int getRestingTime() {
+        return restingTime;
+    }
+
+    public void setRestingTime(int restingTime) {
+        this.restingTime = restingTime;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -45,13 +70,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.partOfDays = partOfDays;
     }
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
 
 
     public WTATemplateType getWtaTemplateType() {
@@ -88,27 +106,15 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalLength = intervalLength;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-    public DaysOffInPeriodWTATemplateDTO(String name, boolean disabled,
-                                         String description, long intervalLength, long validationStartDateMillis, long minimumDaysOff, String intervalUnit) {
-        this.intervalLength = intervalLength;
-        this.daysLimit = minimumDaysOff;
-        this.validationStartDateMillis = validationStartDateMillis;
-
-        this.name = name;
-        this.disabled = disabled;
-        this.description = description;
-        this.intervalUnit = intervalUnit;
-
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public DaysOffInPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
     }
 }

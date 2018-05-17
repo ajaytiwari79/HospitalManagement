@@ -37,23 +37,13 @@ end
 rule "Maximum length of Shift"
 salience 20
     when
-        Shift(!locked && $minutes:minutes, $minutes>480)
+         Shift(!locked && $minutes:minutes, $minutes>780)
     then
         scoreHolder.addMediumConstraintMatch(kcontext,  - 5);
 end
 
 
-rule "Min resting time between 2 working days"
-salience 20
-    when
-        $shifts:ArrayList() from collect (Shift())
-        Shift(!locked && getRestingTimeBetweenTwoWorkingDays($shifts)<660)
-    then
-        scoreHolder.addHardConstraintMatch(kcontext,  - 10);
-end
-
-
-
+/*
 
 rule "Max time between 2 shifts same day"
 salience 15
@@ -101,8 +91,8 @@ salience 15
     then
         scoreHolder.addMediumConstraintMatch(kcontext,  - 1);
 end
-
-/**** Break Rules*******/
+*/
+/**** Break Rules******
 rule "Check for first break"
 salience 20
     when
@@ -130,7 +120,7 @@ salience 20
     then
         scoreHolder.addHardConstraintMatch(kcontext,  - 1);
 end
-
+*/
 /*
 rule "Staffing Level Limits"
 salience 20
@@ -167,3 +157,15 @@ salience 20
         ShiftPlanningUtility.registerFactHandle(factHandle,$shift);
 end
 */
+/*************IN-direct activities********/
+rule "In-direct activitites within shift"
+salience 20
+    when
+        $employee:Employee()
+        $indirectActivities:IndirectActivity(hasEmployee($employee))
+        $shift:Shift(!locked && employee.equals($employee) && !containsActivity($indirectActivities))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  -1);
+end
+
+

@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,12 +24,29 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    private int intervalLength;
+    private String intervalUnit;
 
+    public int getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(int intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -104,5 +122,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         super(name, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.limitCount = limitCount;
+        this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 }

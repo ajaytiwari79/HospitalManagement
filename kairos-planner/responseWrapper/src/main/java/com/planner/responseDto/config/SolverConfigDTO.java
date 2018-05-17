@@ -3,7 +3,7 @@ package com.planner.responseDto.config;
 import com.planner.responseDto.commonDto.BaseDTO;
 
 import java.util.List;
-
+@Deprecated
 public class SolverConfigDTO extends BaseDTO{
 
     private String name;

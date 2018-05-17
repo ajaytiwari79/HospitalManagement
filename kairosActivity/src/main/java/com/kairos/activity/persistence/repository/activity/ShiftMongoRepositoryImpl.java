@@ -74,28 +74,4 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-
-    public List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEPs(List<Long> unitEmploymentPositionIds, Date startDate, Date endDate) {
-       /* Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitEmploymentPositionId").in(unitEmploymentPositionIds).and("isMainShift").is(true)
-                        .and("startDate").lte(endDate).and("endDate").gte(startDate)),
-                lookup("activities","activityId","_id","activity")
-                ,project("unitEmploymentPositionId")
-                        .andInclude("deleted")
-                        .andInclude("startDate")
-                        .andInclude("endDate")
-                        .andInclude("isMainShift")
-                        .and("activity").arrayElementAt(0).as("activity")
-        );
-        AggregationResults<ShiftQueryResultWithActivity> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResultWithActivity.class);*/
-        return null;//result.getMappedResults();
-    }
-
-    /*public Shift findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").exists(true).
-                andOperator(Criteria.where("startDate").gte(startDate),Criteria.where("startDate").lt(endDate)),Criteria.where("endDate").exists(true).andOperator(
-                Criteria.where("endDate").gt(startDate),Criteria.where("endDate").lte(endDate))));
-                      return (Shift) mongoTemplate.findOne(query,Shift.class);
-    }*/
 }
