@@ -16,19 +16,19 @@ public class MasterAssetDto {
 
     @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set<Long> organisationType;
+    private Set<Long> organizationTypes;
 
     @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set <Long> organisationSubType;
+    private Set <Long> organizationSubTypes;
 
     @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set <Long>organisationService;
+    private Set <Long>organizationServices;
 
     @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set <Long> organisationSubService;
+    private Set <Long> organizationSubServices;
 
     public String getName() {
         return name;
@@ -46,35 +46,35 @@ public class MasterAssetDto {
         this.description = description;
     }
 
-    public Set<Long> getOrganisationType() {
-        return organisationType;
+    public Set<Long> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganisationType(Set<Long> organisationType) {
-        this.organisationType = organisationType;
+    public void setOrganizationTypes(Set<Long> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public Set<Long> getOrganisationSubType() {
-        return organisationSubType;
+    public Set<Long> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganisationSubType(Set<Long> organisationSubType) {
-        this.organisationSubType = organisationSubType;
+    public void setOrganizationSubTypes(Set<Long> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
-    public Set<Long> getOrganisationService() {
-        return organisationService;
+    public Set<Long> getOrganizationServices() {
+        return organizationServices;
     }
 
-    public void setOrganisationService(Set<Long> organisationService) {
-        this.organisationService = organisationService;
+    public void setOrganizationServices(Set<Long> organizationServices) {
+        this.organizationServices = organizationServices;
     }
 
-    public Set<Long> getOrganisationSubService() {
-        return organisationSubService;
+    public Set<Long> getOrganizationSubServices() {
+        return organizationSubServices;
     }
 
-    public void setOrganisationSubService(Set<Long> organisationSubService) {
-        this.organisationSubService = organisationSubService;
+    public void setOrganizationSubServices(Set<Long> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
     }
 }

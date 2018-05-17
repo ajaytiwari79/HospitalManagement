@@ -1,8 +1,6 @@
 package com.kairos.persistance.model.agreement_template.dto;
 
-import com.kairos.persistance.model.clause.AccountType;
-import com.kairos.persistance.model.organization.OrganizationService;
-import com.kairos.persistance.model.organization.OrganizationType;
+
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;

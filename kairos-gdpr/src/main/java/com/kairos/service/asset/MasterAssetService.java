@@ -33,10 +33,10 @@ public class MasterAssetService extends MongoBaseService {
 
     public MasterAsset addMasterAsset(MasterAssetDto masterAsset) {
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterAsset.getOrganisationType();
-        orgSubTypeIds = masterAsset.getOrganisationSubType();
-        orgServiceIds = masterAsset.getOrganisationService();
-        orgSubServiceIds = masterAsset.getOrganisationSubService();
+        orgTypeIds = masterAsset.getOrganizationTypes();
+        orgSubTypeIds = masterAsset.getOrganizationSubTypes();
+        orgServiceIds = masterAsset.getOrganizationServices();
+        orgSubServiceIds = masterAsset.getOrganizationSubServices();
         MasterAsset newAsset = new MasterAsset();
         if (masterAssetMongoRepository.findByName(masterAsset.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAsset.getName() + " exists");
@@ -53,24 +53,24 @@ public class MasterAssetService extends MongoBaseService {
 
                 List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
                 comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-                newAsset.setOrganisationSubType(orgSubTypes);
+                newAsset.setOrganizationSubTypes(orgSubTypes);
 
             }
             if (orgServiceIds != null && orgServiceIds.size() != 0) {
                 List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
                 comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-                newAsset.setOrganisationService(orgServices);
+                newAsset.setOrganizationServices(orgServices);
 
 
             }
             if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
                 List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
                 comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-                newAsset.setOrganisationSubService(orgSubServices);
+                newAsset.setOrganizationSubServices(orgSubServices);
 
             }
             comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
-            newAsset.setOrganisationType(requestResult.getOrganizationTypes());
+            newAsset.setOrganizationTypes(requestResult.getOrganizationTypes());
 
         }
         newAsset.setName(masterAsset.getName());
@@ -94,10 +94,10 @@ public class MasterAssetService extends MongoBaseService {
     public MasterAsset updateMasterAsset(BigInteger id, MasterAssetDto masterAssetDto) {
 
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterAssetDto.getOrganisationType();
-        orgSubTypeIds = masterAssetDto.getOrganisationSubType();
-        orgServiceIds = masterAssetDto.getOrganisationService();
-        orgSubServiceIds = masterAssetDto.getOrganisationSubService();
+        orgTypeIds = masterAssetDto.getOrganizationTypes();
+        orgSubTypeIds = masterAssetDto.getOrganizationSubTypes();
+        orgServiceIds = masterAssetDto.getOrganizationServices();
+        orgSubServiceIds = masterAssetDto.getOrganizationSubServices();
         MasterAsset exists = masterAssetMongoRepository.findByid(id);
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
@@ -115,24 +115,24 @@ public class MasterAssetService extends MongoBaseService {
 
             List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
             comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-            exists.setOrganisationSubType(orgSubTypes);
+            exists.setOrganizationSubTypes(orgSubTypes);
 
         }
         if (orgServiceIds != null && orgServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
             comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-            exists.setOrganisationService(orgServices);
+            exists.setOrganizationServices(orgServices);
 
 
         }
         if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
             comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-            exists.setOrganisationSubService(orgSubServices);
+            exists.setOrganizationSubServices(orgSubServices);
 
         }
         comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
-        exists.setOrganisationType(requestResult.getOrganizationTypes());
+        exists.setOrganizationTypes(requestResult.getOrganizationTypes());
         exists.setName(masterAssetDto.getName());
         exists.setDescription(masterAssetDto.getDescription());
         return save(exists);

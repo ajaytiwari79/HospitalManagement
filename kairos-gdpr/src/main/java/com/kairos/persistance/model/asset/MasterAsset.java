@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document(collection = "global_asset")
+@Document(collection = "master_asset")
 public class MasterAsset extends MongoBaseEntity {
 
 
@@ -17,11 +17,11 @@ public class MasterAsset extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-    private List<OrganizationTypeAndServiceBasicDto> organisationType;
+    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    private List <OrganizationTypeAndServiceBasicDto> organisationSubType;
-    private List <OrganizationTypeAndServiceBasicDto>organisationService;
-    private List <OrganizationTypeAndServiceBasicDto> organisationSubService;
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List <OrganizationTypeAndServiceBasicDto>organizationServices;
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     public String getName() {
         return name;
@@ -39,35 +39,35 @@ public class MasterAsset extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationType() {
-        return organisationType;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganisationType(List<OrganizationTypeAndServiceBasicDto> organisationType) {
-        this.organisationType = organisationType;
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationSubType() {
-        return organisationSubType;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganisationSubType(List<OrganizationTypeAndServiceBasicDto> organisationSubType) {
-        this.organisationSubType = organisationSubType;
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationService() {
-        return organisationService;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
+        return organizationServices;
     }
 
-    public void setOrganisationService(List<OrganizationTypeAndServiceBasicDto> organisationService) {
-        this.organisationService = organisationService;
+    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
+        this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationSubService() {
-        return organisationSubService;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
+        return organizationSubServices;
     }
 
-    public void setOrganisationSubService(List<OrganizationTypeAndServiceBasicDto> organisationSubService) {
-        this.organisationSubService = organisationSubService;
+    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
     }
 }

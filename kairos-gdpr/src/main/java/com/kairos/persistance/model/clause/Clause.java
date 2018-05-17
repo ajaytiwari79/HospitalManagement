@@ -2,10 +2,8 @@ package com.kairos.persistance.model.clause;
 
 
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.organization.OrganizationService;
-import com.kairos.persistance.model.organization.OrganizationType;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
@@ -22,18 +20,18 @@ public class Clause extends MongoBaseEntity {
     @NotNull(message = "error.clause.title.cannotbe.null")
     private String title;
 
-    private List<String> tags = new ArrayList<>();
+    private List<ClauseTag> tags = new ArrayList<>();
 
     @NotEmpty(message = "error.clause.title.cannotbe.empty")
     @NotNull(message = "error.clause.title.cannotbe.null")
     private String description;
 
 
-    private List<OrganizationTypeAndServiceBasicDto> organisationType;
+    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    private List <OrganizationTypeAndServiceBasicDto> organisationSubType;
-    private List <OrganizationTypeAndServiceBasicDto>organisationService;
-    private List <OrganizationTypeAndServiceBasicDto> organisationSubService;
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List <OrganizationTypeAndServiceBasicDto>organizationServices;
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
 
     private List<AccountType> accountTypes;
@@ -47,11 +45,11 @@ public class Clause extends MongoBaseEntity {
         this.title = title;
     }
 
-    public List<String> getTags() {
+    public List<ClauseTag> getTags() {
         return tags;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<ClauseTag> tags) {
         this.tags = tags;
     }
 
@@ -67,36 +65,36 @@ public class Clause extends MongoBaseEntity {
 
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationType() {
-        return organisationType;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
+        return organizationTypes;
     }
 
-    public void setOrganisationType(List<OrganizationTypeAndServiceBasicDto> organisationType) {
-        this.organisationType = organisationType;
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
+        this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationSubType() {
-        return organisationSubType;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganisationSubType(List<OrganizationTypeAndServiceBasicDto> organisationSubType) {
-        this.organisationSubType = organisationSubType;
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationService() {
-        return organisationService;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
+        return organizationServices;
     }
 
-    public void setOrganisationService(List<OrganizationTypeAndServiceBasicDto> organisationService) {
-        this.organisationService = organisationService;
+    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
+        this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganisationSubService() {
-        return organisationSubService;
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
+        return organizationSubServices;
     }
 
-    public void setOrganisationSubService(List<OrganizationTypeAndServiceBasicDto> organisationSubService) {
-        this.organisationSubService = organisationSubService;
+    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
     }
 
     public List<AccountType> getAccountTypes() {

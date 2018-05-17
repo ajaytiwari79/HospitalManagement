@@ -24,9 +24,4 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     List<Clause> getClauseByAccountType(String accountType);
 
 
-    @Query("{$and:[{'organizationType.name':?0},{'organizationService.name':?1},{'accountType.accountTypeEnum':?2}]}")
-    List<Clause> getClauseByOrgnizationServiceAndTypeAndAccount(String orgType,String orgService,String accountType);
-
-
-
 }

@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistance.country.Country;
 import com.kairos.persistance.model.clause.AccountType;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.organization.OrganizationService;
-import com.kairos.persistance.model.organization.OrganizationType;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -24,8 +22,7 @@ public class AgreementQueryResult {
 
 
     String description;
-    OrganizationType organisationType;
-    OrganizationService orgService;
+
     AccountType accountType;
     List<Clause> clauses;
 
@@ -71,21 +68,6 @@ public class AgreementQueryResult {
         this.description = description;
     }
 
-    public OrganizationType getOrganisationType() {
-        return organisationType;
-    }
-
-    public void setOrganisationType(OrganizationType organisationType) {
-        this.organisationType = organisationType;
-    }
-
-    public OrganizationService getOrgService() {
-        return orgService;
-    }
-
-    public void setOrgService(OrganizationService orgService) {
-        this.orgService = orgService;
-    }
 
     public AccountType getAccountType() {
         return accountType;

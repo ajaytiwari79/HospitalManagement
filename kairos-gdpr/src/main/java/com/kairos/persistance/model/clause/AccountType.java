@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.enums.AccountTypeEnum;
-import com.kairos.persistance.model.organization.enums.EnumString;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.mongodb.core.mapping.Document;
 

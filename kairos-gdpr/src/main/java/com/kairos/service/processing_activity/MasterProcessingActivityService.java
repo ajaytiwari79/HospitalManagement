@@ -39,10 +39,10 @@ public class MasterProcessingActivityService extends MongoBaseService {
     public MasterProcessingActivity addMasterProcessingActivity(MasterProcessingActivityDto masterProcessingActivityDto) {
 
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterProcessingActivityDto.getOrganisationType();
-        orgSubTypeIds = masterProcessingActivityDto.getOrganisationSubType();
-        orgServiceIds = masterProcessingActivityDto.getOrganisationService();
-        orgSubServiceIds = masterProcessingActivityDto.getOrganisationSubService();
+        orgTypeIds = masterProcessingActivityDto.getOrganizationTypes();
+        orgSubTypeIds = masterProcessingActivityDto.getOrganizationSubTypes();
+        orgServiceIds = masterProcessingActivityDto.getOrganizationServices();
+        orgSubServiceIds = masterProcessingActivityDto.getOrganizationSubServices();
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity();
 
         if (masterProcessingActivityRepository.findByName(masterProcessingActivityDto.getName()) != null) {
@@ -59,24 +59,24 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
             List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
             comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-            masterProcessingActivity.setOrganisationSubType(orgSubTypes);
+            masterProcessingActivity.setOrganizationSubTypes(orgSubTypes);
 
         }
         if (orgServiceIds != null && orgServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
             comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-            masterProcessingActivity.setOrganisationService(orgServices);
+            masterProcessingActivity.setOrganizationServices(orgServices);
 
 
         }
         if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
             comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-            masterProcessingActivity.setOrganisationSubService(orgSubServices);
+            masterProcessingActivity.setOrganizationSubServices(orgSubServices);
 
         }
         comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
-        masterProcessingActivity.setOrganisationType(requestResult.getOrganizationTypes());
+        masterProcessingActivity.setOrganizationTypes(requestResult.getOrganizationTypes());
         masterProcessingActivity.setName(masterProcessingActivityDto.getName());
         masterProcessingActivity.setDescription(masterProcessingActivityDto.getDescription());
         return save(masterProcessingActivity);
@@ -98,10 +98,10 @@ public class MasterProcessingActivityService extends MongoBaseService {
     public MasterProcessingActivity updateMasterProcessingActivity(BigInteger id, MasterProcessingActivityDto masterProcessingActivityDto) {
 
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterProcessingActivityDto.getOrganisationType();
-        orgSubTypeIds = masterProcessingActivityDto.getOrganisationSubType();
-        orgServiceIds = masterProcessingActivityDto.getOrganisationService();
-        orgSubServiceIds = masterProcessingActivityDto.getOrganisationSubService();
+        orgTypeIds = masterProcessingActivityDto.getOrganizationTypes();
+        orgSubTypeIds = masterProcessingActivityDto.getOrganizationSubTypes();
+        orgServiceIds = masterProcessingActivityDto.getOrganizationServices();
+        orgSubServiceIds = masterProcessingActivityDto.getOrganizationSubServices();
 
         MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
         if (!Optional.of(exists).isPresent()) {
@@ -119,24 +119,24 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
             List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
             comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-            exists.setOrganisationSubType(orgSubTypes);
+            exists.setOrganizationSubTypes(orgSubTypes);
 
         }
         if (orgServiceIds != null && orgServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
             comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-            exists.setOrganisationService(orgServices);
+            exists.setOrganizationServices(orgServices);
 
 
         }
         if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
             comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-            exists.setOrganisationSubService(orgSubServices);
+            exists.setOrganizationSubServices(orgSubServices);
 
         }
         comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
-        exists.setOrganisationType(requestResult.getOrganizationTypes());
+        exists.setOrganizationTypes(requestResult.getOrganizationTypes());
 
 
         exists.setName(masterProcessingActivityDto.getName());

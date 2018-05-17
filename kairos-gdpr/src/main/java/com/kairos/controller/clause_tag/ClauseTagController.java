@@ -16,6 +16,7 @@ import java.math.BigInteger;
 @RestController
 @RequestMapping(API_CLAUSE_TAG_URL)
 @Api(API_CLAUSE_TAG_URL)
+@CrossOrigin
 public class ClauseTagController {
 
 

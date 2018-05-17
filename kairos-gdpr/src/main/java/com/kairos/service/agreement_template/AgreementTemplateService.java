@@ -6,9 +6,6 @@ import com.kairos.persistance.model.agreement_template.AgreementTemplate;
 import com.kairos.persistance.model.agreement_template.dto.AgreementTemplateDto;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.repository.agreement_template.AgreementTemplateMongoRepository;
-import com.kairos.persistance.repository.clause.AccountTypeMongoRepository;
-import com.kairos.persistance.repository.organization.OrganizationServiceMongoRepository;
-import com.kairos.persistance.repository.organization.OrganizationTypeMongoRepository;
 import com.kairos.response.dto.AgreementQueryResult;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.clause.AccountTypeService;
@@ -27,12 +24,6 @@ public class AgreementTemplateService extends MongoBaseService {
     private AgreementTemplateMongoRepository agreementTemplateMongoRepository;
 
     @Inject
-    private OrganizationTypeMongoRepository organizationTypeMongoRepository;
-
-    @Inject
-    private OrganizationServiceMongoRepository organizationServiceMongoRepository;
-
-    @Inject
     private AccountTypeService accountTypeService;
 
     @Inject
@@ -48,14 +39,7 @@ public class AgreementTemplateService extends MongoBaseService {
         BigInteger accountType = agreementTemplateDto.getAccountTypeId();
         Boolean isDefault = true;
         List<BigInteger> clauseids = agreementTemplateDto.getClauseIds();
-        if (orgTypeId != null) {
-            newAgreementTemplate.setOrganisationType(organizationTypeMongoRepository.findById(orgTypeId.toString()));
-            isDefault = false;
-        }
-        if (orgServiceId != null) {
-            newAgreementTemplate.setOrgService(organizationServiceMongoRepository.findById(orgServiceId.toString()));
-            isDefault = false;
-        }
+
         if (accountType != null) {
 
             newAgreementTemplate.setAccountType(accountTypeService.getAccountTypeById(accountType));

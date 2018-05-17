@@ -5,13 +5,14 @@ import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.RequestDataNull;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
+import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class ClauseTagService extends MongoBaseService {
 
         ClauseTag exist = clauseTagMongoRepository.findByName(clauseTag);
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data already exist for  " + clauseTag);
+            throw new DuplicateDataException("clause tag already exist for  " + clauseTag);
         } else {
             ClauseTag newClauseTag = new ClauseTag();
             newClauseTag.setName(clauseTag);
@@ -54,7 +55,7 @@ public class ClauseTagService extends MongoBaseService {
 
         ClauseTag exist = clauseTagMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+            throw new DataNotFoundByIdException("clause tag not exist for id " + id);
         } else {
             return exist;
 
@@ -89,6 +90,32 @@ public class ClauseTagService extends MongoBaseService {
             return save(exist);
 
         }
+    }
+
+
+    public List<ClauseTag> addClauseTagAndGetClauseTagList(List<ClauseTagDto> tagList) {
+
+        List<ClauseTag> clauseTagList = new ArrayList<>();
+        for (ClauseTagDto tagDto : tagList) {
+
+
+            if (tagDto.getId() == null) {
+
+                if(clauseTagMongoRepository.findByName(tagDto.getName())!=null)
+                {
+                    throw new DuplicateDataException("tag with name "+tagDto.getName()+" already exist");
+
+                }
+                ClauseTag newClauseTag = new ClauseTag();
+                newClauseTag.setName(tagDto.getName());
+                clauseTagList.add(save(newClauseTag));
+                continue;
+
+            }
+        clauseTagList.add(getClauseTagById(tagDto.getId()));
+        }
+        return clauseTagList;
+
     }
 
 
