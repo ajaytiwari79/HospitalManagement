@@ -2,7 +2,6 @@ package com.kairos.service.organizationMetadata;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.PaymentSettings;
 import com.kairos.persistence.model.organization.PaymentSettingsDTO;
@@ -15,7 +14,6 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,8 +172,8 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         return coordinateInPolygon;
     }
 
-    public List<PaymentSettingsQueryResult> getPaymentSettings(Long unitId) {
-        List<PaymentSettingsQueryResult> paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
+    public PaymentSettingsQueryResult getPaymentSettings(Long unitId) {
+        PaymentSettingsQueryResult paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             logger.info("Unable to payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get  payments settings for unit " + unitId);
@@ -185,7 +183,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     }
 
     private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
-        PaymentSettings paymentSettings =  new PaymentSettings(paymentSettingsDTO.getWeeklyPayDay(), paymentSettingsDTO.getFornightlyPayDay(), paymentSettingsDTO.getMonthlyPayDay());
+        PaymentSettings paymentSettings =  new PaymentSettings(paymentSettingsDTO.getWeeklyPayDay(), paymentSettingsDTO.getFornightlyPayDay(), paymentSettingsDTO.getMonthlyPayDate());
         organization.setPaymentSettings(paymentSettings);
         save(organization);
         return paymentSettings.getId();

@@ -13,17 +13,17 @@ public class PaymentSettingsDTO {
     private DayOfWeek fornightlyPayDay;
     private Long lastFornigthtlyPayDate;
     @Range(min = 1l, max = 31L)
-    private Long monthlyPayDay;
+    private Long monthlyPayDate;
 
     public PaymentSettingsDTO() {
         // default cons
     }
 
-    public PaymentSettingsDTO(Long id, DayOfWeek weeklyPayDay, DayOfWeek fornightlyPayDay, Long monthlyPayDay) {
+    public PaymentSettingsDTO(Long id, DayOfWeek weeklyPayDay, DayOfWeek fornightlyPayDay, Long monthlyPayDate) {
         this.id = id;
         this.weeklyPayDay = weeklyPayDay;
         this.fornightlyPayDay = fornightlyPayDay;
-        this.monthlyPayDay = monthlyPayDay;
+        this.monthlyPayDate = monthlyPayDate;
     }
 
     public Long getId() {
@@ -34,12 +34,12 @@ public class PaymentSettingsDTO {
         this.id = id;
     }
 
-    public Long getMonthlyPayDay() {
-        return monthlyPayDay;
+    public Long getMonthlyPayDate() {
+        return monthlyPayDate;
     }
 
-    public void setMonthlyPayDay(Long monthlyPayDay) {
-        this.monthlyPayDay = monthlyPayDay;
+    public void setMonthlyPayDate(Long monthlyPayDate) {
+        this.monthlyPayDate = monthlyPayDate;
     }
 
     public DayOfWeek getWeeklyPayDay() {
