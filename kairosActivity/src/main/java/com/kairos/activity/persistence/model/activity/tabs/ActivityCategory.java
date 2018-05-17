@@ -23,7 +23,7 @@ public class ActivityCategory extends MongoBaseEntity{
     private String name;
     private String description;
     private Long countryId;
-    private Long unitId;
+    private BigInteger timeTypeId;
 
 
     public ActivityCategory() {
@@ -35,10 +35,11 @@ public class ActivityCategory extends MongoBaseEntity{
         this.name = name;
     }
 
-    public ActivityCategory(String name, String description, Long countryId) {
+    public ActivityCategory(String name, String description, Long countryId, BigInteger timeTypeId) {
         this.name = name;
         this.description = description;
         this.countryId=countryId;
+        this.timeTypeId = timeTypeId;
     }
 
 
@@ -64,14 +65,6 @@ public class ActivityCategory extends MongoBaseEntity{
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
     }
 
     @Override
@@ -103,5 +96,13 @@ public class ActivityCategory extends MongoBaseEntity{
                 .append("name", name)
                 .append("description", description)
                 .toString();
+    }
+
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
     }
 }

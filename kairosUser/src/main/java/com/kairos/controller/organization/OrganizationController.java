@@ -185,7 +185,7 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationDTO organizationDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createNewUnit(organizationDTO, unitId));
+                organizationService.createNewUnit(organizationDTO, unitId,false,false));
     }
 
 
@@ -508,7 +508,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = "/unit/{unitId}/general", method = RequestMethod.PUT)
-    @ApiOperation("Get general details of Client")
+    @ApiOperation("Update general details of Client")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationGeneralDetails(@PathVariable long unitId, @Validated @RequestBody OrganizationGeneral organizationGeneral) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -575,6 +575,12 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getParentOrganization(countryId));
+    }
+
+    @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
     }
 
     @RequestMapping(value = "/unit", method = RequestMethod.GET)
@@ -1329,6 +1335,20 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
+    }
+
+    @ApiOperation(value = "Get Default data for Orders")
+    @RequestMapping(value = UNIT_URL+"/order/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForOrder(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
+    }
+    @ApiOperation(value = "Init optplanner integration")
+    @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organisationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.initialOptaplannerSync(organisationId,unitId));
+
     }
 }
 

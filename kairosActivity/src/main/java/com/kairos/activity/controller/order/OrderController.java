@@ -25,18 +25,17 @@ public class OrderController {
     @Inject
     OrderService orderService;
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     @ApiOperation("create orders")
     public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderOpenshiftResponseDTO orderResponseDto)  {
-        orderService.createOrder(orderResponseDto);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,orderService.createOrder(orderResponseDto));
     }
 
     @RequestMapping(value = "/{orderId}", method = RequestMethod.PUT)
     @ApiOperation("update orders")
-    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable BigInteger orderId, @RequestBody OrderResponseDTO orderResponseDto)  {
-        orderService.updateOrder(orderResponseDto,orderId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable BigInteger orderId, @RequestBody OrderOpenshiftResponseDTO orderResponseDto)  {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.updateOrder(orderResponseDto,orderId));
     }
 
     @ApiOperation("delete an order")
@@ -47,7 +46,7 @@ public class OrderController {
     }
 
     @ApiOperation(value = "Get All orders by unitId")
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllOrdersByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.getOrdersByUnitId(unitId));

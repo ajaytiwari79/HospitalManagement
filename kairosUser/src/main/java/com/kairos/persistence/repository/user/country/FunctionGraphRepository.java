@@ -40,11 +40,4 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
 
     @Query("MATCH (level:Level)<-[:" + HAS_ORGANIZATION_LEVEL + "]-(function:Function{deleted:false}) where id(level)={0} return id(function) as id,function.name as name")
     List<FunctionDTO> getFunctionsByOrganizationLevel(Long organizationLevelId);
-
-
-    @Query("MATCH (organization:Organization)-[:" + COUNTRY + "]->(country:Country)<-[:BELONGS_TO]-(function:Function{deleted:false}) where id(organization)={0}" +
-            " return id(function) as id,function.name as name")
-    List<FunctionDTO> findFunctionsByOrganization(Long organizationId);
-
-
 }

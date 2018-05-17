@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
-
+import java.util.List;
 import static com.kairos.activity.constants.ApiConstants.OPENSHIFT_URL;
 
 @RestController
@@ -26,18 +26,21 @@ public class OpenShiftController {
     @Inject
     OpenShiftService openShiftService;
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     @ApiOperation("create openshifts")
     public ResponseEntity<Map<String, Object>> createOpenShift(@RequestBody OpenShiftResponseDTO openShiftResponseDTO)  {
-        openShiftService.createOpenShift(openShiftResponseDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftService.createOpenShift(openShiftResponseDTO));
     }
 
-    @RequestMapping(value = "/{openShiftId}", method = RequestMethod.PUT)
+   /* @RequestMapping(value = "/{openShiftId}", method = RequestMethod.PUT)
     @ApiOperation("update openShift")
     public ResponseEntity<Map<String, Object>> updateOpenShift(@PathVariable BigInteger openShiftId, @RequestBody OpenShiftResponseDTO openShiftResponseDTO)  {
-        openShiftService.updateOpenShift(openShiftResponseDTO,openShiftId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftService.updateOpenShift(openShiftResponseDTO,openShiftId));
+    }*/
+    @RequestMapping(value = "", method = RequestMethod.PUT)
+    @ApiOperation("update openShift")
+    public ResponseEntity<Map<String, Object>> updateOpenShift(@PathVariable BigInteger openShiftId, @PathVariable BigInteger orderId, @RequestBody List<OpenShiftResponseDTO> openShiftResponseDTOs)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftService.updateOpenShift(openShiftResponseDTOs,orderId));
     }
 
     @ApiOperation("delete an openshift")
@@ -48,9 +51,8 @@ public class OpenShiftController {
     }
 
     @ApiOperation(value = "Get All openshifts by order and unitId")
-    @RequestMapping(value = "/{orderId}", method = RequestMethod.GET)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllOrdersByUnitId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getAllOpenShiftsByUnitId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.getOpenshiftsByUnitIdAndOrderId(unitId,orderId));
     }
 

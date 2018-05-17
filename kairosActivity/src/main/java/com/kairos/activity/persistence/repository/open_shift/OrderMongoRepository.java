@@ -12,10 +12,10 @@ import java.util.List;
 @Repository
 public interface OrderMongoRepository extends MongoBaseRepository<Order, BigInteger> {
 
-    @Query("{'deleted' : false,'_id':?0}")
+    @Query("{'deleted':false, '_id':?0}")
     Order findOrderByIdAndEnabled(BigInteger id);
 
-    @Query("{'deleted' : false,'unitId':?0}")
+    @Query("{'deleted':false, 'unitId':?0}")
     List<Order> findOrdersByUnitId(Long unitId);
 
 
