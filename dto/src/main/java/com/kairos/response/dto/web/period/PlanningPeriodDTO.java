@@ -5,6 +5,7 @@ import com.kairos.persistence.model.enums.DurationType;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -17,10 +18,12 @@ public class PlanningPeriodDTO {
     private BigInteger id;
     private String name;
     @NotNull(message = "error.startdate.notnull")
-    private Long startDateMillis;
-    private Long endDateMillis;
-    private Date startDate;
-    private Date endDate;
+//    private Long startDateMillis;
+//    private Long endDateMillis;
+//    private Date startDate;
+//    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long unitId = -1L;
     private int duration;
     private DurationType durationType;
@@ -39,8 +42,17 @@ public class PlanningPeriodDTO {
         // default constructor
     }
 
-    public PlanningPeriodDTO(Long startDateMillis, int duration, DurationType durationType, int recurringNumber, Date endDate, ZoneId zoneId){
+    /*public PlanningPeriodDTO(Long startDateMillis, int duration, DurationType durationType, int recurringNumber, Date endDate, ZoneId zoneId){
         this.startDateMillis = startDateMillis;
+        this.duration = duration;
+        this.durationType = durationType;
+        this.recurringNumber = recurringNumber;
+        this.endDate = endDate;
+        this.zoneId = zoneId;
+    }*/
+
+    public PlanningPeriodDTO( int duration, DurationType durationType, int recurringNumber, LocalDate endDate, ZoneId zoneId){
+//        this.startDateMillis = startDateMillis;
         this.duration = duration;
         this.durationType = durationType;
         this.recurringNumber = recurringNumber;
@@ -136,7 +148,7 @@ public class PlanningPeriodDTO {
         this.id = id;
     }
 
-    public Long getStartDateMillis() {
+    /*public Long getStartDateMillis() {
         return startDateMillis;
     }
 
@@ -166,7 +178,7 @@ public class PlanningPeriodDTO {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
+    }*/
 
     public String getName() {
         return name;
@@ -198,6 +210,22 @@ public class PlanningPeriodDTO {
 
     public void setZoneId(ZoneId zoneId) {
         this.zoneId = zoneId;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }
 

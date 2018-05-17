@@ -1,36 +1,34 @@
 package com.kairos.activity.persistence.model.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by prerna on 6/4/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PlanningPeriod extends MongoBaseEntity {
+public class PlanningPeriodX extends MongoBaseEntity {
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String name;
     @Indexed
     private Long unitId = -1L;
     private BigInteger currentPhaseId;
     private BigInteger nextPhaseId;
-    private List<PeriodPhaseFlippingDate> phaseFlippingDate = new ArrayList<>();
+    private List<PeriodPhaseFlippingDateX> phaseFlippingDate = new ArrayList<>();
 
-    public PlanningPeriod(){
+    public PlanningPeriodX(){
         // default constructor
     }
 
-    public PlanningPeriod(String name, Date startDate, Date endDate, Long unitId, List<PeriodPhaseFlippingDate> phaseFlippingDate, BigInteger currentPhaseId, BigInteger nextPhaseId) {
+    public PlanningPeriodX(String name, LocalDate startDate, LocalDate endDate, Long unitId, List<PeriodPhaseFlippingDateX> phaseFlippingDate, BigInteger currentPhaseId, BigInteger nextPhaseId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -40,19 +38,19 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.nextPhaseId = nextPhaseId;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -64,11 +62,11 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public List<PeriodPhaseFlippingDate> getPhaseFlippingDate() {
+    public List<PeriodPhaseFlippingDateX> getPhaseFlippingDate() {
         return phaseFlippingDate;
     }
 
-    public void setPhaseFlippingDate(List<PeriodPhaseFlippingDate> phaseFlippingDate) {
+    public void setPhaseFlippingDate(List<PeriodPhaseFlippingDateX> phaseFlippingDate) {
         this.phaseFlippingDate = phaseFlippingDate;
     }
 

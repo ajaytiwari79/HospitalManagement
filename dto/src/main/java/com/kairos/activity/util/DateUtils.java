@@ -1,5 +1,6 @@
 package com.kairos.activity.util;
 
+import com.kairos.persistence.model.enums.DurationType;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -35,6 +36,7 @@ public class DateUtils {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate;
     }
+
     public static Date convertLocalDateToDate(LocalDate dateToConvert) {
         return Date.from(dateToConvert.atStartOfDay()
                 .atZone(ZoneId.systemDefault())
@@ -327,10 +329,6 @@ public class DateUtils {
         return add(date, Calendar.DAY_OF_MONTH, amount);
     }
 
-    public static Date addMonths(final Date date, final int amount) {
-        return add(date, Calendar.MONTH, amount);
-    }
-
     private static Date add(final Date date, final int calendarField, final int amount) {
         if (date == null) {
             throw new IllegalArgumentException("The date must not be null");
@@ -393,6 +391,11 @@ public class DateUtils {
         return simpleDateFormat.format(date);
     }
 
+    public static String formatLocalDate(LocalDate localDate, String dateFormatString){
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(dateFormatString);
+        return localDate.format(formatter);
+    }
+
     public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
     {
         TimeZone fromTimeZone = TimeZone.getTimeZone("UTC");
@@ -435,5 +438,23 @@ public class DateUtils {
             dates.add(ld);
         }
         return dates;
+    }
+
+    public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
+        switch (durationType){
+            case DAYS: {
+                localDate.plusDays(duration*recurringNumber);
+                break;
+            }
+            case WEEKS: {
+                localDate.plusDays(duration *recurringNumber * 7);
+                break;
+            }
+            case MONTHS: {
+                localDate.plusMonths(duration *recurringNumber );
+                break;
+            }
+        }
+        return localDate;
     }
 }

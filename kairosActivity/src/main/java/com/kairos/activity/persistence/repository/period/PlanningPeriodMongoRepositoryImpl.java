@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,31 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }
 
-    public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate) {
+    /*public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate) {
+
+        ProjectionOperation projectionOperation = Aggregation.project().
+                and("id").as("id").
+                andInclude("name").
+                andInclude("startDate").
+                andInclude("endDate").
+                andInclude("phaseFlippingDate").
+                and("current_phase_data.name").as("currentPhase").
+                and("next_phase_data.name").as("nextPhase");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").gte(startDate).and("endDate").lte(endDate)),
+                lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
+                lookup("phases", "nextPhaseId", "_id", "next_phase_data"),
+                sort(Sort.Direction.ASC,"startDate"),
+                projectionOperation
+
+        );
+
+        AggregationResults<com.kairos.response.dto.web.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.response.dto.web.period.PlanningPeriodDTO.class);
+        return result.getMappedResults();
+    }*/
+
+    public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate) {
 
         ProjectionOperation projectionOperation = Aggregation.project().
                 and("id").as("id").
@@ -108,7 +133,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
 
-    public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence) {
+    public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startDate, LocalDate endDate, int sequence) {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
@@ -125,6 +150,27 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Map resultData = result.getUniqueMappedResult();
         if (Optional.ofNullable(resultData).isPresent()) {
             return (Integer) result.getUniqueMappedResult().get("countOfPhasesWithOtherSequence") > 0;
+        } else {
+            return false;
+        }
+    }
+
+    public  boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate) {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
+                        .orOperator(
+                                Criteria.where("startDate").gte(startDate).lte(endDate),
+                                Criteria.where("endDate").gte(startDate).lte(endDate),
+                                Criteria.where("startDate").gte(startDate).and("endDate").lte(endDate)
+                        )), count().as("countOfPhases")
+        );
+
+        AggregationResults<Map> result =
+                mongoTemplate.aggregate(aggregation, "planningPeriod", Map.class);
+        Map resultData = result.getUniqueMappedResult();
+        if (Optional.ofNullable(resultData).isPresent()) {
+            return (Integer) result.getUniqueMappedResult().get("countOfPhases") > 0;
         } else {
             return false;
         }
