@@ -72,6 +72,7 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -327,8 +328,8 @@ public class OrganizationService extends UserBaseService {
         organizationResponseMap.put("company",organizationResponseWrapper);
 
         if(organizationRequestWrapper.getWorkCenterUnit()!=null){
-            Map<String, Object>  workCenterUnitMap = createNewUnit(organizationRequestWrapper.getWorkCenterUnit(), organization.getId());
-            Long workCenterUnitId = Long.parseLong(workCenterUnitMap.get("id")+"");;
+            Map<String, Object>  workCenterUnitMap = createNewUnit(organizationRequestWrapper.getWorkCenterUnit(), organization.getId(),true, false);
+            Long workCenterUnitId = Long.parseLong(workCenterUnitMap.get("id")+"");
 
             Organization workCenterUnit = organizationGraphRepository.findOne(workCenterUnitId);
             workCenterUnit.setWorkCenterUnit(true);
@@ -342,8 +343,8 @@ public class OrganizationService extends UserBaseService {
         }
 
         if(organizationRequestWrapper.getGdprUnit()!=null){
-            Map<String, Object>  gdprUnitMap = createNewUnit(organizationRequestWrapper.getGdprUnit(), organization.getId());
-            Long gdprUnitId = Long.parseLong(gdprUnitMap.get("id")+"");;
+            Map<String, Object>  gdprUnitMap = createNewUnit(organizationRequestWrapper.getGdprUnit(), organization.getId(),false,true);
+            Long gdprUnitId = Long.parseLong(gdprUnitMap.get("id")+"");
 
             Organization gdprUnit = organizationGraphRepository.findOne(gdprUnitId);
             gdprUnit.setGdprUnit(true);
@@ -437,30 +438,47 @@ public class OrganizationService extends UserBaseService {
         save(organization);
         organizationResponseDTOs.put("company",organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
 
-        if(organizationRequestWrapper.getGdprUnit()!=null) {
-            Organization gdprUnit = organizationGraphRepository.findOne(organizationRequestWrapper.getGdprUnit().getId(), 2);
-            if (!Optional.ofNullable(gdprUnit).isPresent()) {
-                throw new InternalError("Gdpr Unit not found by Id " + organizationRequestWrapper.getGdprUnit().getId());
+        if(organizationRequestWrapper.getWorkCenterUnit()!=null) {
+            Organization workCenterUnit;
+            Long workCenterUnitId = organizationRequestWrapper.getWorkCenterUnit().getId();
+            if(workCenterUnitId ==null){
+            Map<String, Object>  workCenterUnitMap = createNewUnit(organizationRequestWrapper.getWorkCenterUnit(), organizationId, true, false);
+               workCenterUnitId = Long.parseLong(workCenterUnitMap.get("id")+"");;
+                workCenterUnit = organizationGraphRepository.findOne(workCenterUnitId,2);
+            } else{
+                workCenterUnit = organizationGraphRepository.findOne(workCenterUnitId, 2);
+                if (!Optional.ofNullable(workCenterUnit).isPresent()) {
+                    throw new InternalError("WorkCenter Unit not found by Id " + organizationRequestWrapper.getWorkCenterUnit().getId());
+                }
+                workCenterUnit = saveOrganizationDetails(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit(), true, countryId);
+                if (!Optional.ofNullable(workCenterUnit).isPresent()) {
+                    return null;
+                }
+                save(workCenterUnit);
             }
-            gdprUnit = saveOrganizationDetails(gdprUnit, organizationRequestWrapper.getGdprUnit(), true, countryId);
-            if (!Optional.ofNullable(gdprUnit).isPresent()) {
-                return null;
-            }
-            save(gdprUnit);
-            organizationResponseDTOs.put("gdprUnit",organizationResponse(gdprUnit, organizationRequestWrapper.getGdprUnit().getTypeId(), organizationRequestWrapper.getGdprUnit().getSubTypeId(), organizationRequestWrapper.getGdprUnit().getCompanyCategoryId()));
+            organizationResponseDTOs.put("workCenterUnit",organizationResponse(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit().getTypeId(), organizationRequestWrapper.getWorkCenterUnit().getSubTypeId(), organizationRequestWrapper.getWorkCenterUnit().getCompanyCategoryId()));
         }
 
-        if(organizationRequestWrapper.getWorkCenterUnit()!=null) {
-            Organization workCenterUnit = organizationGraphRepository.findOne(organizationRequestWrapper.getWorkCenterUnit().getId(), 2);
-            if (!Optional.ofNullable(workCenterUnit).isPresent()) {
-                throw new InternalError("WorkCenter Unit not found by Id " + organizationRequestWrapper.getWorkCenterUnit().getId());
+        if(organizationRequestWrapper.getGdprUnit()!=null) {
+            Long gdprUnitId = organizationRequestWrapper.getGdprUnit().getId();
+            Organization gdprUnit;
+            if(gdprUnitId ==null){
+                Map<String, Object>  gdprUnitMap = createNewUnit(organizationRequestWrapper.getGdprUnit(), organizationId,false,true);
+                gdprUnitId = Long.parseLong(gdprUnitMap.get("id")+"");;
+                gdprUnit = organizationGraphRepository.findOne(gdprUnitId, 2);
+            } else {
+                gdprUnit = organizationGraphRepository.findOne(gdprUnitId, 2);
+                if (!Optional.ofNullable(gdprUnit).isPresent()) {
+                    throw new InternalError("Gdpr Unit not found by Id " + organizationRequestWrapper.getGdprUnit().getId());
+                }
+                gdprUnit = saveOrganizationDetails(gdprUnit, organizationRequestWrapper.getGdprUnit(), true, countryId);
+                if (!Optional.ofNullable(gdprUnit).isPresent()) {
+                    return null;
+                }
+                save(gdprUnit);
             }
-            workCenterUnit = saveOrganizationDetails(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit(), true, countryId);
-            if (!Optional.ofNullable(workCenterUnit).isPresent()) {
-                return null;
-            }
-            save(workCenterUnit);
-            organizationResponseDTOs.put("workCenterUnit",organizationResponse(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit().getTypeId(), organizationRequestWrapper.getWorkCenterUnit().getSubTypeId(), organizationRequestWrapper.getWorkCenterUnit().getCompanyCategoryId()));
+
+            organizationResponseDTOs.put("gdprUnit",organizationResponse(gdprUnit, organizationRequestWrapper.getGdprUnit().getTypeId(), organizationRequestWrapper.getGdprUnit().getSubTypeId(), organizationRequestWrapper.getGdprUnit().getCompanyCategoryId()));
         }
         return organizationResponseDTOs;
     }
@@ -530,7 +548,7 @@ public class OrganizationService extends UserBaseService {
     }
 
     private Organization saveOrganizationDetails(Organization organization, OrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
-        organization.setName(orgDetails.getName());
+        organization.setName(WordUtils.capitalize(orgDetails.getName()));
         if (!Optional.ofNullable(orgDetails.getUnion()).isPresent()) {
             throw new ActionNotPermittedException("Please specify this is union or organization");
         }
@@ -623,7 +641,7 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
-    public Map<String, Object> createNewUnit(OrganizationDTO organizationDTO, long unitId) {
+    public Map<String, Object> createNewUnit(OrganizationDTO organizationDTO, long unitId, boolean workCenterUnit, boolean gdprUnit) {
 
         Organization parent = organizationGraphRepository.findOne(unitId);
 
@@ -634,9 +652,11 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotFoundByIdException("Can't find Organization with provided Id" + unitId);
         }
         unit.setTimeZone(ZoneId.of(TIMEZONE_UTC));
-        unit.setName(organizationDTO.getName());
+        unit.setName(WordUtils.capitalize(organizationDTO.getName()));
         unit.setDescription(organizationDTO.getDescription());
         unit.setPrekairos(organizationDTO.isPreKairos());
+        unit.setWorkCenterUnit(workCenterUnit);
+        unit.setGdprUnit(gdprUnit);
 
         AddressDTO addressDTO = organizationDTO.getContactAddress();
 

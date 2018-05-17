@@ -185,7 +185,7 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationDTO organizationDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createNewUnit(organizationDTO, unitId));
+                organizationService.createNewUnit(organizationDTO, unitId,false,false));
     }
 
 
