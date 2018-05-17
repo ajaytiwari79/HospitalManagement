@@ -169,15 +169,6 @@ public class Expertise extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
-    }
-
     public List<SeniorityLevel> getSeniorityLevel() {
         return seniorityLevel;
     }
@@ -244,7 +235,7 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, PaidOutFrequencyEnum paidOutFrequency, boolean published) {
+    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
         this.name = name;
         this.id = id;
         this.description = description;
@@ -252,7 +243,6 @@ public class Expertise extends UserBaseEntity {
         this.endDateMillis = endDateMillis;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.paidOutFrequency = paidOutFrequency;
         this.published = published;
     }
 
@@ -265,7 +255,7 @@ public class Expertise extends UserBaseEntity {
 
 
     public Expertise retrieveBasicDetails() {
-        return new Expertise(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.paidOutFrequency, this.published);
+        return new Expertise(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.published);
 
     }
 
