@@ -54,10 +54,12 @@ public class OpenShiftService extends MongoBaseService {
 
             }
             save(openShifts);
-            Map<LocalDate,BigInteger> openShiftIDMap = openShifts.stream().collect(Collectors.toMap(OpenShift::getStartDate,
-                            OpenShift::getId));
+            OpenShift openShiftCurrent;
+            int currentElement = 0;
             for(OpenShiftResponseDTO openShiftResponseDTO: openShiftResponseDTOs) {
-                openShiftResponseDTO.setId(openShiftIDMap.get(openShiftResponseDTO.getStartDate()));
+                openShiftCurrent = openShifts.get(currentElement);
+                ObjectMapperUtils.copyProperties(openShiftCurrent,openShiftResponseDTO);
+                currentElement++;
             }
 
             return openShiftResponseDTOs;
@@ -79,26 +81,21 @@ public class OpenShiftService extends MongoBaseService {
 
             List<OpenShift> openShifts = new ArrayList<OpenShift>() ;
             OpenShift openShift = null;
-            List<BigInteger> openShifTIds = openShiftResponseDTOs.stream().filter(openShiftResponseDTO -> openShiftResponseDTO.getId()!=null).map(openShiftResponseDTO -> new BigInteger(openShiftResponseDTO.getId().toString())).collect(Collectors.toList());
-            List<OpenShift> openShiftsUpdated = openShiftMongoRepository.findAllByIdsAndDeletedFalse(openShifTIds);
+            List<BigInteger> openShiftIds = openShiftResponseDTOs.stream().filter(openShiftResponseDTO -> openShiftResponseDTO.getId()!=null).map(openShiftResponseDTO -> new BigInteger(openShiftResponseDTO.getId().toString())).collect(Collectors.toList());
+            List<OpenShift> openShiftsUpdated = openShiftMongoRepository.findAllByIdsAndDeletedFalse(openShiftIds);
             Map<BigInteger,OpenShift> openShiftsMap = openShiftsUpdated.stream().collect(Collectors.toMap(OpenShift::getId,
                     openShiftUpdated -> openShiftUpdated));
             for(OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
                 if(Optional.ofNullable(openShiftResponseDTO.getId()).isPresent()) {
-
                     openShift = openShiftsMap.get(openShiftResponseDTO.getId());
-                    ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
-                    openShift.setOrderId(orderId);
-                    openShifts.add(openShift);
-
                 }
                 else {
                     openShift = new OpenShift();
-                    ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
-                    openShift.setOrderId(orderId);
-                    openShifts.add(openShift);
-
                 }
+                ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
+                openShift.setOrderId(orderId);
+                openShifts.add(openShift);
+
             }
         save(openShifts);
          int currentElement = 0;
@@ -118,7 +115,7 @@ public class OpenShiftService extends MongoBaseService {
 
             OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
             if(!Optional.ofNullable(openShift).isPresent()) {
-                throw new DataNotFoundByIdException("OpenShuift does not exist by id"+ openShiftId);
+                throw new DataNotFoundByIdException("OpenShift does not exist by id"+ openShiftId);
             }
             openShift.setDeleted(true);
             save(openShift);

@@ -5,6 +5,7 @@ import com.kairos.response.dto.web.open_shift.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public class Order extends MongoBaseEntity {
     private LocalTime toTime;
     private Integer minOpenShiftHours;
     private WeekType weekType;
-    private List<String> dayType;
+    private List<DayOfWeek> dayType;
     private Long reasonCodeId;
     private String noteForPlanner;
     private Long expertiseId;
@@ -38,6 +39,16 @@ public class Order extends MongoBaseEntity {
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
+
+
+    public List<DayOfWeek> getDayType() {
+        return dayType;
+    }
+
+    public void setDayType(List<DayOfWeek> dayType) {
+        this.dayType = dayType;
+    }
+
     public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
         return shiftAssignmentCriteria;
     }
@@ -46,13 +57,7 @@ public class Order extends MongoBaseEntity {
         this.shiftAssignmentCriteria = shiftAssignmentCriteria;
     }
 
-    public List<String> getDayType() {
-        return dayType;
-    }
 
-    public void setDayType(List<String> dayType) {
-        this.dayType = dayType;
-    }
     public Integer getPriority() {
         return priority;
     }

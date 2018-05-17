@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.open_shift;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -18,14 +19,12 @@ public class OrderResponseDTO {
     private LocalTime toTime;
     private Integer MinOpenShiftHours;
     private WeekType weekType;
-    private List<String> dayType = new ArrayList<String>();
+    private List<DayOfWeek> dayType = new ArrayList<DayOfWeek>();
     private Long reasonCodeId;
     private String noteForPlanner;
     private Long expertiseId;
     private List<Long> skillLevel = new ArrayList<Long>();
-
     private List<Long> functionIds;
-
     private boolean acuteOrder;
     private StartFrom startFrom;
     private Integer priority;
@@ -39,14 +38,13 @@ public class OrderResponseDTO {
     private BigInteger id;
 
 
-    public List<String> getDayType() {
+    public List<DayOfWeek> getDayType() {
         return dayType;
     }
 
-    public void setDayType(List<String> dayType) {
+    public void setDayType(List<DayOfWeek> dayType) {
         this.dayType = dayType;
     }
-
     public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
         return shiftAssignmentCriteria;
     }
