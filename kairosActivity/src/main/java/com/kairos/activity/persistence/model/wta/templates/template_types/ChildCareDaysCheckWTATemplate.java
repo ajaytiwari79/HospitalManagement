@@ -18,22 +18,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
-    private List<BigInteger> activityIds;
+    private List<Long> activities;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();;
     private LocalDate validationStartDate;
     private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
-    protected float recommendedValue;
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -71,13 +63,13 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
        this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
     }
 
-    public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activities,
+    public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities,
                                          int numberOfLeaves, LocalDate validationStartDate, int numberOfWeeks) {
         super(name, description);
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
         this.disabled=disabled;
         this.ageRange = ageRange;
-        this.activityIds = activityIds;
+        this.activities = activities;
         this.validationStartDate = validationStartDate;
         this.numberOfWeeks = numberOfWeeks;
     }
@@ -90,12 +82,12 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         this.ageRange = ageRange;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
+    public List<Long> getActivities() {
+        return activities;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
+    public void setActivities(List<Long> activities) {
+        this.activities = activities;
     }
 
     public LocalDate getValidationStartDate() {

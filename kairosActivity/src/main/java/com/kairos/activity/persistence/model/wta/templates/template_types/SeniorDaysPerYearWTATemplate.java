@@ -4,7 +4,6 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,21 +12,11 @@ import java.util.List;
  */
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     private List<AgeRange> ageRange;
-    private List<BigInteger> activityIds;
+    private List<Long> activitieIds;
     private LocalDate validationStartDate;
     private Long numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    protected float recommendedValue;
 
     public boolean isCarryForwardLeave() {
         return carryForwardLeave;
@@ -50,12 +39,12 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         //Default Constructor
     }
 
-    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activitieIds,
+    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds,
                                         LocalDate validationStartDate, Long numberOfWeeks) {
         super(name , description);
         this.disabled=disabled;
         this.ageRange = ageRange;
-        this.activityIds = activityIds;
+        this.activitieIds = activitieIds;
         this.validationStartDate = validationStartDate;
         this.numberOfWeeks = numberOfWeeks;
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
@@ -69,12 +58,12 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         this.ageRange = ageRange;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
+    public List<Long> getActivitieIds() {
+        return activitieIds;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
+    public void setActivitieIds(List<Long> activitieIds) {
+        this.activitieIds = activitieIds;
     }
 
     public LocalDate getValidationStartDate() {

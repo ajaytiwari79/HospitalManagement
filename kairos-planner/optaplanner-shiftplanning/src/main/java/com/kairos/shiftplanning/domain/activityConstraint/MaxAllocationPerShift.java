@@ -1,13 +1,17 @@
 package com.kairos.shiftplanning.domain.activityConstraint;
 
-import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
+import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.wta.ConstraintHandler;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import org.joda.time.DateTime;
+import org.kie.api.runtime.rule.RuleContext;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class MaxAllocationPerShift implements ConstraintHandler {
 
@@ -44,21 +48,21 @@ public class MaxAllocationPerShift implements ConstraintHandler {
     }
 
 
-    public int checkConstraints(ActivityPlannerEntity activityPlannerEntity, ShiftRequestPhase shift){
+    public int checkConstraints(Activity activity, ShiftRequestPhase shift){
         List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
         ShiftPlanningUtility.sortActivityLineIntervals(alis);
         int allocatedActivityCount = 0;
         /*for (int i=1;i<alis.size();i++){
-            if(alis.get(i-1).getActivityPlannerEntity().equals(activityPlannerEntity) && !alis.get(i).getActivityPlannerEntity().equals(activityPlannerEntity)){
+            if(alis.get(i-1).getActivity().equals(activity) && !alis.get(i).getActivity().equals(activity)){
                 allocatedActivityCount++;
             }
         }
-        if(alis.get(alis.size()-1).getActivityPlannerEntity().equals(activityPlannerEntity)){
+        if(alis.get(alis.size()-1).getActivity().equals(activity)){
             allocatedActivityCount++;
         }*/
         ActivityLineInterval prev=null;
         for(ActivityLineInterval ali:alis){
-            if(ali.getActivityPlannerEntity().equals(activityPlannerEntity) && !ali.getActivityPlannerEntity().equals(prev==null?null:prev.getActivityPlannerEntity())){
+            if(ali.getActivity().equals(activity) && !ali.getActivity().equals(prev==null?null:prev.getActivity())){
                 allocatedActivityCount++;
             }
             prev=ali;

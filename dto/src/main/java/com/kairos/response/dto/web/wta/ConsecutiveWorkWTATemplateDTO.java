@@ -26,24 +26,7 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
-    private int intervalLength;
-    private String intervalUnit;
 
-    public int getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(int intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;

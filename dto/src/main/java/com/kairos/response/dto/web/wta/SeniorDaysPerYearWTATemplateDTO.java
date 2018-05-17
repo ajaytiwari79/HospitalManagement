@@ -12,21 +12,12 @@ import java.util.List;
  */
 public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<AgeRange> ageRange;
-    private List<BigInteger> activityIds;
+    private List<Long> activitieIds;
     private LocalDate validationStartDate;
     private Long numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    protected float recommendedValue;
     public SeniorDaysPerYearWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
@@ -63,12 +54,12 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
         this.ageRange = ageRange;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
+    public List<Long> getActivitieIds() {
+        return activitieIds;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
+    public void setActivitieIds(List<Long> activitieIds) {
+        this.activitieIds = activitieIds;
     }
 
 

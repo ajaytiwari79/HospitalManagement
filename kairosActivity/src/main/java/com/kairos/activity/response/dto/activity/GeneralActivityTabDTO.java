@@ -29,9 +29,6 @@ public class GeneralActivityTabDTO {
     private String ultraShortName;
 
     private boolean overRuleCtaWta;
-    private String payrollType;
-    private String payrollSystem;
-
 
     public String getUltraShortName() {
         return ultraShortName;
@@ -60,8 +57,6 @@ public class GeneralActivityTabDTO {
                 ", originalIconName='" + originalIconName + '\'' +
                 ", modifiedIconName='" + modifiedIconName + '\'' +
                 ", tags=" + tags +
-                ", payrollType=" + payrollType +
-                ", payrollSystem=" + payrollSystem +
                 '}';
     }
 
@@ -72,7 +67,7 @@ public class GeneralActivityTabDTO {
     public GeneralActivityTab buildGeneralActivityTab() {
         GeneralActivityTab generalActivityTab =
                 new GeneralActivityTab(name, code, printoutSymbol,categoryId, colorPresent, backgroundColor, textColor, description,this.isActive,
-                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta, this.payrollSystem, this.payrollType);
+                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta);
         return generalActivityTab;
     }
 
@@ -215,21 +210,5 @@ public class GeneralActivityTabDTO {
 
     public void setOverRuleCtaWta(boolean overRuleCtaWta) {
         this.overRuleCtaWta = overRuleCtaWta;
-    }
-
-    public String getPayrollType() {
-        return payrollType;
-    }
-
-    public void setPayrollType(String payrollType) {
-        this.payrollType = payrollType;
-    }
-
-    public String getPayrollSystem() {
-        return payrollSystem;
-    }
-
-    public void setPayrollSystem(String payrollSystem) {
-        this.payrollSystem = payrollSystem;
     }
 }

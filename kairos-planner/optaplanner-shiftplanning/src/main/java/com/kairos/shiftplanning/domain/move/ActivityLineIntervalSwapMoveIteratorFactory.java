@@ -1,7 +1,11 @@
 package com.kairos.shiftplanning.domain.move;
 
+import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.ActivityLineIntervalWrapper;
+import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.joda.time.LocalDate;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;

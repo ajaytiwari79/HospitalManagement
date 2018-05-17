@@ -28,15 +28,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private boolean isRestingTimeAllowed;
     private int restingTime;
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    protected float recommendedValue;
     public boolean isRestingTimeAllowed() {
         return isRestingTimeAllowed;
     }

@@ -1,10 +1,10 @@
 package com.kairos.shiftplanning.domain;
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.wta.*;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
@@ -18,61 +18,28 @@ import java.util.Map;
 import java.util.Set;
 
 
-@XStreamAlias("EmployeePlanningFact")
-public class EmployeePlanningFact {
-    private static Logger log= LoggerFactory.getLogger(EmployeePlanningFact.class);
+@XStreamAlias("Employee")
+public class Employee {
+    private static Logger log= LoggerFactory.getLogger(Employee.class);
+
+    public Employee() {
+    }
+
+    public Employee(String id, String name, Set<Skill> skillSet) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.skillSet = skillSet;
+    }
+
     private String id;
+
     private BigDecimal baseCost;
     transient private WorkingTimeConstraints workingTimeConstraints;
     private PrevShiftsInfo prevShiftsInfo;
     private DateTime prevShiftStart;
     private DateTime prevShiftEnd;
     transient private CollectiveTimeAgreement collectiveTimeAgreement;
-    private Location location;
-    private String name;
-    private Set<Skill> skillSet;
-    private List<UnavailabilityRequest> unavailabilityRequests;
-    private Long expertiseId;
-    private int totalWeeklyMinutes;
-    private int workingDaysInWeek;
-    private PaidOutFrequencyEnum paidOutFrequencyEnum;
-    private Long employmentTypeId;
-
-
-    public EmployeePlanningFact(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.skillSet = skillSet;
-        this.expertiseId = expertiseId;
-        this.totalWeeklyMinutes=totalWeeklyMinutes;
-        this.workingDaysInWeek=workingDaysInWeek;
-        this.paidOutFrequencyEnum=paidOutFrequencyEnum;
-        this.employmentTypeId = employmentTypeId;
-    }
-    public int getTotalWeeklyMinutes() {
-        return totalWeeklyMinutes;
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public PaidOutFrequencyEnum getPaidOutFrequencyEnum() {
-        return paidOutFrequencyEnum;
-    }
-
-    public void setPaidOutFrequencyEnum(PaidOutFrequencyEnum paidOutFrequencyEnum) {
-        this.paidOutFrequencyEnum = paidOutFrequencyEnum;
-    }
 
     public CollectiveTimeAgreement getCollectiveTimeAgreement() {
         return collectiveTimeAgreement;
@@ -121,6 +88,18 @@ public class EmployeePlanningFact {
     public void setBaseCost(BigDecimal baseCost) {
         this.baseCost = baseCost;
     }
+
+
+    public Long getAvialableMinutes() {
+        return avialableMinutes;
+    }
+
+    public void setAvialableMinutes(Long avialableMinutes) {
+        this.avialableMinutes = avialableMinutes;
+    }
+
+    private Long avialableMinutes;
+
     public Location getLocation() {
         return location;
     }
@@ -129,7 +108,11 @@ public class EmployeePlanningFact {
         this.location = location;
     }
 
-
+    private Location location;
+    private String name;
+    /*@PlanningVariable(valueRangeProviderRefs = {"vehicleRange"},strengthComparatorClass = VehicleComparator.class)
+    private Vehicle vehicle;*/
+    private Set<Skill> skillSet;
 
     public Set<Skill> getSkillSet() {
         return skillSet;
@@ -142,7 +125,7 @@ public class EmployeePlanningFact {
     private Map<Citizen, Affinity> affinityMap = new LinkedHashMap<Citizen, Affinity>();
     //private List<AvailabilityRequest> availabilityList;
 
-
+    private List<UnavailabilityRequest> unavailabilityRequests;
 
     public List<UnavailabilityRequest> getUnavailabilityRequests() {
         return unavailabilityRequests;
@@ -186,20 +169,10 @@ public class EmployeePlanningFact {
     public void setName(String name) {
         this.name = name;
     }
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
-    }
 
     public String toString() {
         return "E:" + id;//+"-"+getAvailabilityList();//+skillSet+"-
     }
-    public EmployeePlanningFact() {
-    }
-
 
 
     @Override
@@ -208,7 +181,7 @@ public class EmployeePlanningFact {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        EmployeePlanningFact employee = (EmployeePlanningFact) o;
+        Employee employee = (Employee) o;
 
         return new EqualsBuilder()
                 .append(id, employee.id)
@@ -227,7 +200,7 @@ public class EmployeePlanningFact {
                 .append(id)
                 .toHashCode();*/
         int hashcode=id.hashCode();
-        //log.info("EmployeePlanningFact hashcode:"+id+":"+hashcode);
+        //log.info("Employee hashcode:"+id+":"+hashcode);
         return hashcode;
     }
     public int checkConstraints(List<Shift> shifts, int index){
@@ -240,13 +213,5 @@ public class EmployeePlanningFact {
     }
     public void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int index, int contraintPenality){
         getWorkingTimeConstraints().breakLevelConstraints(scoreHolder,kContext,index,contraintPenality);
-    }
-
-    public Long getEmploymentTypeId() {
-        return employmentTypeId;
-    }
-
-    public void setEmploymentTypeId(Long employmentTypeId) {
-        this.employmentTypeId = employmentTypeId;
     }
 }

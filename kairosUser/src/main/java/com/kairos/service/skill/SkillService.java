@@ -1,6 +1,5 @@
 package com.kairos.service.skill;
 
-import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
@@ -510,21 +509,22 @@ public class SkillService extends UserBaseService {
 
         List<Map<String, Object>> skills;
         List<Map<String, Object>> response = new ArrayList<>();
-        List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staffList = staffService.getStaffWithBasicInfo(id, false);
+            List<StaffPersonalDetailDTO> staffList = staffService.getStaffWithBasicInfo(id, false);
             List<Long> staffIds = new ArrayList<>(staffList.size());
-            staffList.stream().forEach(staffPersonalDetailDTO -> {
-                staffIds.add(staffPersonalDetailDTO.getId());
-            });
+            for (StaffPersonalDetailDTO map : staffList) {
+                response.add((Map<String, Object>) map);
+                staffIds.add(map.getId());
+            }
             skills = organizationGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            staffList = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             List<Long> staffIds = new ArrayList<>(staffList.size());
-            staffList.stream().forEach(staffPersonalDetailDTO -> {
-                staffIds.add(staffPersonalDetailDTO.getId());
-            });
+            for (StaffPersonalDetailDTO map : staffList) {
+                response.add((Map<String, Object>) map);
+                staffIds.add(map.getId());
+            }
             skills = teamGraphRepository.getAssignedSkillsOfStaffByTeam(id, staffIds);
         } else {
             throw new InternalError("Type is not valid");
@@ -536,7 +536,7 @@ public class SkillService extends UserBaseService {
 
         Map<String, Object> map = new HashMap<>();
         map.put("skills", skillsResponse);
-        map.put("staffList", ObjectMapperUtils.copyPropertiesOfListByMapper(staffList, Map.class));
+        map.put("staffList", response);
         return map;
     }
 

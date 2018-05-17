@@ -16,7 +16,7 @@ public class NightWorkerGeneralResponseDTO {
     private boolean nightWorker;
     private LocalDate startDate;
     private PersonType personType;
-    private int questionnaireFrequencyInMonths;
+    private int questionnaireFrequency;
 
     public NightWorkerGeneralResponseDTO(){
         // default constructor
@@ -58,11 +58,11 @@ public class NightWorkerGeneralResponseDTO {
         this.personType = personType;
     }
 
-    public int getQuestionnaireFrequencyInMonths() {
-        return questionnaireFrequencyInMonths;
+    public int getQuestionnaireFrequency() {
+        return questionnaireFrequency;
     }
 
-    public void setQuestionnaireFrequencyInMonths(int questionnaireFrequencyInMonths) {
-        this.questionnaireFrequencyInMonths = questionnaireFrequencyInMonths;
+    public void setQuestionnaireFrequency(int questionnaireFrequency) {
+        this.questionnaireFrequency = questionnaireFrequency;
     }
 }

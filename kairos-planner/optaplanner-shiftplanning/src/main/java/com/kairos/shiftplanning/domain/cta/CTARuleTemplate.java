@@ -1,8 +1,12 @@
 package com.kairos.shiftplanning.domain.cta;
 
-import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
+import com.kairos.shiftplanning.domain.Activity;
+import com.kairos.shiftplanning.domain.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.TimeInterval;
 import com.kairos.shiftplanning.dto.ActivityIntervalDTO;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.Period;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,8 +21,8 @@ public class CTARuleTemplate {
     //where 1 index is Monday and 7 index is Sunday.
     private boolean[] days;
     private int granularity;
-    //We need to add ActivityPlannerEntity Types also
-    private List<ActivityPlannerEntity> activities;
+    //We need to add Activity Types also
+    private List<Activity> activities;
     private List<LocalDate> holidayDates;
 
     public Long getId() {
@@ -77,18 +81,18 @@ public class CTARuleTemplate {
         this.holidayDates = holidayDates;
     }
 
-    public List<ActivityPlannerEntity> getActivities() {
+    public List<Activity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ActivityPlannerEntity> activities) {
+    public void setActivities(List<Activity> activities) {
         this.activities = activities;
     }
 
     public BigDecimal getCostForThisCTATemplate(List<ActivityIntervalDTO> aliDTOs, BigDecimal baseCost){
         BigDecimal costPerTemplate = new BigDecimal(0);
         for (ActivityIntervalDTO intervalDTO:aliDTOs) {
-            if(!intervalDTO.isProcessedForDay() && activities.contains(intervalDTO.getActivityPlannerEntity()) && (days==null || days[intervalDTO.getStart().getDayOfWeek()])){
+            if(!intervalDTO.isProcessedForDay() && activities.contains(intervalDTO.getActivity()) && (days==null || days[intervalDTO.getStart().getDayOfWeek()])){
                 costPerTemplate = costPerTemplate.add(getCostByInterval(intervalDTO,baseCost));
                 if(holidayDates!=null && !holidayDates.isEmpty() && holidayDates.contains(intervalDTO.getStart().toLocalDate())){
                     intervalDTO.setProcessedForDay(true);

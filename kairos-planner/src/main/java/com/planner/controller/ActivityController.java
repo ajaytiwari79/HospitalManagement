@@ -25,14 +25,14 @@ public class ActivityController {
     @Autowired
     private ActivityService activityService;
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    @ApiOperation("Create ActivityPlannerEntity")
+    @ApiOperation("Create Activity")
     public ResponseEntity<Map<String, Object>> addActivity(@RequestBody @Valid ActivityNoTabsDTO activityDTO,
                                                                 @PathVariable Long unitId) {
         activityService.createActivity(unitId,activityDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
     }
     @RequestMapping(value = "/{activityKairosId}", method = RequestMethod.PUT)
-    @ApiOperation("Update ActivityPlannerEntity")
+    @ApiOperation("Update Activity")
     public ResponseEntity<Map<String, Object>> updateActivity(@RequestBody @Valid ActivityNoTabsDTO activityDTO,
                                                                 @PathVariable Long unitId,@PathVariable BigInteger activityKairosId) {
         activityService.updateActivity(unitId,activityKairosId,activityDTO);

@@ -23,15 +23,13 @@ public interface ActivityCategoryRepository extends MongoRepository<ActivityCate
     @Query("{'deleted': false, 'countryId' : ?0}")
     List<ActivityCategory> findByCountryId(long countryId);
 
+    @Query("{'deleted': false, 'name' :{$regex:?0,$options:'i'}, 'unitId' : ?1}")
+    ActivityCategory getCategoryByNameAndUnit(String categoryName, Long unitId);
+
     @Query(value = "{ 'name' :{$regex:?0,$options:'i'} ,'deleted':false} ")
     ActivityCategory getCategoryByName(String categoryName);
 
-    @Query(value = "{ 'countryId':?0, 'timeTypeId':?1, 'deleted':false }")
-    ActivityCategory getCategoryByTimeType(Long countryId, BigInteger timeTypeId);
+    List<ActivityCategory> findByDeletedFalse();
 
-    @Query(value = "{ '_id':?0, 'deleted':false}")
-    ActivityCategory getByIdAndNonDeleted(BigInteger categoryId);
-
-    @Query(value = "{ 'name':?0, 'deleted':?1 }")
     boolean existsByNameIgnoreCaseAndDeleted(String name, boolean status );
 }

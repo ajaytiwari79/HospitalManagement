@@ -6,7 +6,6 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
-import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -101,8 +100,6 @@ public class RuleTemplateService extends MongoBaseService {
 
         ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",true,"Maximum number of consecutive days",true,daysCount);
         consecutiveWorking.setCountryId(countryDTO.getId());
-        consecutiveWorking.setIntervalLength(12);
-        consecutiveWorking.setIntervalUnit(week);
         consecutiveWorking.setPhaseTemplateValues(phaseTemplateValues);
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
@@ -207,24 +204,6 @@ public class RuleTemplateService extends MongoBaseService {
         //careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
-
-        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate=new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence",false,"Minimum days off after a series of night shifts in sequence",1,week,1);
-        daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        daysOffAfterASeriesWTATemplate.setCountryId(countryDTO.getId());
-        daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        wtaBaseRuleTemplates1.add(daysOffAfterASeriesWTATemplate);
-
-        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No OF Sequence Shift", PartOfDay.DAY,PartOfDay.NIGHT);
-        noOfSequenceShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        noOfSequenceShiftWTATemplate.setCountryId(countryDTO.getId());
-        noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        wtaBaseRuleTemplates1.add(noOfSequenceShiftWTATemplate);
-
-        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate=new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased Risk",false,"Employees with increased risk",18,62,false);
-        employeesWithIncreasedRiskWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        employeesWithIncreasedRiskWTATemplate.setCountryId(countryDTO.getId());
-        employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
         BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",false,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
         breaksInShiftWTATemplate.setCountryId(countryDTO.getId());

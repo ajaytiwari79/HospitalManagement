@@ -21,8 +21,6 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForStaffingLevel;
     private boolean eligibleForPresence;
     private boolean eligibleForAbsence;
-    private boolean breakAllowed = false;
-    private boolean approvalAllowed = false;
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -73,7 +71,7 @@ public class RulesActivityTab implements Serializable{
     }
 
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest,  boolean eligibleAgainstTimeRules,  boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules,boolean eligibleForStaffingLevel, boolean eligibleForPresence,boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed) {
+                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules,boolean eligibleForStaffingLevel, boolean eligibleForPresence,boolean eligibleForAbsence) {
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
         this.eligibleForRequest = eligibleForRequest;
@@ -85,8 +83,7 @@ public class RulesActivityTab implements Serializable{
         this.eligibleForStaffingLevel=eligibleForStaffingLevel;
         this.eligibleForPresence=eligibleForPresence;
         this.eligibleForAbsence=eligibleForAbsence;
-        this.breakAllowed = breakAllowed;
-        this.approvalAllowed = approvalAllowed;
+
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -153,19 +150,4 @@ public class RulesActivityTab implements Serializable{
         this.eligibleForSchedules = eligibleForSchedules;
     }
 
-    public boolean isBreakAllowed() {
-        return breakAllowed;
-    }
-
-    public void setBreakAllowed(boolean breakAllowed) {
-        this.breakAllowed = breakAllowed;
-    }
-
-    public boolean isApprovalAllowed() {
-        return approvalAllowed;
-    }
-
-    public void setApprovalAllowed(boolean approvalAllowed) {
-        this.approvalAllowed = approvalAllowed;
-    }
 }

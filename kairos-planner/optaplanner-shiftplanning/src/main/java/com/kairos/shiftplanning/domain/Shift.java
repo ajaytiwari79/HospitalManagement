@@ -8,7 +8,7 @@ import java.util.List;
 public interface Shift {
     DateTime getStart();
     DateTime getEnd();
-    EmployeePlanningFact getEmployee();
+    Employee getEmployee();
     List<ShiftBreak> getBreaks();
     void setBreaks(List<ShiftBreak> breaks);
     //boolean isRequestedByStaff();

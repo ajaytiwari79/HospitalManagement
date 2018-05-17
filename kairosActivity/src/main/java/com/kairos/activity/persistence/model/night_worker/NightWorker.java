@@ -16,7 +16,7 @@ public class NightWorker extends MongoBaseEntity{
     private boolean nightWorker;
     private LocalDate startDate;
     private PersonType personType;
-    private int questionnaireFrequencyInMonths;
+    private int questionnaireFrequency;
     private Long staffId;
     private List<BigInteger> staffQuestionnairesId;
 
@@ -24,11 +24,11 @@ public class NightWorker extends MongoBaseEntity{
         // default constructor
     }
 
-    public NightWorker(boolean nightWorker, LocalDate startDate, PersonType personType, int questionnaireFrequencyInMonths, Long staffId){
+    public NightWorker(boolean nightWorker, LocalDate startDate, PersonType personType, int questionnaireFrequency, Long staffId){
         this.nightWorker = nightWorker;
         this.startDate = startDate;
         this.personType = personType;
-        this.questionnaireFrequencyInMonths = questionnaireFrequencyInMonths;
+        this.questionnaireFrequency = questionnaireFrequency;
         this.staffId = staffId;
     }
 
@@ -56,20 +56,12 @@ public class NightWorker extends MongoBaseEntity{
         this.personType = personType;
     }
 
-    public int getQuestionnaireFrequencyInMonths() {
-        return questionnaireFrequencyInMonths;
+    public int getQuestionnaireFrequency() {
+        return questionnaireFrequency;
     }
 
-    public void setQuestionnaireFrequencyInMonths(int questionnaireFrequencyInMonths) {
-        this.questionnaireFrequencyInMonths = questionnaireFrequencyInMonths;
-    }
-
-    public List<BigInteger> getStaffQuestionnairesId() {
-        return staffQuestionnairesId;
-    }
-
-    public void setStaffQuestionnairesId(List<BigInteger> staffQuestionnairesId) {
-        this.staffQuestionnairesId = staffQuestionnairesId;
+    public void setQuestionnaireFrequency(int questionnaireFrequency) {
+        this.questionnaireFrequency = questionnaireFrequency;
     }
 
     public Long getStaffId() {
@@ -80,4 +72,11 @@ public class NightWorker extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
+    public List<BigInteger> getStaffQuestionnaires() {
+        return staffQuestionnairesId;
+    }
+
+    public void setStaffQuestionnaires(List<BigInteger> staffQuestionnairesId) {
+        this.staffQuestionnairesId = staffQuestionnairesId;
+    }
 }

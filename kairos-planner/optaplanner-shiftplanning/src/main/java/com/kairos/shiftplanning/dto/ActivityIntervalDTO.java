@@ -1,10 +1,12 @@
 package com.kairos.shiftplanning.dto;
 
-import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
+import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+
+import java.util.UUID;
 
 public class ActivityIntervalDTO {
 
@@ -13,7 +15,7 @@ public class ActivityIntervalDTO {
     private ActivityLineInterval next;
     private DateTime start;
     private boolean required;
-    private ActivityPlannerEntity activityPlannerEntity;
+    private Activity activity;
     private ShiftRequestPhase shift;
     private boolean processedForDay;
     //Duration in minutes
@@ -27,7 +29,7 @@ public class ActivityIntervalDTO {
         this.next = lineInterval.getNext();
         this.start = lineInterval.getStart();
         this.required = lineInterval.isRequired();
-        this.activityPlannerEntity = lineInterval.getActivityPlannerEntity();
+        this.activity = lineInterval.getActivity();
         this.shift = lineInterval.getShift();
         this.duration = lineInterval.getDuration();
         this.staffNo = lineInterval.getStaffNo();
@@ -101,12 +103,12 @@ public class ActivityIntervalDTO {
         this.required = required;
     }
 
-    public ActivityPlannerEntity getActivityPlannerEntity() {
-        return activityPlannerEntity;
+    public Activity getActivity() {
+        return activity;
     }
 
-    public void setActivityPlannerEntity(ActivityPlannerEntity activityPlannerEntity) {
-        this.activityPlannerEntity = activityPlannerEntity;
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 
     public ShiftRequestPhase getShift() {

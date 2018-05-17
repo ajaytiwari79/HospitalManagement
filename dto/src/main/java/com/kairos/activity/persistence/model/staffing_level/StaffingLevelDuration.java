@@ -7,7 +7,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 //import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 public class StaffingLevelDuration {
     //@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
@@ -24,9 +23,6 @@ public class StaffingLevelDuration {
     public StaffingLevelDuration(LocalTime from, LocalTime to) {
         this.from = from;
         this.to = to;
-    }
-    public int getDuration(){
-        return  (int)ChronoUnit.MINUTES.between(from, to);
     }
 
     public LocalTime getFrom() {

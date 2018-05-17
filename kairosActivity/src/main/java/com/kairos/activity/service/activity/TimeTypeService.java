@@ -6,8 +6,6 @@ import com.kairos.activity.custom_exception.TimeTypeLinkedException;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.TimeType;
-import com.kairos.activity.persistence.model.activity.tabs.ActivityCategory;
-import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.activity.persistence.repository.activity.TimeTypeMongoRepository;
@@ -29,8 +27,6 @@ public class TimeTypeService extends MongoBaseService {
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private ActivityMongoRepositoryImpl activityMongoRepository;
-    @Inject
-    private ActivityCategoryService activityCategoryService;
 
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
@@ -48,7 +44,6 @@ public class TimeTypeService extends MongoBaseService {
                     if(timeTypeDTO.getUpperLevelTimeTypeId() != null){
                         TimeType parentTimeType = timeTypeMongoRepository.findOne(timeTypeDTO.getUpperLevelTimeTypeId());
                         parentTimeType.getChildTimeTypeIds().add(timeType.getId());
-                        parentTimeType.setLeafNode(false);
                         save(parentTimeType);
                     }
                     timeTypeDTO.setId(timeType.getId());
@@ -69,8 +64,6 @@ public class TimeTypeService extends MongoBaseService {
                     timeType.setLabel(timeTypeDTO.getLabel());
                     timeType.setDescription(timeTypeDTO.getDescription());
                     save(timeType);
-                    if(timeType.isLeafNode())
-                        activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
                 }
             } else {
                 throw new DuplicateDataException("Name already Exists");
@@ -171,7 +164,6 @@ public class TimeTypeService extends MongoBaseService {
         List<Activity> activity = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
         if (activity.isEmpty() && timeTypes.isEmpty()) {
-            activityCategoryService.removeTimeTypeRelatedCategory(countryId, timeTypeId);
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
             timeType.setDeleted(true);
             save(timeType);

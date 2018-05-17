@@ -24,8 +24,6 @@ public class RulesActivityTabDTO {
     private boolean eligibleForStaffingLevel;
     private boolean eligibleForPresence;
     private boolean eligibleForAbsence;
-    private boolean breakAllowed = false;
-    private boolean approvalAllowed = false;
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -57,7 +55,7 @@ public class RulesActivityTabDTO {
 
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed, approvalAllowed);
+                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence);
 
         return rulesActivityTab;
     }
@@ -136,21 +134,5 @@ public class RulesActivityTabDTO {
 
     public void setEligibleForSchedules(List<PhaseTemplateValue> eligibleForSchedules) {
         this.eligibleForSchedules = eligibleForSchedules;
-    }
-
-    public boolean isBreakAllowed() {
-        return breakAllowed;
-    }
-
-    public void setBreakAllowed(boolean breakAllowed) {
-        this.breakAllowed = breakAllowed;
-    }
-
-    public boolean isApprovalAllowed() {
-        return approvalAllowed;
-    }
-
-    public void setApprovalAllowed(boolean approvalAllowed) {
-        this.approvalAllowed = approvalAllowed;
     }
 }

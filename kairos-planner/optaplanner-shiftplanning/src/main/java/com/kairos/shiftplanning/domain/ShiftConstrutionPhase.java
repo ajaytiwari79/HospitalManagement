@@ -1,8 +1,10 @@
 package com.kairos.shiftplanning.domain;
 
+import com.kairos.shiftplanning.utils.MoveableEntitySelectionFilter;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.joda.time.*;
 import org.kie.api.runtime.rule.RuleContext;
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
@@ -14,7 +16,7 @@ import java.util.*;
 @XStreamAlias("ShiftConstrutionPhase")
 public class ShiftConstrutionPhase implements Shift{
     private UUID id;
-    private EmployeePlanningFact employee;
+    private Employee employee;
     @PlanningVariable(valueRangeProviderRefs = "possibleStartTimes")
     private DateTime start;
     @PlanningVariable(valueRangeProviderRefs = "possibleEndTimes")
@@ -98,11 +100,11 @@ public class ShiftConstrutionPhase implements Shift{
         return getMinutes() == 0 ? 0 : getMinutes() - getBreakMinutes();
     }*/
 
-    public EmployeePlanningFact getEmployee() {
+    public Employee getEmployee() {
         return employee;
     }
 
-    public void setEmployee(EmployeePlanningFact employee) {
+    public void setEmployee(Employee employee) {
         this.employee = employee;
     }
 

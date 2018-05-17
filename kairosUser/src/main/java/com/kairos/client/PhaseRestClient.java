@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -115,37 +114,6 @@ public class PhaseRestClient {
             RestTemplateResponseEnvelope<List<PhaseDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e) {
-
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-        }
-
-    }
-    /**
-     * A temp restclient and to be replaced with rest client in other branch
-     */
-    @Async
-    public void initialOptaplannerSync (Long unitId){
-
-        final String baseUrl=getBaseUrl(false);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/planner_integration",
-                            HttpMethod.POST,
-                            null, typeReference, unitId);
-
-            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                logger.info("RestExchange",restExchange);
             } else {
                 throw new RuntimeException(response.getMessage());
             }

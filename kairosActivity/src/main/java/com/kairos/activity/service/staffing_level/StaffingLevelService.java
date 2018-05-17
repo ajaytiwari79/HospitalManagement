@@ -141,8 +141,7 @@ public class StaffingLevelService extends MongoBaseService {
         BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO, new String[]{"presenceStaffingLevelInterval", "absenceStaffingLevelInterval"});
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
-        StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
-        plannerSyncService.publishStaffingLevel(unitId, staffingLevelDTO, IntegrationOperation.CREATE);
+        plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.CREATE);
 
         return presenceStaffingLevelDTO;
     }
@@ -197,9 +196,7 @@ public class StaffingLevelService extends MongoBaseService {
         BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO);
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
-        //plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.UPDATE);
-        StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
-        plannerSyncService.publishStaffingLevel(unitId, staffingLevelDTO, IntegrationOperation.UPDATE);
+        plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.UPDATE);
         return presenceStaffingLevelDTO;
     }
 
@@ -769,11 +766,11 @@ public class StaffingLevelService extends MongoBaseService {
             , List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos) {
         logger.info("updating staffing level organizationId  {} ,{}", unitId);
         List<StaffingLevel> staffingLevels = new ArrayList<StaffingLevel>();
-        List<StaffingLevelDTO> staffingLevelDTOS=new ArrayList<>();
+        StaffingLevel staffingLevel;
         for(AbsenceStaffingLevelDto absenceStaffingLevelDto : absenceStaffingLevelDtos ) {
-            StaffingLevel staffingLevel=null;
             if(Optional.ofNullable(absenceStaffingLevelDto.getId()).isPresent()) {
-                 staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).get();
+
+                staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).get();
                 if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
                     logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
                     throw new UnsupportedOperationException("we can not modified the current date of staffing level");
@@ -790,12 +787,11 @@ public class StaffingLevelService extends MongoBaseService {
                 }
             }
             staffingLevels.add(staffingLevel);
-            StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
-            staffingLevelDTOS.add(staffingLevelDTO);
-        }
+           }
            this.save(staffingLevels);
            absenceStaffingLevelDtos = StaffingLevelUtil.buildAbsenceStaffingLevelDto(staffingLevels);
-        plannerSyncService.publishStaffingLevels(unitId, staffingLevelDTOS, IntegrationOperation.UPDATE);
+
+        // plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.UPDATE);
         return absenceStaffingLevelDtos;
     }
 

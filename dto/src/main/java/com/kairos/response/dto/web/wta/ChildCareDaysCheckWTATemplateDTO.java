@@ -13,30 +13,12 @@ import java.util.List;
  */
 public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<AgeRange> ageRange;
-    private List<BigInteger> activityIds;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
     private LocalDate validationStartDate;
     private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    protected float recommendedValue;
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
 
     public ChildCareDaysCheckWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;

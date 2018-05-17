@@ -18,7 +18,6 @@ public class TimeType extends MongoBaseEntity{
     private TimeTypes timeTypes;
     private BigInteger upperLevelTimeTypeId;
     private String label;
-    private boolean leafNode;
     private String description;
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
 
@@ -43,7 +42,6 @@ public class TimeType extends MongoBaseEntity{
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
-        this.leafNode = true;
     }
 
 
@@ -85,13 +83,5 @@ public class TimeType extends MongoBaseEntity{
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isLeafNode() {
-        return leafNode;
-    }
-
-    public void setLeafNode(boolean leafNode) {
-        this.leafNode = leafNode;
     }
 }

@@ -25,7 +25,6 @@ dependencies {
     //compile 'org.openjdk.jmh:jmh-core:1.19'
     //compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '1.2.0'
     //compile('org.kairos:dto:0.0.1-SNAPSHOT')
-    compile project (':dto')
     compile 'org.freemarker:freemarker:2.3.28'
     compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'

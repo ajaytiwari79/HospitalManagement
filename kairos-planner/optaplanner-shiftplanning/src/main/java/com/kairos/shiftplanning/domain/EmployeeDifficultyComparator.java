@@ -6,16 +6,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
-public class EmployeeDifficultyComparator implements  Comparator<EmployeePlanningFact> {
+public class EmployeeDifficultyComparator implements  Comparator<Employee> {
     private static Logger log= LoggerFactory.getLogger(EmployeeDifficultyComparator.class);
 
     @Override
-    public int compare(EmployeePlanningFact o1, EmployeePlanningFact o2) {
+    public int compare(Employee o1, Employee o2) {
 
         //return o1.getAvailableMinutes().compareTo(o2.getAvailableMinutes());
         //return o1.getAvailableMinutesAfterPlanning().compareTo(o2.getAvailableMinutesAfterPlanning());
     	//return o1.getId().compareTo(o2.getId());
-        //log.info("EmployeePlanningFact:{}",new CompareToBuilder().append(o1.getAvialableMinutes(),o2.getAvialableMinutes()).append(o1.getId(),o2.getId()).toComparison());
-    	return new CompareToBuilder().append(o1.getId(),o2.getId()).toComparison();//availablemins
+        //log.info("Employee:{}",new CompareToBuilder().append(o1.getAvialableMinutes(),o2.getAvialableMinutes()).append(o1.getId(),o2.getId()).toComparison());
+    	return new CompareToBuilder().append(o1.getAvialableMinutes(),o2.getAvialableMinutes()).append(o1.getId(),o2.getId()).toComparison();
     }
 }

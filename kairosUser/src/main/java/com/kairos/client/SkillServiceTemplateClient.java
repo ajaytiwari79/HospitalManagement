@@ -44,7 +44,7 @@ public class SkillServiceTemplateClient {
 
             logger.debug("typeReference "+typeReference);
             ResponseEntity<RestTemplateResponseEnvelope<Object>> restExchange =
-                    restTemplate.exchange(getBaseUrl(false)+"/task_types/getAllAvlSkill",//"http://zuulservice/kairos/activity/api/v1/organization/{organizationId}/task_types/getAllAvlSkill"
+                    restTemplate.exchange(getBaseUrl(false)+"task_types/getAllAvlSkill",//"http://zuulservice/kairos/activity/api/v1/organization/{organizationId}/task_types/getAllAvlSkill"
                             HttpMethod.POST, request, typeReference, organizationId);
 
             logger.info("restExchange.getBody() "+ restExchange.getBody());
