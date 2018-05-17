@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Created by pavan on 7/5/18.
  */
+
 @QueryResult
 public class StaffExpertiseQueryResult {
     private Long id;

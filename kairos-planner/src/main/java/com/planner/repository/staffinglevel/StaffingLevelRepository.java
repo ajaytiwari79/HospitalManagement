@@ -13,4 +13,5 @@ import java.util.Optional;
 @Repository
 public interface StaffingLevelRepository extends MongoBaseRepository<StaffingLevel,String> {
     List<StaffingLevel> getStaffingLevelsByUnitAndDates(Long unitId, LocalDate start,LocalDate end);
+    List<StaffingLevel> getStaffingLevelsByUnitAndDates(Long unitId, List<LocalDate> dates);
 }

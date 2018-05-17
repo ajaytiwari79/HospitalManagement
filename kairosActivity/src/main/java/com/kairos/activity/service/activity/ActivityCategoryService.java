@@ -4,6 +4,7 @@ import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.activity.TimeType;
 import com.kairos.activity.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
@@ -27,6 +28,30 @@ public class ActivityCategoryService extends MongoBaseService{
     @Inject
     ActivityMongoRepository activityMongoRepository;
 
+    //TODO: need to be removed, not in use as category will be updated accroding to linked time type.
+    public ActivityCategory updateActivityCategoryByUnit(Long unitId, BigInteger activityCategoryId, String name){
+        if(name.equalsIgnoreCase("NONE")){
+            throw new ActionNotPermittedException("Can't rename category as NONE");
+        }
+        boolean isAlreadyExists=activityCategoryRepository.existsByNameIgnoreCaseAndDeleted(name,false);
+        if(isAlreadyExists){
+            throw new DuplicateDataException("Category already exists "+name);
+        }
+        Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
+        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
+        if(activityCategory.getName().equals("NONE")){
+            throw new InvalidOperationException("Can't update NONE category");
+        }
+        if(activityCategory.getCountryId()!=null){
+            throw new InvalidOperationException("Can't update Country category");
+        }
+
+        activityCategory.setName(name);
+        activityCategoryRepository.save(activityCategory);
+        return activityCategory;
+    }
+
+    //TODO: need to be removed, not in use as category will be updated accroding to linked time type.
     public ActivityCategory updateActivityCategory(Long countryId, BigInteger activityCategoryId, String name){
 
         if(name.equalsIgnoreCase("NONE")){
@@ -44,6 +69,14 @@ public class ActivityCategoryService extends MongoBaseService{
             activityCategory.setName(name);
             activityCategoryRepository.save(activityCategory);
             return activityCategory;
+        }
+    }
+
+    public void updateActivityCategoryForTimeType(Long countryId, TimeType timeType){
+        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, timeType.getId());
+        if(category != null){
+            category.setName(timeType.getLabel());
+            save(category);
         }
     }
 
@@ -66,28 +99,6 @@ public class ActivityCategoryService extends MongoBaseService{
 
    }
 
-    public ActivityCategory updateActivityCategoryByUnit(Long unitId, BigInteger activityCategoryId, String name){
-        if(name.equalsIgnoreCase("NONE")){
-            throw new ActionNotPermittedException("Can't rename category as NONE");
-        }
-        boolean isAlreadyExists=activityCategoryRepository.existsByNameIgnoreCaseAndDeleted(name,false);
-        if(isAlreadyExists){
-            throw new DuplicateDataException("Category already exists "+name);
-        }
-        Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
-        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
-        if(activityCategory.getName().equals("NONE")){
-            throw new InvalidOperationException("Can't update NONE category");
-        }
-        if(activityCategory.getCountryId()!=null){
-            throw new InvalidOperationException("Can't update Country category");
-        }
-
-            activityCategory.setName(name);
-            activityCategoryRepository.save(activityCategory);
-            return activityCategory;
-    }
-
     public boolean deleteActivityCategoryByUnit(Long unitId,BigInteger activityCategoryId){
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
@@ -108,4 +119,13 @@ public class ActivityCategoryService extends MongoBaseService{
         activityCategoryRepository.save(activityCategory);
         return  true;
     }
+
+    public void removeTimeTypeRelatedCategory(Long countryId, BigInteger timeTypeId){
+        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, timeTypeId);
+        if(category !=null){
+            category.setDeleted(true);
+            save(category);
+        }
+    }
+
 }
