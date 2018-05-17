@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M7'
+		springBootVersion = '2.0.2.RELEASE'
 		swaggerVersion = '2.5.0'
 		jacksonVersion= '2.9.2'
         projectVersion="0.0.1"
@@ -43,7 +43,7 @@ repositories {
 task wrapper(type: Wrapper) { gradleVersion = '4.1' }
 
 ext {
-	springCloudVersion = 'Finchley.M5'
+	springCloudVersion = 'Finchley.M8'
 }
 dependencies {
 	compile project (':dto')
@@ -55,7 +55,10 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
 	compile('org.springframework.cloud:spring-cloud-starter-security')
+
 	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
+
+
 	//compile('org.springframework.boot:spring-boot-starter-data-redis')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')

@@ -13,11 +13,14 @@ import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
-import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.activity.shift.ShiftWrapper;
 import com.kairos.enums.shift.ShiftState;
+import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.pay_out.PayOutService;
@@ -80,6 +83,8 @@ public class ShiftService extends MongoBaseService {
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private WTAService wtaService;
+    @Inject
+    private OpenShiftMongoRepository openShiftMongoRepository;
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
@@ -565,4 +570,12 @@ public class ShiftService extends MongoBaseService {
         return response;
     }
 
+    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date selectedDate) throws ParseException {
+        Date endDate = new Date(selectedDate.toString());
+        endDate.setDate(endDate.getDate() + 1);
+        List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, selectedDate, endDate);
+        List<OpenShiftResponseDTO> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, selectedDate);
+
+        return new ShiftWrapper(assignedShifts, openShifts);
+    }
 }
