@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -211,6 +213,23 @@ public class Organization extends UserBaseEntity {
     @DateString("HH:MM")
     private Date nightEndTimeTo;
     private boolean union;
+
+    private String desiredUrl;
+    private String shortCompanyName;
+    @Relationship(type = HAS_COMPANY_CATEGORY)
+    private CompanyCategory companyCategory;
+    private Integer kairosCompanyId;
+    private CompanyType companyType;
+
+    private String vatId;
+
+    private boolean costCenter;
+    private Integer costCenterId;
+    private CompanyUnitType companyUnitType;
+
+    private boolean boardingCompleted;
+    private boolean workCenterUnit;
+    private boolean gdprUnit;
 
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
     public Organization(String name, List<Group> groupList, List<Organization> children) {
@@ -797,5 +816,101 @@ public class Organization extends UserBaseEntity {
 
     public void setPaymentSettings(PaymentSettings paymentSettings) {
         this.paymentSettings = paymentSettings;
+    }
+
+    public String getDesiredUrl() {
+        return desiredUrl;
+    }
+
+    public void setDesiredUrl(String desiredUrl) {
+        this.desiredUrl = desiredUrl;
+    }
+
+    public String getShortCompanyName() {
+        return shortCompanyName;
+    }
+
+    public void setShortCompanyName(String shortCompanyName) {
+        this.shortCompanyName = shortCompanyName;
+    }
+
+    public Integer getKairosCompanyId() {
+        return kairosCompanyId;
+    }
+
+    public void setKairosCompanyId(Integer kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
+    }
+
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
+    public void setCompanyType(CompanyType companyType) {
+        this.companyType = companyType;
+    }
+
+    public String getVatId() {
+        return vatId;
+    }
+
+    public void setVatId(String vatId) {
+        this.vatId = vatId;
+    }
+
+    public boolean isCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(boolean costCenter) {
+        this.costCenter = costCenter;
+    }
+
+    public Integer getCostCenterId() {
+        return costCenterId;
+    }
+
+    public void setCostCenterId(Integer costCenterId) {
+        this.costCenterId = costCenterId;
+    }
+
+    public CompanyUnitType getCompanyUnitType() {
+        return companyUnitType;
+    }
+
+    public void setCompanyUnitType(CompanyUnitType companyUnitType) {
+        this.companyUnitType = companyUnitType;
+    }
+
+    public CompanyCategory getCompanyCategory() {
+        return companyCategory;
+    }
+
+    public void setCompanyCategory(CompanyCategory companyCategory) {
+        this.companyCategory = companyCategory;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public void setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
+    }
+
+    public boolean isWorkCenterUnit() {
+        return workCenterUnit;
+    }
+
+    public void setWorkCenterUnit(boolean workCenterUnit) {
+        this.workCenterUnit = workCenterUnit;
+    }
+
+    public boolean isGdprUnit() {
+        return gdprUnit;
+    }
+
+    public void setGdprUnit(boolean gdprUnit) {
+        this.gdprUnit = gdprUnit;
     }
 }
