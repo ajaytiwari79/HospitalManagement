@@ -15,6 +15,8 @@ import java.util.List;
 public class TimeCalculationActivityTab implements Serializable {
 
     private String methodForCalculatingTime;
+    private String fullDayCalculationType;
+    private String fullWeekCalculationType;
     private Boolean allowBreakReduction;
     private Long fixedTimeValue;
     private Long monthsToCalculate;
@@ -176,9 +178,11 @@ public class TimeCalculationActivityTab implements Serializable {
         this.multiplyWithValue = multiplyWithValue;
     }
 
-    public TimeCalculationActivityTab(String methodForCalculatingTime, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
+    public TimeCalculationActivityTab(String methodForCalculatingTime, String fullDayCalculationType, String fullWeekCalculationType, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
                                       Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd, int historyDuration, LocalTime defaultStartTime) {
         this.methodForCalculatingTime = methodForCalculatingTime;
+        this.fullDayCalculationType = fullDayCalculationType;
+        this.fullWeekCalculationType = fullWeekCalculationType;
         this.allowBreakReduction = allowBreakReduction;
         this.fixedTimeValue = fixedTimeValue;
         this.monthsToCalculate = monthsToCalculate;
@@ -196,4 +200,19 @@ public class TimeCalculationActivityTab implements Serializable {
         this.defaultStartTime = defaultStartTime;
     }
 
+    public String getFullDayCalculationType() {
+        return fullDayCalculationType;
+    }
+
+    public void setFullDayCalculationType(String fullDayCalculationType) {
+        this.fullDayCalculationType = fullDayCalculationType;
+    }
+
+    public String getFullWeekCalculationType() {
+        return fullWeekCalculationType;
+    }
+
+    public void setFullWeekCalculationType(String fullWeekCalculationType) {
+        this.fullWeekCalculationType = fullWeekCalculationType;
+    }
 }

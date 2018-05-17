@@ -120,11 +120,13 @@ public class OrganizationGeneral {
     }
 
 
-
     public boolean isKairosHub() {
         return isKairosHub;
     }
 
+    public void setIsKairosHub(boolean isKairosHub) {
+        this.isKairosHub = isKairosHub;
+    }
 
     public void setEanNumber(String eanNumber) {
         this.eanNumber = eanNumber;
@@ -152,10 +154,6 @@ public class OrganizationGeneral {
 
     public void setpNumber(String pNumber) {
         this.pNumber = pNumber;
-    }
-
-    public void setKairosHub(boolean kairosHub) {
-        isKairosHub = kairosHub;
     }
 
 

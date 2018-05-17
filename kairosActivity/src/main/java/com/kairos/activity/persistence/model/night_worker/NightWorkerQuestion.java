@@ -16,6 +16,11 @@ public class NightWorkerQuestion extends MongoBaseEntity{
         // default constructor
     }
 
+    public String getQuestion() {
+        return question;
+    }
 
-
+    public void setQuestion(String question) {
+        this.question = question;
+    }
 }

@@ -26,7 +26,7 @@ public class NightWorkerController {
     NightWorkerService nightWorkerService;
 
     @ApiOperation(value = "update night worker general details")
-    @PutMapping(value = "/night_worker/general/{staffId}")
+    @PutMapping(value = "/staff/{staffId}/night_worker_general")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateNightWorkerGeneralDetails(@PathVariable Long staffId, @PathVariable Long unitId,
                                                            @RequestBody @Valid NightWorkerGeneralResponseDTO nightWorkerGeneralResponseDTO) {
@@ -34,18 +34,25 @@ public class NightWorkerController {
     }
 
     @ApiOperation(value = "get night worker general details")
-    @GetMapping(value = "/night_worker/general/{staffId}")
+    @GetMapping(value = "/staff/{staffId}/night_worker_general")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getNightWorkerGeneralDetails(@PathVariable Long staffId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.getNightWorkerDetailsOfStaff(unitId, staffId));
     }
 
-    @ApiOperation(value = "get night worker general details")
-    @PostMapping(value = "/night_worker/questionnaire/{staffId}")
+    @ApiOperation(value = "get night worker questionnaire details")
+    @GetMapping(value = "/staff/{staffId}/night_worker_questionnaire")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addNightWorkerQuestionnaireDetails(@PathVariable Long staffId, @PathVariable Long unitId,
-                                                                            @RequestBody @Valid QuestionnaireAnswerResponseDTO questionnaireAnswerResponseDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.addNightWorkerQuestionnaire(unitId, staffId, questionnaireAnswerResponseDTO));
+    public ResponseEntity<Map<String, Object>> getNightWorkerQuestionnaireDetails(@PathVariable Long staffId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.getNightWorkerQuestionnaire(unitId, staffId));
+    }
+
+    @ApiOperation(value = "update night worker questionnaire details")
+    @PutMapping(value = "/staff/{staffId}/night_worker_questionnaire/{questionnaireId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNightWorkerQustionnaie(@PathVariable Long staffId, @PathVariable Long unitId, @PathVariable BigInteger questionnaireId,
+                                                                                  @RequestBody @Valid QuestionnaireAnswerResponseDTO questionnaireAnswerResponseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerQuestionnaire(unitId, staffId, questionnaireId, questionnaireAnswerResponseDTO));
     }
 
 }
