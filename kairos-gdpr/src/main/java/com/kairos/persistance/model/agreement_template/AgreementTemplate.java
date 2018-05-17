@@ -2,7 +2,11 @@ package com.kairos.persistance.model.agreement_template;
 
 
 import com.kairos.persistance.country.Country;
+<<<<<<< HEAD
 import com.kairos.persistance.model.account_type.AccountType;
+=======
+import com.kairos.persistance.model.clause.AccountType;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;

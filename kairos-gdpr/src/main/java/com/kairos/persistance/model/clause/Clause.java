@@ -2,13 +2,20 @@ package com.kairos.persistance.model.clause;
 
 
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+<<<<<<< HEAD
 import com.kairos.persistance.model.account_type.AccountType;
+=======
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+<<<<<<< HEAD
+=======
+import java.math.BigInteger;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import java.util.ArrayList;
 import java.util.List;
 

@@ -8,7 +8,11 @@ import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.repository.agreement_template.AgreementTemplateMongoRepository;
 import com.kairos.response.dto.AgreementQueryResult;
 import com.kairos.service.MongoBaseService;
+<<<<<<< HEAD
 import com.kairos.service.account_type.AccountTypeService;
+=======
+import com.kairos.service.clause.AccountTypeService;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.service.clause.ClauseService;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;

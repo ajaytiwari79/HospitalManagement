@@ -1,7 +1,12 @@
 package com.kairos.controller.asset;
 
 
+<<<<<<< HEAD
 import com.kairos.dto.MasterAssetDto;
+=======
+import com.kairos.persistance.model.asset.MasterAsset;
+import com.kairos.persistance.model.asset.dto.MasterAssetDto;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.service.asset.MasterAssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

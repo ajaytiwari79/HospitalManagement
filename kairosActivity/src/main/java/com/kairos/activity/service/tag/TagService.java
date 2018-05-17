@@ -95,7 +95,7 @@ public class TagService extends MongoBaseService {
         }
         Tag tag = tagMongoRepository.findTagByIdAndCountryIdAndDeletedAndCountryTagTrue(tagId, countryId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
+            throw new DataNotFoundByIdException("Incorrect clause_tag id " + tagId);
         }
         tag.setDeleted(true);
         this.save(tag);
@@ -185,7 +185,7 @@ public class TagService extends MongoBaseService {
         }
         Tag tag = tagMongoRepository.findTagByIdAndOrganizationIdAndDeletedAndCountryTagFalse(tagId, organizationId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
+            throw new DataNotFoundByIdException("Incorrect clause_tag id " + tagId);
         }
         tag.setDeleted(true);
         this.save(tag);

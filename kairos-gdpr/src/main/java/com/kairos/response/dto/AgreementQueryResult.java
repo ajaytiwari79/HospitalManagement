@@ -3,7 +3,11 @@ package com.kairos.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistance.country.Country;
+<<<<<<< HEAD
 import com.kairos.persistance.model.account_type.AccountType;
+=======
+import com.kairos.persistance.model.clause.AccountType;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.model.clause.Clause;
 
 import java.math.BigInteger;

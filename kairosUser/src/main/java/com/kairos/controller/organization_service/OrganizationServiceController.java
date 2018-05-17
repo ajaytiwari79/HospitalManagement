@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
@@ -109,5 +110,10 @@ public class OrganizationServiceController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
 
+    @ApiOperation(value = "Get  Organization services by set ids")
+    @RequestMapping(value = "/organization_services/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getAllOrganizationServicesByIds(@RequestBody Set<Long> ids) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getAllOrganizationServicesByIds(ids));
+    }
 
 }

@@ -27,8 +27,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     /*@Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise")*/
     @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) with expertise, country \n" +
-            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[:COUNTRY_HAS_TAG]-(country) WHERE tag.deleted=false AND tag.masterDataType='EXPERTISE' with expertise,tag\n" +
-            "RETURN id(expertise) as id, expertise.name as name, expertise.description as description,CASE when tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag})  END as tags")
+            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(clause_tag:Tag)<-[:COUNTRY_HAS_TAG]-(country) WHERE clause_tag.deleted=false AND clause_tag.masterDataType='EXPERTISE' with expertise,clause_tag\n" +
+            "RETURN id(expertise) as id, expertise.name as name, expertise.description as description,CASE when clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag})  END as tags")
     List<ExpertiseTagDTO> getAllExpertiseWithTagsByCountry(long countryId);
 
     @Override
@@ -50,7 +50,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("Match (expertise:Expertise) where id(expertise)={0} with expertise\n" +
             "Match (skillCategory:SkillCategory{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country)={1} with skillCategory,expertise,country\n" +
             "Match (skill:Skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory) with skill,skillCategory,expertise,country\n" +
-            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[" + COUNTRY_HAS_TAG + "]-(country)  with skill,skillCategory,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
+            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(clause_tag:Tag)<-[" + COUNTRY_HAS_TAG + "]-(country)  with skill,skillCategory,expertise, CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as tags\n" +
             "optional Match (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as skill,skillCategory\n" +
             "return collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
     ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);

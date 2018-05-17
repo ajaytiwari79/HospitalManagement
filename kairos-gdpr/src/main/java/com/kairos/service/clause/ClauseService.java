@@ -6,17 +6,29 @@ import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.DataNotExists;
+<<<<<<< HEAD
 import com.kairos.custome_exception.RequestDataNull;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.ClauseDto;
+=======
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.persistance.model.clause.AccountType;
+import com.kairos.persistance.model.clause.Clause;
+import com.kairos.persistance.model.clause.dto.ClauseDto;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.service.MongoBaseService;
+<<<<<<< HEAD
 import com.kairos.service.account_type.AccountTypeService;
+=======
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.utils.ComparisonUtils;

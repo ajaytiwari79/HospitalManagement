@@ -6,7 +6,11 @@ import com.kairos.persistance.model.master_data.AssetType;
 import com.kairos.persistance.model.master_data.OrganizationalSecurityMeasure;
 import com.kairos.persistance.model.master_data.TechnicalSecurityMeasure;
 import com.kairos.persistance.model.processing_activity.ProcessingActivity;
+<<<<<<< HEAD
 import com.kairos.dto.ProcessingActivityDto;
+=======
+import com.kairos.persistance.model.processing_activity.dto.ProcessingActivityDto;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.repository.master_data.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.master_data.TechnicalSecurityMeasureMongoRepository;

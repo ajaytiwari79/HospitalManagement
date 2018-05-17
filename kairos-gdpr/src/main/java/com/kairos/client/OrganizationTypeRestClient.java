@@ -55,7 +55,11 @@ public class OrganizationTypeRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
+<<<<<<< HEAD
             throw new RuntimeException("exception occurred in filter micro service " + e.getMessage());
+=======
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
         }
 
     }
@@ -86,7 +90,11 @@ public class OrganizationTypeRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
+<<<<<<< HEAD
             throw new RuntimeException("exception occurred in filter micro service " + e.getMessage());
+=======
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
         }
 
     }

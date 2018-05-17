@@ -5,7 +5,11 @@ import static com.kairos.constant.ApiConstant.API_CLAUSES_URL;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.persistance.model.clause.Clause;
+<<<<<<< HEAD
 import com.kairos.dto.ClauseDto;
+=======
+import com.kairos.persistance.model.clause.dto.ClauseDto;
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrievedEvent;

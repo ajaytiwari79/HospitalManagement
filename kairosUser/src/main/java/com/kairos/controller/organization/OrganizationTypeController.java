@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.client.dto.gdpr.OrganizationTypeAndServiceRequestDto;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
@@ -88,6 +89,37 @@ public class OrganizationTypeController {
     public ResponseEntity<Map<String,Object>> deleteLinkingOfOrganizationTypeAndService(@RequestBody  Set<Long> orgTypeId, @PathVariable long organizationServiceId){
         organizationTypeService.deleteLinkingOfOrganizationTypeAndService(orgTypeId,organizationServiceId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+
+    //Bobby
+    @ApiOperation(value = "Get  Organization Types by set ids")
+    @RequestMapping(value = "/organization_type/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getAllOrganizationTypeByIds(@RequestBody Set<Long> ids) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeByIds(ids));
+    }
+
+    //bobby
+    /*@ApiOperation(value = "Get  Organization Types by set ids")
+    @RequestMapping(value = "/organization_sub_types/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getAllOrganizationSubTypeByIds(@RequestBody Set<Long> ids) {
+        List<OrganizationType> response = organizationTypeService.getAllOrganizationSubTypeByIds(ids);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    }*/
+
+//bobby
+    @ApiOperation(value = "get organization and services")
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/all", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getOrgTypeAndOrgServicesResponseDto(@PathVariable Long countryId) {
+    return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId) );
+    }
+
+
+
+    @ApiOperation(value = "Get  Organization Types by set ids")
+    @RequestMapping(value = "/org_types_and_services/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> organizationTypesAndServicesAndSubTypes(@RequestBody OrganizationTypeAndServiceRequestDto requestDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.organizationTypesAndServicesAndSubTypes(requestDto));
     }
 
 

@@ -31,7 +31,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+<<<<<<< HEAD
         logger.error("error in filter service ",ex);
+=======
+        logger.error("error in user service ",ex);
+>>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
         List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());

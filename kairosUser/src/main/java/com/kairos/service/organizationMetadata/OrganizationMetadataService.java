@@ -68,7 +68,7 @@ public class OrganizationMetadataService extends UserBaseService {
     }
 
     public LocalAreaTag createNew(LocalAreaTag localAreaTag, long unitId) {
-        logger.info("local area tag is" + localAreaTag.toString());
+        logger.info("local area clause_tag is" + localAreaTag.toString());
         Organization organization = organizationGraphRepository.findOne(unitId);
 
 
