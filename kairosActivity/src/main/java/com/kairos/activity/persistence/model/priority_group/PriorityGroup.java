@@ -111,14 +111,6 @@ public class PriorityGroup extends MongoBaseEntity {
         this.name = name;
     }
 
-    public ScheduledProcess getScheduledProcess() {
-        return scheduledProcess;
-    }
-
-    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
-        this.scheduledProcess = scheduledProcess;
-    }
-
     public Integer getPriority() {
         return priority;
     }
@@ -133,5 +125,13 @@ public class PriorityGroup extends MongoBaseEntity {
 
     public void setOrderId(BigInteger orderId) {
         this.orderId = orderId;
+    }
+
+    public ScheduledProcess getScheduledProcess() {
+        return scheduledProcess;
+    }
+
+    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
+        this.scheduledProcess = scheduledProcess;
     }
 }

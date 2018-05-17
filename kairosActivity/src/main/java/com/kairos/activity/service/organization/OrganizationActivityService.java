@@ -8,6 +8,7 @@ import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
+import com.kairos.activity.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
@@ -23,6 +24,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.integration.PlannerSyncService;
+import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private ActivityCategoryRepository activityCategoryRepository;
     @Inject
     private PlannerSyncService plannerSyncService;
+    @Inject
+    OrderService orderService;
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -209,6 +213,13 @@ public class OrganizationActivityService extends MongoBaseService {
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         return activityDTO;
+    }
+
+    public OrderAndActivityDTO getActivitiesWithBalanceSettings(long unitId){
+        OrderAndActivityDTO orderAndActivityDTO=new OrderAndActivityDTO();
+        orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
+        orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
+        return orderAndActivityDTO;
     }
 
 }

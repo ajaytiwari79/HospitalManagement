@@ -10,18 +10,75 @@ public class ShiftNotificationEvent {
    private Shift shift;
    private boolean shiftUpdated;
    private Shift previousStateShift;
+   private boolean isShiftForPresence;
+   private boolean deletedShift;
+   private boolean isActivityChangedFromPresenceToAbsence;
+   private boolean isActivityChangedFromAbsenceToPresence;
+
+
+    public boolean isActivityChangedFromPresenceToAbsence() {
+        return isActivityChangedFromPresenceToAbsence;
+    }
+
+    public void setActivityChangedFromPresenceToAbsence(boolean activityChangedFromPresenceToAbsence) {
+        isActivityChangedFromPresenceToAbsence = activityChangedFromPresenceToAbsence;
+    }
+
+    public boolean isActivityChangedFromAbsenceToPresence() {
+        return isActivityChangedFromAbsenceToPresence;
+    }
+
+    public void setActivityChangedFromAbsenceToPresence(boolean activityChangedFromAbsenceToPresence) {
+        isActivityChangedFromAbsenceToPresence = activityChangedFromAbsenceToPresence;
+    }
+
+
+    public boolean isDeletedShift() {
+        return deletedShift;
+    }
+
+    public void setDeletedShift(boolean deletedShift) {
+        this.deletedShift = deletedShift;
+    }
+
+
+    public boolean isShiftForPresence() {
+        return isShiftForPresence;
+    }
+
+    public void setShiftForPresence(boolean shiftForPresence) {
+        isShiftForPresence = shiftForPresence;
+    }
+
 
     public ShiftNotificationEvent() {
     }
 
     public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
-      boolean shiftUpdated, Shift previousStateShift) {
+      boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence) {
         this.unitId = unitId;
         this.currentDate = currentDate;
         this.shift = shift;
         this.shiftUpdated = shiftUpdated;
         this.previousStateShift = previousStateShift;
+        this.isShiftForPresence = isShiftForPresence;
+
     }
+    public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
+                                  boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence,boolean deletedShift,boolean isActivityChangedFromAbsenceToPresence,
+                                  boolean isActivityChangedFromPresenceToAbsence) {
+        this.unitId = unitId;
+        this.currentDate = currentDate;
+        this.shift = shift;
+        this.shiftUpdated = shiftUpdated;
+        this.previousStateShift = previousStateShift;
+        this.isShiftForPresence = isShiftForPresence;
+        this.deletedShift = deletedShift;
+        this.isActivityChangedFromAbsenceToPresence = isActivityChangedFromAbsenceToPresence;
+        this.isActivityChangedFromPresenceToAbsence = isActivityChangedFromPresenceToAbsence;
+
+    }
+
 
     public Long getUnitId() {
         return unitId;

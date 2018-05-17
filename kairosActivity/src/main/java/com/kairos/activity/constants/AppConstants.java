@@ -229,6 +229,9 @@ public class AppConstants {
     // Default Settings of period for unit
     public static final int PRESENCE_LIMIT_IN_YEAR = 1;
     public static final int ABSENCE_LIMIT_IN_YEAR = 2;
+    public static final int ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE = 1;
+    public static final int ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE = 2;
+
 
     // Staff Questionnaire
     public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";

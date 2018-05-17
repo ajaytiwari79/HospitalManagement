@@ -1,20 +1,15 @@
 package com.kairos.response.dto.web.open_shift;
 
+import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderResponseDTO {
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
     private Long unitId;
-    private Long activityId;
+    private BigInteger activityId;
     private Long plannedTimeId;
     private Long contactPersonId;
     private String contactPersonMobile;
@@ -24,12 +19,12 @@ public class OrderResponseDTO {
     private LocalTime toTime;
     private Integer MinOpenShiftHours;
     private WeekType weekType;
-    private DayTypeOrder dayType;
+    private List<DayOfWeek> dayType = new ArrayList<DayOfWeek>();
     private Long reasonCodeId;
-    private String notForPlanner;
-    private Long experitiseId;
-    private List<Long> skillLevel;
-    private Long functionId;
+    private String noteForPlanner;
+    private Long expertiseId;
+    private List<Long> skillLevel = new ArrayList<Long>();
+    private List<Long> functionIds;
     private boolean acuteOrder;
     private StartFrom startFrom;
     private Integer priority;
@@ -37,18 +32,41 @@ public class OrderResponseDTO {
     private String noteForCandidate;
     private LocalDate deadline;
     private OrderNotificationsCriteriaForPlanner notificationsCriteria;
-    private ShiftAssignmentCriteria siftAssignmentCriteria;
-    private BringYour bringYour;
-    private DeadlineRule deadlineRule;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
+    private BringVehicle bringVehicle;
+    private DeadlineRule deadlineRule;
+    private BigInteger id;
 
 
-    public Long getActivityId() {
-        return activityId;
+    public List<DayOfWeek> getDayType() {
+        return dayType;
     }
 
-    public void setActivityId(Long activityId) {
-        this.activityId = activityId;
+    public void setDayType(List<DayOfWeek> dayType) {
+        this.dayType = dayType;
+    }
+    public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
+        return shiftAssignmentCriteria;
+    }
+
+    public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
+        this.shiftAssignmentCriteria = shiftAssignmentCriteria;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
     public Long getPlannedTimeId() {
@@ -123,13 +141,6 @@ public class OrderResponseDTO {
         this.weekType = weekType;
     }
 
-    public DayTypeOrder getDayType() {
-        return dayType;
-    }
-
-    public void setDayType(DayTypeOrder dayType) {
-        this.dayType = dayType;
-    }
 
     public Long getReasonCodeId() {
         return reasonCodeId;
@@ -139,20 +150,20 @@ public class OrderResponseDTO {
         this.reasonCodeId = reasonCodeId;
     }
 
-    public String getNotForPlanner() {
-        return notForPlanner;
+    public String getNoteForPlanner() {
+        return noteForPlanner;
     }
 
-    public void setNotForPlanner(String notForPlanner) {
-        this.notForPlanner = notForPlanner;
+    public void setNoteForPlanner(String noteForPlanner) {
+        this.noteForPlanner = noteForPlanner;
     }
 
-    public Long getExperitiseId() {
-        return experitiseId;
+    public Long getExpertiseId() {
+        return expertiseId;
     }
 
-    public void setExperitiseId(Long experitiseId) {
-        this.experitiseId = experitiseId;
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
     }
 
     public List<Long> getSkillLevel() {
@@ -163,13 +174,7 @@ public class OrderResponseDTO {
         this.skillLevel = skillLevel;
     }
 
-    public Long getFunctionId() {
-        return functionId;
-    }
 
-    public void setFunctionId(Long functionId) {
-        this.functionId = functionId;
-    }
 
     public boolean isAcuteOrder() {
         return acuteOrder;
@@ -221,20 +226,14 @@ public class OrderResponseDTO {
         this.notificationsCriteria = notificationsCriteria;
     }
 
-    public ShiftAssignmentCriteria getSiftAssignmentCriteria() {
-        return siftAssignmentCriteria;
+
+
+    public BringVehicle getBringVehicle() {
+        return bringVehicle;
     }
 
-    public void setSiftAssignmentCriteria(ShiftAssignmentCriteria siftAssignmentCriteria) {
-        this.siftAssignmentCriteria = siftAssignmentCriteria;
-    }
-
-    public BringYour getBringYour() {
-        return bringYour;
-    }
-
-    public void setBringYour(BringYour bringYour) {
-        this.bringYour = bringYour;
+    public void setBringVehicle(BringVehicle bringVehicle) {
+        this.bringVehicle = bringVehicle;
     }
 
     public DeadlineRule getDeadlineRule() {
@@ -245,13 +244,6 @@ public class OrderResponseDTO {
         this.deadlineRule = deadlineRule;
     }
 
-    public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
-        return shiftAssignmentCriteria;
-    }
-
-    public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
-        this.shiftAssignmentCriteria = shiftAssignmentCriteria;
-    }
 
     public Integer getPriority() {
         return priority;
@@ -260,4 +252,21 @@ public class OrderResponseDTO {
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
+    public BigInteger getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
+    }
+
+
+    public List<Long> getFunctionIds() {
+        return functionIds;
+    }
+
+    public void setFunctionIds(List<Long> functionIds) {
+        this.functionIds = functionIds;
+    }
+
 }

@@ -91,7 +91,7 @@ public class PayTableServiceIntegrationTest {
     @Test
     @OrderTest(order = 1)
     public void createPayTable() {
-        PayTableDTO payTableDTO = new PayTableDTO("Test pay level", "SF", "", DateUtil.getCurrentDate(), null, organizationLevel);
+        PayTableDTO payTableDTO = new PayTableDTO("Test pay level", "SF", "", DateUtil.getCurrentDate(), null, "monthly", organizationLevel);
         HttpEntity<PayTableDTO> entity = new HttpEntity<>(payTableDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableResponse>> typeReference =
@@ -111,7 +111,7 @@ public class PayTableServiceIntegrationTest {
     @Test
     @OrderTest(order = 3)
     public void updatePayLevel() {
-        PayTableUpdateDTO payTableUpdateDTO = new PayTableUpdateDTO("Test pay level", "SF", "By test", currentDate.toDate(), null, organizationLevel);
+        PayTableUpdateDTO payTableUpdateDTO = new PayTableUpdateDTO("Test pay level", "SF", "By test", currentDate.toDate(), null, "monthly", organizationLevel);
         HttpEntity<PayTableUpdateDTO> entity = new HttpEntity<>(payTableUpdateDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableResponse>> typeReference =

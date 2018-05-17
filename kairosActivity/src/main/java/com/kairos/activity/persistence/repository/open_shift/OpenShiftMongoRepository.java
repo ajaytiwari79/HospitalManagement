@@ -13,7 +13,10 @@ public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,
     @Query("{'deleted' : false,'_id':?0}")
     OpenShift findOpenShiftByIdAndEnabled(BigInteger id);
 
-    @Query("{'deleted' : false,'unitId':?0,'orderId':?1}")
+    @Query("{'deleted':false, 'unitId':?0, 'orderId':?1}")
     List<OpenShift> findOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId);
+
+    @Query("{'deleted' :false, '_id':{$in:?0}}")
+    List<OpenShift> findAllByIdsAndDeletedFalse(List<BigInteger> openShiftIds);
 
 }

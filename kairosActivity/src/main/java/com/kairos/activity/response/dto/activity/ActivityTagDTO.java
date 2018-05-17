@@ -3,6 +3,7 @@ package com.kairos.activity.response.dto.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
@@ -30,6 +31,7 @@ public class ActivityTagDTO {
     private Long unitId;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
+    private BalanceSettingsActivityTab balanceSettingsActivityTab;
 
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
         return timeCalculationActivityTab;

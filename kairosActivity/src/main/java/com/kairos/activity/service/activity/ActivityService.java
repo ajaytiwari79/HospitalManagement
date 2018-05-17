@@ -1021,6 +1021,7 @@ public class ActivityService extends MongoBaseService {
         Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
         return activity;
     }
+
     public Object initialOptaplannerSync(Long organisationId, Long unitId) {
         List<Activity> activities=activityMongoRepository.findAllActivitiesByUnitId(unitId);
         plannerSyncService.publishActivities(unitId,activities,IntegrationOperation.CREATE);
