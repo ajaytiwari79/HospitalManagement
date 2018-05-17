@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
@@ -42,11 +44,13 @@ public class UnionService {
         OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         organizationCreationData.setZipCodes(zipCodes);
+        organizationCreationData.setCompanyTypes(CompanyType.getListOfCompanyType());
+        organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
         List<Map<String, Object>> orgData = new ArrayList<>();
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("homeAddress");
+            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
             orgBasicData.put("municipalities", (address.get("zipCode") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCode"))));
             orgData.add(orgBasicData);
         }
