@@ -60,10 +60,4 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
-
-
-//    @Query(value="{unitId:?0,deleted:false}",fields="{ 'balanceSettingsActivityTab' : 1,''}")
-//    List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
-
-
 }

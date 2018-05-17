@@ -22,11 +22,7 @@ public class PriorityGroupIntegrationService {
         countryDetail.put("countryId",countryId);
         priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/priority_groups",countryDetail);
     }
-
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){
         return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
         }
-
-
-
 }

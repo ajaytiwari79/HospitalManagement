@@ -18,13 +18,27 @@ public class OrderDefaultDataWrapper {
     private List<Expertise> expertise;
     private List<TimeType> timeTypes;
     private List<StaffPersonalDetailDTO> staffList;
-    private List<PresenceType> plannedTime;
+    private List<PresenceTypeDTO> plannedTime;
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
     private List<com.kairos.persistence.model.user.country.DayType> dayTypes;
 
     public OrderDefaultDataWrapper() {
         //Default Constructor
+    }
+
+    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
+                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
+        this.orders = orders;
+        this.activities = activities;
+        this.skills = skills;
+        this.expertise = expertise;
+        this.timeTypes = timeTypes;
+        this.staffList = staffList;
+        this.plannedTime = plannedTime;
+        this.functions = functions;
+        this.reasonCodes = reasonCodes;
+        this.dayTypes = dayTypes;
     }
 
     public List<OrderResponseDTO> getOrders() {
@@ -75,11 +89,11 @@ public class OrderDefaultDataWrapper {
         this.staffList = staffList;
     }
 
-    public List<PresenceType> getPlannedTime() {
+    public List<PresenceTypeDTO> getPlannedTime() {
         return plannedTime;
     }
 
-    public void setPlannedTime(List<PresenceType> plannedTime) {
+    public void setPlannedTime(List<PresenceTypeDTO> plannedTime) {
         this.plannedTime = plannedTime;
     }
 
