@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.FormatUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -53,6 +54,8 @@ public class RegionService extends UserBaseService {
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private List<ZipCode> allZipCodes;
@@ -148,7 +151,8 @@ public class RegionService extends UserBaseService {
     public Map<String,Object> getAllZipCodesData(long zipcodeId) {
         ZipCode zipCode = zipCodeGraphRepository.findOne(zipcodeId);
         if(zipCode == null){
-            throw new InternalError("Zipcode can't be null");
+            exceptionService.internalServerError("exception.zipCode.notFound");
+
         }
         HashMap<String,Object> responseData = new HashMap<>();
         responseData.put("geographyData", FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipcodeId)));
@@ -161,7 +165,8 @@ public class RegionService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         List<Region> response = new ArrayList<>();
         if (country==null){
-            throw new DataNotFoundByIdException("Can't find country by provided Id");
+            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+
         }
 
         try {
@@ -177,7 +182,8 @@ public class RegionService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if(!rowIterator.hasNext()){
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 1 position");
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow",1);
+
             }
 
             Region region;

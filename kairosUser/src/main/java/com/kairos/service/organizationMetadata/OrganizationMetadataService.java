@@ -17,6 +17,7 @@ import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,8 @@ public class OrganizationMetadataService extends UserBaseService {
     @Inject
     private
     PaymentSettingRepository paymentSettingRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     private static final Logger logger = LoggerFactory.getLogger(OrganizationMetadataService.class);
 
 
@@ -178,7 +180,8 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         List<PaymentSettingsQueryResult> paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             logger.info("Unable to payments settings for unit ,{}", unitId);
-            throw new DataNotFoundByIdException("Unable to get  payments settings for unit " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.paymentsetting.unable",unitId);
+
         }
 
         return paymentSettings;
@@ -188,12 +191,14 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 1);
         if (!organization.isPresent()) {
             logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
-            throw new DataNotFoundByIdException("Unable to get organization by id" + unitId);
+           exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+
         }
         if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent() && !organization.get().getPaymentSettings().isEmpty()) {
             Optional<PaymentSettings> paymentSettingsFromDB = organization.get().getPaymentSettings().stream().filter(paymentSettings -> paymentSettings.getType().equals(paymentSettingsDTO.getType())).findFirst();
             if (paymentSettingsFromDB.isPresent()) {
-                throw new DuplicateDataException("payment settings " + paymentSettingsDTO.getType() + " is already present for the organization");
+                exceptionService.duplicateDataException("message.unit.paymentsetting.alreadyExist",paymentSettingsDTO.getType());
+
             }
         }
         paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
@@ -219,7 +224,8 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId, paymentSettingsDTO.getId());
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             logger.info("Unable to payment while updating payments settings for unit ,{}", unitId);
-            throw new DataNotFoundByIdException("Unable to get payment updating payments settings for unit ,{}" + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.paymentsetting.update.unable",unitId);
+
         }
         if (paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)) {
             paymentSettings.setDateOfPayment(paymentSettingsDTO.getDateOfPayment());

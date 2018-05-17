@@ -1,5 +1,6 @@
 package com.kairos.service.skill;
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
@@ -29,6 +30,7 @@ import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
@@ -103,7 +105,8 @@ public class SkillService extends UserBaseService {
     private TagService tagService;
     @Inject
     private TagGraphRepository tagGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
@@ -123,7 +126,8 @@ public class SkillService extends UserBaseService {
             Map<String, Object> response = skill.retrieveDetails();
             return response;
         }
-        throw new DuplicateDataException("Can't create duplicate skill in same category");
+        exceptionService.duplicateDataException("message.skill.name.duplicate");
+            return  null;
 
     }
 
@@ -321,8 +325,10 @@ public class SkillService extends UserBaseService {
             }
             return getAllAvailableSkills(id, type);
         } else {
-            throw new InternalError("Type not correct");
+            exceptionService.internalServerError("message.type.notvalid");
+
         }
+        return null;
     }
 
 
@@ -374,8 +380,9 @@ public class SkillService extends UserBaseService {
             }
             return skillUpdated;
         } else {
-            throw new InternalError("Type incorrect");
+            exceptionService.internalServerError("message.type.notvalid");
         }
+        return false;
     }
 
     public boolean requestForCreateNewSkill(long unitId, Skill skill) {
@@ -404,6 +411,7 @@ public class SkillService extends UserBaseService {
             Organization unit = organizationGraphRepository.getOrganizationByTeamId(id);
             unitId = unit.getId();
         } else {
+            //exceptionService.internalServerError("message.type.notvalid");
             throw new InternalError("Type incorrect");
         }
 
@@ -486,7 +494,8 @@ public class SkillService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            throw new InternalError("staff can not be null");
+            exceptionService.internalServerError("message.staff.id.notFound");
+
         }
 
         long lastModificationDate = DateUtil.getCurrentDate().getTime();
@@ -507,27 +516,27 @@ public class SkillService extends UserBaseService {
     public Map<String, Object> getStaffSkills(long id, String type) {
 
 
-        List<Map<String, Object>> skills;
+        List<Map<String, Object>> skills=null;
         List<Map<String, Object>> response = new ArrayList<>();
+        List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            List<StaffPersonalDetailDTO> staffList = staffService.getStaffWithBasicInfo(id, false);
+            staffList = staffService.getStaffWithBasicInfo(id, false);
             List<Long> staffIds = new ArrayList<>(staffList.size());
-            for (StaffPersonalDetailDTO map : staffList) {
-                response.add((Map<String, Object>) map);
-                staffIds.add(map.getId());
-            }
+            staffList.stream().forEach(staffPersonalDetailDTO -> {
+                staffIds.add(staffPersonalDetailDTO.getId());
+            });
             skills = organizationGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            staffList = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             List<Long> staffIds = new ArrayList<>(staffList.size());
-            for (StaffPersonalDetailDTO map : staffList) {
-                response.add((Map<String, Object>) map);
-                staffIds.add(map.getId());
-            }
+            staffList.stream().forEach(staffPersonalDetailDTO -> {
+                staffIds.add(staffPersonalDetailDTO.getId());
+            });
             skills = teamGraphRepository.getAssignedSkillsOfStaffByTeam(id, staffIds);
         } else {
-            throw new InternalError("Type is not valid");
+            exceptionService.internalServerError("message.type.notvalid");
+           // throw new InternalError("Type is not valid");
         }
         List<Map<String, Object>> skillsResponse = new ArrayList<>();
         for (Map<String, Object> map : skills) {
@@ -536,7 +545,7 @@ public class SkillService extends UserBaseService {
 
         Map<String, Object> map = new HashMap<>();
         map.put("skills", skillsResponse);
-        map.put("staffList", response);
+        map.put("staffList", ObjectMapperUtils.copyPropertiesOfListByMapper(staffList, Map.class));
         return map;
     }
 
@@ -607,7 +616,8 @@ public class SkillService extends UserBaseService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new InternalError("Invalid country id ");
+            exceptionService.internalServerError("exception.country.id.notFound",countryId);
+
         }
 
         List<String> externalIds = timeCareSkills.stream().map(timeCareSkill -> String.valueOf(timeCareSkill.getId())).

@@ -4,6 +4,7 @@ import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,8 @@ public class ProvinceService extends UserBaseService {
     @Inject
     private RegionGraphRepository regionGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
 
     public Map<String, Object> updateProvinceById(Province province) {
         Province currentProvince = provinceGraphRepository.findOne(province.getId());
@@ -54,7 +57,8 @@ public class ProvinceService extends UserBaseService {
     public Map<String, Object> addProvinceToRegion(Province province, Long regionId) {
         Region region = regionGraphRepository.findOne(regionId);
         if(region == null){
-            throw new InternalError("Region is null");
+            exceptionService.internalServerError("message.provinceservice.region.notFound");
+            
         }
         province.setRegion(region);
         save(province);

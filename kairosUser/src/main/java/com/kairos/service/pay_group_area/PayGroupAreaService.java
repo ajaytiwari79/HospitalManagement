@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaResponse;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,8 @@ public class PayGroupAreaService extends UserBaseService {
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
     private PayGroupAreaRelationshipRepository payGroupAreaRelationshipRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     private Logger logger = LoggerFactory.getLogger(PayGroupArea.class);
 
     public PayGroupAreaQueryResult savePayGroupArea(Long countryId, PayGroupAreaDTO payGroupAreaDTO) {

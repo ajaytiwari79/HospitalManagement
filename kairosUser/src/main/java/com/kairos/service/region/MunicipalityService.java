@@ -6,6 +6,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,8 @@ public class MunicipalityService extends UserBaseService {
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
     private ProvinceGraphRepository provinceGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     public Municipality createMunicipality(Municipality municipality){
         return save(municipality);
@@ -75,7 +77,8 @@ public class MunicipalityService extends UserBaseService {
     public Map<String, Object> addZipCodeToMunicipality(Long municipalityId, ZipCode zipCode) {
         Municipality municipality = municipalityGraphRepository.findOne(municipalityId);
         if(municipality == null){
-            throw new InternalError("Municipality is null");
+            exceptionService.internalServerError("exception.municipality.notFound");
+
         }
         List<Municipality> municipalities = zipCode.getMunicipalities();
         municipalities.add(municipality);

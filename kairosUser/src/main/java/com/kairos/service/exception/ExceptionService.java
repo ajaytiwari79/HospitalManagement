@@ -71,4 +71,10 @@ public class ExceptionService {
     public void flsCallException(String message,Object... params) {
         throw new FlsCallException(convertMessage(message, params));
     }
+    public void nullPointerException(String message,Object... params) {
+        throw new NullPointerException(convertMessage(message, params));
+    }
+    public void unitNotFoundException(String message,Object... params) {
+        throw new UnitNotFoundException(convertMessage(message, params));
+    }
 }

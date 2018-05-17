@@ -81,7 +81,7 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow");
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow",1);
 
             }
 
@@ -141,7 +141,7 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow");
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow",2);
 
             }
 

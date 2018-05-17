@@ -7,6 +7,7 @@ import com.kairos.persistence.model.organization.OrganizationSetting;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,8 @@ public class OpenningHourService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     public OrganizationSetting getDefaultSettings(){
         OrganizationSetting organizationSetting  = new OrganizationSetting();
@@ -85,7 +87,8 @@ public class OpenningHourService {
     public boolean setDefaultOpeningHours(long unitId) {
         Organization unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
-            throw new DataNotFoundByIdException("Incorrect unit id ");
+            exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+
         }
         OrganizationSetting organizationSetting = getDefaultSettings();
         unit.setOrganizationSetting(organizationSetting);
