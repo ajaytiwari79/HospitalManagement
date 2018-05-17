@@ -16,18 +16,26 @@ import com.kairos.activity.custom_exception.DataNotFoundException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.activity.TimeType;
 import com.kairos.activity.persistence.model.activity.tabs.*;
+import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.persistence.repository.activity.TimeTypeMongoRepository;
+import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
+import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.service.shift.ShiftService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
@@ -71,22 +79,20 @@ import static org.springframework.http.MediaType.APPLICATION_XML;
 public class ActivityService extends MongoBaseService {
     @Autowired
     private OrganizationRestClient organizationRestClient;
-
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ActivityCategoryRepository activityCategoryRepository;
-
     @Inject
     private ShiftService shiftService;
     @Autowired
     private PhaseService phaseService;
-
     @Inject
     private TagMongoRepository tagMongoRepository;
     @Inject
     private OrganizationActivityService organizationActivityService;
-
+    @Inject
+    private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -95,6 +101,10 @@ public class ActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
+    @Autowired
+    private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -104,8 +114,7 @@ public class ActivityService extends MongoBaseService {
                 findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
 
         if (Optional.ofNullable(activity).isPresent()) {
-            logger.error("ActivityName already exist" + activityDTO.getName());
-            throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
+            exceptionService.duplicateDataException("exception.duplicateData", "activity", activityDTO.getName());
         }
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId);
@@ -128,7 +137,7 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory != null) {
             generalActivityTab.setCategoryId(activityCategory.getId());
         } else {
-            ActivityCategory category = new ActivityCategory("NONE", "", countryId);
+            ActivityCategory category = new ActivityCategory("NONE", "", countryId, null);
             save(category);
             generalActivityTab.setCategoryId(category.getId());
         }
@@ -175,7 +184,6 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByCountry(countryId);
         List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
@@ -229,32 +237,15 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
         logger.info(generalDTO.toString());
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted(generalDTO.getCategoryName(), countryId, false);
-
-        if (activityCategory != null) {
-
-            generalDTO.setCategoryId(activityCategory.getId());
-        } else {
-
-            ActivityCategory category = new ActivityCategory(generalDTO.getCategoryName(), "", countryId);
-            save(category);
-
-            if (category == null) {
-
-                throw new DataNotFoundByIdException("Category can't be created!!");
-
-            }
-
-            generalDTO.setCategoryId(category.getId());
-
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            throw new DataNotFoundByIdException("Category Not Available");
         }
         Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
-
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            throw new DuplicateDataException("Name already is use " + generalDTO.getName());
+            exceptionService.duplicateDataException("exception.duplicateData", "activity");
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
-
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
@@ -262,6 +253,7 @@ public class ActivityService extends MongoBaseService {
         if (Optional.ofNullable(activity.getGeneralActivityTab().getOriginalIconName()).isPresent()) {
             generalTab.setOriginalIconName(activity.getGeneralActivityTab().getOriginalIconName());
         }
+        activity.getBalanceSettingsActivityTab().setTimeTypeId(activityCategory.getTimeTypeId());
         activity.setGeneralActivityTab(generalTab);
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
@@ -318,10 +310,26 @@ public class ActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("TimeCareActivity not found : " + balanceDTO.getActivityId());
         }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
+        //updating activity category based on time type
+        updateActivityCategory(activity);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
+        activityTabsWrapper.setActivityCategories(activityCategoryRepository.findByCountryId(activity.getCountryId()));
 
         return activityTabsWrapper;
+
+    }
+
+    public void updateActivityCategory(Activity activity){
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId(), activity.getCountryId());
+        if(timeType == null)
+            throw new DataNotFoundException("Related Time Type not found");
+        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(activity.getCountryId(), activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(category == null){
+            category = new ActivityCategory(timeType.getLabel(), "", activity.getCountryId(), timeType.getId());
+            save(category);
+        }
+        activity.getGeneralActivityTab().setCategoryId(category.getId());
 
     }
 
@@ -346,7 +354,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(compositeShiftActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("TimeCareActivity not found by Id: " + compositeShiftActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", compositeShiftActivityDTO.getActivityId());
         }
         Set<BigInteger> activityIds = compositeShiftActivityDTO.getActivityList();
         Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(activityIds);
@@ -374,7 +382,7 @@ public class ActivityService extends MongoBaseService {
     public List<ActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (activity == null) {
-            throw new DataNotFoundByIdException("TimeCareActivity not found by Id : " + activityId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
         if (activity.getCompositeActivities() != null) {
@@ -440,7 +448,7 @@ public class ActivityService extends MongoBaseService {
             notesActivityTab.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         }
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid ActivityId : " + notesActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", notesActivityDTO.getActivityId());
         }
         activity.setNotesActivityTab(notesActivityTab);
         save(activity);
@@ -529,7 +537,7 @@ public class ActivityService extends MongoBaseService {
     public void updateOrgMappingDetailOfActivity(OrganizationMappingActivityDTO organizationMappingActivityDTO) {
         Activity activity = activityMongoRepository.findOne(new BigInteger(organizationMappingActivityDTO.getActivityId().toString()));
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid ActivityId" + organizationMappingActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", organizationMappingActivityDTO.getActivityId());
         }
 
         boolean isSuccess = organizationRestClient.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
@@ -543,8 +551,8 @@ public class ActivityService extends MongoBaseService {
         activity.setLevels(organizationMappingActivityDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingActivityDTO.getEmploymentTypes());
         save(activity);
-        if(activity.getUnitId()!=null){
-            plannerSyncService.publishActivity(activity.getUnitId(),activity,IntegrationOperation.UPDATE);
+        if (activity.getUnitId() != null) {
+            plannerSyncService.publishActivity(activity.getUnitId(), activity, IntegrationOperation.UPDATE);
         }
 
     }
@@ -554,7 +562,7 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Activity  not found : " + activityId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         OrganizationMappingActivityDTO organizationMappingActivityDTO = new OrganizationMappingActivityDTO();
         organizationMappingActivityDTO.setOrganizationSubTypes(activity.getOrganizationSubTypes());
@@ -598,7 +606,7 @@ public class ActivityService extends MongoBaseService {
         OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = optaPlannerSettingActivityTabDTO.buildOptaPlannerSettingTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(optaPlannerSettingActivityTabDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid ActivityId : " + optaPlannerSettingActivityTabDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", optaPlannerSettingActivityTabDTO.getActivityId());
         }
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         save(activity);
@@ -623,7 +631,7 @@ public class ActivityService extends MongoBaseService {
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTabDTO.buildCTAAndWTASettingActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(ctaAndWtaSettingsActivityTabDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid ActivityId : " + ctaAndWtaSettingsActivityTabDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", ctaAndWtaSettingsActivityTabDTO.getActivityId());
         }
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
         save(activity);
@@ -693,7 +701,7 @@ public class ActivityService extends MongoBaseService {
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         byte[] bytes = file.getBytes();
         String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
@@ -713,7 +721,7 @@ public class ActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
         if (activity.getState().equals(ActivityStateEnum.LIVE)) {
-            throw new ActionNotPermittedException("activity type is being used in organizations : " + activityId);
+            exceptionService.actionNotPermittedException("exception.alreadyInUse", "activity");
         }
 
 
@@ -778,7 +786,7 @@ public class ActivityService extends MongoBaseService {
         }
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory == null) {
-            activityCategory = new ActivityCategory("NONE", "", countryId);
+            activityCategory = new ActivityCategory("NONE", "", countryId, null);
             save(activityCategory);
         }
         List<Long> orgTypes = organizationDTO.getOrganizationTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
@@ -1012,5 +1020,19 @@ public class ActivityService extends MongoBaseService {
         }
         Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
         return activity;
+    }
+
+    public Object initialOptaplannerSync(Long organisationId, Long unitId) {
+        List<Activity> activities=activityMongoRepository.findAllActivitiesByUnitId(unitId);
+        plannerSyncService.publishActivities(unitId,activities,IntegrationOperation.CREATE);
+        List<StaffingLevel> staffingLevels= staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId,DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)),DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
+        List<StaffingLevelDTO> staffingLevelDTOS= new ArrayList<>();
+        for(StaffingLevel staffingLevel:staffingLevels){
+            StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
+            staffingLevelDTOS.add(staffingLevelDTO);
+        }
+        plannerSyncService.publishStaffingLevels(unitId,staffingLevelDTOS,IntegrationOperation.CREATE);
+        return null;
+
     }
 }

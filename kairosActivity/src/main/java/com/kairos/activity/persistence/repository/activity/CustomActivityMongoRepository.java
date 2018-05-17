@@ -40,4 +40,8 @@ public interface CustomActivityMongoRepository {
 
     Activity getActivityByNameAndUnitId(Long unitId,String name);
 
+    List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
+
+
+
 }

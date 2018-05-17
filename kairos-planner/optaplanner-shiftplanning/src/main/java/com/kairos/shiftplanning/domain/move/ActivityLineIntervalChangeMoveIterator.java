@@ -32,7 +32,7 @@ public class  ActivityLineIntervalChangeMoveIterator<T>
     public ActivityLineIntervalChangeMove next() {
         int index=workingRandom==null?n++:workingRandom.nextInt(activityLineIntervalWrappers.size());
         ActivityLineIntervalWrapper activityLineIntervalWrapper= activityLineIntervalWrappers.get(index);
-        if(activityLineIntervalWrapper.getActivityLineInterval().getActivity().isTypeAbsence()){
+        if(activityLineIntervalWrapper.getActivityLineInterval().getActivityPlannerEntity().isTypeAbsence()){
             log.debug("providing absence move");
         }
         List<ActivityLineInterval> exIntervals = ShiftPlanningUtility.getOverlappingActivityLineIntervals(activityLineIntervalWrapper.getShiftRequestPhase()==null?null:activityLineIntervalWrapper.getShiftRequestPhase().getActivityLineIntervals(),activityLineIntervalWrapper.getActivityLineInterval());

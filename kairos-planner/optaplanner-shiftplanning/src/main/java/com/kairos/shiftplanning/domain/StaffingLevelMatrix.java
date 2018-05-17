@@ -56,10 +56,6 @@ public class StaffingLevelMatrix {
 
         return minMax;
     }
-    public void tp(){
-        int i=1;
-        return;
-    }
 
     public int[] getActivitiesRank() {
         return activitiesRank;

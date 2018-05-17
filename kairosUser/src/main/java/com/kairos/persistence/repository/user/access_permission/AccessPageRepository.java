@@ -305,6 +305,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "create unique (ac)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:isEnabled, read:read, write:write}]->(accessPage)")
     void copyAccessGroupPageRelationShips(Long oldAccessGroupId,Long newAccessGroupId);
 
+    @Query("MATCH (a:AccessPage) WHERE a.isModule={0} WITH id(a) as id,a.name as name,a.moduleId as moduleId, "+
+            "toInt(split(a.moduleId,\"_\")[1]) as tabIdNumber return tabIdNumber ORDER BY tabIdNumber DESC LIMIT 1")
+    Integer getLastTabOrModuleIdOfAccessPage(boolean isModule);
+
 }
 
 

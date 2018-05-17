@@ -1,5 +1,6 @@
 package com.planner.domain.staffinglevel;
 
+import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.planner.domain.MongoBaseEntity;
@@ -16,16 +17,18 @@ public class StaffingLevel extends MongoBaseEntity {
     private Date currentDate;
     private Long weekCount;
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelTimeSlotDTO> staffingLevelInterval=new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
     public StaffingLevel() {
     }
 
-    public StaffingLevel(BigInteger unitId, Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelTimeSlotDTO> staffingLevelInterval,BigInteger kariosId) {
+    public StaffingLevel(BigInteger unitId, Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelInterval> presenceStaffingLevelInterval,List<StaffingLevelInterval> absenceStaffingLevelInterval,BigInteger kariosId) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.staffingLevelSetting = staffingLevelSetting;
-        this.staffingLevelInterval = staffingLevelInterval;
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
+        this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
         this.unitId=unitId;
         this.kairosId=kariosId;
     }
@@ -68,12 +71,20 @@ public class StaffingLevel extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public List<StaffingLevelTimeSlotDTO> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+
+    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
+    public List<StaffingLevelInterval> getAbsenceStaffingLevelInterval() {
+        return absenceStaffingLevelInterval;
+    }
+
+    public void setAbsenceStaffingLevelInterval(List<StaffingLevelInterval> absenceStaffingLevelInterval) {
+        this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
+    }
 }

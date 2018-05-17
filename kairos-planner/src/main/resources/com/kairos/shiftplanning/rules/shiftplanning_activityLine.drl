@@ -7,25 +7,25 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 global HardMediumSoftLongScoreHolder scoreHolder;
 
 
-rule "Unassigned activity interval required"
+rule "Unassigned activityPlannerEntity interval required"
 salience 20
     when
-        ActivityLineInterval(activity.isTypePresence() && shift==null && required)
+        ActivityLineInterval(activityPlannerEntity.isTypePresence() && shift==null && required)
     then
         scoreHolder.addSoftConstraintMatch(kcontext,  - 2);
 end
-rule "Unassigned activity interval"
+rule "Unassigned activityPlannerEntity interval"
 salience 20
     when
-        ActivityLineInterval(activity.isTypePresence() && shift==null && !required)
+        ActivityLineInterval(activityPlannerEntity.isTypePresence() && shift==null && !required)
     then
         scoreHolder.addSoftConstraintMatch(kcontext,  - 1);
 end
 
-rule "Unassigned absence activity interval"
+rule "Unassigned absence activityPlannerEntity interval"
 salience 20
     when
-        ActivityLineInterval(activity.isTypeAbsence() && shift==null && required)
+        ActivityLineInterval(activityPlannerEntity.isTypeAbsence() && shift==null && required)
     then
         scoreHolder.addSoftConstraintMatch(kcontext,  - 96);
 end

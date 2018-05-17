@@ -1,52 +1,47 @@
 package com.kairos.activity.persistence.model.priority_group;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.enums.PriorityGroup.Priority;
+import com.kairos.persistence.model.enums.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroup extends MongoBaseEntity {
-    //private ShiftSelectionType shiftSelectionType;
-    //private boolean singleLongerShift;
-    private boolean activated=true;
-    //private FeatureRule featureRule;
-    //private NotificationWay notificationWay;
+    private boolean deActivated;
     private OpenShiftCancelProcess openShiftCancelProcess;
-    private RoundRule roundRule;
+    private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
-    //private Priority priority;
     private Long countryId;
     private Long unitId;
     private BigInteger countryParentId;
-    private Integer priority;
+    private PriorityGroupName name;
     private BigInteger orderId;
+    private ScheduledProcess scheduledProcess;
 
 
     public PriorityGroup() {
         //Default Constructor
     }
 
-    public PriorityGroup(Integer priority, boolean activated, OpenShiftCancelProcess openShiftCancelProcess, RoundRule roundRule, StaffExcludeFilter staffExcludeFilter,
-                         StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
-        this.priority=priority;
-        this.activated = activated;
+    public PriorityGroup(PriorityGroupName name, boolean deActivated, OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
+                         StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId,ScheduledProcess scheduledProcess) {
+        this.name=name;
+        this.deActivated = deActivated;
         this.openShiftCancelProcess = openShiftCancelProcess;
-        this.roundRule = roundRule;
+        this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
         this.countryId = countryId;
         this.unitId = unitId;
+        this.scheduledProcess=scheduledProcess;
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isDeActivated() {
+        return deActivated;
     }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
+    public void setDeActivated(boolean deActivated) {
+        this.deActivated = deActivated;
     }
 
 
@@ -59,12 +54,12 @@ public class PriorityGroup extends MongoBaseEntity {
         this.openShiftCancelProcess = openShiftCancelProcess;
     }
 
-    public RoundRule getRoundRule() {
-        return roundRule;
+    public RoundRules getRoundRules() {
+        return roundRules;
     }
 
-    public void setRoundRule(RoundRule roundRule) {
-        this.roundRule = roundRule;
+    public void setRoundRules(RoundRules roundRules) {
+        this.roundRules = roundRules;
     }
 
     public StaffExcludeFilter getStaffExcludeFilter() {
@@ -107,13 +102,14 @@ public class PriorityGroup extends MongoBaseEntity {
         this.countryParentId = countryParentId;
     }
 
-    public Integer getPriority() {
-        return priority;
+    public PriorityGroupName getName() {
+        return name;
     }
 
-    public void setPriority(Integer priority) {
-        this.priority = priority;
+    public void setName(PriorityGroupName name) {
+        this.name = name;
     }
+
     public BigInteger getOrderId() {
         return orderId;
     }
@@ -122,6 +118,11 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
+    public ScheduledProcess getScheduledProcess() {
+        return scheduledProcess;
+    }
 
-
+    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
+        this.scheduledProcess = scheduledProcess;
+    }
 }

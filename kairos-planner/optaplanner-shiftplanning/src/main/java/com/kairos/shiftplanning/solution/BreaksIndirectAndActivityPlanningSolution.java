@@ -22,7 +22,7 @@ public class BreaksIndirectAndActivityPlanningSolution {
 	private String id;
 	private Long unitId;
 	@ProblemFactCollectionProperty
-    private List<Employee> employees;
+    private List<EmployeePlanningFact> employees;
     @ProblemFactCollectionProperty
     private List<LocalDate> weekDates;
     @PlanningEntityCollectionProperty
@@ -31,7 +31,7 @@ public class BreaksIndirectAndActivityPlanningSolution {
     //@ValueRangeProvider(id = "shifts")
     private List<ShiftRequestPhase> shifts;
     @ProblemFactCollectionProperty
-    private List<Activity> activities;
+    private List<ActivityPlannerEntity> activities;
     @ProblemFactCollectionProperty
     //@ValueRangeProvider(id = "activityLineIntervals")
     private List<ActivityLineInterval> activityLineIntervals;
@@ -66,11 +66,11 @@ public class BreaksIndirectAndActivityPlanningSolution {
         this.shifts = shifts;
     }
 
-    public List<Activity> getActivities() {
+    public List<ActivityPlannerEntity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<Activity> activities) {
+    public void setActivities(List<ActivityPlannerEntity> activities) {
         this.activities = activities;
     }
 
@@ -80,11 +80,11 @@ public class BreaksIndirectAndActivityPlanningSolution {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public List<Employee> getEmployees() {
+	public List<EmployeePlanningFact> getEmployees() {
 		return employees;
 	}
 
-	public void setEmployees(List<Employee> employees) {
+	public void setEmployees(List<EmployeePlanningFact> employees) {
 		this.employees = employees;
 	}
 

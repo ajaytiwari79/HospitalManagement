@@ -3,16 +3,13 @@ package com.kairos.persistence.model.user.staff;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.filter.FilterDetail;
+import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.model.user.filter.FilterGroup;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.List;
-import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.FILTER_BY_PAGE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.FILTER_DETAIL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FILTER_GROUP;
 
@@ -33,7 +30,7 @@ public class StaffFavouriteFilter extends UserBaseEntity {
     private FilterGroup filterGroup;
 
     @Relationship(type = FILTER_DETAIL)
-    private List<FilterDetail> filtersData;
+    private List<FilterSelection> filtersData;
 
     private String name;
 
@@ -41,7 +38,7 @@ public class StaffFavouriteFilter extends UserBaseEntity {
         // default constructor
     }
 
-    public StaffFavouriteFilter(String name, List<FilterDetail> filtersData, FilterGroup filterGroup){
+    public StaffFavouriteFilter(String name, List<FilterSelection> filtersData, FilterGroup filterGroup){
         this.name = name;
         this.filtersData = filtersData;
         this.filterGroup = filterGroup;
@@ -71,11 +68,11 @@ public class StaffFavouriteFilter extends UserBaseEntity {
         this.filterJson = filterJson;
     }*/
 
-    public List<FilterDetail> getFiltersData() {
+    public List<FilterSelection> getFiltersData() {
         return filtersData;
     }
 
-    public void setFiltersData(List<FilterDetail> filtersData) {
+    public void setFiltersData(List<FilterSelection> filtersData) {
         this.filtersData = filtersData;
     }
 

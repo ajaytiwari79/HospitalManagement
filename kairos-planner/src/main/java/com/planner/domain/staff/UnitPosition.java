@@ -26,11 +26,12 @@ public class UnitPosition  extends MongoBaseEntity {
     private Long seniorityLevelId;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private WorkingTimeAgreement workingTimeAgreement;
+    private String staffId;
 
     public UnitPosition() {
     }
 
-    public UnitPosition(Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum, WorkingTimeAgreement workingTimeAgreement, BigInteger kairosId) {
+    public UnitPosition(Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum, WorkingTimeAgreement workingTimeAgreement, BigInteger kairosId,String staffId) {
         this.expertiseId = expertiseId;
         this.positionCodeId = positionCodeId;
         this.startDateMillis = startDateMillis;
@@ -47,6 +48,7 @@ public class UnitPosition  extends MongoBaseEntity {
         this.paidOutFrequencyEnum = paidOutFrequencyEnum;
         this.workingTimeAgreement = workingTimeAgreement;
         this.kairosId=kairosId;
+        this.staffId=staffId;
     }
 
     public Long getExpertiseId() {
@@ -168,5 +170,13 @@ public class UnitPosition  extends MongoBaseEntity {
 
     public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
+    }
+
+    public String getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(String staffId) {
+        this.staffId = staffId;
     }
 }
