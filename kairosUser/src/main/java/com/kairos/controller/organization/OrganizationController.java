@@ -1338,7 +1338,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Default data for Orders")
-    @RequestMapping(value = "/unit/{unitId}/order/default-data", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/order/default_data", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataForOrder(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
