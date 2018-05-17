@@ -9,7 +9,7 @@ import java.util.List;
  * Created by oodles on 16/4/18.
  */
 public enum CompanyType {
-    KAIROS_PROSPEKT("Kairos Prospekt"), KAIROS_CLIENT("Kairos Client"), UNION("Union"), KAIROS_HUB("Kairos Hub"),SUBCONTRACTOR_TO_CLENT("Subcontractor to client");
+    KAIROS_PROSPECT("Kairos Prospect"), KAIROS_CLIENT("Kairos Client"), UNION("Union"), KAIROS_HUB("Kairos Hub"),SUBCONTRACTOR_TO_CLENT("Subcontractor to client");
 
     public String value;
     CompanyType(String value) {
