@@ -1,6 +1,7 @@
 package com.kairos.service.exception;
 
 import com.kairos.custom_exception.*;
+import com.kairos.service.fls_visitour.exceptions.scheduler.FlsCallException;
 import com.kairos.service.locale.LocaleService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -57,5 +58,17 @@ public class ExceptionService {
     }
     public void dataNotMatchedException(String message,Object... params) {
         throw new DataNotMatchedException(convertMessage(message, params));
+    }
+    public void unsupportedOperationException(String message,Object... params) {
+        throw new UnsupportedOperationException(convertMessage(message, params));
+    }
+    public void runtimeException(String message,Object... params) {
+        throw new RuntimeException(convertMessage(message, params));
+    }
+    public void flsCredentialException(String message,Object... params) {
+        throw new FlsCredentialException(convertMessage(message, params));
+    }
+    public void flsCallException(String message,Object... params) {
+        throw new FlsCallException(convertMessage(message, params));
     }
 }

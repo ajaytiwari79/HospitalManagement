@@ -151,15 +151,17 @@ public class ExpertiseService extends UserBaseService {
         for (int i = 0; i < seniorityLevels.size(); i++) {
             if (!seniorityLevels.get(i).getId().equals(currentSeniorityLevelId)) { // we are skipping the current
                 if (seniorityLevelDTO.getTo() == null && seniorityLevels.get(i).getTo() == null) {
-                    throw new ActionNotPermittedException("Already a more than is present in seniority level " + seniorityLevels.get(i).getId());
+                    exceptionService.actionNotPermittedException("exception.expertise.seniorityLevel.present",seniorityLevels.get(i).getId());
+
                 } else if (seniorityLevelDTO.getTo() == null && seniorityLevels.get(i).getTo() != null) {
                     if (seniorityLevelDTO.getFrom() > seniorityLevels.get(i).getTo()) {
-                        throw new ActionNotPermittedException("The start must be greater than " + seniorityLevels.get(i).getTo() + " " + seniorityLevels.get(i).getId());
+                        exceptionService.actionNotPermittedException("exception.expertise.seniorityLevel.greaterThan",seniorityLevels.get(i).getTo(),seniorityLevels.get(i).getId());
+
                     }
                     break;
                 } else if (seniorityLevelDTO.getTo() != null && seniorityLevels.get(i).getTo() == null) {
                     if (seniorityLevelDTO.getTo() > seniorityLevels.get(i).getFrom()) {
-                        throw new ActionNotPermittedException("The end must be less than " + seniorityLevels.get(i).getFrom() + " " + seniorityLevels.get(i).getId());
+                        exceptionService.actionNotPermittedException("exception.expertise.seniorityLevel.lessThan", seniorityLevels.get(i).getFrom(), seniorityLevels.get(i).getId());
                     }
 
                 } else {
@@ -409,7 +411,8 @@ public class ExpertiseService extends UserBaseService {
                 currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
 
         if (!seniorityLevelToUpdate.isPresent()) {
-            throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
+            exceptionService.dataNotFoundByIdException("exception.expertise.seniorityLevel.notFound",expertiseDTO.getSeniorityLevel().getId());
+
         }
 
 
@@ -498,7 +501,7 @@ public class ExpertiseService extends UserBaseService {
                     seniorityLevelGraphRepository.removeAllPreviousPayGroupAreaFromSeniorityLevel(seniorityLevelDTO.getId());
                     List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreasIds());
                     if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreasIds().size())
-                        throw new ActionNotPermittedException("Unable to get all payGroup Areas");
+                        exceptionService.actionNotPermittedException("exception.expertise.payGroup.unableToGet");
                     seniorityLevel.setPayGroupAreas(payGroupAreas);
                 }
 
@@ -512,7 +515,8 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
             PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
             if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
-                throw new DataNotFoundByIdException("Invalid pay grade id " + seniorityLevelDTO.getPayGradeId());
+                exceptionService.dataNotFoundByIdException("exception.expertise.payGradeId.notFound", seniorityLevelDTO.getPayGradeId());
+
             }
             seniorityLevel.setPayGrade(payGrade);
         }
@@ -531,7 +535,8 @@ public class ExpertiseService extends UserBaseService {
         if (!expertise.getOrganizationLevel().getId().equals(expertiseDTO.getOrganizationLevelId())) {
             Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
+                exceptionService.dataNotFoundByIdException("exception.country.level.id.notFound",expertiseDTO.getOrganizationLevelId());
+
             }
             expertise.setOrganizationLevel(level);
         }
@@ -540,7 +545,8 @@ public class ExpertiseService extends UserBaseService {
         if (!previousOrganizationLevelIds.equals(expertiseDTO.getOrganizationServiceIds())) {
             Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
             if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != expertiseDTO.getOrganizationServiceIds().size()) {
-                throw new DataNotFoundByIdException("All services are not found");
+                exceptionService.dataNotFoundByIdException("exception.expertise.serviceNotFound");
+
             }
             expertise.setOrganizationServices(organizationService);
         }
@@ -548,7 +554,8 @@ public class ExpertiseService extends UserBaseService {
         if (!expertise.getUnion().getId().equals(expertiseDTO.getUnionId())) {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(expertiseDTO.getUnionId());
             if (!Optional.ofNullable(union).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid union id " + expertiseDTO.getUnionId());
+                exceptionService.dataNotFoundByIdException("exception.expertise.unionId.notFound",expertiseDTO.getUnionId());
+
             }
             expertise.setUnion(union);
         }
@@ -563,10 +570,12 @@ public class ExpertiseService extends UserBaseService {
     public ExpertiseQueryResult deleteExpertise(Long expertiseId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid expertise Id");
+            exceptionService.dataNotFoundByIdException("exception.expertise.id.notFound",expertiseId);
+
         }
         if (expertise.isPublished()) {
-            throw new ActionNotPermittedException("Expertise can't be removed, Its already published");
+            exceptionService.actionNotPermittedException("exception.expertise.cannotRemoved");
+
 
         }
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
@@ -589,10 +598,12 @@ public class ExpertiseService extends UserBaseService {
     public boolean removeSeniorityLevelFromExpertise(Long expertiseId, Long seniorityLevelId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid expertise Id");
+            exceptionService.dataNotFoundByIdException("exception.expertise.id.notFound",expertiseId);
+
         }
         if (expertise.isPublished()) {
-            throw new ActionNotPermittedException("SeniorityLevelId can't be removed, expertise is already published");
+            exceptionService.actionNotPermittedException("exception.expertise.seniorityLevel.idCannotRemoved");
+
         }
 
         if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
@@ -678,7 +689,8 @@ public class ExpertiseService extends UserBaseService {
     public UnionServiceWrapper getUnionsAndService(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid country Id");
+            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+
         }
         UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
         unionServiceWrapper.setServices(organizationServiceService.getAllOrganizationService(countryId));
@@ -692,10 +704,11 @@ public class ExpertiseService extends UserBaseService {
     public ExpertiseQueryResult publishExpertise(Long expertiseId, Long publishedDateMillis) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid expertise id");
+            exceptionService.dataNotFoundByIdException("exception.expertise.id.notFound",expertiseId);
+
         }
         if (expertise.isPublished()) {
-            throw new ActionNotPermittedException("expertise is already published");
+            exceptionService.actionNotPermittedException("exception.expertise.alreadyPublished");
         }
         expertise.setPublished(true);
         expertise.setStartDateMillis(new Date(publishedDateMillis));
@@ -717,7 +730,8 @@ public class ExpertiseService extends UserBaseService {
     public ExpertiseQueryResult getExpertiseById(Long expertiseId) {
         ExpertiseQueryResult expertise = expertiseGraphRepository.getExpertiseById(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Expertise Id " + expertiseId);
+            exceptionService.dataNotFoundByIdException("exception.expertise.id.notFound",expertiseId);
+
         }
         return expertise;
     }
@@ -744,7 +758,8 @@ public class ExpertiseService extends UserBaseService {
     public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent() || expertise.get().isDeleted()) {
-            throw new DataNotFoundByIdException("No expertise found" + expertiseId);
+            exceptionService.dataNotFoundByIdException("exception.expertise.id.notFound",expertiseId);
+
         }
         validateAgeRange(ageRangeDTO);
 
@@ -766,9 +781,10 @@ public class ExpertiseService extends UserBaseService {
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
-                throw new ActionNotPermittedException("Invalid Range: From " + ageRangeDTO.get(i).getFrom() + " to " + ageRangeDTO.get(i).getTo());
+                exceptionService.actionNotPermittedException("exception.expertise.age.rangeInvalid",ageRangeDTO.get(i).getFrom(), ageRangeDTO.get(i).getTo());
             if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
-                throw new ActionNotPermittedException("Age Range overlap");
+                exceptionService.actionNotPermittedException("exception.expertise.age.overlap");
+
         }
 
     }

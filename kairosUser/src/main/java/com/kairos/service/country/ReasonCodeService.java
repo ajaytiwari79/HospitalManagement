@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.response.dto.web.ReasonCodeDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +30,19 @@ public class ReasonCodeService extends UserBaseEntity {
    ReasonCodeGraphRepository reasonCodeGraphRepository;
    @Inject
    CountryGraphRepository countryGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     public ReasonCodeDTO createReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
-            throw new DataNotFoundByIdException("Country not found: "+countryId);
+            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+
         }
 
         boolean isAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,-1L,"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isAlreadyExists){
-            throw new DuplicateDataException("ReasonCode already exists: "+reasonCodeDTO.getName());
+            exceptionService.duplicateDataException("exception.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
+
         }
         ReasonCode reasonCode=new ReasonCode(reasonCodeDTO.getName().trim(),reasonCodeDTO.getCode(),reasonCodeDTO.getDescription(),reasonCodeDTO.getReasonCodeType(),country);
         reasonCodeGraphRepository.save(reasonCode);
@@ -53,11 +57,13 @@ public class ReasonCodeService extends UserBaseEntity {
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
         boolean isNameAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,reasonCodeDTO.getId(),"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isNameAlreadyExists){
-            throw new DuplicateDataException("ReasonCode already exists: "+reasonCodeDTO.getName());
+            exceptionService.duplicateDataException("exception.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
+
         }
         ReasonCode reasonCode=reasonCodeGraphRepository.findByCountryAndReasonCode(countryId,reasonCodeDTO.getId());
         if(!Optional.ofNullable(reasonCode).isPresent()){
-            throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeDTO.getId());
+            exceptionService.dataNotFoundByIdException("exception.reasonCode.id.notFound",reasonCodeDTO.getId());
+
         }
         reasonCode.setName(reasonCodeDTO.getName().trim());
         reasonCode.setCode(reasonCodeDTO.getCode());
@@ -69,7 +75,8 @@ public class ReasonCodeService extends UserBaseEntity {
     public boolean deleteReasonCode(long countryId,long reasonCodeId){
         ReasonCode reasonCode=reasonCodeGraphRepository.findByCountryAndReasonCode(countryId,reasonCodeId);
         if(!Optional.ofNullable(reasonCode).isPresent()){
-            throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeId);
+            exceptionService.dataNotFoundByIdException("exception.reasonCode.id.notFound",reasonCodeId);
+
         }
         reasonCode.setDeleted(true);
         reasonCodeGraphRepository.save(reasonCode);

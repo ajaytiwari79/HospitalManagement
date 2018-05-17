@@ -3,6 +3,7 @@ package com.kairos.service.country;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,6 +26,8 @@ public class TimeTypeRestClient {
     private Logger logger = LoggerFactory.getLogger(TimeTypeRestClient.class);
     @Inject
     private RestTemplate restTemplate;
+    @Inject
+    private ExceptionService exceptionService;
 
     public List<TimeTypeDTO> getAllTimeTypes(Long countryId) {
         final String baseUrl = getBaseUrl(false);
@@ -49,10 +52,11 @@ public class TimeTypeRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
+            exceptionService.runtimeException("exception.timeType.exceptionOccurred",e.getMessage());
+
         }
 
-
+return  null;
     }
 
 

@@ -42,6 +42,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.CALL, payload);
             return response;
         } catch (Exception ex){
+
             throw new FlsCredentialException("Invalid FLS credentials");
         }
     }
