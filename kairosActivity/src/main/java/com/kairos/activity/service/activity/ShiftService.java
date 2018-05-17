@@ -45,8 +45,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.activity.constants.AppConstants.FULL_DAY_CALCULATION;
-import static com.kairos.activity.constants.AppConstants.FULL_WEEK;
+import static com.kairos.activity.constants.AppConstants.*;
 import static com.kairos.activity.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 
 /**
@@ -144,7 +143,7 @@ public class ShiftService extends MongoBaseService {
 
 
         //anil m2 notify event for updating staffing level
-        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
 
                 applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null,isShiftForPreence));
         return shift.getShiftQueryResult();
@@ -170,7 +169,7 @@ public class ShiftService extends MongoBaseService {
             }
             shifts.add(shift);
             //timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
-            boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+            boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
 
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null,isShiftForPreence));
         }
@@ -225,11 +224,11 @@ public class ShiftService extends MongoBaseService {
         payOutService.savePayOut(shift.getUnitPositionId(), shift);
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
-        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
 
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
-                true, oldStateOfShift,isShiftForPreence,false,isActivityChangedFromAbsenceToPresence(activityOld,activity),
-                isActivityChangedFromPresenceToAbsence(activityOld,activity)));
+                true, oldStateOfShift,isShiftForPreence,false,activityChangeStatus(activityOld,activity)==ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE
+                , activityChangeStatus(activityOld,activity)==ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE));
         ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
         shiftQueryResult.setName(activity.getName());
         shiftQueryResult.setDurationMinutes(shift.getDurationMinutes());
@@ -270,7 +269,7 @@ public class ShiftService extends MongoBaseService {
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
         payOutService.savePayOut(shift.getUnitPositionId(), shift);
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
-        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
                 false, null,isShiftForPreence,true,false,false));
 
@@ -522,22 +521,18 @@ public class ShiftService extends MongoBaseService {
         return shiftQueryResults;
     }
 
-    public boolean isActivityChangedFromPresenceToAbsence(Activity activityOld, Activity activityCurrent) {
-        boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
-        boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+    public int activityChangeStatus(Activity activityOld, Activity activityCurrent) {
+        boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)||activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+        boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)||activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+        int activityChangeStatus = 0;
+        if(isShiftOldForPresence&&isShiftCurrentForAbsence){
+            activityChangeStatus = 1;
+        }
+        else if(!isShiftOldForPresence&&!isShiftCurrentForAbsence) {
+            activityChangeStatus = 2;
+        }
 
-        return isShiftOldForPresence&&isShiftCurrentForAbsence;
-
-
-    }
-
-    public boolean isActivityChangedFromAbsenceToPresence(Activity activityOld, Activity activityCurrent) {
-        boolean isShiftOldForAbsence = (activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
-        boolean isShiftCurrentForPresence = !(activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
-
-        return isShiftOldForAbsence&&isShiftCurrentForPresence;
-
-
+        return activityChangeStatus;
     }
 
 }
