@@ -6,25 +6,13 @@ import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-<<<<<<< HEAD
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.processing_activity.MasterProcessingActivity;
 import com.kairos.dto.MasterProcessingActivityDto;
-=======
-import com.kairos.custome_exception.RequestDataNull;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.persistance.model.processing_activity.MasterProcessingActivity;
-import com.kairos.persistance.model.processing_activity.dto.MasterProcessingActivityDto;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.repository.processing_activity.MasterProcessingActivityRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
-<<<<<<< HEAD
-=======
-import org.springframework.util.StringUtils;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;

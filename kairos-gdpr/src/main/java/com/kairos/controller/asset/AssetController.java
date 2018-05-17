@@ -1,12 +1,8 @@
 package com.kairos.controller.asset;
 
 
-<<<<<<< HEAD
+
 import com.kairos.dto.MasterAssetDto;
-=======
-import com.kairos.persistance.model.asset.MasterAsset;
-import com.kairos.persistance.model.asset.dto.MasterAssetDto;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.service.asset.MasterAssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -16,11 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.inject.Inject;
-
 import java.math.BigInteger;
-
 import static com.kairos.constant.ApiConstant.API_MASTER_ASSET_URL;
 
 @RestController

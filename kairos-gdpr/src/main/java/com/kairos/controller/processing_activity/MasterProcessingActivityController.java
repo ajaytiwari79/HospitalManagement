@@ -1,12 +1,8 @@
 package com.kairos.controller.processing_activity;
 
 
-<<<<<<< HEAD
+
 import com.kairos.dto.MasterProcessingActivityDto;
-=======
-import com.kairos.persistance.model.processing_activity.MasterProcessingActivity;
-import com.kairos.persistance.model.processing_activity.dto.MasterProcessingActivityDto;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.service.processing_activity.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

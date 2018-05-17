@@ -5,10 +5,6 @@ public final class ApiConstant {
 
     public static final String API_V1 = "/api/v1";
     public static final String API_CLAUSES_URL = API_V1 + "/clauses";
-<<<<<<< HEAD
-=======
-    public static final String API_CLAUSES_ADD_CLAUSE = API_CLAUSES_URL + "/add_Clause";
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 
     public static final String API_ORGANIZATION = API_V1 + "/organization";
     public static final String API_ORGANIZATION_TYPE = API_ORGANIZATION + "/type";

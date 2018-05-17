@@ -5,25 +5,17 @@ import com.kairos.client.OrganizationTypeRestClient;
 import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
 import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.*;
+import com.kairos.dto.MasterAssetDto;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.asset.MasterAsset;
-<<<<<<< HEAD
-import com.kairos.dto.MasterAssetDto;
-=======
-import com.kairos.persistance.model.asset.dto.MasterAssetDto;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.repository.asset.MasterAssetMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-<<<<<<< HEAD
-=======
-import java.util.stream.Collectors;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
+
 
 @Service
 public class MasterAssetService extends MongoBaseService {

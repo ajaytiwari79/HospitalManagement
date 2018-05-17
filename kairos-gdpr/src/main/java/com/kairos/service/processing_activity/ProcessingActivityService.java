@@ -2,15 +2,11 @@ package com.kairos.service.processing_activity;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DuplicateDataException;
+import com.kairos.dto.ProcessingActivityDto;
 import com.kairos.persistance.model.master_data.AssetType;
 import com.kairos.persistance.model.master_data.OrganizationalSecurityMeasure;
 import com.kairos.persistance.model.master_data.TechnicalSecurityMeasure;
 import com.kairos.persistance.model.processing_activity.ProcessingActivity;
-<<<<<<< HEAD
-import com.kairos.dto.ProcessingActivityDto;
-=======
-import com.kairos.persistance.model.processing_activity.dto.ProcessingActivityDto;
->>>>>>> d97f2521641985b2ef7974bbd2871f4291a34c91
 import com.kairos.persistance.repository.master_data.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.master_data.TechnicalSecurityMeasureMongoRepository;
@@ -19,7 +15,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.master_data.DataSubjectService;
 import com.kairos.service.master_data.ProcessingPurposeService;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
