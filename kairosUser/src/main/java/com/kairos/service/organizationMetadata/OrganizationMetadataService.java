@@ -183,11 +183,18 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     }
 
     private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
-        PaymentSettings paymentSettings =  new PaymentSettings(paymentSettingsDTO.getWeeklyPayDay(), paymentSettingsDTO.getFornightlyPayDay(), paymentSettingsDTO.getMonthlyPayDate());
+        PaymentSettings paymentSettings =  updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
         organization.setPaymentSettings(paymentSettings);
         save(organization);
         return paymentSettings.getId();
 
+    }
+
+    private PaymentSettings updatePaymentSettingsWithDates(PaymentSettings paymentSettings, PaymentSettingsDTO paymentSettingsDTO){
+        paymentSettings.setFornightlyPayDay(paymentSettingsDTO.getFornightlyPayDay());
+        paymentSettings.setWeeklyPayDay(paymentSettingsDTO.getWeeklyPayDay());
+        //TODO: calling date updation method
+        return paymentSettings;
     }
 
     public PaymentSettingsDTO updatePaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
@@ -200,6 +207,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
         }else {
+            updatePaymentSettingsWithDates(paymentSettings, paymentSettingsDTO);
             save(paymentSettings);
         }
         return paymentSettingsDTO;

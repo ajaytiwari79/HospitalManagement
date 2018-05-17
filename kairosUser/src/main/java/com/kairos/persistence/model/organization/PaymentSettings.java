@@ -14,7 +14,7 @@ public class PaymentSettings extends UserBaseEntity {
 
     private DayOfWeek weeklyPayDay;
     private DayOfWeek fornightlyPayDay;
-    private Long lastFornigthtlyPayDate;
+    private Long lastFornightlyPayDate;
     @Range(min = 1l, max = 31L)
     private Long monthlyPayDate;
 
@@ -23,10 +23,11 @@ public class PaymentSettings extends UserBaseEntity {
         // default cons
     }
 
-    public PaymentSettings(DayOfWeek weeklyPayDay, DayOfWeek fornightlyPayDay, Long monthlyPayDate) {
+    public PaymentSettings(DayOfWeek weeklyPayDay, DayOfWeek fornightlyPayDay, Long monthlyPayDate, Long lastFornightlyPayDate) {
         this.weeklyPayDay = weeklyPayDay;
         this.monthlyPayDate = monthlyPayDate;
         this.fornightlyPayDay = fornightlyPayDay;
+        this.lastFornightlyPayDate = lastFornightlyPayDate;
     }
 
     public DayOfWeek getWeeklyPayDay() {
@@ -45,12 +46,12 @@ public class PaymentSettings extends UserBaseEntity {
         this.fornightlyPayDay = fornightlyPayDay;
     }
 
-    public Long getLastFornigthtlyPayDate() {
-        return lastFornigthtlyPayDate;
+    public Long getLastFornightlyPayDate() {
+        return lastFornightlyPayDate;
     }
 
-    public void setLastFornigthtlyPayDate(Long lastFornigthtlyPayDate) {
-        this.lastFornigthtlyPayDate = lastFornigthtlyPayDate;
+    public void setLastFornightlyPayDate(Long lastFornightlyPayDate) {
+        this.lastFornightlyPayDate = lastFornightlyPayDate;
     }
 
     public Long getMonthlyPayDate() {

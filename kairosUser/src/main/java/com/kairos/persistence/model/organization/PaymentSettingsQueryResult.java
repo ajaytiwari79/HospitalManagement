@@ -1,12 +1,10 @@
 package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
-import java.time.ZonedDateTime;
 
 /**
  * Created by vipul on 17/4/18.
@@ -18,7 +16,7 @@ public class PaymentSettingsQueryResult {
     private DayOfWeek weeklyPayDay;
     private DayOfWeek fornightlyPayDay;
     @Range(min = 1l, max = 31L)
-    private Long monthlyPayDay;
+    private Long monthlyPayDate;
     private Long lastFornightlyPayDate;
 
     public PaymentSettingsQueryResult() {
@@ -49,12 +47,12 @@ public class PaymentSettingsQueryResult {
         this.fornightlyPayDay = fornightlyPayDay;
     }
 
-    public Long getMonthlyPayDay() {
-        return monthlyPayDay;
+    public Long getMonthlyPayDate() {
+        return monthlyPayDate;
     }
 
-    public void setMonthlyPayDay(Long monthlyPayDay) {
-        this.monthlyPayDay = monthlyPayDay;
+    public void setMonthlyPayDate(Long monthlyPayDate) {
+        this.monthlyPayDate = monthlyPayDate;
     }
 
     public Long getLastFornightlyPayDate() {

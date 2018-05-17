@@ -19,8 +19,8 @@ public interface PaymentSettingRepository extends Neo4jBaseRepository<PaymentSet
             "return id(paymentSettings) as id," +
             "paymentSettings.weeklyPayDay as weeklyPayDay, " +
             "paymentSettings.fornightlyPayDay as fornightlyPayDay," +
-            "paymentSettings.lastFornigthtlyPayDate as lastFornigthtlyPayDate, " +
-            "paymentSettings.monthlyPayDay as monthlyPayDay")
+            "paymentSettings.lastFornightlyPayDate as lastFornightlyPayDate, " +
+            "paymentSettings.monthlyPayDate as monthlyPayDate")
     PaymentSettingsQueryResult getPaymentSettingByUnitId(Long unitId);
 
     @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Organization) where id(unit)={0} AND id(paymentSettings)={1}" +
