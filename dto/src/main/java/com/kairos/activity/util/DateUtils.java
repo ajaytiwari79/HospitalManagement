@@ -11,10 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
@@ -38,6 +35,12 @@ public class DateUtils {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate;
     }
+    public static Date convertLocalDateToDate(LocalDate dateToConvert) {
+        return Date.from(dateToConvert.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
+
 
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -324,6 +327,10 @@ public class DateUtils {
         return add(date, Calendar.DAY_OF_MONTH, amount);
     }
 
+    public static Date addMonths(final Date date, final int amount) {
+        return add(date, Calendar.MONTH, amount);
+    }
+
     private static Date add(final Date date, final int calendarField, final int amount) {
         if (date == null) {
             throw new IllegalArgumentException("The date must not be null");
@@ -381,6 +388,11 @@ public class DateUtils {
             return dateTime.toString(formatter);
     }
 
+    public static String getDateString(Date date, String dateFormatString){
+        SimpleDateFormat simpleDateFormat =  new SimpleDateFormat(dateFormatString);
+        return simpleDateFormat.format(date);
+    }
+
     public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
     {
         TimeZone fromTimeZone = TimeZone.getTimeZone("UTC");
@@ -409,5 +421,19 @@ public class DateUtils {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
+    }
+    /**
+     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
+     */
+    public static DateTime getDateTime(Date date, LocalTime time){
+        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
+    }
+
+    public static List<LocalDate> getDates(LocalDate start, LocalDate end){
+        List<LocalDate> dates= new ArrayList<>();
+        for(LocalDate ld=start;!ld.isAfter(end);ld=ld.plusDays(1)){
+            dates.add(ld);
+        }
+        return dates;
     }
 }

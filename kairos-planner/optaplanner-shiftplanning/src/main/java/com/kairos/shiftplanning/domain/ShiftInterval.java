@@ -5,12 +5,12 @@ import org.joda.time.DateTime;
 public class ShiftInterval {
     private DateTime start;
     private DateTime end;
-    private Activity activity;
+    private ActivityPlannerEntity activityPlannerEntity;
 
-    public ShiftInterval(DateTime start, DateTime end, Activity activity) {
+    public ShiftInterval(DateTime start, DateTime end, ActivityPlannerEntity activityPlannerEntity) {
         this.start = start;
         this.end = end;
-        this.activity = activity;
+        this.activityPlannerEntity = activityPlannerEntity;
     }
 
     public DateTime getStart() {
@@ -29,11 +29,11 @@ public class ShiftInterval {
         this.end = end;
     }
 
-    public Activity getActivityType() {
-        return activity;
+    public ActivityPlannerEntity getActivityType() {
+        return activityPlannerEntity;
     }
 
-    public void setActivityType(Activity activityType) {
-        this.activity = activity;
+    public void setActivityType(ActivityPlannerEntity activityPlannerEntityType) {
+        this.activityPlannerEntity = activityPlannerEntity;
     }
 }

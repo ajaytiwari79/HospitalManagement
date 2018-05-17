@@ -8,19 +8,19 @@ public class OpenShiftCancelProcess {
     private boolean underStaffingPresentForActivity;
     private boolean overStaffingPresentForActivity;
     private boolean sickPersonCallsUnSick;
-    private boolean shortestWorkingTime;
+    private boolean lessUnderStaffing; //if underStaffing is less than shortest working time
 
     public OpenShiftCancelProcess() {
         //Default Constructor
     }
 
     public OpenShiftCancelProcess(boolean shiftAssignedToFictiveEmployee, boolean underStaffingPresentForActivity, boolean overStaffingPresentForActivity,
-                                  boolean sickPersonCallsUnSick, boolean shortestWorkingTime) {
+                                  boolean sickPersonCallsUnSick, boolean lessUnderStaffing) {
         this.shiftAssignedToFictiveEmployee = shiftAssignedToFictiveEmployee;
         this.underStaffingPresentForActivity = underStaffingPresentForActivity;
         this.overStaffingPresentForActivity = overStaffingPresentForActivity;
         this.sickPersonCallsUnSick = sickPersonCallsUnSick;
-        this.shortestWorkingTime = shortestWorkingTime;
+        this.lessUnderStaffing = lessUnderStaffing;
     }
 
     public boolean isShiftAssignedToFictiveEmployee() {
@@ -47,12 +47,12 @@ public class OpenShiftCancelProcess {
         this.overStaffingPresentForActivity = overStaffingPresentForActivity;
     }
 
-    public boolean getShortestWorkingTime() {
-        return shortestWorkingTime;
+    public boolean getLessUnderStaffing() {
+        return lessUnderStaffing;
     }
 
-    public void setShortestWorkingTime(boolean shortestWorkingTime) {
-        this.shortestWorkingTime = shortestWorkingTime;
+    public void setLessUnderStaffing(boolean lessUnderStaffing) {
+        this.lessUnderStaffing = lessUnderStaffing;
     }
 
     public boolean isSickPersonCallsUnSick() {

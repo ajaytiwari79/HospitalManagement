@@ -23,7 +23,7 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 @RestController
 @RequestMapping(API_UNIT_URL + "/staff")
 public class StaffController {
-    private Logger logger= LoggerFactory.getLogger(StaffController.class);
+    private static Logger logger= LoggerFactory.getLogger(StaffController.class);
     @Autowired
     private StaffService staffService;
     @RequestMapping(value = "/", method = RequestMethod.POST)

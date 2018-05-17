@@ -3,6 +3,7 @@ package com.kairos.service.access_permisson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.security.CurrentUserDetails;
+import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
@@ -25,6 +26,7 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -68,7 +70,7 @@ public class AccessPageService extends UserBaseService {
     @Inject
     UserGraphRepository userGraphRepository;
 
-    public AccessPage createAccessPage(AccessPageDTO accessPageDTO){
+    public synchronized AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
                 getTabId(accessPageDTO.isModule()));
         if(Optional.ofNullable(accessPageDTO.getParentTabId()).isPresent()){
@@ -193,7 +195,14 @@ public class AccessPageService extends UserBaseService {
         return accessPageRepository.findByModuleId(moduleId);
 
     }
+
     private synchronized String getTabId(Boolean isModule){
+
+        Integer lastTabIdNumber = accessPageRepository.getLastTabOrModuleIdOfAccessPage(isModule);
+        return (isModule ? AppConstants.MODULE_ID_PRFIX : AppConstants.TAB_ID_PRFIX)+(Optional.ofNullable(lastTabIdNumber).isPresent() ? String.valueOf(lastTabIdNumber+1) : "1");
+    }
+
+    /*private synchronized String getTabId(Boolean isModule){
 
         AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
         if(!Optional.ofNullable(accessPageCustomId).isPresent()){
@@ -224,7 +233,7 @@ public class AccessPageService extends UserBaseService {
         }
         save(accessPageCustomId);
         return tabId;
-    }
+    }*/
 
     // TODO Uncomment and integrate
     /*public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long organizationId, Long userId){

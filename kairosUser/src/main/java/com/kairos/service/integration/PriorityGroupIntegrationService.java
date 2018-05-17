@@ -20,7 +20,7 @@ public class PriorityGroupIntegrationService {
     public void createDefaultPriorityGroupsFromCountry(long countryId,long unitId){
         Map<String,Object> countryDetail =new HashMap<>();
         countryDetail.put("countryId",countryId);
-        priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/copy_priority_group",countryDetail);
+        priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/priority_groups",countryDetail);
     }
 
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){

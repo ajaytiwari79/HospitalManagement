@@ -88,6 +88,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         return null;
     }
+
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId, type);
@@ -100,26 +101,22 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityDetails;
     }
 
-    public List<Activity> getActivityByUnitId(Long unitId, String type) {
-        List<Activity> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
-        return activities;
-    }
-
     public Map<String, Object> getAllActivityByUnitAndDeleted(Long unitId) {
         Map<String, Object> response = new HashMap<>();
+        Long organizationId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByDeletedFalse();
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationId);
         response.put("activities", activities);
         response.put("activityCategories", activityCategories);
         return response;
     }
 
     public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId) {
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByDeletedFalse();
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(activity.getCountryId());
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
         generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
@@ -144,28 +141,15 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
-        Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByName(generalDTO.getCategoryName());
-        if (activityCategory != null) {
-
-            generalDTO.setCategoryId(activityCategory.getId());
-        } else {
-
-            ActivityCategory category = new ActivityCategory(generalDTO.getCategoryName(), "", unitId);
-            category.setUnitId(unitId);
-            category.setCountryId(null);
-            save(category);
-            if (category == null) {
-                throw new DataNotFoundByIdException("Category can't be created!!");
-            }
-            generalDTO.setCategoryId(category.getId());
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            throw new DataNotFoundByIdException("Category Not Available");
         }
-
+        Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnit(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId());
         if (Optional.ofNullable(IsActivityExists).isPresent()) {
             throw new DuplicateDataException("Name already is use " + generalDTO.getName());
         }
-
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
@@ -173,13 +157,14 @@ public class OrganizationActivityService extends MongoBaseService {
         if (Optional.ofNullable(activity.getGeneralActivityTab().getOriginalIconName()).isPresent()) {
             generalTab.setOriginalIconName(activity.getGeneralActivityTab().getOriginalIconName());
         }
+        activity.getBalanceSettingsActivityTab().setTimeTypeId(activityCategory.getTimeTypeId());
         activity.setGeneralActivityTab(generalTab);
         activity.setName(generalTab.getName());
         activity.setDescription(generalTab.getDescription());
         activity.setTags(generalDTO.getTags());
         save(activity);
         generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByDeletedFalse();
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(activity.getCountryId());
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);
         return activityTabsWrapper;
     }

@@ -14,7 +14,6 @@
   <scoreDirectorFactory>
       <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning_activityLine.drl</scoreDrl>
       <scoreDrl>com/kairos/shiftplanning/rules/wtaConstraintsRule.drl</scoreDrl>
-      <!--<scoreDrl>com/kairos/shiftplanning/rules/ctaConstraintsRule.drl</scoreDrl>-->
       <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>

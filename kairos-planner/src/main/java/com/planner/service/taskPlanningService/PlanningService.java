@@ -1,13 +1,21 @@
 package com.planner.service.taskPlanningService;
 
+import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
+import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.planning.solution.TaskPlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.domain.taskPlanning.PlanningProblem;
 import com.planner.enums.PlanningStatus;
+import com.planner.repository.config.SolverConfigRepository;
 import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
 import com.planner.responseDto.config.SolverConfigDTO;
 import com.planner.service.config.DroolsConfigService;
+import com.planner.service.config.PathProvider;
 import com.planner.service.config.SolverConfigService;
+import com.planner.service.shiftPlanningService.ShiftPlanningService;
+import com.planner.util.wta.ShiftPlanningUtil;
 import com.thoughtworks.xstream.XStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +37,12 @@ public class PlanningService {
     @Autowired private TaskPlanningSolutionService taskPlanningSolutionService;
     @Autowired private DroolsConfigService droolsConfigService;
     @Autowired private SolverConfigService solverConfigService;
+    @Autowired private SolverConfigRepository solverConfigRepository;
+    @Autowired private ShiftPlanningService shiftPlanningService;
+    @Autowired
+    private PathProvider pathProvider;
+    @Autowired
+    private PlannerLauncherService plannerLauncherService;
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
         PlanningProblem planningProblem = (PlanningProblem) planningRepository.findById(id,PlanningProblem.class);
@@ -41,7 +55,7 @@ public class PlanningService {
 
 
     public TaskPlanningDTO submitTaskPlanningProblem(TaskPlanningDTO taskPlanningDTO){
-        SolverConfigDTO solverConfigDTO = solverConfigService.getOneForPlanning(taskPlanningDTO.getSolverConfigId());
+        SolverConfigDTO solverConfigDTO =null;// solverConfigService.getOneForPlanning(taskPlanningDTO.getSolverConfigId());
         boolean initializedTaskPlanner = initializeTaskPlanner(solverConfigDTO);
         if(initializedTaskPlanner){
             PlanningProblem planningProblem = new PlanningProblem();
@@ -96,4 +110,15 @@ public class PlanningService {
     }
 
 
+    public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
+        ShiftRequestPhasePlanningSolution problem=shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
+        ShiftPlanningUtil.toXml(problem,pathProvider.getProblemXmlpath());
+        solverConfigService.createShiftPlanningSolverConfig(planningSubmissionDTO.getSolverConfigId());
+        try {
+            plannerLauncherService.instantiateNewSolver();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new PlanningSubmissonResponseDTO();
+    }
 }

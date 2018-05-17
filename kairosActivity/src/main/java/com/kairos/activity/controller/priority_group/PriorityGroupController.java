@@ -20,13 +20,13 @@ import static com.kairos.activity.constants.ApiConstants.*;
 @Api(API_ORGANIZATION_URL)
 public class PriorityGroupController {
     @Inject
-    PriorityGroupService priorityGroupService;
+    private PriorityGroupService priorityGroupService;
 
     @ApiOperation("Create Priority Group")
-    @PostMapping(value = COUNTRY_URL+"/priority_group")
+    @PostMapping(value = COUNTRY_URL+"/priority_groups")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createPriorityGroup(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.createPriorityGroupForCountry(countryId));
+    public ResponseEntity<Map<String, Object>> createPriorityGroup(@PathVariable Long countryId,@RequestBody PriorityGroupDTO priorityGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.createPriorityGroupForCountry(countryId,priorityGroupDTO));
     }
 
     @ApiOperation("Get all Priority Group based on countryId")
@@ -37,21 +37,21 @@ public class PriorityGroupController {
     }
 
     @ApiOperation("Update Priority Group")
-    @PutMapping(value = COUNTRY_URL+"/priority_group/{priorityGroupId}")
+    @PutMapping(value = COUNTRY_URL+"/priority_groups/{priorityGroupId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updatePriorityGroup(@PathVariable Long countryId, @PathVariable BigInteger priorityGroupId, @RequestBody PriorityGroupDTO priorityGroupDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.updatePriorityGroup(countryId,priorityGroupId, priorityGroupDTO));
     }
 
     @ApiOperation("delete Priority Group based on countryId")
-    @DeleteMapping(value = COUNTRY_URL+"/priority_group/{priorityGroupId}")
+    @DeleteMapping(value = COUNTRY_URL+"/priority_groups/{priorityGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deletePriorityGroup(@PathVariable Long countryId, @PathVariable BigInteger priorityGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.deletePriorityGroup(countryId,priorityGroupId));
     }
 
     @ApiOperation("Copy Priority Group for Units")
-    @PostMapping(value = UNIT_URL+"/copy_priority_group")
+    @PostMapping(value = UNIT_URL+"/priority_groups")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyPriorityGroupsForUnit(@PathVariable Long unitId,@RequestParam("countryId") Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.copyPriorityGroupsForUnit(unitId,countryId));
@@ -65,31 +65,38 @@ public class PriorityGroupController {
     }
 
     @ApiOperation("Update Priority Group")
-    @PutMapping(value = UNIT_URL+"/priority_group/{priorityGroupId}")
+    @PutMapping(value = UNIT_URL+"/priority_groups/{priorityGroupId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updatePriorityGroupOfUnit(@PathVariable Long unitId, @PathVariable BigInteger priorityGroupId, @RequestBody PriorityGroupDTO priorityGroupDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.updatePriorityGroupOfUnit(unitId,priorityGroupId, priorityGroupDTO));
     }
 
     @ApiOperation("delete Priority Group based on countryId")
-    @DeleteMapping(value = UNIT_URL+"/priority_group/{priorityGroupId}")
+    @DeleteMapping(value = UNIT_URL+"/priority_groups/{priorityGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deletePriorityGroupOfUnit(@PathVariable Long unitId, @PathVariable BigInteger priorityGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.deletePriorityGroupOfUnit(unitId,priorityGroupId));
     }
 
-    @ApiOperation("Copy Priority Group for Units")
-    @PostMapping(value = UNIT_URL+"/order/{orderId}/copy_priority_group")
+    @ApiOperation("Copy Priority Group for Orders")
+    @PostMapping(value = UNIT_URL+"/order/{orderId}/priority_groups")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyPriorityGroupsForOrder(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.copyPriorityGroupsForOrder(unitId,orderId));
     }
 
     @ApiOperation("Get  Priority Group based on priorityGroupId")
-    @GetMapping(value = COUNTRY_URL+"/priority_group/{priorityGroupId}")
+    @GetMapping(value = COUNTRY_URL+"/priority_groups/{priorityGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getPriorityGroupById(@PathVariable BigInteger priorityGroupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupById(priorityGroupId));
+    public ResponseEntity<Map<String, Object>> getPriorityGroupOfCountryById(@PathVariable Long countryId,@PathVariable BigInteger priorityGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupOfCountryById(countryId,priorityGroupId));
+    }
+
+    @ApiOperation("Get  Priority  Group of unit based on priorityGroupId")
+    @GetMapping(value = UNIT_URL+"/priority_groups/{priorityGroupId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPriorityGroupOfUnitById(@PathVariable Long unitId,@PathVariable BigInteger priorityGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupOfUnitById(unitId,priorityGroupId));
     }
 
 
