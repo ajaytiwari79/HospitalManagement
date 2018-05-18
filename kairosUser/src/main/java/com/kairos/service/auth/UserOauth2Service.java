@@ -44,7 +44,7 @@ public class UserOauth2Service implements UserDetailsService {
             return new UserPrincipal(user,getPermission(user));
         }else{
             // Not found...
-            exceptionService.usernameNotFoundException("exception.user.userName.notFound",username);
+            exceptionService.usernameNotFoundException("message.user.userName.notFound",username);
         }
        return  null;
     }

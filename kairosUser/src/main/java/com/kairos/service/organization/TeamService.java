@@ -134,13 +134,13 @@ public class TeamService extends UserBaseService {
                 }
                 Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                 if(municipality == null){
-                    exceptionService.internalServerError("exception.municipality.notFound");
+                    exceptionService.internalServerError("message.municipality.notFound");
 
                 }
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                    exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+                    exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
                 }
                 logger.info("Geography Data: " + geographyData);
@@ -186,13 +186,13 @@ public class TeamService extends UserBaseService {
                     }
                     Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                     if(municipality == null){
-                        exceptionService.internalServerError("exception.municipality.notFound");
+                        exceptionService.internalServerError("message.municipality.notFound");
 
                     }
                     Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                     if (geographyData == null) {
                         logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                        exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+                        exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
                     }
                     logger.info("Geography Data: " + geographyData);
@@ -227,12 +227,12 @@ public class TeamService extends UserBaseService {
                 ZipCode zipCode = organizationContactAddress.getZipCode();
                 logger.debug("zip code found is "+zipCode);
                 if(zipCode == null){
-                    exceptionService.internalServerError("exception.zipCode.notFound");
+                    exceptionService.internalServerError("message.zipCode.notFound");
                     
                 }
                 Municipality municipality = organizationContactAddress.getMunicipality();
                 if(municipality == null){
-                    exceptionService.internalServerError("exception.municipality.notFound");
+                    exceptionService.internalServerError("message.municipality.notFound");
 
                 }
 
@@ -240,7 +240,7 @@ public class TeamService extends UserBaseService {
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+                    exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
                 }
                 logger.info("Geography Data: " + geographyData);

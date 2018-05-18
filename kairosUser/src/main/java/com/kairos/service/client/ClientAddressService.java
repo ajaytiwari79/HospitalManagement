@@ -75,7 +75,7 @@ public class ClientAddressService extends UserBaseService {
         Client citizen = clientGraphRepository.getClientByClientIdAndUnitId(clientId,unitId);
         if (citizen == null) {
             logger.error("Citizen not found : citizenId " + clientId+" unitId "+unitId);
-            exceptionService.internalServerError("exception.client.citizen.notFound",clientId,unitId);
+            exceptionService.internalServerError("message.client.citizen.notFound",clientId,unitId);
 
         }
 
@@ -178,7 +178,7 @@ public class ClientAddressService extends UserBaseService {
 
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
-            exceptionService.internalServerError("exception.client.citizen.notFound",clientId,unitId);
+            exceptionService.internalServerError("message.client.citizen.notFound",clientId,unitId);
 
         }
         ContactAddress contactAddress;
@@ -261,7 +261,7 @@ public class ClientAddressService extends UserBaseService {
 
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
-            exceptionService.internalServerError("exception.client.citizen.notFound",clientId,unitId);
+            exceptionService.internalServerError("message.client.citizen.notFound",clientId,unitId);
 
         }
 
@@ -272,7 +272,7 @@ public class ClientAddressService extends UserBaseService {
             contactAddress = contactAddressGraphRepository.findOne(addressId);
         }
         if (contactAddress == null) {
-            exceptionService.internalServerError("exception.client.contactaAddress.notFound");
+            exceptionService.internalServerError("message.client.contactaAddress.notFound");
 
         }
 
@@ -324,7 +324,7 @@ public class ClientAddressService extends UserBaseService {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.internalServerError("exception.municipality.notFound");
+            exceptionService.internalServerError("message.municipality.notFound");
 
         }
 
@@ -332,7 +332,7 @@ public class ClientAddressService extends UserBaseService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -449,7 +449,7 @@ public class ClientAddressService extends UserBaseService {
     public Object updateAddressCoordinates(AddressDTO address) {
         ContactAddress contactAddress = contactAddressGraphRepository.findOne(address.getId());
         if (contactAddress == null) {
-            exceptionService.dataNotFoundByIdException("exception.client.contactaAddress.notFound");
+            exceptionService.dataNotFoundByIdException("message.client.contactaAddress.notFound");
 
         }
         contactAddress.setLongitude(address.getLongitude());

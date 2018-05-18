@@ -280,7 +280,7 @@ public class OrganizationService extends UserBaseService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            exceptionService.internalServerError("exception.country.id.notFound",countryId);
+            exceptionService.internalServerError("message.country.id.notFound",countryId);
 
         }
         Organization organization = new Organization();
@@ -376,7 +376,7 @@ public class OrganizationService extends UserBaseService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            exceptionService.internalServerError("exception.country.id.notFound",countryId);
+            exceptionService.internalServerError("message.country.id.notFound",countryId);
         }
         Organization organization = new Organization();
         organization.setParentOrganization(true);
@@ -440,7 +440,7 @@ public class OrganizationService extends UserBaseService {
         OrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
-           exceptionService.internalServerError("exception.organization.id.notFound",organizationId);
+           exceptionService.internalServerError("message.organization.id.notFound",organizationId);
 
         }
         organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
@@ -608,19 +608,19 @@ public class OrganizationService extends UserBaseService {
         }
 
         if (zipCode == null) {
-            exceptionService.internalServerError("exception.zipCode.notFound");
+            exceptionService.internalServerError("message.zipCode.notFound");
 
         }
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.internalServerError("exception.municipality.notFound");
+            exceptionService.internalServerError("message.municipality.notFound");
 
         }
 
 
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
-            exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
         }
 
@@ -647,7 +647,7 @@ public class OrganizationService extends UserBaseService {
 
         CompanyCategory companyCategory =  companyCategoryGraphRepository.findOne(orgDetails.getCompanyCategoryId());
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.companyCategory.id.notFound",orgDetails.getCompanyCategoryId());
+            exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound",orgDetails.getCompanyCategoryId());
 
         }
 
@@ -669,7 +669,7 @@ public class OrganizationService extends UserBaseService {
         ContactAddress contactAddress = new ContactAddress();
 
         if (!Optional.ofNullable(parent).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
         unit.setTimeZone(ZoneId.of(TIMEZONE_UTC));
@@ -692,14 +692,14 @@ public class OrganizationService extends UserBaseService {
             }
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
             if (municipality == null) {
-                exceptionService.internalServerError("exception.municipality.notFound");
+                exceptionService.internalServerError("message.municipality.notFound");
 
             }
 
 
             Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
             if (geographyData == null) {
-                exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+                exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
             }
 
@@ -737,12 +737,12 @@ public class OrganizationService extends UserBaseService {
                 }
                 Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                 if (municipality == null) {
-                    exceptionService.internalServerError("exception.municipality.notFound");
+                    exceptionService.internalServerError("message.municipality.notFound");
 
                 }
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
-                    exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+                    exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
                 }
 
@@ -778,7 +778,7 @@ public class OrganizationService extends UserBaseService {
 
         CompanyCategory companyCategory =  companyCategoryGraphRepository.findOne(organizationDTO.getCompanyCategoryId());
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.companyCategory.id.notFound",organizationDTO.getCompanyCategoryId());
+            exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound",organizationDTO.getCompanyCategoryId());
 
         }
 
@@ -854,7 +854,7 @@ public class OrganizationService extends UserBaseService {
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(id, 0);
             if (unit == null) {
-                exceptionService.internalServerError("exception.organization.id.notFound",id);
+                exceptionService.internalServerError("message.organization.id.notFound",id);
 
             }
             Map<String, Object> metaData = null;
@@ -908,7 +908,7 @@ public class OrganizationService extends UserBaseService {
     public boolean updateOrganizationGeneralDetails(OrganizationGeneral organizationGeneral, long unitId) throws ParseException {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null) {
-            exceptionService.internalServerError("exception.unit.id.notFound",unitId);
+            exceptionService.internalServerError("message.unit.id.notFound",unitId);
 
         }
 
@@ -935,7 +935,7 @@ public class OrganizationService extends UserBaseService {
         if (contactAddress != null) {
             Municipality municipality = municipalityGraphRepository.findOne(organizationGeneral.getMunicipalityId());
             if (municipality == null) {
-                exceptionService.internalServerError("exception.municipality.notFound");
+                exceptionService.internalServerError("message.municipality.notFound");
 
             }
             contactAddress.setMunicipality(municipality);
@@ -1044,7 +1044,7 @@ public class OrganizationService extends UserBaseService {
 
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.internalServerError("exception.organization.id.notFound",unitId);
+            exceptionService.internalServerError("message.organization.id.notFound",unitId);
 
         }
 
@@ -1236,7 +1236,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             logger.debug("Searching organization by id " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
         organization.setOneTimeSyncPerformed(true);
@@ -1248,7 +1248,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             logger.debug("Searching organization by id " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
         organization.setAutoGeneratedPerformed(true);
@@ -1386,7 +1386,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.debug("Searching organization by id " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
         Long countryId = organizationGraphRepository.getCountryId(unitId);
@@ -1415,7 +1415,7 @@ public class OrganizationService extends UserBaseService {
 
         }
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",id);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
 
         }
         return organization.getId();
@@ -1438,7 +1438,7 @@ public class OrganizationService extends UserBaseService {
 
         }
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",id);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
 
         }
         return organization;
@@ -1501,7 +1501,7 @@ public class OrganizationService extends UserBaseService {
         Map<String, Object> timeZonesData = new HashMap<>();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
 
@@ -1610,7 +1610,7 @@ public class OrganizationService extends UserBaseService {
     public ZoneId getTimeZoneStringOfUnit(Long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;

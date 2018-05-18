@@ -35,13 +35,13 @@ public class ReasonCodeService extends UserBaseEntity {
     public ReasonCodeDTO createReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
 
         boolean isAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,-1L,"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isAlreadyExists){
-            exceptionService.duplicateDataException("exception.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
+            exceptionService.duplicateDataException("message.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
 
         }
         ReasonCode reasonCode=new ReasonCode(reasonCodeDTO.getName().trim(),reasonCodeDTO.getCode(),reasonCodeDTO.getDescription(),reasonCodeDTO.getReasonCodeType(),country);
@@ -57,12 +57,12 @@ public class ReasonCodeService extends UserBaseEntity {
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
         boolean isNameAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,reasonCodeDTO.getId(),"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isNameAlreadyExists){
-            exceptionService.duplicateDataException("exception.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
+            exceptionService.duplicateDataException("message.reasonCode.name.alreadyExist",reasonCodeDTO.getName());
 
         }
         ReasonCode reasonCode=reasonCodeGraphRepository.findByCountryAndReasonCode(countryId,reasonCodeDTO.getId());
         if(!Optional.ofNullable(reasonCode).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.reasonCode.id.notFound",reasonCodeDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound",reasonCodeDTO.getId());
 
         }
         reasonCode.setName(reasonCodeDTO.getName().trim());
@@ -75,7 +75,7 @@ public class ReasonCodeService extends UserBaseEntity {
     public boolean deleteReasonCode(long countryId,long reasonCodeId){
         ReasonCode reasonCode=reasonCodeGraphRepository.findByCountryAndReasonCode(countryId,reasonCodeId);
         if(!Optional.ofNullable(reasonCode).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.reasonCode.id.notFound",reasonCodeId);
+            exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound",reasonCodeId);
 
         }
         reasonCode.setDeleted(true);

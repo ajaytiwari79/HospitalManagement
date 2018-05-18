@@ -146,7 +146,7 @@ public class DayTypeService extends UserBaseService {
                 danishName = "Soendag";
                 break;
             default:
-                exceptionService.unsupportedOperationException("exception.dayType.invalid");
+                exceptionService.unsupportedOperationException("message.dayType.invalid");
 
 
 

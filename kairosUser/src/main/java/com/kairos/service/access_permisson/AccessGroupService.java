@@ -59,7 +59,7 @@ public class AccessGroupService extends UserBaseService {
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName().trim());
         if ( isAccessGroupExistWithSameName ) {
-            exceptionService.duplicateDataException("exception.duplicate", "access-group" , accessGroup.getName());
+            exceptionService.duplicateDataException("message.duplicate", "access-group" , accessGroup.getName());
 
         }
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -83,7 +83,7 @@ public class AccessGroupService extends UserBaseService {
             setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(),getOrganizationCategory(organization.isUnion(), organization.isKairosHub()));
             return accessGroup;
         } else {
-            exceptionService.actionNotPermittedException("exception.permitted","access-group");
+            exceptionService.actionNotPermittedException("message.permitted","access-group");
 
         }
         return null;
@@ -92,11 +92,11 @@ public class AccessGroupService extends UserBaseService {
     public AccessGroup updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
         if ( !Optional.ofNullable(accessGrpToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
+            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",accessGroupId);
 
         }
         if( accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId) ){
-           exceptionService.duplicateDataException("exception.duplicate","access-group",accessGroupDTO.getName());
+           exceptionService.duplicateDataException("message.duplicate","access-group",accessGroupDTO.getName());
 
         }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
@@ -215,7 +215,7 @@ public class AccessGroupService extends UserBaseService {
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
-                exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
+                exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",accessGroupId);
 
             }
         }
@@ -276,7 +276,7 @@ public class AccessGroupService extends UserBaseService {
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
-                exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
+                exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",accessGroupId);
 
             }
         }
@@ -479,7 +479,7 @@ public class AccessGroupService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString());
         if ( isAccessGroupExistWithSameName ) {
-            exceptionService.duplicateDataException("exception.duplicate","access-group",accessGroupDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate","access-group",accessGroupDTO.getName());
 
         }
         AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
@@ -501,11 +501,11 @@ public class AccessGroupService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         AccessGroup accessGrpToUpdate = accessGroupRepository.findCountryAccessGroupByIdAndCategory(countryId, accessGroupId, accessGroupDTO.getOrganizationCategory().toString());
         if (! Optional.ofNullable(accessGrpToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
+            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",accessGroupId);
 
         }
         if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
-            exceptionService.duplicateDataException("exception.duplicate","access-group",accessGroupDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate","access-group",accessGroupDTO.getName());
 
         }
 
@@ -521,7 +521,7 @@ public class AccessGroupService extends UserBaseService {
     public boolean deleteCountryAccessGroup(long accessGroupId) {
         AccessGroup accessGroupToDelete = accessGroupRepository.findOne(accessGroupId);
         if (! Optional.ofNullable(accessGroupToDelete).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupId);
+            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",accessGroupId);
 
         }
         accessGroupToDelete.setDeleted(true);
@@ -576,7 +576,7 @@ public class AccessGroupService extends UserBaseService {
     public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
         if (!organization.isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",organizationId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",organizationId);
 
         }
         Organization parent;
@@ -587,17 +587,17 @@ public class AccessGroupService extends UserBaseService {
             parent = organizationGraphRepository.getParentOfOrganization(organization.get().getId());
         }
         if(Optional.ofNullable(parent).isPresent()){
-            exceptionService.actionNotPermittedException("exception.accessGroup.copied");
+            exceptionService.actionNotPermittedException("message.accessGroup.copied");
 
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
         if ( isAccessGroupExistWithSameName ) {
-            exceptionService.duplicateDataException("exception.duplicate","access-group",accessGroupDTO.getName().trim());
+            exceptionService.duplicateDataException("message.duplicate","access-group",accessGroupDTO.getName().trim());
 
         }
         Optional<AccessGroup> currentAccessGroup=accessGroupRepository.findById(accessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",accessGroupDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",accessGroupDTO.getId());
 
         }
         AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
@@ -612,17 +612,17 @@ public class AccessGroupService extends UserBaseService {
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
         Optional<Country> country = countryGraphRepository.findById(countryId);
         if(!country.isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString());
         if (isAccessGroupExistWithSameName) {
-            exceptionService.duplicateDataException("exception.duplicate","access-group",countryAccessGroupDTO.getName().trim());
+            exceptionService.duplicateDataException("message.duplicate","access-group",countryAccessGroupDTO.getName().trim());
 
         }
         Optional<AccessGroup> currentAccessGroup = accessGroupRepository.findById(countryAccessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.acessGroupId.incorrect",countryAccessGroupDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect",countryAccessGroupDTO.getId());
 
         }
         AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());

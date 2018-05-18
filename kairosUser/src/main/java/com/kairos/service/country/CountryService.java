@@ -123,7 +123,7 @@ public class CountryService extends UserBaseService {
             super.save(country);
             return country.retrieveDetails();
         } else {
-            exceptionService.duplicateDataException("exception.country.name.duplicate");
+            exceptionService.duplicateDataException("message.country.name.duplicate");
 
         }
         return null;
@@ -149,12 +149,12 @@ public class CountryService extends UserBaseService {
         String name = "(?i)" + country.getName();
         List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry(name, country.getId());
         if (!duplicateCountryList.isEmpty()) {
-            exceptionService.duplicateDataException("exception.country.name.duplicate");
+            exceptionService.duplicateDataException("message.country.name.duplicate");
 
         }
         Country currentCountry = (Country) findOne(country.getId());
         if (country == null) {
-            exceptionService.internalServerError("exception.country.id.notFound",country.getId());
+            exceptionService.internalServerError("message.country.id.notFound",country.getId());
 
         }
         currentCountry.setName(country.getName());
@@ -217,7 +217,7 @@ public class CountryService extends UserBaseService {
         List<CountryHolidayCalender> calenderList = new ArrayList<>();
         Country country = countryGraphRepository.findOne(countryId, 2);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         try {
@@ -334,7 +334,7 @@ public class CountryService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             logger.debug("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         country.addLevel(level);
@@ -346,7 +346,7 @@ public class CountryService extends UserBaseService {
         Level levelToUpdate = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToUpdate == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("exception.country.vehicle.id.notFound",levelId);
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
 
         }
         levelToUpdate.setName(level.getName());
@@ -358,7 +358,7 @@ public class CountryService extends UserBaseService {
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToDelete == null) {
             logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("exception.country.vehicle.id.notFound",levelId);
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
 
         }
 
@@ -375,7 +375,7 @@ public class CountryService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             logger.debug("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         List<RelationType> relationTypes = new ArrayList<RelationType>();
@@ -396,7 +396,7 @@ public class CountryService extends UserBaseService {
         RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
         if (relationType == null) {
             logger.debug("Finding relation type by id::" + relationTypeId);
-            exceptionService.dataNotFoundByIdException("exception.country.realtionType.id.notFound",relationTypeId);
+            exceptionService.dataNotFoundByIdException("message.country.realtionType.id.notFound",relationTypeId);
 
         }
 
@@ -410,7 +410,7 @@ public class CountryService extends UserBaseService {
                 null;
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         country.addResources(vehicle);
@@ -421,7 +421,7 @@ public class CountryService extends UserBaseService {
     public List<Vehicle> getVehicleList(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("exception.country.id.notNull");
+            exceptionService.dataNotFoundByIdException("message.country.id.notNull");
             //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesByCountry(countryId);
@@ -430,7 +430,7 @@ public class CountryService extends UserBaseService {
     public List<VehicleQueryResult> getAllVehicleListWithFeatures(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            exceptionService.dataNotFoundByIdException("exception.country.id.notNull");
+            exceptionService.dataNotFoundByIdException("message.country.id.notNull");
             //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
@@ -441,7 +441,7 @@ public class CountryService extends UserBaseService {
                 countryGraphRepository.getResources(countryId, resourcesId):null;
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Finding vehicle by id::" + resourcesId + " Country id " + countryId);
-            exceptionService.dataNotFoundByIdException("exception.country.vehicle.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
         }
         vehicle.setEnabled(false);
         save(vehicle);
@@ -453,7 +453,7 @@ public class CountryService extends UserBaseService {
                 countryGraphRepository.getResources(countryId, resourcesId) : null;
         if (!Optional.ofNullable(vehicleToUpdate).isPresent()) {
             logger.debug("Finding vehicle by id::" + resourcesId);
-            exceptionService.dataNotFoundByIdException("exception.country.vehicle.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
 
         }
         vehicleToUpdate.setName(vehicle.getName());

@@ -39,12 +39,12 @@ public class FunctionService extends UserBaseEntity{
     public FunctionDTO createFunction(Long countryId, com.kairos.response.dto.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         Function isAlreadyExists=functionGraphRepository.findByNameIgnoreCase(countryId,functionDTO.getName().trim());
         if(Optional.ofNullable(isAlreadyExists).isPresent()){
-            exceptionService.duplicateDataException("exception.function.name.alreadyExist",functionDTO.getName());
+            exceptionService.duplicateDataException("message.function.name.alreadyExist",functionDTO.getName());
 
         }
         List<Level> levels=new ArrayList<>();
@@ -75,17 +75,17 @@ public class FunctionService extends UserBaseEntity{
     public FunctionDTO updateFunction(Long countryId, com.kairos.response.dto.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         Function function=functionGraphRepository.findOne(functionDTO.getId());
         if(!Optional.ofNullable(function).isPresent() || function.isDeleted() == true){
-            exceptionService.dataNotFoundByIdException("exception.function.id.notFound",functionDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.function.id.notFound",functionDTO.getId());
 
         }
         Function isNameAlreadyExists=functionGraphRepository.findByNameExcludingCurrent(countryId,functionDTO.getId(),functionDTO.getName().trim());
         if(Optional.ofNullable(isNameAlreadyExists).isPresent()){
-            exceptionService.duplicateDataException("exception.function.name.alreadyExist",functionDTO.getName());
+            exceptionService.duplicateDataException("message.function.name.alreadyExist",functionDTO.getName());
 
         }
         List<Level> levels=new ArrayList<>();
@@ -113,7 +113,7 @@ public class FunctionService extends UserBaseEntity{
     public boolean deleteFunction(long functionId){
         Function function=functionGraphRepository.findOne(functionId);
         if(!Optional.ofNullable(function).isPresent() || function.isDeleted() == true){
-            exceptionService.dataNotFoundByIdException("exception.function.id.notFound",functionId);
+            exceptionService.dataNotFoundByIdException("message.function.id.notFound",functionId);
 
         }
         function.setDeleted(true);

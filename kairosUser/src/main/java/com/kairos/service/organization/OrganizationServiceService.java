@@ -203,7 +203,7 @@ public class OrganizationServiceService extends UserBaseService {
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(id);
             if (unit == null) {
-                exceptionService.internalServerError("exception.organization.id.notFound",id);
+                exceptionService.internalServerError("message.organization.id.notFound",id);
 
             }
 

@@ -67,7 +67,7 @@ public class UnionService {
     public List<UnionResponseDTO> getAllUnionByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-           exceptionService.dataNotFoundByIdException("exception.organisation.notFound");
+           exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
@@ -81,7 +81,7 @@ public class UnionService {
         List<UnionResponseDTO> allUnions = new ArrayList<>();
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organisation.notFound");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
@@ -94,7 +94,7 @@ public class UnionService {
     public boolean addUnionInOrganization(Long unionId, Long organizationId, boolean joined) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organisation.notFound");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
         }
         Organization union = organizationGraphRepository.findOne(unionId);

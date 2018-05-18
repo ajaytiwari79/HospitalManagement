@@ -77,7 +77,7 @@ public class MunicipalityService extends UserBaseService {
     public Map<String, Object> addZipCodeToMunicipality(Long municipalityId, ZipCode zipCode) {
         Municipality municipality = municipalityGraphRepository.findOne(municipalityId);
         if(municipality == null){
-            exceptionService.internalServerError("exception.municipality.notFound");
+            exceptionService.internalServerError("message.municipality.notFound");
 
         }
         List<Municipality> municipalities = zipCode.getMunicipalities();

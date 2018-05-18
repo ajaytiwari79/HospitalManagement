@@ -252,7 +252,7 @@ public class UserService extends UserBaseService {
             smsService.sendSms(user.getContactDetail().getMobilePhone(), message);
             return true;
         } else {
-            exceptionService.internalServerError("exception.user.mobileNumber.notFound");
+            exceptionService.internalServerError("message.user.mobileNumber.notFound");
         }
         return  false;
     }
@@ -302,7 +302,7 @@ public class UserService extends UserBaseService {
         currentUser = generateTokenToUser(currentUser);
         Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
-            exceptionService.internalServerError("exception.organisation.notFound");
+            exceptionService.internalServerError("message.organisation.notFound");
 
         }
         Map<String, Object> map = new HashMap<>();
@@ -333,7 +333,7 @@ public class UserService extends UserBaseService {
             currentUser = generateTokenToUser(currentUser);
             Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
             if (org == null) {
-                exceptionService.internalServerError("exception.organisation.notFound");
+                exceptionService.internalServerError("message.organisation.notFound");
 
             }
             Map<String, Object> map = new HashMap<>();
@@ -355,7 +355,7 @@ public class UserService extends UserBaseService {
         User user = userGraphRepository.findByEmail(firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             logger.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
-           exceptionService.dataNotFoundByIdException("exception.user.email.notFound",firstTimePasswordUpdateDTO.getEmail());
+           exceptionService.dataNotFoundByIdException("message.user.email.notFound",firstTimePasswordUpdateDTO.getEmail());
 
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getPassword2());

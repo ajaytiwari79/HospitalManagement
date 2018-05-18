@@ -75,13 +75,13 @@ public class EmploymentTypeService extends UserBaseService {
         }
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
 
         boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), -1L);
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException("exception.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
+            exceptionService.duplicateDataException("message.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
 
         }
         EmploymentType employmentTypeToCreate = new EmploymentType(employmentTypeDTO.getName(), employmentTypeDTO.getDescription(), employmentTypeDTO.isAllowedForContactPerson(),
@@ -99,18 +99,18 @@ public class EmploymentTypeService extends UserBaseService {
         }
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         EmploymentType employmentTypeToUpdate = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToUpdate == null) {
-            exceptionService.dataNotFoundByIdException("exception.employmentType.id.notFound",employmentTypeId);
+            exceptionService.dataNotFoundByIdException("message.employmentType.id.notFound",employmentTypeId);
 
         }
         if (!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())) {
             boolean isAlreadyExists = employmentTypeGraphRepository.findByNameExcludingCurrent(countryId, "(?i)" + employmentTypeDTO.getName().trim(), employmentTypeId);
             if (isAlreadyExists) {
-                exceptionService.duplicateDataException("exception.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
+                exceptionService.duplicateDataException("message.employmentType.name.alreadyExist",employmentTypeDTO.getName().trim());
 
             }
         }
@@ -128,7 +128,7 @@ public class EmploymentTypeService extends UserBaseService {
         EmploymentType employmentTypeToDelete = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToDelete == null) {
 //            logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException("exception.employmentType.id.notFound",employmentTypeId);
+            exceptionService.dataNotFoundByIdException("message.employmentType.id.notFound",employmentTypeId);
 
         }
 
@@ -140,7 +140,7 @@ public class EmploymentTypeService extends UserBaseService {
     public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
@@ -150,7 +150,7 @@ public class EmploymentTypeService extends UserBaseService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
 
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);
@@ -161,13 +161,13 @@ public class EmploymentTypeService extends UserBaseService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
 
         }
         EmploymentType employmentType = employmentTypeGraphRepository.findOne(employmentTypeId, 0);
 //        boolean employmentTypeExistInOrganization = employmentTypeGraphRepository.isEmploymentTypeExistInOrganization(unitId, organizationEmploymentTypeDTO.getEmploymentTypeId(), false);
         if (employmentType == null) {
-            exceptionService.dataNotFoundByIdException("exception.employmentType.id.notFound",employmentTypeId);
+            exceptionService.dataNotFoundByIdException("message.employmentType.id.notFound",employmentTypeId);
 
         }
 
@@ -188,7 +188,7 @@ public class EmploymentTypeService extends UserBaseService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
 
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);

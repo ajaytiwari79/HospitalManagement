@@ -87,7 +87,7 @@ public class OpenningHourService {
     public boolean setDefaultOpeningHours(long unitId) {
         Organization unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
 
         }
         OrganizationSetting organizationSetting = getDefaultSettings();

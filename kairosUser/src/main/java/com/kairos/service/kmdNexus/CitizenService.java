@@ -496,7 +496,7 @@ public class CitizenService {
         if(staff == null) staff = new Staff();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null)
-            exceptionService.internalServerError("exception.organization.id.notFound",unitId);
+            exceptionService.internalServerError("message.organization.id.notFound",unitId);
 
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());

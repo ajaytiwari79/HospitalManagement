@@ -55,7 +55,7 @@ public class WTAOrganizationService extends UserBaseService {
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.unit.invalid",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.invalid",unitId);
 
         }
         List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);
@@ -154,7 +154,7 @@ public class WTAOrganizationService extends UserBaseService {
             // if rule template is still null so this category does not exist.
             if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
                 logger.info("category does not exist in when updating wta's rule template  :", ruleTemplateCategoryName);
-                exceptionService.dataNotFoundByIdException("exception.category.notExist",ruleTemplateCategoryName,id);
+                exceptionService.dataNotFoundByIdException("message.category.notExist",ruleTemplateCategoryName,id);
 
             }
         }
@@ -545,7 +545,7 @@ public class WTAOrganizationService extends UserBaseService {
                     wtaBaseRuleTemplates.add(breaksInShift);
                     break;
                 default:
-                    exceptionService.dataNotFoundByIdException("exception.InvalidTemplateType");
+                    exceptionService.dataNotFoundByIdException("message.InvalidTemplateType");
 
             }
 

@@ -98,7 +98,7 @@ public class AddressVerificationService {
         if(contactAddress.getMunicipalityId() != null){
             Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipalityId());
             if(municipality == null){
-                exceptionService.internalServerError("exception.municipality.notFound");
+                exceptionService.internalServerError("message.municipality.notFound");
 
             }
             municipalityName = municipality.getName();
@@ -107,7 +107,7 @@ public class AddressVerificationService {
         }
 
         if (zipCode == null) {
-            exceptionService.zipCodeNotFoundException("exception.zipCode.notFound");
+            exceptionService.zipCodeNotFoundException("message.zipCode.notFound");
 
         }
         logger.info("Verifying with Information \n house: " +
@@ -177,7 +177,7 @@ public class AddressVerificationService {
                 client.setTemporaryAddress(clientTemporaryAddressList);
                 break;
             default:
-                exceptionService.internalServerError("exception.client.addressType.notFound");
+                exceptionService.internalServerError("message.client.addressType.notFound");
 
         }
         clientGraphRepository.save(client);

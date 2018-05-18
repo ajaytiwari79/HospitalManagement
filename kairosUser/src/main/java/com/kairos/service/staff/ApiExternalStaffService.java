@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.timeCareShift.GetEmploymentByIdResponse;
 import com.kairos.util.timeCareShift.GetEmploymentByIdResult;
@@ -42,6 +43,8 @@ public class ApiExternalStaffService extends UserBaseService {
     private StaffService staffService;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private ExceptionService exceptionService;
 
     public Staff createTimeCareStaff(Map<String, Object> data) {
         if (data != null) {
@@ -67,7 +70,8 @@ public class ApiExternalStaffService extends UserBaseService {
             Organization unit =organizationGraphRepository.findOne(orgnaizationId,0);
 
             if(unit == null){
-                throw new InternalError("unit can't be null");
+                exceptionService.internalServerError("error.unit.notfound");
+                //throw new InternalError("unit can't be null");
             }
 
             Organization parent = null;

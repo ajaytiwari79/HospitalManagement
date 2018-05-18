@@ -151,7 +151,7 @@ public class RegionService extends UserBaseService {
     public Map<String,Object> getAllZipCodesData(long zipcodeId) {
         ZipCode zipCode = zipCodeGraphRepository.findOne(zipcodeId);
         if(zipCode == null){
-            exceptionService.internalServerError("exception.zipCode.notFound");
+            exceptionService.internalServerError("message.zipCode.notFound");
 
         }
         HashMap<String,Object> responseData = new HashMap<>();
@@ -165,7 +165,7 @@ public class RegionService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         List<Region> response = new ArrayList<>();
         if (country==null){
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
 

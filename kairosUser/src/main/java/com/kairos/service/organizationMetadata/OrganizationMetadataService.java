@@ -191,7 +191,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 1);
         if (!organization.isPresent()) {
             logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
-           exceptionService.dataNotFoundByIdException("exception.unit.id.notFound",unitId);
+           exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
 
         }
         if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent() && !organization.get().getPaymentSettings().isEmpty()) {

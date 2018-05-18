@@ -40,12 +40,12 @@ public class CompanyCategoryService extends UserBaseService {
         }
         Optional<Country> country = countryGraphRepository.findById(countryId);
         if (!Optional.ofNullable(country.get()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         boolean isAlreadyExists = companyCategoryGraphRepository.findByCountryAndNameExcludingCurrent(countryId, -1L, "(?i)" + companyCategoryDTO.getName().trim());
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException("exception.companyCategory.name.alreadyExist", companyCategoryDTO.getName().trim());
+            exceptionService.duplicateDataException("message.companyCategory.name.alreadyExist", companyCategoryDTO.getName().trim());
 
         }
         CompanyCategory companyCategory = new CompanyCategory(companyCategoryDTO.getName().trim(), companyCategoryDTO.getDescription(), country.get());
@@ -65,13 +65,13 @@ public class CompanyCategoryService extends UserBaseService {
         }
         CompanyCategory companyCategory = companyCategoryGraphRepository.findByCountryAndCompanycategory(countryId, companyCategoryDTO.getId());
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.companyCategory.id.notFound",companyCategoryDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound",companyCategoryDTO.getId());
 
         }
         if (!companyCategoryDTO.getName().trim().equalsIgnoreCase(companyCategory.getName())) {
             boolean isAlreadyExists = companyCategoryGraphRepository.findByCountryAndNameExcludingCurrent(countryId, companyCategoryDTO.getId(), "(?i)" + companyCategoryDTO.getName().trim());
             if (isAlreadyExists) {
-                exceptionService.duplicateDataException("exception.companyCategory.name.alreadyExist", companyCategoryDTO.getName().trim());
+                exceptionService.duplicateDataException("message.companyCategory.name.alreadyExist", companyCategoryDTO.getName().trim());
 
             }
         }
@@ -84,7 +84,7 @@ public class CompanyCategoryService extends UserBaseService {
     public boolean deleteCompanyCategory(Long countryId, Long companyCategoryId) {
         CompanyCategory companyCategory = companyCategoryGraphRepository.findByCountryAndCompanycategory(countryId, companyCategoryId);
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.companyCategory.id.notFound",companyCategoryId);
+            exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound",companyCategoryId);
 
         }
         companyCategory.setDeleted(true);

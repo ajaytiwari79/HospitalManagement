@@ -54,12 +54,12 @@ public class FeatureService extends UserBaseService{
     public Feature addCountryFeature(Long countryId, FeatureDTO featureDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         logger.info("featureDTO : "+featureDTO.getName());
         if( featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
-            exceptionService.duplicateDataException("exception.feature.name.alreadyExist",featureDTO.getName());
+            exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName());
 
         }
         return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
@@ -68,17 +68,17 @@ public class FeatureService extends UserBaseService{
     public FeatureQueryResult updateFeature(Long countryId, Long featureId, FeatureDTO featureDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         Feature feature = featureGraphRepository.getFeatureById(featureId, countryId, false);
         if( feature == null) {
-            exceptionService.dataNotFoundByIdException("exception.feature.id.notFound",featureId);
+            exceptionService.dataNotFoundByIdException("message.feature.id.notFound",featureId);
 
         }
 
         if( ! ( feature.getName().equalsIgnoreCase(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
-            exceptionService.duplicateDataException("exception.feature.name.alreadyExist",featureDTO.getName() );
+            exceptionService.duplicateDataException("message.feature.name.alreadyExist",featureDTO.getName() );
 
         }
         return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
@@ -88,12 +88,12 @@ public class FeatureService extends UserBaseService{
     public Boolean deleteFeature(Long countryId, Long featureId){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         Feature feature = featureGraphRepository.getFeatureById(featureId, countryId, false);
         if( feature == null) {
-            exceptionService.dataNotFoundByIdException("exception.feature.id.notFound",featureId);
+            exceptionService.dataNotFoundByIdException("message.feature.id.notFound",featureId);
 
         }
         feature.setDeleted(true);
@@ -104,7 +104,7 @@ public class FeatureService extends UserBaseService{
     public HashMap<String,Object> getListOfFeatures(Long countryId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
 
@@ -121,7 +121,7 @@ public class FeatureService extends UserBaseService{
     public Vehicle updateFeaturesOfVehicle(Long countryId, Long vehicleId, VehicleFeaturesDTO vehicleFeaturesDTO){
         Vehicle vehicle = vehicleGraphRepository.findOne(vehicleId,0);
         if (vehicle == null) {
-            exceptionService.dataNotFoundByIdException("exception.feature.vehicle.id.notFound",vehicleId);
+            exceptionService.dataNotFoundByIdException("message.feature.vehicle.id.notFound",vehicleId);
 
         }
         List<Feature> features = featureGraphRepository.getListOfFeaturesByCountryAndIds(countryId,false, vehicleFeaturesDTO.getFeatures());
@@ -148,7 +148,7 @@ public class FeatureService extends UserBaseService{
     public Resource updateFeaturesOfResource(Long organizationId, Long resourceId, VehicleFeaturesDTO vehicleFeaturesDTO){
         Resource resource = resourceGraphRepository.getResourceOfOrganizationById(organizationId, resourceId, false);
         if (resource == null) {
-            exceptionService.dataNotFoundByIdException("exception.feature.resource.id.notFound",resourceId);
+            exceptionService.dataNotFoundByIdException("message.feature.resource.id.notFound",resourceId);
 
         }
         List<Feature> features = featureGraphRepository.getAvailableFeaturesOfResourceByOrganizationAndIds(organizationId, resourceId, false, vehicleFeaturesDTO.getFeatures());

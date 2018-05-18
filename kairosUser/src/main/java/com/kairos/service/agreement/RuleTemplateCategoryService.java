@@ -62,7 +62,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         int ruleFound = countryGraphRepository.checkDuplicateRuleTemplateCategory(countryId, ruleTemplateCategory.getRuleTemplateCategoryType(), name);
 
         if (ruleFound != 0) {
-            exceptionService.duplicateDataException("exception.ruleTemplate.category.duplicate",name);
+            exceptionService.duplicateDataException("message.ruleTemplate.category.duplicate",name);
         }
 
         Country country = countryService.getCountryById(countryId);
@@ -75,7 +75,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notExist");
+            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
 
         }
         return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(countryId, ruleTemplateCategoryType);
@@ -90,11 +90,11 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public boolean deleteRuleTemplateCategory(long countryId, long templateCategoryId) {
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if (ruleTemplateCategory == null) {
-            exceptionService.dataNotFoundByIdException("exception.ruleTemplate.category.notExist",templateCategoryId);
+            exceptionService.dataNotFoundByIdException("message.ruleTemplate.category.notExist",templateCategoryId);
 
         }
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
-            exceptionService.actionNotPermittedException("exception.ruleTemplate.category.delete",templateCategoryId);
+            exceptionService.actionNotPermittedException("message.ruleTemplate.category.delete",templateCategoryId);
 
         }
         if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
@@ -115,22 +115,22 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryService.getCountryById(countryId) == null) {
-            exceptionService.dataNotFoundByIdException("exception.country.id.notExist");
+            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
 
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if(!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.ruleTemplate.category.invalid",templateCategoryId);
+            exceptionService.dataNotFoundByIdException("message.ruleTemplate.category.invalid",templateCategoryId);
 
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
-           exceptionService.actionNotPermittedException("exception.ruleTemplate.category.rename",templateCategoryId);
+           exceptionService.actionNotPermittedException("message.ruleTemplate.category.rename",templateCategoryId);
 
         }
         if(!ruleTemplateCategory.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())){
             boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
             if(isAlreadyExists){
-                exceptionService.duplicateDataException("exception.ruleTemplate.category.alreadyExist",ruleTemplateCategory.getName());
+                exceptionService.duplicateDataException("message.ruleTemplate.category.alreadyExist",ruleTemplateCategory.getName());
 
             }
         }

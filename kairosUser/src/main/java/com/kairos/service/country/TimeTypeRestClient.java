@@ -52,7 +52,7 @@ public class TimeTypeRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.runtimeException("exception.timeType.exceptionOccurred",e.getMessage());
+            exceptionService.runtimeException("message.timeType.exceptionOccurred",e.getMessage());
 
         }
 

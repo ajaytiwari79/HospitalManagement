@@ -81,7 +81,7 @@ public class AccessPageService extends UserBaseService {
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
                 logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
-                exceptionService.dataNotFoundByIdException("exception.dataNotFound","parentAccessPage",accessPageDTO.getParentTabId());
+                exceptionService.dataNotFoundByIdException("message.dataNotFound","parentAccessPage",accessPageDTO.getParentTabId());
 
             }
             List<AccessPage> childTabs = parentTab.getSubPages();
@@ -98,7 +98,7 @@ public class AccessPageService extends UserBaseService {
         AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
                 updateAccessTab(accessPageId,accessPageDTO.getName()): null;
         if(!Optional.ofNullable(accessPage).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound","tab",accessPageId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","tab",accessPageId);
 
         }
         return accessPage;

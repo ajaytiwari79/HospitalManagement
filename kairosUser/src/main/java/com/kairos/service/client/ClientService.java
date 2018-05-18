@@ -176,21 +176,21 @@ public class ClientService extends UserBaseService {
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("exception.client.organisation.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound",unitId);
 
         }
 
         if (clientMinimumDTO != null) {
 
             if (!invalidCPRNumber(clientMinimumDTO.getCprnumber())) {
-                exceptionService.dataNotFoundByIdException("exception.client.CRPNumber.notFound");
+                exceptionService.dataNotFoundByIdException("message.client.CRPNumber.notFound");
 
             }
 
 
             Client client = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
             if (Optional.ofNullable(client).isPresent() && client.isCitizenDead()) {
-                exceptionService.duplicateDataException("exception.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
+                exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
 
             }
 
@@ -198,14 +198,14 @@ public class ClientService extends UserBaseService {
                 logger.debug("Using Existing Client..........");
 
                 if (client.isCitizenDead()) {
-                    exceptionService.duplicateDataException("exception.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
+                    exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
 
                 }
 
                 int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
 
                 if (count != 0) {
-                    exceptionService.duplicateDataException("exception.client.CRPNumber.duplicate");
+                    exceptionService.duplicateDataException("message.client.CRPNumber.duplicate");
 
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
@@ -434,7 +434,7 @@ public class ClientService extends UserBaseService {
             response.put("clientGeneral", clientGeneralDetails);
             return response;
         } else {
-            exceptionService.dataNotFoundByIdException("exception.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
 
         }
         return null;
@@ -656,13 +656,13 @@ public class ClientService extends UserBaseService {
         Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
-            exceptionService.dataNotFoundByIdException("exception.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
 
         }
 
         // Check if assigning household member as himself
         if(minimumDTO.getCprnumber().equals(client.getCprNumber())){
-            exceptionService.dataNotMatchedException("exception.client.anotherHouseHold");
+            exceptionService.dataNotMatchedException("message.client.anotherHouseHold");
 
         }
 
@@ -699,7 +699,7 @@ public class ClientService extends UserBaseService {
         Client houseHoldPeople = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
         if (Optional.ofNullable(houseHoldPeople).isPresent()) {
             if (houseHoldPeople.isCitizenDead()) {
-                exceptionService.duplicateDataException("exception.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
+                exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
                             }
         } else {
             houseHoldPeople = new Client();
@@ -717,7 +717,7 @@ public class ClientService extends UserBaseService {
     private void addHouseHoldInOrganization(Client houseHold, long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.client.organisation.notFound",organizationId);
+            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound",organizationId);
 
         }
         ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHold, organization, new DateTime().getMillis());
@@ -777,7 +777,7 @@ public class ClientService extends UserBaseService {
     public boolean markClientAsDead(Long clientId, String deathDate) throws ParseException {
         Client citizen = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(citizen).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
 
         }
         Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
@@ -1080,7 +1080,7 @@ public class ClientService extends UserBaseService {
         Client client = getCitizenById(clientId);
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
         if (client == null || staff == null) {
-            exceptionService.dataNotFoundByIdException("exception.clientOrStaff.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.clientOrStaff.id.invalid");
 
         }
         return new ClientStaffInfoDTO(client.getId(), staff.getId());
@@ -1112,7 +1112,7 @@ public class ClientService extends UserBaseService {
         Client citizen = clientGraphRepository.findOne(citizenId);
         if (citizen == null) {
             logger.debug("Searching client in database by id " + citizenId);
-            exceptionService.dataNotFoundByIdException("exception.client.id.notFound",citizenId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound",citizenId);
 
         }
         citizenDetails.put("id", citizen.getId());
@@ -1139,7 +1139,7 @@ public class ClientService extends UserBaseService {
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
         if (citizen.getHomeAddress() == null) {
-            exceptionService.dataNotFoundByIdException("exception.client.homeAddress.notAvailabe",citizen.getFirstName() );
+            exceptionService.dataNotFoundByIdException("message.client.homeAddress.notAvailabe",citizen.getFirstName() );
 
         }
         Map<String, Object> citizenPlanningMap = new HashMap<>();
@@ -1206,12 +1206,12 @@ public class ClientService extends UserBaseService {
         }
 
         if (zipCode == null) {
-            exceptionService.internalServerError("exception.zipCode.notFound");
+            exceptionService.internalServerError("message.zipCode.notFound");
 
         }
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.internalServerError("exception.municipality.notFound");
+            exceptionService.internalServerError("message.municipality.notFound");
 
         }
 
@@ -1219,7 +1219,7 @@ public class ClientService extends UserBaseService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.internalServerError("exception.geographyData.notFound",municipality.getId());
+            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -1386,14 +1386,14 @@ public class ClientService extends UserBaseService {
         Client client = clientGraphRepository.findOne(clientId, unitId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Finding client by id " + client.getId());
-            exceptionService.dataNotFoundByIdException("exception.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
 
         }
 
         Client houseHoldPerson = clientGraphRepository.findByCprNumber(cprNumber);
         if (Optional.ofNullable(houseHoldPerson).isPresent()) {
             if (houseHoldPerson.isCitizenDead()) {
-                exceptionService.dataNotFoundByIdException("exception.client.CRPNumber.deadcitizen",cprNumber);
+                exceptionService.dataNotFoundByIdException("message.client.CRPNumber.deadcitizen",cprNumber);
 
             } else {
                 ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO();
@@ -1661,7 +1661,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
     public ClientContactPersonStructuredData updateContactPerson(Long clientId,ContactPersonDTO contactPersonDTO){
         Client client = clientGraphRepository.findOne(clientId);
         if(!Optional.ofNullable(client).isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
 
         }
         deleteContactPersonForService(contactPersonDTO.getServiceTypeId(),clientId);
@@ -1676,7 +1676,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
         Organization organization = organizationGraphRepository.findOne(unitId,0);
         if(!Optional.ofNullable(organization).isPresent()){
-            exceptionService.internalServerError("exception.client.organisation.notFound",unitId);
+            exceptionService.internalServerError("message.client.organisation.notFound",unitId);
 
         }
 

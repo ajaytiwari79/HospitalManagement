@@ -404,15 +404,15 @@ public class SkillService extends UserBaseService {
             return null;
         }
 
-        long unitId;
+        long unitId=0;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unitId = id;
         } else if (TEAM.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.getOrganizationByTeamId(id);
             unitId = unit.getId();
         } else {
-            //exceptionService.internalServerError("message.type.notvalid");
-            throw new InternalError("Type incorrect");
+            exceptionService.internalServerError("message.type.notvalid");
+            //throw new InternalError("Type incorrect");
         }
 
         List<Long> selectedSkillId = new ArrayList<>();
@@ -616,7 +616,7 @@ public class SkillService extends UserBaseService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.internalServerError("exception.country.id.notFound",countryId);
+            exceptionService.internalServerError("message.country.id.notFound",countryId);
 
         }
 

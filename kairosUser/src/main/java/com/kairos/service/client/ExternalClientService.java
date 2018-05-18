@@ -254,7 +254,7 @@ public class ExternalClientService extends UserBaseService {
     public Client createCitizenFromKmd(PatientWrapper patientWrapper, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("exception.organisation.notFound");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
         }
 
