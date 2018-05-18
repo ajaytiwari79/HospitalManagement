@@ -416,6 +416,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "DELETE r,filterDetail")
     void detachStaffFavouriteFilterDetails(Long staffFavouriteFilterId);
 
+    @Query("Match(organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(employments:Employment)-[:"+BELONGS_TO+"]->(staff:Staff{deleted:false}) where id(organization)={0} " +
+            "match(staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) return  id(staff) as id, staff.firstName as firstName, " +
+            " staff.lastName as lastName, contactDetail.privatePhone as privatePhone ")
+    List<StaffPersonalDetailDTO> getAllStaffWithMobileNumber(long unitId);
+
     @Query("Match(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employement)-[:"+BELONGS_TO+"]->(s:Staff) where o.id={0} return s")
     List<Staff> getAllStaffByUnitId(long unitId);
 

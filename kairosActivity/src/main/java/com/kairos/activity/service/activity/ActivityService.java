@@ -311,22 +311,27 @@ public class ActivityService extends MongoBaseService {
         }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
-        updateActivityCategory(activity);
+        Long countryId = activity.getCountryId();
+        if(countryId == null)
+            countryId = organizationRestClient.getCountryIdOfOrganization(activity.getUnitId());
+
+        updateActivityCategory(activity, countryId);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
-        activityTabsWrapper.setActivityCategories(activityCategoryRepository.findByCountryId(activity.getCountryId()));
+        activityTabsWrapper.setActivityCategories(activityCategoryRepository.findByCountryId(countryId));
 
         return activityTabsWrapper;
 
     }
 
-    public void updateActivityCategory(Activity activity){
-        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId(), activity.getCountryId());
+    public void updateActivityCategory(Activity activity, Long countryId){
+
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId(), countryId);
         if(timeType == null)
             throw new DataNotFoundException("Related Time Type not found");
-        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(activity.getCountryId(), activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, activity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(category == null){
-            category = new ActivityCategory(timeType.getLabel(), "", activity.getCountryId(), timeType.getId());
+            category = new ActivityCategory(timeType.getLabel(), "", countryId, timeType.getId());
             save(category);
         }
         activity.getGeneralActivityTab().setCategoryId(category.getId());
@@ -1021,6 +1026,7 @@ public class ActivityService extends MongoBaseService {
         Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
         return activity;
     }
+
     public Object initialOptaplannerSync(Long organisationId, Long unitId) {
         List<Activity> activities=activityMongoRepository.findAllActivitiesByUnitId(unitId);
         plannerSyncService.publishActivities(unitId,activities,IntegrationOperation.CREATE);

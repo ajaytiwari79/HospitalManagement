@@ -131,9 +131,9 @@ public class PayTableService extends UserBaseService {
         // if any payTable is found then only validate
         if (Optional.ofNullable(payTableToValidate).isPresent())
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
-        PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), true);
+        PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), payTableDTO.getPaymentUnit(), true);
         save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
         return payTableResponse;
@@ -217,9 +217,10 @@ public class PayTableService extends UserBaseService {
         payTable.setName(payTableDTO.getName().trim());
         payTable.setShortName(payTableDTO.getShortName());
         payTable.setDescription(payTableDTO.getDescription());
+        payTable.setPaymentUnit(payTableDTO.getPaymentUnit());
         prepareDates(payTable, payTableDTO);
         save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
     }

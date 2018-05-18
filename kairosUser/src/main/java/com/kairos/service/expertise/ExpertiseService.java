@@ -328,7 +328,6 @@ public class ExpertiseService extends UserBaseService {
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK);
 
 
-        expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
         SeniorityLevel seniorityLevel = null;
         if (expertiseDTO.getSeniorityLevel() != null) {
             seniorityLevel = new SeniorityLevel();
@@ -562,7 +561,6 @@ public class ExpertiseService extends UserBaseService {
 
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
-        expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
 
 
     }

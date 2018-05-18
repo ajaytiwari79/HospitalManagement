@@ -30,7 +30,7 @@ public class PriorityGroupRestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
+    public <T, V> V publish(T t, Long unitId, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
         final String baseUrl = getBaseUrl(false);
 
         try {
@@ -45,7 +45,7 @@ public class PriorityGroupRestClient {
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException(response.getMessage());
             }
-            return response;
+            return response.getData();
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
@@ -70,6 +70,7 @@ public class PriorityGroupRestClient {
     }
     public static <T> String getURI(T t,String uri,Map<String,Object> queryParams,Object... pathParams){
         URIBuilder builder = new URIBuilder();
+
         if(Optional.ofNullable(queryParams).isPresent()){
             queryParams.entrySet().forEach(e->{
                 builder.addParameter(e.getKey(),e.getValue().toString());
