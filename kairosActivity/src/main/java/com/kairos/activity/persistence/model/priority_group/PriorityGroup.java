@@ -15,9 +15,9 @@ public class PriorityGroup extends MongoBaseEntity {
     private Long unitId;
     private BigInteger countryParentId;
     private PriorityGroupName name;
+
     private BigInteger orderId;
     private ScheduledProcess scheduledProcess;
-
 
     public PriorityGroup() {
         //Default Constructor
@@ -118,11 +118,14 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
+
     public ScheduledProcess getScheduledProcess() {
         return scheduledProcess;
     }
 
+
     public void setScheduledProcess(ScheduledProcess scheduledProcess) {
         this.scheduledProcess = scheduledProcess;
     }
+
 }

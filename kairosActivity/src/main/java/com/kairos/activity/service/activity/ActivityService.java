@@ -25,7 +25,6 @@ import com.kairos.activity.persistence.repository.activity.TimeTypeMongoReposito
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
-import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
@@ -39,8 +38,9 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
-import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
+import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -1022,17 +1022,25 @@ public class ActivityService extends MongoBaseService {
         return activity;
     }
 
+
     public Object initialOptaplannerSync(Long organisationId, Long unitId) {
-        List<Activity> activities=activityMongoRepository.findAllActivitiesByUnitId(unitId);
-        plannerSyncService.publishActivities(unitId,activities,IntegrationOperation.CREATE);
-        List<StaffingLevel> staffingLevels= staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId,DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)),DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
-        List<StaffingLevelDTO> staffingLevelDTOS= new ArrayList<>();
-        for(StaffingLevel staffingLevel:staffingLevels){
-            StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitId(unitId);
+        plannerSyncService.publishActivities(unitId, activities, IntegrationOperation.CREATE);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)), DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
+        List<StaffingLevelDTO> staffingLevelDTOS = new ArrayList<>();
+        for (StaffingLevel staffingLevel : staffingLevels) {
+            StaffingLevelDTO staffingLevelDTO = new StaffingLevelDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
             staffingLevelDTOS.add(staffingLevelDTO);
         }
-        plannerSyncService.publishStaffingLevels(unitId,staffingLevelDTOS,IntegrationOperation.CREATE);
+        plannerSyncService.publishStaffingLevels(unitId, staffingLevelDTOS, IntegrationOperation.CREATE);
         return null;
-
     }
+
+
+    public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId){
+       List<ActivityDTO> activityDTOS =activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
+       List<TimeTypeDTO> timeTypeDTOS=timeTypeService.getAllTimeType(null,countryId);
+       ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS);
+       return activityWithTimeTypeDTO;
+       }
 }

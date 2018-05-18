@@ -1,30 +1,29 @@
 package com.kairos.activity.controller.open_shift;
 
+import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
 import com.kairos.activity.service.open_shift.OpenShiftService;
-import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
-import com.kairos.response.dto.web.open_shift.OrderOpenshiftResponseDTO;
-import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.List;
-import static com.kairos.activity.constants.ApiConstants.OPENSHIFT_URL;
+import static com.kairos.activity.constants.ApiConstants.OPEN_SHIFT_URL;
+
 
 @RestController
-@Api(OPENSHIFT_URL)
-@RequestMapping(OPENSHIFT_URL)
+@Api(OPEN_SHIFT_URL)
+@RequestMapping(OPEN_SHIFT_URL)
 public class OpenShiftController {
 
     @Inject
     OpenShiftService openShiftService;
+
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ApiOperation("create openshifts")
@@ -54,6 +53,13 @@ public class OpenShiftController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllOpenShiftsByUnitId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.getOpenshiftsByUnitIdAndOrderId(unitId,orderId));
+    }
+
+    @ApiOperation(value = "Pick open Shift by staff")
+    @RequestMapping(value = "/{openShiftId}/staff/{staffId}", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> pickOpenShiftByStaff(@RequestParam("shiftSelectionType") ShiftSelectionType shiftSelectionType,@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId,shiftSelectionType));
     }
 
 

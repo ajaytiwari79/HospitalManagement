@@ -1,9 +1,11 @@
 package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -15,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,8 +29,8 @@ public class OpenShiftService extends MongoBaseService {
     private OpenShiftMongoRepository openShiftMongoRepository;
     @Inject
     private PriorityGroupService priorityGroupService;
-
-
+    @Inject
+    private ExceptionService exceptionService;
 
     public OpenShiftResponseDTO createOpenShift(OpenShiftResponseDTO openShiftResponseDTO) {
 
@@ -40,56 +41,25 @@ public class OpenShiftService extends MongoBaseService {
         return openShiftResponseDTO;
     }
 
-    public List<OpenShiftResponseDTO> createOpenShiftFromOrder(List<OpenShiftResponseDTO> openShiftResponseDTOs, BigInteger orderId) {
 
-        List<OpenShift> openShifts = new ArrayList<OpenShift>();
-        for(OpenShiftResponseDTO openShiftResponseDTO: openShiftResponseDTOs) {
-            openShiftResponseDTO.setOrderId(orderId);
-            OpenShift openShift = new OpenShift();
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
-            openShifts.add(openShift);
 
-        }
-        save(openShifts);
-        OpenShift openShiftCurrent;
-        int currentElement = 0;
-        for(OpenShiftResponseDTO openShiftResponseDTO: openShiftResponseDTOs) {
-            openShiftCurrent = openShifts.get(currentElement);
-            ObjectMapperUtils.copyProperties(openShiftCurrent,openShiftResponseDTO);
-            currentElement++;
-        }
 
-        return openShiftResponseDTOs;
-
-    }
-
-    public OpenShiftResponseDTO updateOpenShift(OpenShiftResponseDTO openShiftResponseDTO,BigInteger openShiftId) {
-
-        OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
-        if(!Optional.ofNullable(openShift).isPresent()) {
-            throw new DataNotFoundByIdException("OpenShift doesn not exist by id"+ openShiftId);
-        }
-        ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
-        save(openShift);
-        return openShiftResponseDTO;
-    }
 
     public List<OpenShiftResponseDTO> updateOpenShift(List<OpenShiftResponseDTO> openShiftResponseDTOs,BigInteger orderId) {
 
-        List<OpenShift> openShifts = new ArrayList<OpenShift>() ;
+        List<OpenShift> openShifts = new ArrayList<OpenShift>();
         OpenShift openShift = null;
-        List<BigInteger> openShiftIds = openShiftResponseDTOs.stream().filter(openShiftResponseDTO -> openShiftResponseDTO.getId()!=null).map(openShiftResponseDTO -> new BigInteger(openShiftResponseDTO.getId().toString())).collect(Collectors.toList());
+        List<BigInteger> openShiftIds = openShiftResponseDTOs.stream().filter(openShiftResponseDTO -> openShiftResponseDTO.getId() != null).map(openShiftResponseDTO -> new BigInteger(openShiftResponseDTO.getId().toString())).collect(Collectors.toList());
         List<OpenShift> openShiftsUpdated = openShiftMongoRepository.findAllByIdsAndDeletedFalse(openShiftIds);
-        Map<BigInteger,OpenShift> openShiftsMap = openShiftsUpdated.stream().collect(Collectors.toMap(OpenShift::getId,
+        Map<BigInteger, OpenShift> openShiftsMap = openShiftsUpdated.stream().collect(Collectors.toMap(OpenShift::getId,
                 openShiftUpdated -> openShiftUpdated));
-        for(OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
-            if(Optional.ofNullable(openShiftResponseDTO.getId()).isPresent()) {
+        for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
+            if (Optional.ofNullable(openShiftResponseDTO.getId()).isPresent()) {
                 openShift = openShiftsMap.get(openShiftResponseDTO.getId());
-            }
-            else {
+            } else {
                 openShift = new OpenShift();
             }
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
+            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
             openShift.setOrderId(orderId);
             openShifts.add(openShift);
 
@@ -97,16 +67,40 @@ public class OpenShiftService extends MongoBaseService {
         save(openShifts);
         int currentElement = 0;
         OpenShift openShiftCurrent;
-        for(OpenShiftResponseDTO openShiftResponseDTO: openShiftResponseDTOs) {
+        for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
 
             openShiftCurrent = openShifts.get(currentElement);
             currentElement++;
-            ObjectMapperUtils.copyProperties(openShiftCurrent,openShiftResponseDTO);
+            ObjectMapperUtils.copyProperties(openShiftCurrent, openShiftResponseDTO);
 
+
+             openShift = new OpenShift();
+            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
+            save(openShift);
         }
-
         return openShiftResponseDTOs;
     }
+
+    public void createOpenShiftFromOrder(List<OpenShiftResponseDTO> openShiftResponseDTOs, BigInteger orderId) {
+
+        List<OpenShift> openShifts = new ArrayList<OpenShift>();
+        for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
+            openShiftResponseDTO.setOrderId(orderId);
+            OpenShift openShift = new OpenShift();
+            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
+            openShifts.add(openShift);
+
+        }
+        save(openShifts);
+    }
+
+
+
+
+
+
+
+
 
     public void deleteOpenShift(BigInteger openShiftId) {
 
@@ -121,7 +115,7 @@ public class OpenShiftService extends MongoBaseService {
 
     public List<OpenShift> getOpenshiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
 
-        List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+    List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(unitId,orderId);
 
         return openShifts;
     }
@@ -131,4 +125,24 @@ public class OpenShiftService extends MongoBaseService {
 
         return openShifts;
     }
+
+    public OpenShiftResponseDTO pickOpenShiftByStaff(long unitId, BigInteger openShiftId, long staffId,ShiftSelectionType shiftSelectionType) {
+        OpenShift openShift = openShiftMongoRepository.findByIdAndUnitIdAndDeletedFalse(openShiftId, unitId);
+        if (!Optional.ofNullable(openShift).isPresent()) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound","openShift",openShiftId);
+        }
+
+        if (shiftSelectionType.equals(ShiftSelectionType.FIRST_PICK)) {
+            openShift.setParentOpenShiftId(openShift.getId());
+            openShift.setId(null);
+        } else if (shiftSelectionType.equals(ShiftSelectionType.SHOW_INTEREST)) {
+            openShift.getInterestedStaff().add(staffId);
+        }
+        save(openShift);
+        OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();
+        ObjectMapperUtils.copyProperties(openShift, openShiftResponseDTO);
+        return openShiftResponseDTO;
+    }
+
+
 }

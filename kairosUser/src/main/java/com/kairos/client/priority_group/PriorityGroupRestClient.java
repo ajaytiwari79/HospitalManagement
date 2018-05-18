@@ -30,15 +30,15 @@ public class PriorityGroupRestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public <T, V> V publish(T t, Long unitId, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(false);
+    public <T, V> V publish(T t, Long id,boolean isUnit, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isUnit);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl +"/unit/"+ unitId + getURI(t,uri,queryParams,pathParams),
+                            baseUrl +id + getURI(t,uri,queryParams,pathParams),
                             getHttpMethod(integrationOperation),
                             t==null?null:new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();

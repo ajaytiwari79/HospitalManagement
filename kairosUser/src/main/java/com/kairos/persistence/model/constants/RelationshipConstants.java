@@ -244,6 +244,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
     public final static String HAS_SENIOR_DAYS = "HAS_SENIOR_DAYS";
     public final static String HAS_CHILD_CARE_DAYS = "HAS_CHILD_CARE_DAYS";
+    public final static String HAS_STAFF_PREFERENCES = "HAS_STAFF_PREFERENCES";
 
 
 
