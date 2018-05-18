@@ -4,6 +4,8 @@ package com.kairos.activity.spec;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.shift.Expertise;
+import com.kairos.activity.service.exception.ExceptionService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -20,6 +22,8 @@ public class ActivityExpertiseSpecification extends AbstractActivitySpecificatio
     public ActivityExpertiseSpecification(Expertise expertise) {
         this.expertise = expertise;
     }
+    @Autowired
+    ExceptionService exceptionService;
 
     @Override
     public boolean isSatisfied(Activity activity) {
@@ -28,7 +32,7 @@ public class ActivityExpertiseSpecification extends AbstractActivitySpecificatio
             if (expertiseIds.contains(expertise.getId())) {
                 return true;
             }
-            throw new InvalidRequestException("Expertise does not match with this activity.");
+            exceptionService.invalidRequestException("message.activity.expertise.match");
         }
         return true;
     }
