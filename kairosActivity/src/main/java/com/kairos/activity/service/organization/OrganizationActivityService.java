@@ -23,11 +23,13 @@ import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,12 +64,14 @@ public class OrganizationActivityService extends MongoBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     OrderService orderService;
+    @Autowired
+    private ExceptionService exceptionService;
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         if (checked) {
             Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
@@ -114,7 +118,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId, Long unitId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
@@ -144,12 +148,12 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
         ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
         if (activityCategory == null) {
-            throw new DataNotFoundByIdException("Category Not Available");
+            exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnit(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId());
         if (Optional.ofNullable(IsActivityExists).isPresent()) {
-            throw new DuplicateDataException("Name already is use " + generalDTO.getName());
+            exceptionService.duplicateDataException("message.activity.name",generalDTO.getName());
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
@@ -201,11 +205,11 @@ public class OrganizationActivityService extends MongoBaseService {
                 findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
-            throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
+            exceptionService.duplicateDataException("message.activity.name",activityDTO.getName());
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
-            throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());

@@ -31,11 +31,10 @@ public class TimeTypeService extends MongoBaseService {
     @Inject
     private ActivityMongoRepositoryImpl activityMongoRepository;
     @Inject
-<<<<<<< HEAD
     private ExceptionService exceptionService;
-=======
+    @Inject
     private ActivityCategoryService activityCategoryService;
->>>>>>> 411331905210b8bd298b42d547359283edc1d652
+
 
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {

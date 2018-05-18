@@ -4,6 +4,7 @@ import com.kairos.activity.custom_exception.*;
 import com.kairos.activity.service.fls_visitour.exceptions.scheduler.FlsCallException;
 import com.kairos.activity.service.fls_visitour.exceptions.scheduler.SchedulerException;
 import com.kairos.activity.service.locale.LocaleService;
+import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -76,5 +77,11 @@ public class ExceptionService {
     }
     public void taskDemandException(String message, Object... params) {
         throw new TaskDemandException(convertMessage(message, params));
+    }
+    public void invalidOperationException(String message, Object... params) {
+        throw new InvalidOperationException(convertMessage(message, params));
+    }
+    public void dataNotFoundException(String message, Object... params) {
+        throw new DataNotFoundException(convertMessage(message, params));
     }
 }
