@@ -440,21 +440,34 @@ public class DateUtils {
         return dates;
     }
 
+    public static LocalDate addDurationInLocalDateExcludingLastDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
+        LocalDate endDate = addDurationInLocalDate(localDate, duration, durationType, recurringNumber);
+        return endDate.minusDays(1);
+    }
+
     public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
         switch (durationType){
             case DAYS: {
-                localDate.plusDays(duration*recurringNumber);
-                break;
+                return localDate.plusDays(duration*recurringNumber);
             }
             case WEEKS: {
-                localDate.plusDays(duration *recurringNumber * 7);
-                break;
+                return localDate.plusDays(duration *recurringNumber * 7);
             }
             case MONTHS: {
-                localDate.plusMonths(duration *recurringNumber );
-                break;
+                return localDate.plusMonths(duration *recurringNumber );
             }
         }
         return localDate;
     }
+
+    public static String getDurationOfTwoLocalDates(LocalDate startDate, LocalDate endDate){
+        // Get duration of period
+        Period period = Period.between(startDate, endDate);
+
+        return  (period.getMonths() > 0 ? period.getMonths() + " MONTHS": "")+
+                ( period.getDays() >= 7 ? period.getDays() / 7 + " WEEKS " : "")+
+                ( period.getDays()%7 > 0 ? period.getDays() % 7 + " DAYS " : "") ;
+
+    }
+
 }

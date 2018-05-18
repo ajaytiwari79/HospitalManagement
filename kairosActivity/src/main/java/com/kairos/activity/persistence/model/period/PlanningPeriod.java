@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,8 +18,10 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriod extends MongoBaseEntity {
 
-    private Date startDate;
-    private Date endDate;
+//    private Date startDate;
+//    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String name;
     @Indexed
     private Long unitId = -1L;
@@ -30,7 +33,7 @@ public class PlanningPeriod extends MongoBaseEntity {
         // default constructor
     }
 
-    public PlanningPeriod(String name, Date startDate, Date endDate, Long unitId, List<PeriodPhaseFlippingDate> phaseFlippingDate, BigInteger currentPhaseId, BigInteger nextPhaseId) {
+    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId, List<PeriodPhaseFlippingDate> phaseFlippingDate, BigInteger currentPhaseId, BigInteger nextPhaseId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -40,7 +43,23 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.nextPhaseId = nextPhaseId;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    /*public Date getStartDate() {
         return startDate;
     }
 
@@ -54,7 +73,7 @@ public class PlanningPeriod extends MongoBaseEntity {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
+    }*/
 
     public Long getUnitId() {
         return unitId;

@@ -30,12 +30,15 @@ public class PlanningPeriodDTO {
     private int recurringNumber;
     private String currentPhase;
     private String nextPhase;
-    private Long requestToPuzzleDate;
+    /*private Long requestToPuzzleDate;
     private Long puzzleToConstructionDate;
-    private Long constructionToDraftDate;
+    private Long constructionToDraftDate;*/
+    private LocalDate requestToPuzzleDate;
+    private LocalDate puzzleToConstructionDate;
+    private LocalDate constructionToDraftDate;
     private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
     private String periodDuration;
-    private ZoneId zoneId;
+//    private ZoneId zoneId;
 
 
     public PlanningPeriodDTO(){
@@ -51,13 +54,12 @@ public class PlanningPeriodDTO {
         this.zoneId = zoneId;
     }*/
 
-    public PlanningPeriodDTO( int duration, DurationType durationType, int recurringNumber, LocalDate endDate, ZoneId zoneId){
-//        this.startDateMillis = startDateMillis;
+    public PlanningPeriodDTO( LocalDate startDate, int duration, DurationType durationType, int recurringNumber, LocalDate endDate){
+        this.startDate = startDate;
         this.duration = duration;
         this.durationType = durationType;
         this.recurringNumber = recurringNumber;
         this.endDate = endDate;
-        this.zoneId = zoneId;
     }
 
     public Long getUnitId() {
@@ -116,7 +118,31 @@ public class PlanningPeriodDTO {
         this.nextPhase = nextPhase;
     }
 
-    public Long getRequestToPuzzleDate() {
+    public LocalDate getRequestToPuzzleDate() {
+        return requestToPuzzleDate;
+    }
+
+    public void setRequestToPuzzleDate(LocalDate requestToPuzzleDate) {
+        this.requestToPuzzleDate = requestToPuzzleDate;
+    }
+
+    public LocalDate getPuzzleToConstructionDate() {
+        return puzzleToConstructionDate;
+    }
+
+    public void setPuzzleToConstructionDate(LocalDate puzzleToConstructionDate) {
+        this.puzzleToConstructionDate = puzzleToConstructionDate;
+    }
+
+    public LocalDate getConstructionToDraftDate() {
+        return constructionToDraftDate;
+    }
+
+    public void setConstructionToDraftDate(LocalDate constructionToDraftDate) {
+        this.constructionToDraftDate = constructionToDraftDate;
+    }
+
+    /*public Long getRequestToPuzzleDate() {
         return requestToPuzzleDate;
     }
 
@@ -138,7 +164,7 @@ public class PlanningPeriodDTO {
 
     public void setConstructionToDraftDate(Long constructionToDraftDate) {
         this.constructionToDraftDate = constructionToDraftDate;
-    }
+    }*/
 
     public BigInteger getId() {
         return id;
@@ -204,13 +230,13 @@ public class PlanningPeriodDTO {
         this.periodDuration = periodDuration;
     }
 
-    public ZoneId getZoneId() {
+    /*public ZoneId getZoneId() {
         return zoneId;
     }
 
     public void setZoneId(ZoneId zoneId) {
         this.zoneId = zoneId;
-    }
+    }*/
 
     public LocalDate getStartDate() {
         return startDate;

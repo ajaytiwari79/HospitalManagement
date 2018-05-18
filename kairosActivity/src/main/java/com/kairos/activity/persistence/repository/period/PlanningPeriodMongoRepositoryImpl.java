@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.period;
 
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.period.PlanningPeriodDTO;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
@@ -32,13 +33,16 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, Date dateLiesInPeriod){
+    public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate localDateLiesInPeriod){
+        Date dateLiesInPeriod = DateUtils.asDate(localDateLiesInPeriod);
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
                 and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod));
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
 
-    public UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, Date startDate, Date endDate){
+    public UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate){
+        Date startDate = DateUtils.asDate(startLocalDate);
+        Date endDate = DateUtils.asDate(endLocalDate);
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
                 and("startDate").gte(startDate).and("endDate").lte(endDate));
         Update update = new Update();
@@ -108,8 +112,10 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }*/
 
-    public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate) {
+    public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
 
+        Date startDate = DateUtils.asDate(startLocalDate);
+        Date endDate = DateUtils.asDate(endLocalDate);
         ProjectionOperation projectionOperation = Aggregation.project().
                 and("id").as("id").
                 andInclude("name").
@@ -133,8 +139,10 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
 
-    public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startDate, LocalDate endDate, int sequence) {
+    public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, int sequence) {
 
+        Date startDate = DateUtils.asDate(startLocalDate);
+        Date endDate = DateUtils.asDate(endLocalDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
                         .orOperator(
@@ -155,8 +163,10 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         }
     }
 
-    public  boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate) {
+    public  boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
 
+        Date startDate = DateUtils.asDate(startLocalDate);
+        Date endDate = DateUtils.asDate(endLocalDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
                         .orOperator(
