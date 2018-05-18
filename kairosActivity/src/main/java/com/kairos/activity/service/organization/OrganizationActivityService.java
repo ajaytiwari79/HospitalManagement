@@ -66,7 +66,7 @@ public class OrganizationActivityService extends MongoBaseService {
         logger.info("activityId,{}", activityId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("validation.activity.id",activityId);
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         if (checked) {
             Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
@@ -117,7 +117,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByDeletedFalse();
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("validation.activity.id",activityId);
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
@@ -155,14 +155,14 @@ public class OrganizationActivityService extends MongoBaseService {
             category.setCountryId(null);
             save(category);
             if (category == null) {
-                exceptionService.dataNotFoundByIdException("validation.category.notExist");
+                exceptionService.dataNotFoundByIdException("message.category.notExist");
             }
             generalDTO.setCategoryId(category.getId());
         }
 
         Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnit(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId());
         if (Optional.ofNullable(IsActivityExists).isPresent()) {
-            exceptionService.duplicateDataException("validation.activity.name",generalDTO.getName());
+            exceptionService.duplicateDataException("message.activity.name",generalDTO.getName());
         }
 
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
@@ -214,12 +214,12 @@ public class OrganizationActivityService extends MongoBaseService {
                 findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
-            exceptionService.duplicateDataException("validation.activity.name",activityDTO.getName());
+            exceptionService.duplicateDataException("message.activity.name",activityDTO.getName());
 
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
-            exceptionService.dataNotFoundByIdException("validation.activity.id",activityId);
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());

@@ -9,6 +9,7 @@ import com.kairos.activity.client.TimeSlotRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.organization.OrganizationLevel;
@@ -78,8 +79,8 @@ public class TaskTypeService extends MongoBaseService {
 
     @Inject
     private TagMongoRepository tagMongoRepository;
-
-
+    @Autowired
+    private ExceptionService exceptionService;
 
 
 
@@ -482,7 +483,7 @@ public class TaskTypeService extends MongoBaseService {
         // OfficeResourceTypeMetadata are in beacon module currently not used
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
         if (isNullOrDeleted(taskType)) {
-            throw new InternalError("task type not found");
+            exceptionService.internalError("error.task.type");
         }
         TaskTypeResourceDTO taskTypeResourceDTO = new TaskTypeResourceDTO();
         taskTypeResourceDTO.setVehicleRequired(taskType.isVehicleRequired());
@@ -853,7 +854,7 @@ public class TaskTypeService extends MongoBaseService {
         }
 
         if(organizationTypeId == null){
-            throw new InternalError("organization type can not be null");
+            exceptionService.internalError("error.organization.type");
         }
 
 
@@ -937,7 +938,7 @@ public class TaskTypeService extends MongoBaseService {
 
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
-            throw new InternalError("Task type not found");
+            exceptionService.internalError("error.task.type");
         }
         TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(taskType.getOrganizationId(),taskTypeId,taskTypeSlaConfigDTO.getTimeSlotId());
         if(taskTypeSlaConfig == null){
@@ -947,7 +948,7 @@ public class TaskTypeService extends MongoBaseService {
                 taskTypeSlaConfig = new TaskTypeSlaConfig(taskTypeId,taskType.getOrganizationId(),
                         taskTypeSlaConfigDTO.getTimeSlotId(), result.get().getName());
             } else {
-                throw new InternalError("Invalid time slot id");
+                exceptionService.internalError("error.timeslot.id");
             }
         }
         List<SlaPerDayInfo> slaPerDayInfoList = taskTypeSlaConfig.getSlaPerDayInfo() != null ? taskTypeSlaConfig.getSlaPerDayInfo() :  new ArrayList<>();
@@ -1020,7 +1021,7 @@ public class TaskTypeService extends MongoBaseService {
 
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
-            throw new InternalError("Task type not found");
+            exceptionService.internalError("task type not found");
         }
 
         List<TimeSlot> currentTimeSlots = countryRestClient.getTimeSlotSetsOfCountry(countryId);
@@ -1144,7 +1145,7 @@ public class TaskTypeService extends MongoBaseService {
             //OrganizationDTO unit = organizationGraphRepository.getOrganizationByTeamId(id);
             OrganizationDTO unit = organizationRestClient.getOrganizationByTeamId(id);
             if(unit == null){
-                throw new InternalError("team can not exist without organization,organization not found");
+                exceptionService.internalError("error.organization.team.notfound");
             }
             visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,unit.getId(),true));
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeByTeamIdAndSubServiceAndIsEnabled(id,subServiceId,true));
@@ -1179,7 +1180,7 @@ public class TaskTypeService extends MongoBaseService {
         } else if(TEAM.equalsIgnoreCase(type)){
             TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
             if(taskType == null){
-                throw new InternalError("Task type can not null");
+                exceptionService.internalError("error.task.type.notnull");
             }
             if(isSelected){
                 taskType.setTeamId(id);
@@ -1229,7 +1230,7 @@ public class TaskTypeService extends MongoBaseService {
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
             logger.error("Incorrect task type id " + taskType);
-            throw new DataNotFoundByIdException("Incorrect task type id ");
+            exceptionService.dataNotFoundByIdException("error.task.type.id");
         }
         List<TaskType> newTaskTypes = new ArrayList<>(taskTypeNames.size());
         taskTypeNames.forEach(taskTypeName->{

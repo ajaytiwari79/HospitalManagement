@@ -157,7 +157,7 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
         FlsCallResponse flsCallResponse = FlsCallResponse.getByCode(code);
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
-            exceptionService.schedulerException("validation.exception.scheduler",flsCallResponse.message,response.getInfoText());
+            exceptionService.schedulerException("message.exception.scheduler",flsCallResponse.message,response.getInfoText());
         }else{
             VTID = response.getVTID();
             logger.info(String.valueOf(VTID));
@@ -195,7 +195,7 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
         FlsCallResponse flsCallResponse = FlsCallResponse.getByCode(code);
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
-            exceptionService.schedulerException("validation.exception.scheduler",flsCallResponse.message,response.getInfoText());
+            exceptionService.schedulerException("message.exception.scheduler",flsCallResponse.message,response.getInfoText());
 
         }else{
              VTID = response.getVTID();
@@ -231,7 +231,7 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
         FlsCallResponse flsCallResponse = FlsCallResponse.getByCode(code);
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
-            exceptionService.schedulerException("validation.exception.scheduler",flsCallResponse.message,response.getInfoText());
+            exceptionService.schedulerException("message.exception.scheduler",flsCallResponse.message,response.getInfoText());
         }else{
              VTID = response.getVTID();
 
@@ -249,7 +249,7 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
         if(flsCallResponse.isError){
             logger.error("Error: " + flsCallResponse.message + " : " + response.getInfoText());
             //throw new InternalError(flsCallResponse.message + " : " + response.getInfoText());
-exceptionService.runtimeException("validation.exception.runtime",flsCallResponse.message,response.getInfoText());
+exceptionService.runtimeException("message.exception.runtime",flsCallResponse.message,response.getInfoText());
         }
 
             int VTID = response.getVTID();

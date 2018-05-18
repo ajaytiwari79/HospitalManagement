@@ -934,7 +934,7 @@ public class PlannerService extends MongoBaseService {
             return actualPlanningTaskUpdate(unitId,Arrays.asList(taskData));
         }
         if (!task.isSingleTask() && task.getActualPlanningTask() != null) {
-            exceptionService.dataNotModifiedException("validation.task.update");
+            exceptionService.dataNotModifiedException("message.task.update");
         }
         Date currentDate = DateUtils.getDate(task.getDateFrom().getTime());
         currentDate.setHours(0);
@@ -2140,7 +2140,7 @@ public class PlannerService extends MongoBaseService {
         long startTime = System.currentTimeMillis();
         OrganizationDTO unit =organizationRestClient.getOrganization(unitId);
         if (unit == null) {
-            exceptionService.dataNotFoundByIdException("validation.unit.id");
+            exceptionService.dataNotFoundByIdException("message.unit.id");
         }
 
         if (unit.isOneTimeSyncPerformed()) {
@@ -2208,7 +2208,7 @@ public class PlannerService extends MongoBaseService {
 
             Task task = taskMongoRepository.findOne(taskId);
             if (task!=null) {
-                exceptionService.dataNotFoundByIdException("validation.task.id");
+                exceptionService.dataNotFoundByIdException("message.task.id");
             }
             if (!task.isSingleTask()) {
                 exceptionService.internalError("error.task.single");

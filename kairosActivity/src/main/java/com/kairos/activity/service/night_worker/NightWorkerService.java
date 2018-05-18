@@ -64,7 +64,7 @@ public class NightWorkerService extends MongoBaseService {
 
     public void validateNightWorkerGeneralDetails(NightWorkerGeneralResponseDTO nightWorkerDTO){
         if(nightWorkerDTO.getQuestionnaireFrequencyInMonths() <= 0){
-            exceptionService.dataNotFoundByIdException("validation.questionnaire.frequency");
+            exceptionService.dataNotFoundByIdException("message.questionnaire.frequency");
         }
     }
 
@@ -99,7 +99,7 @@ public class NightWorkerService extends MongoBaseService {
 
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if(!Optional.ofNullable(nightWorker).isPresent()){
-            exceptionService.dataNotFoundByIdException("validation.staff.nightworker");
+            exceptionService.dataNotFoundByIdException("message.staff.nightworker");
         }
 //        List<QuestionAnswerPair> tempQAPair = ObjectMapperUtils.copyProperties(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class);
         // TODO Validate if questionnaire is being added after valid frequency

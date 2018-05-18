@@ -71,4 +71,10 @@ public class ExceptionService {
     public void dataNotModifiedException(String message, Object... params) {
         throw new DataNotModifiedException(convertMessage(message, params));
     }
+    public void unsupportedOperationException(String message, Object... params) {
+        throw new UnsupportedOperationException(convertMessage(message, params));
+    }
+    public void taskDemandException(String message, Object... params) {
+        throw new TaskDemandException(convertMessage(message, params));
+    }
 }

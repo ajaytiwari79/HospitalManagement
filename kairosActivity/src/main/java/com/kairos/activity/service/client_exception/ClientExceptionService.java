@@ -629,7 +629,7 @@ public class ClientExceptionService extends MongoBaseService {
     public Object getClientExceptionById(BigInteger taskExceptionId) {
         Optional<ClientException> clientExceptionOptional = clientExceptionMongoRepository.findById(taskExceptionId);
         if (!clientExceptionOptional.isPresent()) {
-            exceptionService.dataNotFoundByIdException("validation.exception.task.notfound");
+            exceptionService.dataNotFoundByIdException("message.exception.task.notfound");
         }
         logger.info("Preparing response");
         ClientException clientException=clientExceptionOptional.get();
@@ -946,7 +946,7 @@ public class ClientExceptionService extends MongoBaseService {
 
     private void validateClientException(List<Long> clientId, Date dateFrom, Date dateTo, BigInteger exceptionTypeId) {
         if (clientExceptionMongoRepository.isExceptionTypeExistBetweenDate(clientId, dateFrom, dateTo, exceptionTypeId)) {
-            exceptionService.invalidClientException("validation.exception.timeslot.create");
+            exceptionService.invalidClientException("message.exception.timeslot.create");
         }
     }
 
@@ -961,14 +961,14 @@ public class ClientExceptionService extends MongoBaseService {
         newDateTO.setHours(toTime.getHour());
         newDateTO.setMinutes(toTime.getMinute());
         if (clientExceptionMongoRepository.isExceptionExistBetweenDate(clientException.getClientId(), newDateFrom, newDateTO, clientException.getId())) {
-            exceptionService.invalidClientException("validation.exception.timeslot.create");
+            exceptionService.invalidClientException("message.exception.timeslot.create");
         }
     }
 
     private void validateClientException(Date dateFrom, Date dateTo, List<BigInteger> exceptionIds,List<Long> clientIds) throws ParseException {
 
         if (clientExceptionMongoRepository.isExceptionExistBetweenDate(clientIds, dateFrom, dateTo, exceptionIds)) {
-            exceptionService.invalidClientException("validation.exception.timeslot.create");
+            exceptionService.invalidClientException("message.exception.timeslot.create");
         }
     }
 
@@ -978,7 +978,7 @@ public class ClientExceptionService extends MongoBaseService {
         ;
         long count = clientExceptionMongoRepository.countSickExceptionsAfterDate(citizenId, startDate.toDate());
         if (daysToReview <= count) {
-            exceptionService.invalidClientException("validation.exception.timeslot.create");
+            exceptionService.invalidClientException("message.exception.timeslot.create");
         }
     }
 

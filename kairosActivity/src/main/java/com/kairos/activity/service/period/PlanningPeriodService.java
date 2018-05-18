@@ -139,7 +139,7 @@ public class PlanningPeriodService extends MongoBaseService {
         // TODO Check monday if duration is in week and first day of month if duration is in month
         List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);;
         if(!Optional.ofNullable(phases).isPresent()){
-            exceptionService.dataNotFoundByIdException("validation.organization.phases",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.phases",unitId);
         }
 
         //Set Start Date and End date in PlanningPeriodDTO according to recurringNumber
@@ -165,15 +165,15 @@ public class PlanningPeriodService extends MongoBaseService {
                         planningPeriodDTO.getStartDate().before(lastPlanningPeriod.getEndDate()) )  ||
                         ((planningPeriodDTO.getEndDate().before(lastPlanningPeriod.getEndDate()) || planningPeriodDTO.getEndDate().equals(lastPlanningPeriod.getEndDate()) ) &&
                                 planningPeriodDTO.getEndDate().after(firstPlanningPeriod.getStartDate())))  ){
-            exceptionService.actionNotPermittedException("validation.period.date.alreadyexists");
+            exceptionService.actionNotPermittedException("message.period.date.alreadyexists");
         }
 
         if(Optional.ofNullable(firstPlanningPeriod).isPresent() && planningPeriodDTO.getEndDate().before(firstPlanningPeriod.getStartDate()) && firstPlanningPeriod.getStartDate().getTime() - planningPeriodDTO.getEndDate().getTime() > 1){
-            exceptionService.actionNotPermittedException("validation.period.duration");
+            exceptionService.actionNotPermittedException("message.period.duration");
         }
 
         if(Optional.ofNullable(firstPlanningPeriod).isPresent() && planningPeriodDTO.getStartDate().after(lastPlanningPeriod.getEndDate()) && planningPeriodDTO.getStartDate().getTime() - lastPlanningPeriod.getEndDate().getTime() > 1){
-            exceptionService.actionNotPermittedException("validation.period.date.start");
+            exceptionService.actionNotPermittedException("message.period.date.start");
         }
 
         planningPeriodDTO.setZoneId(getTimeZoneOfOrganization(unitId));
@@ -326,7 +326,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public ZoneId getTimeZoneOfOrganization(Long unitId){
         ZoneId unitZoneId = organizationRestClient.getOrganizationTimeZone(unitId);
         if(!Optional.ofNullable(unitZoneId).isPresent() ){
-            exceptionService.actionNotPermittedException("validation.unit.timezone");
+            exceptionService.actionNotPermittedException("message.unit.timezone");
         }
         return unitZoneId;
     }
@@ -336,7 +336,7 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(periodId);
 
         if(!Optional.ofNullable(planningPeriod).isPresent()){
-            exceptionService.dataNotFoundByIdException("validation.period.organization.notfound",periodId);
+            exceptionService.dataNotFoundByIdException("message.period.organization.notfound",periodId);
         }
 
         planningPeriodDTO.setStartDate(DateUtils.getDate(planningPeriodDTO.getStartDateMillis()));
@@ -344,7 +344,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
         // If start date is equal to end date or end date is less than start date
         if(planningPeriodDTO.getStartDate().compareTo(planningPeriodDTO.getEndDate()) >= 0 ){
-            exceptionService.actionNotPermittedException("validation.period.duration");
+            exceptionService.actionNotPermittedException("message.period.duration");
         }
 
         planningPeriodDTO.setZoneId(getTimeZoneOfOrganization(unitId));
@@ -353,7 +353,7 @@ public class PlanningPeriodService extends MongoBaseService {
         // We are checking request phase by its name, can be done by sequence, need to ask
         // We know here that sequence of request phase is 0
         if(!phaseMongoRepository.checkPhaseBySequence(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_SEQUENCE)){
-           exceptionService.actionNotPermittedException("validation.period.phase.request.name",planningPeriod.getName());
+           exceptionService.actionNotPermittedException("message.period.phase.request.name",planningPeriod.getName());
         }
 
         //Check if startDate and endDate is different from the original one
@@ -374,7 +374,7 @@ public class PlanningPeriodService extends MongoBaseService {
         // We know here that sequence of request phase is 0
         if(planningPeriodMongoRepository.checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(
                 unitId, planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),AppConstants.REQUEST_PHASE_SEQUENCE)){
-           exceptionService.actionNotPermittedException("validation.period.phase.request.merge");
+           exceptionService.actionNotPermittedException("message.period.phase.request.merge");
         }
 
         Date startDateOfPeriodToBeDeleted = Optional.ofNullable(previousPeriod).isPresent() ? previousPeriod.getStartDate() : planningPeriod.getStartDate() ;
@@ -411,21 +411,21 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
 
         if(!Optional.ofNullable(planningPeriod).isPresent()){
-            exceptionService.dataNotFoundByIdException("validation.period.unit.id",periodId);
+            exceptionService.dataNotFoundByIdException("message.period.unit.id",periodId);
         }
 
         // Check if it is last period
         PlanningPeriod lastPlanningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
 
         if( !lastPlanningPeriod.getId().equals(planningPeriod.getId())){
-            exceptionService.actionNotPermittedException("validation.period.delete.last");
+            exceptionService.actionNotPermittedException("message.period.delete.last");
         }
 
         // Check if period is in request phase
         // We are checking request phase by its name, can be done by sequence, need to ask
         // TO DO check phase by sequence
         if( !phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), "REQUEST")){
-           exceptionService.actionNotPermittedException("validation.period.phase.request.name",planningPeriod.getName());
+           exceptionService.actionNotPermittedException("message.period.phase.request.name",planningPeriod.getName());
         }
 
         planningPeriod.setDeleted(true);
@@ -439,10 +439,10 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
 
         if(!Optional.ofNullable(planningPeriod).isPresent()){
-            exceptionService.dataNotFoundByIdException("validation.period.unit.id",periodId);
+            exceptionService.dataNotFoundByIdException("message.period.unit.id",periodId);
         }
         if(!Optional.ofNullable(planningPeriod.getNextPhaseId()).isPresent()){
-            exceptionService.actionNotPermittedException("validation.period.phase.last");
+            exceptionService.actionNotPermittedException("message.period.phase.last");
         }
         Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
         List<PhaseDTO> toBeNextPhase = phaseMongoRepository.getNextApplicablePhasesOfUnitBySequence(unitId, initialNextPhase.getSequence());

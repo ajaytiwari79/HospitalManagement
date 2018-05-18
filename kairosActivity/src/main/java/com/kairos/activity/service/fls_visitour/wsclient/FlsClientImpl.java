@@ -46,7 +46,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.CALL, payload);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return response;
     }
@@ -62,11 +62,11 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(0 != payload.getFunctionCode()){ /// function code must be zero
-                exceptionService.flsCallException("validation.fls.functioncode","0");
+                exceptionService.flsCallException("message.fls.functioncode","0");
             }
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return sendCallRquest(payload, flsCredentials);
     }
@@ -92,11 +92,11 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(1 != payload.getFunctionCode()){ /// function code must be one
-                exceptionService.flsCallException("validation.fls.functioncode","1");
+                exceptionService.flsCallException("message.fls.functioncode","1");
             }
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return sendCallRquest(payload, flsCredentials);
     }
@@ -111,11 +111,11 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(2 != payload.getFunctionCode()){ /// function code must be 2
-                exceptionService.flsCallException("validation.fls.functioncode","2");
+                exceptionService.flsCallException("message.fls.functioncode","2");
             }
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return sendCallRquest(payload, flsCredentials);
     }
@@ -130,11 +130,11 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(3 != payload.getFunctionCode() &&  4 != payload.getFunctionCode() ){ /// function code must be 3, 4
-                exceptionService.flsCallException("validation.fls.functioncode","3 or 4");
+                exceptionService.flsCallException("message.fls.functioncode","3 or 4");
             }
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return sendCallRquest(payload, flsCredentials);
     }
@@ -149,11 +149,11 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(5 != payload.getFunctionCode()){ /// function code must be 5
-                exceptionService.flsCallException("validation.fls.functioncode","5");
+                exceptionService.flsCallException("message.fls.functioncode","5");
             }
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return sendCallRquest(payload, flsCredentials);
     }
@@ -172,7 +172,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.SHOW_CALL_INFO, payload);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return showCallInfoResponse;
     }
@@ -191,7 +191,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.GEOCODE, geocode);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return response;
     }
@@ -209,7 +209,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIELD_MANAGER, fieldManager);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return fieldManagerResponse;
     }
@@ -227,7 +227,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIX_SCHEDULE, fixSchedule);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
 
         }
         return fixScheduleResponse;
@@ -246,7 +246,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.WORK_SCHEDULE, workSchedule);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return workScheduleResponse;
     }
@@ -264,7 +264,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.OPTIMIZE, optimize);
 
         } catch (Exception ex){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
         return optimizeResponse;
     }
@@ -272,7 +272,7 @@ public class FlsClientImpl implements  FlsClient{
     public WebServiceTemplate webServiceTemplate(Map<String, String> auth) {
 
         if(auth == null || auth.get("flsDefaultUrl") == null || auth.get("flsDefaultUrl").trim().length() < 1){
-            exceptionService.flsCredentialException("validation.fls.credentials");
+            exceptionService.flsCredentialException("message.fls.credentials");
         }
 
         String loggedInUser = "";

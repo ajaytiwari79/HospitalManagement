@@ -51,7 +51,7 @@ public class TimeTypeService extends MongoBaseService {
                     }
                     timeTypeDTO.setId(timeType.getId());
                 } else {
-                    exceptionService.duplicateDataException("validation.name");
+                    exceptionService.duplicateDataException("message.name");
                 }
             }
         });
@@ -69,7 +69,7 @@ public class TimeTypeService extends MongoBaseService {
                     save(timeType);
                 }
             } else {
-                exceptionService.duplicateDataException("validation.name");
+                exceptionService.duplicateDataException("message.name");
             }
         });
         return timeTypeDTOS;
@@ -170,7 +170,7 @@ public class TimeTypeService extends MongoBaseService {
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
             timeType.setDeleted(true);
             save(timeType);
-        } else exceptionService.timeTypeLinkedException("validation.timetype.linked");
+        } else exceptionService.timeTypeLinkedException("message.timetype.linked");
 
         return false;
     }

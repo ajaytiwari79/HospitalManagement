@@ -184,7 +184,7 @@ public class TaskExceptionService extends MongoBaseService {
         RestrictionFrequency restrictionFrequency = restrictionFrequencyService.getRestrictionFrequency(restrictionFrequencyId);
         if(restrictionFrequency == null){
             logger.info("Incorrect id of restriction frequency id " + restrictionFrequencyId);
-            exceptionService.dataNotFoundByIdException("validation.restrictionfrequency.id",restrictionFrequencyId);
+            exceptionService.dataNotFoundByIdException("message.restrictionfrequency.id",restrictionFrequencyId);
         }
         List<Long> citizenIds=clientRestClient.getCitizenIds();
         //DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
@@ -452,7 +452,7 @@ public class TaskExceptionService extends MongoBaseService {
 
         Optional<Task> taskOptional = taskMongoRepository.findById(taskId);
         if (!taskOptional.isPresent()) {
-            exceptionService.dataNotFoundByIdException("validation.task.id");
+            exceptionService.dataNotFoundByIdException("message.task.id");
         }
         Task task=taskOptional.get();
         if (!task.isSingleTask()) {

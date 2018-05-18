@@ -20,6 +20,7 @@ import com.kairos.activity.response.dto.activity.ActivityCategoryListDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.staffing_level.*;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.DateUtils;
@@ -107,6 +108,8 @@ public class StaffingLevelService extends MongoBaseService {
     private RestTemplate restTemplate;
     @Autowired
     private PlannerSyncService plannerSyncService;
+    @Autowired
+    private ExceptionService exceptionService;
 
 
     /**
@@ -131,7 +134,7 @@ public class StaffingLevelService extends MongoBaseService {
                 }
                 staffingLevel.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervals);
             } else {
-                throw new DuplicateDataException("Presence Staffing level already exists with current date " + presenceStaffingLevelDTO.getCurrentDate());
+                exceptionService.duplicateDataException("message.stafflevel.currentdate",presenceStaffingLevelDTO.getCurrentDate());
             }
         } else {
             staffingLevel = StaffingLevelUtil.buildPresenceStaffingLevels(presenceStaffingLevelDTO, unitId);
@@ -190,7 +193,7 @@ public class StaffingLevelService extends MongoBaseService {
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
         if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
             logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
-            throw new UnsupportedOperationException("we can not modified the current date of staffing level");
+            exceptionService.unsupportedOperationException("validattion.stafflevel.currentdate.update");
         }
         staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel);
         this.save(staffingLevel);
@@ -776,7 +779,7 @@ public class StaffingLevelService extends MongoBaseService {
                  staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).get();
                 if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
                     logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
-                    throw new UnsupportedOperationException("we can not modified the current date of staffing level");
+                    exceptionService.unsupportedOperationException("message.stafflevel.currentdate.update");
                 }
                 staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(absenceStaffingLevelDto,unitId,staffingLevel);
             }

@@ -66,7 +66,7 @@ public class PeriodSettingsService extends MongoBaseService {
     public PeriodSettings updatePeriodSettings(Long unitId, PeriodSettingsDTO periodSettingsDTO) {
         PeriodSettings periodSettings = periodSettingsMongoRepository.findByUnit(unitId);
         if (!Optional.ofNullable(periodSettings).isPresent()) {
-            exceptionService.dataNotFoundByIdException("validation.periodsetting.unit",unitId);
+            exceptionService.dataNotFoundByIdException("message.periodsetting.unit",unitId);
         }
         periodSettings.setPresenceLimitInYear(periodSettingsDTO.getPresenceLimitInYear());
         periodSettings.setAbsenceLimitInYear(periodSettingsDTO.getAbsenceLimitInYear());

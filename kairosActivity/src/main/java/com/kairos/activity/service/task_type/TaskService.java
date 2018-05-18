@@ -41,6 +41,7 @@ import com.kairos.activity.response.dto.*;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.serializers.MongoDateMapper;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
 import com.kairos.activity.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.activity.service.pay_out.PayOutCalculationService;
@@ -168,6 +169,8 @@ public class TaskService extends MongoBaseService {
     private PayOutService payOutService;
     @Inject
     private PayOutCalculationService payOutCalculationService;
+    @Autowired
+    private ExceptionService exceptionService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -646,20 +649,20 @@ public class TaskService extends MongoBaseService {
                         getWorkShiftsFromWorkPlaceByIdResult.getEmploymentId()).findFirst();
 
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
-            throw new InternalError("Workplace id/ personId/ person External Employment Id is missing in time care data ");
+           exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
         }
         OrganizationStaffWrapper organizationStaffWrapper = organizationRestClient.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
         if (organizationDTO == null) {
-            throw new InternalError("Invalid external id of organization " + workPlaceId.get());
+            exceptionService.internalError("error.organization.externalid",workPlaceId.get());
         }
         if (!Optional.ofNullable(staffDTO).isPresent()) {
-            throw new InternalError("Invalid external StaffId of organization " + personExternalId.get());
+            exceptionService.internalError("error.organization.external-staffid",personExternalId.get());
         }
         if (!Optional.ofNullable(organizationStaffWrapper.getUnitPosition()).isPresent()) {
-            throw new InternalError("Unit Position missing in kairos " + personExternalId.get());
+            exceptionService.internalError("error.kairos.unitposition",personExternalId.get());
         }
         List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare = timeCareShifts.getGetWorkShiftsFromWorkPlaceByIdResult();
         int sizeOfTimeCareShifts = shiftsFromTimeCare.size();
@@ -1249,7 +1252,7 @@ public class TaskService extends MongoBaseService {
         logger.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
         if (reduction) {
             if (task.getDuration() - minutes <= 0) {
-                throw new InternalError("Task duration cannot be less then 1");
+                exceptionService.internalError("error.task.duration");
             }
             timeTo = timeTo.minusMinutes(minutes);
             task.setTimeTo(Date.from(timeTo.atZone(ZoneId.systemDefault()).toInstant()));

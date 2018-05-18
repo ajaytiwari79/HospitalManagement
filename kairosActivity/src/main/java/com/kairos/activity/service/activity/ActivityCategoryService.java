@@ -33,16 +33,16 @@ public class ActivityCategoryService extends MongoBaseService{
     public ActivityCategory updateActivityCategory(Long countryId, BigInteger activityCategoryId, String name){
 
         if(name.equalsIgnoreCase("NONE")){
-            exceptionService.actionNotPermittedException("validation.category.rename");
+            exceptionService.actionNotPermittedException("message.category.rename");
         }
         boolean isAlreadyExists=activityCategoryRepository.existsByNameIgnoreCaseAndDeleted(name,false);
         if(isAlreadyExists){
-            exceptionService.duplicateDataException("validation.category.alreadyexists",name);
+            exceptionService.duplicateDataException("message.category.alreadyexists",name);
         }
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
         if(activityCategory.getName().equals("NONE")){
-            exceptionService.actionNotPermittedException("validation.category.update");
+            exceptionService.actionNotPermittedException("message.category.update");
         }else {
             activityCategory.setName(name);
             activityCategoryRepository.save(activityCategory);
@@ -55,7 +55,7 @@ public class ActivityCategoryService extends MongoBaseService{
        Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
        if(activityCategory.getName().equals("NONE")){
-           exceptionService.actionNotPermittedException("validation.category.delete");
+           exceptionService.actionNotPermittedException("message.category.delete");
        }
        ActivityCategory category=activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE",countryId,false);
 
@@ -72,19 +72,19 @@ public class ActivityCategoryService extends MongoBaseService{
 
     public ActivityCategory updateActivityCategoryByUnit(Long unitId, BigInteger activityCategoryId, String name){
         if(name.equalsIgnoreCase("NONE")){
-            exceptionService.actionNotPermittedException("validation.category.rename");
+            exceptionService.actionNotPermittedException("message.category.rename");
         }
         boolean isAlreadyExists=activityCategoryRepository.existsByNameIgnoreCaseAndDeleted(name,false);
         if(isAlreadyExists){
-            exceptionService.duplicateDataException("validation.category.alreadyexists",name);
+            exceptionService.duplicateDataException("message.category.alreadyexists",name);
         }
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
         if(activityCategory.getName().equals("NONE")){
-            exceptionService.actionNotPermittedException("validation.category.update");
+            exceptionService.actionNotPermittedException("message.category.update");
         }
         if(activityCategory.getCountryId()!=null){
-            exceptionService.actionNotPermittedException("validation.category.country.update");
+            exceptionService.actionNotPermittedException("message.category.country.update");
         }
 
             activityCategory.setName(name);
@@ -96,10 +96,10 @@ public class ActivityCategoryService extends MongoBaseService{
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
         ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
         if(activityCategory.getName().equals("NONE")){
-            exceptionService.actionNotPermittedException("validation.category.delete");
+            exceptionService.actionNotPermittedException("message.category.delete");
         }
         if(activityCategory.getCountryId()!=null){
-            exceptionService.actionNotPermittedException("validation.category.country.unit.delete");
+            exceptionService.actionNotPermittedException("message.category.country.unit.delete");
 
         }
         ActivityCategory category=activityCategoryRepository.getCategoryByName("NONE");
