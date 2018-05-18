@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.util.DateUtils;
-import com.kairos.planning.domain.Employee;
 import com.kairos.planning.utils.JodaTimeConverter;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
@@ -13,7 +12,7 @@ import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.JodaTimeUtil;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.planner.commonUtil.StaticField;
-import com.planner.domain.Activity;
+import com.planner.domain.activity.Activity;
 import com.planner.domain.staff.Staff;
 import com.planner.domain.staff.UnitPosition;
 import com.planner.domain.staffinglevel.StaffingLevel;
@@ -33,13 +32,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -222,9 +226,9 @@ public class ShiftPlanningService {
         return shiftPlanningSolution;
     }
 
-    public ShiftRequestPhasePlanningSolution createShiftPlanningProblem(Long unitId, LocalDate start, LocalDate end){
+    public ShiftRequestPhasePlanningSolution createShiftPlanningProblem(Long unitId,List<LocalDate> dates){
         ShiftRequestPhasePlanningSolution problem= new ShiftRequestPhasePlanningSolution();
-        List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitAndDates(unitId,start,end);
+        List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitAndDates(unitId,dates);
         List<Activity> activities= activityRepository.getActivitiesByUnitId(unitId);
         List<UnitPosition> unitPositions=unitPositionRepository.getAllUnitPositionsByUnit(unitId);
         List<String> staffIds=unitPositions.stream().map(up->up.getStaffId()).collect(Collectors.toList());
@@ -247,21 +251,20 @@ public class ShiftPlanningService {
         }
         /*Map<String, ActivityPlannerEntity> activityMap=new HashMap<>();
         acts.forEach(a->activityMap.put(a.getId(),a));*/
-        List<StaffingLevelPlannerEntity> sls= new ArrayList<>();
         List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
         Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities= new HashMap<>();
         for (StaffingLevel staffingLevel:staffingLevels){
             activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,true));
             activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,false));
         }
-        List<org.joda.time.LocalDate> dates = JodaTimeUtil.getLocalDates(start, end);
-        Map<org.joda.time.LocalDate, Object[]> matrix=ShiftPlanningUtility.createStaffingLevelMatrix(dates, activityLineIntervals,15, acts);
+        List<org.joda.time.LocalDate> dateList = JodaTimeUtil.getLocalDates(dates);
+        Map<org.joda.time.LocalDate, Object[]> matrix=ShiftPlanningUtility.createStaffingLevelMatrix(dateList, activityLineIntervals,15, acts);
         problem.setStaffingLevelMatrix(new StaffingLevelMatrix(matrix,new int[1]));
         problem.setActivityLineIntervals(activityLineIntervals);
         problem.setEmployees(employees);
-        problem.setShifts(createEmptyShiftsForEmployees(employees,dates));
+        problem.setShifts(createEmptyShiftsForEmployees(employees,dateList));
         problem.setUnitId(unitId);
-        problem.setWeekDates(dates);
+        problem.setWeekDates(dateList);
         problem.setActivitiesIntervalsGroupedPerDay(groupActivityLineIntervals(activityLineIntervals));
         problem.setActivitiesPerDay(perDayActivities);
         return problem;
@@ -301,9 +304,8 @@ public class ShiftPlanningService {
         return  shifts;
     }
 
-    private Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
+    public Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
-
         for(ActivityLineInterval ali:activityLineIntervals){
             String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivityPlannerEntity().getId()+"_"+ali.getStaffNo();
             if(groupedAlis.containsKey(key)){

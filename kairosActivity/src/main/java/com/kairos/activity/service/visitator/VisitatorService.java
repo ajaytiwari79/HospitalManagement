@@ -630,10 +630,10 @@ public class VisitatorService{
         citizenDetails.put("age", citizen.getAge());
         citizenDetails.put("profilePic", citizen.getProfilePic()!=null? envConfig.getServerHost() + FORWARD_SLASH + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
-        citizenDetails.put("address", citizen.getHomeAddress());
+        citizenDetails.put("address", citizen.getContactAddress());
         citizenDetails.put("cprNumber", citizen.getCprNumber());
         citizenDetails.put("privateNumber",citizen.getContactDetail()!=null ? citizen.getContactDetail().getPrivatePhone() : "NA");
-        citizenDetails.put("privateAddress",citizen.getHomeAddress());
+        citizenDetails.put("privateAddress",citizen.getContactAddress());
         citizenDetails.put("gender",citizen.getGender());
         citizenDetails.put("status",citizen.getCivilianStatus());*/
         citizenDetails.put("sumOfVisitationHoursAndTasks", clientAggregatorMongoRepository.findVisitationHoursAndTasksByCitizenIdIn( citizenId, unitId));

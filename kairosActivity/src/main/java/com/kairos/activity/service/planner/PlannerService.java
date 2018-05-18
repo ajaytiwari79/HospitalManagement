@@ -349,7 +349,7 @@ public class PlannerService extends MongoBaseService {
 
         /* List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
          citizenPlanningMap.put("temporaryAddressList", !temporaryAddressList.isEmpty() ? FormatUtil.formatNeoResponse(temporaryAddressList) : Collections.EMPTY_LIST);
-         ContactAddressDTO address = citizen.getHomeAddress();
+         ContactAddressDTO address = citizen.getContactAddress();
          citizenPlanningMap.put("latitude", address.getLatitude());
          citizenPlanningMap.put("longitude", address.getLongitude());
 

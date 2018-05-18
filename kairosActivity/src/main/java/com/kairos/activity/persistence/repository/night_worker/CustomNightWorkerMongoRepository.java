@@ -13,7 +13,5 @@ public interface CustomNightWorkerMongoRepository {
 
     List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaireDetails(Long staffId);
 
-    boolean checkIfNightWorkerQuestionnaireFormIsEnabled(Long staffId, Date date);
-
     List<QuestionAnswerDTO> getNightWorkerQuestions();
 }

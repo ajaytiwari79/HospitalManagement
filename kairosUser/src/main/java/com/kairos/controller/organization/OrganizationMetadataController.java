@@ -71,16 +71,8 @@ public class OrganizationMetadataController {
     }
 
 
-    @ApiOperation(value = "Create Payments settings for a unit")
-    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> createPaymentsSettings(@Validated @RequestBody PaymentSettingsDTO paymentSettingsDTO, @PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.createPaymentsSettings(paymentSettingsDTO,unitId));
-    }
-
-
     @ApiOperation(value = "Update Payments settings for a unit")
-    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.PUT)
+    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> updatePaymentsSettings(@Validated  @RequestBody PaymentSettingsDTO paymentSettingsDTO, @PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.updatePaymentsSettings(paymentSettingsDTO, unitId));

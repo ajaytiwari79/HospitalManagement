@@ -19,6 +19,8 @@ public class ContactAddressDTO {
     private String streetUrl;
     private Boolean addressProtected;
     private Boolean verifiedByVisitour;
+    private Integer zipCodeValue;
+    private String municipalityName;
 
     public ContactAddressDTO() {
     }
@@ -149,6 +151,22 @@ public class ContactAddressDTO {
 
     public void setVerifiedByVisitour(Boolean verifiedByVisitour) {
         this.verifiedByVisitour = verifiedByVisitour;
+    }
+
+    public Integer getZipCodeValue() {
+        return zipCodeValue;
+    }
+
+    public void setZipCodeValue(Integer zipCodeValue) {
+        this.zipCodeValue = zipCodeValue;
+    }
+
+    public String getMunicipalityName() {
+        return municipalityName;
+    }
+
+    public void setMunicipalityName(String municipalityName) {
+        this.municipalityName = municipalityName;
     }
 }
 
