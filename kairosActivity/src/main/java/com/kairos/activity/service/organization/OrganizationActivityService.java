@@ -107,12 +107,13 @@ public class OrganizationActivityService extends MongoBaseService {
         return response;
     }
 
-    public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId) {
+    public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId, Long unitId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(activity.getCountryId());
+        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
         generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
