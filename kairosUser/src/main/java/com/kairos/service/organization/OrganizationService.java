@@ -209,7 +209,7 @@ public class OrganizationService extends UserBaseService {
     @Inject
 
     PriorityGroupIntegrationService priorityGroupIntegrationService;
-
+    @Autowired
     private PlannerSyncService plannerSyncService;
     @Inject
     CompanyCategoryGraphRepository companyCategoryGraphRepository;

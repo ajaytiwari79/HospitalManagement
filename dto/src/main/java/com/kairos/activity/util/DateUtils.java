@@ -422,12 +422,7 @@ public class DateUtils {
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
     }
-    /**
-     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
-     */
-    public static DateTime getDateTime(Date date, LocalTime time){
-        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
-    }
+
 
     public static List<LocalDate> getDates(LocalDate start, LocalDate end){
         List<LocalDate> dates= new ArrayList<>();

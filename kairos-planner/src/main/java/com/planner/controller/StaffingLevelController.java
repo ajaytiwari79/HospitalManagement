@@ -33,7 +33,7 @@ public class StaffingLevelController {
         staffingLevelService.createStaffingLevel(unitId,staffingLevelDto);
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
     }
-    @RequestMapping(value = "/multiple/", method = RequestMethod.POST)
+    @RequestMapping(value = "/multiple", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level")
     public ResponseEntity<Map<String, Object>> addStaffingLevels(@RequestBody @Valid List<StaffingLevelDTO> staffingLevelDtos,
                                                                  @PathVariable Long unitId) {

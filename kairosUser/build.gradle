@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.M7'
+		//springBootVersion = '2.0.2.RELEASE'
 		swaggerVersion = '2.5.0'
 		jacksonVersion= '2.9.2'
         projectVersion="0.0.1"
@@ -11,6 +12,7 @@ buildscript {
 		jcenter()
 		maven { url "https://repo.spring.io/snapshot" }
 		maven { url "https://repo.spring.io/milestone" }
+
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -34,6 +36,7 @@ repositories {
 	jcenter()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url "http://repo.spring.io/release/"}
 	/*maven { url 'http://localhost:8080/repository/local.kairos/'
 		credentials {
 			username = "admin"

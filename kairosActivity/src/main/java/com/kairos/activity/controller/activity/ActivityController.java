@@ -356,10 +356,5 @@ public class ActivityController {
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
     }
-    @ApiOperation(value = "Init optplanner integration")
-    @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organisationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organisationId,unitId));
-    }
+
 }

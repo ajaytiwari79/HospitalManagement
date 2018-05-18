@@ -64,7 +64,8 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class OrganizationController {
+public class
+OrganizationController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -1339,8 +1340,8 @@ public class OrganizationController {
     @ApiOperation(value = "Init optplanner integration")
     @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organisationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.initialOptaplannerSync(organisationId,unitId));
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.initialOptaplannerSync(organizationId,unitId));
     }
 }
 
