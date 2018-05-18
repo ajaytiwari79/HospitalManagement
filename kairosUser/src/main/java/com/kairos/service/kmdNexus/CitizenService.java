@@ -515,7 +515,8 @@ public class CitizenService {
         if (user != null) {
             Staff alreadyExistStaff = staffGraphRepository.getByUser(user.getId());
             if (alreadyExistStaff != null)
-                throw new InternalError("Staff already exists");
+                exceptionService.internalServerError("message.citizen.staff.alreadyexist");
+
             staff = staffService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
         }
 

@@ -1,10 +1,12 @@
 package com.kairos.persistence.model.user.resources;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -18,6 +20,8 @@ import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 @NodeEntity
 public class ResourceUnAvailability extends UserBaseEntity {
 
+    @Inject
+    private ExceptionService exceptionService;
     private Long date;
     private Long startTime;
     private Long endTime;
@@ -82,7 +86,9 @@ public class ResourceUnAvailability extends UserBaseEntity {
             }
             return this;
         } catch (Exception e){
-            throw new InternalError("Something went wrong while parsing date");
+            exceptionService.internalServerError("message.date.somethingwrong");
+
         }
+        return null;
     }
 }
