@@ -53,7 +53,7 @@ public class AssetController {
 
     @ApiOperation(value = "get master asset by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(id));
     }
 

@@ -165,9 +165,7 @@ public class MasterAssetService extends MongoBaseService {
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
 
-        } else {
         }
-
         return exists;
     }
 
