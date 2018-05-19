@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AccountTypeService extends MongoBaseService {
@@ -44,7 +45,7 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountList(List<BigInteger> accountList) {
+    public List<AccountType> getAccountListByIds(Set<BigInteger> accountList) {
         List<AccountType> accountTypeList = new ArrayList<>();
         AccountType accountType;
         for (BigInteger accoundTypeId : accountList) {

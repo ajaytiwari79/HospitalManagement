@@ -3,7 +3,7 @@ package com.kairos.service.clause_tag;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
@@ -26,7 +26,7 @@ public class ClauseTagService extends MongoBaseService {
 
     public ClauseTag createClauseTag(String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
-            throw new RequestDataNull("requested paran name is null or empty");
+            throw new InvalidRequestException("requested paran name is null or empty");
 
         }
 
@@ -79,7 +79,7 @@ public class ClauseTagService extends MongoBaseService {
     public ClauseTag updateClauseTag(BigInteger id, String clauseTag) {
 
         if (StringUtils.isEmpty(clauseTag)) {
-            throw new RequestDataNull("requested paran name is null or empty");
+            throw new InvalidRequestException("requested paran name is null or empty");
 
         }
         ClauseTag exist = clauseTagMongoRepository.findByid(id);

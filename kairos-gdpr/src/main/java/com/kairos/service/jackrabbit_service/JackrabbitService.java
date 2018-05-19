@@ -2,7 +2,7 @@ package com.kairos.service.jackrabbit_service;
 
 
 import com.kairos.custome_exception.ClauseNotFoundJackRabbitException;
-import com.kairos.persistance.model.agreement_template.AgreementTemplate;
+import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.model.clause.Clause;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.jcr.*;
 import javax.jcr.version.Version;
-import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
 
 import java.math.BigInteger;
 import java.util.Calendar;
@@ -133,7 +131,7 @@ public class JackrabbitService {
         return false;
     }
 
-    public Boolean addAgreementTemplate(AgreementTemplate agreementTemplate) throws RepositoryException {
+    public Boolean addAgreementTemplate(PolicyAgreementTemplate agreementTemplate) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         try {
             Node rootNode = session.getRootNode();
@@ -174,7 +172,7 @@ public class JackrabbitService {
     }
 
 
-    public Boolean agreementTemplateVersioning(BigInteger agreementTemplateId, AgreementTemplate agreementTemplate) throws RepositoryException {
+    public Boolean agreementTemplateVersioning(BigInteger agreementTemplateId, PolicyAgreementTemplate agreementTemplate) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         try {
             Node rootNode = session.getRootNode();

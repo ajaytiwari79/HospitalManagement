@@ -42,7 +42,7 @@ public class ClauseDto {
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set <Long> organizationSubServices;
 
-    private List<BigInteger> accountType;
+    private Set<BigInteger> accountType;
 
     public String getTitle() {
         return title;
@@ -102,12 +102,11 @@ public class ClauseDto {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public void setAccountType(List<BigInteger> accountType) {
-        this.accountType = accountType;
-    }
-
-    public List<BigInteger> getAccountType() {
+    public Set<BigInteger> getAccountType() {
         return accountType;
     }
 
+    public void setAccountType(Set<BigInteger> accountType) {
+        this.accountType = accountType;
+    }
 }

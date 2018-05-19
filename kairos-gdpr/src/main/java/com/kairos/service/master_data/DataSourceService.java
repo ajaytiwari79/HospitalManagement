@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.DataSource;
 import com.kairos.persistance.repository.master_data.DataSourceMongoRepository;
 
@@ -29,7 +29,7 @@ public class DataSourceService extends MongoBaseService {
     public DataSource createDataSource(String dataSource) {
         if (StringUtils.isEmpty(dataSource))
         {
-            throw new RequestDataNull("requested dataSource  is null or empty");
+            throw new InvalidRequestException("requested dataSource  is null or empty");
         }
         DataSource exist = dataSourceMongoRepository.findByName(dataSource);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -82,7 +82,7 @@ public class DataSourceService extends MongoBaseService {
     public DataSource updateDataSource(BigInteger id,String dataSource) {
         if (StringUtils.isEmpty(dataSource))
         {
-            throw new RequestDataNull("requested dataSource  is null or empty");
+            throw new InvalidRequestException("requested dataSource  is null or empty");
         }
 
         DataSource exist = dataSourceMongoRepository.findByid(id);
@@ -102,7 +102,7 @@ public class DataSourceService extends MongoBaseService {
             return dataSourceMongoRepository.dataSourceList(dataSourceids);
 
         } else
-            throw new RequestDataNull("requested dataSourceList is null");
+            throw new InvalidRequestException("requested dataSourceList is null");
     }
 
 

@@ -6,7 +6,7 @@ import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause.Clause;
@@ -71,9 +71,9 @@ public class ClauseService extends MongoBaseService {
         requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
         requestDto.setOrganizationServiceIds(orgServiceIds);
         requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
-        List<BigInteger> accountTypeIds = clauseDto.getAccountType();
+        Set<BigInteger> accountTypeIds = clauseDto.getAccountType();
         List<AccountType> accountTypes;
-          Clause clause = new Clause();
+        Clause clause = new Clause();
         if (clauseRepository.findByTitle(clauseDto.getTitle()) != null) {
 
             throw new DuplicateDataException("clause with name title " + clauseDto.getTitle() + " already Exist");
@@ -82,9 +82,9 @@ public class ClauseService extends MongoBaseService {
         List<ClauseTag> tagList=clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
         if (accountTypeIds != null && !accountTypeIds.isEmpty()) {
-            accountTypes = accountTypeService.getAccountList(accountTypeIds);
+            accountTypes = accountTypeService.getAccountListByIds(accountTypeIds);
         } else {
-            throw new RequestDataNull("Accounttype list cannot be  empty");
+            throw new InvalidRequestException("Accounttype list cannot be  empty");
         }
 
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -122,7 +122,7 @@ public class ClauseService extends MongoBaseService {
 
 
     public Clause getClauseById(BigInteger id) {
-        Clause clause = (Clause) clauseRepository.findByid(id);
+        Clause clause =  clauseRepository.findByid(id);
 
         if (!Optional.ofNullable(clause).isPresent()) {
             throw new DataNotExists("clause Data Not Exist for given id" + id);
@@ -159,13 +159,13 @@ public class ClauseService extends MongoBaseService {
             requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
 
             List<AccountType> accountTypes = new ArrayList<>();
-            List<BigInteger> accountTypeIds = clauseDto.getAccountType();
+            Set<BigInteger> accountTypeIds = clauseDto.getAccountType();
             List<ClauseTagDto> tags =clauseDto.getTags();
 
            if (accountTypeIds != null && !accountTypeIds.isEmpty()) {
-                accountTypes = accountTypeService.getAccountList(accountTypeIds);
+                accountTypes = accountTypeService.getAccountListByIds(accountTypeIds);
             } else {
-                throw new RequestDataNull("Accounttype list cannot be  empty");
+                throw new InvalidRequestException("Accounttype list cannot be  empty");
             }
             List<ClauseTag> tagList=clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
 
@@ -250,7 +250,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public List<Clause> getClausesByIds(List<BigInteger> clausesId) {
+    public List<Clause> getClausesByIds(Set<BigInteger> clausesId) {
 
         List<Clause> clauses = new ArrayList<>();
         if (clausesId.size() != 0) {
@@ -265,7 +265,7 @@ public class ClauseService extends MongoBaseService {
             }
             return clauses;
         } else
-            throw new RequestDataNull("Requested clauseId are Not null or empty");
+            throw new InvalidRequestException("Requested clauseId are Not null or empty");
 
 
     }

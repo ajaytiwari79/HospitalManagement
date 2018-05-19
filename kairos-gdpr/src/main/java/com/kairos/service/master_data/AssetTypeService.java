@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.AssetType;
 import com.kairos.persistance.repository.master_data.AssetTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -28,7 +28,7 @@ public class AssetTypeService extends MongoBaseService {
     public AssetType createAssetType(String assetType) {
         if (StringUtils.isEmpty(assetType))
         {
-        throw new RequestDataNull("requested AssetType is null");
+        throw new InvalidRequestException("requested AssetType is null");
         }
         AssetType exist = assetTypeMongoRepository.findByName(assetType);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -81,7 +81,7 @@ public class AssetTypeService extends MongoBaseService {
     public AssetType updateAssetType(BigInteger id,String assetType) {
         if (StringUtils.isEmpty(assetType))
         {
-            throw new RequestDataNull("requested AssetType is null");
+            throw new InvalidRequestException("requested AssetType is null");
 
         }
         AssetType exist = assetTypeMongoRepository.findByid(id);

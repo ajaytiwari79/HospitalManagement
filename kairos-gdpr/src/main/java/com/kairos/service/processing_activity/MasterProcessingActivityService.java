@@ -33,7 +33,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     @Inject
     ComparisonUtils comparisonUtils;
 
-    public MasterProcessingActivity addMasterProcessingActivity(MasterProcessingActivityDto masterProcessingActivityDto) {
+    public MasterProcessingActivity createMasterProcessingActivity(MasterProcessingActivityDto masterProcessingActivityDto) {
 
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
         orgTypeIds = masterProcessingActivityDto.getOrganizationTypes();

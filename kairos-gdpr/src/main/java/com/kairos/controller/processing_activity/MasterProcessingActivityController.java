@@ -30,7 +30,7 @@ public class MasterProcessingActivityController {
     @ApiOperation(value = "add MasterProcessingActivity asset")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ResponseEntity<Object> createMasterProcessingActivity(@Validated  @RequestBody MasterProcessingActivityDto processingActivityDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.addMasterProcessingActivity(processingActivityDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(processingActivityDto));
     }
 
     @ApiOperation(value = "get all MasterProcessingActivity")

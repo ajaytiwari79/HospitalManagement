@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.DataSubject;
 import com.kairos.persistance.repository.master_data.DataSubjectMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -26,7 +26,7 @@ public class DataSubjectService extends MongoBaseService {
     public DataSubject createDataSubject(String dataSubject) {
         if (StringUtils.isEmpty(dataSubject))
         {
-            throw new RequestDataNull("requested dataSource  is null or empty");
+            throw new InvalidRequestException("requested dataSource  is null or empty");
         }
         DataSubject exist = dataSubjectMongoRepository.findByName(dataSubject);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -80,7 +80,7 @@ public class DataSubjectService extends MongoBaseService {
 
         if (StringUtils.isEmpty(dataSubject))
         {
-            throw new RequestDataNull("requested dataSource  is null or empty");
+            throw new InvalidRequestException("requested dataSource  is null or empty");
         }
         DataSubject exist = dataSubjectMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -99,7 +99,7 @@ public class DataSubjectService extends MongoBaseService {
             return dataSubjectMongoRepository.dataSubjectList(dataSubjectids);
 
         } else
-            throw new RequestDataNull("requested DataSubject list is null");
+            throw new InvalidRequestException("requested DataSubject list is null");
     }
 
 

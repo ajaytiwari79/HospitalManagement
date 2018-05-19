@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -25,7 +25,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public TechnicalSecurityMeasure createTechnicalSecurityMeasure(String techSecurityMeasure) {
         if (StringUtils.isEmpty(techSecurityMeasure)) {
-            throw new RequestDataNull("requested techSecurityMeasure name is null");
+            throw new InvalidRequestException("requested techSecurityMeasure name is null");
 
         }
         TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(techSecurityMeasure);
@@ -76,7 +76,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(BigInteger id, String techSecurityMeasure) {
         if (StringUtils.isEmpty(techSecurityMeasure)) {
-            throw new RequestDataNull("requested techSecurityMeasure name is null");
+            throw new InvalidRequestException("requested techSecurityMeasure name is null");
 
         }
 

@@ -15,4 +15,5 @@ public interface AccountTypeMongoRepository extends  MongoRepository<AccountType
 
    @Query("{'typeOfAccount':?0}")
    AccountType findByTypeOfAccount(String typeOfAccount);
+
 }

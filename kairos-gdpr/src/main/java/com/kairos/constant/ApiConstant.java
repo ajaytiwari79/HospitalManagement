@@ -66,6 +66,8 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_proc
 
 //clause tag
 public static final String API_CLAUSE_TAG_URL = API_V1 + "/clause/tag";
+    public static final String API_AGREEMENT_SECTION_URL = API_V1 + "/agreement_section";
+
 
     private ApiConstant() {
     }

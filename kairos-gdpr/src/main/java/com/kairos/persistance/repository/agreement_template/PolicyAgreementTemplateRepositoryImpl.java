@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.agreement_template;
 
-import com.kairos.persistance.model.agreement_template.AgreementTemplate;
-import com.kairos.response.dto.AgreementQueryResult;
+import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.response.dto.agreement_template.AgreementQueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -12,7 +12,7 @@ import java.math.BigInteger;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
-public class AgreementTemplateMongoRepositoryImpl implements CustomAgreementTemplateRepository {
+public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreementTemplateRepository {
 
 
     @Autowired
@@ -25,7 +25,7 @@ public class AgreementTemplateMongoRepositoryImpl implements CustomAgreementTemp
                 lookup("clause", "clauses", "_id", "clauses")
 
         );
-        AggregationResults<AgreementQueryResult> results = mongoTemplate.aggregate(aggregation, AgreementTemplate.class, AgreementQueryResult.class);
+        AggregationResults<AgreementQueryResult> results = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, AgreementQueryResult.class);
         return  results.getUniqueMappedResult();
     }
 }

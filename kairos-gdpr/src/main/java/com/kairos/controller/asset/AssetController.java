@@ -53,8 +53,12 @@ public class AssetController {
 
     @ApiOperation(value = "get master asset by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterAssetById(@PathVariable BigInteger id) {
+        if(id!=null)
+        {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(id));
+    }
+    return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY,false,"id cannot be null");
     }
 
 

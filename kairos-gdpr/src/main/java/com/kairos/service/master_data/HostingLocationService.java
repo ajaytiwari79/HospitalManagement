@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.HostingLocation;
 import com.kairos.persistance.repository.master_data.HostingLocationMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -28,7 +28,7 @@ public class HostingLocationService  extends MongoBaseService {
     public HostingLocation createHostingLocation(String hostingLocation) {
         if (StringUtils.isEmpty(hostingLocation))
         {
-            throw new RequestDataNull("requested hostingLocation is null");
+            throw new InvalidRequestException("requested hostingLocation is null");
 
         }
 
@@ -83,7 +83,7 @@ public class HostingLocationService  extends MongoBaseService {
     public HostingLocation updateHostingLocation(BigInteger id,String hostingLocation) {
         if (StringUtils.isEmpty(hostingLocation))
         {
-            throw new RequestDataNull("requested hostingLocation is null");
+            throw new InvalidRequestException("requested hostingLocation is null");
 
         }
         HostingLocation exist = hostingLocationMongoRepository.findByid(id);

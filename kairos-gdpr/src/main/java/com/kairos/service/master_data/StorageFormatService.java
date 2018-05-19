@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.StorageFormat;
 import com.kairos.persistance.repository.master_data.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -26,7 +26,7 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat createStorageFormat(String storageFormat) {
         if (StringUtils.isEmpty(storageFormat)) {
-            throw new RequestDataNull("requested storageFormat name is null");
+            throw new InvalidRequestException("requested storageFormat name is null");
 
         }
         StorageFormat exist = storageFormatMongoRepository.findByName(storageFormat);
@@ -77,7 +77,7 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat updateStorageFormat(BigInteger id, String storageFormat) {
         if (StringUtils.isEmpty(storageFormat)) {
-            throw new RequestDataNull("requested storageFormat name is null");
+            throw new InvalidRequestException("requested storageFormat name is null");
 
         }
         StorageFormat exist = storageFormatMongoRepository.findByid(id);

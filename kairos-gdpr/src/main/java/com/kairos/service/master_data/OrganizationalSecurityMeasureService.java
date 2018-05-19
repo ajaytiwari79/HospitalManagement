@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -25,7 +25,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     public OrganizationalSecurityMeasure createOrganizationalSecurityMeasure(String orgSecurityMeasure) {
         if (StringUtils.isEmpty(orgSecurityMeasure)) {
-            throw new RequestDataNull("requested orgSecurityMeasure name is null");
+            throw new InvalidRequestException("requested orgSecurityMeasure name is null");
 
         }
         OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(orgSecurityMeasure);
@@ -77,7 +77,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     public OrganizationalSecurityMeasure updateOrganizationalSecurityMeasure(BigInteger id, String orgSecurityMeasure) {
 
         if (StringUtils.isEmpty(orgSecurityMeasure)) {
-            throw new RequestDataNull("requested orgSecurityMeasure name is null");
+            throw new InvalidRequestException("requested orgSecurityMeasure name is null");
 
         }
         OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByid(id);

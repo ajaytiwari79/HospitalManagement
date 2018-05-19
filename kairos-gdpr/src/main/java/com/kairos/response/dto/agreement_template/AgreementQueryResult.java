@@ -1,4 +1,4 @@
-package com.kairos.response.dto;
+package com.kairos.response.dto.agreement_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -140,7 +140,7 @@ public class MasterAssetService extends MongoBaseService {
 
     public MasterAsset getAssetById(BigInteger id) {
         MasterAsset exists = masterAssetMongoRepository.findByid(id);
-        if (!Optional.of(exists).isPresent()) {
+        if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
 
         } else
@@ -162,8 +162,8 @@ public class MasterAssetService extends MongoBaseService {
 
     public MasterAsset getMasterAssetById(BigInteger id) {
         MasterAsset exists = masterAssetMongoRepository.findByid(id);
-        if (!Optional.of(exists).isPresent()) {
-            throw new DataNotFoundByIdException("asset not Exist for id " + id);
+        if (!Optional.ofNullable(exists).isPresent()) {
+            throw new DataNotFoundByIdException("master asset not Exist for id " + id);
 
         }
         return exists;

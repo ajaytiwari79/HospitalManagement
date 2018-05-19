@@ -5,7 +5,7 @@ import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.HostingProvider;
 import com.kairos.persistance.repository.master_data.HostingProviderMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -27,7 +27,7 @@ public class HostingProviderService extends MongoBaseService {
 
     public HostingProvider createHostingProvider(String hostingProvider) {
         if (StringUtils.isEmpty(hostingProvider)) {
-            throw new RequestDataNull("requested hostingProvider is null");
+            throw new InvalidRequestException("requested hostingProvider is null");
 
         }
         HostingProvider exist = hostingProviderMongoRepository.findByName(hostingProvider);
@@ -79,7 +79,7 @@ public class HostingProviderService extends MongoBaseService {
     public HostingProvider updateHostingProvider(BigInteger id, String hostingProvider) {
 
         if (StringUtils.isEmpty(hostingProvider)) {
-            throw new RequestDataNull("requested hostingProvider is null");
+            throw new InvalidRequestException("requested hostingProvider is null");
 
         }
         HostingProvider exist = hostingProviderMongoRepository.findByid(id);

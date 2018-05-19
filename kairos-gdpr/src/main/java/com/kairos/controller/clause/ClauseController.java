@@ -111,7 +111,7 @@ public class ClauseController {
 
     @ApiOperation("get clause by list")
     @PostMapping("/clause/list")
-    public ResponseEntity<Object> getClausesByIds(@RequestBody List<BigInteger> clausesids) {
+    public ResponseEntity<Object> getClausesByIds(@RequestBody Set<BigInteger> clausesids) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClausesByIds(clausesids));
     }
 

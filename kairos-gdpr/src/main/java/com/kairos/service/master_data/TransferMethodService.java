@@ -4,7 +4,7 @@ package com.kairos.service.master_data;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.RequestDataNull;
+import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.TransferMethod;
 import com.kairos.persistance.repository.master_data.TransferMethodMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -28,7 +28,7 @@ public class TransferMethodService extends MongoBaseService {
 
         if (StringUtils.isEmpty(transferMethod))
         {
-            throw new RequestDataNull("requested dataSource  is null or empty");
+            throw new InvalidRequestException("requested dataSource  is null or empty");
         }
         TransferMethod exist = transferMethodMongoRepository.findByName(transferMethod);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -83,7 +83,7 @@ public class TransferMethodService extends MongoBaseService {
 
         if (StringUtils.isEmpty(transferMethod))
         {
-            throw new RequestDataNull("requested dataSource  is null or empty");
+            throw new InvalidRequestException("requested dataSource  is null or empty");
         }
         TransferMethod exist = transferMethodMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
