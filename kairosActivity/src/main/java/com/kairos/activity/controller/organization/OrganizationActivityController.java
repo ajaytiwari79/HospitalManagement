@@ -76,7 +76,7 @@ public class OrganizationActivityController {
     @GetMapping(value = "/activity/{activityId}/general")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable Long unitId,@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getGeneralTabOfActivity(activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getGeneralTabOfActivity(activityId, unitId));
     }
 
 
