@@ -978,6 +978,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
+        //TODO Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
         if (Optional.ofNullable(activity).isPresent()) {
@@ -988,6 +989,10 @@ public class ActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
             throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
         }
+        if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
+            exceptionService.actionNotPermittedException("Activity is not eligible for copy","RulesActivityTab.isEligibleForCopy");
+        }
+
 
         Activity activityCopied = new Activity();
         Activity.copyProperties(activityFromDatabase.get(), activityCopied, "id", "organizationTypes", "organizationSubTypes");

@@ -26,6 +26,7 @@ public class RulesActivityTabDTO {
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private boolean eligibleForCopy;
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -57,7 +58,8 @@ public class RulesActivityTabDTO {
 
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed, approvalAllowed);
+                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,
+                eligibleForPresence,eligibleForAbsence, breakAllowed, approvalAllowed,eligibleForCopy);
 
         return rulesActivityTab;
     }
@@ -152,5 +154,13 @@ public class RulesActivityTabDTO {
 
     public void setApprovalAllowed(boolean approvalAllowed) {
         this.approvalAllowed = approvalAllowed;
+    }
+
+    public boolean isEligibleForCopy() {
+        return eligibleForCopy;
+    }
+
+    public void setEligibleForCopy(boolean eligibleForCopy) {
+        this.eligibleForCopy = eligibleForCopy;
     }
 }

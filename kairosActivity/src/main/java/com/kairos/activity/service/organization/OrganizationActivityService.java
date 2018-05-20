@@ -23,6 +23,7 @@ import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
@@ -61,7 +62,8 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private PlannerSyncService plannerSyncService;
     @Inject
-    OrderService orderService;
+    private OrderService orderService;
+    @Inject private ExceptionService exceptionService;
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -197,6 +199,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
+        //TODO Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
@@ -206,6 +209,9 @@ public class OrganizationActivityService extends MongoBaseService {
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
+        }
+        if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
+            exceptionService.actionNotPermittedException("Activity is not eligible for copy","RulesActivityTab.isEligibleForCopy");
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());
