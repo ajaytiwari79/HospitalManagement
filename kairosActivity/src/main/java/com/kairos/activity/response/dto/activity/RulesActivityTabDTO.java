@@ -26,6 +26,11 @@ public class RulesActivityTabDTO {
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    // in Minutes
+    private Integer earliestStartTime;
+    private Integer latestStartTime;
+    private Integer shortestDuration;
+    private Integer longestDuration;
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -57,7 +62,8 @@ public class RulesActivityTabDTO {
 
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed, approvalAllowed);
+                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
+                approvalAllowed,earliestStartTime,latestStartTime,shortestDuration,longestDuration);
 
         return rulesActivityTab;
     }
@@ -152,5 +158,37 @@ public class RulesActivityTabDTO {
 
     public void setApprovalAllowed(boolean approvalAllowed) {
         this.approvalAllowed = approvalAllowed;
+    }
+
+    public Integer getEarliestStartTime() {
+        return earliestStartTime;
+    }
+
+    public void setEarliestStartTime(Integer earliestStartTime) {
+        this.earliestStartTime = earliestStartTime;
+    }
+
+    public Integer getLatestStartTime() {
+        return latestStartTime;
+    }
+
+    public void setLatestStartTime(Integer latestStartTime) {
+        this.latestStartTime = latestStartTime;
+    }
+
+    public Integer getShortestDuration() {
+        return shortestDuration;
+    }
+
+    public void setShortestDuration(Integer shortestDuration) {
+        this.shortestDuration = shortestDuration;
+    }
+
+    public Integer getLongestDuration() {
+        return longestDuration;
+    }
+
+    public void setLongestDuration(Integer longestDuration) {
+        this.longestDuration = longestDuration;
     }
 }
