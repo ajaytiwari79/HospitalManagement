@@ -1,27 +1,20 @@
 package com.kairos.service.agreement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.AddRuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
-import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +45,9 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryRepository;
+    @Inject
+    private ExceptionService exceptionService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -66,7 +62,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         int ruleFound = countryGraphRepository.checkDuplicateRuleTemplateCategory(countryId, ruleTemplateCategory.getRuleTemplateCategoryType(), name);
 
         if (ruleFound != 0) {
-            throw new DuplicateDataException("Can't create duplicate rule template category in same country " + name);
+            exceptionService.duplicateDataException("message.ruleTemplate.category.duplicate",name);
         }
 
         Country country = countryService.getCountryById(countryId);
@@ -79,7 +75,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
-            throw new DataNotFoundByIdException("Country does not exist");
+            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
+
         }
         return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(countryId, ruleTemplateCategoryType);
 
@@ -93,10 +90,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public boolean deleteRuleTemplateCategory(long countryId, long templateCategoryId) {
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if (ruleTemplateCategory == null) {
-            throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist" + templateCategoryId);
+            exceptionService.dataNotFoundByIdException("message.ruleTemplate.category.notExist",templateCategoryId);
+
         }
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
+            exceptionService.actionNotPermittedException("message.ruleTemplate.category.delete",templateCategoryId);
+
         }
         if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
             List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
@@ -116,19 +115,23 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryService.getCountryById(countryId) == null) {
-            throw new DataNotFoundByIdException("Country does not exist");
+            exceptionService.dataNotFoundByIdException("message.country.id.notExist");
+
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if(!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()){
-            throw new DataNotFoundByIdException("Invalid category "+templateCategoryId);
+            exceptionService.dataNotFoundByIdException("message.ruleTemplate.category.notfound",templateCategoryId);
+
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
+           exceptionService.actionNotPermittedException("message.ruleTemplate.category.rename",templateCategoryId);
+
         }
         if(!ruleTemplateCategory.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())){
             boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
             if(isAlreadyExists){
-                throw new DuplicateDataException("ruleTemplateCategory name already  exists "+ruleTemplateCategory.getName());
+                exceptionService.duplicateDataException("message.ruleTemplate.category.duplicate",ruleTemplateCategory.getName());
+
             }
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());

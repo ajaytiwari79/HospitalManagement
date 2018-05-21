@@ -45,6 +45,7 @@ import com.kairos.activity.response.dto.*;
 import com.kairos.activity.service.CustomTimeScaleService;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.client_exception.ClientExceptionService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
 import com.kairos.activity.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.activity.service.task_type.TaskDemandService;
@@ -152,6 +153,8 @@ public class PlannerService extends MongoBaseService {
     CustomTimeScaleService customTimeScaleService;
     @Inject
     private MongoTemplate mongoTemplate;
+    @Inject
+    private ExceptionService exceptionService;
 
     @Autowired
     CustomTimeScaleRepository customTimeScaleRepository;
@@ -425,7 +428,7 @@ public class PlannerService extends MongoBaseService {
                     }
                 } else {
                     logger.info("intervalWeeks " + intervalWeeks);
-                    throw new InternalError("Atleast one week interval required in task demand start and end date");
+                    exceptionService.internalError("error.task.demand.date.startandend");
                 }
                 randomDates = randomDateGeneratorService.getRandomDates(numOfWeeks, visitCount, createTaskFrom, isWeekend, taskDemandEndDate, publicHolidayList,skipTaskOnPublicHoliday);
             }
@@ -813,7 +816,7 @@ public class PlannerService extends MongoBaseService {
                 clientExceptionService.updateTaskException(citizenId, task);
 
                 if(!validateDaySpecification(taskType,task)){
-                    throw new InternalError("Task can not be created on this day ");
+                    exceptionService.internalError("error.task.day.create");
                 }
 
                 taskService.save(task);
@@ -878,7 +881,7 @@ public class PlannerService extends MongoBaseService {
             Task proxyTask = new Task();
             proxyTask.setDateFrom(updatedDate);
             if(taskType != null && !validateDaySpecification(taskType,proxyTask)){
-                throw new InternalError("Task can not Move on this day");
+                exceptionService.internalError("error.task.day.move");
             }
             Date currentDate = DateUtils.getDate(task.getDateFrom().getTime());
             currentDate.setHours(0);
@@ -910,7 +913,7 @@ public class PlannerService extends MongoBaseService {
 
         Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
         List<Task> taskList = new ArrayList<>();
-        List<Task> taskRepetitionsList;
+        List<Task> taskRepetitionsList=new ArrayList<>();
         List<Task> tasksToReturn = new ArrayList<>();
         List<Task> nonEditableTasks = new ArrayList<>();
         SimpleDateFormat executionDateFormat = new SimpleDateFormat(ONLY_DATE);
@@ -925,13 +928,13 @@ public class PlannerService extends MongoBaseService {
         Task proxyTask = new Task();
         proxyTask.setDateFrom(updatedDate);
         if(taskType != null && !validateDaySpecification(taskType,proxyTask)){
-            throw new InternalError("Task can not Move on this day");
+            exceptionService.internalError("error.task.day.move");
         }
         if (task.isSingleTask() ) {
             return actualPlanningTaskUpdate(unitId,Arrays.asList(taskData));
         }
         if (!task.isSingleTask() && task.getActualPlanningTask() != null) {
-            throw new DataNotModifiedException("This task is not editable");
+            exceptionService.dataNotModifiedException("message.task.update");
         }
         Date currentDate = DateUtils.getDate(task.getDateFrom().getTime());
         currentDate.setHours(0);
@@ -942,7 +945,8 @@ public class PlannerService extends MongoBaseService {
             daysDifference = TimeUnit.DAYS.convert(updatedDate.getTime() - currentDate.getTime(), TimeUnit.MILLISECONDS);
         }
         if (taskData.getMainTask() != null && taskData.getMainTask() == true && taskData.getUpdateAllByDemand() != null && taskData.getUpdateAllByDemand() == true) {
-            throw new DataNotFoundByIdException(task.getName() + " is main Task. Cannot be updated by Demand");
+            exceptionService.dataNotFoundByIdException("error.task.main.update",task.getName());
+
         } else {
             if (taskData.getUpdateAllByDemand() != null && taskData.getUpdateAllByDemand() == true) {
                 taskRepetitionsList = taskService.getTasksByDemandId(task.getTaskDemandId() + "");
@@ -2136,7 +2140,7 @@ public class PlannerService extends MongoBaseService {
         long startTime = System.currentTimeMillis();
         OrganizationDTO unit =organizationRestClient.getOrganization(unitId);
         if (unit == null) {
-            throw new InternalError("Unit can't be null");
+            exceptionService.dataNotFoundByIdException("message.unit.id");
         }
 
         if (unit.isOneTimeSyncPerformed()) {
@@ -2204,10 +2208,10 @@ public class PlannerService extends MongoBaseService {
 
             Task task = taskMongoRepository.findOne(taskId);
             if (task!=null) {
-                throw new InternalError("Task not found");
+                exceptionService.dataNotFoundByIdException("message.task.id");
             }
             if (!task.isSingleTask()) {
-                throw new InternalError("This is not a single task");
+                exceptionService.internalError("error.task.single");
             }
             ArrayList<Task> tasksToReturn = new ArrayList<>(taskData.size());
             SimpleDateFormat executionDateFormat = new SimpleDateFormat(ONLY_DATE);
@@ -2357,7 +2361,8 @@ public class PlannerService extends MongoBaseService {
         logger.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
         if (reduction) {
             if (task.getDuration() - minutes <= 0) {
-                throw new InternalError("Task duration cannot be less then 1");
+                exceptionService.internalError("error.task.duration");
+                //throw new InternalError("Task duration cannot be less then 1");
             }
             timeTo = timeTo.minusMinutes(minutes);
             task.setTimeTo(Date.from(timeTo.atZone(ZoneId.systemDefault()).toInstant()));

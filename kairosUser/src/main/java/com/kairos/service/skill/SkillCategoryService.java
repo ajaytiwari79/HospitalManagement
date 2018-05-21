@@ -5,6 +5,7 @@ import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,8 @@ public class SkillCategoryService extends UserBaseService {
     @Inject
     CountryGraphRepository countryGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
     public Object createSkillCategory(long countryId, SkillCategory skillCategory)  {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
@@ -33,14 +36,15 @@ public class SkillCategoryService extends UserBaseService {
         }
         String name = "(?i)"+skillCategory.getName();
         if (!skillCategoryGraphRepository.checkDuplicateSkillCategory(countryId,name).isEmpty()){
-            throw   new DuplicateDataException("Can't create duplicate skillCategory in same country");
+            exceptionService.duplicateDataException("message.skillcategory.name.duplicate");
+
         }else {
             skillCategory.setCountry(country);
             save(skillCategory);
             return skillCategory.retieveDetails();
         }
 
-
+        return null;
     }
 
 

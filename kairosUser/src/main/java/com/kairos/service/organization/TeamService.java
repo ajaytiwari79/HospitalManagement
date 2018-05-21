@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.client.AddressVerificationService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
@@ -85,17 +86,22 @@ public class TeamService extends UserBaseService {
     private RegionGraphRepository regionGraphRepository;
     @Inject
     private EnvConfig envConfig;
+    @Inject
+    private ExceptionService exceptionService;
+
 
     public Map<String, Object> createTeam(long groupId, Long unitId, TeamDTO teamDTO, String type) {
         Long orgId = organizationService.getOrganizationIdByTeamIdOrGroupIdOrOrganizationId(type, unitId);
         Group group = groupGraphRepository.findOne(groupId);
         if(group == null){
-            throw new DataNotFoundByIdException("Can't find group with provided Id");
+            exceptionService.dataNotFoundByIdException("message.teamservice.group.id.notFound");
+
         }
         OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByGroupId(groupId);
 
         if (organizationContactAddress.getOrganization()==null){
-            throw new DataNotFoundByIdException("Can't find unit with provided Id");
+            exceptionService.dataNotFoundByIdException("message.teamservice.unit.id.notFound");
+
         }
 
 
@@ -128,12 +134,14 @@ public class TeamService extends UserBaseService {
                 }
                 Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                 if(municipality == null){
-                    throw new InternalError("Municpality not found");
+                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+
                 }
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                    throw new InternalError("Geography data not found with provided municipality");
+                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+
                 }
                 logger.info("Geography Data: " + geographyData);
 
@@ -178,12 +186,14 @@ public class TeamService extends UserBaseService {
                     }
                     Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                     if(municipality == null){
-                        throw new InternalError("Municpality not found");
+                        exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+
                     }
                     Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                     if (geographyData == null) {
                         logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                        throw new InternalError("Geography data not found with provided municipality");
+                        exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+
                     }
                     logger.info("Geography Data: " + geographyData);
 
@@ -217,18 +227,21 @@ public class TeamService extends UserBaseService {
                 ZipCode zipCode = organizationContactAddress.getZipCode();
                 logger.debug("zip code found is "+zipCode);
                 if(zipCode == null){
-                    throw new InternalError("zip code not found");
+                    exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
+                    
                 }
                 Municipality municipality = organizationContactAddress.getMunicipality();
                 if(municipality == null){
-                    throw new InternalError("Municpality not found");
+                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+
                 }
 
 
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    throw new InternalError("Geography data not found with provided municipality");
+                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+
                 }
                 logger.info("Geography Data: " + geographyData);
 
@@ -300,7 +313,8 @@ public class TeamService extends UserBaseService {
         logger.info("staff----------> "+staff);
         logger.info("team----------> "+team);
         if(staff==null || team == null){
-            throw  new InternalError("staff or team can't be empty");
+            exceptionService.internalServerError("error.teamservice.stafforteam.notEmpty");
+
         }
 
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId,staffId);
@@ -314,7 +328,8 @@ public class TeamService extends UserBaseService {
                 }
                 return true;
             } else {
-                throw new InternalError("something went wrong on server");
+                exceptionService.dataNotFoundByIdException("message.teamservice.somethingwrong");
+
             }
         } else {
             int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId,staffId,DateUtil.getCurrentDate().getTime(),isAssigned);
@@ -325,9 +340,11 @@ public class TeamService extends UserBaseService {
                 }
                 return true;
             } else {
-                throw new InternalError("something went wrong on server");
+                exceptionService.dataNotFoundByIdException("message.teamservice.somethingwrong");
+
             }
         }
+        return false;
     }
 
     /**
@@ -339,7 +356,8 @@ public class TeamService extends UserBaseService {
     public List<Map<String,Object>> getStaffForImportInTeam(long teamId){
         Team team = teamGraphRepository.findOne(teamId,0);
         if(team == null){
-            throw new InternalError("Team not found");
+            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound",teamId);
+
         }
         List<Map<String,Object>> queryResult = teamGraphRepository.getAllStaffByOrganization(teamId,envConfig.getServerHost() + FORWARD_SLASH);
         List<Map<String,Object>> staff = new ArrayList<>();
@@ -423,7 +441,7 @@ public class TeamService extends UserBaseService {
 
         Team team = teamGraphRepository.findOne(teamId);
         if (team == null) {
-            throw new InternalError("Team can not be null");
+            exceptionService.dataNotFoundByIdException("message.teamservice.team.notFound",teamId);
         }
         team.setName(teamDTO.getName());
         team.setDescription(teamDTO.getDescription());

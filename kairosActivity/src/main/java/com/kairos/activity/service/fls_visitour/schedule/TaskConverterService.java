@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.task.SkillExpertise;
 import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.persistence.model.task.TaskStatus;
 import com.kairos.activity.persistence.repository.task_type.TaskMongoRepository;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.util.DateUtils;
 import de.tourenserver.ArrayOfFixedCall;
@@ -38,6 +39,8 @@ public class TaskConverterService {
     TaskMongoRepository taskMongoRepository;
     @Inject
     TaskService taskService;
+    @Inject
+    ExceptionService exceptionService;
     @Autowired
     IntegrationRestClient integrationServiceRestClient;
     @Autowired
@@ -193,7 +196,7 @@ public class TaskConverterService {
             //taskService.save(task);
 
         } else {
-            throw new InternalError("Error while creting Task in Visitour");
+            exceptionService.internalError("error.task.visitour.create");
         }
 
     }
@@ -304,7 +307,7 @@ public class TaskConverterService {
         if (vtID > 0) {
             logger.info("Call Updated Successfully " + vtID);
         } else {
-            throw new InternalError("Error while Updating Task in Visitour");
+            exceptionService.internalError("error.task.visitour.update");
         }
 
         //Below code is commented by Yasir, as we are not confirming calls in Visitour just after updating.

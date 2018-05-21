@@ -19,6 +19,8 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.client.AddressVerificationService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.util.DistanceCalculator;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
@@ -59,13 +61,15 @@ public class StaffAddressService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     public ContactAddress saveAddress(long staffId, AddressDTO addressDTO, long unitId) {
         ContactAddress contactAddress = null;
         Staff staff = staffGraphRepository.findOne(staffId);
 
         if (staff == null) {
-            throw new DataNotFoundByIdException("Can't find Staff with provided Id");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
 
         }
         if (addressDTO.getId() != null) {
@@ -95,14 +99,16 @@ public class StaffAddressService extends UserBaseService {
             }
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
             if (municipality == null) {
-                throw new InternalError("Municpality not found");
+                exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+
             }
 
 
             Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
             if (geographyData == null) {
                 logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                throw new InternalError("Geography data not found with provided municipality");
+                exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+
             }
             logger.info("Geography Data: " + geographyData);
 
@@ -170,14 +176,16 @@ public class StaffAddressService extends UserBaseService {
                 }
                 Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                 if (municipality == null) {
-                    throw new InternalError("Municpality not found");
+                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+
                 }
 
 
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    throw new InternalError("Geography data not found with provided municipality");
+                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+
                 }
                 logger.info("Geography Data: " + geographyData);
 
@@ -222,7 +230,7 @@ public class StaffAddressService extends UserBaseService {
         if (staff == null) {
             return null;
         }
-        ContactAddress address;
+        ContactAddress address=null;
         ContactAddress staffAddress = staff.getContactAddress();
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
@@ -236,7 +244,8 @@ public class StaffAddressService extends UserBaseService {
             countryId = teamGraphRepository.getCountryByTeamId(unitId);
             address = team.getContactAddress();
         } else {
-            throw new InternalError("type can not be null");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
 
         double distance = 0;

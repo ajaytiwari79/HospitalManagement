@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,8 @@ public class RuleTemplateServiceTest {
     TestRestTemplate restTemplate;
     @Autowired
     RuleTemplateService ruleTemplateService;
-
+    @Inject
+    private ExceptionService exceptionService;
     static RuleTemplateCategoryDTO ruleTemplateCategoryDTO=new RuleTemplateCategoryDTO();
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateServiceTest.class);
     static String baseUrlWithCountry;
@@ -142,7 +145,10 @@ public class RuleTemplateServiceTest {
                     .append("/unit/").append(unitId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
+
         }
+        return null;
     }
+
 }

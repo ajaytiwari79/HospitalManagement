@@ -4,6 +4,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.user.resources.ResourceWrapper;
 import com.kairos.persistence.model.user.resources.VehicleLocation;
 import com.kairos.persistence.repository.user.resources.VehicleLocationRepository;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,20 +23,26 @@ public class VehicleLocationService {
     @Inject
     private VehicleLocationRepository vehicleLocationRepository;
 
-    public VehicleLocation createVehicleLocation(VehicleLocation vehicleLocation){
+    @Inject
+    private ExceptionService exceptionService;
+
+    public VehicleLocation createVehicleLocation(VehicleLocation vehicleLocation) {
 
         return vehicleLocationRepository.save(vehicleLocation);
     }
 
-    public VehicleLocation updateVehicleLocation(VehicleLocation vehicleLocation, Long vehicleLocationId){
+    public VehicleLocation updateVehicleLocation(VehicleLocation vehicleLocation, Long vehicleLocationId) {
 
         VehicleLocation existingVehicleLocation = vehicleLocationRepository.findOne(vehicleLocationId);
         if (Optional.ofNullable(existingVehicleLocation).isPresent()) {
             existingVehicleLocation.setName(vehicleLocation.getName());
             existingVehicleLocation.setDescription(vehicleLocation.getDescription());
             return vehicleLocationRepository.save(existingVehicleLocation);
+        } else {
+            exceptionService.dataNotFoundByIdException("message.vehiclelocationservices.id.notFound");
+
         }
-        throw new DataNotFoundByIdException("Vehicle Location not found by id");
+        return null;
     }
 
     /**
@@ -47,10 +55,11 @@ public class VehicleLocationService {
         if (Optional.ofNullable(vehicleLocation).isPresent()) {
             vehicleLocation.setEnabled(false);
             return vehicleLocationRepository.save(vehicleLocation) != null;
-        }
-        throw new DataNotFoundByIdException("Vehicle Location not found by id");
+        } else{
+            exceptionService.dataNotFoundByIdException("message.vehiclelocationservices.id.notFound");
     }
-
+return false;
+}
     public List<VehicleLocation> getAllVehicleLocations() {
         return vehicleLocationRepository.findAll();
     }
