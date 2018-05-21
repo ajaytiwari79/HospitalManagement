@@ -23,6 +23,7 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private boolean eligibleForCopy;
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -73,7 +74,7 @@ public class RulesActivityTab implements Serializable{
     }
 
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest,  boolean eligibleAgainstTimeRules,  boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules,boolean eligibleForStaffingLevel, boolean eligibleForPresence,boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed) {
+                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules,boolean eligibleForStaffingLevel, boolean eligibleForPresence,boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed,boolean eligibleForCopy) {
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
         this.eligibleForRequest = eligibleForRequest;
@@ -87,6 +88,7 @@ public class RulesActivityTab implements Serializable{
         this.eligibleForAbsence=eligibleForAbsence;
         this.breakAllowed = breakAllowed;
         this.approvalAllowed = approvalAllowed;
+        this.eligibleForCopy=eligibleForCopy;
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -167,5 +169,13 @@ public class RulesActivityTab implements Serializable{
 
     public void setApprovalAllowed(boolean approvalAllowed) {
         this.approvalAllowed = approvalAllowed;
+    }
+
+    public boolean isEligibleForCopy() {
+        return eligibleForCopy;
+    }
+
+    public void setEligibleForCopy(boolean eligibleForCopy) {
+        this.eligibleForCopy = eligibleForCopy;
     }
 }

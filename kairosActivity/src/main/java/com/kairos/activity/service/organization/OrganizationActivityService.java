@@ -63,9 +63,10 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private PlannerSyncService plannerSyncService;
     @Inject
-    OrderService orderService;
-    @Autowired
+    private OrderService orderService;
+    @Inject
     private ExceptionService exceptionService;
+
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -201,6 +202,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
+        //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
@@ -210,6 +212,9 @@ public class OrganizationActivityService extends MongoBaseService {
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
+        }
+        if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
+            exceptionService.actionNotPermittedException("Activity is not eligible for copy");
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());
