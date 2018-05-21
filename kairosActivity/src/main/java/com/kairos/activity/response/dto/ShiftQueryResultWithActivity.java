@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.phase.Phase;
 
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.util.DateTimeInterval;
 import org.joda.time.Interval;
 
 import java.math.BigInteger;
@@ -58,6 +59,10 @@ public class ShiftQueryResultWithActivity {
 
     public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
+    }
+
+    public int getMinutes(){
+        return ((int)(this.startDate.getTime() - this.endDate.getTime())/3600000);
     }
 
     public int getScheduledMinutes() {
@@ -213,8 +218,8 @@ public class ShiftQueryResultWithActivity {
         this.activity = activity;
     }
 
-    public Interval getInterval(){
-       return new Interval(startDate.getTime(),endDate.getTime());
+    public DateTimeInterval getInterval(){
+       return new DateTimeInterval(startDate.getTime(),endDate.getTime());
     }
 
 }

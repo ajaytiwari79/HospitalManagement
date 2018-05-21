@@ -1,5 +1,6 @@
 package com.kairos.activity.spec;
 
+import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
@@ -33,6 +34,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     private ShiftQueryResultWithActivity shift;
     private Phase phase;
     private List<ShiftQueryResultWithActivity> shifts;
+    private TimeSlotWrapper timeSlotWrapper;
     //private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
 
     public ActivityWTARulesSpecification(WTAQueryResultDTO wtaResponseDTO, Phase phase, ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -40,6 +42,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
         this.shift = shift;
         this.phase = phase;
         this.shifts = shifts;
+        this.timeSlotWrapper = staffAdditionalInfoDTO.getTimeSlotSets().get(0);
     }
 
 
@@ -65,22 +68,22 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                 wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
                 break;*/
                 case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
-                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(ConsecutiveRestPartOfDayWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(ConsecutiveRestPartOfDayWTATemplate)ruleTemplate,timeSlotWrapper);
                     break;
                 case NUMBER_OF_PARTOFDAY:
-                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(NumberOfPartOfDayShiftsWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(NumberOfPartOfDayShiftsWTATemplate)ruleTemplate,timeSlotWrapper);
                     break;
                 case DAYS_OFF_IN_PERIOD:
                     WTARuleTemplateValidatorUtility.checkConstraints(shifts,(DaysOffInPeriodWTATemplate)ruleTemplate);
                     break;
                 case AVERAGE_SHEDULED_TIME:
-                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(AverageScheduledTimeWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shift,shifts,(AverageScheduledTimeWTATemplate)ruleTemplate);
                     break;
                 case VETO_PER_PERIOD:
                     //WTARuleTemplateValidatorUtility.checkConstraints((VetoPerPeriodWTATemplate)ruleTemplate);
                     break;
                 case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
-                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(NumberOfWeekendShiftsInPeriodWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shift,shifts,(NumberOfWeekendShiftsInPeriodWTATemplate)ruleTemplate);
                     break;
             /*case CARE_DAYS_CHECK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ChildCareDayCheckWTATemplate.class);
@@ -92,13 +95,13 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     WTARuleTemplateValidatorUtility.checkConstraints(shifts,shift,(DurationBetweenShiftsWTATemplate)ruleTemplate);
                     break;
                 case WEEKLY_REST_PERIOD:
-                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(WeeklyRestPeriodWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shift,shifts,(WeeklyRestPeriodWTATemplate)ruleTemplate);
                     break;
                 case SHORTEST_AND_AVERAGE_DAILY_REST:
                     WTARuleTemplateValidatorUtility.checkConstraints(shifts,(ShortestAndAverageDailyRestWTATemplate)ruleTemplate);
                     break;
                 case NUMBER_OF_SHIFTS_IN_INTERVAL:
-                    //WTARuleTemplateValidatorUtility.checkConstraints((ShiftsInIntervalWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shift,shifts,(ShiftsInIntervalWTATemplate)ruleTemplate);
                     break;
                 case TIME_BANK:
                     //WTARuleTemplateValidatorUtility.checkConstraints((TimeBankWTATemplate)ruleTemplate);

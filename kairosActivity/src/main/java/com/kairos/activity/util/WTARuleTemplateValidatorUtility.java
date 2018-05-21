@@ -8,6 +8,8 @@ package com.kairos.activity.util;
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.custom_exception.InvalidRequestException;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
@@ -22,6 +24,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,14 +43,15 @@ public class WTARuleTemplateValidatorUtility {
 
 
     //MaximumAverageScheduledTimeWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, AverageScheduledTimeWTATemplate ruleTemplate){
+    public static int checkConstraints(ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts, AverageScheduledTimeWTATemplate ruleTemplate){
         int totalScheduledTime = 0;//(int) shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumAverageScheduledTimeInfo();
-        for (ShiftQueryResultWithActivity shift:shifts) {
-            if(interval.overlaps(shift.getInterval())){
-                totalScheduledTime+=interval.overlap(shift.getInterval()).toPeriod().getMinutes();
+        DateTimeInterval interval = getIntervalByRuleTemplate(shift,ruleTemplate.getIntervalUnit(),ruleTemplate.getIntervalLength());
+        for (ShiftQueryResultWithActivity shift1:shifts) {
+            if(interval.overlaps(shift1.getInterval())){
+                totalScheduledTime+=interval.overlap(shift1.getInterval()).getMinutes();
             }
         }
-        return totalScheduledTime>maximumAvgTime?totalScheduledTime-(int)maximumAvgTime:0;
+        return totalScheduledTime>ruleTemplate.getMaximumAvgTime()?totalScheduledTime-(int)ruleTemplate.getMaximumAvgTime():0;
     }
 
 
@@ -72,16 +76,18 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     //MaximumConsecutiveWorkingDaysWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,ShiftQueryResultWithActivity shift, ConsecutiveWorkWTATemplate ruleTemplate) {
+    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts,ShiftQueryResultWithActivity shift, ConsecutiveWorkWTATemplate ruleTemplate) {
         int consecutiveDays = getConsecutiveDays(getSortedAndUniqueDates(shifts));
-        return consecutiveDays > daysLimit?(consecutiveDays-(int) daysLimit):0;
+        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getLimitCount(), consecutiveDays)) {
+            new InvalidRequestException("");
+        }
     }
 
     //MaximumConsecutiveWorkingNightsWTATemplate
     private static int getConsecutiveNightShifts(Set<LocalDate> localDates, Shift shift){
         int count = 0;
         int i=1;
-        LocalDate prevDayOfShift = shift.getStartDate().toLocalDate().minusDays(i);
+        LocalDate prevDayOfShift = DateUtils.getZoneDateTime(shift.getStartDate()).toLocalDate().minusDays(i);
         while (true){
             if(localDates.contains(prevDayOfShift)){
                 count++;
@@ -92,7 +98,7 @@ public class WTARuleTemplateValidatorUtility {
         return count;
     }
 
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts){
+    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,TimeSlotWrapper timeSlotWrapper){
         if(shifts.size()<2) return  0;
         int count = 0;
         int consecutiveNightCount = 1;
@@ -100,7 +106,7 @@ public class WTARuleTemplateValidatorUtility {
         List<LocalDate> localDates=getSortedDates(shifts);
         for (int i=localDates.size()-1;i>=0;i--){
             if(i!=0){
-                if(localDates.get(i-1).equals(localDates.get(i).minusDays(1))  && isNightShift(shifts.get(i))&& isNightShift(shifts.get(i-1))){
+                if(localDates.get(i-1).equals(localDates.get(i).minusDays(1))  && isNightShift(shifts.get(i),timeSlotWrapper)&& isNightShift(shifts.get(i-1),timeSlotWrapper)){
                     count++;
                 }else {
                     count = 0;
@@ -110,53 +116,64 @@ public class WTARuleTemplateValidatorUtility {
                 consecutiveNightCount = count;
             }
         }
+
         return consecutiveNightCount > nightsWorked?(consecutiveNightCount-(int) nightsWorked):0;
     }
 
     //MaximumDaysOffInPeriodWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, DaysOffInPeriodWTATemplate ruleTemplate){
+    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts, DaysOffInPeriodWTATemplate ruleTemplate){
         int shiftsNum=getSortedDates(shifts).size();
-        return 7-shiftsNum>daysLimit?0:(daysLimit-(7 - shiftsNum));
+        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getDaysLimit(), shiftsNum)) {
+            new InvalidRequestException("");
+        }
     }
 
     //MaximumNightShiftLengthWTATemplate
-    public static int checkConstraints(ShiftQueryResultWithActivity shift){
-        if(isNightShift(shift)){
+    public static int checkConstraints(ShiftQueryResultWithActivity shift,TimeSlotWrapper timeSlotWrapper){
+        if(isNightShift(shift,timeSlotWrapper)){
             return !(shift).isAbsenceActivityApplied() && shift.getMinutes() > timeLimit?(shift.getMinutes()-timeLimit):0;
         }
         return 0;
     }
 
     //MaximumNumberOfNightsWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, NumberOfPartOfDayShiftsWTATemplate ruleTemplate){
-        if(shifts.size()<0) return 0;
-        int count = (int)shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumNumberOfNightsInfo();
-        for (ShiftQueryResultWithActivity shift:shifts){
-            if(isNightShift(shift)){
-                count++;
+    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts, NumberOfPartOfDayShiftsWTATemplate ruleTemplate,TimeSlotWrapper timeSlotWrapper){
+        if(shifts.size()>0) {
+            int count = 0;//(int) shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumNumberOfNightsInfo();
+            for (ShiftQueryResultWithActivity shift : shifts) {
+                if (isNightShift(shift, timeSlotWrapper)) {
+                    count++;
+                }
+            }
+            if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getNoOfPartOfDayWorked(), count)) {
+                new InvalidRequestException("");
             }
         }
-        return count > nightsWorked?(count- nightsWorked):0;
     }
 
 
     //MaximumShiftLengthWTATemplate
-    public static int checkConstraints(ShiftQueryResultWithActivity shift, ShiftLengthWTATemplate ruleTemplate){
-        return !shift.isAbsenceActivityApplied()&& shift.getMinutes()>timeLimit?(shift.getMinutes()-(int)timeLimit):0;
+    public static void checkConstraints(ShiftQueryResultWithActivity shift, ShiftLengthWTATemplate ruleTemplate){
+        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getTimeLimit(), shift.getMinutes())) {
+            new InvalidRequestException("");
+        }
     }
 
     //MaximumShiftsInIntervalWTATemplate
-    public int checkConstraints(List<ShiftQueryResultWithActivity> shifts){
+    public static void checkConstraints(ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts,ShiftsInIntervalWTATemplate ruleTemplate){
         int shiftCount = 0;
-        for (ShiftQueryResultWithActivity shift:shifts) {
-            if(interval.contains(shift.getStartDate()))
+        DateTimeInterval interval = getIntervalByRuleTemplate(shift,ruleTemplate.getIntervalUnit(),ruleTemplate.getIntervalLength());
+        for (ShiftQueryResultWithActivity shift1:shifts) {
+            if(interval.contains(shift1.getStartDate()))
                 shiftCount++;
         }
-        return shiftCount>shiftsLimit?(shiftCount-(int)shiftsLimit):0;
+        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getShiftsLimit(), shiftCount)) {
+            new InvalidRequestException("");
+        }
     }
 
     //MinimumConsecutiveNightsWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts){
+    /*public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,TimeSlotWrapper timeSlotWrapper){
         if(shifts.size()<2) return 0;
         int count = 0;
         int consecutiveNightCount=1;
@@ -165,7 +182,7 @@ public class WTARuleTemplateValidatorUtility {
 
         for (int i=localDates.size()-1;i>=0;i--){
             if(i!=0){
-                if(localDates.get(i-1).equals(localDates.get(i).minusDays(1)) && isNightShift(shifts.get(i)) &&  isNightShift(shifts.get(i-1))){
+                if(localDates.get(i-1).equals(localDates.get(i).minusDays(1)) && isNightShift(shifts.get(i),timeSlotWrapper) &&  isNightShift(shifts.get(i-1),timeSlotWrapper)){
                     count++;
                 }else {
                     count = 0;
@@ -176,44 +193,44 @@ public class WTARuleTemplateValidatorUtility {
             }
         }
         return consecutiveNightCount < daysLimit?(daysLimit - consecutiveNightCount):0;
-    }
+    }*/
 
     // MinimumDailyRestingTimeWTATemplateTemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,DailyRestingTimeWTATemplate dailyRestingTimeWTATemplate){
-        if(shifts.size()<2) return 0;
-        List<DateTimeInterval> intervals=getSortedIntervals(shifts);
-        int restingTimeUnder=0;
-        for(int i=1;i<intervals.size();i++){
-            DateTime lastEnd=intervals.get(i-1).getEndDate();
-            DateTime thisStart=intervals.get(i).getStartDate();
-            long totalRest=(thisStart.getMillis()-lastEnd.getMillis())/60000;
-            restingTimeUnder=(int)(dailyRestingTime >totalRest? dailyRestingTime -totalRest:0);//TODO do we need to verify if shifts overlap. Not needed but possible while it'
+    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts,DailyRestingTimeWTATemplate ruleTemplate){
+        if(shifts.size()>2) {
+            List<DateTimeInterval> intervals = getSortedIntervals(shifts);
+            int restingTimeUnder = 0;
+            for (int i = 1; i < intervals.size(); i++) {
+                long lastEnd = intervals.get(i - 1).getEndMillis();
+                long thisStart = intervals.get(i).getStartMillis();
+                long totalRest = (thisStart - lastEnd) / 60000;
+                if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getContinuousDayRestHours(), (int) totalRest)) {
+                    new InvalidRequestException("");
+                }
+            }
         }
-
-        return restingTimeUnder;
     }
 
 
     //MinimumDurationBetweenShiftWTATemplate
-    public static boolean checkConstraints(List<ShiftQueryResultWithActivity> shifts, ShiftQueryResultWithActivity shift,DurationBetweenShiftsWTATemplate ruleTemplate) {
+    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts, ShiftQueryResultWithActivity shift,DurationBetweenShiftsWTATemplate ruleTemplate) {
         boolean isValid = false;
         int timefromPrevShift = 0;
-        shifts = (List<Shift>) shifts.stream().filter(shift1 -> shift1.getStartDate() != null && shift1.getEndDate() != null).filter(shift1 -> shift1.getEndDate().isBefore(shift.getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
+        shifts = (List<ShiftQueryResultWithActivity>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(shift.getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
         if (shifts.size() > 0) {
-            DateTime prevShiftEnd = new DateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
-            timefromPrevShift = new Period(prevShiftEnd, new DateTime(shift.getStartDate())).getMinutes();
-            if(timefromPrevShift==0 && shift.getStartDate().getDayOfWeek()==1){
-                timefromPrevShift = new Period(shift.getEmployee().getPrevShiftEnd(), shift.getStartDate()).getMinutes();
-            }
+            ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
+            timefromPrevShift = new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(shift.getStartDate())).getMinutes();
+            /*if(timefromPrevShift==0 && shift.getStartDate().getDayOfWeek()==1){
+                timefromPrevShift = new DateTimeInterval(shift.getEmployee().getPrevShiftEnd(), shift.getStartDate()).getMinutes();
+            }*/
         }
-        if (timefromPrevShift < minimumDurationBetweenShifts) {
-            isValid = true;
+        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getDurationBetweenShifts(), (int) timefromPrevShift)) {
+            new InvalidRequestException("");
         }
-        return isValid;
     }
 
     //MinimumRestConsecutiveNightsWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, ConsecutiveRestPartOfDayWTATemplate ruleTemplate) {
+    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, ConsecutiveRestPartOfDayWTATemplate ruleTemplate,TimeSlotWrapper timeSlotWrapper) {
         if(shifts.size()<2) return 0;
         sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
@@ -222,15 +239,15 @@ public class WTARuleTemplateValidatorUtility {
         int consDays=0;
         int totalRestUnder=0;
         while (l<dates.size()){
-            if(dates.get(l-1).equals(dates.get(l).minusDays(1)) && isNightShift(shifts.get(l))&& isNightShift(shifts.get(l-1))){
+            if(dates.get(l-1).equals(dates.get(l).minusDays(1)) && isNightShift(shifts.get(l),timeSlotWrapper)&& isNightShift(shifts.get(l-1),timeSlotWrapper)){
                 consDays++;
             }else{
                 consDays=0;
             }
             if(consDays>=nightsWorked){
-                DateTime start=new DateTime(shifts.get(l-1).getEndDate());
-                DateTime end=new DateTime(shifts.get(l).getStartDate());
-                int diff=new DateTimeInterval(start,end).toDuration().toStandardMinutes().getMinutes()- minimumRest;//FIXME
+                ZonedDateTime start=DateUtils.getZoneDateTime(shifts.get(l-1).getEndDate());
+                ZonedDateTime end=DateUtils.getZoneDateTime(shifts.get(l).getStartDate());
+                int diff=new DateTimeInterval(start,end).getMinutes()- minimumRest;//FIXME
                 totalRestUnder+=diff;
                 consDays=0;
             }
@@ -258,9 +275,9 @@ public class WTARuleTemplateValidatorUtility {
                 consDays=0;
             }
             if(consDays>=daysWorked){
-                DateTime start=new DateTime(shifts.get(l-1).getEndDate());
-                DateTime end=new DateTime(shifts.get(l).getStartDate());
-                int diff=new DateTimeInterval(start,end).toDuration().toStandardMinutes().getMinutes()- minimumRest;//FIXME
+                ZonedDateTime start=DateUtils.getZoneDateTime(shifts.get(l-1).getEndDate());
+                ZonedDateTime end=DateUtils.getZoneDateTime(shifts.get(l).getStartDate());
+                int diff=new DateTimeInterval(start,end).getMinutes()- minimumRest;//FIXME
                 totalRestUnder+=diff;
                 consDays=0;
             }
@@ -275,20 +292,26 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     //MinimumWeeklyRestPeriodWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,WeeklyRestPeriodWTATemplate ruleTemplate){
-        if(shifts.size()<2) return 0;
-        int totalRestTime = interval.getMinutes();
-        for (ShiftQueryResultWithActivity shift:shifts) {
-            totalRestTime-=shift.getMinutes();
+    public static void checkConstraints(ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts,WeeklyRestPeriodWTATemplate ruleTemplate){
+        if(shifts.size()>2) {
+            int totalRestTime = getIntervalByRuleTemplate(shift, ruleTemplate.getIntervalUnit(), ruleTemplate.getIntervalLength()).getMinutes();
+            for (ShiftQueryResultWithActivity shift1 : shifts) {
+                totalRestTime -= shift1.getMinutes();
+            }
+            if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getContinuousWeekRest(), totalRestTime)) {
+                new InvalidRequestException("");
+            }
         }
-        return totalRestTime<continuousWeekRest?(totalRestTime-(int)continuousWeekRest):0;
     }
 
 
     //NumberOfWeekendShiftInPeriodWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,NumberOfWeekendShiftsInPeriodWTATemplate ruleTemplate){
+    public static void checkConstraints(ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts,NumberOfWeekendShiftsInPeriodWTATemplate ruleTemplate){
+        DateTimeInterval interval = getIntervalByRuleTemplate(shift,ruleTemplate.getIntervalUnit(),ruleTemplate.getIntervalLength());
         int weekendShifts=(int) shifts.stream().filter(s->interval.contains(s.getStartDate())).count();
-        return weekendShifts>numberShiftsPerPeriod?weekendShifts-numberShiftsPerPeriod:0;
+        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getFromTime(), weekendShifts)) {
+            new InvalidRequestException("");
+        }
     }
 
 
@@ -301,7 +324,7 @@ public class WTARuleTemplateValidatorUtility {
         for(int i=1;i<intervals.size();i++){
             ZonedDateTime lastEnd=intervals.get(i-1).getEnd();
             ZonedDateTime thisStart=intervals.get(i).getStart();
-            long totalRest=(thisStart.getMillisOfDay()-lastEnd.getMillis())/60000;
+            long totalRest=(thisStart.getMillisOfDay()-lastEnd.toInstant().toEpochMilli())/60000;
             restingTimeUnder=(int)(continuousDayRestingTime >totalRest? continuousDayRestingTime -totalRest:0);
             totalRestAllShifts+=totalRest;
         }
@@ -310,7 +333,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static List<LocalDate> getSortedDates(List<ShiftQueryResultWithActivity> shifts){
-        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->DateUtils.asJodaLocalDate(s.getStartDate())).collect(Collectors.toSet()));
+        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
         Collections.sort(dates);
         return dates;
     }
@@ -324,14 +347,14 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static List<ShiftQueryResultWithActivity> sortShifts(List<ShiftQueryResultWithActivity> shifts){
-        shifts.sort(Comparator.comparing(Shift::getStartDate));
+        shifts.sort(Comparator.comparing(s->s.getStartDate()));
         return shifts;
     }
 
     public static Comparator getShiftStartTimeComparator() {
-        Comparator shiftStartComparator = new Comparator<Shift>() {
+        Comparator shiftStartComparator = new Comparator<ShiftQueryResultWithActivity>() {
             @Override
-            public int compare(Shift shift1, Shift shift2) {
+            public int compare(ShiftQueryResultWithActivity shift1, ShiftQueryResultWithActivity shift2) {
                 if (shift1.getStartDate() != null && shift2.getStartDate() != null && shift1.getStaffId().equals(shift2.getStaffId())) {
                     return shift1.getStartDate().compareTo(shift2.getStartDate());
                 } else {
@@ -342,8 +365,12 @@ public class WTARuleTemplateValidatorUtility {
         return shiftStartComparator;
     }
 
+    public static boolean isValid(MinMaxSetting minMaxSetting,int limitValue,int calculatedValue){
+        return minMaxSetting.equals(MinMaxSetting.MINIMUM)? limitValue < calculatedValue : limitValue > calculatedValue;
+    }
+
     public static List<LocalDate> getSortedAndUniqueDates(List<ShiftQueryResultWithActivity> shifts){
-        List<LocalDate> dates=new ArrayList<LocalDate>(shifts.stream().map(s->DateUtils.asJodaLocalDate(s.getStartDate())).collect(Collectors.toSet()));
+        List<LocalDate> dates=new ArrayList<LocalDate>(shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
         Collections.sort(dates);
         return dates;
     }
@@ -364,9 +391,9 @@ public class WTARuleTemplateValidatorUtility {
     public static boolean isValidForPartOfDay(Shift shift, List<PartOfDay> partOfDays, List<TimeSlotWrapper> timeSlotWrappers){
         for (PartOfDay partOfDay:partOfDays){
             switch (partOfDay){
-                case DAY: return new TimeInterval(new DateTime(shift.getStartDate()).getMinuteOfDay(),new DateTime(shift.getEndDate()).getMinuteOfDay()).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
-                case NIGHT:return new TimeInterval(new DateTime(shift.getStartDate()).getMinuteOfDay(),new DateTime(shift.getEndDate()).getMinuteOfDay()).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
-                case EVENING:return new TimeInterval(new DateTime(shift.getStartDate()).getMinuteOfDay(),new DateTime(shift.getEndDate()).getMinuteOfDay()).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
+                case DAY: return new TimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY),DateUtils.getZoneDateTime(shift.getEndDate()).get(ChronoField.MINUTE_OF_DAY)).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
+                case NIGHT:return new TimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY),DateUtils.getZoneDateTime(shift.getEndDate()).get(ChronoField.MINUTE_OF_DAY)).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
+                case EVENING:return new TimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY),DateUtils.getZoneDateTime(shift.getEndDate()).get(ChronoField.MINUTE_OF_DAY)).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
             }
         }
         return false;
@@ -392,7 +419,7 @@ public class WTARuleTemplateValidatorUtility {
         return interval1;
     }*/
 
-    public DateTimeInterval getIntervalByRuleTemplate(Shift shift,String intervalUnit,long intervalValue){
+    public static DateTimeInterval getIntervalByRuleTemplate(ShiftQueryResultWithActivity shift,String intervalUnit,long intervalValue){
         DateTimeInterval interval = null;
         switch (intervalUnit){
             case DAYS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusDays((int)intervalValue),DateUtils.getZoneDateTime(shift.getEndDate()).plusDays((int)intervalValue));
@@ -407,7 +434,7 @@ public class WTARuleTemplateValidatorUtility {
         return interval;
     }
 
-    public DateTimeInterval getIntervalByNumberOfWeeks(Shift shift, int numberOfWeeks, LocalDate validationStartDate){
+    public DateTimeInterval getIntervalByNumberOfWeeks(ShiftQueryResultWithActivity shift, int numberOfWeeks, LocalDate validationStartDate){
         LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
         DateTimeInterval dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()),endDate.atStartOfDay(ZoneId.systemDefault()));
         do {
@@ -423,65 +450,65 @@ public class WTARuleTemplateValidatorUtility {
         });
     }*/
 
-    public DateTimeInterval getIntervalByRuleTemplates(Shift shift, List<WTABaseRuleTemplate> wtaBaseRuleTemplates){
+    public DateTimeInterval getIntervalByRuleTemplates(ShiftQueryResultWithActivity shift, List<WTABaseRuleTemplate> wtaBaseRuleTemplates){
         DateTimeInterval interval = new DateTimeInterval(shift.getStartDate().getTime(),shift.getEndDate().getTime());
         for (WTABaseRuleTemplate ruleTemplate : wtaBaseRuleTemplates) {
             switch (ruleTemplate.getWtaTemplateType()) {
                 case NUMBER_OF_PARTOFDAY:
                     NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = (NumberOfPartOfDayShiftsWTATemplate)ruleTemplate;
-                    interval.addInterval(getIntervalByRuleTemplate(shift,numberOfPartOfDayShiftsWTATemplate.getIntervalUnit(),numberOfPartOfDayShiftsWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,numberOfPartOfDayShiftsWTATemplate.getIntervalUnit(),numberOfPartOfDayShiftsWTATemplate.getIntervalLength()));
+
 
                     break;
                 case DAYS_OFF_IN_PERIOD:
                     DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = (DaysOffInPeriodWTATemplate)ruleTemplate;
-                    interval = getIntervalByRuleTemplate(shift,daysOffInPeriodWTATemplate.getIntervalUnit(),daysOffInPeriodWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,daysOffInPeriodWTATemplate.getIntervalUnit(),daysOffInPeriodWTATemplate.getIntervalLength()));
 
                     break;
                 case AVERAGE_SHEDULED_TIME:
                     AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate)ruleTemplate;
-                    interval = getIntervalByRuleTemplate(shift,averageScheduledTimeWTATemplate.getIntervalUnit(),averageScheduledTimeWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,averageScheduledTimeWTATemplate.getIntervalUnit(),averageScheduledTimeWTATemplate.getIntervalLength()));
                     break;
                 case VETO_PER_PERIOD:
                     VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate = (VetoPerPeriodWTATemplate)ruleTemplate;
-                    interval = getIntervalByNumberOfWeeks(shift,vetoPerPeriodWTATemplate.getNumberOfWeeks(),vetoPerPeriodWTATemplate.getValidationStartDate());
+                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift,vetoPerPeriodWTATemplate.getNumberOfWeeks(),vetoPerPeriodWTATemplate.getValidationStartDate()));
 
                     break;
                 case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
                     NumberOfWeekendShiftsInPeriodWTATemplate numberOfWeekendShiftsInPeriodWTATemplate = (NumberOfWeekendShiftsInPeriodWTATemplate)ruleTemplate;
-                    interval = getIntervalByRuleTemplate(shift,numberOfWeekendShiftsInPeriodWTATemplate.getIntervalUnit(),numberOfWeekendShiftsInPeriodWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,numberOfWeekendShiftsInPeriodWTATemplate.getIntervalUnit(),numberOfWeekendShiftsInPeriodWTATemplate.getIntervalLength()));
 
                     break;
                 case WEEKLY_REST_PERIOD:
                     WeeklyRestPeriodWTATemplate weeklyRestPeriodWTATemplate = (WeeklyRestPeriodWTATemplate)ruleTemplate;
-                    interval = getIntervalByRuleTemplate(shift,weeklyRestPeriodWTATemplate.getIntervalUnit(),weeklyRestPeriodWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,weeklyRestPeriodWTATemplate.getIntervalUnit(),weeklyRestPeriodWTATemplate.getIntervalLength()));
 
                     break;
                 case SHORTEST_AND_AVERAGE_DAILY_REST:
                     ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate)ruleTemplate;
-                    interval = getIntervalByRuleTemplate(shift,shortestAndAverageDailyRestWTATemplate.getIntervalUnit(),shortestAndAverageDailyRestWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,shortestAndAverageDailyRestWTATemplate.getIntervalUnit(),shortestAndAverageDailyRestWTATemplate.getIntervalLength()));
 
                     break;
                 case NUMBER_OF_SHIFTS_IN_INTERVAL:
                     ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate = (ShiftsInIntervalWTATemplate)ruleTemplate;
-                    interval = getIntervalByRuleTemplate(shift,shiftsInIntervalWTATemplate.getIntervalUnit(),shiftsInIntervalWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift,shiftsInIntervalWTATemplate.getIntervalUnit(),shiftsInIntervalWTATemplate.getIntervalLength()));
 
                     break;
                 case SENIOR_DAYS_PER_YEAR:
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate)ruleTemplate;
-                    interval = getIntervalByNumberOfWeeks(shift,seniorDaysPerYearWTATemplate.getNumberOfWeeks().intValue(),seniorDaysPerYearWTATemplate.getValidationStartDate());
+                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift,seniorDaysPerYearWTATemplate.getNumberOfWeeks().intValue(),seniorDaysPerYearWTATemplate.getValidationStartDate()));
 
                     break;
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)ruleTemplate;
-                    interval = getIntervalByNumberOfWeeks(shift,childCareDaysCheckWTATemplate.getNumberOfWeeks(),childCareDaysCheckWTATemplate.getValidationStartDate());
+                    interval = interval.addInterval(getIntervalByNumberOfWeeks(shift,childCareDaysCheckWTATemplate.getNumberOfWeeks(),childCareDaysCheckWTATemplate.getValidationStartDate()));
 
                     break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
         }
-
-
+        return interval;
     }
 
 }
