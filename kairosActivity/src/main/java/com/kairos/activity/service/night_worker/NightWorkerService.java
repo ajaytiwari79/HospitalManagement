@@ -4,14 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.night_worker.NightWorker;
+import com.kairos.activity.persistence.model.night_worker.NightWorkerUnitSettings;
 import com.kairos.activity.persistence.model.night_worker.QuestionAnswerPair;
 import com.kairos.activity.persistence.model.night_worker.StaffQuestionnaire;
 import com.kairos.activity.persistence.repository.night_worker.NightWorkerMongoRepository;
+import com.kairos.activity.persistence.repository.night_worker.NightWorkerUnitSettingsMongoRepository;
 import com.kairos.activity.persistence.repository.night_worker.StaffQuestionnaireMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.response.dto.web.night_worker.NightWorkerUnitSettingsDTO;
 import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
 import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,9 @@ public class NightWorkerService extends MongoBaseService {
 
     @Inject
     StaffQuestionnaireMongoRepository staffQuestionnaireMongoRepository;
+
+    @Inject
+    NightWorkerUnitSettingsMongoRepository nightWorkerUnitSettingsMongoRepository;
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaire(Long unitId, Long staffId){
         return nightWorkerMongoRepository.getNightWorkerQuestionnaireDetails(staffId);
@@ -111,6 +117,7 @@ public class NightWorkerService extends MongoBaseService {
         return staffQuestionnaire;
     }
 
+
     // Function will called for scheduled job
     public void createNightWorkerQuestionnaireForStaff(Long staffId){
 
@@ -127,5 +134,29 @@ public class NightWorkerService extends MongoBaseService {
         save(nightWorker);
     }
 
+    public NightWorkerUnitSettings createDefaultNightWorkerSettings(Long unitId) {
+        NightWorkerUnitSettings nightWorkerSettings = new NightWorkerUnitSettings(AppConstants.ELIGIBLE_MIN_AGE,AppConstants.ELIGIBLE_MAX_AGE, unitId);
+        save(nightWorkerSettings);
+        return nightWorkerSettings;
+    }
 
+    public NightWorkerUnitSettingsDTO getNightWorkerSettings(Long unitId){
+        NightWorkerUnitSettings nightWorkerSettings = nightWorkerUnitSettingsMongoRepository.findByUnit(unitId);
+        if(!Optional.ofNullable(nightWorkerSettings).isPresent()){
+            nightWorkerSettings =  createDefaultNightWorkerSettings(unitId);
+        }
+        return ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettings, NightWorkerUnitSettingsDTO.class);
+    }
+
+    public NightWorkerUnitSettingsDTO updateNightWorkerSettings(Long unitId, NightWorkerUnitSettingsDTO unitSettingsDTO) {
+        NightWorkerUnitSettings nightWorkerSettings = nightWorkerUnitSettingsMongoRepository.findByUnit(unitId);
+        if (!Optional.ofNullable(nightWorkerSettings).isPresent()) {
+            throw new DataNotFoundByIdException("Night Worker setting not found for unit : "+unitId);
+        }
+        nightWorkerSettings.setEligibleMinAge(unitSettingsDTO.getEligibleMinAge());
+        nightWorkerSettings.setEligibleMaxAge(unitSettingsDTO.getEligibleMaxAge());
+
+        save(nightWorkerSettings);
+        return unitSettingsDTO;
+    }
 }
