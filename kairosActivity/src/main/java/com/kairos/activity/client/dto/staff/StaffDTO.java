@@ -2,6 +2,7 @@ package com.kairos.activity.client.dto.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.client.dto.skill.Skill;
+import com.kairos.persistence.model.enums.Gender;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -44,6 +45,9 @@ public class StaffDTO {
     private String profilePic;
     private Set<Skill> skillSet;
     private Long unitEmploymentPositionId;
+    private Gender gender;
+    private boolean pregnant;
+
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
@@ -235,5 +239,21 @@ public class StaffDTO {
 
     public void setContactDetail(ContactDetail contactDetail) {
         this.contactDetail = contactDetail;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
     }
 }
