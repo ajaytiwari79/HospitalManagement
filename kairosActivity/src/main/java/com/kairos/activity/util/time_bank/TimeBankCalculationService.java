@@ -712,7 +712,7 @@ public class TimeBankCalculationService {
                     nextEndDay = startDateTime.plusDays(1);
                     break;
                 case WEEKLY:
-                    nextEndDay = startDateTime.getDayOfWeek() == 7 ? startDateTime.plusWeeks(1) : startDateTime.withDayOfWeek(DateTimeConstants.SUNDAY);
+                    nextEndDay = startDateTime.getDayOfWeek() == 1 ? startDateTime.plusWeeks(1) : startDateTime.withDayOfWeek(DateTimeConstants.MONDAY).plusWeeks(1);
                     break;
                 case MONTHLY:
                     nextEndDay = startDateTime.dayOfMonth().withMaximumValue().plusDays(1);
@@ -725,7 +725,7 @@ public class TimeBankCalculationService {
                     break;
                 //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
             }
-            intervals.add(new Interval(startDateTime, nextEndDay));
+            intervals.add(new Interval(startDateTime, nextEndDay.isAfter(endDateTime)?endDateTime:nextEndDay));
             startDateTime = nextEndDay;
         }
         if (!startDateTime.equals(endDateTime) && startDateTime.isBefore(endDateTime)) {
