@@ -990,7 +990,7 @@ public class ActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
         }
         if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
-            exceptionService.actionNotPermittedException("Activity is not eligible for copy","RulesActivityTab.isEligibleForCopy");
+            exceptionService.actionNotPermittedException("Activity is not eligible for copy");
         }
 
 
