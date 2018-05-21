@@ -1,8 +1,6 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
@@ -15,6 +13,7 @@ import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepos
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.ADVANCE;
@@ -42,14 +40,16 @@ public class TimeSlotService extends UserBaseService {
     private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
     private TimeSlotSetRepository timeSlotSetRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     private static final Logger logger = LoggerFactory.getLogger(TimeSlotService.class);
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (organization == null) {
-            throw new InternalError("Organization can not found");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
         return prepareTimeSlotResponse(organization);
     }
@@ -61,7 +61,7 @@ public class TimeSlotService extends UserBaseService {
     public Map<String, Object> getTimeSlotSets(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (organization == null) {
-            throw new InternalError("Organization can not found");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
         }
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(),TimeSlotType.TASK_PLANNING);
         Map<String,Object> timeSlotSetData = new HashMap<>();
@@ -73,7 +73,8 @@ public class TimeSlotService extends UserBaseService {
     public TimeSlotSet createTimeSlotSet(long unitId, TimeSlotSetDTO timeSlotSetDTO) {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
-            throw new InternalError("Unit is not present");
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         TimeSlotSet timeSlotSet = new TimeSlotSet(timeSlotSetDTO.getName(), timeSlotSetDTO.getStartDate(), unit.getTimeSlotMode());
         timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
@@ -88,7 +89,8 @@ public class TimeSlotService extends UserBaseService {
     public TimeSlotDTO createTimeSlot(Long timeSlotSetId,TimeSlotDTO timeSlotDTO){
         TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
         if(!Optional.ofNullable(timeSlotSet).isPresent()){
-            throw new DataNotFoundByIdException("Invalid time slot id");
+            exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
+
         }
         TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
         ObjectMapper objectMapper = new ObjectMapper();
@@ -109,7 +111,8 @@ public class TimeSlotService extends UserBaseService {
             TimeSlot timeSlot = (Optional.ofNullable(timeSlotDTO.getId()).isPresent())?
                     timeSlotGraphRepository.findOne(timeSlotDTO.getId()):new TimeSlot(timeSlotDTO.getName());
             if(timeSlot == null){
-                throw new InternalError("Invalid time slot id");
+                exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
+
             }
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
                     (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
@@ -124,12 +127,13 @@ public class TimeSlotService extends UserBaseService {
     public List<TimeSlotSet> updateTimeSlotSet(Long unitId, Long timeSlotSetId, TimeSlotSetDTO timeSlotSetDTO) {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
-            throw new UnitNotFoundException("Invalid unit id ");
+            exceptionService.unitNotFoundException("message.unit.id.notFound",unitId);
+
         }
         TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
         if (!Optional.ofNullable(timeSlotSet).isPresent()) {
             logger.error("Invalid time slot id " + timeSlotSetId);
-            throw new DataNotFoundByIdException("Invalid time slot id");
+            exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
         }
         List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate(),
                 timeSlotSetDTO.getEndDate(),timeSlotSet.getTimeSlotType());
@@ -159,7 +163,8 @@ public class TimeSlotService extends UserBaseService {
     public Map<String, Object> updateTimeSlotType(long unitId, boolean standardTimeSlot) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new InternalError("Organization can not found");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
         organization.setTimeSlotMode((standardTimeSlot) ? STANDARD : ADVANCE);
         organizationGraphRepository.save(organization);
@@ -171,7 +176,8 @@ public class TimeSlotService extends UserBaseService {
 
         TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
         if(timeSlotSet == null){
-            throw new InternalError("Invalid time slot set id ");
+            exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
+
         }
 
         List<TimeSlotDTO> timeSlotsToUpdate = new ArrayList<>();
@@ -215,12 +221,14 @@ public class TimeSlotService extends UserBaseService {
     public boolean deleteTimeSlotSet(Long unitId, Long timeSlotSetId) {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
-            throw new UnitNotFoundException("Invalid unit id ");
+            exceptionService.unitNotFoundException("message.unit.id.notFound",unitId);
+
         }
         TimeSlotSet timeSlotSetToDelete = timeSlotSetRepository.findOne(timeSlotSetId);
         if (!Optional.ofNullable(timeSlotSetToDelete).isPresent()) {
             logger.error("Invalid time slot id " + timeSlotSetId);
-            throw new DataNotFoundByIdException("Invalid time slot id");
+            exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");
+
         }
         TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByStartDateAfter(unitId, timeSlotSetToDelete.getEndDate());
         if (Optional.ofNullable(timeSlotSet).isPresent()) {
@@ -335,7 +343,8 @@ public class TimeSlotService extends UserBaseService {
     public List<TimeSlotWrapper> getCurrentTimeSlotOfUnit(Long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId,0);
         if(!Optional.ofNullable(unit).isPresent()){
-            throw new InternalError("Unit is null");
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(),unit.getTimeSlotMode(),new Date());
         return timeSlotWrappers;
@@ -402,7 +411,8 @@ public class TimeSlotService extends UserBaseService {
     public List<TimeSlotSet> getShiftPlanningTimeSlotSetsByUnit(Long unitId){
          Organization organization = organizationGraphRepository.findById(unitId, 0).get();
          if(!Optional.ofNullable(organization).isPresent()){
-             throw new DataNotFoundByIdException("Organization not found");
+             exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
          }
          return timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
     }

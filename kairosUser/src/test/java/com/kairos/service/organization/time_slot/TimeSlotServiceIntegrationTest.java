@@ -5,6 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,7 +42,8 @@ public class TimeSlotServiceIntegrationTest {
     private String url ;
     @Autowired
     TestRestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
     private static final DateFormat df = new SimpleDateFormat(ONLY_DATE);
 
     @Test
@@ -103,8 +106,10 @@ public class TimeSlotServiceIntegrationTest {
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         }else{
-            throw new UnsupportedOperationException("ogranization ID must not be null");
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
+
         }
+        return null;
 
     }
 }

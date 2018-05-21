@@ -1,7 +1,5 @@
 package com.kairos.service.pay_group_area;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
@@ -15,6 +13,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaResponse;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,22 +39,25 @@ public class PayGroupAreaService extends UserBaseService {
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
     private PayGroupAreaRelationshipRepository payGroupAreaRelationshipRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     private Logger logger = LoggerFactory.getLogger(PayGroupArea.class);
 
     public PayGroupAreaQueryResult savePayGroupArea(Long countryId, PayGroupAreaDTO payGroupAreaDTO) {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
         Level level = countryGraphRepository.getLevel(countryId, payGroupAreaDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid level id " + payGroupAreaDTO.getLevelId());
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",payGroupAreaDTO.getLevelId());
+
         }
         Optional<Municipality> municipality = municipalityGraphRepository.findById(payGroupAreaDTO.getMunicipalityId());
         if (!Optional.ofNullable(municipality).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
+            exceptionService.dataNotFoundByIdException("message.paygroup.municipality.notFound",payGroupAreaDTO.getMunicipalityId());
+
         }
         // Pay group area is already created Need to make a relationship with the new Municipality with pay group area
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository
@@ -66,7 +68,8 @@ public class PayGroupAreaService extends UserBaseService {
         if (Optional.ofNullable(payGroupAreaDTO.getPayGroupAreaId()).isPresent()) {
             payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getPayGroupAreaId());
             if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
-                throw new DataNotFoundByIdException("Invalid pay group id");
+                exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaDTO.getPayGroupAreaId());
+
             }
         } else {
             // creating a new Pay group area and creating relationship among them
@@ -89,7 +92,8 @@ public class PayGroupAreaService extends UserBaseService {
         Optional<PayGroupAreaMunicipalityRelationship> municipalityRelationship = payGroupAreaRelationshipRepository.findById(payGroupAreaDTO.getId());
         if (!municipalityRelationship.isPresent()) {
             logger.info("pay group area not found");
-            throw new DataNotFoundByIdException("Invalid pay group id" + payGroupAreaDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaDTO.getId());
+
         }
 
 
@@ -107,7 +111,8 @@ public class PayGroupAreaService extends UserBaseService {
             logger.info(payGroupAreaDTO.getMunicipalityId() + "-----CHANGED-----" + (municipalityRelationship.get().getMunicipality().getId()));
             Optional<Municipality> municipality = municipalityGraphRepository.findById(payGroupAreaDTO.getMunicipalityId());
             if (!Optional.ofNullable(municipality).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
+                exceptionService.dataNotFoundByIdException("message.paygroup.municipality.notFound",payGroupAreaDTO.getMunicipalityId());
+
             }
 
             payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityRelationship.get().getMunicipality().getId(), payGroupAreaDTO.getId());
@@ -138,21 +143,24 @@ public class PayGroupAreaService extends UserBaseService {
                 if (payGroupAreas.get(i).getEndDateMillis() != null) {
                     if (new DateTime(payGroupAreas.get(i).getStartDateMillis()).isBefore(new DateTime(payGroupAreaDTO.getEndDateMillis()))
                             && new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
-                        throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDateMillis())
-                                + " " + (new DateTime(payGroupAreaDTO.getEndDateMillis())) + " " + new DateTime(payGroupAreas.get(i).getEndDateMillis()) + " " + (new DateTime(payGroupAreaDTO.getStartDateMillis())));
+                        exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap1",new DateTime(payGroupAreas.get(i).getStartDateMillis()),(new DateTime(payGroupAreaDTO.getEndDateMillis())), new DateTime(payGroupAreas.get(i).getEndDateMillis()),(new DateTime(payGroupAreaDTO.getStartDateMillis())));
+                        //throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDateMillis())
+                        //        + " " + (new DateTime(payGroupAreaDTO.getEndDateMillis())) + " " + new DateTime(payGroupAreas.get(i).getEndDateMillis()) + " " + (new DateTime(payGroupAreaDTO.getStartDateMillis())));
                     }
                 } else {
                     if (new DateTime(payGroupAreaDTO.getEndDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
                         Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
                         payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(),payGroupAreas.get(i).getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
                     } else {
-                        throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getEndDateMillis()) + " " + (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+                        exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap",new DateTime(payGroupAreaDTO.getEndDateMillis()),(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+
                     }
                 }
             } else {
                 if (payGroupAreas.get(i).getEndDateMillis() != null) {
                     if (new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
-                        throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getStartDateMillis()) + " old" + (new DateTime(payGroupAreas.get(i).getEndDateMillis())));
+                        exceptionService.actionNotPermittedException("message.paygroup.daterange.overlapold",new DateTime(payGroupAreaDTO.getStartDateMillis()),(new DateTime(payGroupAreas.get(i).getEndDateMillis())));
+
                     }
                 } else {
                     logger.info(new DateTime(payGroupAreaDTO.getStartDateMillis())+"to create CURRENT -->"+(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
@@ -161,7 +169,8 @@ public class PayGroupAreaService extends UserBaseService {
                         logger.info(new DateTime(dateOneDayLessStartDate) + " new Date to update--------------");
                         payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(),payGroupAreas.get(i).getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
                     } else {
-                        throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getStartDateMillis()) + " " + (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+                        exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap",new DateTime(payGroupAreaDTO.getStartDateMillis()),(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+
                     }
                 }
             }
@@ -172,7 +181,8 @@ public class PayGroupAreaService extends UserBaseService {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
             logger.info("pay group area not found for deletion  ");
-            throw new DataNotFoundByIdException("Invalid pay group id");
+            exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaId);
+
         }
         payGroupArea.setDeleted(true);
         save(payGroupArea);
@@ -182,7 +192,8 @@ public class PayGroupAreaService extends UserBaseService {
     public List<PayGroupAreaQueryResult> getPayGroupArea(Long countryId, Long levelId) {
         Level level = countryGraphRepository.getLevel(countryId, levelId);
         if (!Optional.ofNullable(level).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid level in country");
+           exceptionService.dataNotFoundByIdException("message.paygroup.level.notfound");
+
         }
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
         return payGroupAreas;
@@ -191,7 +202,8 @@ public class PayGroupAreaService extends UserBaseService {
     public PayGroupAreaResponse getMunicipalityAndOrganizationLevel(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid country id");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
@@ -204,7 +216,8 @@ public class PayGroupAreaService extends UserBaseService {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
             logger.info("pay group area not found for deletion  ");
-            throw new DataNotFoundByIdException("Invalid pay group id");
+            exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaId);
+
         }
 
         payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityId, relationshipId);
