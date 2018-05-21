@@ -99,13 +99,7 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeByIds(ids));
     }
 
-    //bobby
-    /*@ApiOperation(value = "Get  Organization Types by set ids")
-    @RequestMapping(value = "/organization_sub_types/", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> getAllOrganizationSubTypeByIds(@RequestBody Set<Long> ids) {
-        List<OrganizationType> response = organizationTypeService.getAllOrganizationSubTypeByIds(ids);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
-    }*/
+
 
 //bobby
     @ApiOperation(value = "get organization and services")

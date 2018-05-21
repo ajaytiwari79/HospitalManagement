@@ -41,7 +41,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
 
     public List<ProcessingPurpose> getAllProcessingPurpose() {
-        List<ProcessingPurpose> result = processingPurposeMongoRepository.findAll();
+        List<ProcessingPurpose> result = processingPurposeMongoRepository.findAllProcessingPurposes();
         if (result.size() != 0) {
             return result;
 
@@ -52,7 +52,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     public ProcessingPurpose getProcessingPurposeById(BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
@@ -64,11 +64,12 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurposeById(BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            processingPurposeMongoRepository.delete(exist);
+           exist.setDeleted(true);
+           save(exist);
             return true;
 
         }
@@ -81,7 +82,7 @@ public class ProcessingPurposeService extends MongoBaseService {
         {
             throw new InvalidRequestException("requested dataSource  is null or empty");
         }
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {

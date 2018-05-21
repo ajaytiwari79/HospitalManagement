@@ -18,7 +18,15 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
 
     Clause findByTitle(String title);
 
-    Clause findByid(BigInteger id);
+
+
+    @Query("{'_id':?0,deleted:false}")
+    Clause findByIdAndNonDeleted(BigInteger id);
+
+
+    @Query("{deleted:false}")
+    List<Clause>  findAllClause();
+
 
     @Query("{'accountType':?0}")
     List<Clause> getClauseByAccountType(String accountType);

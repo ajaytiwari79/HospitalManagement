@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 import static com.kairos.constant.ApiConstant.API_AGREEMENT_SECTION_URL;
 
@@ -61,6 +63,15 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
     public ResponseEntity<Object>  getAllAgreementSection()
     {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAllAgreementSection());
+
+    }
+
+
+
+    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    public ResponseEntity<Object>  getAllAgreementSectionList(@RequestBody @NotEmpty Set<BigInteger> ids)
+    {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAgreementSectionWithDataList(ids));
 
     }
 

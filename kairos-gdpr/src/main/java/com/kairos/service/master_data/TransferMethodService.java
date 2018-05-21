@@ -43,7 +43,7 @@ public class TransferMethodService extends MongoBaseService {
 
 
     public List<TransferMethod> getAllTransferMethod() {
-        List<TransferMethod> result = transferMethodMongoRepository.findAll();
+        List<TransferMethod> result = transferMethodMongoRepository.findAllTransferMethods();
         if (result.size()!=0) {
             return result;
 
@@ -55,7 +55,7 @@ public class TransferMethodService extends MongoBaseService {
 
     public TransferMethod getTransferMethodById(BigInteger id) {
 
-        TransferMethod exist = transferMethodMongoRepository.findByid(id);
+        TransferMethod exist = transferMethodMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -68,11 +68,12 @@ public class TransferMethodService extends MongoBaseService {
 
     public Boolean deleteTransferMethodById(BigInteger id) {
 
-        TransferMethod exist = transferMethodMongoRepository.findByid(id);
+        TransferMethod exist = transferMethodMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            transferMethodMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -85,7 +86,7 @@ public class TransferMethodService extends MongoBaseService {
         {
             throw new InvalidRequestException("requested dataSource  is null or empty");
         }
-        TransferMethod exist = transferMethodMongoRepository.findByid(id);
+        TransferMethod exist = transferMethodMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {

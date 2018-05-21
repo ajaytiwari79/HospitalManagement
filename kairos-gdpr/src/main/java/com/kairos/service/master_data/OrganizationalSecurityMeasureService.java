@@ -40,7 +40,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
 
     public List<OrganizationalSecurityMeasure> getAllOrganizationalSecurityMeasure() {
-        List<OrganizationalSecurityMeasure> result = organizationalSecurityMeasureMongoRepository.findAll();
+        List<OrganizationalSecurityMeasure> result = organizationalSecurityMeasureMongoRepository.findAllHostingProviders();
         if (result.size() != 0) {
             return result;
 
@@ -51,7 +51,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureById(BigInteger id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByid(id);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -63,11 +63,12 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     public Boolean deleteOrganizationalSecurityMeasureById(BigInteger id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByid(id);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            organizationalSecurityMeasureMongoRepository.delete(exist);
+           exist.setDeleted(true);
+           save(exist);
             return true;
 
         }
@@ -80,7 +81,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
             throw new InvalidRequestException("requested orgSecurityMeasure name is null");
 
         }
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByid(id);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

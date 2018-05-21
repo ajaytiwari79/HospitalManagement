@@ -42,7 +42,7 @@ public class HostingProviderService extends MongoBaseService {
 
 
     public List<HostingProvider> getAllHostingProvider() {
-        List<HostingProvider> result = hostingProviderMongoRepository.findAll();
+        List<HostingProvider> result = hostingProviderMongoRepository.findAllHostingProviders();
         if (result.size() != 0) {
             return result;
 
@@ -53,7 +53,7 @@ public class HostingProviderService extends MongoBaseService {
 
     public HostingProvider getHostingProviderById(BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByid(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -65,11 +65,12 @@ public class HostingProviderService extends MongoBaseService {
 
     public Boolean deleteHostingProviderById(BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByid(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            hostingProviderMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -82,7 +83,7 @@ public class HostingProviderService extends MongoBaseService {
             throw new InvalidRequestException("requested hostingProvider is null");
 
         }
-        HostingProvider exist = hostingProviderMongoRepository.findByid(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

@@ -43,7 +43,7 @@ public class DataSourceService extends MongoBaseService {
 
 
     public List<DataSource> getAllDataSource() {
-        List<DataSource> result = dataSourceMongoRepository.findAll();
+        List<DataSource> result = dataSourceMongoRepository.findAllDataSources();
         if (result.size()!=0) {
             return result;
 
@@ -55,7 +55,7 @@ public class DataSourceService extends MongoBaseService {
 
     public DataSource getDataSourceById(BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByid(id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
@@ -68,11 +68,12 @@ public class DataSourceService extends MongoBaseService {
 
     public Boolean deleteDataSourceById(BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByid(id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            dataSourceMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -85,7 +86,7 @@ public class DataSourceService extends MongoBaseService {
             throw new InvalidRequestException("requested dataSource  is null or empty");
         }
 
-        DataSource exist = dataSourceMongoRepository.findByid(id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {

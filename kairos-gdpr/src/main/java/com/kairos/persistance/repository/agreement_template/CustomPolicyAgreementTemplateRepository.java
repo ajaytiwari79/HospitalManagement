@@ -1,11 +1,11 @@
 package com.kairos.persistance.repository.agreement_template;
 
-import com.kairos.response.dto.agreement_template.AgreementQueryResult;
+import com.kairos.response.dto.agreement_template.PolicyAgreementTemplateResponseDto;
 
 import java.math.BigInteger;
 
 public interface CustomPolicyAgreementTemplateRepository {
 
-    AgreementQueryResult findById(BigInteger id);
+    PolicyAgreementTemplateResponseDto getpolicyAgreementWithData(BigInteger id);
 
 }

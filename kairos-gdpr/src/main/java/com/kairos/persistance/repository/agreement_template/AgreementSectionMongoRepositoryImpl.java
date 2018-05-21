@@ -6,11 +6,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
-
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSectionRepository {
 
@@ -21,10 +21,9 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
 
 
     @Override
-    public AgreementSectionResponseDto getAgreementSectionWithDataById(BigInteger id,Boolean deleted) {
+    public AgreementSectionResponseDto getAgreementSectionWithDataById(BigInteger id) {
         Aggregation aggregation=Aggregation.newAggregation(
-
-                match(Criteria.where("_id").is(id).and("deleted").is(deleted)),
+                match(Criteria.where("_id").is(id).and("deleted").is(false)),
                 lookup("clause","clauseIds","_id","clauses")
         );
         AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);
@@ -36,6 +35,17 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where("deleted").is(false)),
+                lookup("clause","clauseIds","_id","clauses")
+        );
+        AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);
+        return  response.getMappedResults();
+    }
+
+    @Override
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Set<BigInteger> ids) {
+        Aggregation aggregation=Aggregation.newAggregation(
+
+                match(Criteria.where("deleted").is(false).and("_id").in(ids)),
                 lookup("clause","clauseIds","_id","clauses")
         );
         AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);

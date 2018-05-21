@@ -16,6 +16,8 @@ public interface AgreementSectionMongoRepository extends MongoRepository<Agreeme
     @Query("{'_id':?0,deleted:false}")
     AgreementSection findByIdAndNonDeleted(BigInteger id);
 
+    AgreementSection findByid(BigInteger id);
+
     AgreementSection findByTitle(String name);
 
     @Query("{'_id':{$in:?0},deleted:false}")

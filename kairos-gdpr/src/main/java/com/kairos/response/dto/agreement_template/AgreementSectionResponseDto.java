@@ -14,6 +14,7 @@ import java.util.List;
 public class AgreementSectionResponseDto {
 
     BigInteger id;
+    private String title;
     List<Clause> clauses;
 
     public BigInteger getId() {
@@ -31,6 +32,15 @@ public class AgreementSectionResponseDto {
     public void setClauses(List<Clause> clauses) {
         this.clauses = clauses;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public AgreementSectionResponseDto()
     {
 

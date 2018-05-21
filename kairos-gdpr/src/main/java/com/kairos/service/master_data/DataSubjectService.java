@@ -40,7 +40,7 @@ public class DataSubjectService extends MongoBaseService {
 
 
     public List<DataSubject> getAllDataSubject() {
-        List<DataSubject> result = dataSubjectMongoRepository.findAll();
+        List<DataSubject> result = dataSubjectMongoRepository.findAllDataSubjects();
         if (result.size()!=0) {
             return result;
 
@@ -52,7 +52,7 @@ public class DataSubjectService extends MongoBaseService {
 
     public DataSubject getDataSubjectById(BigInteger id) {
 
-        DataSubject exist = dataSubjectMongoRepository.findByid(id);
+        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -65,11 +65,12 @@ public class DataSubjectService extends MongoBaseService {
 
     public Boolean deleteDataSubjectById(BigInteger id) {
 
-        DataSubject exist = dataSubjectMongoRepository.findByid(id);
+        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            dataSubjectMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -82,7 +83,7 @@ public class DataSubjectService extends MongoBaseService {
         {
             throw new InvalidRequestException("requested dataSource  is null or empty");
         }
-        DataSubject exist = dataSubjectMongoRepository.findByid(id);
+        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {

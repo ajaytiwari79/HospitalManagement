@@ -41,7 +41,7 @@ public class StorageFormatService extends MongoBaseService {
 
 
     public List<StorageFormat> getAllStorageFormat() {
-        List<StorageFormat> result = storageFormatMongoRepository.findAll();
+        List<StorageFormat> result = storageFormatMongoRepository.findAllStorageFormats();
         if (result.size() != 0) {
             return result;
 
@@ -52,7 +52,7 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat getStorageFormatById(BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByid(id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -64,11 +64,12 @@ public class StorageFormatService extends MongoBaseService {
 
     public Boolean deleteStorageFormatById(BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByid(id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            storageFormatMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -80,7 +81,7 @@ public class StorageFormatService extends MongoBaseService {
             throw new InvalidRequestException("requested storageFormat name is null");
 
         }
-        StorageFormat exist = storageFormatMongoRepository.findByid(id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {

@@ -1,6 +1,7 @@
 package com.kairos.controller.agreement_template;
 
 import com.kairos.dto.PolicyAgreementTemplateDto;
+import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -10,9 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
+import javax.jcr.RepositoryException;
 import java.math.BigInteger;
-
-
 import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 
 
@@ -29,7 +29,7 @@ public class AgreementTemplateController {
 
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPolicyAgreementTemplate(@Validated @RequestBody PolicyAgreementTemplateDto agreementTemplateDto) {
+    public ResponseEntity<Object> createPolicyAgreementTemplate(@Validated @RequestBody PolicyAgreementTemplateDto agreementTemplateDto) throws RepositoryException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(agreementTemplateDto));
 
     }
@@ -54,18 +54,27 @@ public class AgreementTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(id));
 
     }
-/*
 
     @PutMapping("/update/{id}")
-    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable BigInteger id, @RequestBody List<BigInteger> clausesIds ) {
+    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDto policyAgreementTemplateDto ) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateAgreementTemplateclauses(id,clausesIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(id,policyAgreementTemplateDto));
 
     }
 
-*/
+
+
+    @GetMapping("template/{id}")
+    public   ResponseEntity<Object> policyDocumentVersion(@PathVariable BigInteger id, @RequestParam VersionNode version) throws RepositoryException {
+        if (id==null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
+        }
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,policyAgreementTemplateService.getPolicyTemplateVersion(id,version));
+
+    }
 
 
 

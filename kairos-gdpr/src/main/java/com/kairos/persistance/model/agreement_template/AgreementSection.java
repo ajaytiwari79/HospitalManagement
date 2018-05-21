@@ -15,13 +15,13 @@ public class AgreementSection extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
     private String title;
-    private SortedSet<BigInteger> clauseIds;
+    private Set<BigInteger> clauseIds;
 
-    public SortedSet<BigInteger> getClauseIds() {
+    public Set<BigInteger> getClauseIds() {
         return clauseIds;
     }
 
-    public void setClauseIds(SortedSet<BigInteger> clauseIds) {
+    public void setClauseIds(Set<BigInteger> clauseIds) {
         this.clauseIds = clauseIds;
     }
 
@@ -34,7 +34,7 @@ public class AgreementSection extends MongoBaseEntity {
     }
 
 
-   public AgreementSection(String title,SortedSet<BigInteger> clauseIds)
+   public AgreementSection(String title,Set<BigInteger> clauseIds)
     {
         this.title=title;
         this.clauseIds=clauseIds;

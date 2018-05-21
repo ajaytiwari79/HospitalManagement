@@ -42,7 +42,7 @@ public class AssetTypeService extends MongoBaseService {
 
 
     public List<AssetType> getAllAssetType() {
-        List<AssetType> result = assetTypeMongoRepository.findAll();
+        List<AssetType> result = assetTypeMongoRepository.findAllAssetTypes();
         if (result.size()!=0) {
             return result;
 
@@ -54,7 +54,7 @@ public class AssetTypeService extends MongoBaseService {
 
     public AssetType getAssetTypeById(BigInteger id) {
 
-        AssetType exist = assetTypeMongoRepository.findByid(id);
+        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -67,11 +67,12 @@ public class AssetTypeService extends MongoBaseService {
 
     public Boolean deleteAssetTypeById(BigInteger id) {
 
-        AssetType exist = assetTypeMongoRepository.findByid(id);
+        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            assetTypeMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -84,7 +85,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new InvalidRequestException("requested AssetType is null");
 
         }
-        AssetType exist = assetTypeMongoRepository.findByid(id);
+        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {

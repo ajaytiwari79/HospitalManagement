@@ -42,7 +42,7 @@ public class ClauseTagService extends MongoBaseService {
 
 
     public List<ClauseTag> getAllClauseTag() {
-        List<ClauseTag> result = clauseTagMongoRepository.findAll();
+        List<ClauseTag> result = clauseTagMongoRepository.findAllClauseTag();
         if (result.size() != 0) {
             return result;
 
@@ -53,7 +53,7 @@ public class ClauseTagService extends MongoBaseService {
 
     public ClauseTag getClauseTagById(BigInteger id) {
 
-        ClauseTag exist = clauseTagMongoRepository.findByid(id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("clause tag not exist for id " + id);
         } else {
@@ -65,11 +65,12 @@ public class ClauseTagService extends MongoBaseService {
 
     public Boolean deleteClauseTagById(BigInteger id) {
 
-        ClauseTag exist = clauseTagMongoRepository.findByid(id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            clauseTagMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -82,7 +83,7 @@ public class ClauseTagService extends MongoBaseService {
             throw new InvalidRequestException("requested paran name is null or empty");
 
         }
-        ClauseTag exist = clauseTagMongoRepository.findByid(id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {

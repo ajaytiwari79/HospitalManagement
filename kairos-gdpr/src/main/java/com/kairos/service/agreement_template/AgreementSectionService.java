@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AgreementSectionService extends MongoBaseService {
@@ -35,8 +36,8 @@ public class AgreementSectionService extends MongoBaseService {
             throw new DuplicateDataException("section with name " + agreementSection.getTitle() + "  already exist");
         }
         for (BigInteger clauseId : agreementSection.getClauseIds()) {
-            if (clauseMongoRepository.findByid(clauseId) == null) {
-                throw new DataNotFoundByIdException("clause for id  " + clauseId + "  nogt found");
+            if (clauseMongoRepository.findByIdAndNonDeleted(clauseId) == null) {
+                throw new DataNotFoundByIdException("clause for id  " + clauseId + "  not found");
             }
         }
         return save(new AgreementSection(agreementSection.getTitle(), agreementSection.getClauseIds()));
@@ -45,11 +46,11 @@ public class AgreementSectionService extends MongoBaseService {
 
     public Boolean deleteAgreementSection(BigInteger id) {
 
-        AgreementSection exist=agreementSectionMongoRepository.findByIdAndNonDeleted(id);
+        AgreementSection exist = agreementSectionMongoRepository.findByIdAndNonDeleted(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
             save(exist);
-           return true;
+            return true;
         }
         throw new DataNotFoundByIdException(" agreement section for id " + id + " not exist");
 
@@ -58,7 +59,7 @@ public class AgreementSectionService extends MongoBaseService {
 
     public AgreementSectionResponseDto getAgreementSectionWithDataById(BigInteger id) {
 
-        AgreementSectionResponseDto exist=agreementSectionMongoRepository.getAgreementSectionWithDataById(id,false);
+        AgreementSectionResponseDto exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
@@ -69,8 +70,8 @@ public class AgreementSectionService extends MongoBaseService {
 
     public List<AgreementSectionResponseDto> getAllAgreementSection() {
 
-        List<AgreementSectionResponseDto> result=agreementSectionMongoRepository.getAllAgreementSectionWithData();
-        if (result.size()!=0) {
+        List<AgreementSectionResponseDto> result = agreementSectionMongoRepository.getAllAgreementSectionWithData();
+        if (result.size() != 0) {
             return result;
         }
         throw new DataNotExists("agreement section not exist create new sections");
@@ -78,37 +79,11 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Set<BigInteger> ids) {
 
-
-
-    public List<AgreementSection> getAgreementSectionByIds(Set<BigInteger> ids) {
-
-        List<AgreementSection> result=new ArrayList<>();
-        for (BigInteger id:ids)
-        {
-            AgreementSection agreementSection=agreementSectionMongoRepository.findByIdAndNonDeleted(id);
-            if (!Optional.ofNullable(agreementSection).isPresent()) {
-                throw new DataNotFoundByIdException("agreement section not found for id "+id);
-            }
-            result.add(agreementSection);
-        }
-return result;
+        return agreementSectionMongoRepository.getAgreementSectionWithDataList(ids);
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

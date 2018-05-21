@@ -7,6 +7,7 @@ import com.kairos.custome_exception.DataNotExists;
 import com.kairos.dto.ClauseDto;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
+import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrievedEvent;
 import com.kairos.utils.ResponseHandler;
@@ -119,6 +120,17 @@ public class ClauseController {
     @GetMapping("/getAll")
     public ResponseEntity<Object> getAllClauses() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses());
+    }
+
+
+
+    @ApiOperation("default clauses page with default size 10 ")
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Object> getclauseVersion(@PathVariable BigInteger id, @RequestParam VersionNode versionNode) throws RepositoryException {
+        if (id!=null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, versionNode));
+        }
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
     }
 
 

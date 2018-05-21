@@ -53,8 +53,8 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(exists).isPresent()) {
             ProcessingActivity processingActivity = new ProcessingActivity();
 
-            AssetType assetType = assetTypeMongoRepository.findByid(processingActivityDto.getAssetTypeid());
-            OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByid(processingActivityDto.getOrgSecurityMeasureid());
+            AssetType assetType = assetTypeMongoRepository.findByIdAndNonDeleted(processingActivityDto.getAssetTypeid());
+            OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(processingActivityDto.getOrgSecurityMeasureid());
 
             if (assetType == null) {
                 throw new DataNotExists("asset type not exist for id " + processingActivityDto.getAssetTypeid());
@@ -64,7 +64,7 @@ public class ProcessingActivityService extends MongoBaseService {
                 throw new DataNotExists("organizationalSecurityMeasure  not exist for id " + processingActivityDto.getOrgSecurityMeasureid());
 
             }
-            TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByid(processingActivityDto.getTechnicalSecurityMeasure());
+            TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(processingActivityDto.getTechnicalSecurityMeasure());
             if (technicalSecurityMeasure == null) {
                 throw new DataNotExists("technical SecurityMeasure  not exist for id " + processingActivityDto.getTechnicalSecurityMeasure());
 

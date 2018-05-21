@@ -40,7 +40,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public List<TechnicalSecurityMeasure> getAllTechnicalSecurityMeasure() {
-        List<TechnicalSecurityMeasure> result = technicalSecurityMeasureMongoRepository.findAll();
+        List<TechnicalSecurityMeasure> result = technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures();
         if (result.size() != 0) {
             return result;
 
@@ -51,7 +51,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public TechnicalSecurityMeasure getTechnicalSecurityMeasureById(BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -63,11 +63,12 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public Boolean deleteTechnicalSecurityMeasureById(BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            technicalSecurityMeasureMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -80,7 +81,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
         }
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {

@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data;
 
 
+import com.kairos.persistance.model.master_data.AssetType;
 import com.kairos.persistance.model.master_data.DataSource;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -12,9 +13,15 @@ import java.util.List;
 @Repository
 public interface DataSourceMongoRepository extends MongoRepository<DataSource,BigInteger> {
 
-    DataSource findByid(BigInteger id);
+    @Query("{'_id':?0,deleted:false}")
+    DataSource findByIdAndNonDeleted(BigInteger id);
     DataSource findByName(String name);
 
     @Query("{'_id':{$in:?0}}")
     List<DataSource> dataSourceList(List<BigInteger> dataSourceids);
+
+
+    @Query("{deleted:false}")
+    List<DataSource> findAllDataSources();
+
 }

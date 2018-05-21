@@ -44,7 +44,7 @@ public class HostingLocationService  extends MongoBaseService {
 
 
     public List<HostingLocation> getAllHostingLocation() {
-        List<HostingLocation> result = hostingLocationMongoRepository.findAll();
+        List<HostingLocation> result = hostingLocationMongoRepository.findAllHostingLocations();
         if (result.size()!=0) {
             return result;
 
@@ -56,7 +56,7 @@ public class HostingLocationService  extends MongoBaseService {
 
     public HostingLocation getHostingLocationById(BigInteger id) {
 
-        HostingLocation exist = hostingLocationMongoRepository.findByid(id);
+        HostingLocation exist = hostingLocationMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
@@ -69,11 +69,12 @@ public class HostingLocationService  extends MongoBaseService {
 
     public Boolean deleteHostingLocationById(BigInteger id) {
 
-        HostingLocation exist = hostingLocationMongoRepository.findByid(id);
+        HostingLocation exist = hostingLocationMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {
-            hostingLocationMongoRepository.delete(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -86,7 +87,7 @@ public class HostingLocationService  extends MongoBaseService {
             throw new InvalidRequestException("requested hostingLocation is null");
 
         }
-        HostingLocation exist = hostingLocationMongoRepository.findByid(id);
+        HostingLocation exist = hostingLocationMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id "+id);
         } else {

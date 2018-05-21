@@ -56,7 +56,7 @@ public class OrganizationTypeAndServiceRestClientRequestDto {
 this.organizationTypeIds=organizationTypeIds;
 this.organizationSubTypeIds=organizationSubTypeIds;
 this.organizationServiceIds=organizationServiceIds;
-this.organizationSubServiceIds=getOrganizationSubServiceIds();
+this.organizationSubServiceIds=organizationSubServiceIds;
 
     }
 
