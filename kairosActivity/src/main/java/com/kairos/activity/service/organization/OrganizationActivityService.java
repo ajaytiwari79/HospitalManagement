@@ -199,7 +199,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
-        //TODO Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
+        //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
