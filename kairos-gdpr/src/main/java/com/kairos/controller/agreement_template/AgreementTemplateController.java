@@ -66,7 +66,18 @@ public class AgreementTemplateController {
 
 
 
-    @GetMapping("template/{id}")
+    @GetMapping("/all")
+    public   ResponseEntity<Object> getPolicyAgreementTemplateWithData()
+    {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,policyAgreementTemplateService.getPolicyAgreementTemplateWithData());
+
+    }
+
+
+
+
+
+    @GetMapping("/template/{id}")
     public   ResponseEntity<Object> policyDocumentVersion(@PathVariable BigInteger id, @RequestParam VersionNode version) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");

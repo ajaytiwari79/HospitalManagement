@@ -10,7 +10,6 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSectionRepository {
 

@@ -5,7 +5,7 @@ import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
+import com.kairos.dto.ClauseTagDto;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;

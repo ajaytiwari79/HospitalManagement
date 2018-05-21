@@ -13,7 +13,6 @@ import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.ClauseDto;
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
 import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.service.MongoBaseService;

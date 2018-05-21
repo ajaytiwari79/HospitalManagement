@@ -1,9 +1,5 @@
 package com.kairos.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;

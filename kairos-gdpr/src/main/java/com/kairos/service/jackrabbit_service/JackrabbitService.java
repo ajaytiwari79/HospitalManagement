@@ -6,6 +6,7 @@ import com.kairos.custome_exception.JackrabbitNodeNotFoundException;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.clause.ClauseBasicResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.jcr.*;
 import javax.jcr.version.Version;
-import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.Calendar;
@@ -26,7 +25,6 @@ import static com.kairos.constant.JackRabbitConstant.NODE_TYPE_UNSTRUCTURED;
 import static com.kairos.constant.JackRabbitConstant.CLAUSE_CHILD_NODE;
 import static com.kairos.constant.JackRabbitConstant.AGREEMENT_TEMPLATE_PARENT_NODE;
 import static com.kairos.constant.JackRabbitConstant.AGREEMENT_TEMPLATE_CHILD_NODE;
-import static com.kairos.constant.JackRabbitConstant.EXTENSION;
 import static com.kairos.constant.JackRabbitConstant.JCR_CONTENT;
 import static com.kairos.constant.JackRabbitConstant.NODE_TYPE_RESOURCE;
 import static com.kairos.constant.JackRabbitConstant.JCR_DATA;
@@ -377,7 +375,7 @@ public class JackrabbitService {
 
                     context.append(section.getTitle());
                     context.append("\n");
-                    for (Clause clause : section.getClauses()) {
+                    for (ClauseBasicResponseDto clause : section.getClauses()) {
                         context.append(clause.getTitle());
                         context.append("\n");
                         context.append(clause.getDescription());

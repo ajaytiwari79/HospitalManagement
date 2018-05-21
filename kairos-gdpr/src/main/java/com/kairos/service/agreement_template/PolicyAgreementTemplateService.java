@@ -117,13 +117,25 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplate getPolicyAgreementTemplateById(BigInteger id) {
-        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
+    public PolicyAgreementTemplateResponseDto getPolicyAgreementTemplateById(BigInteger id) {
+        PolicyAgreementTemplateResponseDto exist = policyAgreementTemplateRepository.getPolicyAgreementWithDataById(id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
         throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
     }
+
+
+
+    public List<PolicyAgreementTemplateResponseDto> getPolicyAgreementTemplateWithData() {
+        List<PolicyAgreementTemplateResponseDto>  exist = policyAgreementTemplateRepository.getPolicyAgreementWithData();
+        if (exist.size()!=0) {
+            return exist;
+        }
+        throw new DataNotExists("policy agreement template ");
+    }
+
+
 
 
     public Boolean deletePolicyAgreementTemplate(BigInteger id) {
@@ -216,22 +228,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         }
 
     }
-
-
-    public PolicyAgreementTemplateResponseDto getPolicyAgreementTemplateWithDataById(BigInteger id) {
-        PolicyAgreementTemplateResponseDto exist = policyAgreementTemplateRepository.getpolicyAgreementWithData(id);
-        if (Optional.ofNullable(exist).isPresent()) {
-            return exist;
-        }
-        throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
-    }
-
-
-
-
-
-
-
 
 
 
