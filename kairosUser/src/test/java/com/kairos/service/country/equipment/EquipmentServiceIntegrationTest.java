@@ -12,6 +12,7 @@ import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
 import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
 import com.kairos.service.country.feature.FeatureService;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
@@ -53,7 +54,8 @@ public class EquipmentServiceIntegrationTest {
     TestRestTemplate restTemplate;
     @Inject
     EquipmentService equipmentService;
-
+    @Inject
+    private ExceptionService exceptionService;
     static String nameOfEquipment = "Test Equipment";
     static Long createdEquipmentId;
     static Long orgId = 71L;
@@ -257,8 +259,9 @@ public class EquipmentServiceIntegrationTest {
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else{
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 }

@@ -4,6 +4,8 @@ import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.staffing_level.Day;
+import com.kairos.activity.service.exception.ExceptionService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -18,6 +20,8 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
     private List<DayType> dayTypes;
     private Set<Day> days = new HashSet<>();
     private Date shiftStartDateTime;
+    @Autowired
+    private ExceptionService exceptionService;
 
     public ActivityDayTypeSpecification(List<DayType> dayTypes, Date shiftStartDateTime) {
         this.dayTypes = dayTypes;
@@ -34,8 +38,9 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
         } else if (this.days.contains(getDay(shiftStartDateTime))) {
             return true;
         } else {
-            throw new InvalidRequestException("Activity cannot be created on this day");
-        }
+            exceptionService.invalidRequestException("message.activity.day.create");
+            }
+        return true;
     }
 
     private Day getDay(Date activityDate) {
@@ -43,7 +48,7 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
         Calendar c = Calendar.getInstance();
         c.setTime(activityDate);
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        Day activityDay;
+        Day activityDay=null;
         switch (dayOfWeek) {
             case 1:
                 activityDay = SUNDAY;
@@ -67,7 +72,8 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
                 activityDay = SATURDAY;
                 break;
             default:
-                throw new InternalError("Invalid day");
+                exceptionService.internalError("error.day.invalid");
+
         }
         return activityDay;
 

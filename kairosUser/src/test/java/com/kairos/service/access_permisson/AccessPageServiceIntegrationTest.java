@@ -16,6 +16,7 @@ import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,7 +57,7 @@ public class AccessPageServiceIntegrationTest {
     @Inject private CountryService countryService;
     @Inject private OrganizationService organizationService;
     @Inject private AccessPageService accessPageService;
-
+    @Inject private ExceptionService exceptionService;
     static Long countryId = null;
     static Long organizationId = null;
     static Long mainModuleId = null;
@@ -179,9 +180,10 @@ public class AccessPageServiceIntegrationTest {
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else{
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 
 }

@@ -1,8 +1,6 @@
 package com.kairos.activity.service.night_worker;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.night_worker.NightWorker;
 import com.kairos.activity.persistence.model.night_worker.NightWorkerUnitSettings;
 import com.kairos.activity.persistence.model.night_worker.QuestionAnswerPair;
@@ -11,6 +9,7 @@ import com.kairos.activity.persistence.repository.night_worker.NightWorkerMongoR
 import com.kairos.activity.persistence.repository.night_worker.NightWorkerUnitSettingsMongoRepository;
 import com.kairos.activity.persistence.repository.night_worker.StaffQuestionnaireMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -37,6 +35,8 @@ public class NightWorkerService extends MongoBaseService {
 
     @Inject
     NightWorkerMongoRepository nightWorkerMongoRepository;
+    @Inject
+    ExceptionService exceptionService;
 
     @Inject
     StaffQuestionnaireMongoRepository staffQuestionnaireMongoRepository;
@@ -60,7 +60,7 @@ public class NightWorkerService extends MongoBaseService {
 
     public void validateNightWorkerGeneralDetails(NightWorkerGeneralResponseDTO nightWorkerDTO){
         if(nightWorkerDTO.getQuestionnaireFrequencyInMonths() <= 0){
-            throw new DataNotFoundByIdException("Invalid questionnaire frequency.");
+            exceptionService.dataNotFoundByIdException("message.questionnaire.frequency");
         }
     }
 
@@ -101,7 +101,6 @@ public class NightWorkerService extends MongoBaseService {
             staffQuestionnaire.setSubmittedOn(DateUtils.getLocalDateFromDate(DateUtils.getDate()));
             answerResponseDTO.setSubmitted(true);
             answerResponseDTO.setSubmittedOn(staffQuestionnaire.getSubmittedOn());
-
         }
         staffQuestionnaire.setQuestionAnswerPair(ObjectMapperUtils.copyPropertiesOfListByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
         save(staffQuestionnaire);
