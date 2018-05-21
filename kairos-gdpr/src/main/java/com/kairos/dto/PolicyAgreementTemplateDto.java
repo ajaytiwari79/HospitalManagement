@@ -3,6 +3,7 @@ package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
@@ -41,15 +42,15 @@ public class PolicyAgreementTemplateDto {
     private Set<BigInteger> accountTypes;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set<BigInteger> agreementSections;
+    private List<AgreementSection> agreementSections;
 
     private Long countryId;
 
-    public Set<BigInteger> getAgreementSections() {
+    public List<AgreementSection> getAgreementSections() {
         return agreementSections;
     }
 
-    public void setAgreementSections(Set<BigInteger> agreementSections) {
+    public void setAgreementSections(List<AgreementSection> agreementSections) {
         this.agreementSections = agreementSections;
     }
 

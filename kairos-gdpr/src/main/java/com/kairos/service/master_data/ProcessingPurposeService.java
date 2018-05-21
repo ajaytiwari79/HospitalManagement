@@ -5,7 +5,7 @@ import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
-import com.kairos.persistance.model.master_data.ProcessingPurpose;
+import com.kairos.persistance.model.processing_activity_masterdata.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.ProcessingPurposeMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;

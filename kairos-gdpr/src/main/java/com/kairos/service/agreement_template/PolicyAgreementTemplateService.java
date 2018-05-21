@@ -9,6 +9,7 @@ import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.dto.PolicyAgreementTemplateDto;
+import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
@@ -24,10 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -66,7 +64,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             orgSubTypeIds = policyAgreementTemplateDto.getOrganizationSubTypes();
             orgServiceIds = policyAgreementTemplateDto.getOrganizationServices();
             orgSubServiceIds = policyAgreementTemplateDto.getOrganizationSubServices();
-            Set<BigInteger> agreementSectionIds = policyAgreementTemplateDto.getAgreementSections();
+            List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
@@ -74,7 +72,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
             if (Optional.ofNullable(requestResult).isPresent()) {
-                List<AgreementSectionResponseDto> sectionResponseDtos = new ArrayList<>();
+                Map<String,Object> sections =new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
                     List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
                     comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
@@ -95,9 +93,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 }
 
-                if (agreementSectionIds.size() != 0) {
-                    sectionResponseDtos = agreementSectionService.getAgreementSectionWithDataList(agreementSectionIds);
-                    policyAgreementTemplate.setAgreementSections(agreementSectionIds);
+                if (agreementSection.size() != 0) {
+                    sections= agreementSectionService.createAgreementSections(agreementSection);
+                    policyAgreementTemplate.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 policyAgreementTemplate.setOrganizationTypes(requestResult.getOrganizationTypes());
@@ -105,7 +103,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 policyAgreementTemplate.setDescription(policyAgreementTemplateDto.getDescription());
                 policyAgreementTemplate.setCountryId(policyAgreementTemplateDto.getCountryId());
                 policyAgreementTemplate = save(policyAgreementTemplate);
-                jackrabbitService.addAgreementTemplateJackrabbit(policyAgreementTemplate.getId(), policyAgreementTemplate, sectionResponseDtos);
+                jackrabbitService.addAgreementTemplateJackrabbit(policyAgreementTemplate.getId(), policyAgreementTemplate, (List<AgreementSectionResponseDto>) sections.get("section"));
             } else {
 
                 throw new DataNotExists("data not found in kairos User");
@@ -141,7 +139,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplate updatePolicyAgreementTemplate(BigInteger id, com.kairos.dto.PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
+    public PolicyAgreementTemplate updatePolicyAgreementTemplate(BigInteger id, PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
 
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -153,14 +151,14 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             orgSubTypeIds = policyAgreementTemplateDto.getOrganizationSubTypes();
             orgServiceIds = policyAgreementTemplateDto.getOrganizationServices();
             orgSubServiceIds = policyAgreementTemplateDto.getOrganizationSubServices();
-            Set<BigInteger> agreementSectionIds = policyAgreementTemplateDto.getAgreementSections();
+            List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
             if (Optional.ofNullable(requestResult).isPresent()) {
-                List<AgreementSectionResponseDto> sectionResponseDtos = new ArrayList<>();
+                Map<String,Object> sections =new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
                     List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
                     comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
@@ -181,9 +179,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     exist.setAccountTypes(accountTypeIds);
                 }
 
-                if (agreementSectionIds.size() != 0) {
-                    sectionResponseDtos = agreementSectionService.getAgreementSectionWithDataList(agreementSectionIds);
-                    exist.setAgreementSections(agreementSectionIds);
+                if (agreementSection.size() != 0) {
+                    sections = agreementSectionService.createAgreementSections(agreementSection);
+                    exist.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 exist.setOrganizationTypes(requestResult.getOrganizationTypes());
@@ -191,7 +189,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 exist.setDescription(policyAgreementTemplateDto.getDescription());
                 exist.setCountryId(policyAgreementTemplateDto.getCountryId());
 
-                jackrabbitService.agreementTemplateVersioning(id, exist, sectionResponseDtos);
+                jackrabbitService.agreementTemplateVersioning(id, exist, (List<AgreementSectionResponseDto>) sections.get("section"));
             } else {
 
                 throw new DataNotExists("data not found in kairos User");
@@ -227,6 +225,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         }
         throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
     }
+
+
+
+
+
+
 
 
 

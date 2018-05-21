@@ -12,6 +12,6 @@ public interface CustomAgreementSectionRepository {
 
     List<AgreementSectionResponseDto> getAllAgreementSectionWithData();
 
-    List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Set<BigInteger> ids);
+    List<AgreementSectionResponseDto> getAgreementSectionWithDataList(List<BigInteger> ids);
 
 }

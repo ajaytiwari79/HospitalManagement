@@ -1,18 +1,15 @@
 package com.kairos.controller.master_data;
 
 
-import com.kairos.persistance.model.master_data.DataSource;
 import com.kairos.service.master_data.DataSourceService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;

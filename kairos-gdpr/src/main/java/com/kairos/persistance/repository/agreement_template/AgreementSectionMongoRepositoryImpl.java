@@ -42,7 +42,7 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
     }
 
     @Override
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Set<BigInteger> ids) {
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(List<BigInteger> ids) {
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where("deleted").is(false).and("_id").in(ids)),

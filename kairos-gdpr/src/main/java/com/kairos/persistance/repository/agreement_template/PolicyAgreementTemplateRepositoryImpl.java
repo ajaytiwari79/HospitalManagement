@@ -19,7 +19,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
     @Override
     public PolicyAgreementTemplateResponseDto getpolicyAgreementWithData(BigInteger id) {
-        Aggregation aggregation=Aggregation.newAggregation(
+      /*  Aggregation aggregation=Aggregation.newAggregation(
 
 
                 match(Criteria.where("_id").is(id).and("deleted").is(false)),
@@ -30,6 +30,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
 
-        );
+        );*/
+      return  null;
     }
 }

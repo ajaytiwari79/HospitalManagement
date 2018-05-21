@@ -50,19 +50,28 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_proc
     public static final String API_HOSTING_LOCATION_URL = API_V1 + "/hosting_location";
 
 
+
     //Hosting provider url
     public static final String API_HOSTING_PROVIDER_URL = API_V1 + "/hosting_provider";
 
+    //Hosting type url
+    public static final String API_HOSTING_TYPE_URL = API_V1 + "/hosting_type";
 
     //Organizational Security Measure  url
     public static final String API_ORG_SEC_MEASURE_URL = API_V1 + "/organization_security";
 
-    //Technical Security Measure  url
+    //storage format   url
     public static final String API_STORAGE_FORMAT_URL = API_V1 + "/storage_format";
 
+    //storage type   url
+    public static final String API_STORAGE_TYPE_URL = API_V1 + "/storage_type";
+
+    //data disposal type   url
+    public static final String API_DATA_DISPOSAL_URL = API_V1 + "/data_disposal";
+
 
     //Technical Security Measure  url
-    public static final String API_TECH_SEC_MEASURE_URL = API_V1 + "/technical_security";
+    public static final String API_TECH_SECURITY_MEASURE_URL = API_V1 + "/technical_security";
 
 //clause tag
 public static final String API_CLAUSE_TAG_URL = API_V1 + "/clause/tag";

@@ -1,7 +1,6 @@
 package com.kairos.controller.master_data;
 
 
-import com.kairos.persistance.model.master_data.DataSubject;
 import com.kairos.service.master_data.DataSubjectService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constant.ApiConstant.API_DATASUBJECT_URL;

@@ -1,8 +1,7 @@
 package com.kairos.persistance.repository.master_data;
 
 
-import com.kairos.persistance.model.master_data.AssetType;
-import com.kairos.persistance.model.master_data.DataSource;
+import com.kairos.persistance.model.processing_activity_masterdata.DataSource;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
