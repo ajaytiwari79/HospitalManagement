@@ -510,7 +510,7 @@ public class StaffService extends UserBaseService {
 
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (unit == null) {
-            exceptionService.invalidRequestException("error.unit.notfound");
+            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
 
         }
 
@@ -1694,7 +1694,7 @@ public class StaffService extends UserBaseService {
 
         Organization organization = organizationGraphRepository.findByExternalId(externalId);
         if (organization == null) {
-            exceptionService.internalServerError("error.externalid.notfound");
+            exceptionService.dataNotFoundByIdException("message.externalid.notfound");
 
         }
 
@@ -1705,7 +1705,7 @@ public class StaffService extends UserBaseService {
 
         AccessGroup accessGroup = accessGroupRepository.findTaskGiverAccessGroup(organization.getId());
         if (accessGroup == null) {
-            exceptionService.internalServerError("error.taskgiver.accesgroup.notPresent");
+            exceptionService.dataNotFoundByIdException("message.taskgiver.accesgroup.notPresent");
 
         }
 

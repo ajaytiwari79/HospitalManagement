@@ -158,7 +158,7 @@ public class EmploymentService extends UserBaseService {
         Organization unit = organizationGraphRepository.findOne(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
-            exceptionService.internalServerError("error.unit.notfound");
+            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
 
         }
 

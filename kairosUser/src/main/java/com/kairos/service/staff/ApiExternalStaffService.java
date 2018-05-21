@@ -70,7 +70,7 @@ public class ApiExternalStaffService extends UserBaseService {
             Organization unit =organizationGraphRepository.findOne(orgnaizationId,0);
 
             if(unit == null){
-                exceptionService.internalServerError("error.unit.notfound");
+                exceptionService.dataNotFoundByIdException("message.unit.notfound",orgnaizationId);
                 //throw new InternalError("unit can't be null");
             }
 
