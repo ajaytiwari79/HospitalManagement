@@ -467,7 +467,8 @@ public class CountryService extends UserBaseService {
 
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
-         List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
+         TimeTypeDTO timeType= timeTypeRestClient.getAllTimeTypes(countryId).get(0);
+         List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
          List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
          List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
