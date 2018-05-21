@@ -14,9 +14,8 @@ public class PriorityGroup extends MongoBaseEntity {
     private Long countryId;
     private Long unitId;
     private BigInteger countryParentId;
-    private PriorityGroupName name;
-
     private BigInteger orderId;
+    private PriorityGroupName name;
     private ScheduledProcess scheduledProcess;
 
     public PriorityGroup() {
@@ -108,6 +107,14 @@ public class PriorityGroup extends MongoBaseEntity {
 
     public void setName(PriorityGroupName name) {
         this.name = name;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     public BigInteger getOrderId() {
