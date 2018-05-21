@@ -72,7 +72,7 @@ public class AccessPageService extends UserBaseService {
     @Inject
     UserGraphRepository userGraphRepository;
     @Inject
-    ExceptionService exceptionService;
+    private ExceptionService exceptionService;
 
     public synchronized AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),

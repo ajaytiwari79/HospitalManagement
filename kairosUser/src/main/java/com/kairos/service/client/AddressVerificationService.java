@@ -98,7 +98,7 @@ public class AddressVerificationService {
         if(contactAddress.getMunicipalityId() != null){
             Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipalityId());
             if(municipality == null){
-                exceptionService.internalServerError("message.municipality.notFound");
+                exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
             }
             municipalityName = municipality.getName();
@@ -177,7 +177,7 @@ public class AddressVerificationService {
                 client.setTemporaryAddress(clientTemporaryAddressList);
                 break;
             default:
-                exceptionService.internalServerError("message.client.addressType.notFound");
+                exceptionService.dataNotFoundByIdException("message.client.addressType.notFound");
 
         }
         clientGraphRepository.save(client);

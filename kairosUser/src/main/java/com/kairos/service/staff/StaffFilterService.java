@@ -3,8 +3,6 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.enums.FilterType;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
@@ -240,7 +238,7 @@ public class StaffFilterService extends UserBaseService{
         }
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
                 !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
-            exceptionService.dataNotFoundByIdException("message.staff.filter.setting.invalid");
+            exceptionService.dataNotFoundByIdException("message.staff.filter.setting.notfound");
 
         }
 

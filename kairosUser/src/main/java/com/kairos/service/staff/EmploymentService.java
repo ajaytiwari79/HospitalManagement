@@ -519,7 +519,7 @@ public class EmploymentService extends UserBaseService {
 
         }
         if (unit == null) {
-            exceptionService.internalServerError("message.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         }
         List<AccessGroup> accessGroups;
@@ -640,7 +640,7 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.internalServerError("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
 
         }
         Organization unit=null;
@@ -709,7 +709,7 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.internalServerError("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
 
         }
 

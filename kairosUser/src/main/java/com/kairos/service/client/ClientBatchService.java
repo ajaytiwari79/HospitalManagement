@@ -347,12 +347,12 @@ public class ClientBatchService {
 
                     zipCodeDb = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
                     if (zipCodeDb == null) {
-                        exceptionService.internalServerError("message.zipCode.notFound");
+                        exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
 
                     }
                     Municipality municipality = municipalityGraphRepository.getMunicipalityByZipCodeId(zipCodeDb.getId());
                     if (municipality == null) {
-                        exceptionService.internalServerError("message.municipality.notFound");
+                        exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
                     }
 
@@ -360,7 +360,7 @@ public class ClientBatchService {
                     Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                     if (geographyData == null) {
                         logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                        exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+                        exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
                     }
                     logger.info("Geography Data: " + geographyData);

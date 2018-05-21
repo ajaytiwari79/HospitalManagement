@@ -86,7 +86,7 @@ public class ResourceUnAvailability extends UserBaseEntity {
             }
             return this;
         } catch (Exception e){
-            exceptionService.internalServerError("message.date.somethingwrong");
+            exceptionService.dataNotFoundByIdException("message.date.somethingwrong");
 
         }
         return null;

@@ -103,7 +103,7 @@ public class OrganizationAddressService {
                 List<Country> countries = countryGraphRepository.findByName("Denmark");
                 Country country;
                 if (countries.isEmpty()) {
-                    exceptionService.internalServerError("message.organizationAddress.teamAddress.notBelongs");
+                    exceptionService.dataNotFoundByIdException("message.organizationAddress.teamAddress.notBelongs");
 
                 }
                 country = countries.get(0);
@@ -171,13 +171,13 @@ public class OrganizationAddressService {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.internalServerError("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
         }
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -272,7 +272,7 @@ public class OrganizationAddressService {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.internalServerError("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
         }
 
@@ -280,7 +280,7 @@ public class OrganizationAddressService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);

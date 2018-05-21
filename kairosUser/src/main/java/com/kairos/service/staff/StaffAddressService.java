@@ -99,7 +99,7 @@ public class StaffAddressService extends UserBaseService {
             }
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
             if (municipality == null) {
-                exceptionService.internalServerError("message.municipality.notFound");
+                exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
             }
 
@@ -107,7 +107,7 @@ public class StaffAddressService extends UserBaseService {
             Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
             if (geographyData == null) {
                 logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+                exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
             }
             logger.info("Geography Data: " + geographyData);
@@ -176,7 +176,7 @@ public class StaffAddressService extends UserBaseService {
                 }
                 Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
                 if (municipality == null) {
-                    exceptionService.internalServerError("message.municipality.notFound");
+                    exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
                 }
 
@@ -184,7 +184,7 @@ public class StaffAddressService extends UserBaseService {
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
                     logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+                    exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
                 }
                 logger.info("Geography Data: " + geographyData);

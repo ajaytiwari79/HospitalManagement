@@ -1,7 +1,5 @@
 package com.kairos.service.organization;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
@@ -95,7 +93,7 @@ public class OrganizationTypeService extends UserBaseService {
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organizationtype.id.Invalid",updateOrganizationTypeDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.organizationtype.id.notfound",updateOrganizationTypeDTO.getId());
 
         }
         if (!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()) {

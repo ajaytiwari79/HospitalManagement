@@ -120,7 +120,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if(!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.ruleTemplate.category.invalid",templateCategoryId);
+            exceptionService.dataNotFoundByIdException("message.ruleTemplate.category.notfound",templateCategoryId);
 
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
@@ -130,7 +130,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if(!ruleTemplateCategory.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())){
             boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
             if(isAlreadyExists){
-                exceptionService.duplicateDataException("message.ruleTemplate.category.alreadyExist",ruleTemplateCategory.getName());
+                exceptionService.duplicateDataException("message.ruleTemplate.category.duplicate",ruleTemplateCategory.getName());
 
             }
         }

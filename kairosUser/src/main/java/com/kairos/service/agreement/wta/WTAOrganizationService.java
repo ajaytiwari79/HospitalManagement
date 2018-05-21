@@ -55,7 +55,7 @@ public class WTAOrganizationService extends UserBaseService {
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.invalid",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
 
         }
         List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);

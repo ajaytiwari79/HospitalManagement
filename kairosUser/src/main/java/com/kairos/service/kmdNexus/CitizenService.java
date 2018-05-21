@@ -496,7 +496,7 @@ public class CitizenService {
         if(staff == null) staff = new Staff();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null)
-            exceptionService.internalServerError("message.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
 
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
@@ -515,7 +515,7 @@ public class CitizenService {
         if (user != null) {
             Staff alreadyExistStaff = staffGraphRepository.getByUser(user.getId());
             if (alreadyExistStaff != null)
-                exceptionService.internalServerError("message.citizen.staff.alreadyexist");
+                exceptionService.dataNotFoundByIdException("message.citizen.staff.alreadyexist");
 
             staff = staffService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
         }

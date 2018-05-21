@@ -252,7 +252,7 @@ public class UserService extends UserBaseService {
             smsService.sendSms(user.getContactDetail().getMobilePhone(), message);
             return true;
         } else {
-            exceptionService.internalServerError("message.user.mobileNumber.notFound");
+            exceptionService.dataNotFoundByIdException("message.user.mobileNumber.notFound");
         }
         return  false;
     }
@@ -302,7 +302,7 @@ public class UserService extends UserBaseService {
         currentUser = generateTokenToUser(currentUser);
         Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
-            exceptionService.internalServerError("message.organisation.notFound");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
         }
         Map<String, Object> map = new HashMap<>();
@@ -333,7 +333,7 @@ public class UserService extends UserBaseService {
             currentUser = generateTokenToUser(currentUser);
             Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
             if (org == null) {
-                exceptionService.internalServerError("message.organisation.notFound");
+                exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
             }
             Map<String, Object> map = new HashMap<>();

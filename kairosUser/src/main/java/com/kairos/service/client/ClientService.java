@@ -3,9 +3,6 @@ package com.kairos.service.client;
 import com.kairos.client.*;
 import com.kairos.client.dto.*;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -1080,7 +1077,7 @@ public class ClientService extends UserBaseService {
         Client client = getCitizenById(clientId);
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
         if (client == null || staff == null) {
-            exceptionService.dataNotFoundByIdException("message.clientOrStaff.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.clientOrStaff.id.notfound");
 
         }
         return new ClientStaffInfoDTO(client.getId(), staff.getId());
@@ -1206,12 +1203,12 @@ public class ClientService extends UserBaseService {
         }
 
         if (zipCode == null) {
-            exceptionService.internalServerError("message.zipCode.notFound");
+            exceptionService.dataNotFoundByIdException("message.zipCode.notFound");
 
         }
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            exceptionService.internalServerError("message.municipality.notFound");
+            exceptionService.dataNotFoundByIdException("message.municipality.notFound");
 
         }
 
@@ -1219,7 +1216,7 @@ public class ClientService extends UserBaseService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -1676,7 +1673,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
         Organization organization = organizationGraphRepository.findOne(unitId,0);
         if(!Optional.ofNullable(organization).isPresent()){
-            exceptionService.internalServerError("message.client.organisation.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound",unitId);
 
         }
 

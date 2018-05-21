@@ -1,10 +1,6 @@
 package com.kairos.service.pay_table;
 
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.FunctionDTO;
@@ -26,7 +22,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -72,7 +67,7 @@ public class PayTableService extends UserBaseService {
     public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.level.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
 
         }
 
@@ -117,7 +112,7 @@ public class PayTableService extends UserBaseService {
         logger.info(payTableDTO.toString());
         Level level = countryGraphRepository.getLevel(countryId, payTableDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-           exceptionService.dataNotFoundByIdException("message.paytable.level.invalid");
+           exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
 
         }
 
@@ -197,7 +192,7 @@ public class PayTableService extends UserBaseService {
     public PayTableResponse updatePayTable(Long countryId, Long payTableId, PayTableUpdateDTO payTableDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         // if  name or short name is changes then only we are checking its name existance
@@ -243,7 +238,7 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> addPayGradeInPayTable(Long payTableId, PayGradeDTO payGradeDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         Boolean isAlreadyExists = payTableGraphRepository.checkPayGradeLevelAlreadyExists(payTableId, payGradeDTO.getPayGradeLevel());
@@ -348,7 +343,7 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> getPayGradesByPayTableId(Long payTableId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         return payTableGraphRepository.getPayGradesByPayTableId(payTableId);
@@ -357,7 +352,7 @@ public class PayTableService extends UserBaseService {
     public boolean removePayGradeInPayTable(Long payTableId, Long payGradeId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         if (payTable.isPublished()) {
@@ -365,7 +360,7 @@ public class PayTableService extends UserBaseService {
 
         }
         if (!Optional.ofNullable(payTable.getPayGrades()).isPresent() || payTable.getPayGrades().isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         boolean found = false;
@@ -383,7 +378,7 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> removePayTable(Long payTableId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         if (payTable.isPublished()) {
@@ -426,7 +421,7 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> updatePayGradeInPayTable(Long payTableId, Long payGradeId, PayGradeDTO payGradeDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         PayGrade payGrade = null;
@@ -437,7 +432,7 @@ public class PayTableService extends UserBaseService {
             }
         }
         if (!Optional.ofNullable(payGrade).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.paygrade.id.invalid",payGradeId);
+            exceptionService.dataNotFoundByIdException("message.paygrade.id.notfound",payGradeId);
 
         }
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
@@ -513,7 +508,7 @@ public class PayTableService extends UserBaseService {
     public List<PayTable> publishPayTable(Long payTableId, Long publishedDateMillis) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("message.paytable.id.invalid");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
 
         }
         if (payTable.isPublished()) {

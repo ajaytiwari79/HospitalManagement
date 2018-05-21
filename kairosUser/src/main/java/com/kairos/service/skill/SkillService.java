@@ -325,7 +325,7 @@ public class SkillService extends UserBaseService {
             }
             return getAllAvailableSkills(id, type);
         } else {
-            exceptionService.internalServerError("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException("message.type.notvalid");
 
         }
         return null;
@@ -380,7 +380,7 @@ public class SkillService extends UserBaseService {
             }
             return skillUpdated;
         } else {
-            exceptionService.internalServerError("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException("message.type.notvalid");
         }
         return false;
     }
@@ -411,7 +411,7 @@ public class SkillService extends UserBaseService {
             Organization unit = organizationGraphRepository.getOrganizationByTeamId(id);
             unitId = unit.getId();
         } else {
-            exceptionService.internalServerError("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException("message.type.notvalid");
             //throw new InternalError("Type incorrect");
         }
 
@@ -494,7 +494,7 @@ public class SkillService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.internalServerError("message.staff.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.staff.id.notFound");
 
         }
 
@@ -535,7 +535,7 @@ public class SkillService extends UserBaseService {
             });
             skills = teamGraphRepository.getAssignedSkillsOfStaffByTeam(id, staffIds);
         } else {
-            exceptionService.internalServerError("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException("message.type.notvalid");
            // throw new InternalError("Type is not valid");
         }
         List<Map<String, Object>> skillsResponse = new ArrayList<>();
@@ -616,7 +616,7 @@ public class SkillService extends UserBaseService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.internalServerError("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
 

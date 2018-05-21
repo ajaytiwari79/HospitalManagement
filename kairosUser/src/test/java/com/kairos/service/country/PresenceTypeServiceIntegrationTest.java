@@ -4,6 +4,7 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.PresenceTypeWithTimeTypeDTO;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.util.Date;
 
 /**
@@ -36,7 +38,8 @@ public class PresenceTypeServiceIntegrationTest {
     TestRestTemplate restTemplate;
     static Long createdId;
     static Long createdIdForDelete;
-
+    @Inject
+    private ExceptionService exceptionService;
     @Test
     public void test1_AddPresenceType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
@@ -101,8 +104,9 @@ public class PresenceTypeServiceIntegrationTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 }

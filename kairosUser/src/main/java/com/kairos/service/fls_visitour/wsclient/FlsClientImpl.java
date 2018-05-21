@@ -1,7 +1,5 @@
 package com.kairos.service.fls_visitour.wsclient;
-import com.kairos.custom_exception.FlsCredentialException;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.fls_visitour.exceptions.scheduler.FlsCallException;
 import com.kairos.service.fls_visitour.webservice_config.WebServiceMessageSenderWithAuth;
 import com.kairos.util.FlsUrlPaths;
 import com.kairos.util.IPAddressUtil;
@@ -45,7 +43,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.CALL, payload);
             return response;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
         }
         return null;
     }
@@ -66,7 +64,7 @@ public class FlsClientImpl implements  FlsClient{
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
            // throw new FlsCredentialException("Invalid FLS credentials");
         }
         return null;
@@ -98,7 +96,7 @@ public class FlsClientImpl implements  FlsClient{
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
             //throw new FlsCredentialException("Invalid FLS credentials");
         }
         return null;
@@ -119,7 +117,7 @@ public class FlsClientImpl implements  FlsClient{
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -140,7 +138,7 @@ public class FlsClientImpl implements  FlsClient{
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -161,7 +159,7 @@ public class FlsClientImpl implements  FlsClient{
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -181,7 +179,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.SHOW_CALL_INFO, payload);
             return showCallInfoResponse;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -201,7 +199,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.GEOCODE, geocode);
             return response;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -223,7 +221,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIELD_MANAGER, fieldManager);
             return fieldManagerResponse;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -242,7 +240,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIX_SCHEDULE, fixSchedule);
             return fixScheduleResponse;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -260,7 +258,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.WORK_SCHEDULE, workSchedule);
             return workScheduleResponse;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -278,7 +276,7 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.OPTIMIZE, optimize);
             return optimizeResponse;
         } catch (Exception ex){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
 
         }
         return null;
@@ -287,7 +285,7 @@ public class FlsClientImpl implements  FlsClient{
     public WebServiceTemplate webServiceTemplate(Map<String, String> auth) {
 
         if(auth == null || auth.get("flsDefaultUrl") == null || auth.get("flsDefaultUrl").trim().length() < 1){
-            exceptionService.flsCredentialException("message.fls.credentials.invalid");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
         }
 
         String loggedInUser = "";

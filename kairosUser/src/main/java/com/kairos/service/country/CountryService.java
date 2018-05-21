@@ -154,7 +154,7 @@ public class CountryService extends UserBaseService {
         }
         Country currentCountry = (Country) findOne(country.getId());
         if (country == null) {
-            exceptionService.internalServerError("message.country.id.notFound",country.getId());
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",country.getId());
 
         }
         currentCountry.setName(country.getName());

@@ -57,7 +57,7 @@ public class ProvinceService extends UserBaseService {
     public Map<String, Object> addProvinceToRegion(Province province, Long regionId) {
         Region region = regionGraphRepository.findOne(regionId);
         if(region == null){
-            exceptionService.internalServerError("message.provinceservice.region.notFound");
+            exceptionService.dataNotFoundByIdException("message.provinceservice.region.notFound");
             
         }
         province.setRegion(region);

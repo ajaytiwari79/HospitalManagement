@@ -5,10 +5,6 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
@@ -91,7 +87,6 @@ import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -1445,7 +1440,7 @@ public class StaffService extends UserBaseService {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         Staff staff = staffGraphRepository.getStaffByUnitId(parentOrganization.getId(), staffId);
         if (staff == null) {
-            exceptionService.internalServerError("message.staff.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.staff.id.notFound");
 
         }
         List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId, date);
@@ -1699,7 +1694,7 @@ public class StaffService extends UserBaseService {
 
         Organization organization = organizationGraphRepository.findByExternalId(externalId);
         if (organization == null) {
-            exceptionService.internalServerError("error.externalid.invalid");
+            exceptionService.internalServerError("error.externalid.notfound");
 
         }
 

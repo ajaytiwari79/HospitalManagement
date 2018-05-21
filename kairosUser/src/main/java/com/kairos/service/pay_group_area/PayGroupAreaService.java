@@ -1,7 +1,5 @@
 package com.kairos.service.pay_group_area;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
@@ -70,7 +68,7 @@ public class PayGroupAreaService extends UserBaseService {
         if (Optional.ofNullable(payGroupAreaDTO.getPayGroupAreaId()).isPresent()) {
             payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getPayGroupAreaId());
             if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
-                exceptionService.dataNotFoundByIdException("message.paygroup.id.invalid",payGroupAreaDTO.getPayGroupAreaId());
+                exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaDTO.getPayGroupAreaId());
 
             }
         } else {
@@ -94,7 +92,7 @@ public class PayGroupAreaService extends UserBaseService {
         Optional<PayGroupAreaMunicipalityRelationship> municipalityRelationship = payGroupAreaRelationshipRepository.findById(payGroupAreaDTO.getId());
         if (!municipalityRelationship.isPresent()) {
             logger.info("pay group area not found");
-            exceptionService.dataNotFoundByIdException("message.paygroup.id.invalid",payGroupAreaDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaDTO.getId());
 
         }
 
@@ -183,7 +181,7 @@ public class PayGroupAreaService extends UserBaseService {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
             logger.info("pay group area not found for deletion  ");
-            exceptionService.dataNotFoundByIdException("message.paygroup.id.invalid",payGroupAreaId);
+            exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaId);
 
         }
         payGroupArea.setDeleted(true);
@@ -194,7 +192,7 @@ public class PayGroupAreaService extends UserBaseService {
     public List<PayGroupAreaQueryResult> getPayGroupArea(Long countryId, Long levelId) {
         Level level = countryGraphRepository.getLevel(countryId, levelId);
         if (!Optional.ofNullable(level).isPresent()) {
-           exceptionService.dataNotFoundByIdException("message.paygroup.level.invalid");
+           exceptionService.dataNotFoundByIdException("message.paygroup.level.notfound");
 
         }
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
@@ -218,7 +216,7 @@ public class PayGroupAreaService extends UserBaseService {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
             logger.info("pay group area not found for deletion  ");
-            exceptionService.dataNotFoundByIdException("message.paygroup.id.invalid",payGroupAreaId);
+            exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound",payGroupAreaId);
 
         }
 

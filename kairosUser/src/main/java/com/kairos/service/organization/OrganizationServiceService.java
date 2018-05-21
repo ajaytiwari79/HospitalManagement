@@ -196,14 +196,14 @@ public class OrganizationServiceService extends UserBaseService {
 
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
         if (organizationService == null) {
-            exceptionService.internalServerError("message.organizationService.id.notFound");
+            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
 
         }
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(id);
             if (unit == null) {
-                exceptionService.internalServerError("message.organization.id.notFound",id);
+                exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
 
             }
 
@@ -222,7 +222,7 @@ public class OrganizationServiceService extends UserBaseService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                exceptionService.internalServerError("message.organizationService.team.notFound");
+                exceptionService.dataNotFoundByIdException("message.organizationService.team.notFound");
 
             }
             if (isSelected) {
@@ -359,7 +359,7 @@ public class OrganizationServiceService extends UserBaseService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                exceptionService.internalServerError("message.organizationService.team.notFound");
+                exceptionService.dataNotFoundByIdException("message.organizationService.team.notFound");
 
             }
             response = filterSkillData(teamGraphRepository.getOrganizationServicesOfTeam(id));

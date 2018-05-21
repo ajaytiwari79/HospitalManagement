@@ -17,8 +17,6 @@ import com.kairos.client.TimeBankRestClient;
 
 import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.response.dto.web.wta.WTADTO;
@@ -283,7 +281,7 @@ public class UnitPositionService extends UserBaseService {
         UnitPosition oldUnitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
 
-            exceptionService.dataNotFoundByIdException("message.positionid.invalid",unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.positionid.notfound",unitPositionId);
 
         }
 
@@ -363,7 +361,7 @@ public class UnitPositionService extends UserBaseService {
         }
         Optional<Organization> unitPositionInOrganization = organizationGraphRepository.findById(unitPositionDTO.getUnitId(), 0);
         if (!unitPositionInOrganization.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.invalid");
+            exceptionService.dataNotFoundByIdException("message.organization.notfound");
 
         }
         unitPosition.setUnit(unitPositionInOrganization.get());
@@ -393,7 +391,7 @@ public class UnitPositionService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(unitPositionDTO.getStaffId());
         if (!Optional.ofNullable(staff).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unitposition.staff.invalid",unitPositionDTO.getStaffId());
+            exceptionService.dataNotFoundByIdException("message.unitposition.staff.notfound",unitPositionDTO.getStaffId());
 
         }
         unitPosition.setStaff(staff);
@@ -435,7 +433,7 @@ public class UnitPositionService extends UserBaseService {
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId());
         SeniorityLevel seniorityLevel = getSeniorityLevelByStaffAndExpertise(staff.getId(), currentExpertise.get());
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.seniorityLevel.id.invalid",unitPositionDTO.getReasonCodeId());
+            exceptionService.dataNotFoundByIdException("message.seniorityLevel.id.notfound",unitPositionDTO.getReasonCodeId());
 
         }
         unitPosition.setSeniorityLevel(seniorityLevel);
@@ -593,7 +591,7 @@ public class UnitPositionService extends UserBaseService {
     public EmploymentUnitPositionDTO getUnitPositionsOfStaff(long id, long staffId, boolean allOrganization) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unitposition.staff.invalid",staffId);
+            exceptionService.dataNotFoundByIdException("message.unitposition.staff.notfound",staffId);
 
         }
 
@@ -842,7 +840,7 @@ public class UnitPositionService extends UserBaseService {
         }
 
         if (expertise == null) {
-            exceptionService.dataNotFoundByIdException("message.unitposition.expertise.invalid",expertiseId);
+            exceptionService.dataNotFoundByIdException("message.unitposition.expertise.notfound",expertiseId);
 
         }
 

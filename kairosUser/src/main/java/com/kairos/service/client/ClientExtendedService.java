@@ -233,7 +233,7 @@ public class ClientExtendedService extends UserBaseService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with municipality id: " + municipality.getId());
-            exceptionService.internalServerError("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
 
         }
         contactAddressToSave.setMunicipality(municipality);
