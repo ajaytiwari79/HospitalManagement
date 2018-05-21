@@ -21,6 +21,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskReportMongoRepos
 import com.kairos.activity.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.activity.response.dto.TaskDTO;
 import com.kairos.activity.service.activity_stream.NotificationService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.service.tpa.TaskReportService;
@@ -75,6 +76,8 @@ public class AbsencePlanningService {
     private TaskReportService taskReportService;
     @Inject
     private TaskService taskService;
+    @Inject
+    private ExceptionService exceptionService;
 
     private @Autowired StaffRestClient staffRestClient;
     private @Autowired
@@ -731,7 +734,7 @@ public class AbsencePlanningService {
             taskService.save(task1);
 
         } else {
-            throw new InternalError("Error while updated Working time of Engineer in Visitour");
+            exceptionService.internalError("error.visitour.worktime.engineer.update");
         }
     }
 
@@ -820,7 +823,7 @@ public class AbsencePlanningService {
                 taskService.save(task1);
 
             } else {
-                throw new InternalError("Error while creting Task in Visitour");
+                exceptionService.internalError("error.visitour.task.create");
             }
         }
     }

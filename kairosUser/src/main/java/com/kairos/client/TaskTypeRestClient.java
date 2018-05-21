@@ -2,6 +2,7 @@ package com.kairos.client;
 
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static com.kairos.client.RestClientURLUtil.getBaseUrl;
@@ -23,7 +25,8 @@ public class TaskTypeRestClient {
 
     @Autowired
     RestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
       /** @auther anil maurya
      * map in task demand controller
      * @param unitId
@@ -48,9 +51,10 @@ public class TaskTypeRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            //throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
         }
-
+return null;
     }
 
 }

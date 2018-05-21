@@ -22,6 +22,7 @@ import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
@@ -77,6 +78,8 @@ public class CostTimeAgreementServiceTest {
     private String url;
     @Inject
     TestRestTemplate restTemplate;
+    @Inject
+    private ExceptionService exceptionService;
     static Long createdCtaId = null;
     //    static Long countryId = 53L;
     static Long countryId = null;
@@ -375,9 +378,10 @@ public class CostTimeAgreementServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 
 }

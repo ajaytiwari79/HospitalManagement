@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +47,18 @@ public class TagService extends UserBaseService {
     @Inject
     private TeamGraphRepository teamGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
+
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
-        }
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+                    }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
         if( tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
-            throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
+            exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
+
         }
         return tagGraphRepository.createCountryTag(countryId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
     }
@@ -61,18 +66,21 @@ public class TagService extends UserBaseService {
     public Tag  updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         Tag tag = tagGraphRepository.getCountryTagByIdAndDataType(tagId, countryId, tagDTO.getMasterDataType().toString(), false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Tag does not exist with id " +tagId );
+            exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
+
         }
 
         /*if(! ( clause_tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
             throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
         }*/
         if( ! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
-            throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
+            exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
+
         }
         return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
@@ -80,7 +88,8 @@ public class TagService extends UserBaseService {
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
 
         if(filterText == null){
@@ -122,11 +131,12 @@ public class TagService extends UserBaseService {
     public Boolean deleteCountryTag(Long countryId, Long tagId){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         Tag tag = tagGraphRepository.getCountryTag(countryId, tagId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect clause_tag id " + tagId);
+            exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
         }
         tag.setDeleted(true);
         save(tag);
@@ -143,11 +153,13 @@ public class TagService extends UserBaseService {
         }
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",organizationId);
+
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
         if( tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
-            throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
+            exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
+
         }
         return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
     }
@@ -158,14 +170,17 @@ public class TagService extends UserBaseService {
         }
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",organizationId);
+
         }
         Tag tag = tagGraphRepository.getOrganizationTagByIdAndDataType(tagId, organizationId, tagDTO.getMasterDataType().toString(), false);
         if( tag == null){
-            throw new DuplicateDataException("Tag does not exist with id " +tagId );
+            exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
+
         }
         if( ! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
-            throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
+            exceptionService.duplicateDataException("message.tag.name.alreadyExist",tagDTO.getName());
+
         }
         return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
@@ -176,11 +191,12 @@ public class TagService extends UserBaseService {
         }
         Organization organization = organizationGraphRepository.findOne(orgId, 0);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect Unit Id " + orgId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",orgId);
+
         }
         Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect clause_tag id " + tagId);
+            exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
         }
         tag.setDeleted(true);
         save(tag);
@@ -193,7 +209,8 @@ public class TagService extends UserBaseService {
         }
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",organizationId);
+
         }
         if(filterText == null){
             filterText = "";
@@ -211,7 +228,8 @@ public class TagService extends UserBaseService {
     public Boolean updateShowCountryTagSettingOfOrganization(Long organizationId, boolean showCountryTags) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",organizationId);
+
         }
         organization.setShowCountryTags(showCountryTags);
         organizationGraphRepository.save(organization);
@@ -251,7 +269,8 @@ public class TagService extends UserBaseService {
     public List<Tag> getCountryTagsOfSkill(long countryId, long skillId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         return tagGraphRepository.getCountryTagsOfSkillByIdAndDeleted(skillId, filterText, false);
     }
@@ -259,7 +278,8 @@ public class TagService extends UserBaseService {
     public List<Tag> getCountryTagsOfExpertise(long countryId, long expertiseId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         return tagGraphRepository.getCountryTagsOfExpertiseByIdAndDeleted(expertiseId, filterText, false);
     }
@@ -267,7 +287,8 @@ public class TagService extends UserBaseService {
     public List<Tag> getCountryTagsOfWTA(long countryId, long wtaId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         return tagGraphRepository.getCountryTagsOfWTAByIdAndDeleted(wtaId, filterText, false);
     }
@@ -275,7 +296,8 @@ public class TagService extends UserBaseService {
     public List<Tag> getCountryTagsOfRuleTemplateCategory(long countryId, long ruleTmplCategoryId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         return tagGraphRepository.getCountryTagsOfRuleTemplateCategoryByIdAndDeleted(ruleTmplCategoryId, filterText, false);
     }
@@ -289,7 +311,8 @@ public class TagService extends UserBaseService {
     public HashMap<String,Object> getListOfMasterDataType(Long orgId){
         Organization organization = organizationGraphRepository.findOne(orgId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect Unit Id " + orgId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",orgId);
+
         }
         HashMap<String, Object> tagCategoryData = new HashMap<String,Object>();
         tagCategoryData.put("tagCategories",MasterDataTypeEnum.getListOfMasterDataType());

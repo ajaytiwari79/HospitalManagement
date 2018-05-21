@@ -12,6 +12,7 @@ import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepos
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ public class OrganizationServiceService extends UserBaseService {
     @Inject
     private TeamGraphRepository teamGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -132,12 +135,14 @@ public class OrganizationServiceService extends UserBaseService {
     public Map<String, Object> addCountrySubService(final long serviceId, com.kairos.persistence.model.organization.OrganizationService subService) {
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
-            throw new DataNotFoundByIdException("Can't find Organization Service with provided Id");
+            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
+
         }
 
         String name = "(?i)" + subService.getName();
         if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
-            throw new DuplicateDataException("Can't create duplicate sub service in same category");
+            exceptionService.duplicateDataException("message.organizationService.subservice.duplicated");
+
         }
 
         logger.info("Creating : " + subService.getName() + " In " + organizationService.getName());
@@ -188,13 +193,15 @@ public class OrganizationServiceService extends UserBaseService {
 
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
         if (organizationService == null) {
-            throw new InternalError("organization service is null");
+            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
+
         }
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(id);
             if (unit == null) {
-                throw new InternalError("Organization is null");
+                exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
+
             }
 
             if (isSelected) {
@@ -212,7 +219,8 @@ public class OrganizationServiceService extends UserBaseService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                throw new InternalError("team can not null");
+                exceptionService.dataNotFoundByIdException("message.organizationService.team.notFound");
+
             }
             if (isSelected) {
                 if (teamGraphRepository.countOfServices(id, organizationService.getId()) == 0) {
@@ -304,7 +312,9 @@ public class OrganizationServiceService extends UserBaseService {
         String name = "(?i)" + organizationService.getName();
         com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
         if (organizationService1 != null) {
-            throw new DuplicateDataException("Can't create organization service");
+            //exceptionService.duplicateDataException();
+            exceptionService.duplicateDataException("message.organizationService.service.duplicate");
+
         }
         List<com.kairos.persistence.model.organization.OrganizationService> organizationServices = country.getOrganizationServices();
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
@@ -346,7 +356,8 @@ public class OrganizationServiceService extends UserBaseService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
-                throw new InternalError("Team is null");
+                exceptionService.dataNotFoundByIdException("message.organizationService.team.notFound");
+
             }
             response = filterSkillData(teamGraphRepository.getOrganizationServicesOfTeam(id));
 
@@ -493,7 +504,8 @@ public class OrganizationServiceService extends UserBaseService {
     public com.kairos.persistence.model.organization.OrganizationService findOne(Long id) {
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (!Optional.ofNullable(organizationService).isPresent()) {
-            throw new DataNotFoundByIdException("Unable to find organization Service");
+            exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
+
         }
         return organizationService;
     }

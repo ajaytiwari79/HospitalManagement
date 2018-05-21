@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.*;
 import com.kairos.response.dto.web.client.CitizenSupplier;
 import com.kairos.service.client.ExternalClientService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.TimeSlotService;
@@ -98,6 +99,8 @@ public class CitizenService {
     @Inject
     private TimeSlotService timeSlotService;
 
+    @Inject
+    private ExceptionService exceptionService;
     /**
      * This method is used to import Citizen from KMD Nexus.
      * @return
@@ -493,7 +496,8 @@ public class CitizenService {
         if(staff == null) staff = new Staff();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null)
-            throw new InternalError("organization not found");
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
+
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
         staff.setCurrentStatus(payload.getCurrentStatus());
@@ -511,7 +515,8 @@ public class CitizenService {
         if (user != null) {
             Staff alreadyExistStaff = staffGraphRepository.getByUser(user.getId());
             if (alreadyExistStaff != null)
-                throw new InternalError("Staff already exists");
+                exceptionService.dataNotFoundByIdException("message.citizen.staff.alreadyexist");
+
             staff = staffService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
         }
 

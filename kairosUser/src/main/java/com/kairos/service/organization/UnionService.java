@@ -12,6 +12,8 @@ import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
@@ -36,7 +38,8 @@ public class UnionService {
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
     private RegionGraphRepository regionGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     public UnionQueryWrapper getAllUnionOfCountry(Long countryId) {
         UnionQueryWrapper unionQueryWrapper = new UnionQueryWrapper();
 
@@ -64,7 +67,8 @@ public class UnionService {
     public List<UnionResponseDTO> getAllUnionByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+           exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> organizationQueryResult = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
@@ -77,7 +81,8 @@ public class UnionService {
         List<UnionResponseDTO> allUnions = new ArrayList<>();
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
 
@@ -89,11 +94,13 @@ public class UnionService {
     public boolean addUnionInOrganization(Long unionId, Long organizationId, boolean joined) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
         Organization union = organizationGraphRepository.findOne(unionId);
         if (!Optional.ofNullable(union).isPresent() || union.isUnion() == false || union.isEnable() == false) {
-            throw new DataNotFoundByIdException("Can't find union with provided Id");
+    exceptionService.dataNotFoundByIdException("message.union.id.notFound");
+
         }
         if (joined)
             organizationGraphRepository.addUnionInOrganization(organizationId, unionId, DateUtil.getCurrentDate().getTime());
