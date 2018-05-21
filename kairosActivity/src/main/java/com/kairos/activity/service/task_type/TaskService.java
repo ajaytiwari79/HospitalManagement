@@ -656,10 +656,10 @@ public class TaskService extends MongoBaseService {
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
         if (organizationDTO == null) {
-            exceptionService.internalError("error.organization.externalid",workPlaceId.get());
+            exceptionService.dataNotFoundByIdException("message.organization.externalid",workPlaceId.get());
         }
         if (!Optional.ofNullable(staffDTO).isPresent()) {
-            exceptionService.internalError("error.organization.external-staffid",personExternalId.get());
+            exceptionService.dataNotFoundByIdException("message.organization.external-staffid",personExternalId.get());
         }
         if (!Optional.ofNullable(organizationStaffWrapper.getUnitPosition()).isPresent()) {
             exceptionService.internalError("error.kairos.unitposition",personExternalId.get());

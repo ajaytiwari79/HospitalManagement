@@ -65,7 +65,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     public RuleTemplateAndCategoryDTO createRuleTemplateCategory(long countryId, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            excpExceptionService.actionNotPermittedException("message.country.id",countryId);
+            excpExceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, ruleTemplateCategoryDTO.getName(), ruleTemplateCategoryDTO.getRuleTemplateCategoryType());
@@ -189,7 +189,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     public RuleTemplateCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId,RuleTemplateCategoryDTO ruleTemplateCategory){
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            excpExceptionService.actionNotPermittedException("message.country.id",countryId);
+            excpExceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findById(templateCategoryId).get();
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());

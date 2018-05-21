@@ -75,17 +75,17 @@ public class WTAOrganizationService extends MongoBaseService {
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            exceptionService.actionNotPermittedException("message.wta-response-dto.start-end-date",wtaId);
+            exceptionService.actionNotPermittedException("message.wta.start-end-date",wtaId);
         }
         boolean isWTAAlreadyExists = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
         if (isWTAAlreadyExists) {
             logger.info("Duplicate WTA name in organization :", wtaId);
-            exceptionService.duplicateDataException("message.wta-response-dto.name.alreadyExists",updateDTO.getName());
+            exceptionService.duplicateDataException("message.wta.name.alreadyExists",updateDTO.getName());
         }
         WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
-            exceptionService.dataNotFoundByIdException("message.wta-response-dto.id",wtaId);
+            exceptionService.dataNotFoundByIdException("message.wta.id",wtaId);
         }
         if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
             logger.info("Expertise cant be changed at unit level :", wtaId);

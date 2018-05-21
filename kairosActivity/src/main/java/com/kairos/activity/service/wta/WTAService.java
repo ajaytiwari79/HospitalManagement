@@ -108,7 +108,7 @@ public class WTAService extends MongoBaseService {
         Date startDate = (wtaDTO.getStartDateMillis() == 0) ? DateUtils.getCurrentDate() : new Date(wtaDTO.getStartDateMillis());
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (startDate.getTime() > wtaDTO.getEndDateMillis()) {
-                exceptionService.invalidRequestException("message.wta-dto.start-end-date");
+                exceptionService.invalidRequestException("message.wta.start-end-date");
             }
             wta.setEndDate(new Date(wtaDTO.getEndDateMillis()));
         }
@@ -250,7 +250,7 @@ public class WTAService extends MongoBaseService {
     public WTAResponseDTO updateWtaOfCountry(Long countryId, BigInteger wtaId, WTADTO updateDTO) {
 
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            exceptionService.actionNotPermittedException("message.wta-response-dto.start-current-date",wtaId);
+            exceptionService.actionNotPermittedException("message.wta.start-current-date",wtaId);
         }
         WorkingTimeAgreement workingTimeAgreement = wtaRepository.getWtaByNameExcludingCurrent(updateDTO.getName(), countryId, wtaId, updateDTO.getOrganizationType(), updateDTO.getOrganizationSubType());
         if (Optional.ofNullable(workingTimeAgreement).isPresent()) {

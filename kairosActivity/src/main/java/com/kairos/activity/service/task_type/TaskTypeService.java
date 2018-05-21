@@ -948,7 +948,7 @@ public class TaskTypeService extends MongoBaseService {
                 taskTypeSlaConfig = new TaskTypeSlaConfig(taskTypeId,taskType.getOrganizationId(),
                         taskTypeSlaConfigDTO.getTimeSlotId(), result.get().getName());
             } else {
-                exceptionService.internalError("error.timeslot.id");
+                exceptionService.dataNotFoundByIdException("message.timeslot.id");
             }
         }
         List<SlaPerDayInfo> slaPerDayInfoList = taskTypeSlaConfig.getSlaPerDayInfo() != null ? taskTypeSlaConfig.getSlaPerDayInfo() :  new ArrayList<>();
@@ -1230,7 +1230,7 @@ public class TaskTypeService extends MongoBaseService {
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if(!Optional.ofNullable(taskType).isPresent()){
             logger.error("Incorrect task type id " + taskType);
-            exceptionService.dataNotFoundByIdException("error.task.type.id");
+            exceptionService.dataNotFoundByIdException("meassage.task.type.id");
         }
         List<TaskType> newTaskTypes = new ArrayList<>(taskTypeNames.size());
         taskTypeNames.forEach(taskTypeName->{
