@@ -98,7 +98,7 @@ public class TimeBankCalculationService {
     public void calculateScheduleAndDurationHour(Shift shift, Activity activity, StaffUnitPositionDetails unitPosition){
         int scheduledMinutes = 0;
         int duration = 0;
-        int weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType()))?unitPosition.getFullTimeWeeklyMinutes():unitPosition.getTotalWeeklyMinutes();
+        int weeklyMinutes = 0;
 
         switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
@@ -115,6 +115,7 @@ public class TimeBankCalculationService {
                 break;
 
             case AppConstants.FULL_DAY_CALCULATION:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType()))?unitPosition.getFullTimeWeeklyMinutes():unitPosition.getTotalWeeklyMinutes();
                 duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
@@ -123,6 +124,7 @@ public class TimeBankCalculationService {
                 scheduledMinutes = duration;
                 break;
             case AppConstants.FULL_WEEK:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType()))?unitPosition.getFullTimeWeeklyMinutes():unitPosition.getTotalWeeklyMinutes();
                 duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
