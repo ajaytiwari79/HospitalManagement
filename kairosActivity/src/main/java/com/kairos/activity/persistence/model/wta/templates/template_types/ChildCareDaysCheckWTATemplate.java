@@ -25,7 +25,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
-    protected float recommendedValue;
+    private float recommendedValue;
 
     public float getRecommendedValue() {
         return recommendedValue;

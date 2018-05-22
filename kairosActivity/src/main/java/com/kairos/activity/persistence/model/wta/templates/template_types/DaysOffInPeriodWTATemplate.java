@@ -29,7 +29,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
     private boolean isRestingTimeAllowed;
     private int restingTime;
-    protected float recommendedValue;
+    private float recommendedValue;
 
 
     public MinMaxSetting getMinMaxSetting() {

@@ -27,7 +27,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         this.recommendedValue = recommendedValue;
     }
 
-    protected float recommendedValue;
+    private float recommendedValue;
 
     public boolean isCarryForwardLeave() {
         return carryForwardLeave;
