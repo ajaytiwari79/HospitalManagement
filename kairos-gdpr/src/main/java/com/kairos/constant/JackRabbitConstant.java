@@ -2,8 +2,8 @@ package com.kairos.constant;
 
 public class JackRabbitConstant {
 
-    public static final String CLAUSE_PARENT_NODE="caluse_parent";
-    public static final String CLAUSE_CHILD_NODE="caluse";
+    public static final String CLAUSE_PARENT_NODE="clause_parent";
+    public static final String CLAUSE_CHILD_NODE="clause";
 
     public static final String AGREEMENT_TEMPLATE_PARENT_NODE="agreement_template_parent";
     public static final String AGREEMENT_TEMPLATE_CHILD_NODE="agreement_template";

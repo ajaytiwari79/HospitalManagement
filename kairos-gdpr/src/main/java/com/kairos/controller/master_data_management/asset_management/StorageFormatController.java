@@ -77,7 +77,7 @@ public class StorageFormatController {
 
 
     @ApiOperation("update StorageFormat by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateStorageFormat(@PathVariable BigInteger id, @RequestBody StorageFormat storageFormat) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

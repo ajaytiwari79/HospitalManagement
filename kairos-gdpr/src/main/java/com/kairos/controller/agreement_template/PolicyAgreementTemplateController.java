@@ -35,7 +35,7 @@ public class PolicyAgreementTemplateController {
     }
 
 
-    @GetMapping("/agreement/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getPolicyAgreementTemplateById(@PathVariable BigInteger id) {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
@@ -77,8 +77,8 @@ public class PolicyAgreementTemplateController {
 
 
 
-    @GetMapping("/template/{id}")
-    public   ResponseEntity<Object> getPolicyDocumentVersion(@PathVariable BigInteger id, @RequestParam VersionNode version) throws RepositoryException {
+    @GetMapping("/{id}/version")
+    public   ResponseEntity<Object> getPolicyTemplateVersion(@PathVariable BigInteger id, @RequestParam String version) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }
@@ -87,6 +87,15 @@ public class PolicyAgreementTemplateController {
 
     }
 
+    @GetMapping("/{id}/versions")
+    public   ResponseEntity<Object> getPolicyTemplateAllVersionList(@PathVariable BigInteger id) throws RepositoryException {
+        if (id==null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
+        }
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,policyAgreementTemplateService.getPolicyTemplateAllVersionList(id));
+
+    }
 
 
 }

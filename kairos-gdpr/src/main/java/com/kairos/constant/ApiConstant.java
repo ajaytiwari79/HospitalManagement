@@ -8,12 +8,6 @@ public final class ApiConstant {
     public static final String API_CLAUSE_TAG_URL = API_V1 + "/clause_tag";
     public static final String API_ACCOUNT_TYPE_URL = API_V1 + "/account";
 
-
-
-
-
-
-
     //master asset data
     public static final String API_MASTER_ASSET_URL = API_V1 + "/master_asset";
     public static final String API_STORAGE_FORMAT_URL = API_V1 + "/storage_format";
@@ -33,7 +27,7 @@ public final class ApiConstant {
     public static final String API_DATASUBJECT_URL = API_V1 + "/data_subject";
     public static final String API_RESPONSIBILITY_TYPE= API_V1 + "/responsibility_type";
     public static final String API_DESTINATION= API_V1 + "/destination";
-    public static final String API_PROCESSING_LEGAL_BASIS= API_V1 + "/processing_basis";
+    public static final String API_PROCESSING_LEGAL_BASIS= API_V1 + "/legal_basis";
 
     //agreement template
     public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + "/agreement_template";

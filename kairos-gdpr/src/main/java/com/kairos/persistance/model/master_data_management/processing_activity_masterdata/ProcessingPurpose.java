@@ -18,4 +18,7 @@ public class ProcessingPurpose extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public ProcessingPurpose()
+    {}
 }

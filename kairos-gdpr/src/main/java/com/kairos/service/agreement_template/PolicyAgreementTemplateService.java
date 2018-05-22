@@ -215,19 +215,16 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public String getPolicyTemplateVersion(BigInteger id, VersionNode version) throws RepositoryException {
-        switch (version) {
-            case ROOT_VERSION:
-                return jackrabbitService.getpolicyTemplateVersion(id, "1.0");
-            case BASE_VERSION:
-                return jackrabbitService.getpolicyTemplateBaseVersion(id);
-            default:
-                return null;
-
-        }
-
+    public String getPolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
+                return jackrabbitService.getpolicyTemplateVersion(id, version);
     }
 
+
+    public List<String> getPolicyTemplateAllVersionList(BigInteger id) throws RepositoryException {
+
+        return jackrabbitService.getPolicyTemplateVersions(id);
+
+    }
 
 
 }

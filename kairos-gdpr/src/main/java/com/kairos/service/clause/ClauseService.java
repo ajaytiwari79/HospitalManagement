@@ -236,18 +236,16 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public String getClauseVersion(BigInteger id, VersionNode version) throws RepositoryException {
-        switch (version) {
-            case ROOT_VERSION:
-                return jackrabbitService.getClauseVersion(id, "1.0");
-            case BASE_VERSION:
-                return jackrabbitService.getclauseBaseVersion(id);
-            default:
-                return null;
+    public String getClauseVersion(BigInteger id, String version) throws RepositoryException {
+                return jackrabbitService.getClauseVersion(id, version);
 
         }
 
+    public List<String> getAllClauseVersion(BigInteger id) throws RepositoryException {
+        return jackrabbitService.getClauseVersions(id);
+
     }
+
 
 
 

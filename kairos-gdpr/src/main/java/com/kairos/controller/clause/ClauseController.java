@@ -47,7 +47,7 @@ public class ClauseController {
     }
 
     @ApiOperation("get clause by id")
-    @GetMapping("/clause/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getClause(@PathVariable BigInteger id) {
         if (id!=null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(id));
@@ -76,7 +76,7 @@ public class ClauseController {
     }
 
     @ApiOperation("update clause description")
-    @PutMapping("/update/clause/{clauseId}")
+    @PutMapping("/update/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
 
         if (clauseId!=null) {
@@ -93,18 +93,27 @@ public class ClauseController {
     }
 
     @ApiOperation("get All clauses")
-    @GetMapping("/getAll")
+    @GetMapping("/all")
     public ResponseEntity<Object> getAllClauses() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses());
     }
 
 
 
-    @ApiOperation("default clauses page with default size 10 ")
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getclauseVersion(@PathVariable BigInteger id, @RequestParam VersionNode versionNode) throws RepositoryException {
+    @ApiOperation("")
+    @GetMapping("/{id}/version")
+    public ResponseEntity<Object> getClauseVersion(@PathVariable BigInteger id, @RequestParam String version) throws RepositoryException {
         if (id!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, versionNode));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, version));
+        }
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
+    }
+
+    @ApiOperation("")
+    @GetMapping("/{id}/versions")
+    public ResponseEntity<Object> getAllClauseVersion(@PathVariable BigInteger id) throws RepositoryException {
+        if (id!=null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauseVersion(id));
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
     }

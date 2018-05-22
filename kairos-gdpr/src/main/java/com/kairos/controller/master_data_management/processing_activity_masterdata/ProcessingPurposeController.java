@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -30,7 +31,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("add pocessing purpose")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingPurpose(@RequestBody List<ProcessingPurpose> processingPurposes) {
+    public ResponseEntity<Object> createProcessingPurpose(@Validated @RequestBody List<ProcessingPurpose> processingPurposes) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(processingPurposes));
 
     }
@@ -75,7 +76,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("update pocessing purpose by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id,@RequestBody ProcessingPurpose   processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id,@Validated  @RequestBody ProcessingPurpose   processingPurpose) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

@@ -1,4 +1,4 @@
-package com.kairos.config;
+package com.kairos.config.swagger;
 
 
 import org.springframework.context.annotation.Bean;
