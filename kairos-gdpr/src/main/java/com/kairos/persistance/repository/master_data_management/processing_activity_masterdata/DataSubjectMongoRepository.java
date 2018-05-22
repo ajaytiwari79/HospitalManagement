@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface DataSubjectMongoRepository extends MongoRepository<DataSubject,BigInteger> {
@@ -19,7 +20,7 @@ public interface DataSubjectMongoRepository extends MongoRepository<DataSubject,
     DataSubject findByName(String name);
 
     @Query("{'_id':{$in:?0}}")
-    List<DataSubject> dataSubjectList(List<BigInteger> ids);
+    List<DataSubject> getDataSubjectList(List<BigInteger> ids);
 
 
 

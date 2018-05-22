@@ -20,7 +20,7 @@ import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 @RequestMapping(API_AGREEMENT_TEMPLATE_URl)
 @Api(API_AGREEMENT_TEMPLATE_URl)
 @CrossOrigin
-public class AgreementTemplateController {
+public class PolicyAgreementTemplateController {
 
 
     @Inject
@@ -78,7 +78,7 @@ public class AgreementTemplateController {
 
 
     @GetMapping("/template/{id}")
-    public   ResponseEntity<Object> policyDocumentVersion(@PathVariable BigInteger id, @RequestParam VersionNode version) throws RepositoryException {
+    public   ResponseEntity<Object> getPolicyDocumentVersion(@PathVariable BigInteger id, @RequestParam VersionNode version) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }

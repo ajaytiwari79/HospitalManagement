@@ -8,8 +8,8 @@ import java.math.BigInteger;
 
 public interface MasterProcessingActivityRepository extends MongoRepository<MasterProcessingActivity,BigInteger> {
 
-
-    MasterProcessingActivity findByid(BigInteger id);
+    @Query("{'_id':?0,deleted:false}")
+    MasterProcessingActivity findByIdAndNonDeleted(BigInteger id);
 
     @Query("{'name':?0,deleted:false}")
     MasterProcessingActivity findByName(String name);

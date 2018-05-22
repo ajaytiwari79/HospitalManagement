@@ -11,7 +11,6 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.ClauseDto;
-import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
@@ -122,7 +121,7 @@ public class ClauseService extends MongoBaseService {
 
 
 
-    public Clause getClauseById(BigInteger id) {
+    public Clause getClause(BigInteger id) {
         Clause clause =  clauseRepository.findByIdAndNonDeleted(id);
 
         if (!Optional.ofNullable(clause).isPresent()) {
@@ -208,55 +207,9 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public List<Clause> getClause(ClauseGetQueryDto clauseQueryDto) {
-        Query query = new Query();
-        String whereQuery = null;
-        List<Clause> clauses;
-        List<Long> organizationTypes, organizationSubTypes, organizationServices, organizationSubServices;
-        organizationTypes = clauseQueryDto.getOrganizationTypes();
-        organizationSubTypes = clauseQueryDto.getOrganizationSubTypes();
-        organizationServices = clauseQueryDto.getOrganizationServices();
-        organizationSubServices = clauseQueryDto.getOrganizationSubServices();
-        Criteria criteria = new Criteria();
-        if (!Optional.ofNullable(clauseQueryDto).isPresent()) {
-            return null;
-        } else {
-
-            if (clauseQueryDto.getAccountTypes() != null) {
-                whereQuery = "accountTypes._id";
-                query.addCriteria((Criteria.where(whereQuery).in(clauseQueryDto.getAccountTypes())));
-            }
-            if (organizationServices != null) {
-                whereQuery = "organizationServices";
-                query.addCriteria((Criteria.where(whereQuery).in(organizationServices)));
-
-            }
-            if (organizationTypes != null) {
-                whereQuery = "organizationTypes";
-                query.addCriteria((Criteria.where(whereQuery).in(organizationTypes)));
-
-            }
-           /* if (organizationSubServices!=null) {
-                whereQuery = "organizationServices";
-                query.addCriteria(Criteria.where(whereQuery).in(organizationSubServices));
-
-            }*/
-            if (clauseQueryDto.getTags() != null) {
-                whereQuery = "tags";
-                query.addCriteria(Criteria.where(whereQuery).in(clauseQueryDto.getTags()));
-            }
-            clauses = mongoTemplate.find(query, Clause.class);
-            if (clauses.size() != 0) {
-                return clauses;
-            }
-            throw new DataNotExists("clause not exists");
-
-        }
-
-    }
 
 
-    public List<Clause> getClausesByIds(Set<BigInteger> clausesId) {
+    public List<Clause> getClauseList(Set<BigInteger> clausesId) {
 
         List<Clause> clauses = new ArrayList<>();
         if (clausesId.size() != 0) {
@@ -318,6 +271,66 @@ public class ClauseService extends MongoBaseService {
         }
 
     }
+
+
+
+
+
+
+/*
+
+
+
+
+    public List<Clause> getClause(ClauseGetQueryDto clauseQueryDto) {
+        Query query = new Query();
+        String whereQuery = null;
+        List<Clause> clauses;
+        List<Long> organizationTypes, organizationSubTypes, organizationServices, organizationSubServices;
+        organizationTypes = clauseQueryDto.getOrganizationTypes();
+        organizationSubTypes = clauseQueryDto.getOrganizationSubTypes();
+        organizationServices = clauseQueryDto.getOrganizationServices();
+        organizationSubServices = clauseQueryDto.getOrganizationSubServices();
+        Criteria criteria = new Criteria();
+        if (!Optional.ofNullable(clauseQueryDto).isPresent()) {
+            return null;
+        } else {
+
+            if (clauseQueryDto.getAccountTypes() != null) {
+                whereQuery = "accountTypes._id";
+                query.addCriteria((Criteria.where(whereQuery).in(clauseQueryDto.getAccountTypes())));
+            }
+            if (organizationServices != null) {
+                whereQuery = "organizationServices";
+                query.addCriteria((Criteria.where(whereQuery).in(organizationServices)));
+
+            }
+            if (organizationTypes != null) {
+                whereQuery = "organizationTypes";
+                query.addCriteria((Criteria.where(whereQuery).in(organizationTypes)));
+
+            }
+           */
+/* if (organizationSubServices!=null) {
+                whereQuery = "organizationServices";
+                query.addCriteria(Criteria.where(whereQuery).in(organizationSubServices));
+
+            }*//*
+
+            if (clauseQueryDto.getTags() != null) {
+                whereQuery = "tags";
+                query.addCriteria(Criteria.where(whereQuery).in(clauseQueryDto.getTags()));
+            }
+            clauses = mongoTemplate.find(query, Clause.class);
+            if (clauses.size() != 0) {
+                return clauses;
+            }
+            throw new DataNotExists("clause not exists");
+
+        }
+
+    }
+*/
 
 
 

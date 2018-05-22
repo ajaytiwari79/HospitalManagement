@@ -96,7 +96,6 @@ public class JackrabbitService {
             InputStream inputStream=new ByteArrayInputStream(file.getBytes());
             Node rootNode = session.getRootNode();
             Node clauseNode = rootNode.getNode(CLAUSE_PARENT_NODE + "/" + CLAUSE_CHILD_NODE + clauseid);
-
             if (clauseNode.isNode()) {
                 clauseNode.checkout();
                 clauseNode.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
@@ -105,7 +104,7 @@ public class JackrabbitService {
 
                  Node contentNode = clauseNode.getNode(JCR_CONTENT);
                 if (!contentNode.isNode()) {
-                    throw new JackrabbitNodeNotFoundException("policy document template file Node not found");
+                    throw new JackrabbitNodeNotFoundException("clause not found");
                 }
                 Binary binary = session.getValueFactory().createBinary(inputStream);
                 contentNode.setProperty(JCR_DATA, binary);

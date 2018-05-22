@@ -20,7 +20,7 @@ public interface ProcessingPurposeMongoRepository extends MongoRepository<Proces
 
 
     @Query("{'_id':{$in:?0},deleted:false}")
-    List<ProcessingPurpose> processingPurposeList(List<BigInteger> ids);
+    List<ProcessingPurpose> getProcessingPurposeList(List<BigInteger> ids);
 
 
     @Query("{deleted:false}")

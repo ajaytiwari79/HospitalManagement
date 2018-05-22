@@ -45,11 +45,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (masterProcessingActivityRepository.findByName(masterProcessingActivityDto.getName()) != null) {
             throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
         }
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto();
-        requestDto.setOrganizationTypeIds(orgTypeIds);
-        requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
-        requestDto.setOrganizationServiceIds(orgServiceIds);
-        requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -100,16 +96,12 @@ public class MasterProcessingActivityService extends MongoBaseService {
         orgServiceIds = masterProcessingActivityDto.getOrganizationServices();
         orgSubServiceIds = masterProcessingActivityDto.getOrganizationSubServices();
 
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(id);
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         }
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto();
-        requestDto.setOrganizationTypeIds(orgTypeIds);
-        requestDto.setOrganizationSubTypeIds(orgSubTypeIds);
-        requestDto.setOrganizationServiceIds(orgServiceIds);
-        requestDto.setOrganizationSubServiceIds(orgSubServiceIds);
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -143,7 +135,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     public MasterProcessingActivity getMasterProcessingActivityById(BigInteger id) {
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(id);
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
@@ -154,23 +146,23 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     public Boolean deleteMasterProcessingActivity(BigInteger id) {
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(id);
         if (exists == null) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         } else
-            masterProcessingActivityRepository.delete(exists);
+            exists.setDeleted(true);
+           save(exists);
         return true;
 
     }
 
     public MasterProcessingActivity getmasterProcessingActivityById(BigInteger id) {
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(id);
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         } else
-
             return exists;
 
     }

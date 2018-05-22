@@ -98,6 +98,11 @@ public class DataSubjectService extends MongoBaseService {
         }
     }
 
+    public List<DataSubject> getDataSubjectList(List<BigInteger> ids) {
+
+       return dataSubjectMongoRepository.getDataSubjectList(ids);
+    }
+
 
 
     public DataSubject getDataSubjectByName(String name) {

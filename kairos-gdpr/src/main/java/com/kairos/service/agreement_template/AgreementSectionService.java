@@ -31,9 +31,9 @@ public class AgreementSectionService extends MongoBaseService {
 
     public AgreementSection createAgreementSection(AgreementSection agreementSection) {
 
-        if (agreementSectionMongoRepository.findByTitle(agreementSection.getTitle()) != null) {
+       /* if (agreementSectionMongoRepository.findByTitle(agreementSection.getTitle()) != null) {
             throw new DuplicateDataException("section with name " + agreementSection.getTitle() + "  already exist");
-        }
+        }*/
         for (BigInteger clauseId : agreementSection.getClauseIds()) {
             if (clauseMongoRepository.findByIdAndNonDeleted(clauseId) == null) {
                 throw new DataNotFoundByIdException("clause for id  " + clauseId + "  not found");

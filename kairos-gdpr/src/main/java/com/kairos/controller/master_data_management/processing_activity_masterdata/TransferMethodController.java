@@ -28,7 +28,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("add transfer Method ")
-    @PostMapping("/add_method")
+    @PostMapping("/add")
     public ResponseEntity<Object> createTransferMethod(@RequestBody List<TransferMethod> transferMethods) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.createTransferMethod(transferMethods));
 

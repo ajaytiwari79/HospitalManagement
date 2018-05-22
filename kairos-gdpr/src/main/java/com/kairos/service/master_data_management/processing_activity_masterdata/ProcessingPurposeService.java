@@ -121,6 +121,12 @@ public class ProcessingPurposeService extends MongoBaseService {
 
 
 
+    public List<ProcessingPurpose> geProcessingPurposeList(List<BigInteger> ids) {
+        return processingPurposeMongoRepository.getProcessingPurposeList(ids);
+    }
+
+
+
 }
 
     

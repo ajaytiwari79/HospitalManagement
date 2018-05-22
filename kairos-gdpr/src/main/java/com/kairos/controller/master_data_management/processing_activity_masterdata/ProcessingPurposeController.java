@@ -29,7 +29,7 @@ public class ProcessingPurposeController {
 
 
     @ApiOperation("add pocessing purpose")
-    @PostMapping("/add_purpose")
+    @PostMapping("/add")
     public ResponseEntity<Object> createProcessingPurpose(@RequestBody List<ProcessingPurpose> processingPurposes) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(processingPurposes));
 

@@ -26,7 +26,7 @@ public class ResponsibilityTypeController {
 
 
     @ApiOperation("add ResponsibilityType  ")
-    @PostMapping("/add_method")
+    @PostMapping("/add")
     public ResponseEntity<Object> createResponsibilityType(@RequestBody List<ResponsibilityType> responsibilityTypes) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(responsibilityTypes));
 

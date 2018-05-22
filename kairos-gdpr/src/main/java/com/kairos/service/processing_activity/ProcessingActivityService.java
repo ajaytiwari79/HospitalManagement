@@ -77,8 +77,8 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setAssetType(assetType);
             processingActivity.setOrganizationalSecurityMeasure(organizationalSecurityMeasure);
             processingActivity.setTechnicalSecurityMeasure(technicalSecurityMeasure);
-            processingActivity.setDataSubjects(dataSubjectService.dataSubjectList(dataSubectids));
-            processingActivity.setProcessingPurposes(processingPurposeService.processingPurposeList(processingPurposeids));
+            processingActivity.setDataSubjects(dataSubjectService.getDataSubjectList(dataSubectids));
+            processingActivity.setProcessingPurposes(processingPurposeService.geProcessingPurposeList(processingPurposeids));
             processingActivity.setOrganisationId(processingActivity.getOrganisationId());
             processingActivity.setHostingCountryId(processingActivityDto.getHostingCountryId());
             processingActivity.setProcessOwnerStaff(processingActivityDto.getProcessOwnerStaff());
