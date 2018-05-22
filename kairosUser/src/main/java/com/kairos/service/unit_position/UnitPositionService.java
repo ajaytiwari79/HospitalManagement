@@ -82,6 +82,8 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -859,10 +861,7 @@ public class UnitPositionService extends UserBaseService {
 
         }
 
-        DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
-        DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
-
-        Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
+        Integer experienceInMonth =(int)ChronoUnit.MONTHS.between(DateUtil.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
         logger.info("user has current experience in months :{}", experienceInMonth);
         SeniorityLevel appliedSeniorityLevel = null;
         for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {
