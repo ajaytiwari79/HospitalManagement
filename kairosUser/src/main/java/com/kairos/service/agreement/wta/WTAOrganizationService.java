@@ -1,15 +1,10 @@
 package com.kairos.service.agreement.wta;
 
 import com.kairos.constants.RuleTemplates;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
@@ -21,9 +16,9 @@ import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateG
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -52,13 +47,16 @@ public class WTAOrganizationService extends UserBaseService {
     private CountryService countryService;
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
+    @Inject
+    ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid unit  " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
+
         }
         List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);
         return workingTimeAgreements;
@@ -156,7 +154,8 @@ public class WTAOrganizationService extends UserBaseService {
             // if rule template is still null so this category does not exist.
             if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
                 logger.info("category does not exist in when updating wta's rule template  :", ruleTemplateCategoryName);
-                throw new DataNotFoundByIdException("category : " + ruleTemplateCategoryName + " does not exist in when updating wta's rule template  :" + id);
+                exceptionService.dataNotFoundByIdException("message.category.notExist",ruleTemplateCategoryName,id);
+
             }
         }
         return ruleTemplateCategory;
@@ -546,7 +545,8 @@ public class WTAOrganizationService extends UserBaseService {
                     wtaBaseRuleTemplates.add(breaksInShift);
                     break;
                 default:
-                    throw new DataNotFoundByIdException("Invalid TEMPLATE");
+                    exceptionService.dataNotFoundByIdException("message.InvalidTemplateType");
+
             }
 
         }

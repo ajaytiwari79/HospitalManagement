@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRe
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,7 +48,8 @@ public class ResourceService extends UserBaseService {
     VehicleGraphRepository vehicleGraphRepository;
     @Inject
     ResourceUnavailabilityRelationshipRepository unavailabilityRelationshipRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     /**
      * Get the List of Resources in Organization
@@ -120,7 +122,8 @@ public class ResourceService extends UserBaseService {
             resource.setDeleted(true);
             return resourceGraphRepository.save(resource) != null;
         }
-        throw new DataNotFoundByIdException("Resource not found by id");
+        exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+        return false;
     }
 
     public List<ResourceWrapper> getUnitResources(Long unitId) {
@@ -146,18 +149,21 @@ public class ResourceService extends UserBaseService {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
-            throw new DataNotFoundByIdException("Incorrect unit id ");
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         Resource dbResourceObject = resourceGraphRepository.getResourceByRegistrationNumberAndUnit(unitId,resourceDTO.getRegistrationNumber());
 
         if(Optional.ofNullable(dbResourceObject).isPresent()){
-            throw new DuplicateDataException("Resource already exist with register number " + resourceDTO.getRegistrationNumber());
+            exceptionService.duplicateDataException("message.resource.alreadyexist",resourceDTO.getRegistrationNumber());
+
         }
 
         Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Vehicle type not found " + resourceDTO.getVehicleTypeId());
-            throw new DataNotFoundByIdException("Vehicle type not found");
+            exceptionService.dataNotFoundByIdException("message.resource.vehicletype.notfound");
+
         }
         Resource resource = new Resource(vehicle, resourceDTO.getRegistrationNumber(), resourceDTO.getNumber(),
                 resourceDTO.getModelDescription(), resourceDTO.getCostPerKM(), resourceDTO.getFuelType());
@@ -177,12 +183,14 @@ public class ResourceService extends UserBaseService {
         Resource resource = (Optional.ofNullable(resourceId).isPresent()) ? resourceGraphRepository.findOne(resourceId) : null;
         if (!Optional.ofNullable(resource).isPresent()) {
             logger.error("Incorrect resource id" + resourceId);
-            throw new DataNotFoundByIdException("Incorrect id of resource");
+            exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+
         }
         Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Vehicle type not found " + resourceDTO.getVehicleTypeId());
-            throw new DataNotFoundByIdException("Vehicle type not found");
+            exceptionService.dataNotFoundByIdException("message.resource.vehicletype.notfound");
+
         }
         resource.setVehicleType(vehicle);
         resource.setNumber(resourceDTO.getNumber());
@@ -203,7 +211,8 @@ public class ResourceService extends UserBaseService {
         Resource resource = resourceGraphRepository.findOne(resourceId);
         if (!Optional.ofNullable(resource).isPresent()) {
             logger.error("Resource not found by id " + resource);
-            throw new DataNotFoundByIdException("Resource not found");
+            exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+
         }
         List<ResourceUnavailabilityRelationship> resourceUnavailabilityRelationships = new ArrayList<>
                 (unavailabilityDTO.getUnavailabilityDates().size());
@@ -220,7 +229,8 @@ public class ResourceService extends UserBaseService {
                 resourceUnavailabilityRelationships.add(resourceUnavailabilityRelationship);
                 resourceUnAvailabilities.add(resourceUnAvailability);
             } catch (ParseException e) {
-                throw new InternalError("Incorrect resource date ");
+                exceptionService.internalServerError("error.resource.date.incorrect");
+
             }
         }
         unavailabilityRelationshipRepository.saveAll(resourceUnavailabilityRelationships);
@@ -232,7 +242,8 @@ public class ResourceService extends UserBaseService {
         ResourceUnAvailability resourceUnAvailability = resourceGraphRepository.getResourceUnavailabilityById(resourceId,unAvailabilityId);
         if(!Optional.ofNullable(resourceUnAvailability).isPresent()){
             logger.error("Incorrect id of Resource unavailability " + unAvailabilityId);
-            throw new DataNotFoundByIdException("Resource unavailability not found ");
+            exceptionService.dataNotFoundByIdException("message.resource.unavailability.notfound");
+
         }
         if(unavailabilityDTO.isFullDay()){
             resourceUnAvailability.setFullDay(unavailabilityDTO.isFullDay());
@@ -262,7 +273,8 @@ public class ResourceService extends UserBaseService {
         Resource resource = resourceGraphRepository.findOne(resourceId);
         if(!Optional.ofNullable(resource).isPresent()){
             logger.error("Resource not found by id " + resource);
-            throw new DataNotFoundByIdException("Resource not found");
+                exceptionService.dataNotFoundByIdException("message.resource.id.notfound");
+
         }
         Instant instant = Instant.parse(date);
         LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
