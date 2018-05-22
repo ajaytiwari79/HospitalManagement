@@ -1,7 +1,7 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.response.dto.web.experties.AgeRangeDTO;
-import com.kairos.persistence.model.user.expertise.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.service.locale.LocaleService;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.expertise;
 
-import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -19,7 +19,7 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
             "return case when function IS NOT NULL then collect(distinct{functionId:id(function),name:function.name ,description:function.description," +
             "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,payGrade as payGrade,collect(DISTINCT pga) as payGroupAreas")
-    FunctionAndSeniorityLevelQueryResult getFunctionAndPayGroupAreaBySeniorityLevelId(Long seniorityLevelId);
+    SeniorityLevelQueryResult getFunctionAndPayGroupAreaBySeniorityLevelId(Long seniorityLevelId);
 
     @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
             "match(seniorityLevel)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea) detach delete rel")
@@ -46,5 +46,5 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
             "return id(seniorityLevel) as id,seniorityLevel.from as from,seniorityLevel.pensionPercentage as pensionPercentage,seniorityLevel.freeChoicePercentage as freeChoicePercentage," +
             "seniorityLevel.freeChoiceToPension as freeChoiceToPension,seniorityLevel.to as to,case when function IS NOT NULL then collect(distinct{id:id(function),amount:relation.amount,name:function.name ,description:function.description," +
             "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,payGrade as payGrade,collect(DISTINCT pga) as payGroupAreas")
-    FunctionAndSeniorityLevelQueryResult getSeniorityLevelById(Long seniorityLevelId);
+    SeniorityLevelQueryResult getSeniorityLevelById(Long seniorityLevelId);
 }

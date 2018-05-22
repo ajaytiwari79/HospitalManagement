@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
-import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.payment_type.PaymentType;

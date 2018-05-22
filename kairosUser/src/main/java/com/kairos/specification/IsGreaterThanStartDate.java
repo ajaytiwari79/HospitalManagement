@@ -1,7 +1,7 @@
 package com.kairos.specification;
 
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

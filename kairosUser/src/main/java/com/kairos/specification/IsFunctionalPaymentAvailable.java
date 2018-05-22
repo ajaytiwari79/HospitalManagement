@@ -2,7 +2,7 @@ package com.kairos.specification;
 
 import com.kairos.persistence.model.user.expertise.FunctionalPayment;
 import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
-import com.kairos.persistence.model.user.expertise.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.exception.ExceptionService;
 
 import static java.time.temporal.ChronoUnit.DAYS;

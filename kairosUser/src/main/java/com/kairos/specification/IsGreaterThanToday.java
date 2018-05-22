@@ -1,6 +1,6 @@
 package com.kairos.specification;
 
-import com.kairos.persistence.model.user.expertise.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 

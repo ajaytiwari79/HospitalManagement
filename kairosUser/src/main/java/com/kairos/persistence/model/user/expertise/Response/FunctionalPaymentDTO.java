@@ -1,8 +1,8 @@
-package com.kairos.persistence.model.user.expertise;
+package com.kairos.persistence.model.user.expertise.Response;
 
 
 import com.kairos.config.neo4j.converter.LocalDateConverter;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -20,6 +20,9 @@ public class FunctionalPaymentDTO {
     private LocalDate endDate;
     private PaidOutFrequencyEnum paidOutFrequency;
     private boolean published;
+
+
+
 
     public FunctionalPaymentDTO() {
         //dc

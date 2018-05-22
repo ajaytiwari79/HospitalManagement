@@ -1,52 +1,8 @@
 package com.kairos.service.agreement.wta;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.tag.Tag;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.ExpertiseIdListDTO;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.agreement.RuleTemplateCategoryService;
-import com.kairos.service.agreement.RuleTemplateService;
-import com.kairos.service.country.tag.TagService;
-import com.kairos.service.expertise.ExpertiseService;
-import com.kairos.util.DateUtil;
-import org.apache.commons.lang3.SerializationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.util.*;
-
-import static com.kairos.constants.AppConstants.COPY_OF;
 
 
 /**

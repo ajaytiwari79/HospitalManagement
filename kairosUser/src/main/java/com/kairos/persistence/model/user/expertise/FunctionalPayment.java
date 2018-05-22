@@ -2,14 +2,17 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_FOR_EXPERTISE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
 @NodeEntity
 public class FunctionalPayment extends UserBaseEntity {
@@ -22,6 +25,8 @@ public class FunctionalPayment extends UserBaseEntity {
     private LocalDate endDate;
     private boolean published;
     private PaidOutFrequencyEnum paidOutFrequency;
+    private Set<FunctionalPaymentMatrix> functionalPayments;
+
 
     public FunctionalPayment() {
 
@@ -69,11 +74,19 @@ public class FunctionalPayment extends UserBaseEntity {
         this.paidOutFrequency = paidOutFrequency;
     }
 
-    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate,PaidOutFrequencyEnum paidOutFrequency) {
+    public Set<FunctionalPaymentMatrix> getFunctionalPayments() {
+        return functionalPayments;
+    }
+
+    public void setFunctionalPayments(Set<FunctionalPaymentMatrix> functionalPayments) {
+        this.functionalPayments = functionalPayments;
+    }
+
+    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paidOutFrequency) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
         this.published = false;
-        this.paidOutFrequency=paidOutFrequency;
+        this.paidOutFrequency = paidOutFrequency;
     }
 }
