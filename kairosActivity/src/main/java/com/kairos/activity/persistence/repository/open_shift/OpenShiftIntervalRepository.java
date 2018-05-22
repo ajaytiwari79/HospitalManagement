@@ -12,4 +12,6 @@ import java.util.List;
 public interface OpenShiftIntervalRepository extends MongoBaseRepository<OpenShiftInterval,BigInteger> {
 
     List<OpenShiftIntervalDTO> findByCountryIdAndDeletedFalse(Long countryId);
+
+    List<OpenShiftInterval> findAllByCountryIdAndDeletedFalse(Long countryId);
 }

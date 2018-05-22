@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +24,12 @@ public class OpenShiftIntervalService extends MongoBaseService {
     @Inject private ExceptionService exceptionService;
 
     public OpenShiftIntervalDTO createInterval(Long countryId,OpenShiftIntervalDTO openShiftIntervalDTO){
+        List<OpenShiftInterval> openShiftIntervals=openShiftIntervalRepository.findAllByCountryIdAndDeletedFalse(countryId);
+        Collections.sort(openShiftIntervals);
+        validateRange(openShiftIntervalDTO,openShiftIntervals);
         OpenShiftInterval openShiftInterval=new OpenShiftInterval();
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO,openShiftInterval);
-        openShiftIntervalRepository.save(openShiftInterval);
+        save(openShiftInterval);
         openShiftIntervalDTO.setId(openShiftInterval.getId());
         return openShiftIntervalDTO;
         }
@@ -39,8 +43,11 @@ public class OpenShiftIntervalService extends MongoBaseService {
             if(!openShiftInterval.isPresent()){
                 exceptionService.dataNotFoundByIdException("exception.noOpenShiftIntervalFound","OpenShiftInterval",openShiftIntervalId);
             }
+            List<OpenShiftInterval> openShiftIntervals=openShiftIntervalRepository.findAllByCountryIdAndDeletedFalse(countryId);
+            Collections.sort(openShiftIntervals);
+            validateRange(openShiftIntervalDTO,openShiftIntervals);
             ObjectMapperUtils.copyProperties(openShiftIntervalDTO,openShiftInterval);
-            openShiftIntervalRepository.save(openShiftInterval.get());
+            save(openShiftInterval.get());
             return openShiftIntervalDTO;
         }
 
@@ -54,8 +61,16 @@ public class OpenShiftIntervalService extends MongoBaseService {
             return true;
         }
 
-        private void validateRange(OpenShiftInterval openShiftInterval,OpenShiftIntervalDTO openShiftIntervalDTO){
-            for
+        private void validateRange(OpenShiftIntervalDTO openShiftIntervalDTO,List<OpenShiftInterval> openShiftIntervals){
+            for(OpenShiftInterval openShiftInterval:openShiftIntervals){
+                if (openShiftIntervalDTO.getFrom() < openShiftInterval.getFrom() && !(openShiftIntervalDTO.getTo() <= openShiftInterval.getFrom())) {
+                             exceptionService.actionNotPermittedException("exception.overlap.interval");
+                        } else if (openShiftIntervalDTO.getFrom() > openShiftInterval.getFrom() && !(openShiftIntervalDTO.getFrom() >= openShiftInterval.getTo())) {
+                            exceptionService.actionNotPermittedException("exception.overlap.interval");
+                        } else if (openShiftIntervalDTO.getFrom() == openShiftInterval.getFrom() || (openShiftIntervalDTO.getTo() == openShiftInterval.getTo())) {
+                            exceptionService.actionNotPermittedException("exception.overlap.interval");
+                        }
+            }
         }
 
 }

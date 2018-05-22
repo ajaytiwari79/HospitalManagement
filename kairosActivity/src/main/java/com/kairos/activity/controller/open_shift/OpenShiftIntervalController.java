@@ -21,7 +21,7 @@ import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_COUNTR
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 @Api(API_ORGANIZATION_COUNTRY_URL)
 public class OpenShiftIntervalController {
-    @Inject private OpenShiftIntervalService openShiftIntervalService;
+    @Inject  private OpenShiftIntervalService openShiftIntervalService;
     @ApiOperation("Create Interval")
     @PostMapping(value = "/interval")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

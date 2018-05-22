@@ -1,14 +1,14 @@
 package com.kairos.activity.persistence.model.open_shift;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-
-import java.math.BigInteger;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 //Domain name can be changed
+@Document
 public class OpenShiftInterval extends MongoBaseEntity implements Comparable<OpenShiftInterval> {
     private int from;
     private int to;
-    private BigInteger countryId;
+    private Long countryId;
 
     public OpenShiftInterval() {
         //Default Constructor
@@ -30,11 +30,11 @@ public class OpenShiftInterval extends MongoBaseEntity implements Comparable<Ope
         this.to = to;
     }
 
-    public BigInteger getCountryId() {
+    public Long getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(BigInteger countryId) {
+    public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
 
