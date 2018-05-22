@@ -3,6 +3,7 @@ package com.kairos.activity.service.activity;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.SkillRestClient;
+import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
@@ -37,6 +38,7 @@ import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -101,6 +103,8 @@ public class ActivityService extends MongoBaseService {
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private StaffRestClient  staffRestClient;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -655,6 +659,9 @@ public class ActivityService extends MongoBaseService {
 //        List<PhaseDTO> phaseDTOs = phaseService.getPhasesByCountryId(countryId);
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePhasesByOrganizationId(unitId);
 
+        UserAccessRoleDTO userAccessRoleDTO = staffRestClient.getAccessOfCurrentLoggedInStaff();
+        phaseActivityDTO.setStaffGroup(userAccessRoleDTO.getStaffGroup());
+        phaseActivityDTO.setManagementGroup(userAccessRoleDTO.getManagementGroup());
         phaseActivityDTO.setApplicablePhases(phaseDTOs);
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
