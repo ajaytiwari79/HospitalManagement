@@ -46,6 +46,7 @@ public class PolicyAgreementTemplateDto {
 
     private Long countryId;
 
+    @NotEmpty(message = "error.message.list.cannot.be.empty")
     public List<AgreementSection> getAgreementSections() {
         return agreementSections;
     }

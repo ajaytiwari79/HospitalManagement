@@ -54,6 +54,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private JackrabbitService jackrabbitService;
 
     public PolicyAgreementTemplate createPolicyAgreementTemplate(PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
+
         String name = policyAgreementTemplateDto.getName();
         if (policyAgreementTemplateRepository.findByName(name) != null) {
             throw new DuplicateDataException("policy document template With name " + name + " already exist");
@@ -64,13 +65,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             orgSubTypeIds = policyAgreementTemplateDto.getOrganizationSubTypes();
             orgServiceIds = policyAgreementTemplateDto.getOrganizationServices();
             orgSubServiceIds = policyAgreementTemplateDto.getOrganizationSubServices();
+
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
-            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-
+            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             if (Optional.ofNullable(requestResult).isPresent()) {
                 Map<String,Object> sections =new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -88,15 +89,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
                     policyAgreementTemplate.setOrganizationSubServices(orgSubServices);
                 }
-                if (accountTypeIds.size() != 0) {
-                    accountTypeService.getAccountListByIds(accountTypeIds);
-                    policyAgreementTemplate.setAccountTypes(accountTypeIds);
-                }
-
                 if (agreementSection.size() != 0) {
                     sections= agreementSectionService.createAgreementSections(agreementSection);
                     policyAgreementTemplate.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
+                accountTypeService.getAccountListByIds(accountTypeIds);
+                policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 policyAgreementTemplate.setOrganizationTypes(requestResult.getOrganizationTypes());
                 policyAgreementTemplate.setName(policyAgreementTemplateDto.getName());
@@ -158,17 +156,19 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
         } else {
 
+            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
             Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
             orgTypeIds = policyAgreementTemplateDto.getOrganizationTypes();
             orgSubTypeIds = policyAgreementTemplateDto.getOrganizationSubTypes();
             orgServiceIds = policyAgreementTemplateDto.getOrganizationServices();
             orgSubServiceIds = policyAgreementTemplateDto.getOrganizationSubServices();
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
-            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
+
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-
+            accountTypeService.getAccountListByIds(accountTypeIds);
+            exist.setAccountTypes(accountTypeIds);
             if (Optional.ofNullable(requestResult).isPresent()) {
                 Map<String,Object> sections =new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -187,8 +187,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     exist.setOrganizationSubServices(orgSubServices);
                 }
                 if (accountTypeIds.size() != 0) {
-                    accountTypeService.getAccountListByIds(accountTypeIds);
-                    exist.setAccountTypes(accountTypeIds);
+
                 }
 
                 if (agreementSection.size() != 0) {

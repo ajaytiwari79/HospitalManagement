@@ -31,15 +31,16 @@ public class MasterAssetService extends MongoBaseService {
     ComparisonUtils comparisonUtils;
 
     public MasterAsset addMasterAsset(MasterAssetDto masterAsset) {
-        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterAsset.getOrganizationTypes();
-        orgSubTypeIds = masterAsset.getOrganizationSubTypes();
-        orgServiceIds = masterAsset.getOrganizationServices();
-        orgSubServiceIds = masterAsset.getOrganizationSubServices();
+
         MasterAsset newAsset = new MasterAsset();
         if (masterAssetMongoRepository.findByName(masterAsset.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAsset.getName() + " exists");
         } else {
+            Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
+            orgTypeIds = masterAsset.getOrganizationTypes();
+            orgSubTypeIds = masterAsset.getOrganizationSubTypes();
+            orgServiceIds = masterAsset.getOrganizationServices();
+            orgSubServiceIds = masterAsset.getOrganizationSubServices();
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
@@ -88,16 +89,16 @@ public class MasterAssetService extends MongoBaseService {
 
     public MasterAsset updateMasterAsset(BigInteger id, MasterAssetDto masterAssetDto) {
 
+
+        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(id);
+        if (!Optional.of(exists).isPresent()) {
+            throw new DataNotFoundByIdException("asset not Exist for id " + id);
+        }
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
         orgTypeIds = masterAssetDto.getOrganizationTypes();
         orgSubTypeIds = masterAssetDto.getOrganizationSubTypes();
         orgServiceIds = masterAssetDto.getOrganizationServices();
         orgSubServiceIds = masterAssetDto.getOrganizationSubServices();
-        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(id);
-        if (!Optional.of(exists).isPresent()) {
-            throw new DataNotFoundByIdException("asset not Exist for id " + id);
-        }
-
         OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
