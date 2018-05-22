@@ -13,7 +13,6 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
@@ -32,7 +31,6 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -160,8 +158,6 @@ public class StaffService extends UserBaseService {
     private OrganizationService organizationService;
     @Autowired
     private UnitPositionGraphRepository unitPositionGraphRepository;
-    @Autowired
-    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
     @Inject
@@ -1589,8 +1585,8 @@ public class StaffService extends UserBaseService {
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
 
-            WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
-            staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
+            //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
+            //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
 
         if (activityDayTypes != null && !activityDayTypes.isEmpty()) {
