@@ -25,7 +25,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
-    protected float recommendedValue;
+    private float recommendedValue;
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -71,7 +71,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
        this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
     }
 
-    public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activities,
+    public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,
                                          int numberOfLeaves, LocalDate validationStartDate, int numberOfWeeks) {
         super(name, description);
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;

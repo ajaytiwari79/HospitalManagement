@@ -133,6 +133,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     @Query("MATCH (wta:WorkingTimeAgreement)-[hasTag:"+HAS_TAG+"]-(clause_tag:Tag) WHERE clause_tag.countryTag=true AND id(wta)={0}  AND lower(clause_tag.name) contains lower({1}) AND clause_tag.deleted = {2} return clause_tag")
     List<Tag> getCountryTagsOfWTAByIdAndDeleted(long wtaId, String filterText, boolean deleted);
 
+
     @Query("MATCH (r:RuleTemplateCategory)-[hasTag:"+HAS_TAG+"]-(clause_tag:Tag) WHERE clause_tag.countryTag=true AND id(r)={0}  AND lower(clause_tag.name) contains lower({1}) AND clause_tag.deleted = {2} return clause_tag")
     List<Tag> getCountryTagsOfRuleTemplateCategoryByIdAndDeleted(long ruleTmplCategoryId, String filterText, boolean deleted);
 

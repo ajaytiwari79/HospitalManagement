@@ -40,8 +40,8 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
         return isRestingTimeAllowed;
     }
 
-    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+    public void setIsRestingTimeAllowed(boolean isRestingTimeAllowed) {
+        this.isRestingTimeAllowed = isRestingTimeAllowed;
     }
 
     public int getRestingTime() {
