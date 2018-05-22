@@ -23,7 +23,7 @@ public class OrganizationTypeAndServiceBasicDto {
     public void setName(String name) {
         this.name = name;
     }
-     public OrganizationTypeAndServiceBasicDto()
-     {}
+
+     public OrganizationTypeAndServiceBasicDto(){}
 
 }

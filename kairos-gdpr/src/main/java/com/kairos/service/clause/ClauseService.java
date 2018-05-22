@@ -71,7 +71,6 @@ public class ClauseService extends MongoBaseService {
         List<AccountType> accountTypes;
         Clause clause = new Clause();
         if (clauseRepository.findByTitle(clauseDto.getTitle()) != null) {
-
             throw new DuplicateDataException("clause with name title " + clauseDto.getTitle() + " already Exist");
         }
 

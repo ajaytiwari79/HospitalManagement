@@ -33,7 +33,6 @@ import java.util.*;
 @CrossOrigin
 public class ClauseController {
 
-
     @Inject
     private ClauseService clauseService;
 

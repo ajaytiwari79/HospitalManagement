@@ -22,7 +22,7 @@ public class RestClientURLUtils {
         if (hasUnitInUrl) {
 
             String baseUrl = new StringBuilder("http://localhost:8091/kairos/user/api/v1/organization/").append("24").toString();
-return baseUrl;
+            return baseUrl;
         } else {
             String baseUrl = new StringBuilder(userServiceBaseUrl + "organization/").append("24").toString();
             return baseUrl;

@@ -25,6 +25,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class OrganizationType extends UserBaseEntity {
 
     private boolean isEnable = true;
+
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
 

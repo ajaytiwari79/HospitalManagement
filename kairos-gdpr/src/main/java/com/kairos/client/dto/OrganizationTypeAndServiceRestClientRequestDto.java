@@ -4,12 +4,9 @@ import java.util.Set;
 
 public class OrganizationTypeAndServiceRestClientRequestDto {
 
-
-   private Set<Long> organizationTypeIds;
+    private Set<Long> organizationTypeIds;
     private Set<Long> organizationSubTypeIds;
-
     private Set<Long> organizationServiceIds;
-
     private Set<Long> organizationSubServiceIds;
 
     public Set<Long> getOrganizationTypeIds() {
@@ -44,21 +41,16 @@ public class OrganizationTypeAndServiceRestClientRequestDto {
         this.organizationSubServiceIds = organizationSubServiceIds;
     }
 
-    public OrganizationTypeAndServiceRestClientRequestDto()
-    {
+    public OrganizationTypeAndServiceRestClientRequestDto() { }
 
-
+    public OrganizationTypeAndServiceRestClientRequestDto(Set<Long> organizationTypeIds,
+                                                          Set<Long> organizationSubTypeIds,
+                                                          Set<Long> organizationServiceIds,
+                                                          Set<Long> organizationSubServiceIds){
+                this.organizationTypeIds=organizationTypeIds;
+                this.organizationSubTypeIds=organizationSubTypeIds;
+                this.organizationServiceIds=organizationServiceIds;
+                this.organizationSubServiceIds=organizationSubServiceIds;
     }
-
-    public OrganizationTypeAndServiceRestClientRequestDto(Set<Long> organizationTypeIds,Set<Long> organizationSubTypeIds
-    ,Set<Long> organizationServiceIds,Set<Long> organizationSubServiceIds)
-    {
-this.organizationTypeIds=organizationTypeIds;
-this.organizationSubTypeIds=organizationSubTypeIds;
-this.organizationServiceIds=organizationServiceIds;
-this.organizationSubServiceIds=organizationSubServiceIds;
-
-    }
-
 
 }

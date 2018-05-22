@@ -25,16 +25,11 @@ public class Clause extends MongoBaseEntity {
     @NotNull(message = "error.clause.title.cannotbe.null")
     private String description;
 
-
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
-
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List <OrganizationTypeAndServiceBasicDto>organizationServices;
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
-
-
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
     private List<AccountType> accountTypes;
-
 
     public String getTitle() {
         return title;
@@ -60,9 +55,7 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
-     public Clause() {
-
-    }
+     public Clause() { }
 
     public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
         return organizationTypes;

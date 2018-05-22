@@ -7,8 +7,8 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseTagDto {
 
-private BigInteger id;
-private  String name;
+    private BigInteger id;
+    private String name;
 
     public BigInteger getId() {
         return id;

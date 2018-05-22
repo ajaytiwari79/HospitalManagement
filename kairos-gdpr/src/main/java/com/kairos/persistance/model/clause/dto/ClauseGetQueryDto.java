@@ -8,12 +8,9 @@ public class ClauseGetQueryDto {
     private List<BigInteger> accountTypes;
     private List<String> tags;
     private List<Long> organizationTypes;
-    private List<Long>  organizationSubTypes;
-
-    private List<Long>  organizationServices;
-    private List<Long>  organizationSubServices;
-
-
+    private List<Long> organizationSubTypes;
+    private List<Long> organizationServices;
+    private List<Long> organizationSubServices;
 
     public List<String> getTags() {
         return tags;

@@ -12,9 +12,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountType extends MongoBaseEntity {
 
-@UniqueElements
-private String typeOfAccount;
-
+    @UniqueElements
+    private String typeOfAccount;
 
     public String getTypeOfAccount() {
         return typeOfAccount;
@@ -24,9 +23,6 @@ private String typeOfAccount;
         this.typeOfAccount = typeOfAccount;
     }
 
-    public AccountType()
-{}
-
-
+    public AccountType(){}
 
 }
