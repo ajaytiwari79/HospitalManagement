@@ -210,14 +210,14 @@ public class WTAService extends UserBaseService {
             ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, wtaDTO.getRuleTemplates());
         }
         wta.setRuleTemplates(ruleTemplates);
-        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDateMillis();
-        wta.setStartDateMillis(dateInMillies);
+        Long dateInMillies = (wtaDTO.getStartDate() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDate();
+        wta.setStartDate(dateInMillies);
 
-        if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
-            if (dateInMillies > wtaDTO.getEndDateMillis()) {
+        if (wtaDTO.getEndDate() != null && wtaDTO.getEndDate() > 0) {
+            if (dateInMillies > wtaDTO.getEndDate()) {
                 throw new InvalidRequestException("End Date must not be greater than start date");
             }
-            wta.setEndDateMillis(wtaDTO.getEndDateMillis());
+            wta.setEndDate(wtaDTO.getEndDate());
         }
 
         return wta;
@@ -263,7 +263,7 @@ public class WTAService extends UserBaseService {
     }
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long countryId) {
-        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+        if (updateDTO.getStartDate() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
         WorkingTimeAgreement versionWTA = new WorkingTimeAgreement();
@@ -279,17 +279,17 @@ public class WTAService extends UserBaseService {
                 });
             }
         });
-        versionWTA.setStartDateMillis(oldWta.getStartDateMillis());
-        versionWTA.setEndDateMillis(updateDTO.getStartDateMillis());
+        versionWTA.setStartDate(oldWta.getStartDate());
+        versionWTA.setEndDate(updateDTO.getStartDate());
         save(versionWTA);
 
 
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
 
-        oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        if (oldWta.getEndDateMillis() != null) {
-            oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+        oldWta.setStartDate(updateDTO.getStartDate());
+        if (oldWta.getEndDate() != null) {
+            oldWta.setEndDate(updateDTO.getEndDate());
         }
 
 
@@ -456,8 +456,8 @@ public class WTAService extends UserBaseService {
     public WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement newWta) {
         newWta.setName(COPY_OF + oldWta.getName());
         newWta.setDescription(oldWta.getDescription());
-        newWta.setStartDateMillis(oldWta.getStartDateMillis());
-        newWta.setEndDateMillis(oldWta.getEndDateMillis());
+        newWta.setStartDate(oldWta.getStartDate());
+        newWta.setEndDate(oldWta.getEndDate());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setId(null);
         return newWta;
@@ -468,11 +468,11 @@ public class WTAService extends UserBaseService {
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         newWta.setName(updatedWta.getName());
         newWta.setDescription(updatedWta.getDescription());
-        if (updatedWta.getStartDateMillis() < System.currentTimeMillis()) {
+        if (updatedWta.getStartDate() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
-        newWta.setStartDateMillis(updatedWta.getStartDateMillis());
-        newWta.setEndDateMillis(updatedWta.getEndDateMillis());
+        newWta.setStartDate(updatedWta.getStartDate());
+        newWta.setEndDate(updatedWta.getEndDate());
         newWta.setId(null);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updatedWta.getRuleTemplates().size() > 0) {

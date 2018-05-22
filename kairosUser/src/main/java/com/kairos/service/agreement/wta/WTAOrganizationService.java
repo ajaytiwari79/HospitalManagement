@@ -92,8 +92,8 @@ public class WTAOrganizationService extends UserBaseService {
         BeanUtils.copyProperties(oldWta, newWta);
         newWta.setId(null);
         newWta.setDeleted(true);
-        newWta.setStartDateMillis(oldWta.getStartDateMillis());
-        newWta.setEndDateMillis(updateDTO.getStartDateMillis());
+        newWta.setStartDate(oldWta.getStartDate());
+        newWta.setEndDate(updateDTO.getStartDate());
         newWta.setCountryParentWTA(null);
         newWta.getRuleTemplates().forEach(ruleTemplate -> {
             if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
@@ -110,11 +110,11 @@ public class WTAOrganizationService extends UserBaseService {
 
         oldWta.setName(updateDTO.getName());
         oldWta.setDescription(updateDTO.getDescription());
-        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+        if (updateDTO.getStartDate() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
-        oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+        oldWta.setStartDate(updateDTO.getStartDate());
+        oldWta.setEndDate(updateDTO.getEndDate());
         oldWta.setExpertise(oldWta.getExpertise());
         oldWta.setParentWTA(newWta);
         oldWta.setDisabled(false);
@@ -131,7 +131,7 @@ public class WTAOrganizationService extends UserBaseService {
 
         save(oldWta);
         //Preparing Response for frontend
-        //workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
+        //workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDate());
         oldWta.setParentWTA(newWta.getParentWTA());
 
         oldWta.getExpertise().setCountry(null);

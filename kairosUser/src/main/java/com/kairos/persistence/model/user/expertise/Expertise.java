@@ -57,8 +57,6 @@ public class Expertise extends UserBaseEntity {
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
 
-    private PaidOutFrequencyEnum paidOutFrequency;
-
     @Relationship(type = VERSION_OF)
     private Expertise parentExpertise;
 

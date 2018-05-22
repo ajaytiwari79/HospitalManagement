@@ -1,7 +1,9 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.response.dto.web.experties.AgeRangeDTO;
+import com.kairos.persistence.model.user.expertise.FunctionalPaymentDTO;
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.service.locale.LocaleService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
@@ -34,6 +36,8 @@ public class ExpertiseController {
     private UnitPositionService unitPositionService;
     @Autowired
     private LocaleService localeService;
+    @Autowired
+    private FunctionalPaymentService functionalPaymentService;
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
@@ -84,11 +88,24 @@ public class ExpertiseController {
     @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
     public ResponseEntity<Map<String, Object>> updateUnitPosition(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO, wtaType));
-
-
     }
 
+    @ApiOperation(value = "save a functional payment settings for expertise")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> saveFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.saveFunctionalPayment(expertiseId, functionalPaymentDTO));
+    }
 
+    @ApiOperation(value = "save a functional payment settings for expertise")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getFunctionalPayment(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getFunctionalPayment(expertiseId));
+    }
 
+    @ApiOperation(value = "update a functional payment settings for expertise")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(expertiseId, functionalPaymentDTO));
+    }
 
 }
