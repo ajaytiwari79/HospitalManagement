@@ -255,7 +255,7 @@ public class StaffService extends UserBaseService {
                 }
             }
             if(!isSeniorityLevelMatched){
-                exceptionService.actionNotPermittedException("None of seniority levels exists with current experience "+staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound","seniorityLevel "+staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
             }
 
             staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
