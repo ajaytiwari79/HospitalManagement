@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
@@ -32,6 +33,20 @@ public class OpenShiftIntervalController {
     @GetMapping(value = "/intervals")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivity(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.getAllIntervalsByCountryId(countryId));
+    }
+
+    @ApiOperation("Update Interval of Activity")
+    @PutMapping(value = "/interval/{openShiftIntervalId}")
+        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateGeneralTab(@PathVariable Long countryId, @PathVariable BigInteger openShiftIntervalId, @RequestBody OpenShiftIntervalDTO openShiftIntervalDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.updateInterval(countryId,openShiftIntervalId, openShiftIntervalDTO));
+    }
+
+    @ApiOperation("delete an Interval based on countryId")
+    @DeleteMapping(value = "/interval/{openShiftIntervalId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteActivity(@PathVariable Long countryId,@PathVariable BigInteger openShiftIntervalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.deleteOpenShiftInterval(countryId,openShiftIntervalId));
     }
 }

@@ -34,11 +34,28 @@ public class OpenShiftIntervalService extends MongoBaseService {
          return openShiftIntervalRepository.findByCountryIdAndDeletedFalse(countryId);
         }
 
-        public OpenShiftIntervalDTO updateInterval(Long countryId,BigInteger openOpenShiftIntervalId,OpenShiftIntervalDTO openShiftIntervalDTO){
-            Optional<OpenShiftInterval> openShiftInterval=openShiftIntervalRepository.findById(openOpenShiftIntervalId);
+        public OpenShiftIntervalDTO updateInterval(Long countryId,BigInteger openShiftIntervalId,OpenShiftIntervalDTO openShiftIntervalDTO){
+            Optional<OpenShiftInterval> openShiftInterval=openShiftIntervalRepository.findById(openShiftIntervalId);
             if(!openShiftInterval.isPresent()){
-                exceptionService.dataNotFoundByIdException("exception.dataNotFound","OpenShiftInterval",openOpenShiftIntervalId);
+                exceptionService.dataNotFoundByIdException("exception.noOpenShiftIntervalFound","OpenShiftInterval",openShiftIntervalId);
             }
+            ObjectMapperUtils.copyProperties(openShiftIntervalDTO,openShiftInterval);
+            openShiftIntervalRepository.save(openShiftInterval.get());
+            return openShiftIntervalDTO;
+        }
+
+        public boolean deleteOpenShiftInterval(Long countryId,BigInteger openShiftIntervalId){
+            Optional<OpenShiftInterval> openShiftInterval=openShiftIntervalRepository.findById(openShiftIntervalId);
+            if(!openShiftInterval.isPresent()){
+                exceptionService.dataNotFoundByIdException("exception.noOpenShiftIntervalFound","OpenShiftInterval",openShiftIntervalId);
+            }
+            openShiftInterval.get().setDeleted(true);
+            openShiftIntervalRepository.save(openShiftInterval.get());
+            return true;
+        }
+
+        private void validateRange(OpenShiftInterval openShiftInterval,OpenShiftIntervalDTO openShiftIntervalDTO){
+            for
         }
 
 }
