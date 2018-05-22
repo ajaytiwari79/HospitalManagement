@@ -67,7 +67,7 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Inject DayTypeGraphRepository dayTypeGraphRepository;
     private @Inject  EmploymentTypeGraphRepository employmentTypeGraphRepository;
     private @Inject AccessGroupRepository accessGroupRepository;
-    private @Inject TimeTypeGraphRepository timeTypeGraphRepository;
+   // private @Inject TimeTypeGraphRepository timeTypeGraphRepository;
     private @Inject UserGraphRepository userGraphRepository;
     private  @Inject CurrencyService currencyService;
     private  @Inject ExpertiseGraphRepository expertiseGraphRepository;

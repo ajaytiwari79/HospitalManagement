@@ -119,13 +119,15 @@ public class TagController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfExpertise(countryId, expertiseId, filterText));
     }
 
-    @ApiOperation(value = "Get list of Tags of WTA")
-    @RequestMapping(value = COUNTRY_URL + "/wta/{wtaId}/clause_tag", method = RequestMethod.GET)
+
+    /*@ApiOperation(value = "Get list of Tags of WTA")
+    @RequestMapping(value = COUNTRY_URL + "/wta/{wtaId}/tag", method = RequestMethod.GET)
+>>>>>>> 4d75638a92211c68b490abe14444c9db668b1417
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsOfWTA(@PathVariable long countryId, @PathVariable long wtaId,
                                                               @RequestParam(value = "filterText",required = false) String filterText) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfWTA(countryId, wtaId, filterText));
-    }
+    }*/
 
     @ApiOperation(value = "Get list of Tags of rule Template Category")
     @RequestMapping(value = COUNTRY_URL + "/rule_template_category/{ruleTemplateCategoryId}/clause_tag", method = RequestMethod.GET)

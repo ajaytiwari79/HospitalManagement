@@ -284,14 +284,14 @@ public class TagService extends UserBaseService {
         return tagGraphRepository.getCountryTagsOfExpertiseByIdAndDeleted(expertiseId, filterText, false);
     }
 
-    public List<Tag> getCountryTagsOfWTA(long countryId, long wtaId, String filterText){
+    /*public List<Tag> getCountryTagsOfWTA(long countryId, long wtaId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
         return tagGraphRepository.getCountryTagsOfWTAByIdAndDeleted(wtaId, filterText, false);
-    }
+    }*/
 
     public List<Tag> getCountryTagsOfRuleTemplateCategory(long countryId, long ruleTmplCategoryId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
