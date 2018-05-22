@@ -48,6 +48,8 @@ import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.response.dto.web.staff.EligibleNightWorkerStaffIdListDTO;
+import com.kairos.response.dto.web.staff.UnitStaffResponseDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -1826,6 +1828,10 @@ public class StaffService extends UserBaseService {
             }
         }
         return nextSeniorityLevelInMonths;
+    }
+
+    public UnitStaffResponseDTO getUnitWiseStaffList(){
+        return staffGraphRepository.getStaffListOfUnitWithBasicInfo();
     }
 
 }

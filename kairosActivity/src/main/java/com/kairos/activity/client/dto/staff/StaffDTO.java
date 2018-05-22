@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -45,9 +46,6 @@ public class StaffDTO {
     private String profilePic;
     private Set<Skill> skillSet;
     private Long unitEmploymentPositionId;
-    private Gender gender;
-    private boolean pregnant;
-
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
@@ -241,19 +239,8 @@ public class StaffDTO {
         this.contactDetail = contactDetail;
     }
 
-    public Gender getGender() {
-        return gender;
+    public void setInactiveFrom(Long inactiveFrom) {
+        this.inactiveFrom = inactiveFrom;
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public boolean isPregnant() {
-        return pregnant;
-    }
-
-    public void setPregnant(boolean pregnant) {
-        this.pregnant = pregnant;
-    }
 }

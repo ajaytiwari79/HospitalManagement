@@ -1,8 +1,9 @@
 package com.kairos.activity.spec.night_worker;
 
-import com.kairos.activity.client.dto.staff.StaffDTO;
+
 import com.kairos.activity.spec.AbstractActivitySpecification;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.response.dto.web.StaffDTO;
 
 import java.time.LocalDate;
 import java.time.Period;
