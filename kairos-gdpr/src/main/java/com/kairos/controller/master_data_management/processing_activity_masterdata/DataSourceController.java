@@ -38,7 +38,11 @@ public class DataSourceController {
 
     @ApiOperation("get dataSource by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getDataSourceById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataSource(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(id));
 
     }
@@ -61,7 +65,11 @@ public class DataSourceController {
 
     @ApiOperation("delete dataSource  by id")
     @DeleteMapping("/delete/id/{id}")
-    public ResponseEntity<Object> deleteDataSourceById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteDataSource(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(id));
 
     }
@@ -69,7 +77,11 @@ public class DataSourceController {
     @ApiOperation("update dataSource by id")
     @PutMapping("/update/id/{id}")
     public ResponseEntity<Object> updateDataSource(@PathVariable BigInteger id, @RequestBody DataSource dataSource) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(id, dataSource));
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(id,dataSource));
 
     }
 

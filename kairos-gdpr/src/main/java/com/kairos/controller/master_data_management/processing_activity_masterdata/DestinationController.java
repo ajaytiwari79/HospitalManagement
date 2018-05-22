@@ -34,7 +34,10 @@ public class DestinationController {
 
     @ApiOperation("get Destination by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getDestinationById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDestination(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestination(id));
 
     }
@@ -57,15 +60,21 @@ public class DestinationController {
 
     @ApiOperation("delete Destination by id")
     @DeleteMapping("/delete/id/{id}")
-    public ResponseEntity<Object> deleteDestinationById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteDestination(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.deleteDestination(id));
 
     }
 
     @ApiOperation("update Destination by id")
     @PutMapping("/update/id/{id}")
-    public ResponseEntity<Object> updateDestination(@PathVariable BigInteger id, @RequestBody Destination destinations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.updateDestination(id, destinations));
+    public ResponseEntity<Object> updateDestination(@PathVariable BigInteger id, @RequestBody Destination destination) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.updateDestination(id,destination));
 
     }
 

@@ -35,7 +35,10 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("get ResponsibilityType  by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getResponsibilityTypeById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getResponsibilityType(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(id));
 
     }
@@ -60,7 +63,10 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("delete ResponsibilityType  by id")
     @DeleteMapping("/delete/id/{id}")
-    public ResponseEntity<Object> deleteResponsibilityTypeById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(id));
 
     }
@@ -68,7 +74,10 @@ public class ResponsibilityTypeController {
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/update/id/{id}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable BigInteger id, @RequestBody ResponsibilityType responsibilityType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(id, responsibilityType));
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(id,responsibilityType));
 
     }
 

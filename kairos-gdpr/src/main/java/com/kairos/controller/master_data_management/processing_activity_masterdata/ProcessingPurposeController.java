@@ -38,7 +38,10 @@ public class ProcessingPurposeController {
 
     @ApiOperation("get pocessing purpose by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getProcessingPurposeById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(id));
 
     }
@@ -62,7 +65,10 @@ public class ProcessingPurposeController {
 
     @ApiOperation("delete pocessing purpose by id")
     @DeleteMapping("/delete/id/{id}")
-    public ResponseEntity<Object> deleteProcessingPurposeById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(id));
 
     }
@@ -70,7 +76,10 @@ public class ProcessingPurposeController {
     @ApiOperation("update pocessing purpose by id")
     @PutMapping("/update/id/{id}")
     public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id,@RequestBody ProcessingPurpose   processingPurpose) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(id, processingPurpose));
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(id,processingPurpose));
 
     }
 

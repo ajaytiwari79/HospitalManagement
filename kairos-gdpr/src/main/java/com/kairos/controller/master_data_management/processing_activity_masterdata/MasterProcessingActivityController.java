@@ -42,18 +42,27 @@ public class MasterProcessingActivityController {
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable BigInteger id, @RequestBody MasterProcessingActivityDto processingActivityDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(id, processingActivityDto));
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(id,processingActivityDto));
     }
 
     @ApiOperation(value = "delete MasterProcessingActivity")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteMasterProcessingActivity(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteMasterProcessingActivity(id));
     }
 
     @ApiOperation(value = "get MasterProcessingActivity by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivityById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityById(id));
     }
 

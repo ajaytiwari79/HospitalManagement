@@ -33,6 +33,7 @@ public final class ApiConstant {
     public static final String API_DATASUBJECT_URL = API_V1 + "/data_subject";
     public static final String API_RESPONSIBILITY_TYPE= API_V1 + "/responsibility_type";
     public static final String API_DESTINATION= API_V1 + "/destination";
+    public static final String API_PROCESSING_LEGAL_BASIS= API_V1 + "/processing_basis";
 
     //agreement template
     public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + "/agreement_template";
