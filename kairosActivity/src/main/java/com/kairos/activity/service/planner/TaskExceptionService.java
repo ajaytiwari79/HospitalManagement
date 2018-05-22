@@ -20,6 +20,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskTypeMongoReposit
 import com.kairos.activity.response.dto.*;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.client_exception.ClientExceptionService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
 import com.kairos.activity.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.activity.service.restrcition_freuency.RestrictionFrequencyService;
@@ -94,6 +95,8 @@ public class TaskExceptionService extends MongoBaseService {
     private RestrictionFrequencyService restrictionFrequencyService;
     @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(TaskExceptionService.class);
@@ -181,7 +184,7 @@ public class TaskExceptionService extends MongoBaseService {
         RestrictionFrequency restrictionFrequency = restrictionFrequencyService.getRestrictionFrequency(restrictionFrequencyId);
         if(restrictionFrequency == null){
             logger.info("Incorrect id of restriction frequency id " + restrictionFrequencyId);
-            throw new DataNotFoundByIdException("Invalid selected restriction frequency " + restrictionFrequencyId);
+            exceptionService.dataNotFoundByIdException("message.restrictionfrequency.id",restrictionFrequencyId);
         }
         List<Long> citizenIds=clientRestClient.getCitizenIds();
         //DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
@@ -449,11 +452,11 @@ public class TaskExceptionService extends MongoBaseService {
 
         Optional<Task> taskOptional = taskMongoRepository.findById(taskId);
         if (!taskOptional.isPresent()) {
-            throw new InternalError("Task not found");
+            exceptionService.dataNotFoundByIdException("message.task.id");
         }
         Task task=taskOptional.get();
         if (!task.isSingleTask()) {
-            throw new InternalError("This is not a single task");
+            exceptionService.internalError("error.task.single");
         }
         ArrayList<Task> tasksToReturn = new ArrayList<>(taskData.size());
         SimpleDateFormat executionDateFormat = new SimpleDateFormat(ONLY_DATE);

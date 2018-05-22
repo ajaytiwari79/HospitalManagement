@@ -3,6 +3,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,13 @@ public class DepartmentService extends UserBaseService {
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     public Organization createDepartment(long organizationId, Department department) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (organization == null) {
-            throw new NullPointerException("organization can not be null");
+            exceptionService.nullPointerException("error.departmentService.organization.notNull");
+            
         }
         List<Department> departments = (organization.getDepartments() == null) ? new ArrayList<>() : organization.getDepartments();
         departments.add(department);
