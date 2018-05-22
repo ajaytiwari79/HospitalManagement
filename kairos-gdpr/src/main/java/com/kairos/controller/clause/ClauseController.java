@@ -47,7 +47,7 @@ public class ClauseController {
     }
 
     @ApiOperation("get clause by id")
-    @GetMapping("/clause/id/{id}")
+    @GetMapping("/clause/{id}")
     public ResponseEntity<Object> getClause(@PathVariable BigInteger id) {
         if (id!=null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(id));
@@ -64,7 +64,7 @@ public class ClauseController {
     }*/
 
     @ApiOperation("delete clause by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteClause(@PathVariable BigInteger id) {
         if (id!=null)
         {
@@ -101,7 +101,7 @@ public class ClauseController {
 
 
     @ApiOperation("default clauses page with default size 10 ")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getclauseVersion(@PathVariable BigInteger id, @RequestParam VersionNode versionNode) throws RepositoryException {
         if (id!=null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, versionNode));

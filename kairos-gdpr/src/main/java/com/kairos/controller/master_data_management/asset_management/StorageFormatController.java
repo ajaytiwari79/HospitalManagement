@@ -37,7 +37,7 @@ public class StorageFormatController {
 
 
     @ApiOperation("get StorageFormat by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getStorageFormat(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -65,7 +65,7 @@ public class StorageFormatController {
 
 
     @ApiOperation("delete StorageFormat  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteStorageFormat(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

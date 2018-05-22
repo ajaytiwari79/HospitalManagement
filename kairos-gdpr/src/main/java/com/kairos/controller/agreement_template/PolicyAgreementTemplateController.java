@@ -45,7 +45,7 @@ public class PolicyAgreementTemplateController {
     }
 
 
-    @DeleteMapping("delete/id/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Object> deleteById(@PathVariable BigInteger id) {
 
         if (id==null) {

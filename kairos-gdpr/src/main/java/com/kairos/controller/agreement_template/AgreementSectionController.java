@@ -39,7 +39,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
     }
 
 
-    @RequestMapping(value = "/delete/id/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
     public ResponseEntity<Object>  deleteAgreementSection(@PathVariable BigInteger id )
     { if (id!=null) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(id));
@@ -50,7 +50,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
 
 
 
-    @RequestMapping(value = "/id/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public ResponseEntity<Object>  getAgreementSectionWithDataById(@PathVariable BigInteger id )
     {
         if (id!=null) {

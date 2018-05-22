@@ -58,7 +58,7 @@ public class MasterAssetController {
     }
 
     @ApiOperation(value = "get master asset by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getMasterAsset(@PathVariable BigInteger id) {
         if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(id));

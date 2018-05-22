@@ -37,7 +37,7 @@ public class DataSubjectController {
 
 
     @ApiOperation("get DataSubject by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getDataSubject(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -63,7 +63,7 @@ public class DataSubjectController {
 
 
     @ApiOperation("delete DataSubject by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataSubject(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -73,7 +73,7 @@ public class DataSubjectController {
     }
 
     @ApiOperation("update DataSubject by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateDataSubject(@PathVariable BigInteger id, @RequestBody DataSubject dataSubject) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

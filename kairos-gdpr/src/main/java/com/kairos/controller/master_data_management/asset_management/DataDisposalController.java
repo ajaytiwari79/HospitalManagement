@@ -34,7 +34,7 @@ public class DataDisposalController {
 
 
     @ApiOperation("get DataDisposal by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getDataDisposal(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -63,7 +63,7 @@ public class DataDisposalController {
 
 
     @ApiOperation("delete HostingProvider  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataDisposal(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -74,7 +74,7 @@ public class DataDisposalController {
     }
 
     @ApiOperation("update DataDisposal by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateDataDisposal(@PathVariable BigInteger id, @RequestBody DataDisposal dataDisposal) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

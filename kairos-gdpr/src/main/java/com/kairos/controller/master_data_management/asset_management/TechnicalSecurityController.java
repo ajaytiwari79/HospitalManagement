@@ -60,7 +60,7 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -71,7 +71,7 @@ public class TechnicalSecurityController {
     }
 
     @ApiOperation("update TechnicalSecurityMeasure by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable BigInteger id, @RequestBody TechnicalSecurityMeasure securityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

@@ -58,7 +58,7 @@ public class MasterProcessingActivityController {
     }
 
     @ApiOperation(value = "get MasterProcessingActivity by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

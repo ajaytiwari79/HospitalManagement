@@ -36,7 +36,7 @@ public class HostingProviderController {
 
 
     @ApiOperation("get HostingProvider by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getHostingProvider(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -65,7 +65,7 @@ public class HostingProviderController {
 
 
     @ApiOperation("delete HostingProvider  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteHostingProvider(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -76,7 +76,7 @@ public class HostingProviderController {
     }
 
     @ApiOperation("update HostingProvider by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateHostingProvider(@PathVariable BigInteger id, @RequestBody HostingProvider hostingProvider) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

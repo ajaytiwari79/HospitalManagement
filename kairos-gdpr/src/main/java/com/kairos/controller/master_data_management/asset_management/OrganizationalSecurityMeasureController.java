@@ -38,7 +38,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -68,7 +68,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -79,7 +79,7 @@ public class OrganizationalSecurityMeasureController {
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable BigInteger id, @RequestBody OrganizationalSecurityMeasure orgSecurityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

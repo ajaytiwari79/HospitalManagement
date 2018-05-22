@@ -36,7 +36,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("get transfer Method by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getTransferMethod(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -65,7 +65,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("delete transfer Method by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteTransferMethod(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -75,7 +75,7 @@ public class TransferMethodController {
     }
 
     @ApiOperation("update transfer Method by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTransferMethod(@PathVariable BigInteger id, @RequestBody TransferMethod transferMethod) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

@@ -70,7 +70,6 @@ public class StorageTypeService extends MongoBaseService {
 
 
     public Boolean deleteStorageType(BigInteger id) {
-
         StorageType exist = storageTypeMongoRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);

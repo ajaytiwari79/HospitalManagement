@@ -35,7 +35,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -61,7 +61,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -72,7 +72,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("update ProcessingLegalBasis by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable BigInteger id, @RequestBody ProcessingLegalBasis legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

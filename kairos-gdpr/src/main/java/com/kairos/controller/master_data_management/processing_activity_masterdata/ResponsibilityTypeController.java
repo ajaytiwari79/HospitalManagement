@@ -34,7 +34,7 @@ public class ResponsibilityTypeController {
 
 
     @ApiOperation("get ResponsibilityType  by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getResponsibilityType(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -62,7 +62,7 @@ public class ResponsibilityTypeController {
 
 
     @ApiOperation("delete ResponsibilityType  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteResponsibilityType(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -72,7 +72,7 @@ public class ResponsibilityTypeController {
     }
 
     @ApiOperation("update ResponsibilityType  by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable BigInteger id, @RequestBody ResponsibilityType responsibilityType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

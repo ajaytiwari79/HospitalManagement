@@ -33,7 +33,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("get AssetType by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getAssetTypeById(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -52,7 +52,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("delete AssetType  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteAssetTypeById(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
@@ -63,7 +63,7 @@ public class AssetTypeController {
     }
 
     @ApiOperation("update AssetType by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateAssetType(@PathVariable BigInteger id, @RequestParam String assetType) {
 
         if (id == null) {
