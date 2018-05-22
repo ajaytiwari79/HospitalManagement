@@ -7,6 +7,7 @@ import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,8 @@ public class PayGroupAreaIntegrationTest {
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
+    @Inject
+    private ExceptionService exceptionService;
     static Long payGroupId;
     static Long relationshipId;
     static private String baseUrlWithCountry;
@@ -143,9 +147,10 @@ public class PayGroupAreaIntegrationTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return  null;
     }
 }
 

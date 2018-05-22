@@ -1,6 +1,7 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,8 @@ public class SkillServiceTemplateClient {
 
     @Autowired
     RestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
     /**
      * endpoint map in taskType controller in task micro service
      * @param serviceIds
@@ -44,7 +47,7 @@ public class SkillServiceTemplateClient {
 
             logger.debug("typeReference "+typeReference);
             ResponseEntity<RestTemplateResponseEnvelope<Object>> restExchange =
-                    restTemplate.exchange(getBaseUrl(false)+"task_types/getAllAvlSkill",//"http://zuulservice/kairos/activity/api/v1/organization/{organizationId}/task_types/getAllAvlSkill"
+                    restTemplate.exchange(getBaseUrl(false)+"/task_types/getAllAvlSkill",//"http://zuulservice/kairos/activity/api/v1/organization/{organizationId}/task_types/getAllAvlSkill"
                             HttpMethod.POST, request, typeReference, organizationId);
 
             logger.info("restExchange.getBody() "+ restExchange.getBody());
@@ -64,7 +67,9 @@ public class SkillServiceTemplateClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+            //throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
+        return null;
     }
 }

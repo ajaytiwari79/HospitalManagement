@@ -15,6 +15,7 @@ import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -29,6 +30,7 @@ import com.kairos.response.dto.web.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,12 +61,14 @@ public class RuleTemplateService extends MongoBaseService {
     private WTAOrganizationService wtaOrganizationService;
     @Inject private OrganizationRestClient organizationRestClient;
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
+    @Autowired
+    private ExceptionService exceptionService;
 
     public boolean createRuleTemplate(long countryId) {
         CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
 
         if (countryDTO == null) {
-            throw new DataNotFoundByIdException("Invalid Country");
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
 
@@ -76,7 +80,7 @@ public class RuleTemplateService extends MongoBaseService {
             save(ruleTemplateCategory);
         }
         if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
-            throw new DataNotFoundByIdException("WTA Rule Template already exists");
+            exceptionService.dataNotFoundByIdException("message.wtaruletemplate.alreadyexists");
         }
 
         String week = "WEEK";
@@ -240,18 +244,18 @@ public class RuleTemplateService extends MongoBaseService {
     public RuleTemplateWrapper getRuleTemplate(long countryId) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (country == null) {
-            throw new DataNotFoundByIdException("Invalid Country");
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.getAllRulesOfCountry(countryId);
 
         if (categoryList == null) {
-            throw new DataNotFoundByIdException("Category List is null");
+            exceptionService.dataNotFoundByIdException("message.category.null-list");
         }
 
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
         if (templateList == null) {
-            throw new DataNotFoundByIdException("Template List is null");
+            exceptionService.dataNotFoundByIdException("message.wta-base-rule-template.null-list");
         }
 
         //
@@ -266,7 +270,7 @@ public class RuleTemplateService extends MongoBaseService {
     public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
         OrganizationDTO organization = organizationRestClient.getOrganizationWithCountryId(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Organization does not exist");
+            exceptionService.dataNotFoundByIdException("message.organization.id");
         }
         //List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementMongoRepository.getWtaByOrganization(organization.getId());
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.getRuleTemplateCategoryByUnitId(unitId);
@@ -298,11 +302,11 @@ public class RuleTemplateService extends MongoBaseService {
     public WTABaseRuleTemplateDTO updateRuleTemplate(long countryId, WTABaseRuleTemplateDTO templateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Country");
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         WTABaseRuleTemplate oldTemplate = wtaBaseRuleTemplateMongoRepository.findOne(templateDTO.getId());
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid TemplateType id " + templateDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.wta-base-rule-template.id",templateDTO.getId());
         }
        /* String templateType=getTemplateType(templateDTO.getTemplateType());
         WTATemplateType ruleTemplateType = getByTemplateType(templateType);*/
@@ -392,19 +396,20 @@ public class RuleTemplateService extends MongoBaseService {
     public WTABaseRuleTemplateDTO copyRuleTemplate(Long countryId, WTABaseRuleTemplateDTO wtaRuleTemplateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Country");
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
        /* if(!Optional.ofNullable(wtaRuleTemplateDTO.getTemplateType()).isPresent()){
             throw new DataNotFoundByIdException("No templateType found");
         }*/
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, wtaRuleTemplateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
-            throw new DataNotFoundByIdException("Category Not matched");
+            exceptionService.dataNotFoundByIdException("message.category.not-matched");
         }
 
         WTABaseRuleTemplate wtaBaseRuleTemplate1 = wtaBaseRuleTemplateMongoRepository.existsByName(countryId,wtaRuleTemplateDTO.getName().trim());
         if (Optional.ofNullable(wtaBaseRuleTemplate1).isPresent()) {
-            throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
+            exceptionService.duplicateDataException("message.wta-base-rule-template.name.alreadyexist",wtaRuleTemplateDTO.getName());
+
         }
         WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO,true);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

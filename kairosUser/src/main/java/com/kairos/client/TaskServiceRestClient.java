@@ -6,6 +6,7 @@ import com.kairos.response.dto.web.EscalatedTasksWrapper;
 import com.kairos.response.dto.web.KMDShift;
 import com.kairos.response.dto.web.ResponseEnvelope;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,8 @@ public class TaskServiceRestClient {
     private static final Logger logger = LoggerFactory.getLogger(SkillServiceTemplateClient.class);
     @Autowired
     RestTemplate restTemplate;
+    @Inject
+    private ExceptionService exceptionService;
     /**
      * @auther anil maurya
      * map in task  controller
@@ -56,8 +60,10 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return null;
 
     }
 
@@ -92,8 +98,10 @@ public class TaskServiceRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return null;
 
 
     }
@@ -150,8 +158,10 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return null;
 
     }
 
@@ -177,9 +187,12 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return null;
     }
+
 
 
     /**
@@ -211,8 +224,10 @@ public class TaskServiceRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return false;
 
 
     }
@@ -258,8 +273,10 @@ public class TaskServiceRestClient {
 
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return null;
 
     }
 

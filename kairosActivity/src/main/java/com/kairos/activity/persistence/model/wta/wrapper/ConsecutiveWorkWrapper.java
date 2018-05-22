@@ -5,6 +5,7 @@ import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.wta.templates.template_types.ConsecutiveWorkWTATemplate;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
@@ -24,8 +25,8 @@ public class ConsecutiveWorkWrapper implements RuleTemplateWrapper{
     @Override
     public boolean isSatisfied() {
         if((wtaTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) || wtaTemplate.getPlannedTimeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getPresenceTypeId())) && isValidForPartOfDay(shift,wtaTemplate.getPartOfDays(),timeSlotWrappers)) {
-            List<ShiftQueryResultWithActivity> shifts = filterShifts(shifts,wtaTemplate.getTimeTypeIds(),wtaTemplate.getPlannedTimeIds(),null);
-            int consecutiveDays = getConsecutiveDays(getSortedAndUniqueDates(shifts));
+            List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = filterShifts(shifts,wtaTemplate.getTimeTypeIds(),wtaTemplate.getPlannedTimeIds(),null);
+            int consecutiveDays = getConsecutiveDays(getSortedAndUniqueDates(shiftQueryResultWithActivities));
             if (!isValid(wtaTemplate.getMinMaxSetting(), (int) wtaTemplate.getLimitCount(), consecutiveDays)) {
                 new InvalidRequestException(wtaTemplate.getName()+" is Broken");
             }

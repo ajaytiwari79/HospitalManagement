@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.response.dto.web.UnitPositionDTO;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.position_code.PositionCodeServiceIntegrationTest;
 import com.kairos.service.staff.EmploymentService;
 import org.junit.*;
@@ -28,6 +29,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -50,7 +52,8 @@ public class UnitPositionServiceIntegrationTest {
     TestRestTemplate restTemplate;
     @Autowired
     EmploymentService employmentService;
-
+    @Inject
+    private ExceptionService exceptionService;
     static private Long createdId;
     static private String baseUrlWithUnit;
 
@@ -119,8 +122,10 @@ public class UnitPositionServiceIntegrationTest {
             logger.info(baseUrl);
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
+
         }
+        return null;
     }
 
 

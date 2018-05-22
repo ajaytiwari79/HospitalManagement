@@ -33,15 +33,15 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     private int restingTime;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
+    private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
     public boolean isRestingTimeAllowed() {
         return isRestingTimeAllowed;
     }
 
-    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+    public void setRestingTimeAllowed(boolean isRestingTimeAllowed) {
+        this.isRestingTimeAllowed = isRestingTimeAllowed;
     }
 
     public int getRestingTime() {

@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.SeniorDaysPerYearWTATemplate;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.util.DateTimeInterval;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class SeniorDaysPerYearWrapper implements RuleTemplateWrapper{
 
     @Override
     public boolean isSatisfied() {
-        return false;
+        DateTimeInterval dateTimeInterval =
+        return true;
     }
 }

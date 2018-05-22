@@ -256,7 +256,7 @@ public class DataImportService {
                                 }
                             }
 
-                            contactAddress = clientGraphRepository.findOne(client.getId()).getHomeAddress();
+                            contactAddress = clientGraphRepository.findOne(client.getId()).getContactAddress();
 
                             if(contactAddress == null){
 

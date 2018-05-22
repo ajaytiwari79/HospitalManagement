@@ -221,28 +221,17 @@ public class StaffRestClient {
         }
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId,List<Long> activityTimeCalculationDayTypes,List<Long> activityRulesTabDayTypes) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId) {
 
         final String baseUrl = getBaseUrl(true);
 
         String activityTimeCalculationDayTypesIds = "";
-        if(activityTimeCalculationDayTypes!=null && !activityTimeCalculationDayTypes.isEmpty()) {
-            String a = activityTimeCalculationDayTypes.toString().replace("[","");
-            a.replace("]","");
-            activityTimeCalculationDayTypesIds = a.replace("]","");
-        }
-        String activityRulesTabDayTypesIds = "";
-        if(activityTimeCalculationDayTypes!=null && !activityTimeCalculationDayTypes.isEmpty()) {
-            String a = activityTimeCalculationDayTypes.toString().replace("[","");
-            a.replace("]","");
-            activityRulesTabDayTypesIds = a.replace("]","");
-        }
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityTimeCalculationDayTypes="+activityTimeCalculationDayTypesIds+"&activityRulesTabDayTypes="+activityRulesTabDayTypes,
+                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type,
                             HttpMethod.GET, null, typeReference, staffId, unitEmploymentId);
             RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

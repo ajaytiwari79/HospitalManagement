@@ -9,6 +9,7 @@ import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
 import com.kairos.response.dto.web.experties.UnionServiceWrapper;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +42,8 @@ public class ExpertiseServiceIntegrationTest {
     private String url;
     @Autowired
     private TestRestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     static private String baseUrlWithCountry;
     static Long organizationLevelId, serviceId, unionId, payTableId, expertiseId;
@@ -60,7 +63,7 @@ public class ExpertiseServiceIntegrationTest {
     public void saveExpertise() throws Exception {
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(1, 4, 1L, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
         CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, Collections.singleton(serviceId)
-                , unionId, 12, 12, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
+                , unionId, 12, 12, seniorityLevelDTO);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>>() {
@@ -81,7 +84,7 @@ public class ExpertiseServiceIntegrationTest {
         expertiseId = 2955L;
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(0, 6, 1L, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
         CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, Collections.singleton(serviceId)
-                , unionId, 12, 12, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
+                , unionId, 12, 12, seniorityLevelDTO);
         expertiseDTO.setId(expertiseId);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
@@ -158,9 +161,10 @@ public class ExpertiseServiceIntegrationTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 
 

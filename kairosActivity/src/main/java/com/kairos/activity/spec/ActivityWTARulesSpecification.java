@@ -10,10 +10,12 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
 
+
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.WTARuleTemplateValidatorUtility;
@@ -21,6 +23,8 @@ import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -36,12 +40,16 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     private List<ShiftQueryResultWithActivity> shifts;
     private TimeSlotWrapper timeSlotWrapper;
     //private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
+    private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
+    @Autowired
+    private ExceptionService exceptionService;
+
 
     public ActivityWTARulesSpecification(WTAQueryResultDTO wtaResponseDTO, Phase phase, ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.wtaResponseDTO = wtaResponseDTO;
         this.shift = shift;
         this.phase = phase;
-        this.shifts = shifts.removeIf();
+        this.shifts = shifts;
         this.timeSlotWrapper = staffAdditionalInfoDTO.getTimeSlotSets().get(0);
     }
 
@@ -52,7 +60,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
         if (wtaResponseDTO.getEndDate()!=null && new DateTime(wtaResponseDTO.getEndDate()).isBefore(shift.getEndDate().getTime())) {
             throw new ActionNotPermittedException("WTA is Expired for unit employment.");
         }
-        for (WTABaseRuleTemplate ruleTemplate : wtaResponseDTO.getRuleTemplates()){
+        /*for (WTABaseRuleTemplate ruleTemplate : wtaResponseDTO.getRuleTemplates()){
             switch (ruleTemplate.getWtaTemplateType()) {
                 case SHIFT_LENGTH:
                     WTARuleTemplateValidatorUtility.checkConstraints(shift,(ShiftLengthWTATemplate)ruleTemplate);
@@ -61,12 +69,12 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     WTARuleTemplateValidatorUtility.checkConstraints(shifts,shift,(ConsecutiveWorkWTATemplate)ruleTemplate);
                     break;
 
-          /*  case CONSECUTIVE_NIGHTS_AND_DAYS:
+          *//*  case CONSECUTIVE_NIGHTS_AND_DAYS:
                 ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate = new ConsecutiveRestPartOfDayWTATemplate();
                 copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate);
                 consecutiveRestPartOfDayWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
                 wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
-                break;*/
+                break;*//*
                 case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
                     WTARuleTemplateValidatorUtility.checkConstraints(shifts,(ConsecutiveRestPartOfDayWTATemplate)ruleTemplate,timeSlotWrapper);
                     break;
@@ -85,9 +93,9 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                 case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
                     WTARuleTemplateValidatorUtility.checkConstraints(shift,shifts,(NumberOfWeekendShiftsInPeriodWTATemplate)ruleTemplate);
                     break;
-            /*case CARE_DAYS_CHECK:
+            *//*case CARE_DAYS_CHECK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ChildCareDayCheckWTATemplate.class);
-                break;*/
+                break;*//*
                 case DAILY_RESTING_TIME:
                     WTARuleTemplateValidatorUtility.checkConstraints(shifts,(DailyRestingTimeWTATemplate)ruleTemplate);
                     break;
@@ -118,7 +126,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
-        }
+        }*/
         return true;
     }
     private String getTemplateType(String templateType){

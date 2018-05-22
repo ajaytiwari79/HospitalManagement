@@ -5,6 +5,7 @@ import com.planner.enums.SolverConfigPhase;
 //import org.springframework.data.cassandra.core.mapping.Table;
 
 //@Table
+@Deprecated
 public class SolverConfig extends BaseEntity {
 
 

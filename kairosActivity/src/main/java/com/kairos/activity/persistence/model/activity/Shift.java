@@ -4,8 +4,9 @@ package com.kairos.activity.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.response.dto.shift.ShiftQueryResult;
 import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.shift.ShiftQueryResult;
+
 import com.kairos.enums.shift.ShiftState;
 import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;

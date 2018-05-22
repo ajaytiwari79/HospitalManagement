@@ -94,7 +94,7 @@ public class WTARuleTemplateValidatorUtility {
         return count;
     }
 
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,TimeSlotWrapper timeSlotWrapper){
+    /*public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,TimeSlotWrapper timeSlotWrapper){
         if(shifts.size()<2) return  0;
         int count = 0;
         int consecutiveNightCount = 1;
@@ -114,7 +114,7 @@ public class WTARuleTemplateValidatorUtility {
         }
 
         return consecutiveNightCount > nightsWorked?(consecutiveNightCount-(int) nightsWorked):0;
-    }
+    }*/
 
 
 
@@ -171,7 +171,7 @@ public class WTARuleTemplateValidatorUtility {
 
 
     //MinimumRestConsecutiveNightsWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, ConsecutiveRestPartOfDayWTATemplate ruleTemplate,TimeSlotWrapper timeSlotWrapper) {
+    /*public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts, ConsecutiveRestPartOfDayWTATemplate ruleTemplate,TimeSlotWrapper timeSlotWrapper) {
         if(shifts.size()<2) return 0;
         sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
@@ -195,14 +195,14 @@ public class WTARuleTemplateValidatorUtility {
             l++;
         }
         return totalRestUnder;
-    }
+    }*/
 
-    public static boolean isNightShift(ShiftQueryResultWithActivity shift,TimeSlotWrapper timeSlotWrapper) {
+    /*public static boolean isNightShift(ShiftQueryResultWithActivity shift,TimeSlotWrapper timeSlotWrapper) {
         return getNightTimeInterval().contains(shift.getStart().getMinuteOfDay());
-    }
+    }*/
 
     //MinimumRestInConsecutiveDaysWTATemplate
-    public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts){
+    /*public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts){
         if(shifts.size()<2) return 0;
         sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
@@ -225,12 +225,12 @@ public class WTARuleTemplateValidatorUtility {
             l++;
         }
         return totalRestUnder;
-    }
+    }*/
 
     //MinimumShiftLengthWTATemplate
-    public static int checkConstraints(ShiftQueryResultWithActivity shift){
+    /*public static int checkConstraints(ShiftQueryResultWithActivity shift){
         return !(shift).isAbsenceActivityApplied() && shift.getMinutes()<timeLimit?((int) timeLimit-shift.getMinutes()):0;
-    }
+    }*/
 
     public static List<LocalDate> getSortedDates(List<ShiftQueryResultWithActivity> shifts){
         List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
@@ -350,8 +350,30 @@ public class WTARuleTemplateValidatorUtility {
         });
     }*/
 
-    public static List<ShiftQueryResultWithActivity> filterShifts(List<ShiftQueryResultWithActivity> shifts, List<BigInteger> timeTypeIds,List<Long> plannedTime,List<BigInteger> activities){
-        if(timeTypeIds.stream())
+    public static List<ShiftQueryResultWithActivity> filterShifts(List<ShiftQueryResultWithActivity> shifts, List<BigInteger> timeTypeIds,List<Long> plannedTimeIds,List<BigInteger> activitieIds){
+        Set<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = new HashSet<>();
+        if(timeTypeIds!=null){
+            shifts.forEach(s->{
+                if(timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())){
+                    shiftQueryResultWithActivities.add(s);
+                }
+            });
+        }
+        if(plannedTimeIds!=null){
+            shifts.forEach(s->{
+                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPresenceTypeId())){
+                    shiftQueryResultWithActivities.add(s);
+                }
+            });
+        }
+        if(activitieIds!=null){
+            shifts.forEach(s->{
+                if(activitieIds.contains(s.getActivity().getId())){
+                    shiftQueryResultWithActivities.add(s);
+                }
+            });
+        }
+        return new ArrayList<>(shiftQueryResultWithActivities);
     }
 
     public DateTimeInterval getIntervalByRuleTemplates(ShiftQueryResultWithActivity shift, List<WTABaseRuleTemplate> wtaBaseRuleTemplates){

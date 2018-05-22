@@ -22,6 +22,7 @@ import com.kairos.response.dto.web.CurrentAddress;
 import com.kairos.response.dto.web.PatientRelative;
 import com.kairos.response.dto.web.PatientWrapper;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.region.RegionService;
 
 import com.kairos.util.DateUtil;
@@ -80,6 +81,8 @@ public class ExternalClientService extends UserBaseService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void addClientRelativeDetailsFromKmd(PatientRelative patientRelative, Client client, long unitId) {
@@ -251,7 +254,8 @@ public class ExternalClientService extends UserBaseService {
     public Client createCitizenFromKmd(PatientWrapper patientWrapper, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Can't find Organization with providedId");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
 
         if (patientWrapper != null) {

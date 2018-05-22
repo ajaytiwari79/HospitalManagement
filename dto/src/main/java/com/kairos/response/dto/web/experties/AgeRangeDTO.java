@@ -3,10 +3,7 @@ package com.kairos.response.dto.web.experties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import java.io.Serializable;
-import java.util.Optional;
 
 /**
  * Created by pavan on 26/4/18.
@@ -15,7 +12,7 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgeRangeDTO implements Comparable<AgeRangeDTO>,Serializable{
     private Long id;
-    private Integer from;
+    private int from;
     private Integer to;
     private Integer leavesAllowed;
 
@@ -23,7 +20,7 @@ public class AgeRangeDTO implements Comparable<AgeRangeDTO>,Serializable{
         //Default Constructor
     }
 
-    public AgeRangeDTO(Long id, Integer from, Integer to, Integer leavesAllowed) {
+    public AgeRangeDTO(Long id, int from, Integer to, Integer leavesAllowed) {
         this.id = id;
         this.from = from;
         this.to = to;
@@ -38,11 +35,11 @@ public class AgeRangeDTO implements Comparable<AgeRangeDTO>,Serializable{
         this.id = id;
     }
 
-    public Integer getFrom() {
+    public int getFrom() {
         return from;
     }
 
-    public void setFrom(Integer from) {
+    public void setFrom(int from) {
         this.from = from;
     }
 
