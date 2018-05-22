@@ -9,26 +9,18 @@ public final class ApiConstant {
     public static final String API_ORGANIZATION = API_V1 + "/organization";
     public static final String API_ORGANIZATION_TYPE = API_ORGANIZATION + "/type";
 
-
-// MasterAsset urls
-
+    // MasterAsset urls
     public static final String API_MASTER_ASSET_URL = API_V1 + "/master_asset";
 
-//Global master processing activity
-
-public static final String API_PROCESSING_ACTIVITY = API_V1 + "/processing_activity";
-public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_processing_activity";
-
-
-
+    //Global master processing activity
+    public static final String API_PROCESSING_ACTIVITY = API_V1 + "/processing_activity";
+    public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_processing_activity";
 
     //Account type url
     public static final String API_ACCOUNT_TYPE_URL = API_V1 + "/account";
 
-
     //Agreement template
     public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + "/agreement_template";
-
 
     //Processing Purpose
     public static final String API_PROCESSING_PURPOSE = API_V1 + "/processing_purpose";
@@ -39,7 +31,6 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_proc
     //data source url
     public static final String API_DATASOURCE_URL = API_V1 + "/data_source";
 
-
     //data subject url
     public static final String API_DATASUBJECT_URL = API_V1 + "/data_subject";
 
@@ -48,8 +39,6 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_proc
 
     //Hosting location url
     public static final String API_HOSTING_LOCATION_URL = API_V1 + "/hosting_location";
-
-
 
     //Hosting provider url
     public static final String API_HOSTING_PROVIDER_URL = API_V1 + "/hosting_provider";
@@ -69,12 +58,11 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_proc
     //data disposal type   url
     public static final String API_DATA_DISPOSAL_URL = API_V1 + "/data_disposal";
 
-
     //Technical Security Measure  url
     public static final String API_TECH_SECURITY_MEASURE_URL = API_V1 + "/technical_security";
 
-//clause tag
-public static final String API_CLAUSE_TAG_URL = API_V1 + "/clause/tag";
+    //clause tag
+    public static final String API_CLAUSE_TAG_URL = API_V1 + "/clause/tag";
     public static final String API_AGREEMENT_SECTION_URL = API_V1 + "/agreement_section";
 
 
