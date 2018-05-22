@@ -1,12 +1,14 @@
 package com.kairos.activity.persistence.model.open_shift;
 
-import com.kairos.activity.enums.IntervalType;
+import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
-//Domain name can be chaged
-public class OpenShiftInterval {
+import java.math.BigInteger;
+
+//Domain name can be changed
+public class OpenShiftInterval extends MongoBaseEntity implements Comparable<OpenShiftInterval> {
     private int from;
     private int to;
-    private IntervalType intervalType;
+    private BigInteger countryId;
 
     public OpenShiftInterval() {
         //Default Constructor
@@ -28,11 +30,16 @@ public class OpenShiftInterval {
         this.to = to;
     }
 
-    public IntervalType getIntervalType() {
-        return intervalType;
+    public BigInteger getCountryId() {
+        return countryId;
     }
 
-    public void setIntervalType(IntervalType intervalType) {
-        this.intervalType = intervalType;
+    public void setCountryId(BigInteger countryId) {
+        this.countryId = countryId;
+    }
+
+    @Override
+    public int compareTo(OpenShiftInterval o) {
+        return this.from-o.from;
     }
 }
