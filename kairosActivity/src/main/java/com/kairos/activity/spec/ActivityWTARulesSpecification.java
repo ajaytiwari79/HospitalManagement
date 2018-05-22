@@ -41,7 +41,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
         this.wtaResponseDTO = wtaResponseDTO;
         this.shift = shift;
         this.phase = phase;
-        this.shifts = shifts;
+        this.shifts = shifts.removeIf();
         this.timeSlotWrapper = staffAdditionalInfoDTO.getTimeSlotSets().get(0);
     }
 
