@@ -16,6 +16,8 @@ public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
     private List<DayType> dayTypes= new ArrayList<>();
+    private boolean staffGroup;
+    private boolean managementGroup;
 
     public PhaseActivityDTO() {
         //Default Constructor
@@ -54,5 +56,21 @@ public class PhaseActivityDTO {
 
     public void setDayTypes(List<DayType> dayTypes) {
         this.dayTypes = dayTypes;
+    }
+
+    public boolean isStaffGroup() {
+        return staffGroup;
+    }
+
+    public void setStaffGroup(boolean staffGroup) {
+        this.staffGroup = staffGroup;
+    }
+
+    public boolean isManagementGroup() {
+        return managementGroup;
+    }
+
+    public void setManagementGroup(boolean managementGroup) {
+        this.managementGroup = managementGroup;
     }
 }
