@@ -42,8 +42,6 @@ public class ClauseDto {
         return title;
     }
 
-
-
     public String getDescription() {
         return description;
     }

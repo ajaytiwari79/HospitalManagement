@@ -109,7 +109,6 @@ public class ClauseService extends MongoBaseService {
         return clause;
     }
 
-
     public Clause getClause(BigInteger id) {
         Clause clause = clauseRepository.findByIdAndNonDeleted(id);
 
