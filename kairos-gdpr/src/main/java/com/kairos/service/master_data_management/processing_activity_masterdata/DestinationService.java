@@ -52,13 +52,8 @@ public class DestinationService extends MongoBaseService {
     }
 
     public List<Destination> getAllDestination() {
-        List<Destination> result = destinationMongoRepository.findAllDestinations();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("Destination not exist please create purpose ");
-    }
+       return destinationMongoRepository.findAllDestinations();
+        }
 
 
     public Destination getDestination(BigInteger id) {

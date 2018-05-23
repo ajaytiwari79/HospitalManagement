@@ -52,12 +52,7 @@ public class StorageFormatService extends MongoBaseService {
 
 
     public List<StorageFormat> getAllStorageFormat() {
-        List<StorageFormat> result = storageFormatMongoRepository.findAllStorageFormats();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("StorageFormat not exist please create purpose ");
+        return storageFormatMongoRepository.findAllStorageFormats();
     }
 
 

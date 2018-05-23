@@ -80,11 +80,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     public List<MasterProcessingActivity> getAllmasterProcessingActivity() {
-        List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.findAll();
-        if (processingActivities.size() != 0) {
-            return processingActivities;
-        } else
-            throw new DataNotExists("No masterProcessingActivity found create assets");
+     return masterProcessingActivityRepository.findAll();
 
     }
 

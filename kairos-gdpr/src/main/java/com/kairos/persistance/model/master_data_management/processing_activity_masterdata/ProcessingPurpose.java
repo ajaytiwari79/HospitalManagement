@@ -8,8 +8,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "processing_purpose")
 public class ProcessingPurpose extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Processing Purpose cannot be null or empty ")
+
+    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
     private String name;
+
+    // @NotNull(message = "error.message.countryId.cannot.be.null")
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public String getName() {
         return name;
@@ -19,6 +31,4 @@ public class ProcessingPurpose extends MongoBaseEntity {
         this.name = name;
     }
 
-    public ProcessingPurpose()
-    {}
 }

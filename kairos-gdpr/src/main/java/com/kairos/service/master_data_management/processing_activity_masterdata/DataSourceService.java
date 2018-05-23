@@ -52,12 +52,7 @@ public class DataSourceService extends MongoBaseService {
     }
 
     public List<DataSource> getAllDataSource() {
-        List<DataSource> result = dataSourceMongoRepository.findAllDataSources();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("DataSource not exist please create purpose ");
+       return dataSourceMongoRepository.findAllDataSources();
     }
 
 

@@ -23,6 +23,16 @@ public class MasterAsset extends MongoBaseEntity {
     private List <OrganizationTypeAndServiceBasicDto>organizationServices;
     private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
+    private Long countryid;
+
+    public Long getCountryid() {
+        return countryid;
+    }
+
+    public void setCountryid(Long countryid) {
+        this.countryid = countryid;
+    }
+
     public String getName() {
         return name;
     }

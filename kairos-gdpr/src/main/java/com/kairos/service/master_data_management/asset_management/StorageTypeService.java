@@ -49,13 +49,8 @@ public class StorageTypeService extends MongoBaseService {
     }
 
     public List<StorageType> getAllStorageType() {
-        List<StorageType> result = storageTypeMongoRepository.findAllStorageTypes();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("StorageType not exist please create purpose ");
-    }
+        return storageTypeMongoRepository.findAllStorageTypes();
+           }
 
 
     public StorageType getStorageType(BigInteger id) {

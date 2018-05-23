@@ -8,8 +8,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class ProcessingLegalBasis extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "name cannot  be null or empty ")
+
+    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
     private String name;
+
+    // @NotNull(message = "error.message.countryId.cannot.be.null")
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public String getName() {
         return name;
@@ -18,4 +30,5 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
 }

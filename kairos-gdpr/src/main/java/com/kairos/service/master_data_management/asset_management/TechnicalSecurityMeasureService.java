@@ -52,13 +52,8 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public List<TechnicalSecurityMeasure> getAllTechnicalSecurityMeasure() {
-        List<TechnicalSecurityMeasure> result = technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("TechnicalSecurityMeasure not exist please create purpose ");
-    }
+       return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures();
+         }
 
 
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(BigInteger id) {

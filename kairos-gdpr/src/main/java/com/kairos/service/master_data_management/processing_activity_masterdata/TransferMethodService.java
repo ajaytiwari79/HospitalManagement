@@ -19,7 +19,7 @@ public class TransferMethodService extends MongoBaseService {
 
 
     @Inject
-    private TransferMethodMongoRepository transferMethodMongoRepository;
+    private TransferMethodMongoRepository transferMethodDestinationRepository;
 
 
     public Map<String, List<TransferMethod>> createTransferMethod(List<TransferMethod> transferMethods) {
@@ -29,7 +29,7 @@ public class TransferMethodService extends MongoBaseService {
         if (transferMethods.size() != 0) {
             for (TransferMethod transferMethod : transferMethods) {
                 if (!StringUtils.isBlank(transferMethod.getName())) {
-                    TransferMethod exist = transferMethodMongoRepository.findByName(transferMethod.getName());
+                    TransferMethod exist = transferMethodDestinationRepository.findByName(transferMethod.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
@@ -53,18 +53,11 @@ public class TransferMethodService extends MongoBaseService {
     }
 
     public List<TransferMethod> getAllTransferMethod() {
-        List<TransferMethod> result = transferMethodMongoRepository.findAllTransferMethods();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("TransferMethod not exist please create purpose ");
+       return transferMethodDestinationRepository.findAllTransferMethods();
     }
-
-
     public TransferMethod getTransferMethod(BigInteger id) {
 
-        TransferMethod exist = transferMethodMongoRepository.findByIdAndNonDeleted(id);
+        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -76,7 +69,7 @@ public class TransferMethodService extends MongoBaseService {
 
     public Boolean deleteTransferMethod(BigInteger id) {
 
-        TransferMethod exist = transferMethodMongoRepository.findByIdAndNonDeleted(id);
+        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -91,7 +84,7 @@ public class TransferMethodService extends MongoBaseService {
     public TransferMethod updateTransferMethod(BigInteger id, TransferMethod transferMethod) {
 
 
-        TransferMethod exist = transferMethodMongoRepository.findByIdAndNonDeleted(id);
+        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -107,7 +100,7 @@ public class TransferMethodService extends MongoBaseService {
 
 
         if (!StringUtils.isBlank(name)) {
-            TransferMethod exist = transferMethodMongoRepository.findByName(name);
+            TransferMethod exist = transferMethodDestinationRepository.findByName(name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

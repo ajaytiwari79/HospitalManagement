@@ -16,6 +16,12 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constant.ApiConstant.API_TRANSFER_METHOD;
+/*
+ *
+ *  created by bobby 20/5/2018
+ * */
+
+
 
 @RestController
 @RequestMapping(API_TRANSFER_METHOD)
@@ -24,13 +30,13 @@ import static com.kairos.constant.ApiConstant.API_TRANSFER_METHOD;
 public class TransferMethodController {
 
     @Inject
-    private TransferMethodService transferMethodService;
+    private TransferMethodService transferMethodDestinationService;
 
 
     @ApiOperation("add transfer Method ")
     @PostMapping("/add")
     public ResponseEntity<Object> createTransferMethod(@RequestBody List<TransferMethod> transferMethods) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.createTransferMethod(transferMethods));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.createTransferMethod(transferMethods));
 
     }
 
@@ -41,7 +47,7 @@ public class TransferMethodController {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.getTransferMethod(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(id));
 
     }
 
@@ -49,14 +55,14 @@ public class TransferMethodController {
     @ApiOperation("get all transfer Method")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllTransferMethod() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.getAllTransferMethod());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllTransferMethod());
 
     }
 
     @ApiOperation("get transfer Method by name")
     @GetMapping("/")
     public ResponseEntity<Object> getResponsibilityTypeByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.getTransferMethodByName(name));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethodByName(name));
 
     }
 
@@ -70,7 +76,7 @@ public class TransferMethodController {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.deleteTransferMethod(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(id));
 
     }
 
@@ -80,7 +86,7 @@ public class TransferMethodController {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.updateTransferMethod(id,transferMethod));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(id, transferMethod));
 
     }
 

@@ -55,13 +55,8 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
     public List<ProcessingPurpose> getAllProcessingPurpose() {
-        List<ProcessingPurpose> result = processingPurposeMongoRepository.findAllProcessingPurposes();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("ProcessingPurpose not exist please create purpose ");
-    }
+       return  processingPurposeMongoRepository.findAllProcessingPurposes();
+       }
 
 
     public ProcessingPurpose getProcessingPurpose(BigInteger id) {

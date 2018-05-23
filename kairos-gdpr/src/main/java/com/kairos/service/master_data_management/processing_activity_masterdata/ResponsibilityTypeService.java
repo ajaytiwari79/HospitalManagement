@@ -52,12 +52,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
     public List<ResponsibilityType> getAllResponsibilityType() {
-        List<ResponsibilityType> result = responsibilityTypeMongoRepository.findAllResponsibilityTypes();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("ResponsibilityType not exist please create purpose ");
+       return responsibilityTypeMongoRepository.findAllResponsibilityTypes();
     }
 
 

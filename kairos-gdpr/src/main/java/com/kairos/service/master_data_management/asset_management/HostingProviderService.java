@@ -53,13 +53,8 @@ public class HostingProviderService extends MongoBaseService {
     }
 
     public List<HostingProvider> getAllHostingProvider() {
-        List<HostingProvider> result = hostingProviderMongoRepository.findAllHostingProviders();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("HostingProvider not exist please create purpose ");
-    }
+       return hostingProviderMongoRepository.findAllHostingProviders();
+           }
 
 
     public HostingProvider getHostingProviderById(BigInteger id) {

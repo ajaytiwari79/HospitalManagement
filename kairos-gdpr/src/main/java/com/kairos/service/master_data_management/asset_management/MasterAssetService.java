@@ -12,6 +12,7 @@ import com.kairos.persistance.repository.master_data_management.asset_management
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -42,7 +43,7 @@ public class MasterAssetService extends MongoBaseService {
             orgServiceIds = masterAsset.getOrganizationServices();
             orgSubServiceIds = masterAsset.getOrganizationSubServices();
 
-            OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
+            OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
             if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -70,6 +71,7 @@ public class MasterAssetService extends MongoBaseService {
 
         }
         newAsset.setName(masterAsset.getName());
+        newAsset.setCountryid(masterAsset.getCountryId());
         newAsset.setDescription(masterAsset.getDescription());
         return save(newAsset);
 
@@ -78,12 +80,7 @@ public class MasterAssetService extends MongoBaseService {
 
 
     public List<MasterAsset> getAllMasterAsset() {
-        List<MasterAsset> assets = masterAssetMongoRepository.findAllMasterAssets();
-        if (assets.size() != 0) {
-            return assets;
-        } else
-            throw new DataNotExists("no Assets found create assets");
-
+        return masterAssetMongoRepository.findAllMasterAssets();
     }
 
 
@@ -99,7 +96,7 @@ public class MasterAssetService extends MongoBaseService {
         orgSubTypeIds = masterAssetDto.getOrganizationSubTypes();
         orgServiceIds = masterAssetDto.getOrganizationServices();
         orgSubServiceIds = masterAssetDto.getOrganizationSubServices();
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
 
@@ -126,7 +123,6 @@ public class MasterAssetService extends MongoBaseService {
         exists.setDescription(masterAssetDto.getDescription());
         return save(exists);
     }
-
 
 
     public Boolean deleteMasterAsset(BigInteger id) {

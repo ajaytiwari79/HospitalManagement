@@ -53,14 +53,8 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     }
 
     public List<ProcessingLegalBasis> getAllProcessingLegalBasis() {
-        List<ProcessingLegalBasis> result = legalBasisMongoRepository.findAllProcessingLegalBases();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("ProcessingLegalBasis not exist please create purpose ");
+        return legalBasisMongoRepository.findAllProcessingLegalBases();
     }
-
 
     public ProcessingLegalBasis getProcessingLegalBasis(BigInteger id) {
 

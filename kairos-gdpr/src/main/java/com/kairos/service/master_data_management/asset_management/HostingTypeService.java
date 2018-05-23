@@ -51,13 +51,8 @@ public class HostingTypeService extends MongoBaseService {
     }
 
     public List<HostingType> getAllHostingType() {
-        List<HostingType> result = hostingTypeMongoRepository.findAllHostingTypes();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("HostingType not exist please create purpose ");
-    }
+       return hostingTypeMongoRepository.findAllHostingTypes();
+          }
 
 
     public HostingType getHostingType(BigInteger id) {

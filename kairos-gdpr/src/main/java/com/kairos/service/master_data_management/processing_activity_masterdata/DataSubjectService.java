@@ -52,13 +52,8 @@ public class DataSubjectService extends MongoBaseService {
     }
 
     public List<DataSubject> getAllDataSubject() {
-        List<DataSubject> result = dataSubjectMongoRepository.findAllDataSubjects();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("DataSubject not exist please create purpose ");
-    }
+       return dataSubjectMongoRepository.findAllDataSubjects();
+          }
 
 
     public DataSubject getDataSubject(BigInteger id) {

@@ -51,12 +51,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
     public List<OrganizationalSecurityMeasure> getAllOrganizationalSecurityMeasure() {
-        List<OrganizationalSecurityMeasure> result = organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("OrganizationalSecurityMeasure not exist please create purpose ");
+        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures();
     }
 
 

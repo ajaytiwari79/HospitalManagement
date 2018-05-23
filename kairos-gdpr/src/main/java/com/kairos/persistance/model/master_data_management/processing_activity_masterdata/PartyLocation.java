@@ -4,8 +4,9 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "dataSource")
-public class DataSource extends  MongoBaseEntity {
+
+@Document(collection = "party_location")
+public class PartyLocation  extends MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")

@@ -53,13 +53,8 @@ public class DataDisposalService extends MongoBaseService {
     }
 
     public List<DataDisposal> getAllDataDisposal() {
-        List<DataDisposal> result = dataDisposalMongoRepository.findAllDataDisposals();
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("DataDisposal not exist please create purpose ");
-    }
+     return dataDisposalMongoRepository.findAllDataDisposals();
+          }
 
 
     public DataDisposal getDataDisposalById(BigInteger id) {

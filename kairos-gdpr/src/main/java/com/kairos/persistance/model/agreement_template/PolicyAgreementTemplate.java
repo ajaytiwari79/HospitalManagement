@@ -27,6 +27,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<BigInteger> agreementSections;
 
     private Long countryId;
+
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
