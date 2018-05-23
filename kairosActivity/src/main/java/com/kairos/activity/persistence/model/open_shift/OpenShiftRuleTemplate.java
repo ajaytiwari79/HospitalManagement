@@ -26,6 +26,11 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
     private Long countryId;
     private BigInteger countryParentId;
     private ShiftSelectionType shiftSelectionType;
+    private FeatureRules featureRules;
+    private NotificationWay notificationWay;
+    private boolean singeLongerShift;
+    private Integer minimumShiftHours;
+    private Integer maximumShiftHours;
 
 
     public OpenShiftRuleTemplate() {
@@ -176,4 +181,43 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.shiftSelectionType = shiftSelectionType;
     }
 
+    public FeatureRules getFeatureRules() {
+        return featureRules;
+    }
+
+    public void setFeatureRules(FeatureRules featureRules) {
+        this.featureRules = featureRules;
+    }
+
+    public NotificationWay getNotificationWay() {
+        return notificationWay;
+    }
+
+    public void setNotificationWay(NotificationWay notificationWay) {
+        this.notificationWay = notificationWay;
+    }
+
+    public boolean isSingeLongerShift() {
+        return singeLongerShift;
+    }
+
+    public void setSingeLongerShift(boolean singeLongerShift) {
+        this.singeLongerShift = singeLongerShift;
+    }
+
+    public Integer getMinimumShiftHours() {
+        return minimumShiftHours;
+    }
+
+    public void setMinimumShiftHours(Integer minimumShiftHours) {
+        this.minimumShiftHours = minimumShiftHours;
+    }
+
+    public Integer getMaximumShiftHours() {
+        return maximumShiftHours;
+    }
+
+    public void setMaximumShiftHours(Integer maximumShiftHours) {
+        this.maximumShiftHours = maximumShiftHours;
+    }
 }
