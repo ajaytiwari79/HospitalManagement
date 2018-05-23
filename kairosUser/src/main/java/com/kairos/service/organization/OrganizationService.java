@@ -67,6 +67,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
@@ -231,6 +232,8 @@ public class OrganizationService extends UserBaseService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private PresenceTypeRepository presenceTypeRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
 
     public Organization getOrganizationById(long id) {
