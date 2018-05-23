@@ -4,6 +4,7 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
@@ -226,7 +227,7 @@ public class OrganizationService extends UserBaseService {
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
-    private PresenceTypeRepository presenceTypeRepository;
+    private PlannedTimeTypeRestClient plannedTimeTypeRestClient;
 
 
     public Organization getOrganizationById(long id) {
@@ -1639,7 +1640,7 @@ public class OrganizationService extends UserBaseService {
         List<Long> organizationServicesIds = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds, DateUtil.getCurrentDateMillis());
         List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
-        List<PresenceTypeDTO> plannedTypes = presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+        List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);

@@ -29,6 +29,7 @@ import java.util.Optional;
 @Service
 @Transactional
 public class PresenceTypeService extends UserBaseService {
+/*
     private Logger logger = LoggerFactory.getLogger(PresenceTypeService.class);
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -144,9 +145,8 @@ public class PresenceTypeService extends UserBaseService {
         }
         PresenceTypeWithTimeTypeDTO presenceTypeWithTimeTypes = new PresenceTypeWithTimeTypeDTO();
         presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(country.getId(), false));
-        //presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(country.getId()));
         presenceTypeWithTimeTypes.setCountryId(country.getId());
         return presenceTypeWithTimeTypes;
     }
-
+*/
 }

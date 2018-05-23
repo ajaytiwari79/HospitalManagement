@@ -1145,6 +1145,7 @@ public class CountryController {
     }*/
 
 
+    /* Not in Use
     @ApiOperation(value = "Add presenceType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/presenceType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1182,6 +1183,7 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId));
     }
+    */
 
     @ApiOperation(value = "Get day types by id")
     @RequestMapping(value = "/day_types", method = RequestMethod.POST)

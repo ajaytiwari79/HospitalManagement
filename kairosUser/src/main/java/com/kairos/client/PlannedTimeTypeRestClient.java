@@ -1,15 +1,16 @@
-package com.kairos.service.country;
-
+package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
+import com.kairos.persistence.model.user.country.PresenceType;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,31 +18,29 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static com.kairos.client.RestClientURLUtil.getBaseUrl;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
-/**
- * Created by vipul on 17/10/17.
- */
-@Service
-public class TimeTypeRestClient {
-    private Logger logger = LoggerFactory.getLogger(TimeTypeRestClient.class);
+@Component
+public class PlannedTimeTypeRestClient {
+    private Logger logger = LoggerFactory.getLogger(PlannedTimeTypeRestClient.class);
     @Inject
     private RestTemplate restTemplate;
     @Inject
     private ExceptionService exceptionService;
 
-    public List<TimeTypeDTO> getAllTimeTypes(Long countryId) {
-        final String baseUrl = getBaseUrl(false);
+    public List<PresenceTypeDTO> getAllPlannedTimeTypes(Long countryId){
+        String baseUrl = getBaseUrl(false)+COUNTRY_URL+"/plannedTimeType";
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeTypeDTO>>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeTypeDTO>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>>() {
                     };
-            ResponseEntity<RestTemplateResponseEnvelope<List<TimeTypeDTO>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/timeType/",
+                            baseUrl,
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
-            RestTemplateResponseEnvelope<List<TimeTypeDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<PresenceTypeDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 logger.info("RestExchange", restExchange);
                 return response.getData();
@@ -56,9 +55,6 @@ public class TimeTypeRestClient {
 
         }
 
-return  null;
+        return null;
     }
-
-
-
 }
