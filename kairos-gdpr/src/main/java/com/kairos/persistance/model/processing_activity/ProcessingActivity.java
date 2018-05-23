@@ -1,12 +1,11 @@
 package com.kairos.persistance.model.processing_activity;
 
 
-import com.kairos.persistance.model.master_data.AssetType;
-import com.kairos.persistance.model.asset_management.OrganizationalSecurityMeasure;
-import com.kairos.persistance.model.asset_management.TechnicalSecurityMeasure;
+import com.kairos.persistance.model.master_data_management.asset_management.OrganizationalSecurityMeasure;
+import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.master_data.DataSubject;
-import com.kairos.persistance.model.processing_activity_masterdata.ProcessingPurpose;
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSubject;
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingPurpose;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 

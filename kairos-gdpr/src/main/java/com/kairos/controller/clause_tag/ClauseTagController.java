@@ -32,7 +32,7 @@ public class ClauseTagController {
 
 
     @ApiOperation("get clauseTag by id")
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getClauseTagById(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "request id is null");
@@ -51,7 +51,7 @@ public class ClauseTagController {
 
 
     @ApiOperation("delete clauseTag  by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteClauseTagById(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "request id is null");
@@ -62,7 +62,7 @@ public class ClauseTagController {
     }
 
     @ApiOperation("update clauseTag by id")
-    @PutMapping("/update/id/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateClauseTag(@PathVariable BigInteger id, @RequestParam  String clauseTag) {
 
         if (id == null) {

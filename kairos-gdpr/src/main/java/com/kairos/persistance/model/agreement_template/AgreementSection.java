@@ -15,6 +15,7 @@ public class AgreementSection extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
     private String title;
+
     private Set<BigInteger> clauseIds;
 
     public Set<BigInteger> getClauseIds() {

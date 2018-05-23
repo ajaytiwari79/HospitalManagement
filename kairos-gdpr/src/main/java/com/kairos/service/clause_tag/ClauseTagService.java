@@ -5,11 +5,11 @@ import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.persistance.model.clause_tag.dto.ClauseTagDto;
+import com.kairos.dto.ClauseTagDto;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class ClauseTagService extends MongoBaseService {
 
     public ClauseTag updateClauseTag(BigInteger id, String clauseTag) {
 
-        if (StringUtils.isEmpty(clauseTag)) {
+        if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
 
         }
@@ -98,20 +98,15 @@ public class ClauseTagService extends MongoBaseService {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
         for (ClauseTagDto tagDto : tagList) {
-
-
             if (tagDto.getId() == null) {
-
                 if(clauseTagMongoRepository.findByName(tagDto.getName())!=null)
                 {
                     throw new DuplicateDataException("tag with name "+tagDto.getName()+" already exist");
-
                 }
                 ClauseTag newClauseTag = new ClauseTag();
                 newClauseTag.setName(tagDto.getName());
                 clauseTagList.add(save(newClauseTag));
                 continue;
-
             }
         clauseTagList.add(getClauseTagById(tagDto.getId()));
         }

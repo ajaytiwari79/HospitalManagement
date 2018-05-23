@@ -6,7 +6,6 @@ import static com.kairos.constant.ApiConstant.API_CLAUSES_URL;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.dto.ClauseDto;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
 import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrievedEvent;
@@ -47,48 +46,25 @@ public class ClauseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(clauseDto));
     }
 
-    /*@ApiOperation("get clause by organization type")
-    @GetMapping("/byorganizationType")
-    public ResponseEntity<Object> getClauseByOrganizationType(@RequestParam String organizationType) {
-        Map<String, Object> result = new HashMap<>();
-        if (!Optional.ofNullable(organizationType).isPresent()) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organizationtype cannot be null or empty");
-        } else {
-            result = clauseService.getClauseByOrganizationType(organizationType);
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, result.get("data"));
-        }
-    }
-*/
     @ApiOperation("get clause by id")
-    @GetMapping("/clause/id/{id}")
-    public ResponseEntity<Object> getClauseById(@PathVariable BigInteger id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getClause(@PathVariable BigInteger id) {
         if (id!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(id));
 
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null  or empty");
 
     }
 
-   /* @ApiOperation("get clause by account type")
-    @GetMapping("/byAccount")
-    public ResponseEntity<Object> getClauseByAccountType(@RequestParam String accountType) {
-        if (StringUtils.isEmpty(accountType)) {
-            throw new NullPointerException("AccountType Cannot be Null or Empty");
-        } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseByAccountType(accountType));
-
-    }
-*/
-
-    @ApiOperation("get clause by multi select")
+    /*@ApiOperation("get clause by multi select")
     @PostMapping("/clause")
     public ResponseEntity<Object> getClause(@RequestBody ClauseGetQueryDto clauseQueryDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(clauseQueryDto));
-    }
+    }*/
 
     @ApiOperation("delete clause by id")
-    @DeleteMapping("/delete/id/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteClause(@PathVariable BigInteger id) {
         if (id!=null)
         {
@@ -100,7 +76,7 @@ public class ClauseController {
     }
 
     @ApiOperation("update clause description")
-    @PutMapping("/update/clause/{clauseId}")
+    @PutMapping("/update/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
 
         if (clauseId!=null) {
@@ -112,23 +88,32 @@ public class ClauseController {
 
     @ApiOperation("get clause by list")
     @PostMapping("/clause/list")
-    public ResponseEntity<Object> getClausesByIds(@RequestBody Set<BigInteger> clausesids) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClausesByIds(clausesids));
+    public ResponseEntity<Object> getClauseList(@RequestBody Set<BigInteger> clausesids) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(clausesids));
     }
 
     @ApiOperation("get All clauses")
-    @GetMapping("/getAll")
+    @GetMapping("/all")
     public ResponseEntity<Object> getAllClauses() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses());
     }
 
 
 
-    @ApiOperation("default clauses page with default size 10 ")
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getclauseVersion(@PathVariable BigInteger id, @RequestParam VersionNode versionNode) throws RepositoryException {
+    @ApiOperation("")
+    @GetMapping("/{id}/version")
+    public ResponseEntity<Object> getClauseVersion(@PathVariable BigInteger id, @RequestParam String version) throws RepositoryException {
         if (id!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, versionNode));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, version));
+        }
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
+    }
+
+    @ApiOperation("")
+    @GetMapping("/{id}/versions")
+    public ResponseEntity<Object> getAllClauseVersion(@PathVariable BigInteger id) throws RepositoryException {
+        if (id!=null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauseVersion(id));
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
     }

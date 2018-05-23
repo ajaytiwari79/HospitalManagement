@@ -3,7 +3,7 @@ package com.kairos.response.dto.agreement_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.response.dto.account_type.AccountTypeBasicResponseDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
@@ -13,15 +13,17 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyAgreementTemplateResponseDto {
 
+    private BigInteger id;
+
     @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
     private String name;
 
     @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
     private String description;
 
-    private Set<AccountType> accountTypes;
+    private List<AccountTypeBasicResponseDto> accountTypes;
 
-    private Set<AgreementSectionResponseDto> agreementSections;
+    private List<AgreementSectionResponseDto> agreementSections;
 
     private Long countryId;
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
@@ -30,6 +32,13 @@ public class PolicyAgreementTemplateResponseDto {
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -47,7 +56,21 @@ public class PolicyAgreementTemplateResponseDto {
         this.description = description;
     }
 
+    public List<AccountTypeBasicResponseDto> getAccountTypes() {
+        return accountTypes;
+    }
 
+    public void setAccountTypes(List<AccountTypeBasicResponseDto> accountTypes) {
+        this.accountTypes = accountTypes;
+    }
+
+    public List<AgreementSectionResponseDto> getAgreementSections() {
+        return agreementSections;
+    }
+
+    public void setAgreementSections(List<AgreementSectionResponseDto> agreementSections) {
+        this.agreementSections = agreementSections;
+    }
 
     public Long getCountryId() {
         return countryId;
