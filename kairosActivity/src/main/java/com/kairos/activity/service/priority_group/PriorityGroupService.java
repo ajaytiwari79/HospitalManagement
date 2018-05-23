@@ -61,14 +61,18 @@ public class PriorityGroupService extends MongoBaseService {
 
     public boolean copyPriorityGroupsForUnit(long unitId,long countryId){
         List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalse(countryId);
-        priorityGroups.forEach(priorityGroup -> {
-            priorityGroup.setCountryParentId(priorityGroup.getId());
-            priorityGroup.setUnitId(unitId);
-            priorityGroup.setId(null);
-            priorityGroup.setCountryId(null);
+        if(!priorityGroups.isEmpty()) {
+            priorityGroups.forEach(priorityGroup -> {
+                priorityGroup.setCountryParentId(priorityGroup.getId());
+                priorityGroup.setUnitId(unitId);
+                priorityGroup.setId(null);
+                priorityGroup.setCountryId(null);
             });
-        save(priorityGroups);
-        return true;
+            save(priorityGroups);
+            return true;
+        } else  {
+            return false;
+        }
     }
 
     public List<PriorityGroupDTO> getPriorityGroupsOfUnit(long unitId) {
