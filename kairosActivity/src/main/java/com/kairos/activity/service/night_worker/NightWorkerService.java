@@ -210,12 +210,12 @@ public class NightWorkerService extends MongoBaseService {
         List<Long> staffIdsEligibleForNightWorker = new ArrayList<>();
         List<Long> staffIdsNotEligibleForNightWorker = new ArrayList<>();
         staffList.stream().forEach(staffDTO -> {
-            ActivitySpecification<StaffDTO> nightWorkerAgeApecification = new NightWorkerAgeEligibilitySpecification(nightWorkerUnitSettings.getEligibleMinAge(),
+            ActivitySpecification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(nightWorkerUnitSettings.getEligibleMinAge(),
                     nightWorkerUnitSettings.getEligibleMaxAge());
             ActivitySpecification<StaffDTO> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
-            ActivitySpecification<StaffDTO> activitySpecification = nightWorkerAgeApecification.or(nightWorkerPregnancySpecification);
+            ActivitySpecification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.or(nightWorkerPregnancySpecification);
 
-            if(activitySpecification.isSatisfied(staffDTO)){
+            if(rulesSpecification.isSatisfied(staffDTO)){
                 staffIdsEligibleForNightWorker.add(staffDTO.getId());
             } else {
                 staffIdsNotEligibleForNightWorker.add(staffDTO.getId());
