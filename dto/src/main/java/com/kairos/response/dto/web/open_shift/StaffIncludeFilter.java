@@ -1,4 +1,4 @@
-package com.kairos.activity.persistence.model.priority_group;
+package com.kairos.response.dto.web.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -14,7 +14,6 @@ public class StaffIncludeFilter {
     private boolean allowForVolunteers;
     private boolean allowForFlexPool;
     private List<Long> expertiseIds;
-    private boolean fullAvailability; //In Minutes
     private Float staffAvailability; // In Percentage
     private Integer distanceFromUnit; //In meter
 
@@ -30,7 +29,6 @@ public class StaffIncludeFilter {
         this.allowForVolunteers = allowForVolunteers;
         this.allowForFlexPool = allowForFlexPool;
         this.expertiseIds = expertiseIds;
-        this.fullAvailability = fullAvailability;
         this.staffAvailability=staffAvailability;
         this.distanceFromUnit=distanceFromUnit;
     }
@@ -81,14 +79,6 @@ public class StaffIncludeFilter {
 
     public void setExpertiseIds(List<Long> expertiseIds) {
         this.expertiseIds = expertiseIds;
-    }
-
-    public boolean isFullAvailability() {
-        return fullAvailability;
-    }
-
-    public void setFullAvailability(boolean fullAvailability) {
-        this.fullAvailability = fullAvailability;
     }
 
     public Float getStaffAvailability() {

@@ -1,4 +1,4 @@
-package com.kairos.activity.persistence.model.priority_group;
+package com.kairos.response.dto.web.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.PriorityGroupName;
@@ -9,7 +9,6 @@ import java.math.BigInteger;
 public class PriorityGroupDTO {
     private BigInteger id;
     private boolean deActivated;
-    private OpenShiftCancelProcess openShiftCancelProcess;
     private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
@@ -17,18 +16,18 @@ public class PriorityGroupDTO {
     private Long unitId;
     private PriorityGroupName name;
     private BigInteger orderId;
-    private ScheduledProcess scheduledProcess;
+    private BigInteger parentId;
+
 
     public PriorityGroupDTO() {
         //Default Constructor
     }
 
     public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean deActivated,
-                            OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
+                             RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
                             StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
         this.id = id;
         this.deActivated = deActivated;
-        this.openShiftCancelProcess = openShiftCancelProcess;
         this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
@@ -52,13 +51,7 @@ public class PriorityGroupDTO {
         this.deActivated = deActivated;
     }
 
-    public OpenShiftCancelProcess getOpenShiftCancelProcess() {
-        return openShiftCancelProcess;
-    }
 
-    public void setOpenShiftCancelProcess(OpenShiftCancelProcess openShiftCancelProcess) {
-        this.openShiftCancelProcess = openShiftCancelProcess;
-    }
 
     public RoundRules getRoundRules() {
         return roundRules;
@@ -116,11 +109,11 @@ public class PriorityGroupDTO {
         this.name = name;
     }
 
-    public ScheduledProcess getScheduledProcess() {
-        return scheduledProcess;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
-        this.scheduledProcess = scheduledProcess;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 }

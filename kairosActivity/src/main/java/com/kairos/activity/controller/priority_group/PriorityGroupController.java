@@ -1,6 +1,6 @@
 package com.kairos.activity.controller.priority_group;
 
-import com.kairos.activity.persistence.model.priority_group.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.*;
@@ -25,8 +26,8 @@ public class PriorityGroupController {
     @ApiOperation("Create Priority Group")
     @PostMapping(value = COUNTRY_URL+"/priority_groups")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createPriorityGroup(@PathVariable Long countryId,@RequestBody PriorityGroupDTO priorityGroupDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.createPriorityGroupForCountry(countryId,priorityGroupDTO));
+    public ResponseEntity<Map<String, Object>> createPriorityGroup(@PathVariable Long countryId, @RequestBody List<PriorityGroupDTO> priorityGroupDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.createPriorityGroupForCountry(countryId,priorityGroupDTOs));
     }
 
     @ApiOperation("Get all Priority Group based on countryId")

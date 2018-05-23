@@ -1,7 +1,7 @@
 package com.kairos.activity.persistence.repository.priority_group;
 
 import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
-import com.kairos.activity.persistence.model.priority_group.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 

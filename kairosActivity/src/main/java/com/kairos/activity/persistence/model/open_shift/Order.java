@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.open_shift;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.enums.InformationReciever;
 import com.kairos.response.dto.web.open_shift.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -39,6 +40,8 @@ public class Order extends MongoBaseEntity {
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
+    private PlannerNotificationInfo plannerNotificationInfo;
+    private List<InformationReciever> informationReceivers;
 
 
     public List<DayOfWeek> getDayType() {
@@ -264,5 +267,19 @@ public class Order extends MongoBaseEntity {
         this.functionIds = functionIds;
     }
 
+    public PlannerNotificationInfo getPlannerNotificationInfo() {
+        return plannerNotificationInfo;
+    }
 
+    public void setPlannerNotificationInfo(PlannerNotificationInfo plannerNotificationInfo) {
+        this.plannerNotificationInfo = plannerNotificationInfo;
+    }
+
+    public List<InformationReciever> getInformationReceivers() {
+        return informationReceivers;
+    }
+
+    public void setInformationReceivers(List<InformationReciever> informationReceivers) {
+        this.informationReceivers = informationReceivers;
+    }
 }

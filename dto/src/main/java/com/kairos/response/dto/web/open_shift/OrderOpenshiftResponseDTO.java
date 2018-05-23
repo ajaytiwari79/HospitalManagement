@@ -6,6 +6,7 @@ public class OrderOpenshiftResponseDTO {
 
     OrderResponseDTO order;
     List<OpenShiftResponseDTO> openshifts;
+    List<PriorityGroupDTO> priorityGroups;
 
     public OrderResponseDTO getOrder() {
         return order;
@@ -23,4 +24,11 @@ public class OrderOpenshiftResponseDTO {
         this.openshifts = openshifts;
     }
 
+    public List<PriorityGroupDTO> getPriorityGroups() {
+        return priorityGroups;
+    }
+
+    public void setPriorityGroups(List<PriorityGroupDTO> priorityGroups) {
+        this.priorityGroups = priorityGroups;
+    }
 }

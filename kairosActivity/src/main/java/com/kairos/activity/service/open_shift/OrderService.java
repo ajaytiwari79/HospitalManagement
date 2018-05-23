@@ -10,6 +10,7 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderOpenshiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class OrderService extends MongoBaseService {
 
 
 
-   public OrderOpenshiftResponseDTO createOrder(OrderOpenshiftResponseDTO orderOpenshiftResponseDTO) {
+   public OrderOpenshiftResponseDTO createOrder(Long unitId,OrderOpenshiftResponseDTO orderOpenshiftResponseDTO) {
 
     Order order = new Order();
     OrderResponseDTO orderResponseDTO = orderOpenshiftResponseDTO.getOrder();
@@ -46,12 +47,11 @@ public class OrderService extends MongoBaseService {
        for(OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
            openShiftResponseDTO.setActivityId(order.getActivityId());
        }
-    openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
-
-    return orderOpenshiftResponseDTO;
-
-
-    }
+       openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
+       List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupService.createPriorityGroups(orderOpenshiftResponseDTO.getPriorityGroups());
+       orderOpenshiftResponseDTO.setPriorityGroups(priorityGroupDTOS);
+       return orderOpenshiftResponseDTO;
+       }
 
     public OrderOpenshiftResponseDTO updateOrder(OrderOpenshiftResponseDTO orderOpenShiftResponseDTO,BigInteger orderId) {
 

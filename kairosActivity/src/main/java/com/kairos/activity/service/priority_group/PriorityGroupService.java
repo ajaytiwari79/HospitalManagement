@@ -5,6 +5,7 @@ import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRe
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +23,11 @@ public class PriorityGroupService extends MongoBaseService {
     private  ExceptionService exceptionService;
 
 
-    public boolean createPriorityGroupForCountry(long countryId,PriorityGroupDTO priorityGroupDTO) {
-        PriorityGroup priorityGroup=new PriorityGroup();
-        ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
-        save(priorityGroup);
-        return true;
+    public List<PriorityGroupDTO> createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
+
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTO, PriorityGroup.class);
+        save(priorityGroups);
+        return priorityGroupDTO;
     }
 
     public List<PriorityGroupDTO> findAllPriorityGroups(long countryId) {
@@ -62,7 +63,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean copyPriorityGroupsForUnit(long unitId,long countryId){
         List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalse(countryId);
         priorityGroups.forEach(priorityGroup -> {
-            priorityGroup.setCountryParentId(priorityGroup.getId());
+            priorityGroup.setParentId(priorityGroup.getId());
             priorityGroup.setUnitId(unitId);
             priorityGroup.setId(null);
             priorityGroup.setCountryId(null);
@@ -117,4 +118,16 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroup getPriorityGroupOfUnitById(Long unitId, BigInteger priorityGroupId){
         return priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId,unitId);
     }
+
+    public List<PriorityGroupDTO> createPriorityGroups(List<PriorityGroupDTO> priorityGroupDTOs) {
+        priorityGroupDTOs.forEach(priorityGroupDTO -> {
+            priorityGroupDTO.setParentId(priorityGroupDTO.getId());
+            priorityGroupDTO.setId(null);
+        });
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
+        save(priorityGroups);
+        return priorityGroupDTOs;
+    }
+
+
 }

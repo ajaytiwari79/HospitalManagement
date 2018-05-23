@@ -1,10 +1,9 @@
-package com.kairos.activity.persistence.model.priority_group;
+package com.kairos.response.dto.web.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundRules {
-    private Integer maximumConcurrentEnquiries;
     private Integer candidatesPerRound;
     private Integer waitingTimeBeforeNextRoundInDays;
     private Integer checkAnswersInDays;// Time to check answer after enquiry
@@ -15,18 +14,9 @@ public class RoundRules {
     }
 
     public RoundRules(Integer maximumConcurrentEnquiries, Integer candidatesPerRound, Integer waitingTimeBeforeNextRoundInDays, Integer minimumCandidateBeforeSelection) {
-        this.maximumConcurrentEnquiries = maximumConcurrentEnquiries;
         this.candidatesPerRound = candidatesPerRound;
         this.waitingTimeBeforeNextRoundInDays = waitingTimeBeforeNextRoundInDays;
         this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
-    }
-
-    public Integer getMaximumConcurrentEnquiries() {
-        return maximumConcurrentEnquiries;
-    }
-
-    public void setMaximumConcurrentEnquiries(Integer maximumConcurrentEnquiries) {
-        this.maximumConcurrentEnquiries = maximumConcurrentEnquiries;
     }
 
     public Integer getCandidatesPerRound() {

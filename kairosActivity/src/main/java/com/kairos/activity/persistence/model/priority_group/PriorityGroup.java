@@ -2,22 +2,25 @@ package com.kairos.activity.persistence.model.priority_group;
 
 import com.kairos.persistence.model.enums.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.response.dto.web.open_shift.RoundRules;
+import com.kairos.response.dto.web.open_shift.StaffExcludeFilter;
+import com.kairos.response.dto.web.open_shift.StaffIncludeFilter;
 
 import java.math.BigInteger;
 
 public class PriorityGroup extends MongoBaseEntity {
     private boolean deActivated;
-    private OpenShiftCancelProcess openShiftCancelProcess;
+    //private OpenShiftCancelProcess openShiftCancelProcess;
     private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
     private Long countryId;
     private Long unitId;
-    private BigInteger countryParentId;
+    private BigInteger parentId;
     private Integer priority;
     private BigInteger orderId;
     private PriorityGroupName name;
-    private ScheduledProcess scheduledProcess;
+    //private ScheduledProcess scheduledProcess;
 
 
     public PriorityGroup() {
@@ -28,13 +31,11 @@ public class PriorityGroup extends MongoBaseEntity {
                          StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId,ScheduledProcess scheduledProcess) {
         this.name=name;
         this.deActivated = deActivated;
-        this.openShiftCancelProcess = openShiftCancelProcess;
         this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
         this.countryId = countryId;
         this.unitId = unitId;
-        this.scheduledProcess=scheduledProcess;
     }
 
     public boolean isDeActivated() {
@@ -43,16 +44,6 @@ public class PriorityGroup extends MongoBaseEntity {
 
     public void setDeActivated(boolean deActivated) {
         this.deActivated = deActivated;
-    }
-
-
-
-    public OpenShiftCancelProcess getOpenShiftCancelProcess() {
-        return openShiftCancelProcess;
-    }
-
-    public void setOpenShiftCancelProcess(OpenShiftCancelProcess openShiftCancelProcess) {
-        this.openShiftCancelProcess = openShiftCancelProcess;
     }
 
     public RoundRules getRoundRules() {
@@ -95,12 +86,12 @@ public class PriorityGroup extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public BigInteger getCountryParentId() {
-        return countryParentId;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setCountryParentId(BigInteger countryParentId) {
-        this.countryParentId = countryParentId;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public PriorityGroupName getName() {
@@ -127,11 +118,4 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
-    public ScheduledProcess getScheduledProcess() {
-        return scheduledProcess;
-    }
-
-    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
-        this.scheduledProcess = scheduledProcess;
-    }
 }
