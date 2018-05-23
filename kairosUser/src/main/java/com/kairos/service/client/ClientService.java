@@ -46,7 +46,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
@@ -63,7 +62,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -218,14 +216,13 @@ public class ClientService extends UserBaseService {
                 client.setFirstName(clientMinimumDTO.getFirstName());
                 client.setLastName(clientMinimumDTO.getLastName());
                 client.setCprNumber(clientMinimumDTO.getCprnumber());
-                client.setAge(calculateAgeFromCprNumber(clientMinimumDTO.getCprnumber()));
+
                 if (client.getEmail() == null) {
                     logger.debug("Creating email with CPR");
                     String cpr = client.getCprNumber();
                     String email = cpr + KAIROS;
                     client.setEmail(email);
                     client.setUserName(email);
-
                     Client nextToKin = new Client();
                     //client.setNextToKin(nextToKin);
                 }
@@ -256,11 +253,6 @@ public class ClientService extends UserBaseService {
         return cprExists;
     }
 
-    public int calculateAgeFromCprNumber(String cprNumber)
-    {
-        int age=Period.between(CPRUtil.getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears();
-        return age;
-    }
 
     public Client generateAgeAndGenderFromCPR(Client client) {
         logger.debug("Generating Gender and Age from CPR....");
