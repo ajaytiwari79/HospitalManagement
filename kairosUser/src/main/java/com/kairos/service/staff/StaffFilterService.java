@@ -3,8 +3,6 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.enums.FilterType;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
@@ -23,6 +21,7 @@ import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphReposi
 import com.kairos.response.dto.web.filter.FilterDetailDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -61,7 +60,8 @@ public class StaffFilterService extends UserBaseService{
     private EnvConfig envConfig;
     @Inject
     ExpertiseGraphRepository expertiseGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId){
         Long userId = UserContext.getUserDetails().getId();
@@ -100,8 +100,12 @@ public class StaffFilterService extends UserBaseService{
             case EXPERTISE: {
                 return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
             }
-            default: throw new InvalidRequestException(filterType.value+" Entity not found");
+
+            default:
+                exceptionService.invalidRequestException("message.staff.filter.entity.notfound",filterType.value);
+
         }
+        return null;
     }
 
     public FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId){
@@ -116,7 +120,8 @@ public class StaffFilterService extends UserBaseService{
     public List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         if(!Optional.ofNullable(filterGroup).isPresent()){
-            throw new InvalidRequestException("Filter feature is not enabled for the module");
+            exceptionService.invalidRequestException("message.staff.filter.feature.notenabled");
+
         }
         List<FilterQueryResult> filterDTOs = new ArrayList<>();
 
@@ -139,13 +144,16 @@ public class StaffFilterService extends UserBaseService{
 
 
         if(!Optional.ofNullable(staffFilterDTO.getName()).isPresent()){
-            throw new InvalidRequestException("Name can not be empty");
+            exceptionService.invalidRequestException("message.staff.filter.name.empty");
+
         }
         if(staffFilterDTO.getFiltersData().isEmpty()){
-            throw new InvalidRequestException("Please select some filters");
+            exceptionService.invalidRequestException("message.staff.filter.select");
+
         }
         if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithName(staffFilterDTO.getModuleId(), staffFilterDTO.getName())){
-            throw new InvalidRequestException("Filter already exists with name : "+staffFilterDTO.getName());
+            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist",staffFilterDTO.getName());
+
         }
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
@@ -164,17 +172,22 @@ public class StaffFilterService extends UserBaseService{
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, organizationId, filterId);
         if(!Optional.ofNullable(staffFavouriteFilter).isPresent()){
-            throw new InvalidRequestException("Invalid id of favourite filter : "+filterId);
+           exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid",filterId);
+
         }
         if(!Optional.ofNullable(favouriteFilterDTO.getName()).isPresent()){
-            throw new InvalidRequestException("Name can not be empty");
+            exceptionService.invalidRequestException("message.staff.filter.name.empty");
+
         }
         if(favouriteFilterDTO.getFiltersData().isEmpty()){
-            throw new InvalidRequestException("Please select some filters");
+
+            exceptionService.invalidRequestException("message.staff.filter.select");
+
         }
         if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithNameExceptId(favouriteFilterDTO.getModuleId(),
                 favouriteFilterDTO.getName(), staffFavouriteFilter.getId())){
-            throw new InvalidRequestException("Filter already exists with name : "+favouriteFilterDTO.getName());
+            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist",favouriteFilterDTO.getName());
+
         }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterSelection> filters =  favouriteFilterDTO.getFiltersData();
@@ -191,7 +204,8 @@ public class StaffFilterService extends UserBaseService{
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, organizationId, filterId);
         if(!Optional.ofNullable(staffFavouriteFilter).isPresent()){
-            throw new InvalidRequestException("Invalid id of favourite filter : "+filterId);
+            exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid",filterId);
+
         }
         staffFavouriteFilter.setDeleted(true);
         save(staffFavouriteFilter);
@@ -219,11 +233,13 @@ public class StaffFilterService extends UserBaseService{
     public List<Map> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired, StaffFilterDTO staffFilterDTO) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
                 !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
-            throw new DataNotFoundByIdException("Invalid module Id or Filter settings are not set");
+            exceptionService.dataNotFoundByIdException("message.staff.filter.setting.notfound");
+
         }
 
         Organization organization = organizationService.fetchParentOrganization(unitId);

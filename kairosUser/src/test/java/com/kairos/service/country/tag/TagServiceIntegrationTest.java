@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.response.dto.web.tag.ShowCountryTagSetting;
 import com.kairos.response.dto.web.tag.TagDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -46,7 +48,8 @@ public class TagServiceIntegrationTest {
     TestRestTemplate restTemplate;
     @Autowired
     TagService tagService;
-
+    @Inject
+    private ExceptionService exceptionService;
     static String nameOfTag = "Test Skill";
     static Long createdTagId ;
     static Long createdOrgTagId;
@@ -296,8 +299,9 @@ public class TagServiceIntegrationTest {
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else{
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 }

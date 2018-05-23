@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.repository.activity;
 
+import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithCompositeDTO;
@@ -122,7 +123,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType"),
                 project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
+                        .and("timeType").arrayElementAt(0).as("timeType"),
+                match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
         AggregationResults<ActivityWithCTAWTASettingsDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCTAWTASettingsDTO.class);
         return result.getMappedResults();
@@ -131,7 +135,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false)),
-                project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType"),
+                project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId").and("timeType").arrayElementAt(0).as("timeType"),
+                match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
         AggregationResults<ActivityWithCTAWTASettingsDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCTAWTASettingsDTO.class);
         return result.getMappedResults();

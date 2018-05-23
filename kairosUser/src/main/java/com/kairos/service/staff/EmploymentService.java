@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -91,7 +92,8 @@ public class EmploymentService extends UserBaseService {
     private StaffService staffService;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
@@ -100,16 +102,20 @@ public class EmploymentService extends UserBaseService {
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
             if(Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEarliestUnitPositionStartDateMillis())
-                throw new ActionNotPermittedException("Employment start date cant exceed Unit Position start date");
+                exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.unitpositionstartdate");
+
             if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDateMillis())
-                throw new ActionNotPermittedException("Employment start date cant exceed employment end date");
+                exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.enddate");
+
         }
 
         if (objectToUpdate == null) {
             logger.info("Staff does not found by id {}", staffId);
-            throw new DataNotFoundByIdException("Staff does not found by id");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-            throw new ActionNotPermittedException("External id can't be changed");
+           exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+
         }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
@@ -152,21 +158,25 @@ public class EmploymentService extends UserBaseService {
         Organization unit = organizationGraphRepository.findOne(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
-            throw new InternalError("unit is null");
+            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
+
         }
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
-            throw new DataNotFoundByIdException("staff  not found   ID: " + staffId);
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            throw new DataNotFoundByIdException("staff employment  not found   ID: " + staffId);
+            exceptionService.dataNotFoundByIdException("message.staff.employment.notFound",staffId);
+
         }
 
         boolean flsSyncStatus = false;
@@ -177,7 +187,8 @@ public class EmploymentService extends UserBaseService {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
             if(Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
-                throw new DataNotFoundByIdException("Unit permission already exist for Access Group" + staffId);
+                exceptionService.dataNotFoundByIdException("message.employment.unitpermission.alreadyexist",staffId);
+
             } else if(!Optional.ofNullable(unitPermission).isPresent()){
                 unitPermission = new UnitPermission();
                 unitPermission.setOrganization(unit);
@@ -307,14 +318,15 @@ public class EmploymentService extends UserBaseService {
 
     public List<Map<String, Object>> getEmployments(long staffId, long unitId, String type) {
 
-        Organization unit;
+        Organization unit=null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(unitId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
         } else {
-            throw new InternalError("Type can't be recognised");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
 
         Organization parent;
@@ -346,7 +358,8 @@ public class EmploymentService extends UserBaseService {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup == null) {
-            throw new InternalError("Access group not found");
+            exceptionService.internalServerError("error.employment.accessgroup.notfound");
+
         }
         Employment employment = new Employment();
         employment.setName("Working as unit manager");
@@ -495,17 +508,19 @@ public class EmploymentService extends UserBaseService {
         if (staff == null) {
             return null;
         }
-        Organization unit;
+        Organization unit=null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(unitId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
-            System.out.println("getting unit from team" + unit.getId());
+
         } else {
-            throw new InternalError("type can not be null");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
         if (unit == null) {
-            throw new InternalError("Organization not found");
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
+
         }
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
@@ -625,16 +640,18 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            throw new InternalError("Staff is null");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
-        Organization unit;
+        Organization unit=null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(id);
         } else {
-            throw new InternalError("Type can't be recognised");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
         PartialLeave partialLeave;
         if (partialLeaveDTO.getId() != null) {
@@ -663,7 +680,8 @@ public class EmploymentService extends UserBaseService {
             }
 
             if (unitPermission == null) {
-                throw new InternalError("unit employment is null");
+                exceptionService.internalServerError("error.unit.employment.null");
+
             }
 
             partialLeave = new PartialLeave();
@@ -691,17 +709,19 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            throw new InternalError("Staff is null");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
 
-        Organization unit;
+        Organization unit=null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(id);
         } else {
-            throw new InternalError("Type can't be recognised");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
         List<PartialLeave> partialLeaves = staffGraphRepository.getPartialLeaves(unit.getId(), staffId);
         List<Map<String, Object>> response = new ArrayList<>(partialLeaves.size());
@@ -816,7 +836,8 @@ public class EmploymentService extends UserBaseService {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         ReasonCode reasonCode = null;
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
+            exceptionService.dataNotFoundByIdException("message.employment.parentorganization.notfound",unit.getId());
+
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);

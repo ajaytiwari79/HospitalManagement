@@ -1,14 +1,10 @@
 package com.kairos.service.position_code;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.OrganizationHierarchyData;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
-import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -22,6 +18,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.PositionCodeUnionWrapper;
 import com.kairos.response.dto.web.organization.position_code.PositionCodeDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
@@ -69,7 +66,8 @@ public class PositionCodeService extends UserBaseService {
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     public PositionCode createPositionCode(Long id, PositionCodeDTO positionCodeDTO, String type) {
         Long unitId = organizationService.getOrganization(id, type);
         PositionCode position = null;
@@ -77,13 +75,15 @@ public class PositionCodeService extends UserBaseService {
         //check if duplicate
         position = positionCodeGraphRepository.checkDuplicatePositionCode(unitId, name);
         if (position != null) {
-            throw new DuplicateDataException("PositionCode already exist");
+            exceptionService.duplicateDataException("message.positioncode.alreadyexist");
+
         }
 
 
         Organization organization = organizationService.getOrganizationDetail(id, type);
         if (!organization.isParentOrganization()) {
-            throw new ActionNotPermittedException("Can only create PositionCode in Parent organization");
+            exceptionService.actionNotPermittedException("message.positioncode.create.parentorganization");
+
         }
 
 
@@ -100,18 +100,21 @@ public class PositionCodeService extends UserBaseService {
     public PositionCode updatePositionCode(Long id, Long positionCodeId, PositionCode positionCode, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         if (!organization.isParentOrganization()) {
-            throw new ActionNotPermittedException("Can only update PositionCode in Parent organization");
+            exceptionService.actionNotPermittedException("message.positioncode.update.parentorganization");
+
         }
 
         PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionCodeId);
         if (!Optional.ofNullable(oldPositionCode).isPresent()) {
             logger.info("position_code code not found,{}", positionCode.getName());
-            throw new DataNotFoundByIdException("PositionCode doesn't exist");
+            exceptionService.dataNotFoundByIdException("message.positioncode.notexist");
+
         }
 
         if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName().trim())) &&
                 (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId() ,"(?i)"+positionCode.getName().trim()) != null)) {
-            throw new DuplicateDataException("PositionCode can't be updated");
+            exceptionService.duplicateDataException("message.positioncode.notupdated");
+
         }
 
 
@@ -126,11 +129,13 @@ public class PositionCodeService extends UserBaseService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         PositionCode positionCode = positionCodeGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(positionCode).isPresent()) {
-            throw new DataNotFoundByIdException("position_code code  not found " + positionId);
+            exceptionService.dataNotFoundByIdException("message.positioncode.id.notfound",positionId);
+
 
         }
         if (!organization.isParentOrganization()) {
-            throw new ActionNotPermittedException("Only parent Organization can remove/edit position_code names.");
+            exceptionService.actionNotPermittedException("message.positioncode.parentorganization");
+
         }
 
 
@@ -151,11 +156,13 @@ public class PositionCodeService extends UserBaseService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             organization = teamService.getOrganizationByTeamId(id);
         } else {
-            throw new InternalError("Type is not valid");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
 
         if (organization == null) {
-            throw new DataNotFoundByIdException("Organization not found-" + id);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",id);
+
         }
         unitId = organization.getId();
         if (organization.isParentOrganization()) {
@@ -181,14 +188,16 @@ public class PositionCodeService extends UserBaseService {
     public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long id, String type, Long staffId) {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
-            throw new DataNotFoundByIdException("Can't find staff with provided Id");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
 
         List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staffId);
 
         Organization organization = organizationService.getOrganizationDetail(id, type);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
-            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+           exceptionService.dataNotFoundByIdException("message.positioncode.organization.notfound");
+
         }
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);

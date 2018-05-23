@@ -8,6 +8,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,8 @@ public class DayTypeService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -143,7 +146,8 @@ public class DayTypeService extends UserBaseService {
                 danishName = "Soendag";
                 break;
             default:
-                throw new UnsupportedOperationException("invalid day");
+                exceptionService.unsupportedOperationException("message.dayType.notfound");
+
 
 
         }

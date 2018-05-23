@@ -2,6 +2,7 @@ package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TableConfiguration;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
+
 import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 @Component
 public class TableConfigRestClient {
     @Autowired
     RestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(TableConfigRestClient.class);
@@ -53,8 +57,10 @@ public class TableConfigRestClient {
 
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
         }
+        return null;
     }
 
 }

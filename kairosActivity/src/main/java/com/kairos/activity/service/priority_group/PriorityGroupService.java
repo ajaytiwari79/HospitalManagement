@@ -36,7 +36,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupDTO updatePriorityGroup(long countryId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
         }
         priorityGroupDTO.setName(priorityGroup.getName());
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
@@ -52,7 +52,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
         }
         priorityGroup.setDeleted(true);
         save(priorityGroup);
@@ -61,14 +61,18 @@ public class PriorityGroupService extends MongoBaseService {
 
     public boolean copyPriorityGroupsForUnit(long unitId,long countryId){
         List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalse(countryId);
-        priorityGroups.forEach(priorityGroup -> {
-            priorityGroup.setCountryParentId(priorityGroup.getId());
-            priorityGroup.setUnitId(unitId);
-            priorityGroup.setId(null);
-            priorityGroup.setCountryId(null);
+        if(!priorityGroups.isEmpty()) {
+            priorityGroups.forEach(priorityGroup -> {
+                priorityGroup.setCountryParentId(priorityGroup.getId());
+                priorityGroup.setUnitId(unitId);
+                priorityGroup.setId(null);
+                priorityGroup.setCountryId(null);
             });
-        save(priorityGroups);
-        return true;
+            save(priorityGroups);
+            return true;
+        } else  {
+            return false;
+        }
     }
 
     public List<PriorityGroupDTO> getPriorityGroupsOfUnit(long unitId) {
@@ -78,7 +82,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupDTO updatePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         priorityGroup.setId(priorityGroupId);
@@ -93,7 +97,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean deletePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
         }
         priorityGroup.setDeleted(true);
         save(priorityGroup);

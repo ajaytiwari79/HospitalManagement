@@ -1,10 +1,9 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -94,10 +93,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as expertise")
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId, Long selectedDateMillis);
 
-    @Query("match(ost:OrganizationType) where  id(ost) in {0} match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO_ORG_SUB_TYPE]->(ost)\n" +
+   /* @Query("match(ost:OrganizationType) where  id(ost) in {0} match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO_ORG_SUB_TYPE]->(ost)\n" +
             "MATCH(workingTimeAgreement)-[:HAS_EXPERTISE_IN]-(expertise:Expertise)\n" +
             "return workingTimeAgreement,expertise")
-    List<WTAAndExpertiseQueryResult> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);
+    List<WTAAndExpertiseQueryResult> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);*/
 
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")

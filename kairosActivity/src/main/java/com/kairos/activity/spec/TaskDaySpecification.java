@@ -2,9 +2,11 @@ package com.kairos.activity.spec;
 
 import com.kairos.activity.persistence.model.staffing_level.Day;
 import com.kairos.activity.persistence.model.task.Task;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.task_type.TaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +25,8 @@ public class TaskDaySpecification extends AbstractTaskSpecification<Task>{
     public TaskDaySpecification(Set<Day> forbiddenDays) {
         this.forbiddenDays = forbiddenDays;
     }
-
+@Autowired
+    ExceptionService exceptionService;
     @Override
     public boolean isSatisfied(Task task) {
         if(forbiddenDays.contains(EVERYDAY)){
@@ -36,7 +39,7 @@ public class TaskDaySpecification extends AbstractTaskSpecification<Task>{
         Calendar c = Calendar.getInstance();
         c.setTime(taskDate);
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        Day taskDay;
+        Day taskDay=null;
         switch (dayOfWeek){
             case 1:
                 taskDay = SUNDAY;
@@ -60,7 +63,7 @@ public class TaskDaySpecification extends AbstractTaskSpecification<Task>{
                 taskDay = SATURDAY;
                 break;
             default:
-                throw new InternalError("Invalid day");
+                exceptionService.internalError("error.day.invalid");
         }
         return taskDay;
 

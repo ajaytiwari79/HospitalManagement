@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.access_permission.*;
+import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessPage;
+import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
+import com.kairos.persistence.model.user.access_permission.Tab;
 import com.kairos.persistence.model.user.auth.StaffPermissionDTO;
 import com.kairos.persistence.model.user.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.user.auth.StaffTabPermission;
@@ -25,8 +27,8 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -69,6 +71,8 @@ public class AccessPageService extends UserBaseService {
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     UserGraphRepository userGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     public synchronized AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
@@ -77,7 +81,8 @@ public class AccessPageService extends UserBaseService {
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
                 logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
-                throw new DataNotFoundByIdException("Parent access page not found::id " + accessPageDTO.getParentTabId());
+                exceptionService.dataNotFoundByIdException("message.dataNotFound","parentAccessPage",accessPageDTO.getParentTabId());
+
             }
             List<AccessPage> childTabs = parentTab.getSubPages();
             childTabs.add(accessPage);
@@ -93,7 +98,8 @@ public class AccessPageService extends UserBaseService {
         AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
                 updateAccessTab(accessPageId,accessPageDTO.getName()): null;
         if(!Optional.ofNullable(accessPage).isPresent()){
-            throw new DataNotFoundByIdException("Tab not found: id " + accessPageId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","tab",accessPageId);
+
         }
         return accessPage;
     }
@@ -207,7 +213,8 @@ public class AccessPageService extends UserBaseService {
         AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
         if(!Optional.ofNullable(accessPageCustomId).isPresent()){
             logger.error("AccessPageCustomId collection is not present");
-            throw new InternalError("AccessPageCustomId collection is not present");
+            exceptionService.internalServerError("error.accessPage.customId.notPresent");
+
         }
         String content[];
         String tabId = null;
@@ -229,7 +236,8 @@ public class AccessPageService extends UserBaseService {
             }
         }
         if(!Optional.ofNullable(tabId).isPresent()){
-            throw new InternalError("tab id is not present");
+            exceptionService.internalServerError("error.tabId.notPresent");
+
         }
         save(accessPageCustomId);
         return tabId;

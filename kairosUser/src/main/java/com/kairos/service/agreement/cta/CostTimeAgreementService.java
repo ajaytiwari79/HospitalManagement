@@ -29,11 +29,11 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
-import com.kairos.response.dto.web.cta.CostTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.userContext.UserContext;
@@ -67,7 +67,7 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Inject DayTypeGraphRepository dayTypeGraphRepository;
     private @Inject  EmploymentTypeGraphRepository employmentTypeGraphRepository;
     private @Inject AccessGroupRepository accessGroupRepository;
-    private @Inject TimeTypeGraphRepository timeTypeGraphRepository;
+   // private @Inject TimeTypeGraphRepository timeTypeGraphRepository;
     private @Inject UserGraphRepository userGraphRepository;
     private  @Inject CurrencyService currencyService;
     private  @Inject ExpertiseGraphRepository expertiseGraphRepository;
@@ -81,7 +81,8 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Inject ActivityTypesRestClient activityTypesRestClient;
     private @Inject UnitPositionGraphRepository unitPositionGraphRepository;
     private @Inject UnitPositionService unitPositionService;
-
+    private @Inject
+    ExceptionService exceptionService;
 
     public boolean isDefaultCTARuleTemplateExists(){
         return ctaRuleTemplateGraphRepository.isDefaultCTARuleTemplateExists();
@@ -110,7 +111,8 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public CTARuleTemplateDTO createCTARuleTemplate(Long countryId, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException{
         if(ctaRuleTemplateGraphRepository.isCTARuleTemplateExistWithSameName(countryId, ctaRuleTemplateDTO.getName())){
-            throw new DuplicateDataException("CTA Rule Template already exists with same name : " +ctaRuleTemplateDTO.getName() );
+           exceptionService.dataNotFoundByIdException("message.cta.ruleTemplate.alreadyExist",ctaRuleTemplateDTO.getName());
+
         }
         // Set id null as new entry should be created
         ctaRuleTemplateDTO.setId(null);
@@ -196,7 +198,8 @@ public class CostTimeAgreementService extends UserBaseService {
                         "", "xyz");
                 break;
             default:
-                throw new IllegalArgumentException("invalid template type");
+                exceptionService.illegalArgumentException("message.InvalidTemplateType");
+
 
         }
         ctaRuleTemplate.setCalculationUnit(CalculationUnit.HOURS);
@@ -325,7 +328,7 @@ public class CostTimeAgreementService extends UserBaseService {
     public Boolean deleteCostTimeAgreement(Long countryId, Long ctaId){
         CostTimeAgreement costTimeAgreement = collectiveTimeAgreementGraphRepository.findCTAByCountryAndIdAndDeleted(countryId,ctaId,false);
         if(costTimeAgreement == null){
-            throw new DataNotFoundByIdException("Invalid CTA Id");
+            exceptionService.dataNotFoundByIdException("message.cta.id.notFound",ctaId);
         }
         costTimeAgreement.setDeleted(true);
         this.save(costTimeAgreement);
@@ -426,9 +429,9 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long countryId, Long unitId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         if( countryId != null && collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId)){
-            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist",collectiveTimeAgreementDTO.getName());
         } else if( unitId != null && collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName(), ctaId )){
-            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist",collectiveTimeAgreementDTO.getName());
         }
         CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId,2);
 
@@ -589,7 +592,8 @@ public class CostTimeAgreementService extends UserBaseService {
     public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         logger.info("saving CostTimeAgreement country {}",countryId);
         if( collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName())){
-            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist",collectiveTimeAgreementDTO.getName() );
+
         }
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
@@ -620,7 +624,8 @@ public class CostTimeAgreementService extends UserBaseService {
         CostTimeAgreement costTimeAgreement = collectiveTimeAgreementGraphRepository.findOne(ctaId);
         CostTimeAgreement newCostTimeAgreement=new CostTimeAgreement();
         if(costTimeAgreement == null){
-            throw new DataNotFoundByIdException("Invalid CTA Id");
+            exceptionService.dataNotFoundByIdException("message.cta.id.notFound",ctaId);
+
         }
         // Clone and create new
         if(cTALinkedWithCountry){
@@ -769,7 +774,8 @@ public class CostTimeAgreementService extends UserBaseService {
     public CTAListQueryResult getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitEmploymentPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
-            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
+           exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId",unitEmploymentPositionId);
+
         }
         CTAListQueryResult cta = collectiveTimeAgreementGraphRepository.getCTAByUnitPositionId(unitEmploymentPositionId);
         return cta;
@@ -778,7 +784,8 @@ public class CostTimeAgreementService extends UserBaseService {
     public UnitPositionQueryResult createCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
-            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitPositionId);
+            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId",unitPositionId);
+
         }
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
@@ -824,7 +831,8 @@ public class CostTimeAgreementService extends UserBaseService {
     public CollectiveTimeAgreementDTO createCopyOfUnitCTA(Long unitId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         logger.info("saving CostTimeAgreement unit {}",unitId);
         if( collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(),-1L)){
-            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist",collectiveTimeAgreementDTO.getName());
+
         }
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
@@ -848,7 +856,8 @@ public class CostTimeAgreementService extends UserBaseService {
     public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) throws ExecutionException, InterruptedException {
         OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
+            exceptionService.dataNotFoundByIdException("message.InvalidOrganizationSubtype",organizationSubTypeId);
+
         }
         if (checked) {
             Integer lastSuffixNumber=collectiveTimeAgreementGraphRepository.getLastSuffixNumberOfCTAName("(?i)"+collectiveTimeAgreementDTO.getName());
@@ -859,7 +868,8 @@ public class CostTimeAgreementService extends UserBaseService {
         } else {
             Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId);
             if (!cta.isPresent()) {
-                throw new DataNotFoundByIdException("cta not found " + ctaId);
+                exceptionService.dataNotFoundByIdException("message.cta.id.notFound",ctaId);
+
             }
             CostTimeAgreement costTimeAgreement=cta.get();
             costTimeAgreement.setDeleted(true);
