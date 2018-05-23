@@ -3,7 +3,7 @@ package com.kairos.response.dto.web.open_shift;
 import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
 
-public class OpenShiftIntervalDTO {
+public class OpenShiftIntervalDTO{
     private BigInteger id;
     private int from;
     private int to;
@@ -49,4 +49,5 @@ public class OpenShiftIntervalDTO {
     public boolean isValid() {
         return (this.from>this.to)?false:true;
     }
+
 }
