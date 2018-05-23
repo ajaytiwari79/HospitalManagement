@@ -9,6 +9,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -22,20 +23,23 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
     public Map<String, List<ResponsibilityType>> createResponsibilityType(List<ResponsibilityType> rsponsibilityTypes) {
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-        List<ResponsibilityType> existing= new ArrayList<>();
-        List<ResponsibilityType> newResponsibilityTypes= new ArrayList<>();
+        List<ResponsibilityType> existing = new ArrayList<>();
+        List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
         if (rsponsibilityTypes.size() != 0) {
             for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
+                if (!StringUtils.isBlank(responsibilityType.getName())) {
+                    ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(responsibilityType.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(responsibilityType.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
+                    } else {
+                        ResponsibilityType newResponsibilityType = new ResponsibilityType();
+                        newResponsibilityType.setName(responsibilityType.getName());
+                        newResponsibilityTypes.add(save(newResponsibilityType));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
 
-                } else {
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType();
-                    newResponsibilityType.setName(responsibilityType.getName());
-                    newResponsibilityTypes.add(save(newResponsibilityType));
-                }
             }
 
             result.put("existing", existing);
@@ -98,8 +102,6 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-
-
     public ResponsibilityType getResponsibilityTypeByName(String name) {
 
 
@@ -109,17 +111,10 @@ public class ResponsibilityTypeService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
-
-
 
 
 }

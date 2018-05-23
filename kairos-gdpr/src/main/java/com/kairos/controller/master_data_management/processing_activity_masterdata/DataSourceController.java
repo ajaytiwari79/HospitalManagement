@@ -56,7 +56,7 @@ public class DataSourceController {
     }
 
     @ApiOperation("get dataSource by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getDataSourceByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(name));
 

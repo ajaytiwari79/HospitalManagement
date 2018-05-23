@@ -22,20 +22,21 @@ public class StorageTypeService extends MongoBaseService {
 
     public Map<String, List<StorageType>> createStorageType(List<StorageType> storageTypes) {
         Map<String, List<StorageType>> result = new HashMap<>();
-        List<StorageType> existing= new ArrayList<>();
+        List<StorageType> existing = new ArrayList<>();
         List<StorageType> newStorageTypes = new ArrayList<>();
         if (storageTypes.size() != 0) {
             for (StorageType storageType : storageTypes) {
-
-                StorageType exist = storageTypeMongoRepository.findByName(storageType.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    StorageType newStorageType = new StorageType();
-                    newStorageType.setName(storageType.getName());
-                    newStorageTypes.add(save(newStorageType));
-                }
+                if (!StringUtils.isBlank(storageType.getName())) {
+                    StorageType exist = storageTypeMongoRepository.findByName(storageType.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
+                    } else {
+                        StorageType newStorageType = new StorageType();
+                        newStorageType.setName(storageType.getName());
+                        newStorageTypes.add(save(newStorageType));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -95,9 +96,6 @@ public class StorageTypeService extends MongoBaseService {
     }
 
 
-
-
-
     public StorageType getStorageTypeByName(String name) {
 
 
@@ -107,17 +105,10 @@ public class StorageTypeService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
-
-
 
 
 }

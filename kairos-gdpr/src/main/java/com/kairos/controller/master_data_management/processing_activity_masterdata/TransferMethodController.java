@@ -54,7 +54,7 @@ public class TransferMethodController {
     }
 
     @ApiOperation("get transfer Method by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getResponsibilityTypeByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodService.getTransferMethodByName(name));
 

@@ -13,6 +13,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
@@ -45,7 +46,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (masterProcessingActivityRepository.findByName(masterProcessingActivityDto.getName()) != null) {
             throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
         }
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -101,7 +102,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         }
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds,orgSubTypeIds,orgServiceIds,orgSubServiceIds);
+        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -152,7 +153,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         } else
             exists.setDeleted(true);
-           save(exists);
+        save(exists);
         return true;
 
     }

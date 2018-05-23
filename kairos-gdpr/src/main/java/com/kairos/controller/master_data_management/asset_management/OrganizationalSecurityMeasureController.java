@@ -59,7 +59,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get Organizational Security Measure by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(name));
 

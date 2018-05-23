@@ -9,6 +9,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -22,20 +23,23 @@ public class DestinationService extends MongoBaseService {
 
     public Map<String, List<Destination>> createDestination(List<Destination> destinations) {
         Map<String, List<Destination>> result = new HashMap<>();
-        List<Destination> existing= new ArrayList<>();
-        List<Destination> newDestinations= new ArrayList<>();
+        List<Destination> existing = new ArrayList<>();
+        List<Destination> newDestinations = new ArrayList<>();
         if (destinations.size() != 0) {
             for (Destination destination : destinations) {
+                if (!StringUtils.isBlank(destination.getName())) {
+                    Destination exist = destinationMongoRepository.findByName(destination.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                Destination exist = destinationMongoRepository.findByName(destination.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
+                    } else {
+                        Destination newDestination = new Destination();
+                        newDestination.setName(destination.getName());
+                        newDestinations.add(save(newDestination));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
 
-                } else {
-                    Destination newDestination = new Destination();
-                    newDestination.setName(destination.getName());
-                    newDestinations.add(save(newDestination));
-                }
             }
 
             result.put("existing", existing);
@@ -107,14 +111,10 @@ public class DestinationService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
 
 
 }

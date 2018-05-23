@@ -55,7 +55,7 @@ public class HostingProviderController {
     }
 
     @ApiOperation("get all HostingProvider ")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getHostingProviderByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(name));
 

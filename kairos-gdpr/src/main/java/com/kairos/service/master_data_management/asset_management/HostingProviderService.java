@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data_management.asset_management
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -24,20 +25,22 @@ public class HostingProviderService extends MongoBaseService {
 
     public Map<String, List<HostingProvider>> createHostingProviders(List<HostingProvider> hostingProviders) {
         Map<String, List<HostingProvider>> result = new HashMap<>();
-        List<HostingProvider> existing= new ArrayList<>();
-        List<HostingProvider> newhostingProviders= new ArrayList<>();
+        List<HostingProvider> existing = new ArrayList<>();
+        List<HostingProvider> newhostingProviders = new ArrayList<>();
         if (hostingProviders.size() != 0) {
             for (HostingProvider hostingProvider : hostingProviders) {
+                if (!StringUtils.isBlank(hostingProvider.getName())) {
+                    HostingProvider exist = hostingProviderMongoRepository.findByName(hostingProvider.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                HostingProvider exist = hostingProviderMongoRepository.findByName(hostingProvider.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    HostingProvider newHostingProvider = new HostingProvider();
-                    newHostingProvider.setName(hostingProvider.getName());
-                    newhostingProviders.add(save(newHostingProvider));
-                }
+                    } else {
+                        HostingProvider newHostingProvider = new HostingProvider();
+                        newHostingProvider.setName(hostingProvider.getName());
+                        newhostingProviders.add(save(newHostingProvider));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -99,8 +102,6 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-
-
     public HostingProvider getHostingProviderByName(String name) {
 
 
@@ -110,16 +111,10 @@ public class HostingProviderService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
-
 
 
 }

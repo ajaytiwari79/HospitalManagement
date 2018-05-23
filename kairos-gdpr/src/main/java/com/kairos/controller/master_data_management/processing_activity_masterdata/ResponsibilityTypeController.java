@@ -52,7 +52,7 @@ public class ResponsibilityTypeController {
     }
 
     @ApiOperation("get ResponsibilityType by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getResponsibilityTypeByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(name));
 

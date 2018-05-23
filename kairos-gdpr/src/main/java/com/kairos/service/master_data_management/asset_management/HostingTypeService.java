@@ -23,20 +23,22 @@ public class HostingTypeService extends MongoBaseService {
 
     public Map<String, List<HostingType>> createHostingType(List<HostingType> hostingTypes) {
         Map<String, List<HostingType>> result = new HashMap<>();
-        List<HostingType> existing= new ArrayList<>();
-        List<HostingType> newHostingTypes= new ArrayList<>();
+        List<HostingType> existing = new ArrayList<>();
+        List<HostingType> newHostingTypes = new ArrayList<>();
         if (hostingTypes.size() != 0) {
             for (HostingType hostingType : hostingTypes) {
+                if (!StringUtils.isBlank(hostingType.getName())) {
+                    HostingType exist = hostingTypeMongoRepository.findByName(hostingType.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                HostingType exist = hostingTypeMongoRepository.findByName(hostingType.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    HostingType newHostingType = new HostingType();
-                    newHostingType.setName(hostingType.getName());
-                    newHostingTypes.add(save(newHostingType));
-                }
+                    } else {
+                        HostingType newHostingType = new HostingType();
+                        newHostingType.setName(hostingType.getName());
+                        newHostingTypes.add(save(newHostingType));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -107,14 +109,10 @@ public class HostingTypeService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
 
 
 }

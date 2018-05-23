@@ -52,7 +52,7 @@ public class TechnicalSecurityController {
     }
 
     @ApiOperation("get TechnicalSecurityMeasure by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName(name));
 

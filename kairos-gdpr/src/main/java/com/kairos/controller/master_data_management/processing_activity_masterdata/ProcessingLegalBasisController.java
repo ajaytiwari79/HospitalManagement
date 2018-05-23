@@ -53,7 +53,7 @@ public class ProcessingLegalBasisController {
     }
 
     @ApiOperation("get ProcessingLegalBasis by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getProcessingLegalBasisByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(name));
 

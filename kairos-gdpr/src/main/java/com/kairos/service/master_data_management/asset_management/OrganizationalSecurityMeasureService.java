@@ -23,20 +23,22 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
         Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
-        List<OrganizationalSecurityMeasure> existing= new ArrayList<>();
+        List<OrganizationalSecurityMeasure> existing = new ArrayList<>();
         List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
         if (orgSecurityMeasures.size() != 0) {
             for (OrganizationalSecurityMeasure securityMeasure : orgSecurityMeasures) {
+                if (!StringUtils.isBlank(securityMeasure.getName())) {
+                    OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(securityMeasure.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(securityMeasure.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    OrganizationalSecurityMeasure newSecurityMeasure = new OrganizationalSecurityMeasure();
-                    newSecurityMeasure.setName(securityMeasure.getName());
-                    newOrgSecurityMeasures.add(save(newSecurityMeasure));
-                }
+                    } else {
+                        OrganizationalSecurityMeasure newSecurityMeasure = new OrganizationalSecurityMeasure();
+                        newSecurityMeasure.setName(securityMeasure.getName());
+                        newOrgSecurityMeasures.add(save(newSecurityMeasure));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -76,8 +78,8 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-           exist.setDeleted(true);
-           save(exist);
+            exist.setDeleted(true);
+            save(exist);
             return true;
 
         }
@@ -97,10 +99,6 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-
-
-
-
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(String name) {
 
 
@@ -110,16 +108,10 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
-
 
 
 }

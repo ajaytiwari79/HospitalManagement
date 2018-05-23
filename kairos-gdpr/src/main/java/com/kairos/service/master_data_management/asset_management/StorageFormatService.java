@@ -23,20 +23,22 @@ public class StorageFormatService extends MongoBaseService {
 
     public Map<String, List<StorageFormat>> createStorageFormat(List<StorageFormat> storageFormats) {
         Map<String, List<StorageFormat>> result = new HashMap<>();
-        List<StorageFormat> existing= new ArrayList<>();
+        List<StorageFormat> existing = new ArrayList<>();
         List<StorageFormat> newStorageFormats = new ArrayList<>();
         if (storageFormats.size() != 0) {
             for (StorageFormat storageFormat : storageFormats) {
+                if (!StringUtils.isBlank(storageFormat.getName())) {
+                    StorageFormat exist = storageFormatMongoRepository.findByName(storageFormat.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                StorageFormat exist = storageFormatMongoRepository.findByName(storageFormat.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    StorageFormat newStorageFormat = new StorageFormat();
-                    newStorageFormat.setName(storageFormat.getName());
-                    newStorageFormats.add(save(newStorageFormat));
-                }
+                    } else {
+                        StorageFormat newStorageFormat = new StorageFormat();
+                        newStorageFormat.setName(storageFormat.getName());
+                        newStorageFormats.add(save(newStorageFormat));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -98,8 +100,6 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-
-
     public StorageFormat getStorageFormatByName(String name) {
 
 
@@ -109,23 +109,10 @@ public class StorageFormatService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

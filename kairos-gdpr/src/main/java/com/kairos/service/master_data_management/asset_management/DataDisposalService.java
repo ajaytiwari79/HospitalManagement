@@ -9,15 +9,13 @@ import com.kairos.persistance.repository.master_data_management.asset_management
 import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
 @Service
 public class DataDisposalService extends MongoBaseService {
-
-
-
 
 
     @Inject
@@ -31,15 +29,18 @@ public class DataDisposalService extends MongoBaseService {
         if (dataDisposals.size() != 0) {
             for (DataDisposal dataDisposal : dataDisposals) {
 
-                DataDisposal exist = dataDisposalMongoRepository.findByName(dataDisposal.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existTechnicalMeasure.add(exist);
+                if (!StringUtils.isBlank(dataDisposal.getName())) {
+                    DataDisposal exist = dataDisposalMongoRepository.findByName(dataDisposal.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existTechnicalMeasure.add(exist);
 
-                } else {
-                    DataDisposal newDataDisposal= new DataDisposal();
-                    newDataDisposal.setName(dataDisposal.getName());
-                    newDataDisposals.add(save(newDataDisposal));
-                }
+                    } else {
+                        DataDisposal newDataDisposal = new DataDisposal();
+                        newDataDisposal.setName(dataDisposal.getName());
+                        newDataDisposals.add(save(newDataDisposal));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existTechnicalMeasure);
@@ -50,6 +51,7 @@ public class DataDisposalService extends MongoBaseService {
 
 
     }
+
     public List<DataDisposal> getAllDataDisposal() {
         List<DataDisposal> result = dataDisposalMongoRepository.findAllDataDisposals();
         if (result.size() != 0) {
@@ -100,7 +102,6 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-
     public DataDisposal getDataDisposalByName(String name) {
 
 
@@ -110,15 +111,10 @@ public class DataDisposalService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
 
 
 }

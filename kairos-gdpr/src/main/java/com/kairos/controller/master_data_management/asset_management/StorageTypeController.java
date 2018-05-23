@@ -54,7 +54,7 @@ public class StorageTypeController {
 
 
     @ApiOperation("get StorageType by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getStorageTypeByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(name));
 

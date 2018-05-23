@@ -56,7 +56,7 @@ public class ProcessingPurposeController {
     }
 
     @ApiOperation("get ProcessingPurpose by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getProcessingPurposeByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(name));
 

@@ -53,7 +53,7 @@ public class DataDisposalController {
     }
 
     @ApiOperation("get DataDisposal by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getDataDisposalByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(name));
 

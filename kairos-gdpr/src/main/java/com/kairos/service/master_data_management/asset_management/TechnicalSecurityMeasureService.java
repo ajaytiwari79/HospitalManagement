@@ -27,16 +27,18 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
         if (techSecurityMeasures.size() != 0) {
             for (TechnicalSecurityMeasure technicalSecurityMeasure : techSecurityMeasures) {
+                if (!StringUtils.isBlank(technicalSecurityMeasure.getName())) {
+                    TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(technicalSecurityMeasure.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(technicalSecurityMeasure.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    TechnicalSecurityMeasure newTechnicalMeasure = new TechnicalSecurityMeasure();
-                    newTechnicalMeasure.setName(technicalSecurityMeasure.getName());
-                    newTechnicalMeasures.add(save(newTechnicalMeasure));
-                }
+                    } else {
+                        TechnicalSecurityMeasure newTechnicalMeasure = new TechnicalSecurityMeasure();
+                        newTechnicalMeasure.setName(technicalSecurityMeasure.getName());
+                        newTechnicalMeasures.add(save(newTechnicalMeasure));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -106,20 +108,10 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
-
-
-
-
-
-
 
 
 }

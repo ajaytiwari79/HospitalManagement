@@ -9,6 +9,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -23,20 +24,22 @@ public class DataSubjectService extends MongoBaseService {
 
     public Map<String, List<DataSubject>> createDataSubject(List<DataSubject> dataSubjects) {
         Map<String, List<DataSubject>> result = new HashMap<>();
-        List<DataSubject> existing= new ArrayList<>();
-        List<DataSubject> newDataSubjects= new ArrayList<>();
+        List<DataSubject> existing = new ArrayList<>();
+        List<DataSubject> newDataSubjects = new ArrayList<>();
         if (dataSubjects.size() != 0) {
             for (DataSubject dataSubject : dataSubjects) {
+                if (!StringUtils.isBlank(dataSubject.getName())) {
+                    DataSubject exist = dataSubjectMongoRepository.findByName(dataSubject.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                DataSubject exist = dataSubjectMongoRepository.findByName(dataSubject.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    DataSubject newDataSubject = new DataSubject();
-                    newDataSubject.setName(dataSubject.getName());
-                    newDataSubjects.add(save(newDataSubject));
-                }
+                    } else {
+                        DataSubject newDataSubject = new DataSubject();
+                        newDataSubject.setName(dataSubject.getName());
+                        newDataSubjects.add(save(newDataSubject));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -100,9 +103,8 @@ public class DataSubjectService extends MongoBaseService {
 
     public List<DataSubject> getDataSubjectList(List<BigInteger> ids) {
 
-       return dataSubjectMongoRepository.getDataSubjectList(ids);
+        return dataSubjectMongoRepository.getDataSubjectList(ids);
     }
-
 
 
     public DataSubject getDataSubjectByName(String name) {
@@ -114,13 +116,12 @@ public class DataSubjectService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-    
-    
+
+
 }
 
 

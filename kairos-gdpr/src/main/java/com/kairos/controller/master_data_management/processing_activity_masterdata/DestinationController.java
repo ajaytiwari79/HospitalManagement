@@ -51,7 +51,7 @@ public class DestinationController {
     }
 
     @ApiOperation("get Destination by name")
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<Object> getDestinationByName(@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(name));
 

@@ -23,20 +23,24 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
     public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(List<ProcessingLegalBasis> legalBases) {
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
-        List<ProcessingLegalBasis> existing= new ArrayList<>();
-        List<ProcessingLegalBasis> newProcessingLegalBasiss= new ArrayList<>();
+        List<ProcessingLegalBasis> existing = new ArrayList<>();
+        List<ProcessingLegalBasis> newProcessingLegalBasiss = new ArrayList<>();
         if (legalBases.size() != 0) {
             for (ProcessingLegalBasis legalBasis : legalBases) {
+                if (!StringUtils.isBlank(legalBasis.getName())) {
 
-                ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(legalBasis.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
+                    ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(legalBasis.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                } else {
-                    ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis();
-                    newProcessingLegalBasis.setName(legalBasis.getName());
-                    newProcessingLegalBasiss.add(save(newProcessingLegalBasis));
-                }
+                    } else {
+                        ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis();
+                        newProcessingLegalBasis.setName(legalBasis.getName());
+                        newProcessingLegalBasiss.add(save(newProcessingLegalBasis));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
+
             }
 
             result.put("existing", existing);
@@ -108,14 +112,10 @@ public class ProcessingLegalBasisService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
-
 
 
 }

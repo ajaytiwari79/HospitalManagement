@@ -9,6 +9,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -27,16 +28,18 @@ public class DataSourceService extends MongoBaseService {
         List<DataSource> newDataSources = new ArrayList<>();
         if (dataSources.size() != 0) {
             for (DataSource dataSource : dataSources) {
+                if (!StringUtils.isBlank(dataSource.getName())) {
+                    DataSource exist = dataSourceMongoRepository.findByName(dataSource.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                DataSource exist = dataSourceMongoRepository.findByName(dataSource.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
-
-                } else {
-                    DataSource newDataSource = new DataSource();
-                    newDataSource.setName(dataSource.getName());
-                    newDataSources.add(save(newDataSource));
-                }
+                    } else {
+                        DataSource newDataSource = new DataSource();
+                        newDataSource.setName(dataSource.getName());
+                        newDataSources.add(save(newDataSource));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
             }
 
             result.put("existing", existing);
@@ -108,8 +111,7 @@ public class DataSourceService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }

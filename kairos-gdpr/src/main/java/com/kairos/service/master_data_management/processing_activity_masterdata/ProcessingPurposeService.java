@@ -25,20 +25,24 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(List<ProcessingPurpose> processingPurposes) {
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
-        List<ProcessingPurpose> existing= new ArrayList<>();
-        List<ProcessingPurpose> newProcessingPurposes= new ArrayList<>();
+        List<ProcessingPurpose> existing = new ArrayList<>();
+        List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
         if (processingPurposes.size() != 0) {
             for (ProcessingPurpose processingPurpose : processingPurposes) {
+                if (!StringUtils.isBlank(processingPurpose.getName())) {
 
-                ProcessingPurpose exist = processingPurposeMongoRepository.findByName(processingPurpose.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
+                    ProcessingPurpose exist = processingPurposeMongoRepository.findByName(processingPurpose.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                } else {
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
-                    newProcessingPurpose.setName(processingPurpose.getName());
-                    newProcessingPurposes.add(save(newProcessingPurpose));
-                }
+                    } else {
+                        ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
+                        newProcessingPurpose.setName(processingPurpose.getName());
+                        newProcessingPurposes.add(save(newProcessingPurpose));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
+
             }
 
             result.put("existing", existing);
@@ -101,8 +105,6 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-
-
     public ProcessingPurpose getProcessingPurposeByName(String name) {
 
 
@@ -112,19 +114,15 @@ public class ProcessingPurposeService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 
 
-
-
     public List<ProcessingPurpose> geProcessingPurposeList(List<BigInteger> ids) {
         return processingPurposeMongoRepository.getProcessingPurposeList(ids);
     }
-
 
 
 }

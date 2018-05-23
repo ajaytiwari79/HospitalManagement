@@ -36,8 +36,8 @@ public class AccountTypeController {
     }
 
     @ApiOperation(value ="account type by name" )
-    @GetMapping("/typeOfAccount/{typeOfAccount}")
-    public ResponseEntity<Object> getAccount(@PathVariable String typeOfAccount) {
+    @GetMapping("/")
+    public ResponseEntity<Object> getAccount(@RequestParam String typeOfAccount) {
         if (StringUtils.isBlank(typeOfAccount)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");
         }

@@ -99,7 +99,7 @@ public class ClauseController {
 
 
 
-    @ApiOperation("")
+    @ApiOperation("get specific version of clause")
     @GetMapping("/{id}/version")
     public ResponseEntity<Object> getClauseVersion(@PathVariable BigInteger id, @RequestParam String version) throws RepositoryException {
         if (id!=null) {
@@ -108,7 +108,7 @@ public class ClauseController {
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
     }
 
-    @ApiOperation("")
+    @ApiOperation("all version")
     @GetMapping("/{id}/versions")
     public ResponseEntity<Object> getAllClauseVersion(@PathVariable BigInteger id) throws RepositoryException {
         if (id!=null) {

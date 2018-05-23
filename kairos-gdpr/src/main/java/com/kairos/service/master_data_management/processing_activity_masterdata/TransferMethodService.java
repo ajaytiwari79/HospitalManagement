@@ -9,6 +9,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -23,20 +24,23 @@ public class TransferMethodService extends MongoBaseService {
 
     public Map<String, List<TransferMethod>> createTransferMethod(List<TransferMethod> transferMethods) {
         Map<String, List<TransferMethod>> result = new HashMap<>();
-        List<TransferMethod> existing= new ArrayList<>();
-        List<TransferMethod> newTransferMethods= new ArrayList<>();
+        List<TransferMethod> existing = new ArrayList<>();
+        List<TransferMethod> newTransferMethods = new ArrayList<>();
         if (transferMethods.size() != 0) {
             for (TransferMethod transferMethod : transferMethods) {
+                if (!StringUtils.isBlank(transferMethod.getName())) {
+                    TransferMethod exist = transferMethodMongoRepository.findByName(transferMethod.getName());
+                    if (Optional.ofNullable(exist).isPresent()) {
+                        existing.add(exist);
 
-                TransferMethod exist = transferMethodMongoRepository.findByName(transferMethod.getName());
-                if (Optional.ofNullable(exist).isPresent()) {
-                    existing.add(exist);
+                    } else {
+                        TransferMethod newTransferMethod = new TransferMethod();
+                        newTransferMethod.setName(transferMethod.getName());
+                        newTransferMethods.add(save(newTransferMethod));
+                    }
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
 
-                } else {
-                    TransferMethod newTransferMethod = new TransferMethod();
-                    newTransferMethod.setName(transferMethod.getName());
-                    newTransferMethods.add(save(newTransferMethod));
-                }
             }
 
             result.put("existing", existing);
@@ -99,9 +103,6 @@ public class TransferMethodService extends MongoBaseService {
     }
 
 
-
-
-
     public TransferMethod getTransferMethodByName(String name) {
 
 
@@ -111,13 +112,10 @@ public class TransferMethodService extends MongoBaseService {
                 throw new DataNotExists("data not exist for name " + name);
             }
             return exist;
-        }
-        else
+        } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
 
 
 }
