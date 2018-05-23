@@ -29,6 +29,7 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -44,6 +45,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
@@ -213,6 +215,8 @@ public class OrganizationService extends UserBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     CompanyCategoryGraphRepository companyCategoryGraphRepository;
+    @Inject
+    private UnitPositionGraphRepository unitPositionGraphRepository;
 
 
     public Organization getOrganizationById(long id) {
@@ -1566,7 +1570,6 @@ public class OrganizationService extends UserBaseService {
                wtaBasicDetailsDTO.setOrganizations(organizationDTOS);
            }
         }
-
         return wtaBasicDetailsDTO;
     }
 
@@ -1578,9 +1581,11 @@ public class OrganizationService extends UserBaseService {
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
     }
 
-    public Object initialOptaplannerSync(Long organisationId, Long unitId) {
+    public Object initialOptaplannerSync(Long organizationId, Long unitId) {
         List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
-        plannerSyncService.publishStaff(unitId,staff,IntegrationOperation.CREATE);
+        plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
+        List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(organizationId);
+        plannerSyncService.publishAllUnitPositions(organizationId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
         phaseRestClient.initialOptaplannerSync(unitId);
         return null;
     }
