@@ -751,5 +751,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  where id(country)={0} return id(union) as id, union.name as name")
     List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
 
+    @Query("MATCH (org:Organization) where org.desiredUrl={0}\n" +
+            "RETURN case when count(org)>0 THEN  true ELSE false END as response")
+    Boolean checkOrgExistWithUrl(String desiredUrl);
+
 
 }

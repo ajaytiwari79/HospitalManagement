@@ -294,6 +294,11 @@ public class OrganizationService extends UserBaseService {
 
         OrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
+        Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
+        if(orgExistWithUrl){
+            exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate",orgDetails.getDesiredUrl());
+        }
+
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             throw new InternalError("Country not found");

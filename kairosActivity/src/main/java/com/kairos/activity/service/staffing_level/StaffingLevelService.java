@@ -388,8 +388,8 @@ public class StaffingLevelService extends MongoBaseService {
     public Map<String, Object> getActivityTypesAndSkillsByUnitId(Long unitId) {
         OrganizationSkillAndOrganizationTypesDTO organizationSkillAndOrganizationTypesDTO =
                 organizationRestClient.getOrganizationSkillOrganizationSubTypeByUnitId(unitId);
-        logger.info("organization type and subtypes {},{}", organizationSkillAndOrganizationTypesDTO.getOrganizationTypeAndSubTypeDTO().getOrganizationSubTypes()
-                , organizationSkillAndOrganizationTypesDTO.getOrganizationTypeAndSubTypeDTO().getOrganizationTypes());
+        /*logger.info("organization type and subtypes {},{}", organizationSkillAndOrganizationTypesDTO.getOrganizationTypeAndSubTypeDTO().getOrganizationSubTypes()
+                , organizationSkillAndOrganizationTypesDTO.getOrganizationTypeAndSubTypeDTO().getOrganizationTypes());*/
         List<ActivityTagDTO> activityTypeList = activityMongoRepository.findAllActivityByOrganizationGroupWithCategoryName(unitId, false);
 
         Map<ActivityCategory, List<ActivityTagDTO>> activityTypeCategoryListMap = activityTypeList.stream().collect(
