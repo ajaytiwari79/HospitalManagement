@@ -577,6 +577,7 @@ public class OrganizationService extends UserBaseService {
         contactAddressDTO.setLongitude(contactAddress.getLongitude());
         contactAddressDTO.setZipCodeValue(contactAddress.getZipCode().getZipCode());
         contactAddressDTO.setMunicipalityName(contactAddress.getMunicipality().getName());
+        contactAddressDTO.setMunicipalityId(contactAddress.getMunicipality().getId());
         return contactAddressDTO;
 
 
