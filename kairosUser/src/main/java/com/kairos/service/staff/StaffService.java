@@ -13,7 +13,6 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
@@ -32,7 +31,6 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -160,8 +158,6 @@ public class StaffService extends UserBaseService {
     private OrganizationService organizationService;
     @Autowired
     private UnitPositionGraphRepository unitPositionGraphRepository;
-    @Autowired
-    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
     @Inject
@@ -174,7 +170,8 @@ public class StaffService extends UserBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     private ExceptionService exceptionService;
-    public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
+
+  public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             return null;
@@ -245,6 +242,17 @@ public class StaffService extends UserBaseService {
             Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
             StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(id, objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate);
             staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
+            boolean isSeniorityLevelMatched=false;
+            for(SeniorityLevel seniorityLevel:expertise.getSeniorityLevel()){
+                if(staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()>seniorityLevel.getFrom()*12 &&
+                        (seniorityLevel.getTo()==null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()<seniorityLevel.getTo()*12)){
+                    isSeniorityLevelMatched=true;
+                    break;
+                }
+            }
+            if(!isSeniorityLevelMatched){
+                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound","seniorityLevel "+staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+            }
 
             staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
             staffPersonalDetail.getExpertiseWithExperience().get(i).setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertise.getSeniorityLevel(),
@@ -270,7 +278,6 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setCapacity(staffPersonalDetail.getCapacity());
         objectToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
         staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
-
 
         if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
             objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
@@ -1589,8 +1596,8 @@ public class StaffService extends UserBaseService {
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
 
-            WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
-            staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
+            //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
+            //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
 
         if (activityDayTypes != null && !activityDayTypes.isEmpty()) {
