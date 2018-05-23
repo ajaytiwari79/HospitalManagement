@@ -19,6 +19,7 @@ import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.persistence.model.user.country.Day;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
+import sun.awt.AppContext;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;

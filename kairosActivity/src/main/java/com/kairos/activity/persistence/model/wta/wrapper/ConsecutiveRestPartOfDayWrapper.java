@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getSortedDates;
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isNightShift;
+
 
 /**
  * @author pradeep
