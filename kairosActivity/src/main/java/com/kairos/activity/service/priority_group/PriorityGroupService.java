@@ -121,4 +121,10 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroup getPriorityGroupOfUnitById(Long unitId, BigInteger priorityGroupId){
         return priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId,unitId);
     }
+
+    public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId) {
+        return priorityGroupRepository.findByUnitIdAndDeletedFalse(unitId);
+    }
+
+
 }

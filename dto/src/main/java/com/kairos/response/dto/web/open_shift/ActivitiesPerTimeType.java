@@ -1,7 +1,4 @@
-package com.kairos.activity.persistence.model.open_shift;
-
-import com.kairos.activity.persistence.model.activity.Activity;
-import com.kairos.activity.persistence.model.activity.TimeType;
+package com.kairos.response.dto.web.open_shift;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -9,7 +6,8 @@ import java.util.List;
 public class ActivitiesPerTimeType {
     private BigInteger timeTypeId;
     private String timeTypeName;
-    private List<Activity> selectedActivities;
+    private List<BigInteger> selectedActivities;
+    private boolean selected;
 
     public ActivitiesPerTimeType() {
         //Default Constructor
@@ -31,11 +29,19 @@ public class ActivitiesPerTimeType {
         this.timeTypeName = timeTypeName;
     }
 
-    public List<Activity> getSelectedActivities() {
+    public List<BigInteger> getSelectedActivities() {
         return selectedActivities;
     }
 
-    public void setSelectedActivities(List<Activity> selectedActivities) {
+    public void setSelectedActivities(List<BigInteger> selectedActivities) {
         this.selectedActivities = selectedActivities;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

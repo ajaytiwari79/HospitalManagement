@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.open_shift;
 
 import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
+import com.kairos.response.dto.web.open_shift.ActivitiesPerTimeType;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -27,6 +28,7 @@ public class OpenShiftRuleTemplateDTO {
     private boolean singeLongerShift;
     private Integer minimumShiftHours;
     private Integer maximumShiftHours;
+    private List<BigInteger> priorityGroupIds;
 
 
     public OpenShiftRuleTemplateDTO() {
@@ -201,5 +203,13 @@ public class OpenShiftRuleTemplateDTO {
 
     public void setMaximumShiftHours(Integer maximumShiftHours) {
         this.maximumShiftHours = maximumShiftHours;
+    }
+
+    public List<BigInteger> getPriorityGroupIds() {
+        return priorityGroupIds;
+    }
+
+    public void setPriorityGroupIds(List<BigInteger> priorityGroupIds) {
+        this.priorityGroupIds = priorityGroupIds;
     }
 }

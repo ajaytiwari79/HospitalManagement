@@ -92,4 +92,12 @@ public class OpenShiftRuleTemplateController {
     public ResponseEntity<Map<String, Object>> getRuleTemplateById(@PathVariable Long unitId,@PathVariable BigInteger ruleTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.getRuleTemplateByIdAndUnitId(ruleTemplateId,unitId));
     }
+
+    @ApiOperation("Get  Rule templates by ActivityId")
+    @GetMapping(value = UNIT_URL+"/rule_template/activity/{activityId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> findByUnitIdAndActivityId(@PathVariable Long unitId,@PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.findByUnitIdAndActivityId(activityId,unitId));
+    }
+
 }

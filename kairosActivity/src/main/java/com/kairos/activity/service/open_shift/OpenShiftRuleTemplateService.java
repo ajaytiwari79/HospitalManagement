@@ -98,4 +98,8 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         return  openShiftRuleTemplateRepository.findByIdAndCountryIdAndDeletedFalse(ruleTemplateId,countryId);
     }
 
+    public List<OpenShiftRuleTemplateDTO> findByUnitIdAndActivityId(BigInteger activityId,Long unitId){
+       return openShiftRuleTemplateRepository.findByUnitIdAndActivityId(activityId,unitId);
+    }
+
 }
