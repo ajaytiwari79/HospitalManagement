@@ -5,6 +5,7 @@ import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,7 @@ public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
     private List<DayType> dayTypes= new ArrayList<>();
-    private boolean staffGroup;
-    private boolean managementGroup;
+    private UserAccessRoleDTO staffAccessRole;
 
     public PhaseActivityDTO() {
         //Default Constructor
@@ -58,19 +58,11 @@ public class PhaseActivityDTO {
         this.dayTypes = dayTypes;
     }
 
-    public boolean isStaffGroup() {
-        return staffGroup;
+    public UserAccessRoleDTO getStaffAccessRole() {
+        return staffAccessRole;
     }
 
-    public void setStaffGroup(boolean staffGroup) {
-        this.staffGroup = staffGroup;
-    }
-
-    public boolean isManagementGroup() {
-        return managementGroup;
-    }
-
-    public void setManagementGroup(boolean managementGroup) {
-        this.managementGroup = managementGroup;
+    public void setStaffAccessRole(UserAccessRoleDTO staffAccessRole) {
+        this.staffAccessRole = staffAccessRole;
     }
 }

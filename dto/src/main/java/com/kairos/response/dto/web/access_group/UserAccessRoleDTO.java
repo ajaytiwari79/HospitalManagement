@@ -3,18 +3,18 @@ package com.kairos.response.dto.web.access_group;
 public class UserAccessRoleDTO {
     private Long userId;
     private Long unitId;
-    private Boolean staffGroup;
-    private Boolean managementGroup;
+    private Boolean staff;
+    private Boolean management;
 
     public UserAccessRoleDTO(){
         // default constructor
     }
 
-    public UserAccessRoleDTO(Long userId, Long unitId, Boolean staffGroup, Boolean managementGroup){
+    public UserAccessRoleDTO(Long userId, Long unitId, Boolean staff, Boolean management){
         this.userId = userId;
         this.unitId = unitId;
-        this.staffGroup = staffGroup;
-        this.managementGroup = managementGroup;
+        this.staff = staff;
+        this.management = management;
     }
 
     public Long getUserId() {
@@ -33,19 +33,19 @@ public class UserAccessRoleDTO {
         this.unitId = unitId;
     }
 
-    public Boolean getStaffGroup() {
-        return staffGroup;
+    public Boolean getStaff() {
+        return staff;
     }
 
-    public void setStaffGroup(Boolean staffGroup) {
-        this.staffGroup = staffGroup;
+    public void setStaff(Boolean staff) {
+        this.staff = staff;
     }
 
-    public Boolean getManagementGroup() {
-        return managementGroup;
+    public Boolean getManagement() {
+        return management;
     }
 
-    public void setManagementGroup(Boolean managementGroup) {
-        this.managementGroup = managementGroup;
+    public void setManagement(Boolean management) {
+        this.management = management;
     }
 }

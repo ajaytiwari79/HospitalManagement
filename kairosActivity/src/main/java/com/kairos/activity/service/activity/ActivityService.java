@@ -659,9 +659,9 @@ public class ActivityService extends MongoBaseService {
 //        List<PhaseDTO> phaseDTOs = phaseService.getPhasesByCountryId(countryId);
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePhasesByOrganizationId(unitId);
 
-        UserAccessRoleDTO userAccessRoleDTO = staffRestClient.getAccessOfCurrentLoggedInStaff();
-        phaseActivityDTO.setStaffGroup(userAccessRoleDTO.getStaffGroup());
-        phaseActivityDTO.setManagementGroup(userAccessRoleDTO.getManagementGroup());
+        // Set access Role of staff
+        phaseActivityDTO.setStaffAccessRole(staffRestClient.getAccessOfCurrentLoggedInStaff());
+
         phaseActivityDTO.setApplicablePhases(phaseDTOs);
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
