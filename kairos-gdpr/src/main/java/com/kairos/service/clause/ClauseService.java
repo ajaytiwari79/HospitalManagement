@@ -1,8 +1,8 @@
 package com.kairos.service.clause;
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
+import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
+import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.DataNotExists;
@@ -12,7 +12,6 @@ import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.ClauseDto;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
@@ -23,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

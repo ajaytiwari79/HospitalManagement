@@ -2,8 +2,8 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
+import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
+import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
@@ -11,7 +11,6 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.dto.PolicyAgreementTemplateDto;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;

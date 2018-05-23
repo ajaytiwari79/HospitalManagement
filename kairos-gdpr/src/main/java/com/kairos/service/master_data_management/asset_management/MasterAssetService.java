@@ -2,8 +2,8 @@ package com.kairos.service.master_data_management.asset_management;
 
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
+import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
+import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.*;
 import com.kairos.dto.MasterAssetDto;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;

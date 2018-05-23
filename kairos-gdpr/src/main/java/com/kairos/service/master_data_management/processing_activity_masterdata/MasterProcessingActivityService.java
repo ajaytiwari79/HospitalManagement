@@ -1,8 +1,8 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.dto.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.dto.OrganizationTypeAndServiceResultDto;
+import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
+import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
