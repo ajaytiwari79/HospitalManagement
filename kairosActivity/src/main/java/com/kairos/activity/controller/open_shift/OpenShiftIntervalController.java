@@ -25,28 +25,28 @@ public class OpenShiftIntervalController {
     @ApiOperation("Create Interval")
     @PostMapping(value = "/interval")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createActivity(@PathVariable Long countryId, @RequestBody @Valid OpenShiftIntervalDTO openShiftIntervalDTO) {
+    public ResponseEntity<Map<String, Object>> createInterval(@PathVariable Long countryId, @RequestBody @Valid OpenShiftIntervalDTO openShiftIntervalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.createInterval(countryId, openShiftIntervalDTO));
     }
 
     @ApiOperation("Get all Intervals based on countryId")
     @GetMapping(value = "/intervals")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivity(@PathVariable long countryId) {
+    public ResponseEntity<Map<String, Object>> getIntervals(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.getAllIntervalsByCountryId(countryId));
     }
 
     @ApiOperation("Update Interval of Activity")
     @PutMapping(value = "/interval/{openShiftIntervalId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateGeneralTab(@PathVariable Long countryId, @PathVariable BigInteger openShiftIntervalId, @RequestBody OpenShiftIntervalDTO openShiftIntervalDTO) {
+    ResponseEntity<Map<String, Object>> updateInterval(@PathVariable Long countryId, @PathVariable BigInteger openShiftIntervalId, @RequestBody OpenShiftIntervalDTO openShiftIntervalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.updateInterval(countryId,openShiftIntervalId, openShiftIntervalDTO));
     }
 
     @ApiOperation("delete an Interval based on countryId")
     @DeleteMapping(value = "/interval/{openShiftIntervalId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteActivity(@PathVariable Long countryId,@PathVariable BigInteger openShiftIntervalId) {
+    public ResponseEntity<Map<String, Object>> deleteInterval(@PathVariable Long countryId,@PathVariable BigInteger openShiftIntervalId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftIntervalService.deleteOpenShiftInterval(countryId,openShiftIntervalId));
     }
 }
