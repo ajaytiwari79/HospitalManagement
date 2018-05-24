@@ -148,9 +148,10 @@ public class PriorityGroupService extends MongoBaseService {
         return priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId,unitId);
     }
 
-    public List<PriorityGroupDTO> createPriorityGroups(List<PriorityGroupDTO> priorityGroupDTOs) {
+    public List<PriorityGroupDTO> createPriorityGroups(BigInteger orderId,List<PriorityGroupDTO> priorityGroupDTOs) {
         priorityGroupDTOs.forEach(priorityGroupDTO -> {
             priorityGroupDTO.setParentId(priorityGroupDTO.getId());
+            priorityGroupDTO.setOrderId(orderId);
             priorityGroupDTO.setId(null);
         });
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
