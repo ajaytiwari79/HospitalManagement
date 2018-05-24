@@ -71,9 +71,9 @@ public class OrganizationActivityService extends MongoBaseService {
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
         Activity activity = activityMongoRepository.findOne(activityId);
-        List<PhaseDTO> phase=phaseService.getPhasesByUnit(unitId);
+        List<PhaseDTO> phaseDTOList=phaseService.getPhasesByUnit(unitId);
         List<PhaseTemplateValue> phaseTemplateValues=new ArrayList<>();
-        for(PhaseDTO phaseDTO:phase) {
+        for(PhaseDTO phaseDTO:phaseDTOList) {
             PhaseTemplateValue phaseTemplateValue=new PhaseTemplateValue(phaseDTO.getId(),phaseDTO.getName(),phaseDTO.getDescription(),false,false);
             phaseTemplateValues.add(phaseTemplateValue);
         }
