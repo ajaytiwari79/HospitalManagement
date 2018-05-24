@@ -2,6 +2,7 @@ package com.kairos.controller.expertise;
 
 import com.kairos.response.dto.web.experties.AgeRangeDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
+import com.kairos.response.dto.web.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.service.locale.LocaleService;
@@ -106,6 +107,18 @@ public class ExpertiseController {
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/functional_payment", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> updateFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(expertiseId, functionalPaymentDTO));
+    }
+
+    @ApiOperation(value = "Add a functional payment settings for functional_payment")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> addMatrixInFunctionalPayment(@PathVariable Long functionalPaymentId, @RequestBody @Valid FunctionalSeniorityLevelDTO functionalPaymentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.addMatrixInFunctionalPayment(functionalPaymentDTO));
+    }
+
+    @ApiOperation(value = "GET a functional payment settings for functional_payment")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/functional_payment/{functionalPaymentId}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getMatrixOfFunctionalPayment(@PathVariable Long functionalPaymentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.getMatrixOfFunctionalPayment(functionalPaymentId));
     }
 
 }

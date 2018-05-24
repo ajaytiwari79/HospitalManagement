@@ -6,6 +6,9 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Set;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -47,4 +50,10 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
             "seniorityLevel.freeChoiceToPension as freeChoiceToPension,seniorityLevel.to as to,case when function IS NOT NULL then collect(distinct{id:id(function),amount:relation.amount,name:function.name ,description:function.description," +
             "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,payGrade as payGrade,collect(DISTINCT pga) as payGroupAreas")
     SeniorityLevelQueryResult getSeniorityLevelById(Long seniorityLevelId);
+
+    @Query("match(seniorityLevel:SeniorityLevel{deleted:false}) where id(seniorityLevel) IN {0}\n" +
+            "return seniorityLevel")
+    List<SeniorityLevel> findAll(Set<Long> seniorityLevelIds);
+
+
 }

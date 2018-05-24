@@ -1,22 +1,21 @@
 package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.config.neo4j.converter.LocalDateConverter;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_FOR_EXPERTISE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
+import static com.kairos.persistence.model.constants.RelationshipConstants.FUNCTIONAL_PAYMENT_MATRIX;
+import static com.kairos.persistence.model.constants.RelationshipConstants.VERSION_OF;
 
 @NodeEntity
 public class FunctionalPayment extends UserBaseEntity {
-
     @Relationship(type = APPLICABLE_FOR_EXPERTISE)
     private Expertise expertise;
     @Convert(LocalDateConverter.class)
@@ -25,7 +24,14 @@ public class FunctionalPayment extends UserBaseEntity {
     private LocalDate endDate;
     private boolean published;
     private PaidOutFrequencyEnum paidOutFrequency;
-    private Set<FunctionalPaymentMatrix> functionalPayments;
+    @Relationship(type = FUNCTIONAL_PAYMENT_MATRIX)
+    private List<FunctionalPaymentMatrix> functionalPaymentMatrices;
+
+
+    @Relationship(type = VERSION_OF)
+    private FunctionalPayment parentFunctionalPayment;
+
+    private boolean hasDraftCopy = false;
 
 
     public FunctionalPayment() {
@@ -74,12 +80,28 @@ public class FunctionalPayment extends UserBaseEntity {
         this.paidOutFrequency = paidOutFrequency;
     }
 
-    public Set<FunctionalPaymentMatrix> getFunctionalPayments() {
-        return functionalPayments;
+    public List<FunctionalPaymentMatrix> getFunctionalPaymentMatrices() {
+        return functionalPaymentMatrices;
     }
 
-    public void setFunctionalPayments(Set<FunctionalPaymentMatrix> functionalPayments) {
-        this.functionalPayments = functionalPayments;
+    public void setFunctionalPaymentMatrices(List<FunctionalPaymentMatrix> functionalPaymentMatrices) {
+        this.functionalPaymentMatrices = functionalPaymentMatrices;
+    }
+
+    public FunctionalPayment getParentFunctionalPayment() {
+        return parentFunctionalPayment;
+    }
+
+    public void setParentFunctionalPayment(FunctionalPayment parentFunctionalPayment) {
+        this.parentFunctionalPayment = parentFunctionalPayment;
+    }
+
+    public boolean isHasDraftCopy() {
+        return hasDraftCopy;
+    }
+
+    public void setHasDraftCopy(boolean hasDraftCopy) {
+        this.hasDraftCopy = hasDraftCopy;
     }
 
     public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paidOutFrequency) {
@@ -87,6 +109,7 @@ public class FunctionalPayment extends UserBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.published = false;
+        this.hasDraftCopy = false;
         this.paidOutFrequency = paidOutFrequency;
     }
 }

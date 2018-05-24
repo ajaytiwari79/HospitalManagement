@@ -228,10 +228,10 @@ public class ExpertiseService extends UserBaseService {
                 SeniorityLevel seniorityLevel = new SeniorityLevel();
                 BeanUtils.copyProperties(seniorityLevelFromDB, seniorityLevel);
                 seniorityLevel.setId(null);
-                SeniorityLevelQueryResult SeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevelFromDB.getId());
+                Optional<SeniorityLevel> SeniorityLevel = seniorityLevelGraphRepository.findById(seniorityLevelFromDB.getId());
 
-                if (Optional.ofNullable(SeniorityLevel.getPayGrade()).isPresent()) {
-                    seniorityLevel.setPayGrade(SeniorityLevel.getPayGrade());
+                if (Optional.ofNullable(SeniorityLevel.get().getPayGrade()).isPresent()) {
+                    seniorityLevel.setPayGrade(SeniorityLevel.get().getPayGrade());
                 }
                 seniorityLevel.setFrom(seniorityLevelFromDB.getFrom());
                 seniorityLevel.setTo(seniorityLevelFromDB.getTo());
@@ -240,7 +240,7 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
                 save(seniorityLevel);
                 expertise.getSeniorityLevel().add(seniorityLevel);
-                seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevelFromDB, seniorityLevel, SeniorityLevel));
+                seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevelFromDB, seniorityLevel));
 
             }
         }
@@ -249,21 +249,10 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
-    private void convertToFunctionObjectFromMap(Function currentFunction, Map<String, Object> currentObject) {
-        currentFunction.setName(currentObject.get("name").toString());
-        currentFunction.setDescription(currentObject.get("description").toString());
-        Long startDateMillis = new Long(currentObject.get("startDate").toString());
-        currentFunction.setStartDate(new Date(startDateMillis));
-        Long endDateMillis = (currentObject.get("endDate") != null) ? new Long(currentObject.get("endDate").toString()) : null;
-        currentFunction.setEndDate((endDateMillis != null) ? new Date(endDateMillis) : null);
-        currentFunction.setId((Long) currentObject.get("functionId")); // setting the ID so that no new NODE is created
-
-    }
 
     /*This method is responsible for generating Seniority Level response */
-    private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevelFromDB, SeniorityLevel seniorityLevel, SeniorityLevelQueryResult functionAndSeniorityLevel) {
+    private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevelFromDB, SeniorityLevel seniorityLevel) {
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO();
-        ObjectMapper objectMapper = new ObjectMapper();
         seniorityLevelDTO = objectMapper.convertValue(seniorityLevel, SeniorityLevelDTO.class);
         seniorityLevelDTO.setParentId(seniorityLevelFromDB.getId());
 
@@ -373,7 +362,7 @@ public class ExpertiseService extends UserBaseService {
             currentExpertise.setHistory(true);
             copiedExpertise.setPublished(false);
             copiedExpertise.setParentExpertise(currentExpertise);
-            // copiedExpertise.getSeniorityLevel().clear();
+            // copiedExpertise.getSeniorityLevelFunction().clear();
             // Calling this function to get any updates or updated value from DTO.
             updateCurrentExpertise(countryId, copiedExpertise, expertiseDTO);
 
@@ -473,11 +462,8 @@ public class ExpertiseService extends UserBaseService {
             }
             expertise.setUnion(union);
         }
-
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
-
-
     }
 
     public ExpertiseQueryResult deleteExpertise(Long expertiseId) {
