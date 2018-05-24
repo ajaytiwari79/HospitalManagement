@@ -8,6 +8,7 @@ import com.kairos.response.dto.web.open_shift.StaffExcludeFilter;
 import com.kairos.response.dto.web.open_shift.StaffIncludeFilter;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class PriorityGroup extends MongoBaseEntity {
     private boolean deActivated;
@@ -22,6 +23,8 @@ public class PriorityGroup extends MongoBaseEntity {
     private BigInteger orderId;
     private PriorityGroupName name;
     private DecisionCriteria decisionCriteria;
+    private BigInteger ruleTemplateId;
+    private List<Long> employmentTypeIds;
     //private ScheduledProcess scheduledProcess;
 
 
@@ -126,5 +129,21 @@ public class PriorityGroup extends MongoBaseEntity {
 
     public void setDecisionCriteria(DecisionCriteria decisionCriteria) {
         this.decisionCriteria = decisionCriteria;
+    }
+
+    public BigInteger getRuleTemplateId() {
+        return ruleTemplateId;
+    }
+
+    public void setRuleTemplateId(BigInteger ruleTemplateId) {
+        this.ruleTemplateId = ruleTemplateId;
+    }
+
+    public List<Long> getEmploymentTypeIds() {
+        return employmentTypeIds;
+    }
+
+    public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
+        this.employmentTypeIds = employmentTypeIds;
     }
 }

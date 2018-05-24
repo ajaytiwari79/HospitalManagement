@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.PriorityGroupName;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroupDTO {
     private BigInteger id;
     private boolean deActivated;
@@ -18,6 +19,7 @@ public class PriorityGroupDTO {
     private BigInteger orderId;
     private BigInteger parentId;
     private DecisionCriteria decisionCriteria;
+    private List<Long> employmentTypeIds;
 
 
     public PriorityGroupDTO() {
@@ -119,10 +121,18 @@ public class PriorityGroupDTO {
     }
 
     public DecisionCriteria getDecisionCriteria() {
-        return decisionCriteria;
+        return decisionCriteria=Optional.ofNullable(decisionCriteria).orElse(new DecisionCriteria());
     }
 
     public void setDecisionCriteria(DecisionCriteria decisionCriteria) {
         this.decisionCriteria = decisionCriteria;
+    }
+
+    public List<Long> getEmploymentTypeIds() {
+        return employmentTypeIds;
+    }
+
+    public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
+        this.employmentTypeIds = employmentTypeIds;
     }
 }

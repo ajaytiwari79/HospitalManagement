@@ -1,10 +1,7 @@
-package com.kairos.client.priority_group;
+package com.kairos.activity.client;
 
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
-import com.kairos.response.dto.web.UnitPositionWtaDTO;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +18,16 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.client.RestClientURLUtil.getBaseUrl;
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
 
 @Service
-public class PriorityGroupRestClient {
-    private static Logger logger = LoggerFactory.getLogger(PriorityGroupRestClient.class);
+public class GenericRestClient {
+    private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;
 
-    public <T, V> V publish(T t, Long id,boolean isUnit, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
+    public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit);
 
         try {

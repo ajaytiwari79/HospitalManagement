@@ -1,16 +1,23 @@
 package com.kairos.activity.service.priority_group;
 
+import com.kairos.activity.client.GenericIntegrationService;
+import com.kairos.activity.client.GenericRestClient;
 import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.activity.response.dto.shift.EmploymentType;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
+import com.kairos.response.dto.web.open_shift.PriorityGroupWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +28,8 @@ public class PriorityGroupService extends MongoBaseService {
     private PriorityGroupRepository priorityGroupRepository;
     @Inject
     private  ExceptionService exceptionService;
+
+    @Inject private GenericIntegrationService genericIntegrationService;
 
 
     public boolean createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
@@ -33,8 +42,12 @@ public class PriorityGroupService extends MongoBaseService {
         return true;
     }
 
-    public List<PriorityGroupDTO> findAllPriorityGroups(long countryId) {
-        return priorityGroupRepository.findByCountryIdAndDeletedFalse(countryId);
+    public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByCountryIdAndDeletedFalse(countryId);
+        List<EmploymentTypeDTO> employmentTypeDTOS=genericIntegrationService.getAllEmploymentType(countryId);
+        PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(employmentTypeDTOS);
+        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
+        return priorityGroupWrapper;
     }
 
     public PriorityGroupDTO updatePriorityGroup(long countryId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
@@ -141,6 +154,11 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupDTO.setId(null);
         });
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
+        save(priorityGroups);
+        return priorityGroupDTOs;
+    }
+    public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
+        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyProperties(priorityGroupDTOs,PriorityGroup.class);
         save(priorityGroups);
         return priorityGroupDTOs;
     }
