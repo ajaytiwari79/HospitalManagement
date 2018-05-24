@@ -8,6 +8,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -32,4 +33,19 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),functions:functions}) as seniorityLevelFunctions \n" +
             " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
     List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrix(Long functionalPaymentId);
+
+
+    @Query(" match(functionalPaymentMatrix:FunctionalPaymentMatrix) where id(functionalPaymentMatrix)={0}\n" +
+            " match(functionalPaymentMatrix)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
+            " match(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]-(seniorityLevel:SeniorityLevel) " +
+            " match(seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
+            "with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,pga,collect({functionId:id(function),amount:function_amt.amount}) as functions \n" +
+            "with functionalPaymentMatrix ,functions,seniorityLevelFunction,seniorityLevel,collect (id(pga)) as payGroupAreaIds \n" +
+            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),functions:functions}) as seniorityLevelFunctions \n" +
+            " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
+    FunctionalPaymentMatrixQueryResult getFunctionalPaymentMatrixById(Long functionalPaymentMatrixId);
+
+    @Query(" MATCH(functionalPaymentMatrix:FunctionalPaymentMatrix)-[relation:" + HAS_PAY_GROUP_AREA + "]->(pga:PayGroupArea) where id(functionalPaymentMatrix)={0} " +
+            " detach delete relation")
+    void removeAllPayGroupAreas(Long functionalPaymentMatrixId);
 }

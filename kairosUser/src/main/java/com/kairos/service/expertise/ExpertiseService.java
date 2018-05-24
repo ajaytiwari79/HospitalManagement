@@ -416,13 +416,11 @@ public class ExpertiseService extends UserBaseService {
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
 
-
         if (!seniorityLevelDTO.getPayGradeId().equals(functionAndSeniorityLevel.getPayGrade().getId())) {
             seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
             PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
             if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
                 exceptionService.dataNotFoundByIdException("message.expertise.payGradeId.notFound", seniorityLevelDTO.getPayGradeId());
-
             }
             seniorityLevel.setPayGrade(payGrade);
         }
