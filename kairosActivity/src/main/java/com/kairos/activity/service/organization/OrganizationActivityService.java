@@ -2,6 +2,7 @@ package com.kairos.activity.service.organization;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
+import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
@@ -26,6 +27,7 @@ import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
+import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vipul on 5/12/17.
@@ -66,11 +65,20 @@ public class OrganizationActivityService extends MongoBaseService {
     private OrderService orderService;
     @Inject
     private ExceptionService exceptionService;
-
+    @Inject
+    private PhaseService phaseService;
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
         Activity activity = activityMongoRepository.findOne(activityId);
+        List<PhaseDTO> phase=phaseService.getPhasesByUnit(unitId);
+        List<PhaseTemplateValue> phaseTemplateValues=new ArrayList<>();
+        for(PhaseDTO phaseDTO:phase) {
+            PhaseTemplateValue phaseTemplateValue=new PhaseTemplateValue(phaseDTO.getId(),phaseDTO.getName(),phaseDTO.getDescription(),false,false);
+            phaseTemplateValues.add(phaseTemplateValue);
+        }
+        activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
+
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
