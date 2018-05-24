@@ -30,8 +30,8 @@ public class RulesActivityTabDTO {
     // in Minutes
     private Integer earliestStartTime;
     private Integer latestStartTime;
-    private Integer shortestDuration;
-    private Integer longestDuration;
+    private Integer shortestTime;
+    private Integer longestTime;
     private boolean eligibleForCopy;
 
 
@@ -67,7 +67,7 @@ public class RulesActivityTabDTO {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime,shortestDuration,longestDuration, eligibleForCopy);
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy);
 
 
         return rulesActivityTab;
@@ -181,20 +181,20 @@ public class RulesActivityTabDTO {
         this.latestStartTime = latestStartTime;
     }
 
-    public Integer getShortestDuration() {
-        return shortestDuration;
+    public Integer getShortestTime() {
+        return shortestTime;
     }
 
-    public void setShortestDuration(Integer shortestDuration) {
-        this.shortestDuration = shortestDuration;
+    public void setShortestTime(Integer shortestTime) {
+        this.shortestTime = shortestTime;
     }
 
-    public Integer getLongestDuration() {
-        return longestDuration;
+    public Integer getLongestTime() {
+        return longestTime;
     }
 
-    public void setLongestDuration(Integer longestDuration) {
-        this.longestDuration = longestDuration;
+    public void setLongestTime(Integer longestTime) {
+        this.longestTime = longestTime;
     }
     public boolean isEligibleForCopy() {
         return eligibleForCopy;
