@@ -673,6 +673,7 @@ public class OrganizationService extends UserBaseService {
         organization.setCompanyCategory(companyCategory);
         organization.setCompanyType(orgDetails.getCompanyType());
         organization.setVatId(orgDetails.getVatId());
+        organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
 
         return organization;
     }
