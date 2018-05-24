@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.priority_group;
 
 import com.kairos.persistence.model.enums.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.response.dto.web.open_shift.DecisionCriteria;
 import com.kairos.response.dto.web.open_shift.RoundRules;
 import com.kairos.response.dto.web.open_shift.StaffExcludeFilter;
 import com.kairos.response.dto.web.open_shift.StaffIncludeFilter;
@@ -20,6 +21,7 @@ public class PriorityGroup extends MongoBaseEntity {
     private Integer priority;
     private BigInteger orderId;
     private PriorityGroupName name;
+    private DecisionCriteria decisionCriteria;
     //private ScheduledProcess scheduledProcess;
 
 
@@ -118,4 +120,11 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
+    public DecisionCriteria getDecisionCriteria() {
+        return decisionCriteria;
+    }
+
+    public void setDecisionCriteria(DecisionCriteria decisionCriteria) {
+        this.decisionCriteria = decisionCriteria;
+    }
 }

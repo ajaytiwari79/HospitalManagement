@@ -23,11 +23,14 @@ public class PriorityGroupService extends MongoBaseService {
     private  ExceptionService exceptionService;
 
 
-    public List<PriorityGroupDTO> createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
-
+    public boolean createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
+        boolean isPriorityGroupsAlreadyExists=priorityGroupRepository.existsByCountryId(countryId);
+        if(isPriorityGroupsAlreadyExists){
+            exceptionService.actionNotPermittedException("priorityGroup.already.exists",countryId);
+        }
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTO, PriorityGroup.class);
         save(priorityGroups);
-        return priorityGroupDTO;
+        return true;
     }
 
     public List<PriorityGroupDTO> findAllPriorityGroups(long countryId) {
@@ -39,8 +42,12 @@ public class PriorityGroupService extends MongoBaseService {
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
         }
-        priorityGroupDTO.setName(priorityGroup.getName());
-        ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+        if (priorityGroup.isDeActivated()!=priorityGroupDTO.isDeActivated()){
+            priorityGroup.setDeActivated(priorityGroupDTO.isDeActivated());
+        }else {
+            priorityGroupDTO.setName(priorityGroup.getName());
+            ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+            }
         priorityGroup.setId(priorityGroupId);
         priorityGroup.setCountryId(countryId);
         save(priorityGroup);
@@ -62,14 +69,18 @@ public class PriorityGroupService extends MongoBaseService {
 
     public boolean copyPriorityGroupsForUnit(long unitId,long countryId){
         List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalse(countryId);
-        priorityGroups.forEach(priorityGroup -> {
-            priorityGroup.setParentId(priorityGroup.getId());
-            priorityGroup.setUnitId(unitId);
-            priorityGroup.setId(null);
-            priorityGroup.setCountryId(null);
-            });
-        save(priorityGroups);
-        return true;
+        if(!priorityGroups.isEmpty()) {
+            priorityGroups.forEach(priorityGroup -> {
+                priorityGroup.setParentId(priorityGroup.getId());
+                priorityGroup.setUnitId(unitId);
+                priorityGroup.setId(null);
+                priorityGroup.setCountryId(null);
+                });
+            save(priorityGroups);
+            return true;
+        } else  {
+            return false;
+        }
     }
 
     public List<PriorityGroupDTO> getPriorityGroupsOfUnit(long unitId) {
@@ -81,9 +92,14 @@ public class PriorityGroupService extends MongoBaseService {
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
         }
-        ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
-        priorityGroup.setId(priorityGroupId);
-        priorityGroup.setUnitId(unitId);
+        if (priorityGroup.isDeActivated()!=priorityGroupDTO.isDeActivated()){
+            priorityGroup.setDeActivated(priorityGroupDTO.isDeActivated());
+        }else {
+            ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+            priorityGroup.setId(priorityGroupId);
+            priorityGroup.setUnitId(unitId);
+            priorityGroup.setName(priorityGroupDTO.getName());
+        }
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;

@@ -17,6 +17,7 @@ public class PriorityGroupDTO {
     private PriorityGroupName name;
     private BigInteger orderId;
     private BigInteger parentId;
+    private DecisionCriteria decisionCriteria;
 
 
     public PriorityGroupDTO() {
@@ -115,5 +116,13 @@ public class PriorityGroupDTO {
 
     public void setParentId(BigInteger parentId) {
         this.parentId = parentId;
+    }
+
+    public DecisionCriteria getDecisionCriteria() {
+        return decisionCriteria;
+    }
+
+    public void setDecisionCriteria(DecisionCriteria decisionCriteria) {
+        this.decisionCriteria = decisionCriteria;
     }
 }

@@ -33,7 +33,7 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> activityIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY,PartOfDay.EVENING,PartOfDay.NIGHT);
-    protected float recommendedValue;
+    private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 

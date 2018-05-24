@@ -130,8 +130,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     @Query("MATCH (e:Expertise)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(e)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
     List<Tag> getCountryTagsOfExpertiseByIdAndDeleted(long expertiseId, String filterText, boolean deleted);
 
-    @Query("MATCH (wta:WorkingTimeAgreement)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(wta)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
-    List<Tag> getCountryTagsOfWTAByIdAndDeleted(long wtaId, String filterText, boolean deleted);
+ /*   @Query("MATCH (wta:WorkingTimeAgreement)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(wta)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
+    List<Tag> getCountryTagsOfWTAByIdAndDeleted(long wtaId, String filterText, boolean deleted);*/
 
     @Query("MATCH (r:RuleTemplateCategory)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(r)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
     List<Tag> getCountryTagsOfRuleTemplateCategoryByIdAndDeleted(long ruleTmplCategoryId, String filterText, boolean deleted);
