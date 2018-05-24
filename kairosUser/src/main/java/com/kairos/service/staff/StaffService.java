@@ -45,6 +45,7 @@ import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -92,6 +93,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_STAFF;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UNIT;
 import static com.kairos.util.FileUtil.createDirectory;
 
 /**
@@ -1826,6 +1830,60 @@ public class StaffService extends UserBaseService {
             }
         }
         return nextSeniorityLevelInMonths;
+    }
+
+    public Set<Long> getStaffByStaffIncludeFilterForPriorityGroups(StaffIncludeFilter staffIncludeFilter, Long unitId) {
+
+/*
+        String staffFilterQuery = "Match (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition)-[:"+IN_UNIT+"]-(org:Organization) where id(org)={unitId}";
+*/
+/*
+                +"Match(up)-[:"+ HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) where id(employmentTYpe) in ";
+*//*
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if(Optional.ofNullable(staffIncludeFilter.getEmploymentTypeIds()).isPresent()&&!staffIncludeFilter.getEmploymentTypeIds().isEmpty()||staffIncludeFilter.isAllowForFlexPool()) {
+            stringBuilder = new StringBuilder("Match(up)-[:"+ HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) where ");
+            if(Optional.ofNullable(staffIncludeFilter.getEmploymentTypeIds()).isPresent()&&!staffIncludeFilter.getEmploymentTypeIds().isEmpty()) {
+                stringBuilder.append("id(employmentType) in {employmentTypeIds} or");
+            }
+            if(staffIncludeFilter.isAllowForFlexPool()) {
+                stringBuilder.append("employmentType.allowedForFlexPool = true or");
+            }
+
+            int index = stringBuilder.lastIndexOf("or");
+            stringBuilder.replace(index,"or".length(), "");
+
+        }
+        stringBuilder.append("return id(staff) as ids");
+        staffFilterQuery += stringBuilder.toString();
+
+
+        Map<String, Object> queryParameters = new HashMap();
+        queryParameters.put("unitId", unitId);
+        queryParameters.put("employmentTypeIds",staffIncludeFilter.getEmploymentTypeIds());
+        session.query(Map.class , query, queryParameters)
+*/
+
+
+        /*if(staffIncludeFilter.isAllowForFullTimeEmployees()||staffIncludeFilter.isAllowForPartTimeEmployees()||staffIncludeFilter.isAllowForHourlyPaidEmployees()||
+                staffIncludeFilter.isAllowForFlexPool()||staffIncludeFilter.isAllowForVolunteers()) {
+
+            stringBuilder = new StringBuilder("Match(up)-[:"+ HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) where ");
+            if(staffIncludeFilter.isAllowForFullTimeEmployees()) {
+                stringBuilder.append("employmentType.name= Full Time or ");
+            }
+            else if(staffIncludeFilter.isAllowForPartTimeEmployees()) {
+                stringBuilder.append("employmentType.name = \"\"")
+            }
+        }*/
+
+        Set<Long> staffIds = staffGraphRepository.getStaffByPriorityGroupStaffIncludeFilter(staffIncludeFilter, unitId);
+
+
+
+        return null;
     }
 
 }

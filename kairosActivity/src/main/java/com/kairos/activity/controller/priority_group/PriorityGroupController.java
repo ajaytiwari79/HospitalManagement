@@ -1,6 +1,6 @@
 package com.kairos.activity.controller.priority_group;
 
-import com.kairos.activity.persistence.model.priority_group.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

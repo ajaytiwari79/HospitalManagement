@@ -24,7 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 24/10/16.
  */
 @Repository
-public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
+public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, CustomStaffGraphRepository {
 
     @Override
     List<Staff> findAll();

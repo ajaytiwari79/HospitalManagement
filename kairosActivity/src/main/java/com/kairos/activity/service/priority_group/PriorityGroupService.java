@@ -5,6 +5,7 @@ import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRe
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

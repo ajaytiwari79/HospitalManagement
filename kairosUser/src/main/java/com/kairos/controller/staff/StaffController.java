@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 
 import com.kairos.response.dto.web.PasswordUpdateDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.organization.OrganizationServiceService;
@@ -613,5 +614,11 @@ public class StaffController {
 
     }
 
+    @RequestMapping(value = "/priority_group", method = RequestMethod.GET)
+    @ApiOperation("get Staff by StaffId ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByPriorityGroup(@PathVariable long unitId, @RequestBody StaffIncludeFilter staffIncludeFilter) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByStaffIncludeFilterForPriorityGroups(staffIncludeFilter,unitId));
+    }
 
 }
