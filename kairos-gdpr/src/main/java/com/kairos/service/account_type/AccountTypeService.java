@@ -23,7 +23,7 @@ public class AccountTypeService extends MongoBaseService {
     private AccountTypeMongoRepository accountTypeRepository;
 
 
-    public AccountType createAccountType(Long countryId,AccountType accountType) {
+    public AccountType createAccountType(AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByTypeOfAccount(accountType.getTypeOfAccount());
         if (Optional.ofNullable(exists).isPresent()) {
@@ -31,13 +31,12 @@ public class AccountTypeService extends MongoBaseService {
         } else {
             AccountType newAccount = new AccountType();
             newAccount.setTypeOfAccount(accountType.getTypeOfAccount());
-            newAccount.setCountryId(countryId);
             return save(newAccount);
         }
     }
 
 
-    public AccountType getAccount(String typeOfAccount) {
+    public AccountType getAccountByName(String typeOfAccount) {
         AccountType account = accountTypeRepository.findByTypeOfAccount(typeOfAccount);
         if (Optional.ofNullable(account).isPresent()) {
             return account;
@@ -46,26 +45,15 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountListByIds(Set<BigInteger> accountList) {
-        List<AccountType> accountTypeList = new ArrayList<>();
-        AccountType accountType;
-        for (BigInteger accoundTypeId : accountList) {
-            accountType = accountTypeRepository.findByid(accoundTypeId);
-            if (accountType != null) {
-                accountTypeList.add(accountType);
-            } else {
-                throw new DataNotExists("Account for id ->" + accoundTypeId + "not Exists");
-            }
-        }
-        return accountTypeList;
+    public List<AccountType> getAccountTypeList(Set<BigInteger> ids) {
+        return accountTypeRepository.getAccountTypeList(ids);
 
     }
 
 
-
-    public List<AccountType> getAllAccountTypeByCountryId(Long CountryId)
+    public List<AccountType> getAllAccountType()
     {
-   return accountTypeRepository.getAllAccountType(4);
+   return accountTypeRepository.getAllAccountType();
 
     }
 

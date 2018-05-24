@@ -35,12 +35,12 @@ public class AgreementSectionController {
 
 
 
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
+   /* @RequestMapping(value = "/add",method = RequestMethod.POST)
     public ResponseEntity<Object>  createAgreementSection(@PathVariable Long countryId,@RequestBody AgreementSection agreementSection)
     {
-return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.createAgreementSection(countryId,agreementSection));
+return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.createAgreementSections(countryId,agreementSection));
 
-    }
+    }*/
 
 
     @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)

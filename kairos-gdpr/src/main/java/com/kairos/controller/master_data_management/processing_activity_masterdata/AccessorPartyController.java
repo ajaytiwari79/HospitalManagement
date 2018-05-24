@@ -32,7 +32,7 @@ public class AccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAccessorParty(@RequestBody List<AccessorParty> accessorParties) {
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId,@RequestBody List<AccessorParty> accessorParties) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(accessorParties));
 
     }

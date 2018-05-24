@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import static com.kairos.constant.ApiConstant.API_MASTER_PROCESSING_ACTIVITY;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 
 @RestController
@@ -29,8 +30,8 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "add MasterProcessingActivity asset")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<Object> createMasterProcessingActivity(@Validated  @RequestBody MasterProcessingActivityDto processingActivityDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(processingActivityDto));
+    public ResponseEntity<Object> createMasterProcessingActivity(@PathVariable  Long countryId, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(countryId,processingActivityDto));
     }
 
     @ApiOperation(value = "get all MasterProcessingActivity")
@@ -41,11 +42,11 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable BigInteger id, @RequestBody MasterProcessingActivityDto processingActivityDto) {
+    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId,@PathVariable BigInteger id, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(id,processingActivityDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(countryId,id,processingActivityDto));
     }
 
     @ApiOperation(value = "delete MasterProcessingActivity")
@@ -59,11 +60,11 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "get MasterProcessingActivity by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityById(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithData(countryId,id));
     }
 
 

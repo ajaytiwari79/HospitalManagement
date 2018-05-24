@@ -16,4 +16,6 @@ public interface PolicyAgreementTemplateRepository extends MongoRepository<Polic
 
     PolicyAgreementTemplate findByName(String name);
 
+    PolicyAgreementTemplate findByid(BigInteger id);
+
 }

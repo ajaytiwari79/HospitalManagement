@@ -33,7 +33,7 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPolicyAgreementTemplate(@Validated @RequestBody PolicyAgreementTemplateDto agreementTemplateDto) throws RepositoryException {
+    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId,@Validated @RequestBody PolicyAgreementTemplateDto agreementTemplateDto) throws RepositoryException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(agreementTemplateDto));
 
     }

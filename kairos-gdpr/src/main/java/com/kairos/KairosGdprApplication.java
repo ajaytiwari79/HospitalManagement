@@ -43,6 +43,8 @@ public class KairosGdprApplication {
 
 
 
+
+
     @Bean("objectMapperJackson")
     @Primary
     public ObjectMapper serializingObjectMapper() {

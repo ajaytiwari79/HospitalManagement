@@ -7,15 +7,18 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,BigInteger> {
 
-
    AccountType findByid(BigInteger id);
 
-   @Query("{deleted:false,countryId:4}")
-   List<AccountType> getAllAccountType(long  countryId);
+   @Query("{deleted:false}")
+   List<AccountType> getAllAccountType();
+
+   @Query("{deleted:false,'_id':{$in:?0}}")
+   List<AccountType> getAccountTypeList(Set<BigInteger> ids);
 
    @Query("{'typeOfAccount':?0}")
    AccountType findByTypeOfAccount(String typeOfAccount);

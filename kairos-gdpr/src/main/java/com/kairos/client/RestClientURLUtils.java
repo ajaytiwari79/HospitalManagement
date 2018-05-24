@@ -20,7 +20,7 @@ public class RestClientURLUtils {
     public final static String getBaseUrl(boolean hasUnitInUrl) {
         if (hasUnitInUrl) {
 
-            String baseUrl = new StringBuilder(userServiceBaseUrl+"/organization/").append("24").toString();
+            String baseUrl = new StringBuilder(userServiceBaseUrl+"/organization/").append(UserContext.getOrgId()).toString();
             return baseUrl;
 
         } else {

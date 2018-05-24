@@ -74,7 +74,7 @@ public class ClauseService extends MongoBaseService {
 
         OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
-        List<AccountType> accountTypes = accountTypeService.getAccountListByIds(accountTypeIds);
+        List<AccountType> accountTypes = accountTypeService.getAccountTypeList(accountTypeIds);
         OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (Optional.ofNullable(requestResult).isPresent()) {
@@ -142,7 +142,7 @@ public class ClauseService extends MongoBaseService {
             orgSubServiceIds = clauseDto.getOrganizationSubServices();
             Set<BigInteger> accountTypeIds = clauseDto.getAccountType();
 
-            List<AccountType> accountTypes = accountTypeService.getAccountListByIds(accountTypeIds);
+            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(accountTypeIds);
             List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);

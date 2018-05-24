@@ -92,7 +92,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     sections= agreementSectionService.createAgreementSections(agreementSection);
                     policyAgreementTemplate.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
-                accountTypeService.getAccountListByIds(accountTypeIds);
+                accountTypeService.getAccountTypeList(accountTypeIds);
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 policyAgreementTemplate.setOrganizationTypes(requestResult.getOrganizationTypes());
@@ -137,7 +137,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     public Boolean deletePolicyAgreementTemplate(BigInteger id) {
 
-        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
+        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
             save(exist);
@@ -166,8 +166,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-            accountTypeService.getAccountListByIds(accountTypeIds);
-            exist.setAccountTypes(accountTypeIds);
             if (Optional.ofNullable(requestResult).isPresent()) {
                 Map<String,Object> sections =new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
@@ -193,6 +191,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     sections = agreementSectionService.createAgreementSections(agreementSection);
                     exist.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
+                accountTypeService.getAccountTypeList(accountTypeIds);
+                exist.setAccountTypes(accountTypeIds);
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 exist.setOrganizationTypes(requestResult.getOrganizationTypes());
                 exist.setName(policyAgreementTemplateDto.getName());

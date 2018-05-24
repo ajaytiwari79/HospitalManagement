@@ -1,9 +1,11 @@
 package com.kairos.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 
 public class MasterProcessingActivityDto {
@@ -14,23 +16,33 @@ public class MasterProcessingActivityDto {
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set<Long> organizationTypes;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set <Long> organizationSubTypes;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set <Long>organizationServices;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set <Long> organizationSubServices;
 
-    public String getName() {
+
+
+    private List<MasterProcessingActivityDto> subProcessingActivities;
+
+
+
+    public List<MasterProcessingActivityDto> getSubProcessingActivity() {
+        return subProcessingActivities;
+    }
+
+    public void setSubProcessingActivity(List<MasterProcessingActivityDto> subProcessingActivities) {
+        this.subProcessingActivities = subProcessingActivities;
+    }
+
+     public String getName() {
         return name;
     }
 

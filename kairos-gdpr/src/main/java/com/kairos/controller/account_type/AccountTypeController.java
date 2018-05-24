@@ -35,8 +35,8 @@ public class AccountTypeController {
 
     @ApiOperation(value ="create new account type" )
     @PostMapping("/add_account")
-    public ResponseEntity<Object> createAccountType(Long countryId, @RequestBody AccountType accountType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId,accountType));
+    public ResponseEntity<Object> createAccountType( @RequestBody AccountType accountType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(accountType));
 
     }
 
@@ -46,11 +46,11 @@ public class AccountTypeController {
         if (StringUtils.isBlank(typeOfAccount)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccount(typeOfAccount));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountByName(typeOfAccount));
 
     }
 
-    @ApiOperation(value ="accounts  by ids list" )
+ /*   @ApiOperation(value ="accounts  by ids list" )
     @RequestMapping(value = "/account_list", method = RequestMethod.POST)
     public ResponseEntity<Object> getAccountList(@RequestBody Set<BigInteger> accountIds) {
         if (accountIds.size()==0) {
@@ -59,13 +59,13 @@ public class AccountTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountListByIds(accountIds));
 
     }
-
+*/
 
 
     @ApiOperation(value ="all account type " )
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<Object> getAllAccounts(@PathVariable Long countryId) {
-          return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountTypeByCountryId(countryId));
+    public ResponseEntity<Object> getAllAccounts() {
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType());
 
     }
 

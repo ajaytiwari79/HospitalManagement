@@ -6,6 +6,7 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -16,7 +17,7 @@ public class AgreementSection extends MongoBaseEntity {
     @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
     private String title;
 
-    private Set<BigInteger> clauseIds;
+    private List<BigInteger> clauseIds;
 
     private Long countryId;
 
@@ -28,11 +29,11 @@ public class AgreementSection extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public Set<BigInteger> getClauseIds() {
+    public List<BigInteger> getClauseIds() {
         return clauseIds;
     }
 
-    public void setClauseIds(Set<BigInteger> clauseIds) {
+    public void setClauseIds(List<BigInteger> clauseIds) {
         this.clauseIds = clauseIds;
     }
 
@@ -45,10 +46,11 @@ public class AgreementSection extends MongoBaseEntity {
     }
 
 
-   public AgreementSection(String title,Set<BigInteger> clauseIds)
+   public AgreementSection(Long countryId ,String title,List<BigInteger> clauseIds)
     {
         this.title=title;
         this.clauseIds=clauseIds;
+        this.countryId=countryId;
     }
 
 

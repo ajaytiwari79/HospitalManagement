@@ -1,24 +1,18 @@
-package com.kairos.persistance.model.master_data_management.processing_activity_masterdata;
+package com.kairos.response.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
-@Document(collection = "master_processing_activity")
-public class MasterProcessingActivity extends MongoBaseEntity {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class MasterProcessingActivityResponseDto {
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    private BigInteger id;
     private String name;
-
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
@@ -26,24 +20,16 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private List<BigInteger> subProcessingActivityIds;
+    private List<MasterProcessingActivityResponseDto> subProcessingActivities;
 
     private Long countryId;
 
-    public Long getCountryId() {
-        return countryId;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public List<BigInteger> getSubProcessingActivityIds() {
-        return subProcessingActivityIds;
-    }
-
-    public void setSubProcessingActivityIds(List<BigInteger> subProcessingActivityIds) {
-        this.subProcessingActivityIds = subProcessingActivityIds;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -94,15 +80,23 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public MasterProcessingActivity() {
-
+    public List<MasterProcessingActivityResponseDto> getSubProcessingActivities() {
+        return subProcessingActivities;
     }
 
-    public MasterProcessingActivity(Long countryId,String name,String description) {
+    public void setSubProcessingActivities(List<MasterProcessingActivityResponseDto> subProcessingActivities) {
+        this.subProcessingActivities = subProcessingActivities;
+    }
 
-        this.name=name;
-        this.description=description;
-        this.countryId=countryId;
-         }
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public MasterProcessingActivityResponseDto()
+    {}
 
 }
