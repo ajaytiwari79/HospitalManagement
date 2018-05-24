@@ -11,10 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import static com.kairos.constant.ApiConstant.API_ACCOUNT_TYPE_URL;
+import static com.kairos.constant.ApiConstant.PARENT_ORGABNIZATION;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 /*
 *
@@ -35,8 +35,8 @@ public class AccountTypeController {
 
     @ApiOperation(value ="create new account type" )
     @PostMapping("/add_account")
-    public ResponseEntity<Object> createAccountType(@RequestBody AccountType accountType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(accountType));
+    public ResponseEntity<Object> createAccountType(Long countryId, @RequestBody AccountType accountType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId,accountType));
 
     }
 
@@ -64,8 +64,8 @@ public class AccountTypeController {
 
     @ApiOperation(value ="all account type " )
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<Object> getAllAccounts() {
-          return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccounts());
+    public ResponseEntity<Object> getAllAccounts(@PathVariable Long countryId) {
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountTypeByCountryId(countryId));
 
     }
 

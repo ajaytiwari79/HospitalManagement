@@ -36,9 +36,9 @@ public class AgreementSectionController {
 
 
     @RequestMapping(value = "/add",method = RequestMethod.POST)
-    public ResponseEntity<Object>  createAgreementSection(@RequestBody AgreementSection agreementSection)
+    public ResponseEntity<Object>  createAgreementSection(@PathVariable Long countryId,@RequestBody AgreementSection agreementSection)
     {
-return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.createAgreementSection(agreementSection));
+return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.createAgreementSection(countryId,agreementSection));
 
     }
 
@@ -55,19 +55,19 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
 
 
     @RequestMapping(value = "/{id}",method = RequestMethod.GET)
-    public ResponseEntity<Object>  getAgreementSectionWithDataById(@PathVariable BigInteger id )
+    public ResponseEntity<Object>  getAgreementSectionWithDataById(@PathVariable Long countryId,@PathVariable BigInteger id )
     {
         if (id!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.getAgreementSectionWithDataById(id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.getAgreementSectionWithDataById(countryId,id));
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"request id Cannot be null");
     }
 
 
     @RequestMapping(value = "/all",method = RequestMethod.GET)
-    public ResponseEntity<Object>  getAllAgreementSection()
+    public ResponseEntity<Object>  getAllAgreementSection(@PathVariable Long countryId)
     {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAllAgreementSection());
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAllAgreementSection(countryId));
 
     }
 

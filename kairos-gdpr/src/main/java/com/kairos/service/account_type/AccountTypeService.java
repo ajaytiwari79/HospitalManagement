@@ -23,15 +23,16 @@ public class AccountTypeService extends MongoBaseService {
     private AccountTypeMongoRepository accountTypeRepository;
 
 
-    public AccountType createAccountType(AccountType accountType) {
+    public AccountType createAccountType(Long countryId,AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByTypeOfAccount(accountType.getTypeOfAccount());
         if (Optional.ofNullable(exists).isPresent()) {
             throw new DuplicateDataException("Account  Already Exists for name" + accountType.getTypeOfAccount());
         } else {
-            AccountType accountType1 = new AccountType();
-            accountType1.setTypeOfAccount(accountType.getTypeOfAccount());
-            return save(accountType1);
+            AccountType newAccount = new AccountType();
+            newAccount.setTypeOfAccount(accountType.getTypeOfAccount());
+            newAccount.setCountryId(countryId);
+            return save(newAccount);
         }
     }
 
@@ -62,15 +63,10 @@ public class AccountTypeService extends MongoBaseService {
 
 
 
-    public List<AccountType> getAllAccounts()
+    public List<AccountType> getAllAccountTypeByCountryId(Long CountryId)
     {
-        List<AccountType> accountTypeList=accountTypeRepository.findAll();
-        if (accountTypeList!=null)
-        {
-            return accountTypeList;
-        }
-        else
-            throw new DataNotExists("accounts not exist create account");
+   return accountTypeRepository.getAllAccountType(4);
+
     }
 
 

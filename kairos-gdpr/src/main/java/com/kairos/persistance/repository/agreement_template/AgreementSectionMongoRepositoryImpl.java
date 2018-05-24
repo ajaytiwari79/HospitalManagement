@@ -30,7 +30,7 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
 
     }
     @Override
-    public List<AgreementSectionResponseDto> getAllAgreementSectionWithData() {
+    public List<AgreementSectionResponseDto> getAllAgreementSectionWithData(Long countryId) {
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where("deleted").is(false)),

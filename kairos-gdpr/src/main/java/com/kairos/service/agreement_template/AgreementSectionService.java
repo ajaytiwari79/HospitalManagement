@@ -29,7 +29,7 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseMongoRepository clauseMongoRepository;
 
 
-    public AgreementSection createAgreementSection(AgreementSection agreementSection) {
+    public AgreementSection createAgreementSection(Long countryId,AgreementSection agreementSection) {
 
        /* if (agreementSectionMongoRepository.findByTitle(agreementSection.getTitle()) != null) {
             throw new DuplicateDataException("section with name " + agreementSection.getTitle() + "  already exist");
@@ -53,7 +53,7 @@ public class AgreementSectionService extends MongoBaseService {
         if (agreementSections.size() != 0) {
 
             for (AgreementSection agreementSection : agreementSections) {
-                AgreementSection section=createAgreementSection(agreementSection);
+                AgreementSection section=createAgreementSection(agreementSection.getCountryId(),agreementSection);
                 ids.add(section.getId());
 
             }
@@ -79,7 +79,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public AgreementSectionResponseDto getAgreementSectionWithDataById(BigInteger id) {
+    public AgreementSectionResponseDto getAgreementSectionWithDataById(Long countryId,BigInteger id) {
 
         AgreementSectionResponseDto exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -90,9 +90,9 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public List<AgreementSectionResponseDto> getAllAgreementSection() {
+    public List<AgreementSectionResponseDto> getAllAgreementSection(Long countryId) {
 
-        List<AgreementSectionResponseDto> result = agreementSectionMongoRepository.getAllAgreementSectionWithData();
+        List<AgreementSectionResponseDto> result = agreementSectionMongoRepository.getAllAgreementSectionWithData(countryId);
         if (result.size() != 0) {
             return result;
         }

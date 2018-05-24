@@ -18,6 +18,16 @@ public class AgreementSection extends MongoBaseEntity {
 
     private Set<BigInteger> clauseIds;
 
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
     public Set<BigInteger> getClauseIds() {
         return clauseIds;
     }

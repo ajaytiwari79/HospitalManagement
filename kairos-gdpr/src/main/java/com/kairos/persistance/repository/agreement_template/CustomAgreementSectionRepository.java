@@ -9,7 +9,7 @@ public interface CustomAgreementSectionRepository {
 
     AgreementSectionResponseDto getAgreementSectionWithDataById(BigInteger id);
 
-    List<AgreementSectionResponseDto> getAllAgreementSectionWithData();
+    List<AgreementSectionResponseDto> getAllAgreementSectionWithData(Long countryId);
 
     List<AgreementSectionResponseDto> getAgreementSectionWithDataList(List<BigInteger> ids);
 
