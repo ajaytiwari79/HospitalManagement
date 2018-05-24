@@ -4,14 +4,21 @@ import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
+import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
+import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.wta.StaffWTACounter;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateWrapper;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
+import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
+import com.kairos.activity.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
@@ -57,6 +64,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.activity.constants.AppConstants.*;
 import static com.kairos.activity.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getRuleTemplateSpecificInfo;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getRuleTemplateWrapper;
 
 /**
  * Created by vipul on 30/8/17.
@@ -92,10 +101,11 @@ public class ShiftService extends MongoBaseService {
 
     private WTAService wtaService;
     @Inject
-
     private ExceptionService exceptionService;
     @Inject
     private OpenShiftMongoRepository openShiftMongoRepository;
+    @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private StaffWTACounterRepository wtaCounterRepository;
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
@@ -318,9 +328,16 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.wta.notFound");
         }
+        if (staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement().getEndDate()!=null && new DateTime(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement().getEndDate()).isBefore(shift.getEndDate().getTime())) {
+            throw new ActionNotPermittedException("WTA is Expired for unit employment.");
+        }
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(),shift.getStartDate());
+        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(planningPeriod.getStartDate(),planningPeriod.getEndDate());
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(staffAdditionalInfoDTO,shift,null,phase.getName(),planningPeriod,staffWTACounters);
+        List<RuleTemplateWrapper> ruleTemplateWrappers = getRuleTemplateWrapper(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement().getRuleTemplates(),ruleTemplateSpecificInfo);
         ActivitySpecification<Activity> activityEmploymentTypeSpecification = new ActivityEmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         ActivitySpecification<Activity> activityExpertiseSpecification = new ActivityExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
-        ActivitySpecification<Activity> activityWTARulesSpecification = new ActivityWTARulesSpecification(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement(), phase, shift, null,staffAdditionalInfoDTO);
+        ActivitySpecification<Activity> activityWTARulesSpecification = new ActivityWTARulesSpecification(ruleTemplateSpecificInfo,ruleTemplateWrappers);
 
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification); //
 

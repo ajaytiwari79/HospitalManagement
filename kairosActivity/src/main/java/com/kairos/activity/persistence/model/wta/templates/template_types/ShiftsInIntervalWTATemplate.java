@@ -22,13 +22,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
-    private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
     private String intervalUnit;
     private LocalDate validationStartDate;
-    private long shiftsLimit;
-    private boolean onlyCompositeShifts;//(checkbox)
-
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
@@ -77,13 +73,6 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
 
     public long getIntervalLength() {
         return intervalLength;
@@ -125,34 +114,16 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.recommendedValue = recommendedValue;
     }
 
-    public long getShiftsLimit() {
-        return shiftsLimit;
-    }
-
-    public void setShiftsLimit(long shiftsLimit) {
-        this.shiftsLimit = shiftsLimit;
-    }
-
-    public boolean isOnlyCompositeShifts() {
-        return onlyCompositeShifts;
-    }
-
-    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
-        this.onlyCompositeShifts = onlyCompositeShifts;
-    }
 
     public ShiftsInIntervalWTATemplate(String name,  boolean disabled,
                                        String description, long intervalLength, String intervalUnit,
-                                       LocalDate validationStartDate, long shiftsLimit, boolean onlyCompositeShifts) {
+                                       LocalDate validationStartDate) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.balanceType = balanceType;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
         this.validationStartDate =validationStartDate;
-        this.shiftsLimit =shiftsLimit;
-        this.onlyCompositeShifts=onlyCompositeShifts;
         wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     }

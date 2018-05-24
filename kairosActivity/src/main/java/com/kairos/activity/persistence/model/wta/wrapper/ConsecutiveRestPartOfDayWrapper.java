@@ -1,16 +1,6 @@
 package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.ConsecutiveRestPartOfDayWTATemplate;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-import com.kairos.activity.util.DateTimeInterval;
-import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.WTARuleTemplateValidatorUtility;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getSortedDates;
 
 
 /**
@@ -23,12 +13,16 @@ public class ConsecutiveRestPartOfDayWrapper implements RuleTemplateWrapper{
 
     private ConsecutiveRestPartOfDayWTATemplate wtaTemplate;
 
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
+
+    public ConsecutiveRestPartOfDayWrapper(ConsecutiveRestPartOfDayWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
 
 
     @Override
-    public boolean isSatisfied() {
+    public String isSatisfied() {
        /* if(shifts.size()<2) return true;
         WTARuleTemplateValidatorUtility.sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
@@ -51,6 +45,6 @@ public class ConsecutiveRestPartOfDayWrapper implements RuleTemplateWrapper{
             }
             l++;
         }*/
-        return false;
+        return "";
     }
 }

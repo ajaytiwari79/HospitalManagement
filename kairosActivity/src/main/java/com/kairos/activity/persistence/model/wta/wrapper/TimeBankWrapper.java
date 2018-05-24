@@ -1,9 +1,6 @@
 package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.TimeBankWTATemplate;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-
-import java.util.List;
 
 /**
  * @author pradeep
@@ -12,14 +9,18 @@ import java.util.List;
 
 public class TimeBankWrapper implements RuleTemplateWrapper{
 
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
 
 
     private TimeBankWTATemplate wtaTemplate;
 
+    public TimeBankWrapper(TimeBankWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
+
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 }

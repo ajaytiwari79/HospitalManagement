@@ -18,12 +18,16 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 public class DailyRestingTimeWrapper implements RuleTemplateWrapper{
 
     private DailyRestingTimeWTATemplate wtaTemplate;
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
+
+    public DailyRestingTimeWrapper(DailyRestingTimeWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
 
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 
     public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts,DailyRestingTimeWTATemplate ruleTemplate){

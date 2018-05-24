@@ -1,9 +1,6 @@
 package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.VetoPerPeriodWTATemplate;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-
-import java.util.List;
 
 /**
  * @author pradeep
@@ -12,14 +9,16 @@ import java.util.List;
 
 public class VetoPerPeriodWrapper implements RuleTemplateWrapper{
 
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
-
-
+    private RuleTemplateSpecificInfo infoWrapper;
     private VetoPerPeriodWTATemplate wtaTemplate;
 
+    public VetoPerPeriodWrapper(VetoPerPeriodWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
+
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 }

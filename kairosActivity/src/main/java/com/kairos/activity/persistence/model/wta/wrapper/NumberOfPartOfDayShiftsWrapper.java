@@ -4,11 +4,12 @@ import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.wta.templates.template_types.NumberOfPartOfDayShiftsWTATemplate;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.util.TimeInterval;
 
 import java.util.List;
 
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isNightShift;
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
 /**
  * @author pradeep
@@ -19,26 +20,36 @@ public class NumberOfPartOfDayShiftsWrapper implements RuleTemplateWrapper{
 
 
     private NumberOfPartOfDayShiftsWTATemplate wtaTemplate;
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
 
-    @Override
-    public boolean isSatisfied() {
-        return false;
+    public NumberOfPartOfDayShiftsWrapper(NumberOfPartOfDayShiftsWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
     }
 
-    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts, NumberOfPartOfDayShiftsWTATemplate ruleTemplate,TimeSlotWrapper timeSlotWrapper){
-        if(shifts.size()>0) {
-            int count = 0;//(int) shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumNumberOfNightsInfo();
-            for (ShiftQueryResultWithActivity shift : shifts) {
-                if (isNightShift(shift, timeSlotWrapper)) {
-                    count++;
+    @Override
+    public String isSatisfied() {
+        if(wtaTemplate.isDisabled()){
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(wtaTemplate.getPartOfDays(),infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
+            if(timeInterval!=null) {
+                DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), wtaTemplate.getIntervalUnit(), wtaTemplate.getIntervalLength());
+                List<ShiftQueryResultWithActivity> shifts = filterShifts(infoWrapper.getShifts(), wtaTemplate.getTimeTypeIds(), wtaTemplate.getPlannedTimeIds(), wtaTemplate.getActivityIds());
+                shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper,wtaTemplate.getPhaseTemplateValues(),wtaTemplate.getId());
+                if (!isValid(wtaTemplate.getMinMaxSetting(), limitAndCounter[0], shifts.size())) {
+                    if(limitAndCounter[1]!=null) {
+                        int counterValue =  limitAndCounter[1] - 1;
+                        if(counterValue<0){
+                            new InvalidRequestException(wtaTemplate.getName() + " is Broken");
+                            infoWrapper.getCounterMap().put(wtaTemplate.getId(), infoWrapper.getCounterMap().getOrDefault(wtaTemplate.getId(), 0) + 1);
+                        }
+                    }else {
+                        new InvalidRequestException(wtaTemplate.getName() + " is Broken");
+                    }
                 }
             }
-            if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getNoOfPartOfDayWorked(), count)) {
-                new InvalidRequestException("");
-            }
         }
+        return "";
     }
 
 }

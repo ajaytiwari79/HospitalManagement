@@ -10,8 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getShiftStartTimeComparator;
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
 /**
  * @author pradeep
@@ -21,28 +20,38 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 public class DurationBetweenShiftsWrapper implements RuleTemplateWrapper{
 
     private DurationBetweenShiftsWTATemplate wtaTemplate;
+    private RuleTemplateSpecificInfo infoWrapper;
 
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    public DurationBetweenShiftsWrapper(DurationBetweenShiftsWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
 
     @Override
-    public boolean isSatisfied() {
-        return false;
-    }
-
-    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts, ShiftQueryResultWithActivity shift,DurationBetweenShiftsWTATemplate ruleTemplate) {
-        boolean isValid = false;
+    public String isSatisfied() {
         int timefromPrevShift = 0;
-        shifts = (List<ShiftQueryResultWithActivity>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(shift.getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
+        List<ShiftQueryResultWithActivity> shifts = filterShifts(infoWrapper.getShifts(), wtaTemplate.getTimeTypeIds(), wtaTemplate.getPlannedTimeIds(), null);
+        shifts = (List<ShiftQueryResultWithActivity>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
         if (shifts.size() > 0) {
             ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
-            timefromPrevShift = new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(shift.getStartDate())).getMinutes();
-            /*if(timefromPrevShift==0 && shift.getStartDate().getDayOfWeek()==1){
-                timefromPrevShift = new DateTimeInterval(shift.getEmployee().getPrevShiftEnd(), shift.getStartDate()).getMinutes();
-            }*/
+            timefromPrevShift = new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper,wtaTemplate.getPhaseTemplateValues(),wtaTemplate.getId());
+            if (!isValid(wtaTemplate.getMinMaxSetting(), limitAndCounter[0], shifts.size())) {
+                if(limitAndCounter[1]!=null) {
+                    int counterValue =  limitAndCounter[1] - 1;
+                    if(counterValue<0){
+                        new InvalidRequestException(wtaTemplate.getName() + " is Broken");
+                        infoWrapper.getCounterMap().put(wtaTemplate.getId(), infoWrapper.getCounterMap().getOrDefault(wtaTemplate.getId(), 0) + 1);
+                    }
+                }else {
+                    new InvalidRequestException(wtaTemplate.getName() + " is Broken");
+                }
+            }
         }
-        if (!isValid(ruleTemplate.getMinMaxSetting(), (int) ruleTemplate.getDurationBetweenShifts(), (int) timefromPrevShift)) {
+        if (!isValid(wtaTemplate.getMinMaxSetting(), (int) wtaTemplate.getDurationBetweenShifts(), (int) timefromPrevShift)) {
             new InvalidRequestException("");
         }
+        return "";
     }
+
 }

@@ -10,6 +10,7 @@ import org.joda.time.Interval;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 
 /*
@@ -43,12 +44,22 @@ public class ShiftQueryResultWithActivity {
     private int scheduledMinutes;
     private int durationMinutes;
     private ShiftQueryResultWithActivity subShift;
+    private List<BigInteger> brokenRuleTemplateIds;
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
     }
 
     public ShiftQueryResultWithActivity() {
+    }
+
+
+    public List<BigInteger> getBrokenRuleTemplateIds() {
+        return brokenRuleTemplateIds;
+    }
+
+    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
+        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
     }
 
     public ShiftQueryResultWithActivity(Date startDate, Date endDate, Activity activity) {
@@ -218,8 +229,12 @@ public class ShiftQueryResultWithActivity {
         this.activity = activity;
     }
 
-    public DateTimeInterval getInterval(){
+    public DateTimeInterval getDateTimeInterval(){
        return new DateTimeInterval(startDate.getTime(),endDate.getTime());
+    }
+
+    public Interval getInterval(){
+        return new Interval(startDate.getTime(),endDate.getTime());
     }
 
 }

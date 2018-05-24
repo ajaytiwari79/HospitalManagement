@@ -1,13 +1,6 @@
 package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.ShortestAndAverageDailyRestWTATemplate;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-import com.kairos.activity.util.DateTimeInterval;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getSortedIntervals;
 
 /**
  * @author pradeep
@@ -18,12 +11,11 @@ public class ShortestAndAverageDailyRestWrapper implements RuleTemplateWrapper{
 
 
     private ShortestAndAverageDailyRestWTATemplate wtaTemplate;
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
 
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 
   /*  public static int checkConstraints(List<ShiftQueryResultWithActivity> shifts,ShortestAndAverageDailyRestWTATemplate ruleTemplate){
@@ -42,4 +34,8 @@ public class ShortestAndAverageDailyRestWrapper implements RuleTemplateWrapper{
         return  (restingTimeUnder + (int)(averageRest>averageRestingTime?averageRest-averageRestingTime:0));
     }*/
 
+    public ShortestAndAverageDailyRestWrapper(ShortestAndAverageDailyRestWTATemplate wtaTemplate, RuleTemplateSpecificInfo infoWrapper) {
+        this.wtaTemplate = wtaTemplate;
+        this.infoWrapper = infoWrapper;
+    }
 }

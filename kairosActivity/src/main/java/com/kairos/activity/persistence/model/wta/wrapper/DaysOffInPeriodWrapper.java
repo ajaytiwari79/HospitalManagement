@@ -17,12 +17,16 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 public class DaysOffInPeriodWrapper implements RuleTemplateWrapper{
 
     private DaysOffInPeriodWTATemplate wtaTemplate;
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
+
+    public DaysOffInPeriodWrapper(DaysOffInPeriodWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
 
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 
 

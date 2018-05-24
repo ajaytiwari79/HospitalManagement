@@ -19,12 +19,16 @@ public class NumberOfWeekendShiftsInPeriodWrapper implements RuleTemplateWrapper
 
     private NumberOfWeekendShiftsInPeriodWTATemplate wtaTemplate;
 
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
+
+    public NumberOfWeekendShiftsInPeriodWrapper(NumberOfWeekendShiftsInPeriodWTATemplate ruleTemplate, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+        this.wtaTemplate = ruleTemplate;
+        this.infoWrapper = ruleTemplateSpecificInfo;
+    }
 
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 
     public static void checkConstraints(ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts,NumberOfWeekendShiftsInPeriodWTATemplate ruleTemplate){

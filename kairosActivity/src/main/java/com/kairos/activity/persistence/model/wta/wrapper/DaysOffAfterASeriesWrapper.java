@@ -1,9 +1,6 @@
 package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.DaysOffAfterASeriesWTATemplate;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-
-import java.util.List;
 
 /**
  * @author pradeep
@@ -14,11 +11,10 @@ public class DaysOffAfterASeriesWrapper implements RuleTemplateWrapper{
 
 
     private DaysOffAfterASeriesWTATemplate wtaTemplate;
-    private List<ShiftQueryResultWithActivity> shifts;
-    private ShiftQueryResultWithActivity shift;
+    private RuleTemplateSpecificInfo infoWrapper;
 
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public String isSatisfied() {
+        return "";
     }
 }

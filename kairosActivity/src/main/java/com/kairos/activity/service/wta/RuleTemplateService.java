@@ -182,7 +182,7 @@ public class RuleTemplateService extends MongoBaseService {
         shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shortestAndAverageDailyRestWTATemplate);
 
-        ShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate("Shifts In Interval",false,"Shifts In Interval",1, week, localDate, 1, true);
+        ShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate("Shifts In Interval",false,"Shifts In Interval",1, week, localDate);
         maximumShiftsInIntervalWTATemplate.setCountryId(countryDTO.getId());
         maximumShiftsInIntervalWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         maximumShiftsInIntervalWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

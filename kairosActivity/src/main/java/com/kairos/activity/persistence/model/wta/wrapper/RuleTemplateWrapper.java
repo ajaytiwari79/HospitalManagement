@@ -7,5 +7,5 @@ package com.kairos.activity.persistence.model.wta.wrapper;
 
 public interface RuleTemplateWrapper {
 
-    boolean isSatisfied();
+    String isSatisfied();
 }
