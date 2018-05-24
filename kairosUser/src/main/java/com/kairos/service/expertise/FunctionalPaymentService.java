@@ -26,8 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static javax.management.timer.Timer.ONE_DAY;
 
 @Service
 @Transactional
@@ -237,12 +240,24 @@ public class FunctionalPaymentService extends UserBaseService {
         return functionalSeniorityLevelDTO;
     }
 
-    private FunctionalSeniorityLevelDTO publishFunctionalPayment(FunctionalPaymentDTO functionalPaymentDTO) {
+    public FunctionalPaymentMatrixQueryResult publishFunctionalPayment(FunctionalPaymentDTO functionalPaymentDTO) {
         Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalPaymentDTO.getId());
         if (!functionalPayment.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "functionalpayment", functionalPaymentDTO.getId());
         }
-        return new FunctionalSeniorityLevelDTO();
+        if (!functionalPayment.get().isPublished()) {
+            exceptionService.dataNotFoundByIdException("message.functionalPayment.alreadyPublished");
+        }
+        functionalPayment.get().setPublished(true);
+
+        functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changinf
+        save(functionalPayment.get());
+        FunctionalPaymentMatrixQueryResult parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentDTO.getId());
+        if (Optional.ofNullable(parentFunctionalPayment).isPresent()) {
+            functionalPaymentGraphRepository.setEndDateToFunctionalPayment(parentFunctionalPayment.getId(), functionalPaymentDTO.getStartDate().minusDays(1L));
+        }
+
+        return parentFunctionalPayment;
 
     }
 

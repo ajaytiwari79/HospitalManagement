@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -48,4 +49,10 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
     @Query(" MATCH(functionalPaymentMatrix:FunctionalPaymentMatrix)-[relation:" + HAS_PAY_GROUP_AREA + "]->(pga:PayGroupArea) where id(functionalPaymentMatrix)={0} " +
             " detach delete relation")
     void removeAllPayGroupAreas(Long functionalPaymentMatrixId);
+
+    FunctionalPaymentMatrixQueryResult getParentFunctionalPayment(Long functionalPaymentId);
+
+    @Query("match(functionalPayment:FunctionalPayment{deleted:false})-[relation:" + VERSION_OF + "]-(functionalPayment:FunctionalPayment{deleted:false}) set functionalPayment.endDate={0} " +
+            "set functionalPayment.hasDraftCopy =false")
+    void setEndDateToFunctionalPayment(Long functionalPaymentId, LocalDate endDate);
 }
