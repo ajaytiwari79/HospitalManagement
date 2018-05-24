@@ -49,6 +49,7 @@ public class Shift extends MongoBaseEntity {
 
     private Long unitPositionId;
     private ShiftState shiftState;
+    private BigInteger parentOpenShiftId;
     public Shift() {
     }
 
@@ -308,5 +309,13 @@ public class Shift extends MongoBaseEntity {
 
     public void setShiftState(ShiftState shiftState) {
         this.shiftState = shiftState;
+    }
+
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
     }
 }

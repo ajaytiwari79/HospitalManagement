@@ -7,7 +7,7 @@ public class DecisionCriteria {
     private boolean moreRestingTime;   //Need to know in detail
     private boolean highestPoints;
     private boolean mostExperienceInUnit;
-    private boolean isMostExperienceInActivity;
+    private boolean mostExperienceInActivity;
 
     public DecisionCriteria() {
         //Default Constructor
@@ -62,10 +62,10 @@ public class DecisionCriteria {
     }
 
     public boolean isMostExperienceInActivity() {
-        return isMostExperienceInActivity;
+        return mostExperienceInActivity;
     }
 
     public void setMostExperienceInActivity(boolean mostExperienceInActivity) {
-        isMostExperienceInActivity = mostExperienceInActivity;
+        this.mostExperienceInActivity = mostExperienceInActivity;
     }
 }

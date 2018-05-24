@@ -18,10 +18,5 @@ public interface OrderMongoRepository extends MongoBaseRepository<Order, BigInte
 
     @Query("{'deleted':false, 'unitId':?0}")
     List<Order> findOrdersByUnitId(Long unitId);
-
-    @Query(value = "{'deleted':false, 'unitId':?0, 'orderId':?1}",fields = "shiftAssignmentCriteria")
-    Order findShiftAssignmentCriteria(Long unitId,BigInteger orderId);
-
-
 }
 

@@ -1,10 +1,8 @@
 package com.kairos.activity.service.priority_group;
 
 import com.kairos.activity.client.GenericIntegrationService;
-import com.kairos.activity.client.GenericRestClient;
-import com.kairos.activity.persistence.model.priority_group.*;
+import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
-import com.kairos.activity.response.dto.shift.EmploymentType;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
