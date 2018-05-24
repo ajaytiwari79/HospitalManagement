@@ -2,7 +2,9 @@ package com.kairos.response.dto.web.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class StaffIncludeFilter {
 
@@ -31,7 +33,7 @@ public class StaffIncludeFilter {
     }
 
     public List<Long> getExpertiseIds() {
-        return expertiseIds;
+        return expertiseIds=Optional.ofNullable(expertiseIds).orElse(new ArrayList<>());
     }
 
     public void setExpertiseIds(List<Long> expertiseIds) {

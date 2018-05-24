@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.PriorityGroupName;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,7 +130,7 @@ public class PriorityGroupDTO {
     }
 
     public List<Long> getEmploymentTypeIds() {
-        return employmentTypeIds;
+        return employmentTypeIds=Optional.ofNullable(employmentTypeIds).orElse(new ArrayList<>());
     }
 
     public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
