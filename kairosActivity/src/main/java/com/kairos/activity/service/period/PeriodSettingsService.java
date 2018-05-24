@@ -6,6 +6,7 @@ import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.period.PeriodSettings;
 import com.kairos.activity.persistence.repository.period.PeriodSettingsMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.response.dto.web.period.PeriodSettingsDTO;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ public class PeriodSettingsService extends MongoBaseService {
 
     @Inject
     PeriodSettingsMongoRepository periodSettingsMongoRepository;
+    @Inject
+    ExceptionService exceptionService;
 
     public PeriodSettings createDefaultPeriodSettings(Long unitId, Long parentOrgId) {
 
@@ -63,7 +66,7 @@ public class PeriodSettingsService extends MongoBaseService {
     public PeriodSettings updatePeriodSettings(Long unitId, PeriodSettingsDTO periodSettingsDTO) {
         PeriodSettings periodSettings = periodSettingsMongoRepository.findByUnit(unitId);
         if (!Optional.ofNullable(periodSettings).isPresent()) {
-            throw new DataNotFoundByIdException("PlanningPeriod setting not found for unit : "+unitId);
+            exceptionService.dataNotFoundByIdException("message.periodsetting.unit",unitId);
         }
         periodSettings.setPresenceLimitInYear(periodSettingsDTO.getPresenceLimitInYear());
         periodSettings.setAbsenceLimitInYear(periodSettingsDTO.getAbsenceLimitInYear());

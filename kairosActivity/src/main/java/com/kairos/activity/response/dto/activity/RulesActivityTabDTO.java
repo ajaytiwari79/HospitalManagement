@@ -26,11 +26,14 @@ public class RulesActivityTabDTO {
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+
     // in Minutes
     private Integer earliestStartTime;
     private Integer latestStartTime;
     private Integer shortestDuration;
     private Integer longestDuration;
+    private boolean eligibleForCopy;
+
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -62,8 +65,10 @@ public class RulesActivityTabDTO {
 
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
+
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime,shortestDuration,longestDuration);
+                approvalAllowed,earliestStartTime,latestStartTime,shortestDuration,longestDuration, eligibleForCopy);
+
 
         return rulesActivityTab;
     }
@@ -191,4 +196,11 @@ public class RulesActivityTabDTO {
     public void setLongestDuration(Integer longestDuration) {
         this.longestDuration = longestDuration;
     }
+    public boolean isEligibleForCopy() {
+        return eligibleForCopy;
+    }
+
+    public void setEligibleForCopy(boolean eligibleForCopy) {
+        this.eligibleForCopy = eligibleForCopy;
+        }
 }

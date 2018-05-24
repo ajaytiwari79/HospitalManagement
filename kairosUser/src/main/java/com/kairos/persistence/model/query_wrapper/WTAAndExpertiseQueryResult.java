@@ -1,20 +1,20 @@
 package com.kairos.persistence.model.query_wrapper;
 
 
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult
 public class WTAAndExpertiseQueryResult {
-    private WorkingTimeAgreement workingTimeAgreement;
+    private WTAResponseDTO workingTimeAgreement;
     private Expertise expertise;
 
-    public WorkingTimeAgreement getWorkingTimeAgreement() {
+    public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 

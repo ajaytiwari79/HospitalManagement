@@ -1,15 +1,9 @@
 package com.kairos.service.agreement.wta;
 
 import com.kairos.constants.RuleTemplates;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
@@ -17,13 +11,11 @@ import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemp
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -41,9 +33,6 @@ import static com.kairos.persistence.model.user.agreement.cta.RuleTemplateCatego
 //@Transactional
 @Service
 public class WTAOrganizationService extends UserBaseService {
-
-    @Inject
-    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -51,94 +40,10 @@ public class WTAOrganizationService extends UserBaseService {
     @Inject
     private CountryService countryService;
     @Inject
-    private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
+    ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
-    public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId, 0);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid unit  " + unitId);
-        }
-        List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);
-        return workingTimeAgreements;
-    }
-
-
-    /*public WorkingTimeAgreement updateWtaOfOrganization(Long unitId, Long wtaId, WTADTO updateDTO) {
-        Organization organization = organizationGraphRepository.findOne(unitId, 1);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid unit  " + unitId);
-        }
-
-        WorkingTimeAgreement oldWta = workingTimeAgreementGraphRepository.findOne(wtaId, 2);
-        if (!Optional.ofNullable(oldWta).isPresent()) {
-            logger.info("wta not found while updating at unit %d", wtaId);
-            throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
-        }
-
-
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-
-        boolean isWTAAlreadyExists = workingTimeAgreementGraphRepository.checkUniqueWTANameInOrganization("(?i)" + updateDTO.getName(), unitId, wtaId);
-        if (isWTAAlreadyExists) {
-            logger.info("Duplicate WTA name in organization :", wtaId);
-            throw new DuplicateDataException("Duplicate WTA name in organization " + updateDTO.getName());
-        }
-        if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
-            logger.info("Expertise cant be changed at unit level :", wtaId);
-            throw new ActionNotPermittedException("Expertise can't be changed");
-        }
-
-        //Copying Properties
-        BeanUtils.copyProperties(oldWta, newWta);
-        newWta.setId(null);
-        newWta.setDeleted(true);
-        newWta.setStartDateMillis(oldWta.getStartDateMillis());
-        newWta.setEndDateMillis(updateDTO.getStartDateMillis());
-        newWta.setCountryParentWTA(null);
-        newWta.getRuleTemplates().forEach(ruleTemplate -> {
-            if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
-                ruleTemplate.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
-                });
-            }
-        });
-
-        ruleTemplateCategoryGraphRepository.detachPreviousRuleTemplates(oldWta.getId());
-        save(newWta);
-        if (Optional.ofNullable(oldWta.getParentWTA()).isPresent()) {
-            workingTimeAgreementGraphRepository.removeOldParentWTAMapping(oldWta.getParentWTA().getId());
-        }
-
-        oldWta.setName(updateDTO.getName());
-        oldWta.setDescription(updateDTO.getDescription());
-        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
-        }
-        oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
-        oldWta.setExpertise(oldWta.getExpertise());
-        oldWta.setParentWTA(newWta);
-        oldWta.setDisabled(false);
-
-        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (updateDTO.getRuleTemplates().size() > 0) {
-
-            ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates());
-            oldWta.setRuleTemplates(ruleTemplates);
-        }
-        //oldWta.setOrganization(organization);
-        //organization.addWorkingTimeAgreements(newWta);
-
-
-        save(oldWta);
-        //Preparing Response for frontend
-        //workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
-        oldWta.setParentWTA(newWta.getParentWTA());
-
-        oldWta.getExpertise().setCountry(null);
-        return oldWta;
-    }*/
 
 
     private RuleTemplateCategory getCategory(List<WTABaseRuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName) {
@@ -156,7 +61,8 @@ public class WTAOrganizationService extends UserBaseService {
             // if rule template is still null so this category does not exist.
             if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
                 logger.info("category does not exist in when updating wta's rule template  :", ruleTemplateCategoryName);
-                throw new DataNotFoundByIdException("category : " + ruleTemplateCategoryName + " does not exist in when updating wta's rule template  :" + id);
+                exceptionService.dataNotFoundByIdException("message.category.notExist",ruleTemplateCategoryName,id);
+
             }
         }
         return ruleTemplateCategory;
@@ -546,7 +452,8 @@ public class WTAOrganizationService extends UserBaseService {
                     wtaBaseRuleTemplates.add(breaksInShift);
                     break;
                 default:
-                    throw new DataNotFoundByIdException("Invalid TEMPLATE");
+                    exceptionService.dataNotFoundByIdException("message.InvalidTemplateType");
+
             }
 
         }

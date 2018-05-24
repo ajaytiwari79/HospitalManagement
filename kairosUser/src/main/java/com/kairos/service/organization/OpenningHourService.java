@@ -1,14 +1,13 @@
 package com.kairos.service.organization;
-import com.kairos.custom_exception.DataNotFoundByIdException;
+
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationSetting;
-import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,8 @@ public class OpenningHourService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     public OrganizationSetting getDefaultSettings(){
         OrganizationSetting organizationSetting  = new OrganizationSetting();
@@ -87,7 +87,8 @@ public class OpenningHourService {
     public boolean setDefaultOpeningHours(long unitId) {
         Organization unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
-            throw new DataNotFoundByIdException("Incorrect unit id ");
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         OrganizationSetting organizationSetting = getDefaultSettings();
         unit.setOrganizationSetting(organizationSetting);

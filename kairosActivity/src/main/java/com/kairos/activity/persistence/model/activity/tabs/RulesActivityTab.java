@@ -23,11 +23,14 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+
     // in Minutes
     private Integer earliestStartTime;
     private Integer latestStartTime;
     private Integer shortestDuration;
     private Integer longestDuration;
+    private boolean eligibleForCopy;
+
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -78,8 +81,10 @@ public class RulesActivityTab implements Serializable{
     }
 
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest,  boolean eligibleAgainstTimeRules,  boolean lockLengthPresent, boolean eligibleToBeForced,
+
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules,boolean eligibleForStaffingLevel, boolean eligibleForPresence,boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    ,Integer earliestStartTime,Integer latestStartTime,Integer shortestDuration,Integer longestDuration) {
+    ,Integer earliestStartTime,Integer latestStartTime,Integer shortestDuration,Integer longestDuration, boolean eligibleForCopy) {
+
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
         this.eligibleForRequest = eligibleForRequest;
@@ -97,6 +102,7 @@ public class RulesActivityTab implements Serializable{
         this.latestStartTime=latestStartTime;
         this.shortestDuration=shortestDuration;
         this.longestDuration=longestDuration;
+        this.eligibleForCopy=eligibleForCopy;
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -179,6 +185,7 @@ public class RulesActivityTab implements Serializable{
         this.approvalAllowed = approvalAllowed;
     }
 
+
     public Integer getEarliestStartTime() {
         return earliestStartTime;
     }
@@ -207,7 +214,14 @@ public class RulesActivityTab implements Serializable{
         return longestDuration;
     }
 
-    public void setLongestDuration(Integer longestDuration) {
-        this.longestDuration = longestDuration;
+    public void setLongestDuration(Integer longestDuration){
+            this.longestDuration = longestDuration;
+        }
+    public boolean isEligibleForCopy() {
+        return eligibleForCopy;
     }
+
+    public void setEligibleForCopy(boolean eligibleForCopy) {
+        this.eligibleForCopy = eligibleForCopy;
+        }
 }

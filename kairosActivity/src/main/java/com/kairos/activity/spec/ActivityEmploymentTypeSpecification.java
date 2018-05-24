@@ -4,6 +4,8 @@ package com.kairos.activity.spec;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.shift.EmploymentType;
+import com.kairos.activity.service.exception.ExceptionService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -16,7 +18,8 @@ public class ActivityEmploymentTypeSpecification extends AbstractActivitySpecifi
 
     private Set<Long> employmentTypeIds = new HashSet<>();
     private EmploymentType employmentType;
-
+    @Autowired
+    ExceptionService exceptionService;
     public ActivityEmploymentTypeSpecification(EmploymentType employmentType) {
         this.employmentType = employmentType;
     }
@@ -28,7 +31,7 @@ public class ActivityEmploymentTypeSpecification extends AbstractActivitySpecifi
             if (employmentTypeIds.contains(employmentType.getId())) {
                 return true;
             }
-            throw new InvalidRequestException("Employment Type is not matched with this activity.");
+            exceptionService.invalidRequestException("message.activity.employement-type-match");
         }
         return true;
 
