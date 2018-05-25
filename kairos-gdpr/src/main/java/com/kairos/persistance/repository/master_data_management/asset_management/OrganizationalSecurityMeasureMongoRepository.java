@@ -13,15 +13,15 @@ import java.util.List;
 public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepository<OrganizationalSecurityMeasure,BigInteger> {
 
 
-    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    @Query("{countryId:?0,'_id':?1,deleted:false}")
     OrganizationalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     OrganizationalSecurityMeasure findByName(Long countryId,String name);
 
     OrganizationalSecurityMeasure findByid(BigInteger id);
 
-    @Query("{deleted:false,'countryId':?0}")
+    @Query("{deleted:false,countryId:?0}")
     List<OrganizationalSecurityMeasure> findAllOrganizationalSecurityMeasures(Long countryId);
 
 }

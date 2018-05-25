@@ -13,15 +13,15 @@ import java.util.List;
 public interface DataDisposalMongoRepository extends MongoRepository<DataDisposal,BigInteger> {
 
 
-    @Query("{deleted:false,'countryId':?0,'_id':?1}")
+    @Query("{deleted:false,countryId:?0,'_id':?1}")
     DataDisposal findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     DataDisposal findByName(Long countryId,String name);
 
     DataDisposal findByid(BigInteger id);
 
 
-    @Query("{deleted:false,'countryId':?0}")
+    @Query("{deleted:false,countryId:?0}")
     List<DataDisposal> findAllDataDisposals(Long countryId);
 }

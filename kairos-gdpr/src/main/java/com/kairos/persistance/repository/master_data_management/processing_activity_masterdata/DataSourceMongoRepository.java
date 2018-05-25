@@ -12,10 +12,10 @@ import java.util.List;
 @Repository
 public interface DataSourceMongoRepository extends MongoRepository<DataSource,BigInteger> {
 
-    @Query("{'countryId':?0,'_id':?0,deleted:false}")
+    @Query("{countryId:?0,'_id':?0,deleted:false}")
     DataSource findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    @Query("{countryId:?0,'name':?1,deleted:false}")
     DataSource findByName(Long countryId,String name);
 
     @Query("{'_id':{$in:?0}}")
@@ -23,7 +23,7 @@ public interface DataSourceMongoRepository extends MongoRepository<DataSource,Bi
 
     DataSource findByid(BigInteger id);
 
-    @Query("{'countryId':?0,deleted:false}")
+    @Query("{countryId:?0,deleted:false}")
     List<DataSource> findAllDataSources(Long countryId);
 
 }

@@ -34,20 +34,20 @@ public class DataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSource(@RequestBody List<DataSource> dataSource) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(dataSource));
+    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@RequestBody List<DataSource> dataSource) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId,dataSource));
 
     }
 
 
     @ApiOperation("get dataSource by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataSource(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId,id));
 
     }
 
@@ -61,8 +61,8 @@ public class DataSourceController {
 
     @ApiOperation("get dataSource by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDataSourceByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(name));
+    public ResponseEntity<Object> getDataSourceByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(countryId,name));
 
     }
 

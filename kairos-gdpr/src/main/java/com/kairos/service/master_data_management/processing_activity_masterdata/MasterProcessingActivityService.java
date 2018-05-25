@@ -13,6 +13,7 @@ import com.kairos.persistance.repository.master_data_management.processing_activ
 import com.kairos.response.dto.MasterProcessingActivityResponseDto;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -34,8 +35,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     public MasterProcessingActivity createMasterProcessingActivity(Long countryId, MasterProcessingActivityDto masterProcessingActivityDto) {
 
+        if (masterProcessingActivityRepository.findByNameAndCountryId(countryId,masterProcessingActivityDto.getName()) != null) {
 
-        if (masterProcessingActivityRepository.findByName(countryId,masterProcessingActivityDto.getName()) != null) {
             throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
         }
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
@@ -65,7 +66,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             masterProcessingActivity.setOrganizationSubServices(orgSubServices);
 
         }
-        if (masterProcessingActivityDto.getSubProcessingActivity()!=null && masterProcessingActivityDto.getSubProcessingActivity().size()>1) {
+        if ( masterProcessingActivityDto.getSubProcessingActivity().size()>1) {
             masterProcessingActivity.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivity(), orgTypeAndServices));
         }
         comparisonUtils.checkOrgTypeAndService(orgTypeIds, orgTypeAndServices.getOrganizationTypes());
@@ -75,8 +76,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     }
-
-
 
 
     public List<BigInteger> addSubProcessingActivity(Long countryId, List<MasterProcessingActivityDto> subProcessingActivities, OrganizationTypeAndServiceResultDto orgTypeAndServices) {
@@ -106,33 +105,30 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
 
-    public List<MasterProcessingActivity> getAllmasterProcessingActivity() {
-        return masterProcessingActivityRepository.getAllMasterProcessingsctivity();
-
-    }
 
 
-    public Boolean checkForDuplicacyByName(Long countryId,List<String> subProcessingAcitivityNames) {
+
+    public void checkForDuplicacyByName(Long countryId,List<String> subProcessingAcitivityNames) {
 
         List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(countryId,subProcessingAcitivityNames);
+        System.err.println("size"+processingActivities.size());
+
         if (processingActivities.size() != 0) {
             throw new DuplicateDataException(" sub processing acitvity " + processingActivities.get(0).getName() + " exist");
-
         }
-        return true;
-
+    }
+    public List<MasterProcessingActivity> getAllmasterProcessingActivity() {
+        return masterProcessingActivityRepository.getAllMasterProcessingsctivity(UserContext.getCountryId());
 
     }
-
 
     public MasterProcessingActivity updateMasterProcessingActivity(Long countryId, BigInteger id, MasterProcessingActivityDto masterProcessingActivityDto) {
 
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(countryId,id);
-
-        if (!Optional.of(exists).isPresent()) {
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByid(id);
+        if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
-
         }
+        System.err.println("_++++++"+exists.getName());
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
         orgTypeIds = masterProcessingActivityDto.getOrganizationTypes();
         orgSubTypeIds = masterProcessingActivityDto.getOrganizationSubTypes();
@@ -143,18 +139,14 @@ public class MasterProcessingActivityService extends MongoBaseService {
         OrganizationTypeAndServiceResultDto orgTypeAndServices = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
 
         if (orgServiceIds.size() != 0) {
-
             List<OrganizationTypeAndServiceBasicDto> orgSubTypes = orgTypeAndServices.getOrganizationSubTypes();
             comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
             exists.setOrganizationSubTypes(orgSubTypes);
-
         }
         if (orgServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgServices = orgTypeAndServices.getOrganizationServices();
             comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
             exists.setOrganizationServices(orgServices);
-
-
         }
         if (orgSubServiceIds.size() != 0) {
             List<OrganizationTypeAndServiceBasicDto> orgSubServices = orgTypeAndServices.getOrganizationSubServices();

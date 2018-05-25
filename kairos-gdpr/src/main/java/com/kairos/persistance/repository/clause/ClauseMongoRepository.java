@@ -28,10 +28,10 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     Clause findByIdAndNonDeleted(Long countryId,BigInteger id);
 
 
-    @Query("{deleted:false,'countryId:?0'}")
+    @Query("{deleted:false,'countryId':?0}")
     List<Clause>  findAllClause(Long countryId);
 
-    @Query("{deleted:false,'countryId:?0','_id':{$in:?1}}")
+    @Query("{deleted:false,'countryId':?0,'_id':{$in:?1}}")
     List<Clause>  getClauseListByIds(Long countryId, Set<BigInteger> ids);
 
     @Query("{'accountType':?0}")

@@ -11,19 +11,20 @@ import java.util.List;
 @Repository
 public interface MasterProcessingActivityRepository extends MongoRepository<MasterProcessingActivity,BigInteger>,CustomMasterProcessingActivity {
 
-    @Query("{'countryId':?0,'_id':?1,deleted:false}")
-    MasterProcessingActivity findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false}")
-    List<MasterProcessingActivity> getAllMasterProcessingsctivity();
+    @Query("{deleted:false,countryId:?0,'_id':?1}")
+    MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'countryId':?0,'name':{$in:?1},deleted:false}")
-    List<MasterProcessingActivity>  masterProcessingActivityListByNames(Long countryId,List<String> name);
+    @Query("{deleted:false,countryId:?0}")
+    List<MasterProcessingActivity> getAllMasterProcessingsctivity(Long countryId);
+
+    @Query("{deleted:false,countryId:?0,name:{$in:?1}}")
+    List<MasterProcessingActivity>  masterProcessingActivityListByNames(Long countryId,List<String> names);
 
     MasterProcessingActivity findByid(BigInteger id);
 
-    @Query("{'countryId':?0,'name':?1,deleted:false}")
-    MasterProcessingActivity findByName(Long countryId,String name);
+    @Query("{deleted:false,countryId:?0,name:?1}")
+    MasterProcessingActivity findByNameAndCountryId(Long countryId,String name);
 
 
 }

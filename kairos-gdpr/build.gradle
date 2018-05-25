@@ -1,8 +1,8 @@
 buildscript {
     ext {
         springBootVersion = '2.0.0.M7'
-        projectVersion="0.0.1"
-        version="0.0.1"
+        projectVersion = "0.0.1"
+        version = "0.0.1"
     }
     repositories {
         mavenCentral()
@@ -49,11 +49,13 @@ dependencies {
     compile('javax.jcr:jcr:2.0')
     compile('org.apache.jackrabbit:oak-jcr:1.7.6')
     compile('org.apache.commons:commons-lang3:3.0')
-   // swagger
+    compile('org.springframework.cloud:spring-cloud-starter-oauth2')
+    // swagger
     compile('io.springfox:springfox-swagger2:2.4.0')
     compile('io.springfox:springfox-swagger-ui:2.4.0')
     compile('org.springframework.boot:spring-boot-starter-web')
-      testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 
 
 }
