@@ -26,7 +26,14 @@ public class RulesActivityTabDTO {
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+
+    // in Minutes
+    private Integer earliestStartTime;
+    private Integer latestStartTime;
+    private Integer shortestTime;
+    private Integer longestTime;
     private boolean eligibleForCopy;
+
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -58,8 +65,10 @@ public class RulesActivityTabDTO {
 
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,
-                eligibleForPresence,eligibleForAbsence, breakAllowed, approvalAllowed,eligibleForCopy);
+
+                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy);
+
 
         return rulesActivityTab;
     }
@@ -156,11 +165,42 @@ public class RulesActivityTabDTO {
         this.approvalAllowed = approvalAllowed;
     }
 
+    public Integer getEarliestStartTime() {
+        return earliestStartTime;
+    }
+
+    public void setEarliestStartTime(Integer earliestStartTime) {
+        this.earliestStartTime = earliestStartTime;
+    }
+
+    public Integer getLatestStartTime() {
+        return latestStartTime;
+    }
+
+    public void setLatestStartTime(Integer latestStartTime) {
+        this.latestStartTime = latestStartTime;
+    }
+
+    public Integer getShortestTime() {
+        return shortestTime;
+    }
+
+    public void setShortestTime(Integer shortestTime) {
+        this.shortestTime = shortestTime;
+    }
+
+    public Integer getLongestTime() {
+        return longestTime;
+    }
+
+    public void setLongestTime(Integer longestTime) {
+        this.longestTime = longestTime;
+    }
     public boolean isEligibleForCopy() {
         return eligibleForCopy;
     }
 
     public void setEligibleForCopy(boolean eligibleForCopy) {
         this.eligibleForCopy = eligibleForCopy;
-    }
+        }
 }
