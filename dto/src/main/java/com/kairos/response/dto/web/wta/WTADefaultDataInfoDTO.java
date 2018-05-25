@@ -1,9 +1,12 @@
 package com.kairos.response.dto.web.wta;
 
+import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,19 +15,40 @@ import java.util.List;
  */
 
 public class WTADefaultDataInfoDTO {
-    List<ActivityDTO> activityList;
-    List<TimeTypeDTO> timeTypes;
-    List<DayTypeDTO> dayTypes;
-    List<PresenceTypeDTO> presenceTypes;
+    private List<ActivityDTO> activityList = new ArrayList<>();
+    private List<TimeTypeDTO> timeTypes = new ArrayList<>();
+    private List<DayTypeDTO> dayTypes = new ArrayList<>();
+    private List<PresenceTypeDTO> presenceTypes = new ArrayList<>();
+    private List<TimeSlotDTO> timeSlots = new ArrayList<>();
+    private Long countryID;
 
 
     public WTADefaultDataInfoDTO() {
     }
 
-    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes) {
+    public Long getCountryID() {
+        return countryID;
+    }
+
+    public void setCountryID(Long countryID) {
+        this.countryID = countryID;
+    }
+
+    public List<TimeSlotDTO> getTimeSlots() {
+        return timeSlots;
+    }
+
+    public void setTimeSlots(List<TimeSlotDTO> timeSlots) {
+        this.timeSlots = timeSlots;
+    }
+
+    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes,List<TimeSlotDTO> timeSlots,Long countryID) {
         this.dayTypes = dayTypes;
         this.presenceTypes = presenceTypes;
+        this.timeSlots = timeSlots;
+        this.countryID = countryID;
     }
+
 
     public List<ActivityDTO> getActivityList() {
         return activityList;
