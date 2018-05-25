@@ -232,5 +232,7 @@ public class AppConstants {
 
     // Staff Questionnaire
     public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
+    public static final int MAX_ONE_ACTIVITY_PER_SHIFT = 10;
+
 
 }

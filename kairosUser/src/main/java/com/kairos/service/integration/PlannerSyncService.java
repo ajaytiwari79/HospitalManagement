@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -48,9 +50,9 @@ public class PlannerSyncService {
     @Async
     public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
         if(integrationOperation.equals(IntegrationOperation.CREATE)){
-            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId());
+            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId());
         }else if(integrationOperation.equals(IntegrationOperation.UPDATE)){
-            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
+            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
         }
         else if(integrationOperation.equals(IntegrationOperation.DELETE)){
             plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
@@ -70,12 +72,25 @@ public class PlannerSyncService {
     }*/
 
 
-    private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType,Long unitId) {
-        WTAResponseDTO wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getWorkingTimeAgreementId());
+    private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType,Long unitId,WTAResponseDTO wtaResponseDTO) {
+        if(wtaResponseDTO==null){
+            wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getWorkingTimeAgreementId());
+        }
         UnitPositionWtaDTO unitPositionWtaDTO=new UnitPositionWtaDTO(unitPosition.getId(),unitPosition.getExpertise().getId(),unitPosition.getPositionCode().getId(),unitPosition.getStartDateMillis(),unitPosition.getEndDateMillis(),
                 unitPosition.getTotalWeeklyMinutes(),unitPosition.getTotalWeeklyMinutes()/60,unitPosition.getAvgDailyWorkingHours(),unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getHourlyWages(),unitPosition.getSalary(),employmentType.getId(),unitId,unitPosition.getSeniorityLevel().getId(),employmentType.getPaymentFrequency(),wtaResponseDTO, unitPosition.getStaff().getId());
         return unitPositionWtaDTO;
+    }
+
+    private List<UnitPositionWtaDTO> createUnitPositionDTOs(Long unitId,List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips) {
+        List<UnitPositionWtaDTO> unitPositionWtaDTOS=new ArrayList<>();
+        List<BigInteger> upIds=unitPositionEmploymentTypeRelationShips.stream().map(upr->upr.getUnitPosition().getWorkingTimeAgreementId()).collect(Collectors.toList());
+        List<WTAResponseDTO> wtaResponseDTOS=workingTimeAgreementRestClient.getWTAByIds(upIds);
+        Map<BigInteger,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getId(), w->w));
+        unitPositionEmploymentTypeRelationShips.forEach(upr->{
+            unitPositionWtaDTOS.add(createUnitPositionDTO(upr.getUnitPosition(),upr.getEmploymentType(),unitId,wtaResponseDTOMap.get(upr.getUnitPosition().getWorkingTimeAgreementId())));
+        });
+        return unitPositionWtaDTOS;
     }
 
     private List<StaffBasicDetailsDTO> createStaffList(List<Staff> staff) {
@@ -93,5 +108,6 @@ public class PlannerSyncService {
     }
 
     public void publishAllUnitPositions(Long organisationId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips, IntegrationOperation create) {
+
     }
 }

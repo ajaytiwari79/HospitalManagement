@@ -1,6 +1,7 @@
 package com.kairos.activity.controller.activity;
 
 
+import com.kairos.activity.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.SkillActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
@@ -282,10 +283,10 @@ public class ActivityController {
     }
 
     @ApiOperation("update Opta PlannerSetting  details  of activity Type")
-    @PutMapping(value = "/activity/opta_planner_settings")
+    @PutMapping(value = "/activity/{activityId}/opta_planner_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OptaPlannerSettingActivityTabDTO optaPlannerSettingActivityTabDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(optaPlannerSettingActivityTabDTO));
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId,@RequestBody OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId,optaPlannerSettingActivityTab));
     }
 
     // cta_wta_settings
