@@ -244,8 +244,8 @@ public class StaffService extends UserBaseService {
             staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
             boolean isSeniorityLevelMatched=false;
             for(SeniorityLevel seniorityLevel:expertise.getSeniorityLevel()){
-                if(staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()>seniorityLevel.getFrom()*12 &&
-                        (seniorityLevel.getTo()==null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()<seniorityLevel.getTo()*12)){
+                if(staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()>=seniorityLevel.getFrom()*12 &&
+                        (seniorityLevel.getTo()==null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()<=seniorityLevel.getTo()*12)){
                     isSeniorityLevelMatched=true;
                     break;
                 }
