@@ -19,7 +19,6 @@ public class WTADefaultDataInfoDTO {
     private List<TimeTypeDTO> timeTypes = new ArrayList<>();
     private List<DayTypeDTO> dayTypes = new ArrayList<>();
     private List<PresenceTypeDTO> presenceTypes = new ArrayList<>();
-    private OrganizationDTO organizationDTO;
     private List<TimeSlotDTO> timeSlots = new ArrayList<>();
     private Long countryID;
 
@@ -50,13 +49,6 @@ public class WTADefaultDataInfoDTO {
         this.countryID = countryID;
     }
 
-    public OrganizationDTO getOrganizationDTO() {
-        return organizationDTO;
-    }
-
-    public void setOrganizationDTO(OrganizationDTO organizationDTO) {
-        this.organizationDTO = organizationDTO;
-    }
 
     public List<ActivityDTO> getActivityList() {
         return activityList;
