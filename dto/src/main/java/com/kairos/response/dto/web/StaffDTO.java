@@ -57,6 +57,10 @@ public class StaffDTO {
     private CurrentAddress primaryAddress;
     private Set<SkillDTO> skillSet;
 
+    public StaffDTO() {
+        // default constructor
+    }
+
     public StaffDTO(Long id, String firstName, Set<SkillDTO> skillSet) {
         this.id = id;
         this.firstName = firstName;

@@ -6,6 +6,7 @@ import com.kairos.response.dto.web.StaffDTO;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Optional;
 
 public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpecification<StaffDTO> {
 
@@ -19,7 +20,12 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
 
     @Override
     public boolean isSatisfied(StaffDTO staffDTO) {
-        int age = Period.between(staffDTO.getDateOfBirth(), LocalDate.now()).getYears();
-        return (age >= eligibleMinAge &&  age <= eligibleMaxAge);
+        if(Optional.ofNullable(staffDTO.getDateOfBirth()).isPresent()){
+            int age = Period.between(staffDTO.getDateOfBirth(), LocalDate.now()).getYears();
+            return (age >= eligibleMinAge &&  age <= eligibleMaxAge);
+        } else {
+            return false;
+        }
+
     }
 }

@@ -10,7 +10,6 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.response.dto.web.staff.UnitStaffResponseDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -431,7 +430,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("MATCH (org:Organization) WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WITH staff, user\n" +
             "MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:IN_UNIT]-(o:Organization)\n" +
-            "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o return id(o) as id, staffData as staffList")
-    UnitStaffResponseDTO getStaffListOfUnitWithBasicInfo();
+            "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
+            "RETURN  id(o) as unitId, staffData as staffList")
+    List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
 
 }

@@ -15,10 +15,11 @@ import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.activity.constants.ApiConstants.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL)
+@Api(API_ORGANIZATION_URL+COUNTRY_URL)
 public class ExpertiseNightWorkerSettingController {
 
     @Inject

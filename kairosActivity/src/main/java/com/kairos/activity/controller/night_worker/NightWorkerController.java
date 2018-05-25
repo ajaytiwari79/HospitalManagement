@@ -70,4 +70,11 @@ public class NightWorkerController {
                                                                             @RequestBody @Valid NightWorkerUnitSettingsDTO nightWorkerUnitSettingsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerSettings(unitId,  nightWorkerUnitSettingsDTO));
     }
+
+    @ApiOperation(value = "update night worker eligibility status")
+    @PutMapping(value = "/night_worker/eligibility_status")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNightWorkerEligibilityOfStaff() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerEligibilityOfStaff());
+    }
 }

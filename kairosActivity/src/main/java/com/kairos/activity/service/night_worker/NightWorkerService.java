@@ -213,7 +213,7 @@ public class NightWorkerService extends MongoBaseService {
             ActivitySpecification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(nightWorkerUnitSettings.getEligibleMinAge(),
                     nightWorkerUnitSettings.getEligibleMaxAge());
             ActivitySpecification<StaffDTO> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
-            ActivitySpecification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.or(nightWorkerPregnancySpecification);
+            ActivitySpecification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.and(nightWorkerPregnancySpecification);
 
             if(rulesSpecification.isSatisfied(staffDTO)){
                 staffIdsEligibleForNightWorker.add(staffDTO.getId());
@@ -231,7 +231,7 @@ public class NightWorkerService extends MongoBaseService {
     }
 
     // Method to be triggered when job will be executed for updating eligibility of Staff for being night worker
-    public void updateNightWorkerEligibilityOfStaff(){
+    public boolean updateNightWorkerEligibilityOfStaff(){
         List<UnitStaffResponseDTO> unitStaffResponseDTOs = staffRestClient.getUnitWiseStaffList();
         List<Long> listOfUnitIds = new ArrayList<Long>();
         unitStaffResponseDTOs.stream().forEach(unitStaffResponseDTO ->{
@@ -249,6 +249,7 @@ public class NightWorkerService extends MongoBaseService {
             checkIfStaffAreEligibleForNightWorker(nightWorkerUnitSettingsMap.get(unitStaffResponseDTO.getUnitId()), unitStaffResponseDTO.getStaffList(), staffEligibleForNightWorker,
                     staffNotEligibleForNightWorker);
         });
+        return true;
     }
 
 }

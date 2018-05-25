@@ -151,8 +151,8 @@ public class ExpertiseService extends UserBaseService {
         TimeSlot timeSlot =  new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
                 null,null,null,null, countryId,expertise.getId() );
-//        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
-//                "/expertise/"+expertise.getId()+"/night_worker_setting",null, null);
+        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
+                "/expertise/"+expertise.getId()+"/night_worker_setting",null, null);
 
         return expertiseResponseDTO;
     }
