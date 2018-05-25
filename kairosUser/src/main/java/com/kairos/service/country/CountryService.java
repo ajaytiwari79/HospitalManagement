@@ -27,6 +27,7 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -47,6 +48,10 @@ import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.NIGHT_END_HOUR;
+import static com.kairos.constants.AppConstants.NIGHT_START_HOUR;
 
 /**
  * Created by oodles on 16/9/16.
@@ -546,7 +551,15 @@ public class CountryService extends UserBaseService {
                 e.printStackTrace();
             }
         });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1);
+        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1,getDefaultTimeSlot(),countryId);
+    }
+
+    public List<TimeSlotDTO> getDefaultTimeSlot(){
+        List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
+        timeSlotDTOS.add(new TimeSlotDTO(DAY,DAY_START_HOUR,00,DAY_END_HOUR,00));
+        timeSlotDTOS.add(new TimeSlotDTO(EVENING,EVENING_START_HOUR,00,EVENING_END_HOUR,00));
+        timeSlotDTOS.add(new TimeSlotDTO(NIGHT,NIGHT_START_HOUR,00,NIGHT_END_HOUR,00));
+        return timeSlotDTOS;
     }
 
 
