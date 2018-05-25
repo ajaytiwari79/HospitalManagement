@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<FunctionalPayment, Long> {
-    @Query("match(functionalPayment:FunctionalPayment{deleted:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) where id(expertise)={0}" +
+    @Query("match(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) where id(expertise)={0}" +
             " return id(functionalPayment) as id, functionalPayment.name as name,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.published as published, " +
             " functionalPayment.paidOutFrequency as paidOutFrequency ORDER BY startDate ASC")
     List<FunctionalPaymentDTO> getFunctionalPaymentOfExpertise(Long expertiseId);
