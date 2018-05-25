@@ -1,5 +1,7 @@
 package com.kairos.client.dto.time_bank;
 
+import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
+
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +26,8 @@ public class CTARuleTemplateDTO {
     private String payrollSystem;
     private String payrollType;
     private String accountType;
+    private CalculationFor calculationFor;
+
 
     public CTARuleTemplateDTO() {
     }
@@ -162,5 +166,13 @@ public class CTARuleTemplateDTO {
 
     public void setPayrollType(String payrollType) {
         this.payrollType = payrollType;
+    }
+
+    public CalculationFor getCalculationFor() {
+        return calculationFor;
+    }
+
+    public void setCalculationFor(CalculationFor calculationFor) {
+        this.calculationFor = calculationFor;
     }
 }
