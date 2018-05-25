@@ -22,7 +22,6 @@ import com.kairos.activity.persistence.repository.activity.TimeTypeMongoReposito
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
-import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
@@ -36,9 +35,8 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
-import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.persistence.model.enums.DurationType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
