@@ -5,6 +5,7 @@ import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.client.dto.staff.StaffDTO;
 import com.kairos.activity.util.userContext.UserContext;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -302,5 +303,29 @@ public class StaffRestClient {
             throw new RuntimeException("exception occurred in user micro service "+e.getMessage());
         }
 
+    }
+
+    public UserAccessRoleDTO getAccessOfCurrentLoggedInStaff() {
+
+        final String baseUrl = getBaseUrl(true);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<UserAccessRoleDTO>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/current_user/access_role",
+                            HttpMethod.GET, null, typeReference);
+            RestTemplateResponseEnvelope<UserAccessRoleDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
     }
 }
