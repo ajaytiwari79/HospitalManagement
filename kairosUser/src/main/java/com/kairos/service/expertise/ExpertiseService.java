@@ -2,6 +2,7 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
 import com.kairos.custom_exception.ActionNotPermittedException;
@@ -150,7 +151,8 @@ public class ExpertiseService extends UserBaseService {
         TimeSlot timeSlot =  new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
                 null,null,null,null, countryId,expertise.getId() );
-//        priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/priority_groups",countryDetail);
+        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
+                "/expertise/"+expertise.getId()+"/night_worker_setting",null, null);
 
         return expertiseResponseDTO;
     }

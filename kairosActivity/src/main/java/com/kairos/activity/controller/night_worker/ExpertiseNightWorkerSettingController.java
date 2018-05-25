@@ -25,7 +25,7 @@ public class ExpertiseNightWorkerSettingController {
     ExpertiseNightWorkerSettingService expertiseNightWorkerSettingService;
 
     @ApiOperation(value = "create expertise night worker settings")
-    @PutMapping(value = "/expertise/{expertiseId}/night_worker_setting")
+    @PostMapping(value = "/expertise/{expertiseId}/night_worker_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createExpertiseNightWorkerSettings(@PathVariable Long countryId, @PathVariable Long expertiseId,
                                                                                @RequestBody @Valid ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO) {

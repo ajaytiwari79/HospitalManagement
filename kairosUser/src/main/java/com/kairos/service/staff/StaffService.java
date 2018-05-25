@@ -346,6 +346,7 @@ public class StaffService extends UserBaseService {
 
 
     public Map<String, Object> retrievePersonalInfo(Staff staff) {
+        User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
@@ -359,6 +360,8 @@ public class StaffService extends UserBaseService {
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
+        map.put("gender", user.getGender());
+        map.put("pregnant", user.isPregnant());
 
 
         List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
