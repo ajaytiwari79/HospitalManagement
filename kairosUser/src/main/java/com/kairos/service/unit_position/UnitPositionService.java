@@ -969,5 +969,9 @@ public class UnitPositionService extends UserBaseService {
 
     }
 
+   public Long getUnitPositionIdByStaffAndExpertise(Long unitId,Long staffId,Long expertiseId){
+       return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId,staffId,expertiseId,System.currentTimeMillis());
+   }
+
 
 }

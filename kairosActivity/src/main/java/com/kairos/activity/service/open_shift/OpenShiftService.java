@@ -6,12 +6,15 @@ import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
+import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
+import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,9 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.PICKABLE;
+import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.SHOW_INTEREST_PLANNER_WILL_CHOOSE;
 
 @Service
 @Transactional
@@ -36,6 +42,8 @@ public class OpenShiftService extends MongoBaseService {
     @Inject private OrderMongoRepository orderMongoRepository;
     @Inject
     private GenericIntegrationService genericIntegrationService;
+    @Inject
+    private ShiftService shiftService;
 
 
 
@@ -138,6 +146,31 @@ public class OpenShiftService extends MongoBaseService {
         List<OpenShiftResponseDTO> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, selectedDate);
 
         return openShifts;
+    }
+
+    public OpenShiftResponseDTO pickOpenShiftByStaff(long unitId, BigInteger openShiftId, long staffId) {
+        OpenShift openShift = openShiftMongoRepository.findByIdAndUnitIdAndDeletedFalse(openShiftId, unitId);
+        if (!Optional.ofNullable(openShift).isPresent()) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShift", openShiftId);
+        }
+        Optional<Order> order=orderMongoRepository.findById(openShift.getOrderId());
+        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,order.get().getExpertiseId());
+
+        if (order.get().getShiftAssignmentCriteria().equals(PICKABLE)) {
+            ShiftDTO shiftDTO=new ShiftDTO(openShift.getActivityId(),unitId,staffId,unitPositionId);
+            shiftDTO.setShiftDate(openShift.getStartDate());
+            shiftDTO.setParentOpenShiftId(openShiftId);
+            shiftService.createShift(unitId,shiftDTO,"Organization",false);
+            openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()-1);
+
+        } else if (ShiftAssignmentCriteria.values().equals(SHOW_INTEREST_PLANNER_WILL_CHOOSE)) {
+            openShift.getInterestedStaff().add(staffId);
+            openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()+1);
+        }
+        save(openShift);
+        OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
+        ObjectMapperUtils.copyProperties(openShift, openShiftResponseDTO);
+        return openShiftResponseDTO;
     }
 
 }

@@ -235,4 +235,11 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(org)  as unitId ")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
+
+    @Query("MATCH(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
+            "MATCH(unitPosition)<-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) " +
+            "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={0} AND id(staff)={1} and id(expertise)={2} \n" +
+            "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
+            "return id(unitPosition)")
+    Long getUnitPositionIdByStaffAndExpertise(Long unitId,Long staffId,Long expertiseId,Long currentMillis);
 }

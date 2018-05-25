@@ -35,9 +35,9 @@ public class GenericRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl +id + getURI(t,uri,queryParams,pathParams),
+                            baseUrl +id + getURI(t,uri,queryParams),
                             getHttpMethod(integrationOperation),
-                            t==null?null:new HttpEntity<>(t), typeReference);
+                            t==null?null:new HttpEntity<>(t), typeReference,pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException(response.getMessage());
@@ -65,7 +65,7 @@ public class GenericRestClient {
 
         }
     }
-    public static <T> String getURI(T t,String uri,Map<String,Object> queryParams,Object... pathParams){
+    public static <T> String getURI(T t,String uri,Map<String,Object> queryParams){
         URIBuilder builder = new URIBuilder();
 
         if(Optional.ofNullable(queryParams).isPresent()){

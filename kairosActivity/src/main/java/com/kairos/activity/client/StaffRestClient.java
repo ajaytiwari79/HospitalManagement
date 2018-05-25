@@ -237,7 +237,7 @@ public class StaffRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityDayTypes="+dayType,
+                            baseUrl + "7599/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityDayTypes="+dayType,
                             HttpMethod.GET, null, typeReference, staffId, unitEmploymentId);
             RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

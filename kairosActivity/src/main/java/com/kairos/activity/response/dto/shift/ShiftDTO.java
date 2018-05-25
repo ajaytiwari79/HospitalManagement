@@ -35,6 +35,7 @@ public class ShiftDTO {
     private long probability;
     private long accumulatedTimeBankInMinutes;
     private String remarks;
+    private BigInteger parentOpenShiftId;
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.activityId.notnull")
     private BigInteger activityId;
@@ -325,5 +326,13 @@ public class ShiftDTO {
 
     public void setUnitPositionId(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
+    }
+
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
     }
 }
