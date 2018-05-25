@@ -8,22 +8,44 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "master_processing_activity")
 public class MasterProcessingActivity extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
-    private  String name;
+    private String name;
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List <OrganizationTypeAndServiceBasicDto>organizationServices;
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
+    private List<BigInteger> subProcessingActivityIds;
+
+    @NotNull(message = "error.message.countryId.cannot.be.null")
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public List<BigInteger> getSubProcessingActivityIds() {
+        return subProcessingActivityIds;
+    }
+
+    public void setSubProcessingActivityIds(List<BigInteger> subProcessingActivityIds) {
+        this.subProcessingActivityIds = subProcessingActivityIds;
+    }
 
     public String getName() {
         return name;
@@ -73,8 +95,15 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public MasterProcessingActivity()
-    {
+    public MasterProcessingActivity() {
 
     }
+
+    public MasterProcessingActivity(Long countryId,String name,String description) {
+
+        this.name=name;
+        this.description=description;
+        this.countryId=countryId;
+         }
+
 }

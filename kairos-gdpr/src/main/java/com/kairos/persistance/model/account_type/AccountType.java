@@ -18,15 +18,6 @@ public class AccountType extends MongoBaseEntity {
     @UniqueElements
     private String typeOfAccount;
 
-    private Long countryId;
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 
     public String getTypeOfAccount() {
         return typeOfAccount;

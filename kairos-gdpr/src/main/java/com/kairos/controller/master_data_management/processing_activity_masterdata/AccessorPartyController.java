@@ -32,20 +32,20 @@ public class AccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAccessorParty(@RequestBody List<AccessorParty> accessorParties) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(accessorParties));
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId,@RequestBody List<AccessorParty> accessorParties) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(countryId,accessorParties));
 
     }
 
 
     @ApiOperation("get AccessorParty by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getAccessorParty(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId,id));
 
     }
 
@@ -59,8 +59,8 @@ public class AccessorPartyController {
 
     @ApiOperation("get AccessorParty by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getAccessorPartyByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyByName(name));
+    public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyByName(countryId,name));
 
     }
 

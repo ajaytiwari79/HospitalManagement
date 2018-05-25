@@ -10,23 +10,29 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Repository
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>{
 
 
-    Clause findByTitle(String title);
+    @Query("{'countryId':?0,'title':?1,deleted:false}")
+    Clause findByTitle(Long countryId,String title);
+
+    Clause findByid(BigInteger id);
 
 
 
-    @Query("{'_id':?0,deleted:false}")
-    Clause findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    Clause findByIdAndNonDeleted(Long countryId,BigInteger id);
 
 
-    @Query("{deleted:false}")
-    List<Clause>  findAllClause();
+    @Query("{deleted:false,'countryId':?0}")
+    List<Clause>  findAllClause(Long countryId);
 
+    @Query("{deleted:false,'countryId':?0,'_id':{$in:?1}}")
+    List<Clause>  getClauseListByIds(Long countryId, Set<BigInteger> ids);
 
     @Query("{'accountType':?0}")
     List<Clause> getClauseByAccountType(String accountType);

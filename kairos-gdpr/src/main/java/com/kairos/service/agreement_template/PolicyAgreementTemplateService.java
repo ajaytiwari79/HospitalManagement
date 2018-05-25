@@ -19,6 +19,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.utils.ComparisonUtils;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     @Inject
     private JackrabbitService jackrabbitService;
 
-    public PolicyAgreementTemplate createPolicyAgreementTemplate(PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
+    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
 
         String name = policyAgreementTemplateDto.getName();
         if (policyAgreementTemplateRepository.findByName(name) != null) {
@@ -70,9 +71,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
+            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
             if (Optional.ofNullable(requestResult).isPresent()) {
-                Map<String,Object> sections =new HashMap<>();
+                Map<String, Object> sections = new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
                     List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
                     comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
@@ -89,15 +90,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     policyAgreementTemplate.setOrganizationSubServices(orgSubServices);
                 }
                 if (agreementSection.size() != 0) {
-                    sections= agreementSectionService.createAgreementSections(agreementSection);
+                    sections = agreementSectionService.createAgreementSections(agreementSection);
                     policyAgreementTemplate.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
-                accountTypeService.getAccountListByIds(accountTypeIds);
-                policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
+                accountTypeService.getAccountTypeList(accountTypeIds);
+                policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 policyAgreementTemplate.setOrganizationTypes(requestResult.getOrganizationTypes());
-                policyAgreementTemplate.setName(policyAgreementTemplateDto.getName());
-                policyAgreementTemplate.setDescription(policyAgreementTemplateDto.getDescription());
                 policyAgreementTemplate.setCountryId(policyAgreementTemplateDto.getCountryId());
                 policyAgreementTemplate = save(policyAgreementTemplate);
                 jackrabbitService.addAgreementTemplateJackrabbit(policyAgreementTemplate.getId(), policyAgreementTemplate, (List<AgreementSectionResponseDto>) sections.get("section"));
@@ -114,8 +113,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplateResponseDto getPolicyAgreementTemplateById(BigInteger id) {
-        PolicyAgreementTemplateResponseDto exist = policyAgreementTemplateRepository.getPolicyAgreementWithDataById(id);
+    public PolicyAgreementTemplateResponseDto getPolicyAgreementTemplateById(Long countryId,BigInteger id) {
+        PolicyAgreementTemplateResponseDto exist = policyAgreementTemplateRepository.getPolicyAgreementWithDataById(countryId,id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
@@ -123,21 +122,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-
     public List<PolicyAgreementTemplateResponseDto> getPolicyAgreementTemplateWithData() {
-        List<PolicyAgreementTemplateResponseDto>  exist = policyAgreementTemplateRepository.getPolicyAgreementWithData();
-        if (exist.size()!=0) {
+        List<PolicyAgreementTemplateResponseDto> exist = policyAgreementTemplateRepository.getPolicyAgreementWithData(UserContext.getCountryId());
+        if (exist.size() != 0) {
             return exist;
         }
         throw new DataNotExists("policy agreement template ");
     }
 
 
-
-
     public Boolean deletePolicyAgreementTemplate(BigInteger id) {
 
-        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
+        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
             save(exist);
@@ -163,13 +159,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             orgSubServiceIds = policyAgreementTemplateDto.getOrganizationSubServices();
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
 
-
             OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
             OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-            accountTypeService.getAccountListByIds(accountTypeIds);
-            exist.setAccountTypes(accountTypeIds);
             if (Optional.ofNullable(requestResult).isPresent()) {
-                Map<String,Object> sections =new HashMap<>();
+                Map<String, Object> sections = new HashMap<>();
                 if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
                     List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
                     comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
@@ -193,11 +186,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     sections = agreementSectionService.createAgreementSections(agreementSection);
                     exist.setAgreementSections((List<BigInteger>) sections.get("ids"));
                 }
+                accountTypeService.getAccountTypeList(accountTypeIds);
+                exist.setAccountTypes(accountTypeIds);
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 exist.setOrganizationTypes(requestResult.getOrganizationTypes());
                 exist.setName(policyAgreementTemplateDto.getName());
                 exist.setDescription(policyAgreementTemplateDto.getDescription());
-                exist.setCountryId(policyAgreementTemplateDto.getCountryId());
+
 
                 jackrabbitService.agreementTemplateVersioning(id, exist, (List<AgreementSectionResponseDto>) sections.get("section"));
             } else {
@@ -215,11 +210,11 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     public String getPolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
-                return jackrabbitService.getpolicyTemplateVersion(id, version);
+        return jackrabbitService.getpolicyTemplateVersion(id, version);
     }
 
 
-    public List<String> getPolicyTemplateAllVersionList(BigInteger id) throws RepositoryException {
+    public List<String> getPolicyTemplateAllVersionList(Long countryId,BigInteger id) throws RepositoryException {
 
         return jackrabbitService.getPolicyTemplateVersions(id);
 

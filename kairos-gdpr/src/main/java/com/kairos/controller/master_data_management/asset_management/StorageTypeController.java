@@ -31,20 +31,20 @@ public class StorageTypeController {
 
     @ApiOperation("add StorageType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createStorageType(@RequestBody List<StorageType> storageTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createStorageType(storageTypes));
+    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId,@RequestBody List<StorageType> storageTypes) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createStorageType(countryId,storageTypes));
 
     }
 
 
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getStorageType(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getStorageType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageType(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageType(countryId,id));
 
     }
 
@@ -59,8 +59,8 @@ public class StorageTypeController {
 
     @ApiOperation("get StorageType by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getStorageTypeByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(name));
+    public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(countryId,name));
 
     }
 

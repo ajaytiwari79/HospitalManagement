@@ -33,19 +33,19 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("add ResponsibilityType  ")
     @PostMapping("/add")
-    public ResponseEntity<Object> createResponsibilityType(@RequestBody List<ResponsibilityType> responsibilityTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(responsibilityTypes));
+    public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId,@RequestBody List<ResponsibilityType> responsibilityTypes) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId,responsibilityTypes));
 
     }
 
 
     @ApiOperation("get ResponsibilityType  by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getResponsibilityType(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId,id));
 
     }
 
@@ -59,8 +59,8 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("get ResponsibilityType by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getResponsibilityTypeByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(name));
+    public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(countryId,name));
 
     }
 

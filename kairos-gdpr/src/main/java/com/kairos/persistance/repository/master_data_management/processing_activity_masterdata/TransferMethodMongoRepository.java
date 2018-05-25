@@ -12,12 +12,13 @@ import java.util.List;
 @Repository
 public interface TransferMethodMongoRepository extends MongoRepository<TransferMethod,BigInteger> {
 
-    @Query("{'_id':?0,deleted:false}")
-    TransferMethod findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    TransferMethod findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    TransferMethod findByName(String name);
+    TransferMethod findByid(BigInteger id);
+    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    TransferMethod findByName(Long countryId,String name);
 
-    @Query("{deleted:false}")
-    List<TransferMethod> findAllTransferMethods();
+    @Query("{'countryId':?0,deleted:false}")
+    List<TransferMethod> findAllTransferMethods(Long countryId);
 }

@@ -12,17 +12,17 @@ import java.util.List;
 @Repository
 public interface AccessorPartyMongoRepository extends MongoRepository<AccessorParty,BigInteger> {
 
-    @Query("{'_id':?0,deleted:false}")
-    AccessorParty findByIdAndNonDeleted(BigInteger id);
+    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    AccessorParty findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    AccessorParty findByName(String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    AccessorParty findByName(Long countryId,String name);
 
     @Query("{'_id':{$in:?0}}")
     List<AccessorParty> accessorPartyList(List<BigInteger> ids);
 
-
-    @Query("{deleted:false}")
-    List<AccessorParty> findAllAccessorParties();
+    AccessorParty findByid(BigInteger id);
+    @Query("{countryId:?0,deleted:false}")
+    List<AccessorParty> findAllAccessorParties(Long countryId);
 
 }

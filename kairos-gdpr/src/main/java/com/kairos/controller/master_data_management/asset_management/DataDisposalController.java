@@ -32,20 +32,20 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataDisposal(@RequestBody List<DataDisposal> dataDisposals) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(dataDisposals));
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId,@RequestBody List<DataDisposal> dataDisposals) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId,dataDisposals));
 
     }
 
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId,id));
 
     }
 
@@ -59,8 +59,8 @@ public class DataDisposalController {
 
     @ApiOperation("get DataDisposal by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDataDisposalByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(name));
+    public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId,name));
 
     }
 

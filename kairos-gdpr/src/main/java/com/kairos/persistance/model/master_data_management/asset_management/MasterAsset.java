@@ -6,6 +6,7 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Document(collection = "master_asset")
@@ -23,14 +24,15 @@ public class MasterAsset extends MongoBaseEntity {
     private List <OrganizationTypeAndServiceBasicDto>organizationServices;
     private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private Long countryid;
+    @NotNull(message = "error.message.countryId.cannot.be.null")
+    private Long countryId;
 
-    public Long getCountryid() {
-        return countryid;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setCountryid(Long countryid) {
-        this.countryid = countryid;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     public String getName() {

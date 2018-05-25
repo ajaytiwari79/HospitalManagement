@@ -14,7 +14,7 @@ public class AccessorParty extends MongoBaseEntity {
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
     private String name;
 
-   // @NotNull(message = "error.message.countryId.cannot.be.null")
+    @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {

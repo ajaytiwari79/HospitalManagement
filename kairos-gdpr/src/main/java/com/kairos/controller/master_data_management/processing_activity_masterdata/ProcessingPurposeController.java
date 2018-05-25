@@ -37,19 +37,19 @@ public class ProcessingPurposeController {
 
     @ApiOperation("add pocessing purpose")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingPurpose(@Validated @RequestBody List<ProcessingPurpose> processingPurposes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(processingPurposes));
+    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @RequestBody List<ProcessingPurpose> processingPurposes) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId,processingPurposes));
 
     }
 
 
     @ApiOperation("get pocessing purpose by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getProcessingPurpose(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId,id));
 
     }
 
@@ -63,8 +63,8 @@ public class ProcessingPurposeController {
 
     @ApiOperation("get ProcessingPurpose by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getProcessingPurposeByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(name));
+    public ResponseEntity<Object> getProcessingPurposeByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(countryId,name));
 
     }
 

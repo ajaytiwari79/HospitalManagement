@@ -42,6 +42,7 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
+/*
 
     ProcessingActivity createProcessingActivity(ProcessingActivityDto processingActivityDto) {
 
@@ -87,6 +88,7 @@ public class ProcessingActivityService extends MongoBaseService {
         } else
             throw new DuplicateDataException("ProcessingActivity for " + processingActivityDto.getName() + "exists");
     }
+*/
 
 
 }

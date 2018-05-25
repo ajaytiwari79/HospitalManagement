@@ -7,6 +7,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ResponsibilityType;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +22,21 @@ public class ResponsibilityTypeService extends MongoBaseService {
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
 
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(List<ResponsibilityType> rsponsibilityTypes) {
+    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,List<ResponsibilityType> rsponsibilityTypes) {
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
         List<ResponsibilityType> existing = new ArrayList<>();
         List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
         if (rsponsibilityTypes.size() != 0) {
             for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(responsibilityType.getName());
+                    ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId,responsibilityType.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         ResponsibilityType newResponsibilityType = new ResponsibilityType();
                         newResponsibilityType.setName(responsibilityType.getName());
+                        newResponsibilityType.setCountryId(countryId);
                         newResponsibilityTypes.add(save(newResponsibilityType));
                     }
                 } else
@@ -52,13 +54,13 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
     public List<ResponsibilityType> getAllResponsibilityType() {
-       return responsibilityTypeMongoRepository.findAllResponsibilityTypes();
+       return responsibilityTypeMongoRepository.findAllResponsibilityTypes(UserContext.getCountryId());
     }
 
 
-    public ResponsibilityType getResponsibilityType(BigInteger id) {
+    public ResponsibilityType getResponsibilityType(Long countryId,BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -70,7 +72,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
     public Boolean deleteResponsibilityType(BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -85,7 +87,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
     public ResponsibilityType updateResponsibilityType(BigInteger id, ResponsibilityType responsibilityType) {
 
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -97,11 +99,11 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public ResponsibilityType getResponsibilityTypeByName(String name) {
+    public ResponsibilityType getResponsibilityTypeByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(name);
+            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

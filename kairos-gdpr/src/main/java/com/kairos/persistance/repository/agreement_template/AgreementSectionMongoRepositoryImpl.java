@@ -41,10 +41,10 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
     }
 
     @Override
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(List<BigInteger> ids) {
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,List<BigInteger> ids) {
         Aggregation aggregation=Aggregation.newAggregation(
 
-                match(Criteria.where("deleted").is(false).and("_id").in(ids)),
+                match(Criteria.where("deleted").is(false).and("_id").in(ids).and("countryId").is(countryId)),
                 lookup("clause","clauseIds","_id","clauses")
         );
         AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);

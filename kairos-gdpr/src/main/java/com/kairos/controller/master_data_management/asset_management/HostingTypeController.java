@@ -35,20 +35,20 @@ public class HostingTypeController {
 
     @ApiOperation("add HostingType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createHostingType(@RequestBody List<HostingType> hostingTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(hostingTypes));
+    public ResponseEntity<Object> createHostingType(@PathVariable Long countryId,@RequestBody List<HostingType> hostingTypes) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId,hostingTypes));
 
     }
 
 
     @ApiOperation("get HostingType by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getHostingType(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getHostingType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(countryId,id));
 
     }
 
@@ -63,8 +63,8 @@ public class HostingTypeController {
 
     @ApiOperation("get HostingType by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getHostingTypeByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingTypeByName(name));
+    public ResponseEntity<Object> getHostingTypeByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingTypeByName(countryId,name));
 
     }
 

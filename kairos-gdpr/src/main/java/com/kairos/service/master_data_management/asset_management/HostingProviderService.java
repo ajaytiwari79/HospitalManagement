@@ -8,6 +8,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingProvider;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingProviderMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,20 +24,21 @@ public class HostingProviderService extends MongoBaseService {
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
-    public Map<String, List<HostingProvider>> createHostingProviders(List<HostingProvider> hostingProviders) {
+    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,List<HostingProvider> hostingProviders) {
         Map<String, List<HostingProvider>> result = new HashMap<>();
         List<HostingProvider> existing = new ArrayList<>();
         List<HostingProvider> newhostingProviders = new ArrayList<>();
         if (hostingProviders.size() != 0) {
             for (HostingProvider hostingProvider : hostingProviders) {
                 if (!StringUtils.isBlank(hostingProvider.getName())) {
-                    HostingProvider exist = hostingProviderMongoRepository.findByName(hostingProvider.getName());
+                    HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,hostingProvider.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         HostingProvider newHostingProvider = new HostingProvider();
                         newHostingProvider.setName(hostingProvider.getName());
+                        newHostingProvider.setCountryId(countryId);
                         newhostingProviders.add(save(newHostingProvider));
                     }
                 } else
@@ -53,13 +55,13 @@ public class HostingProviderService extends MongoBaseService {
     }
 
     public List<HostingProvider> getAllHostingProvider() {
-       return hostingProviderMongoRepository.findAllHostingProviders();
+       return hostingProviderMongoRepository.findAllHostingProviders(UserContext.getCountryId());
            }
 
 
-    public HostingProvider getHostingProviderById(BigInteger id) {
+    public HostingProvider getHostingProviderById(Long countryId,BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -71,7 +73,7 @@ public class HostingProviderService extends MongoBaseService {
 
     public Boolean deleteHostingProvider(BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -85,7 +87,7 @@ public class HostingProviderService extends MongoBaseService {
 
     public HostingProvider updateHostingProvider(BigInteger id, HostingProvider hostingProvider) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -97,11 +99,11 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public HostingProvider getHostingProviderByName(String name) {
+    public HostingProvider getHostingProviderByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            HostingProvider exist = hostingProviderMongoRepository.findByName(name);
+            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

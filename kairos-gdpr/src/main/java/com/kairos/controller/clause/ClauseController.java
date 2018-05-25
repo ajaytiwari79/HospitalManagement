@@ -46,15 +46,15 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping("/add_clause")
-    public ResponseEntity<Object> createClause(@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(clauseDto));
+    public ResponseEntity<Object> createClause(@PathVariable Long countryId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId,clauseDto));
     }
 
     @ApiOperation("get clause by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getClause(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getClause(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId,id));
 
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null  or empty");
@@ -91,9 +91,9 @@ public class ClauseController {
 
 
     @ApiOperation("get clause by list")
-    @PostMapping("/clause/list")
-    public ResponseEntity<Object> getClauseList(@RequestBody Set<BigInteger> clausesids) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(clausesids));
+    @PostMapping("/clauses")
+    public ResponseEntity<Object> getClauseList(@PathVariable Long countryId,@RequestBody Set<BigInteger> clausesids) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(countryId,clausesids));
     }
 
     @ApiOperation("get All clauses")

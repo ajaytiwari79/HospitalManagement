@@ -12,19 +12,20 @@ import java.util.List;
 @Repository
 public interface DestinationMongoRepository extends MongoRepository<Destination,BigInteger> {
 
-    @Query("{'_id':?0,deleted:false}")
-    Destination findByIdAndNonDeleted(BigInteger id);
+    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    Destination findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    Destination findByName(String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    Destination findByName(Long countryId,String name);
 
+    Destination findByid(BigInteger id);
 
     @Query("{'_id':{$in:?0},deleted:false}")
     List<Destination> destinationList(List<BigInteger> ids);
 
 
-    @Query("{deleted:false}")
-    List<Destination> findAllDestinations();
+    @Query("{countryId:?0,deleted:false}")
+    List<Destination> findAllDestinations(Long countryId);
 
 
 }

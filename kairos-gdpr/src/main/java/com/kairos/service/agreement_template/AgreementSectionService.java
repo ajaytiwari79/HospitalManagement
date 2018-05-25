@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.agreement_template.AgreementSectionMong
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,46 +30,36 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseMongoRepository clauseMongoRepository;
 
 
-    public AgreementSection createAgreementSection(Long countryId,AgreementSection agreementSection) {
-
-       /* if (agreementSectionMongoRepository.findByTitle(agreementSection.getTitle()) != null) {
-            throw new DuplicateDataException("section with name " + agreementSection.getTitle() + "  already exist");
-        }*/
-        for (BigInteger clauseId : agreementSection.getClauseIds()) {
-            if (clauseMongoRepository.findByIdAndNonDeleted(clauseId) == null) {
-                throw new DataNotFoundByIdException("clause for id  " + clauseId + "  not found");
-            }
-        }
-     return  save(new AgreementSection(agreementSection.getTitle(), agreementSection.getClauseIds()));
-
-    }
-
-
-    public  Map<String,Object> createAgreementSections(List<AgreementSection> agreementSections) {
+    public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
 
         List<AgreementSectionResponseDto> result = new ArrayList<>();
-        List<BigInteger> ids=new ArrayList<>();
-        Map<String,Object> response=new HashMap<>();
+        List<BigInteger> ids = new ArrayList<>();
+        Map<String, Object> response = new HashMap<>();
 
         if (agreementSections.size() != 0) {
 
             for (AgreementSection agreementSection : agreementSections) {
-                AgreementSection section=createAgreementSection(agreementSection.getCountryId(),agreementSection);
+                AgreementSection section = buildAgreementSection(UserContext.getCountryId(), agreementSection);
                 ids.add(section.getId());
 
             }
-            response.put("section",agreementSectionMongoRepository.getAgreementSectionWithDataList(ids));
-            response.put("ids",ids);
+            response.put("section", agreementSectionMongoRepository.getAgreementSectionWithDataList(UserContext.getCountryId(),ids));
+            response.put("ids", ids);
             return response;
         } else
             throw new InvalidRequestException("agreement section list is empty");
 
     }
 
+    public AgreementSection buildAgreementSection(Long countryId, AgreementSection agreementSection) {
+        return save(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
+
+    }
+
 
     public Boolean deleteAgreementSection(BigInteger id) {
 
-        AgreementSection exist = agreementSectionMongoRepository.findByIdAndNonDeleted(id);
+        AgreementSection exist = agreementSectionMongoRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
             save(exist);
@@ -79,7 +70,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public AgreementSectionResponseDto getAgreementSectionWithDataById(Long countryId,BigInteger id) {
+    public AgreementSectionResponseDto getAgreementSectionWithDataById(Long countryId, BigInteger id) {
 
         AgreementSectionResponseDto exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -101,8 +92,8 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(List<BigInteger> ids) {
-        return agreementSectionMongoRepository.getAgreementSectionWithDataList(ids);
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,List<BigInteger> ids) {
+        return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId,ids);
 
     }
 

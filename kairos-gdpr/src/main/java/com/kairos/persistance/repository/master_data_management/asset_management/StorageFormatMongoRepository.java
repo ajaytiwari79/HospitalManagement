@@ -13,15 +13,16 @@ public interface StorageFormatMongoRepository extends MongoRepository<StorageFor
 
 
 
-    @Query("{'_id':?0,deleted:false}")
-    StorageFormat findByIdAndNonDeleted(BigInteger id);
+    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    StorageFormat findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    StorageFormat findByName(String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    StorageFormat findByName(Long countryId,String name);
 
+    StorageFormat findByid(BigInteger id);
 
-    @Query("{deleted:false}")
-    List<StorageFormat> findAllStorageFormats();
+    @Query("{countryId:?0,deleted:false}")
+    List<StorageFormat> findAllStorageFormats(Long countryId);
 
 
 

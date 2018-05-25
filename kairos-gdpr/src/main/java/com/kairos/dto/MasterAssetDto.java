@@ -30,16 +30,6 @@ public class MasterAssetDto {
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set <Long> organizationSubServices;
 
-    @NotNull(message = "error.message.countryId.cannot.be.null")
-    private Long countryId;
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 
     public String getName() {
         return name;

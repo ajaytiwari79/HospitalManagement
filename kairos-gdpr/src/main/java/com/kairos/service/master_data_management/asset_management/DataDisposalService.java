@@ -7,6 +7,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.repository.master_data_management.asset_management.DataDisposalMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class DataDisposalService extends MongoBaseService {
     private DataDisposalMongoRepository dataDisposalMongoRepository;
 
 
-    public Map<String, List<DataDisposal>> createDataDisposal(List<DataDisposal> dataDisposals) {
+    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId,List<DataDisposal> dataDisposals) {
         Map<String, List<DataDisposal>> result = new HashMap<>();
         List<DataDisposal> existTechnicalMeasure = new ArrayList<>();
         List<DataDisposal> newDataDisposals = new ArrayList<>();
@@ -30,13 +31,14 @@ public class DataDisposalService extends MongoBaseService {
             for (DataDisposal dataDisposal : dataDisposals) {
 
                 if (!StringUtils.isBlank(dataDisposal.getName())) {
-                    DataDisposal exist = dataDisposalMongoRepository.findByName(dataDisposal.getName());
+                    DataDisposal exist = dataDisposalMongoRepository.findByName(countryId,dataDisposal.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existTechnicalMeasure.add(exist);
 
                     } else {
                         DataDisposal newDataDisposal = new DataDisposal();
                         newDataDisposal.setName(dataDisposal.getName());
+                        newDataDisposal.setCountryId(countryId);
                         newDataDisposals.add(save(newDataDisposal));
                     }
                 } else
@@ -53,13 +55,13 @@ public class DataDisposalService extends MongoBaseService {
     }
 
     public List<DataDisposal> getAllDataDisposal() {
-     return dataDisposalMongoRepository.findAllDataDisposals();
+     return dataDisposalMongoRepository.findAllDataDisposals(UserContext.getCountryId());
           }
 
 
-    public DataDisposal getDataDisposalById(BigInteger id) {
+    public DataDisposal getDataDisposalById(Long countryId,BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(id);
+        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -71,7 +73,7 @@ public class DataDisposalService extends MongoBaseService {
 
     public Boolean deleteDataDisposalById(BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(id);
+        DataDisposal exist = dataDisposalMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -86,7 +88,7 @@ public class DataDisposalService extends MongoBaseService {
     public DataDisposal updateDataDisposal(BigInteger id, DataDisposal dataDisposal) {
 
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(id);
+        DataDisposal exist = dataDisposalMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -97,11 +99,11 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public DataDisposal getDataDisposalByName(String name) {
+    public DataDisposal getDataDisposalByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByName(name);
+            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

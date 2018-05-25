@@ -108,7 +108,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplate(String name, String description, Long countryId) {
+    public PolicyAgreementTemplate(Long countryId,String name, String description) {
         this.name = name;
         this.countryId = countryId;
         this.description = description;

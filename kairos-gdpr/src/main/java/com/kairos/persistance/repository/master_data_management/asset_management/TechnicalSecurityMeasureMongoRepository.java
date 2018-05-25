@@ -12,15 +12,17 @@ import java.util.List;
 public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository<TechnicalSecurityMeasure,BigInteger> {
 
 
-    @Query("{'_id':?0,deleted:false}")
-    TechnicalSecurityMeasure findByIdAndNonDeleted(BigInteger id);
+    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    TechnicalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    TechnicalSecurityMeasure findByName(String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    TechnicalSecurityMeasure findByName(Long countryId,String name);
 
 
-    @Query("{deleted:false}")
-    List<TechnicalSecurityMeasure> findAllTechnicalSecurityMeasures();
+    TechnicalSecurityMeasure findByid(BigInteger id);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<TechnicalSecurityMeasure> findAllTechnicalSecurityMeasures(Long countryId);
 
 
 

@@ -33,20 +33,20 @@ public class TechnicalSecurityController {
 
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/add")
-    public ResponseEntity<Object> createTechnicalSecurityMeasure(@RequestBody List<TechnicalSecurityMeasure> securityMeasures) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(securityMeasures));
+    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId,@RequestBody List<TechnicalSecurityMeasure> securityMeasures) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId,securityMeasures));
 
     }
 
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId,id));
 
     }
 
@@ -60,8 +60,8 @@ public class TechnicalSecurityController {
 
     @ApiOperation("get TechnicalSecurityMeasure by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName(name));
+    public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName(countryId,name));
 
     }
 

@@ -6,6 +6,7 @@ import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -15,14 +16,9 @@ import java.util.List;
 @Document(collection = "clause")
 public class Clause extends MongoBaseEntity {
 
-    @NotEmpty(message = "error.clause.title.cannotbe.empty")
-    @NotNull(message = "error.clause.title.cannotbe.null")
     private String title;
 
     private List<ClauseTag> tags = new ArrayList<>();
-
-    @NotEmpty(message = "error.clause.title.cannotbe.empty")
-    @NotNull(message = "error.clause.title.cannotbe.null")
     private String description;
 
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
@@ -30,6 +26,17 @@ public class Clause extends MongoBaseEntity {
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
     private List<AccountType> accountTypes;
+
+    @NotNull
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public String getTitle() {
         return title;
@@ -55,7 +62,7 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
-     public Clause() { }
+
 
     public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
         return organizationTypes;
@@ -95,5 +102,12 @@ public class Clause extends MongoBaseEntity {
 
     public void setAccountTypes(List<AccountType> accountTypes) {
         this.accountTypes = accountTypes;
+    }
+    public Clause(Long countryId,String title,String description) {
+        this.countryId=countryId;
+        this.title=title;
+        this.description=description;
+    }
+    public Clause() {
     }
 }

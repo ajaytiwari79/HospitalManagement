@@ -10,6 +10,8 @@ public class UserContext {
     public static final String ORG_ID         = "org-id";
     public static final String UNIT_ID         = "unit-id";
     public static final String TAB_ID = "tab-id";
+    public static final String COUNTRY_ID  = "country-id";
+
 
     private static final ThreadLocal<String> correlationId= new InheritableThreadLocal<String>();
     private static final ThreadLocal<String> authToken= new InheritableThreadLocal<>();
@@ -17,6 +19,7 @@ public class UserContext {
     private static final ThreadLocal<Long> orgId = new InheritableThreadLocal<Long>();
     private static final ThreadLocal<Long> unitId = new InheritableThreadLocal<Long>();
     private static final ThreadLocal<String> tabId = new InheritableThreadLocal<String>();
+    private static final ThreadLocal<Long> countryId = new InheritableThreadLocal<Long>();
     private static final ThreadLocal<CurrentUserDetails> userDetails = new InheritableThreadLocal<CurrentUserDetails>();
 
     public static String getCorrelationId() { return correlationId.get(); }
@@ -33,6 +36,9 @@ public class UserContext {
 
     public static void setUnitId(Long unitid) {unitId.set(unitid);}
     public static Long getUnitId() {return unitId.get();}
+
+    public static void setCountryId(Long countryid) {countryId.set(countryid);}
+    public static Long getCountryId() {return countryId.get();}
 
     public static void setUserDetails(CurrentUserDetails details) {userDetails.set(details);}
     public static CurrentUserDetails getUserDetails() {return userDetails.get();}

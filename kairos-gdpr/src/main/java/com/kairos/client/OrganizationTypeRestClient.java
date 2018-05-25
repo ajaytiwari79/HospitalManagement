@@ -31,7 +31,7 @@ public class OrganizationTypeRestClient {
         final String baseUrl = RestClientURLUtils.getBaseUrl(true);
         try {
 
-            HttpEntity<OrganizationTypeAndServiceRestClientRequestDto> entity=new HttpEntity<>(requestDto);
+                HttpEntity<OrganizationTypeAndServiceRestClientRequestDto> entity=new HttpEntity<>(requestDto);
             ParameterizedTypeReference<RestTemplateResponseEnvelope< OrganizationTypeAndServiceResultDto>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope< OrganizationTypeAndServiceResultDto>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope< OrganizationTypeAndServiceResultDto>> restExchange =
