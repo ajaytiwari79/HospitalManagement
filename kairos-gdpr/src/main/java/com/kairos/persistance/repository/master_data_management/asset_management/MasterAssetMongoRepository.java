@@ -12,14 +12,16 @@ import java.util.List;
 public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,BigInteger> {
 
 
-    @Query("{'_id':?0,deleted:false}")
-    MasterAsset findByIdANdNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    MasterAsset findByIdANdNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false}")
-    List<MasterAsset> findAllMasterAssets( );
+    @Query("{deleted:false,'countryId':?0}")
+    List<MasterAsset> findAllMasterAssets( Long countryId);
 
-    @Query("{'name':?0,deleted:false}")
-    MasterAsset findByName(String name);
+    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    MasterAsset findByName(Long countryId,String name);
+
+    MasterAsset findByid(BigInteger id);
 
 
 }

@@ -12,19 +12,21 @@ import java.util.List;
 public interface ProcessingPurposeMongoRepository extends MongoRepository<ProcessingPurpose, BigInteger> {
 
 
-    @Query("{'_id':?0,deleted:false}")
-    ProcessingPurpose findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    ProcessingPurpose findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    ProcessingPurpose findByName(String name);
+    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    ProcessingPurpose findByName(Long countryId,String name);
 
-
-    @Query("{'_id':{$in:?0},deleted:false}")
-    List<ProcessingPurpose> getProcessingPurposeList(List<BigInteger> ids);
+    ProcessingPurpose findByid(BigInteger id);
 
 
-    @Query("{deleted:false}")
-    List<ProcessingPurpose> findAllProcessingPurposes();
+    @Query("{'countryId':?0,'_id':{$in:?1},deleted:false}")
+    List<ProcessingPurpose> getProcessingPurposeList(Long countryId,List<BigInteger> ids);
+
+
+    @Query("{'countryId':?0,deleted:false}")
+    List<ProcessingPurpose> findAllProcessingPurposes(Long countryId);
 
 
 }

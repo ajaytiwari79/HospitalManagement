@@ -7,6 +7,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingType;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +22,21 @@ public class HostingTypeService extends MongoBaseService {
     private HostingTypeMongoRepository hostingTypeMongoRepository;
 
 
-    public Map<String, List<HostingType>> createHostingType(List<HostingType> hostingTypes) {
+    public Map<String, List<HostingType>> createHostingType(Long countryId,List<HostingType> hostingTypes) {
         Map<String, List<HostingType>> result = new HashMap<>();
         List<HostingType> existing = new ArrayList<>();
         List<HostingType> newHostingTypes = new ArrayList<>();
         if (hostingTypes.size() != 0) {
             for (HostingType hostingType : hostingTypes) {
                 if (!StringUtils.isBlank(hostingType.getName())) {
-                    HostingType exist = hostingTypeMongoRepository.findByName(hostingType.getName());
+                    HostingType exist = hostingTypeMongoRepository.findByName(countryId,hostingType.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         HostingType newHostingType = new HostingType();
                         newHostingType.setName(hostingType.getName());
+                        newHostingType.setCountryId(countryId);
                         newHostingTypes.add(save(newHostingType));
                     }
                 } else
@@ -51,13 +53,13 @@ public class HostingTypeService extends MongoBaseService {
     }
 
     public List<HostingType> getAllHostingType() {
-       return hostingTypeMongoRepository.findAllHostingTypes();
+       return hostingTypeMongoRepository.findAllHostingTypes(UserContext.getCountryId());
           }
 
 
-    public HostingType getHostingType(BigInteger id) {
+    public HostingType getHostingType(Long countryId,BigInteger id) {
 
-        HostingType exist = hostingTypeMongoRepository.findByIdAndNonDeleted(id);
+        HostingType exist = hostingTypeMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -69,7 +71,7 @@ public class HostingTypeService extends MongoBaseService {
 
     public Boolean deleteHostingType(BigInteger id) {
 
-        HostingType exist = hostingTypeMongoRepository.findByIdAndNonDeleted(id);
+        HostingType exist = hostingTypeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -84,7 +86,7 @@ public class HostingTypeService extends MongoBaseService {
     public HostingType updateHostingType(BigInteger id, HostingType hostingType) {
 
 
-        HostingType exist = hostingTypeMongoRepository.findByIdAndNonDeleted(id);
+        HostingType exist = hostingTypeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -95,11 +97,11 @@ public class HostingTypeService extends MongoBaseService {
         }
     }
 
-    public HostingType getHostingTypeByName(String name) {
+    public HostingType getHostingTypeByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            HostingType exist = hostingTypeMongoRepository.findByName(name);
+            HostingType exist = hostingTypeMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

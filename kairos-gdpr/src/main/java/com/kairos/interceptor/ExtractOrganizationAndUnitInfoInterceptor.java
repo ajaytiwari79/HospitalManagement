@@ -31,19 +31,25 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
 
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if(pathVariables==null){
+        if (pathVariables == null) {
             throw new InvalidRequestException("Url or Parameter is not correct");
         }
-        String orgIdStirng=pathVariables.get("organizationId");
-        String unitIdString=pathVariables.get("unitId");
+        String orgIdStirng = pathVariables.get("organizationId");
+        String unitIdString = pathVariables.get("unitId");
+        String countryIdString = pathVariables.get("countryId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ orgainzationID ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]");
+                + "]" + request.getRequestURI() + "[ orgainzationID ,Unit Id " + orgIdStirng + " ," + unitIdString + " ]");
 
-        if(orgIdStirng!=null){
-              final Long orgId = Long.valueOf(orgIdStirng);
-              UserContext.setOrgId(orgId);
-          }
-        if(unitIdString!=null){
+        if (orgIdStirng != null) {
+            final Long orgId = Long.valueOf(orgIdStirng);
+            UserContext.setOrgId(orgId);
+        }
+        if (countryIdString != null) {
+            final Long countryId = Long.valueOf(countryIdString);
+            UserContext.setCountryId(countryId);
+
+        }
+        if (unitIdString != null) {
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);
         }
@@ -52,7 +58,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         HttpServletRequest httpServletRequest = servletRequest.getRequest();
 
         String tabId = httpServletRequest.getParameter("moduleId");
-        if(Optional.ofNullable(tabId).isPresent()){
+        if (Optional.ofNullable(tabId).isPresent()) {
             UserContext.setTabId(tabId);
         }
 

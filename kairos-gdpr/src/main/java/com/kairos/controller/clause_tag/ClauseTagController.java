@@ -30,7 +30,7 @@ public class ClauseTagController {
 
     @ApiOperation("add clauseTag")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAssetType(@RequestParam  String clauseTag) {
+    public ResponseEntity<Object> createAssetType(@PathVariable Long countryId,@RequestParam  String clauseTag) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.createClauseTag(clauseTag));
 
     }
@@ -38,11 +38,11 @@ public class ClauseTagController {
 
     @ApiOperation("get clauseTag by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getClauseTagById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "request id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getClauseTagById(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getClauseTagById(countryId,id));
 
     }
 

@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface CustomPolicyAgreementTemplateRepository {
 
-    PolicyAgreementTemplateResponseDto getPolicyAgreementWithDataById(BigInteger id);
+    PolicyAgreementTemplateResponseDto getPolicyAgreementWithDataById(Long countryId,BigInteger id);
 
-    List<PolicyAgreementTemplateResponseDto> getPolicyAgreementWithData();
+    List<PolicyAgreementTemplateResponseDto> getPolicyAgreementWithData(Long countryId);
 
 }

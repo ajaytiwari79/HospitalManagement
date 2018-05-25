@@ -21,7 +21,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public PolicyAgreementTemplateResponseDto getPolicyAgreementWithDataById(BigInteger id) {
+    public PolicyAgreementTemplateResponseDto getPolicyAgreementWithDataById(Long countryId,BigInteger id) {
 
 
         Aggregation aggregation=Aggregation.newAggregation(
@@ -49,7 +49,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<PolicyAgreementTemplateResponseDto> getPolicyAgreementWithData( ) {
+    public List<PolicyAgreementTemplateResponseDto> getPolicyAgreementWithData( Long countryId) {
         Aggregation aggregation=Aggregation.newAggregation(
         match(Criteria.where("deleted").is(false)),
                 lookup("account_type","accountTypes","_id","accountTypes"),

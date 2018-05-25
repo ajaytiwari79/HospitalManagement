@@ -11,6 +11,7 @@ import com.kairos.persistance.model.master_data_management.asset_management.Mast
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -31,10 +32,10 @@ public class MasterAssetService extends MongoBaseService {
     @Inject
     ComparisonUtils comparisonUtils;
 
-    public MasterAsset addMasterAsset(MasterAssetDto masterAsset) {
+    public MasterAsset addMasterAsset(Long countryId,MasterAssetDto masterAsset) {
 
         MasterAsset newAsset = new MasterAsset();
-        if (masterAssetMongoRepository.findByName(masterAsset.getName()) != null) {
+        if (masterAssetMongoRepository.findByName(countryId,masterAsset.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAsset.getName() + " exists");
         } else {
             Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
@@ -71,7 +72,7 @@ public class MasterAssetService extends MongoBaseService {
 
         }
         newAsset.setName(masterAsset.getName());
-        newAsset.setCountryid(masterAsset.getCountryId());
+        newAsset.setCountryId(countryId);
         newAsset.setDescription(masterAsset.getDescription());
         return save(newAsset);
 
@@ -80,14 +81,14 @@ public class MasterAssetService extends MongoBaseService {
 
 
     public List<MasterAsset> getAllMasterAsset() {
-        return masterAssetMongoRepository.findAllMasterAssets();
+        return masterAssetMongoRepository.findAllMasterAssets(UserContext.getCountryId());
     }
 
 
     public MasterAsset updateMasterAsset(BigInteger id, MasterAssetDto masterAssetDto) {
 
 
-        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(id);
+        MasterAsset exists = masterAssetMongoRepository.findByid(id);
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
         }
@@ -126,7 +127,7 @@ public class MasterAssetService extends MongoBaseService {
 
 
     public Boolean deleteMasterAsset(BigInteger id) {
-        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(id);
+        MasterAsset exists = masterAssetMongoRepository.findByid(id);
         if (exists == null) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
 
@@ -136,8 +137,8 @@ public class MasterAssetService extends MongoBaseService {
 
     }
 
-    public MasterAsset getMasterAssetById(BigInteger id) {
-        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(id);
+    public MasterAsset getMasterAssetById(Long countryId,BigInteger id) {
+        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(countryId,id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("master asset not Exist for id " + id);
 

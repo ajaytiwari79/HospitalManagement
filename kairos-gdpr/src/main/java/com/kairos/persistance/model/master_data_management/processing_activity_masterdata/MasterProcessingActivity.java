@@ -28,6 +28,7 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> subProcessingActivityIds;
 
+    @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {

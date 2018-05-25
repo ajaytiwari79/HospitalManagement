@@ -9,14 +9,15 @@ import java.util.List;
 
 public interface HostingTypeMongoRepository extends MongoRepository<HostingType,BigInteger> {
 
-    @Query("{'_id':?0,deleted:false}")
-    HostingType findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    HostingType findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    HostingType findByName(String name);
+    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    HostingType findByName(Long countryId,String name);
 
+    HostingType findByid(BigInteger id);
 
-    @Query("{deleted:false}")
-    List<HostingType> findAllHostingTypes();
+    @Query("{'countryId':?0,deleted:false}")
+    List<HostingType> findAllHostingTypes(Long countryId);
 }
 

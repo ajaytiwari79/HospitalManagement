@@ -7,6 +7,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageFormat;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +22,21 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
-    public Map<String, List<StorageFormat>> createStorageFormat(List<StorageFormat> storageFormats) {
+    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId,List<StorageFormat> storageFormats) {
         Map<String, List<StorageFormat>> result = new HashMap<>();
         List<StorageFormat> existing = new ArrayList<>();
         List<StorageFormat> newStorageFormats = new ArrayList<>();
         if (storageFormats.size() != 0) {
             for (StorageFormat storageFormat : storageFormats) {
                 if (!StringUtils.isBlank(storageFormat.getName())) {
-                    StorageFormat exist = storageFormatMongoRepository.findByName(storageFormat.getName());
+                    StorageFormat exist = storageFormatMongoRepository.findByName(countryId,storageFormat.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         StorageFormat newStorageFormat = new StorageFormat();
                         newStorageFormat.setName(storageFormat.getName());
+                        newStorageFormat.setCountryId(countryId);
                         newStorageFormats.add(save(newStorageFormat));
                     }
                 } else
@@ -52,13 +54,13 @@ public class StorageFormatService extends MongoBaseService {
 
 
     public List<StorageFormat> getAllStorageFormat() {
-        return storageFormatMongoRepository.findAllStorageFormats();
+        return storageFormatMongoRepository.findAllStorageFormats(UserContext.getCountryId());
     }
 
 
-    public StorageFormat getStorageFormat(BigInteger id) {
+    public StorageFormat getStorageFormat(Long countryId,BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -70,7 +72,7 @@ public class StorageFormatService extends MongoBaseService {
 
     public Boolean deleteStorageFormat(BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(id);
+        StorageFormat exist = storageFormatMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -84,7 +86,7 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(id);
+        StorageFormat exist = storageFormatMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -95,11 +97,11 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat getStorageFormatByName(String name) {
+    public StorageFormat getStorageFormatByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByName(name);
+            StorageFormat exist = storageFormatMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

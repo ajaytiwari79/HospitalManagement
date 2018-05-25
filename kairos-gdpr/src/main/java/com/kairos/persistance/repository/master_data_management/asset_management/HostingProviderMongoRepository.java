@@ -11,13 +11,14 @@ import java.util.List;
 @Repository
 public interface HostingProviderMongoRepository extends MongoRepository<HostingProvider,BigInteger> {
 
-    @Query("{'_id':?0,deleted:false}")
-    HostingProvider findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    HostingProvider findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    HostingProvider findByName(String name);
+    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    HostingProvider findByName(Long countryId,String name);
 
+    HostingProvider findByid(BigInteger id);
 
-    @Query("{deleted:false}")
-    List<HostingProvider> findAllHostingProviders();
+    @Query("{'countryId':?0,deleted:false}")
+    List<HostingProvider> findAllHostingProviders(Long countryId);
 }

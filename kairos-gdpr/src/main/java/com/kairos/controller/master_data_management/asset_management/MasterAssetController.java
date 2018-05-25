@@ -36,8 +36,8 @@ public class MasterAssetController {
 
     @ApiOperation(value = "add master asset")
     @RequestMapping(value = "/add_asset", method = RequestMethod.POST)
-    public ResponseEntity<Object> addMasterAsset(@Validated @RequestBody MasterAssetDto masterAssetDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.addMasterAsset(masterAssetDto));
+    public ResponseEntity<Object> addMasterAsset(@PathVariable Long countryId,@Validated @RequestBody MasterAssetDto masterAssetDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.addMasterAsset(countryId,masterAssetDto));
     }
 
     @ApiOperation(value = "get all master asset")
@@ -66,9 +66,9 @@ public class MasterAssetController {
 
     @ApiOperation(value = "get master asset by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getMasterAsset(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(countryId,id));
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
     }

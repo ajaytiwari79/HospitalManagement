@@ -11,19 +11,19 @@ import java.util.List;
 @Repository
 public interface MasterProcessingActivityRepository extends MongoRepository<MasterProcessingActivity,BigInteger>,CustomMasterProcessingActivity {
 
-    @Query("{'_id':?0,deleted:false}")
-    MasterProcessingActivity findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    MasterProcessingActivity findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{deleted:false}")
     List<MasterProcessingActivity> getAllMasterProcessingsctivity();
 
-    @Query("{'name':{$in:?0},deleted:false}")
-    List<MasterProcessingActivity>  masterProcessingActivityListByNames(List<String> name);
+    @Query("{'countryId':?0,'name':{$in:?1},deleted:false}")
+    List<MasterProcessingActivity>  masterProcessingActivityListByNames(Long countryId,List<String> name);
 
     MasterProcessingActivity findByid(BigInteger id);
 
-    @Query("{'name':?0,deleted:false}")
-    MasterProcessingActivity findByName(String name);
+    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    MasterProcessingActivity findByName(Long countryId,String name);
 
 
 }

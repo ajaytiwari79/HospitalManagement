@@ -8,6 +8,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ProcessingPurposeMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +24,7 @@ public class ProcessingPurposeService extends MongoBaseService {
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
 
 
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(List<ProcessingPurpose> processingPurposes) {
+    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurpose> processingPurposes) {
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         List<ProcessingPurpose> existing = new ArrayList<>();
         List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
@@ -31,13 +32,14 @@ public class ProcessingPurposeService extends MongoBaseService {
             for (ProcessingPurpose processingPurpose : processingPurposes) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
 
-                    ProcessingPurpose exist = processingPurposeMongoRepository.findByName(processingPurpose.getName());
+                    ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId, processingPurpose.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
                         newProcessingPurpose.setName(processingPurpose.getName());
+                        newProcessingPurpose.setCountryId(countryId);
                         newProcessingPurposes.add(save(newProcessingPurpose));
                     }
                 } else
@@ -55,13 +57,13 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
     public List<ProcessingPurpose> getAllProcessingPurpose() {
-       return  processingPurposeMongoRepository.findAllProcessingPurposes();
-       }
+        return processingPurposeMongoRepository.findAllProcessingPurposes(UserContext.getCountryId());
+    }
 
 
-    public ProcessingPurpose getProcessingPurpose(BigInteger id) {
+    public ProcessingPurpose getProcessingPurpose(Long countryId,BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -73,7 +75,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurpose(BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -88,7 +90,7 @@ public class ProcessingPurposeService extends MongoBaseService {
     public ProcessingPurpose updateProcessingPurpose(BigInteger id, ProcessingPurpose processingPurpose) {
 
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -100,11 +102,11 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public ProcessingPurpose getProcessingPurposeByName(String name) {
+    public ProcessingPurpose getProcessingPurposeByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            ProcessingPurpose exist = processingPurposeMongoRepository.findByName(name);
+            ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -115,8 +117,8 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public List<ProcessingPurpose> geProcessingPurposeList(List<BigInteger> ids) {
-        return processingPurposeMongoRepository.getProcessingPurposeList(ids);
+    public List<ProcessingPurpose> geProcessingPurposeList(Long countryId,List<BigInteger> ids) {
+        return processingPurposeMongoRepository.getProcessingPurposeList(countryId,ids);
     }
 
 

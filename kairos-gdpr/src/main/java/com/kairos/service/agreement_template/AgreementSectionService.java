@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.agreement_template.AgreementSectionMong
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +30,6 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseMongoRepository clauseMongoRepository;
 
 
-
-
     public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
 
         List<AgreementSectionResponseDto> result = new ArrayList<>();
@@ -40,11 +39,11 @@ public class AgreementSectionService extends MongoBaseService {
         if (agreementSections.size() != 0) {
 
             for (AgreementSection agreementSection : agreementSections) {
-                AgreementSection section = buildAgreementSection(agreementSection.getCountryId(), agreementSection);
+                AgreementSection section = buildAgreementSection(UserContext.getCountryId(), agreementSection);
                 ids.add(section.getId());
 
             }
-            response.put("section", agreementSectionMongoRepository.getAgreementSectionWithDataList(ids));
+            response.put("section", agreementSectionMongoRepository.getAgreementSectionWithDataList(UserContext.getCountryId(),ids));
             response.put("ids", ids);
             return response;
         } else
@@ -53,7 +52,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     public AgreementSection buildAgreementSection(Long countryId, AgreementSection agreementSection) {
-        return save(new AgreementSection(countryId,agreementSection.getTitle(), agreementSection.getClauseIds()));
+        return save(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
 
     }
 
@@ -93,8 +92,8 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(List<BigInteger> ids) {
-        return agreementSectionMongoRepository.getAgreementSectionWithDataList(ids);
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,List<BigInteger> ids) {
+        return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId,ids);
 
     }
 

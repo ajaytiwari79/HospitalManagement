@@ -6,6 +6,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.AccessorPartyMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +22,21 @@ public class AccessorPartyService extends MongoBaseService {
     private AccessorPartyMongoRepository accessorPartyMongoRepository;
 
 
-    public Map<String, List<AccessorParty>> createAccessorParty(List<AccessorParty> accessorPartys) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId,List<AccessorParty> accessorPartys) {
         Map<String, List<AccessorParty>> result = new HashMap<>();
         List<AccessorParty> existing = new ArrayList<>();
         List<AccessorParty> newAccessorPartys = new ArrayList<>();
         if (accessorPartys.size() != 0) {
             for (AccessorParty accessorParty : accessorPartys) {
                 if (!StringUtils.isBlank(accessorParty.getName())) {
-                    AccessorParty exist = accessorPartyMongoRepository.findByName(accessorParty.getName());
+                    AccessorParty exist = accessorPartyMongoRepository.findByName(countryId,accessorParty.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         AccessorParty newAccessorParty = new AccessorParty();
                         newAccessorParty.setName(accessorParty.getName());
+                        newAccessorParty.setCountryId(countryId);
                         newAccessorPartys.add(save(newAccessorParty));
                     }
                 } else
@@ -51,14 +53,14 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorParty> getAllAccessorParty() {
-     return accessorPartyMongoRepository.findAllAccessorParties();
+     return accessorPartyMongoRepository.findAllAccessorParties(UserContext.getCountryId());
 
     }
 
 
-    public AccessorParty getAccessorParty(BigInteger id) {
+    public AccessorParty getAccessorParty(Long countryId,BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(id);
+        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -70,7 +72,7 @@ public class AccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(id);
+        AccessorParty exist = accessorPartyMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -85,7 +87,7 @@ public class AccessorPartyService extends MongoBaseService {
     public AccessorParty updateAccessorParty(BigInteger id, AccessorParty accessorParty) {
 
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(id);
+        AccessorParty exist = accessorPartyMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -97,11 +99,11 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
-    public AccessorParty getAccessorPartyByName(String name) {
+    public AccessorParty getAccessorPartyByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByName(name);
+            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

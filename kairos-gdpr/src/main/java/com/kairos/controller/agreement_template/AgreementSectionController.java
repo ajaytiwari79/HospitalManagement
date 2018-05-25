@@ -4,6 +4,7 @@ package com.kairos.controller.agreement_template;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.userContext.UserContext;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,9 +75,9 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
 
 
     @RequestMapping(value = "/list",method = RequestMethod.POST)
-    public ResponseEntity<Object>  getAllAgreementSectionList(@RequestBody @NotEmpty List<BigInteger> ids)
+    public ResponseEntity<Object>  getAllAgreementSectionList(@PathVariable Long countryId,@RequestBody List<BigInteger> ids)
     {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAgreementSectionWithDataList(ids));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAgreementSectionWithDataList(countryId,ids));
 
     }
 

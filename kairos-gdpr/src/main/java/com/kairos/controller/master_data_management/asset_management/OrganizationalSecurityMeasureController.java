@@ -34,21 +34,21 @@ public class OrganizationalSecurityMeasureController {
 
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/add")
-    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@RequestBody List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId,@RequestBody List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(orgSecurityMeasures));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId,orgSecurityMeasures));
 
     }
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId,id));
 
     }
 
@@ -64,8 +64,8 @@ public class OrganizationalSecurityMeasureController {
 
     @ApiOperation("get Organizational Security Measure by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(name));
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId,name));
 
     }
 

@@ -32,19 +32,19 @@ public class DestinationController {
 
     @ApiOperation("add Destination")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDestination(@RequestBody List<Destination> destinations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.createDestination(destinations));
+    public ResponseEntity<Object> createDestination(@PathVariable Long countryId,@RequestBody List<Destination> destinations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.createDestination(countryId,destinations));
 
     }
 
 
     @ApiOperation("get Destination by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDestination(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDestination(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestination(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestination(countryId,id));
 
     }
 
@@ -58,8 +58,8 @@ public class DestinationController {
 
     @ApiOperation("get Destination by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDestinationByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(name));
+    public ResponseEntity<Object> getDestinationByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(countryId,name));
 
     }
 

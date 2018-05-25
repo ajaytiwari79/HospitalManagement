@@ -7,6 +7,7 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSubject;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSubjectMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +23,21 @@ public class DataSubjectService extends MongoBaseService {
     private DataSubjectMongoRepository dataSubjectMongoRepository;
 
 
-    public Map<String, List<DataSubject>> createDataSubject(List<DataSubject> dataSubjects) {
+    public Map<String, List<DataSubject>> createDataSubject(Long countryId,List<DataSubject> dataSubjects) {
         Map<String, List<DataSubject>> result = new HashMap<>();
         List<DataSubject> existing = new ArrayList<>();
         List<DataSubject> newDataSubjects = new ArrayList<>();
         if (dataSubjects.size() != 0) {
             for (DataSubject dataSubject : dataSubjects) {
                 if (!StringUtils.isBlank(dataSubject.getName())) {
-                    DataSubject exist = dataSubjectMongoRepository.findByName(dataSubject.getName());
+                    DataSubject exist = dataSubjectMongoRepository.findByName(countryId,dataSubject.getName());
                     if (Optional.ofNullable(exist).isPresent()) {
                         existing.add(exist);
 
                     } else {
                         DataSubject newDataSubject = new DataSubject();
                         newDataSubject.setName(dataSubject.getName());
+                        newDataSubject.setCountryId(countryId);
                         newDataSubjects.add(save(newDataSubject));
                     }
                 } else
@@ -52,13 +54,13 @@ public class DataSubjectService extends MongoBaseService {
     }
 
     public List<DataSubject> getAllDataSubject() {
-       return dataSubjectMongoRepository.findAllDataSubjects();
+       return dataSubjectMongoRepository.findAllDataSubjects(UserContext.getCountryId());
           }
 
 
-    public DataSubject getDataSubject(BigInteger id) {
+    public DataSubject getDataSubject(Long countryId,BigInteger id) {
 
-        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(id);
+        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -70,7 +72,7 @@ public class DataSubjectService extends MongoBaseService {
 
     public Boolean deleteDataSubject(BigInteger id) {
 
-        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(id);
+        DataSubject exist = dataSubjectMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -85,7 +87,7 @@ public class DataSubjectService extends MongoBaseService {
     public DataSubject updateDataSubject(BigInteger id, DataSubject dataSubject) {
 
 
-        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(id);
+        DataSubject exist = dataSubjectMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -96,17 +98,17 @@ public class DataSubjectService extends MongoBaseService {
         }
     }
 
-    public List<DataSubject> getDataSubjectList(List<BigInteger> ids) {
+    public List<DataSubject> getDataSubjectList(Long countryId,List<BigInteger> ids) {
 
-        return dataSubjectMongoRepository.getDataSubjectList(ids);
+        return dataSubjectMongoRepository.getDataSubjectList(countryId,ids);
     }
 
 
-    public DataSubject getDataSubjectByName(String name) {
+    public DataSubject getDataSubjectByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSubject exist = dataSubjectMongoRepository.findByName(name);
+            DataSubject exist = dataSubjectMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

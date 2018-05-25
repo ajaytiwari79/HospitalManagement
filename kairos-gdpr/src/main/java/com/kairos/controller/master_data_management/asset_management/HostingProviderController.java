@@ -35,20 +35,20 @@ public class HostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/add")
-    public ResponseEntity<Object> createHostingProvider(@RequestBody List<HostingProvider> hostingProviders) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(hostingProviders));
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId,@RequestBody List<HostingProvider> hostingProviders) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId,hostingProviders));
 
     }
 
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId,id));
 
     }
 
@@ -62,8 +62,8 @@ public class HostingProviderController {
 
     @ApiOperation("get all HostingProvider ")
     @GetMapping("/")
-    public ResponseEntity<Object> getHostingProviderByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(name));
+    public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId,name));
 
     }
 

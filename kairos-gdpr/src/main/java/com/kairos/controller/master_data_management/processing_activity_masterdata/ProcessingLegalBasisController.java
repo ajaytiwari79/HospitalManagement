@@ -34,19 +34,19 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingLegalBasis(@RequestBody List<ProcessingLegalBasis> legalBases) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(legalBases));
+    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId,@RequestBody List<ProcessingLegalBasis> legalBases) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId,legalBases));
 
     }
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId,id));
 
     }
 
@@ -60,8 +60,8 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("get ProcessingLegalBasis by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getProcessingLegalBasisByName(@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(name));
+    public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId,@RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId,name));
 
     }
 

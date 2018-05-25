@@ -35,7 +35,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     public MasterProcessingActivity createMasterProcessingActivity(Long countryId, MasterProcessingActivityDto masterProcessingActivityDto) {
 
 
-        if (masterProcessingActivityRepository.findByName(masterProcessingActivityDto.getName()) != null) {
+        if (masterProcessingActivityRepository.findByName(countryId,masterProcessingActivityDto.getName()) != null) {
             throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
         }
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
@@ -60,7 +60,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         }
         if (orgSubServiceIds.size() != 0) {
-            System.err.println("++++++++");
             List<OrganizationTypeAndServiceBasicDto> orgSubServices = orgTypeAndServices.getOrganizationSubServices();
             comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
             masterProcessingActivity.setOrganizationSubServices(orgSubServices);
@@ -97,7 +96,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             subProcessingActivityList.add(subProcessingActivity);
         }
 
-        checkForDuplicacyByName(checkDuplicateInSubProcess);
+        checkForDuplicacyByName(countryId,checkDuplicateInSubProcess);
         subProcessingActivityList = save(subProcessingActivityList);
         List<BigInteger> subProcessingActicitiesIds = new ArrayList<>();
         subProcessingActivityList.forEach(o -> subProcessingActicitiesIds.add(o.getId()));
@@ -113,9 +112,9 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public Boolean checkForDuplicacyByName(List<String> subProcessingAcitivityNames) {
+    public Boolean checkForDuplicacyByName(Long countryId,List<String> subProcessingAcitivityNames) {
 
-        List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(subProcessingAcitivityNames);
+        List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(countryId,subProcessingAcitivityNames);
         if (processingActivities.size() != 0) {
             throw new DuplicateDataException(" sub processing acitvity " + processingActivities.get(0).getName() + " exist");
 
@@ -128,7 +127,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     public MasterProcessingActivity updateMasterProcessingActivity(Long countryId, BigInteger id, MasterProcessingActivityDto masterProcessingActivityDto) {
 
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(id);
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndNonDeleted(countryId,id);
 
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
