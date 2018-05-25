@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<FunctionalPayment, Long> {
     @Query("match(functionalPayment:FunctionalPayment{deleted:false,hasDraftCopy:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) where id(expertise)={0}" +
             " return id(functionalPayment) as id, functionalPayment.name as name,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.published as published, " +
-            " functionalPayment.paidOutFrequency as paidOutFrequency ORDER BY startDate ASC")
+            " functionalPayment.paymentUnit as paymentUnit ORDER BY startDate ASC")
     List<FunctionalPaymentDTO> getFunctionalPaymentOfExpertise(Long expertiseId);
 
     @Query("match(functionalPayment:FunctionalPayment{deleted:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) where id(expertise)={0}" +
@@ -53,7 +53,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query(" match(functionalPayment:FunctionalPayment{deleted:false})-[relation:" + VERSION_OF + "]->(parentFunctionalPayment:FunctionalPayment{deleted:false}) where id(functionalPayment)={0} " +
             " return id(parentFunctionalPayment) as id, parentFunctionalPayment.name as name,parentFunctionalPayment.startDate as startDate,parentFunctionalPayment.endDate as endDate,parentFunctionalPayment.published as published, " +
-            " parentFunctionalPayment.paidOutFrequency as paidOutFrequency")
+            " parentFunctionalPayment.paymentUnit as paymentUnit")
     FunctionalPaymentDTO getParentFunctionalPayment(Long functionalPaymentId);
 
     @Query("match(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) \n" +
