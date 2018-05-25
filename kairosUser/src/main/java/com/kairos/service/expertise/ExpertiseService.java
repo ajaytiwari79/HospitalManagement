@@ -25,6 +25,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 
+import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
@@ -96,6 +97,8 @@ public class ExpertiseService extends UserBaseService {
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -244,7 +247,13 @@ public class ExpertiseService extends UserBaseService {
 
             }
         }
+
         save(expertise);
+        // NOW linking this with functional table
+
+        functionalPaymentGraphRepository.linkFunctionalPaymentExpertise(expertise.getParentExpertise().getId(), expertise.getId());
+
+
         return seniorityLevelResponse;
 
     }
@@ -311,12 +320,18 @@ public class ExpertiseService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "pay-grade", seniorityLevelDTO.getPayGradeId());
         }
         seniorityLevel.setPayGrade(payGrade);
-
         if (!Optional.ofNullable(expertise.getSeniorityLevel()).isPresent()) {
-            expertise.setSeniorityLevel(Arrays.asList(seniorityLevel));
+            List<SeniorityLevel> seniorityLevels = new ArrayList<>(1);
+            seniorityLevels.add(seniorityLevel);
+            expertise.setSeniorityLevel(seniorityLevels);
         } else {
             expertise.getSeniorityLevel().add(seniorityLevel);
         }
+//        if (!Optional.ofNullable(expertise.getSeniorityLevel()).isPresent()) {
+//            expertise.setSeniorityLevel(Arrays.asList(seniorityLevel));
+//        } else {
+//            expertise.getSeniorityLevel().add(seniorityLevel);
+//        }
         save(seniorityLevel);
         return seniorityLevel;
     }

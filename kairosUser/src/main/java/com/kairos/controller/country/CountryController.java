@@ -361,8 +361,8 @@ public class CountryController {
     @ApiOperation(value = "Create a Union")
     @RequestMapping(value = COUNTRY_URL + "/union", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createUnion(@PathVariable Long organizationId,
-                                                                        @PathVariable long countryId,
-                                                                        @RequestBody OrganizationDTO unionDTO) {
+                                                           @PathVariable long countryId,
+                                                           @RequestBody OrganizationDTO unionDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
                 createUnion(unionDTO, countryId, organizationId));
     }
@@ -1009,7 +1009,7 @@ public class CountryController {
     @ApiOperation("get expertise list for particular organization type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertise(@PathVariable long countryId, @PathVariable long orgTypeId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId, orgTypeId,selectedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId, orgTypeId, selectedDate));
     }
 
     @RequestMapping(value = "/country/organizaton_service/{organizationServiceId}", method = RequestMethod.GET)
@@ -1248,5 +1248,14 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
 
     }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @RequestMapping(value =  "/function", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = "expertise") Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByExpertiseId(expertiseId));
+
+    }
+
 }
 
