@@ -33,6 +33,10 @@ public class PlannedTimeTypeIntegrationTest {
     private String url;
     @Inject
     private TestRestTemplate testRestTemplate;
+    /*
+    @Inject
+    private RestTemplate testRestTemplate;
+    */
     @Inject
     private ExceptionService exceptionService;
     static Long createdId;
@@ -53,11 +57,11 @@ public class PlannedTimeTypeIntegrationTest {
 
     @Test
     public void case2_getAllPlannedTimeType() throws Exception{
-        String baseUrl = getBaseUrl(24L, 4L);
+        String baseUrl = "http://localhost:8090/kairos/activity/api/v1/organization/{organizationId}/country/{countryId}/plannedTimeType";//getBaseUrl(24L, 4L);
         System.out.println("baseUrl: "+baseUrl);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> response = testRestTemplate.exchange(baseUrl, HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> response = testRestTemplate.exchange(baseUrl, HttpMethod.GET, null, typeReference,24,4);
         System.out.println("reponse: "+response.getStatusCode());
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
