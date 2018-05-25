@@ -1049,10 +1049,9 @@ public class ClientService extends UserBaseService {
             clientList.add(map.get("Client"));
         }
 
-
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(organizationId, unitId, staffId)));
+      response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(organizationId, unitId, staffId)));
         return response;
     }
 

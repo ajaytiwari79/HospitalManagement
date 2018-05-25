@@ -3,6 +3,7 @@ package com.kairos.activity.service.activity;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.SkillRestClient;
+import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
@@ -10,10 +11,6 @@ import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DataNotFoundException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.TimeType;
@@ -25,7 +22,6 @@ import com.kairos.activity.persistence.repository.activity.TimeTypeMongoReposito
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
-import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
@@ -39,8 +35,8 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
-import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
+import com.kairos.persistence.model.enums.DurationType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -105,6 +101,8 @@ public class ActivityService extends MongoBaseService {
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private StaffRestClient  staffRestClient;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -658,6 +656,9 @@ public class ActivityService extends MongoBaseService {
 
 //        List<PhaseDTO> phaseDTOs = phaseService.getPhasesByCountryId(countryId);
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePhasesByOrganizationId(unitId);
+
+        // Set access Role of staff
+        phaseActivityDTO.setStaffAccessRole(staffRestClient.getAccessOfCurrentLoggedInStaff());
 
         phaseActivityDTO.setApplicablePhases(phaseDTOs);
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();

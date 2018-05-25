@@ -36,7 +36,6 @@ import com.kairos.persistence.model.user.unit_position.*;
 
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -57,7 +56,6 @@ import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepositor
 import com.kairos.response.dto.web.PositionWrapper;
 
 import com.kairos.service.UserBaseService;
-import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationService;
@@ -81,6 +79,8 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -108,8 +108,6 @@ public class UnitPositionService extends UserBaseService {
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
-    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
-    @Inject
     private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
@@ -121,8 +119,6 @@ public class UnitPositionService extends UserBaseService {
     private OrganizationService organizationService;
     @Inject
     private PositionCodeService positionCodeService;
-    @Inject
-    private WTAService wtaService;
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
@@ -906,10 +902,7 @@ public class UnitPositionService extends UserBaseService {
 
         }
 
-        DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
-        DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
-
-        Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
+        Integer experienceInMonth =(int)ChronoUnit.MONTHS.between(DateUtil.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
         logger.info("user has current experience in months :{}", experienceInMonth);
         SeniorityLevel appliedSeniorityLevel = null;
         for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {

@@ -8,7 +8,6 @@ import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCat
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
@@ -34,15 +33,10 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject
     private CountryService countryService;
-
-    @Inject
-    WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-    @Inject
-    private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryRepository;
     @Inject
@@ -141,53 +135,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     }
 
-
-    /*
-  *
-  * This method will change the category of rule Template when we change the rule template all existing rule templates wil set to none
-   * and new rule temp wll be setted to  this new rule template category
-  * */
-    public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO ruleTemplateDTO, long countryId) {
-        Map<String, Object> response = new HashMap();
-        if (ruleTemplateDTO.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA.name())) {
-            response = changeCTARuleTemplateCategory(countryId, ruleTemplateDTO);
-        } else {
-            response = changeWTARuleTemplateCategory(countryId, ruleTemplateDTO);
-        }
-        return response;
-    }
-
-    private Map<String, Object> changeWTARuleTemplateCategory(Long countryId, RuleTemplateDTO ruleTemplateDTO) {
-        Map<String, Object> response = new HashMap();
-        List<RuleTemplate> wtaBaseRuleTemplates = wtaRuleTemplateGraphRepository.getWtaBaseRuleTemplateByIds(ruleTemplateDTO.getRuleTemplateIds());
-        RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "(?i)" + ruleTemplateDTO.getCategoryName(), RuleTemplateCategoryType.WTA);
-        if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
-            previousRuleTemplateCategory = new RuleTemplateCategory(ruleTemplateDTO.getCategoryName());
-            previousRuleTemplateCategory.setRuleTemplateCategoryType(RuleTemplateCategoryType.WTA);
-            previousRuleTemplateCategory.setDeleted(false);
-            Country country = countryGraphRepository.findOne(countryId);
-            List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-            ruleTemplateCategories.add(previousRuleTemplateCategory);
-            country.setRuleTemplateCategories(ruleTemplateCategories);
-            countryGraphRepository.save(country);
-            // Break Previous Relation
-            wtaRuleTemplateGraphRepository.deleteOldCategories(ruleTemplateDTO.getRuleTemplateIds());
-            previousRuleTemplateCategory.setRuleTemplates(wtaBaseRuleTemplates);
-            save(previousRuleTemplateCategory);
-            response.put("category", previousRuleTemplateCategory);
-            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
-
-        } else {
-            List<Long> previousBaseRuleTemplates = ruleTemplateCategoryRepository.findAllExistingRuleTemplateAddedToThiscategory(ruleTemplateDTO.getCategoryName(), countryId);
-            List<Long> newRuleTemplates = ruleTemplateDTO.getRuleTemplateIds();
-            List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(previousBaseRuleTemplates, newRuleTemplates);
-            List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(newRuleTemplates, previousBaseRuleTemplates);
-            ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToAddInCategory, ruleTemplateDTO.getCategoryName());
-            ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
-            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
-        }
-        return response;
-    }
 
     private List<RuleTemplateCategoryDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
 
