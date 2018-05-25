@@ -170,10 +170,11 @@ public class UnitPositionService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.staff.employment.notFound", unitPositionDTO.getStaffId());
 
         }
+        if(employment.getStartDateMillis()!=null){
         if (new DateTime(unitPositionDTO.getStartDateMillis()).isBefore(new DateTime(employment.getStartDateMillis()))) {
             exceptionService.actionNotPermittedException("message.staff.data.employmentdate.lessthan");
 
-        }
+        }}
 
         if (!Optional.ofNullable(positionCode).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.position.name.notexist", unitPositionDTO.getPositionCodeId());
@@ -545,11 +546,16 @@ public class UnitPositionService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.staff.employment.notFound",unitPositionDTO.getStaffId());
 
         }
-        if (new DateTime(unitPositionDTO.getStartDateMillis()).isBefore(new DateTime(employment.getStartDateMillis()))) {
-            exceptionService.actionNotPermittedException("message.staff.data.employmentdate.lessthan");
+        if(employment.getStartDateMillis()!=null) {
+            if (new DateTime(unitPositionDTO.getStartDateMillis()).isBefore(new DateTime(employment.getStartDateMillis()))) {
+                exceptionService.actionNotPermittedException("message.staff.data.employmentdate.lessthan");
+
+            }
+        }
+        if ( unitPositionDTO.getStartDateMillis() <= System.currentTimeMillis()) {
+            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
 
         }
-
         oldUnitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
         oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
 
