@@ -95,33 +95,6 @@ public class StaffRestClient {
         }
     }
 
-    /**
-     * @return
-     * @auther prerna jajoria
-     */
-    /*public StaffDTO getStaffPersonalDetails(Long staffId) {
-
-        final String baseUrl = getBaseUrl(true);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<StaffDTO>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/personal_details",
-                            HttpMethod.GET, null, typeReference, staffId);
-            RestTemplateResponseEnvelope<StaffDTO> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
-        }
-    }*/
     public List<UnitStaffResponseDTO> getUnitWiseStaffList() {
 
         final String baseUrl = getBaseUrl(true);
