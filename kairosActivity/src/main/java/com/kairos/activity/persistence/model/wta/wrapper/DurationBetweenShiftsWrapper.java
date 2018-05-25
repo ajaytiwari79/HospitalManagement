@@ -36,7 +36,7 @@ public class DurationBetweenShiftsWrapper implements RuleTemplateWrapper{
             ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
             timefromPrevShift = new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
             Integer[] limitAndCounter = getValueByPhase(infoWrapper,wtaTemplate.getPhaseTemplateValues(),wtaTemplate.getId());
-            if (!isValid(wtaTemplate.getMinMaxSetting(), limitAndCounter[0], shifts.size())) {
+            if (!isValid(wtaTemplate.getMinMaxSetting(), limitAndCounter[0], timefromPrevShift)) {
                 if(limitAndCounter[1]!=null) {
                     int counterValue =  limitAndCounter[1] - 1;
                     if(counterValue<0){
@@ -47,9 +47,6 @@ public class DurationBetweenShiftsWrapper implements RuleTemplateWrapper{
                     new InvalidRequestException(wtaTemplate.getName() + " is Broken");
                 }
             }
-        }
-        if (!isValid(wtaTemplate.getMinMaxSetting(), (int) wtaTemplate.getDurationBetweenShifts(), (int) timefromPrevShift)) {
-            new InvalidRequestException("");
         }
         return "";
     }

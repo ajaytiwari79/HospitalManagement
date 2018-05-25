@@ -153,7 +153,7 @@ public class WTARuleTemplateValidatorUtility {
     }*/
 
     // MinimumDailyRestingTimeWTATemplateTemplate
-    public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts,DailyRestingTimeWTATemplate ruleTemplate){
+    /*public static void checkConstraints(List<ShiftQueryResultWithActivity> shifts,DailyRestingTimeWTATemplate ruleTemplate){
         if(shifts.size()>2) {
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
             int restingTimeUnder = 0;
@@ -166,7 +166,7 @@ public class WTARuleTemplateValidatorUtility {
                 }
             }
         }
-    }
+    }*/
 
 
     //MinimumDurationBetweenShiftWTATemplate
@@ -520,7 +520,7 @@ public class WTARuleTemplateValidatorUtility {
                     ruleTemplateWrappers.add(new NumberOfWeekendShiftsInPeriodWrapper((NumberOfWeekendShiftsInPeriodWTATemplate)ruleTemplate,ruleTemplateSpecificInfo));
                     break;
                 case DAILY_RESTING_TIME:
-                    ruleTemplateWrappers.add(new DailyRestingTimeWrapper((DailyRestingTimeWTATemplate)ruleTemplate,ruleTemplateSpecificInfo));
+                    ruleTemplateWrappers.add(new DurationBetweenShiftsWrapper((DurationBetweenShiftsWTATemplate)ruleTemplate,ruleTemplateSpecificInfo));
                     break;
                 case DURATION_BETWEEN_SHIFTS:
                     ruleTemplateWrappers.add(new DurationBetweenShiftsWrapper((DurationBetweenShiftsWTATemplate)ruleTemplate,ruleTemplateSpecificInfo));

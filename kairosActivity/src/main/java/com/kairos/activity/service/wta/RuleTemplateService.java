@@ -7,6 +7,7 @@ import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.enums.PartOfDay;
+import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -156,14 +157,15 @@ public class RuleTemplateService extends MongoBaseService {
         careDayCheckWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDayCheckWTATemplate);*/
 
-        DailyRestingTimeWTATemplate dailyRestingTimeWTATemplate = new DailyRestingTimeWTATemplate("Minimum resting hours daily",false,"Minimum resting hours daily",timeInMins);
+        DurationBetweenShiftsWTATemplate dailyRestingTimeWTATemplate = new DurationBetweenShiftsWTATemplate("Minimum resting hours daily",false,"Minimum resting hours daily");
         dailyRestingTimeWTATemplate.setCountryId(countryDTO.getId());
         dailyRestingTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         dailyRestingTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        dailyRestingTimeWTATemplate.setWtaTemplateType(WTATemplateType.DAILY_RESTING_TIME);
         wtaBaseRuleTemplates1.add(dailyRestingTimeWTATemplate);
 
 
-        DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplate("Minimum duration between shifts",false,"Minimum duration between shifts",timeInMins);
+        DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplate("Minimum duration between shifts",false,"Minimum duration between shifts");
         durationBetweenShiftsWTATemplate.setCountryId(countryDTO.getId());
         durationBetweenShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         durationBetweenShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -218,7 +220,7 @@ public class RuleTemplateService extends MongoBaseService {
         daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffAfterASeriesWTATemplate);
 
-        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No OF Sequence Shift", PartOfDay.DAY,PartOfDay.NIGHT);
+        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No of Sequence Shift", PartOfDay.DAY,PartOfDay.NIGHT);
         noOfSequenceShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         noOfSequenceShiftWTATemplate.setCountryId(countryDTO.getId());
         noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
