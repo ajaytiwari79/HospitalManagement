@@ -4,7 +4,6 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -80,7 +79,7 @@ public class PositionCodeServiceIntegrationTest {
         createdId = wtaIdForUpdate = createdIdDelete = response.getBody().getData().getId();
     }
 
-    @Test
+  /*  @Test
     @OrderTest(order = 2)
     public void getPositionCode() throws Exception {
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference =
@@ -90,7 +89,7 @@ public class PositionCodeServiceIntegrationTest {
                 baseUrlWithUnit + "/position_code",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-    }
+    }*/
 
     @Test
     @OrderTest(order = 3)

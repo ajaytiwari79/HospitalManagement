@@ -17,7 +17,7 @@ public class OrderDefaultDataWrapper {
     private List<ActivityDTO> activities;
     private List<Skill> skills;
     private List<Expertise> expertise;
-    private List<TimeType> timeTypes;
+   // private List<TimeType> timeTypes;
     private List<StaffPersonalDetailDTO> staffList;
     private List<PresenceTypeDTO> plannedTime;
     private List<FunctionDTO> functions;
@@ -34,7 +34,7 @@ public class OrderDefaultDataWrapper {
         this.activities = activities;
         this.skills = skills;
         this.expertise = expertise;
-        this.timeTypes = timeTypes;
+       // this.timeTypes = timeTypes;
         this.staffList = staffList;
         this.plannedTime = plannedTime;
         this.functions = functions;
@@ -74,13 +74,13 @@ public class OrderDefaultDataWrapper {
         this.expertise = expertise;
     }
 
-    public List<TimeType> getTimeTypes() {
+  /*  public List<TimeType> getTimeTypes() {
         return timeTypes;
     }
 
     public void setTimeTypes(List<TimeType> timeTypes) {
         this.timeTypes = timeTypes;
-    }
+    }*/
 
     public List<StaffPersonalDetailDTO> getStaffList() {
         return staffList;

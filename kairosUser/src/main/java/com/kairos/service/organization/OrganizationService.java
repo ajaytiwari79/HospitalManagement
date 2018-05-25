@@ -36,7 +36,6 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -57,7 +56,6 @@ import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
@@ -198,14 +196,12 @@ public class OrganizationService extends UserBaseService {
     @Inject
     private AccessPageService accessPageService;
 
-    @Inject
-    private WTAService wtaService;
+    //@Inject
+    //private WTAService wtaService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
     CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
-    @Inject
-    WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     PeriodRestClient periodRestClient;
     @Inject

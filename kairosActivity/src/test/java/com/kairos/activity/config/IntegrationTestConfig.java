@@ -28,7 +28,7 @@ public class IntegrationTestConfig {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new TestUserContextInterceptor())
                 .build();
-        TestRestTemplate restTemplate = new TestRestTemplate(template);
+        TestRestTemplate restTemplate = new TestRestTemplate();
         return restTemplate;
     }
 

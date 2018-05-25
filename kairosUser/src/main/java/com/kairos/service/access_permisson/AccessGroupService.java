@@ -16,12 +16,14 @@ import com.kairos.persistence.repository.user.access_permission.AccessPermission
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.AccessGroupDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateUtil;
+import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -637,5 +639,15 @@ public class AccessGroupService extends UserBaseService {
         accessPageRepository.copyAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
         countryAccessGroupDTO.setId(accessGroup.getId());
         return countryAccessGroupDTO;
+    }
+
+    public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {
+        Long userId = UserContext.getUserDetails().getId();
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,
+                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString()),
+                accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString())
+        );
+        return userAccessRoleDTO;
     }
 }
