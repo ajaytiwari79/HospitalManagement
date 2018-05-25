@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.Date;
@@ -46,7 +47,7 @@ public class PlannedTimeTypeIntegrationTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>>() {};
         ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = testRestTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, typeReference);
         System.out.println("reponse: "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
+        Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
         createdId = response.getBody().getData().getId();
     }
 
@@ -58,7 +59,7 @@ public class PlannedTimeTypeIntegrationTest {
         };
         ResponseEntity<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> response = testRestTemplate.exchange(baseUrl, HttpMethod.GET, null, typeReference);
         System.out.println("reponse: "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
@@ -71,7 +72,7 @@ public class PlannedTimeTypeIntegrationTest {
         };
         ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = testRestTemplate.exchange(baseUrl, HttpMethod.PUT, requestEntity, responseRef);
         System.out.println("reponse: "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
@@ -82,7 +83,7 @@ public class PlannedTimeTypeIntegrationTest {
         };
         ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = testRestTemplate.exchange(baseUrl, HttpMethod.DELETE, null, responseRef);
         System.out.println("reponse: "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     public final String getBaseUrl(Long organizationId, Long countryId) throws Exception{
