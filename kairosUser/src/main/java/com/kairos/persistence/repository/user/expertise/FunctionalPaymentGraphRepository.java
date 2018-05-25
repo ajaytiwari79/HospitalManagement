@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.FunctionalPayment;
+import com.kairos.persistence.model.user.expertise.FunctionalPaymentMatrix;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -44,15 +45,19 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "with functionalPaymentMatrix ,functions,seniorityLevelFunction,seniorityLevel,collect (id(pga)) as payGroupAreaIds \n" +
             "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),functions:functions}) as seniorityLevelFunctions \n" +
             " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
-    FunctionalPaymentMatrixQueryResult getFunctionalPaymentMatrixById(Long functionalPaymentMatrixId);
+    FunctionalPaymentMatrix getFunctionalPaymentMatrixById(Long functionalPaymentMatrixId);
 
     @Query(" MATCH(functionalPaymentMatrix:FunctionalPaymentMatrix)-[relation:" + HAS_PAY_GROUP_AREA + "]->(pga:PayGroupArea) where id(functionalPaymentMatrix)={0} " +
             " detach delete relation")
     void removeAllPayGroupAreas(Long functionalPaymentMatrixId);
 
-    FunctionalPaymentMatrixQueryResult getParentFunctionalPayment(Long functionalPaymentId);
+    @Query(" match(functionalPayment:FunctionalPayment{deleted:false})-[relation:" + VERSION_OF + "]->(parentFunctionalPayment:FunctionalPayment{deleted:false}) where id(functionalPayment)={0} " +
+            " return id(parentFunctionalPayment) as id, parentFunctionalPayment.name as name,parentFunctionalPayment.startDate as startDate,parentFunctionalPayment.endDate as endDate,parentFunctionalPayment.published as published, " +
+            " parentFunctionalPayment.paidOutFrequency as paidOutFrequency")
+    FunctionalPaymentDTO getParentFunctionalPayment(Long functionalPaymentId);
 
-    @Query("match(functionalPayment:FunctionalPayment{deleted:false})-[relation:" + VERSION_OF + "]-(functionalPayment:FunctionalPayment{deleted:false}) set functionalPayment.endDate={0} " +
-            "set functionalPayment.hasDraftCopy =false")
-    void setEndDateToFunctionalPayment(Long functionalPaymentId, LocalDate endDate);
+    @Query("match(childFunctionalPayment:FunctionalPayment{deleted:false})-[relation:VERSION_OF]->(functionalPayment:FunctionalPayment{deleted:false}) \n" +
+            "where id(childFunctionalPayment)={0} AND id(functionalPayment)={1}\n" +
+            " set functionalPayment.hasDraftCopy=false set functionalPayment.endDate={2} detach delete relation")
+    void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, Long endDate);
 }

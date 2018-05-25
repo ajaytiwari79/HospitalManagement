@@ -129,8 +129,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "publish a functional payment settings for expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/functional_payment/{functionalPaymentId}/publish", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> publishFunctionalPayment(@PathVariable Long expertiseId, @RequestBody FunctionalPaymentDTO functionalPaymentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.publishFunctionalPayment(functionalPaymentDTO));
+    public ResponseEntity<Map<String, Object>> publishFunctionalPayment(@PathVariable Long functionalPaymentId,@RequestBody FunctionalPaymentDTO functionalPaymentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.publishFunctionalPayment(functionalPaymentId,functionalPaymentDTO));
     }
 
 }

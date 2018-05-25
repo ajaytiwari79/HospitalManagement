@@ -4,9 +4,11 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.io.Serializable;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
 @NodeEntity
-public class SeniorityLevelFunction extends UserBaseEntity {
+public class SeniorityLevelFunction extends UserBaseEntity  implements Serializable {
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;
     public SeniorityLevelFunction() {

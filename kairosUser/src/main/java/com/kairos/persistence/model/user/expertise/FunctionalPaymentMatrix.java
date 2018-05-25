@@ -5,13 +5,14 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 import static com.kairos.persistence.model.constants.RelationshipConstants.SENIORITY_LEVEL_FUNCTIONS;
 @NodeEntity
-public class FunctionalPaymentMatrix extends UserBaseEntity {
+public class FunctionalPaymentMatrix extends UserBaseEntity implements Serializable {
 
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private Set<PayGroupArea> payGroupAreas;

@@ -23,7 +23,7 @@ public class FunctionalPayment extends UserBaseEntity {
     @Convert(LocalDateConverter.class)
     private LocalDate endDate;
     private boolean published;
-    private PaidOutFrequencyEnum paidOutFrequency;
+    private PaidOutFrequencyEnum paymentUnit;
     @Relationship(type = FUNCTIONAL_PAYMENT_MATRIX)
     private List<FunctionalPaymentMatrix> functionalPaymentMatrices;
 
@@ -72,12 +72,12 @@ public class FunctionalPayment extends UserBaseEntity {
         this.published = published;
     }
 
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
+    public PaidOutFrequencyEnum getPaymentUnit() {
+        return paymentUnit;
     }
 
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
+    public void setPaymentUnit(PaidOutFrequencyEnum paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 
     public List<FunctionalPaymentMatrix> getFunctionalPaymentMatrices() {
@@ -104,12 +104,12 @@ public class FunctionalPayment extends UserBaseEntity {
         this.hasDraftCopy = hasDraftCopy;
     }
 
-    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paidOutFrequency) {
+    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paymentUnit) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
         this.published = false;
         this.hasDraftCopy = false;
-        this.paidOutFrequency = paidOutFrequency;
+        this.paymentUnit = paymentUnit;
     }
 }
