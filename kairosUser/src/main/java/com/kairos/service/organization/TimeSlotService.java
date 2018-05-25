@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
@@ -419,6 +420,13 @@ public class TimeSlotService extends UserBaseService {
 
     public List<TimeSlotWrapper> getShiftPlanningTimeSlotsById(Long timeSlotSetId) {
         return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
+    }
+
+    public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Organization organization){
+        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
+        List<TimeSlotDTO> timeSlotDTOS = ObjectMapperUtils.copyProperties(timeSlotWrappers,TimeSlotDTO.class);
+        return timeSlotDTOS;
     }
 
 }
