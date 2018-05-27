@@ -38,6 +38,7 @@ public class ClauseDto {
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set<BigInteger> accountType;
 
+
     public String getTitle() {
         return title;
     }

@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
+
 import static com.kairos.constant.ApiConstant.API_MASTER_ASSET_URL;
 import static com.kairos.constant.ApiConstant.COUNTRY_URL;
 
@@ -21,12 +23,9 @@ import static com.kairos.constant.ApiConstant.COUNTRY_URL;
  * */
 
 
-
-
 @RestController
 @RequestMapping(API_MASTER_ASSET_URL)
 @Api(API_MASTER_ASSET_URL)
-@CrossOrigin
 public class MasterAssetController {
 
 
@@ -36,8 +35,11 @@ public class MasterAssetController {
 
     @ApiOperation(value = "add master asset")
     @RequestMapping(value = "/add_asset", method = RequestMethod.POST)
-    public ResponseEntity<Object> addMasterAsset(@PathVariable Long countryId,@Validated @RequestBody MasterAssetDto masterAssetDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.addMasterAsset(countryId,masterAssetDto));
+    public ResponseEntity<Object> addMasterAsset(@PathVariable Long countryId, @Validated @RequestBody MasterAssetDto masterAssetDto) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.addMasterAsset(countryId, masterAssetDto));
     }
 
     @ApiOperation(value = "get all master asset")
@@ -66,11 +68,14 @@ public class MasterAssetController {
 
     @ApiOperation(value = "get master asset by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId,@PathVariable BigInteger id) {
-        if (id != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(countryId,id));
-        }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+    public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+
+        } else
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
     }
 
 

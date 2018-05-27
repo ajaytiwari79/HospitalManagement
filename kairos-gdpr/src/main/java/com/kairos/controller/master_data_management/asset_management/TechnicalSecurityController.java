@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
@@ -19,12 +20,9 @@ import static com.kairos.constant.ApiConstant.API_TECH_SECURITY_MEASURE_URL;
  * */
 
 
-
-
 @RestController
 @RequestMapping(API_TECH_SECURITY_MEASURE_URL)
 @Api(API_TECH_SECURITY_MEASURE_URL)
-@CrossOrigin
 public class TechnicalSecurityController {
 
     @Inject
@@ -33,20 +31,25 @@ public class TechnicalSecurityController {
 
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/add")
-    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId,@RequestBody List<TechnicalSecurityMeasure> securityMeasures) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId,securityMeasures));
+    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId, @RequestBody List<TechnicalSecurityMeasure> securityMeasures) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures));
 
     }
 
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, id));
 
     }
 
@@ -60,8 +63,8 @@ public class TechnicalSecurityController {
 
     @ApiOperation("get TechnicalSecurityMeasure by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName(countryId,name));
+    public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName(countryId, name));
 
     }
 

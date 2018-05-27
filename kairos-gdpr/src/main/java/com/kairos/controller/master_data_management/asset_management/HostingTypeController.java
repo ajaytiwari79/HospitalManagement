@@ -23,7 +23,6 @@ import static com.kairos.constant.ApiConstant.API_HOSTING_TYPE_URL;
 @RestController
 @RequestMapping(API_HOSTING_TYPE_URL)
 @Api(API_HOSTING_TYPE_URL)
-@CrossOrigin
 public class HostingTypeController {
 
 
@@ -36,6 +35,9 @@ public class HostingTypeController {
     @ApiOperation("add HostingType")
     @PostMapping("/add")
     public ResponseEntity<Object> createHostingType(@PathVariable Long countryId,@RequestBody List<HostingType> hostingTypes) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId,hostingTypes));
 
     }
@@ -46,9 +48,10 @@ public class HostingTypeController {
     public ResponseEntity<Object> getHostingType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(countryId,id));
+        } else   return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(countryId,id));
 
     }
 

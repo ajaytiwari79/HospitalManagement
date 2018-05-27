@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.constant.ApiConstant.API_PROCESSING_LEGAL_BASIS;
 /*
  *
@@ -19,13 +21,10 @@ import static com.kairos.constant.ApiConstant.API_PROCESSING_LEGAL_BASIS;
  * */
 
 
-
 @RestController
 @RequestMapping(API_PROCESSING_LEGAL_BASIS)
 @Api(API_PROCESSING_LEGAL_BASIS)
-@CrossOrigin
 public class ProcessingLegalBasisController {
-
 
 
     @Inject
@@ -34,19 +33,25 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId,@RequestBody List<ProcessingLegalBasis> legalBases) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId,legalBases));
+    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @RequestBody List<ProcessingLegalBasis> legalBases) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId, legalBases));
 
     }
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId,id));
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, id));
 
     }
 
@@ -60,8 +65,8 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("get ProcessingLegalBasis by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId,name));
+    public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId, name));
 
     }
 

@@ -13,13 +13,13 @@ import java.util.Set;
 @Repository
 public interface DataSubjectMongoRepository extends MongoRepository<DataSubject,BigInteger> {
 
-    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    @Query("{countryId:?0,_id:?1,deleted:false}")
     DataSubject findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
     DataSubject findByName(Long countryId,String name);
 
-    @Query("{countryId:?0,'_id':{$in:?1}}")
+    @Query("{countryId:?0,_id:{$in:?1}}")
     List<DataSubject> getDataSubjectList(Long countryId,List<BigInteger> ids);
 
     DataSubject findByid(BigInteger id);

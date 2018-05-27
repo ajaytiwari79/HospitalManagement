@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
 /*
  *
@@ -19,11 +21,9 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
  * */
 
 
-
 @RestController
 @RequestMapping(API_STORAGE_TYPE_URL)
 @Api(API_STORAGE_TYPE_URL)
-@CrossOrigin
 public class StorageTypeController {
     @Inject
     private StorageTypeService storageTypeService;
@@ -31,20 +31,25 @@ public class StorageTypeController {
 
     @ApiOperation("add StorageType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId,@RequestBody List<StorageType> storageTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createStorageType(countryId,storageTypes));
+    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId, @RequestBody List<StorageType> storageTypes) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createStorageType(countryId, storageTypes));
 
     }
 
 
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getStorageType(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getStorageType(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageType(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageType(countryId, id));
 
     }
 
@@ -59,8 +64,8 @@ public class StorageTypeController {
 
     @ApiOperation("get StorageType by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(countryId,name));
+    public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(countryId, name));
 
     }
 

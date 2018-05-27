@@ -11,20 +11,21 @@ import java.util.List;
 @Repository
 public interface ClauseTagMongoRepository extends MongoRepository<ClauseTag,BigInteger> {
 
-    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    @Query("{countryId:?0,_id:?1,deleted:false}")
     ClauseTag findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false,'countryId':?0}")
+    @Query("{deleted:false,countryId:?0}")
     List<ClauseTag> findAllClauseTag(Long countryId);
 
-    @Query("{deleted:false,'countryId':?0,'_id':{$in:?1}}")
-    List<ClauseTag> findClauseTagsByIds(Long countryId,List<BigInteger> ids);
-
-    @Query("{deleted:false,'countryId':?0,'name':{$in:?1}}")
-    List<ClauseTag> findClauseTagsByNames(Long countryId,List<String> names);
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<ClauseTag> findAllClauseTagByIds(Long countryId,List<BigInteger> ids);
 
 
-    ClauseTag findByName(Long countryId,String name);
+    @Query("{deleted:false,countryId:?0,name:{$in:?1}}")
+    List<ClauseTag> findTagByNames(Long countryId,List<String> names);
+
+
+    ClauseTag findByNameAndCountryId(Long countryId,String name);
     ClauseTag findByid(BigInteger id);
 
 }

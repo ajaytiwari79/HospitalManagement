@@ -10,18 +10,18 @@ import java.util.List;
 public interface ProcessingLegalBasisMongoRepository extends MongoRepository<ProcessingLegalBasis, BigInteger> {
 
 
-    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    @Query("{'countryId':?0,_id:?1,deleted:false}")
     ProcessingLegalBasis findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{'countryId':?0,'name':?1,deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     ProcessingLegalBasis findByName(Long countryId,String name);
     ProcessingLegalBasis findByid(BigInteger id);
 
-    @Query("{'_id':{$in:?0}}")
+    @Query("{_id:{$in:?0}}")
     List<ProcessingLegalBasis> getProcessingLegalBasisList(List<BigInteger> ids);
 
 
-    @Query("{'countryId':?0,deleted:false}")
+    @Query("{countryId:?0,deleted:false}")
     List<ProcessingLegalBasis> findAllProcessingLegalBases(Long countryId);
 
 }

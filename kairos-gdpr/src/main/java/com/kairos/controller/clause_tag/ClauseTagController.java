@@ -21,7 +21,6 @@ import java.math.BigInteger;
 @RestController
 @RequestMapping(API_CLAUSE_TAG_URL)
 @Api(API_CLAUSE_TAG_URL)
-@CrossOrigin
 public class ClauseTagController {
 
 
@@ -31,7 +30,7 @@ public class ClauseTagController {
     @ApiOperation("add clauseTag")
     @PostMapping("/add")
     public ResponseEntity<Object> createAssetType(@PathVariable Long countryId,@RequestParam  String clauseTag) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.createClauseTag(clauseTag));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.createClauseTag(countryId,clauseTag));
 
     }
 

@@ -8,9 +8,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.constant.ApiConstant.API_DATA_DISPOSAL_URL;
 /*
  *
@@ -18,11 +20,9 @@ import static com.kairos.constant.ApiConstant.API_DATA_DISPOSAL_URL;
  * */
 
 
-
 @RestController
 @RequestMapping(API_DATA_DISPOSAL_URL)
 @Api(API_DATA_DISPOSAL_URL)
-@CrossOrigin
 public class DataDisposalController {
 
 
@@ -32,20 +32,25 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId,@RequestBody List<DataDisposal> dataDisposals) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId,dataDisposals));
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @RequestBody List<DataDisposal> dataDisposals) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposals));
 
     }
 
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, id));
 
     }
 
@@ -59,12 +64,10 @@ public class DataDisposalController {
 
     @ApiOperation("get DataDisposal by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId,name));
+    public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId, name));
 
     }
-
-
 
 
     @ApiOperation("delete HostingProvider  by id")

@@ -1,10 +1,8 @@
 package com.kairos.controller.agreement_template;
 
 import com.kairos.dto.PolicyAgreementTemplateDto;
-import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.userContext.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -24,7 +22,6 @@ import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 @RestController
 @RequestMapping(API_AGREEMENT_TEMPLATE_URl)
 @Api(API_AGREEMENT_TEMPLATE_URl)
-@CrossOrigin
 public class PolicyAgreementTemplateController {
 
 

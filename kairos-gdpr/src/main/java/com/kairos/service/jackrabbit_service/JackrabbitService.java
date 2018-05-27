@@ -43,13 +43,13 @@ public class JackrabbitService {
 
     Logger logger = LoggerFactory.getLogger(JackrabbitService.class);
 
-    public Boolean addClauseToJackrabbit( BigInteger id,Clause clause) throws RepositoryException {
+    public Boolean addClauseToJackrabbit(BigInteger id, Clause clause) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
         try {
 
-            String file=clauseFileContent(clause);
-            InputStream inputStream=new ByteArrayInputStream(file.getBytes());
+            String file = clauseFileContent(clause);
+            InputStream inputStream = new ByteArrayInputStream(file.getBytes());
 
 
             Node rootNode = session.getRootNode();
@@ -66,9 +66,9 @@ public class JackrabbitService {
             clauseVersioningNode.setProperty("title", clause.getTitle());
 
 
-            Node content=clauseVersioningNode.addNode(JCR_CONTENT,NODE_TYPE_RESOURCE);
+            Node content = clauseVersioningNode.addNode(JCR_CONTENT, NODE_TYPE_RESOURCE);
             Binary binary = session.getValueFactory().createBinary(inputStream);
-            content.setProperty(JCR_DATA,binary);
+            content.setProperty(JCR_DATA, binary);
             session.save();
             clauseVersioningNode.checkin();
             return true;
@@ -90,8 +90,8 @@ public class JackrabbitService {
         try {
 
 
-            String file=clauseFileContent(clause);
-            InputStream inputStream=new ByteArrayInputStream(file.getBytes());
+            String file = clauseFileContent(clause);
+            InputStream inputStream = new ByteArrayInputStream(file.getBytes());
             Node rootNode = session.getRootNode();
             Node clauseNode = rootNode.getNode(CLAUSE_PARENT_NODE + "/" + CLAUSE_CHILD_NODE + clauseid);
             if (clauseNode.isNode()) {
@@ -100,7 +100,7 @@ public class JackrabbitService {
                 clauseNode.setProperty("id", clause.getId().toString());
                 clauseNode.setProperty("title", clause.getTitle());
 
-                 Node contentNode = clauseNode.getNode(JCR_CONTENT);
+                Node contentNode = clauseNode.getNode(JCR_CONTENT);
                 if (!contentNode.isNode()) {
                     throw new JackrabbitNodeNotFoundException("clause not found");
                 }
@@ -115,9 +115,9 @@ public class JackrabbitService {
 
 
         } catch (RepositoryException e) {
-               e.printStackTrace();
+            e.printStackTrace();
         } catch (Exception e) {
-              e.printStackTrace();
+            e.printStackTrace();
         } finally {
             session.logout();
         }
@@ -125,9 +125,10 @@ public class JackrabbitService {
     }
 
 
-    public String getClauseVersion(BigInteger id, String version) throws RepositoryException {
+    public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-        String result=new String();
+        StringBuffer result = new StringBuffer();
+        BufferedReader bufferedReader;
         try {
             Node clauseVersinongNode = session.getRootNode().getNode(CLAUSE_PARENT_NODE + "/" + CLAUSE_CHILD_NODE + id);
             Node currentNode;
@@ -135,9 +136,21 @@ public class JackrabbitService {
             NodeIterator nodeIterator = version1.getNodes();
             while (nodeIterator.hasNext()) {
                 currentNode = (Node) nodeIterator.next();
-                result = new BufferedReader(new InputStreamReader(currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getStream()))
-                        .lines().collect(Collectors.joining());
+                bufferedReader = new BufferedReader(new InputStreamReader(currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getStream()));
+                String s = bufferedReader.readLine();
+
+                while (s != null) {
+
+                    result.append(s);
+                    s = bufferedReader.readLine();
+
+
+                }
+                currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getBinary().dispose();
+
             }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -150,16 +163,15 @@ public class JackrabbitService {
 
     public List<String> getClauseVersions(BigInteger id) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-        List<String> versionList=new ArrayList<>();
+        List<String> versionList = new ArrayList<>();
         try {
             Node clauseVersinongNode = session.getRootNode().getNode(CLAUSE_PARENT_NODE + "/" + CLAUSE_CHILD_NODE + id);
-            VersionManager versionManager=session.getWorkspace().getVersionManager();
-           VersionIterator versions= versionManager.getVersionHistory(clauseVersinongNode.getPath()).getAllVersions();
-           versions.skip(1);
-           while (versions.hasNext())
-           {
-               versionList.add( versions.nextVersion().getName());
-           }
+            VersionManager versionManager = session.getWorkspace().getVersionManager();
+            VersionIterator versions = versionManager.getVersionHistory(clauseVersinongNode.getPath()).getAllVersions();
+            versions.skip(1);
+            while (versions.hasNext()) {
+                versionList.add(versions.nextVersion().getName());
+            }
 
             return versionList;
 
@@ -168,7 +180,7 @@ public class JackrabbitService {
         } finally {
             session.logout();
         }
-        return  null;
+        return null;
 
     }
 
@@ -259,18 +271,16 @@ public class JackrabbitService {
     }
 
 
-
     public List<String> getPolicyTemplateVersions(BigInteger id) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-        List<String> versionList=new ArrayList<>();
+        List<String> versionList = new ArrayList<>();
         try {
             Node clauseVersinongNode = session.getRootNode().getNode(AGREEMENT_TEMPLATE_PARENT_NODE + "/" + AGREEMENT_TEMPLATE_CHILD_NODE + id);
-            VersionManager versionManager=session.getWorkspace().getVersionManager();
-            VersionIterator versions= versionManager.getVersionHistory(clauseVersinongNode.getPath()).getAllVersions();
+            VersionManager versionManager = session.getWorkspace().getVersionManager();
+            VersionIterator versions = versionManager.getVersionHistory(clauseVersinongNode.getPath()).getAllVersions();
             versions.skip(1);
-            while (versions.hasNext())
-            {
-                versionList.add( versions.nextVersion().getName());
+            while (versions.hasNext()) {
+                versionList.add(versions.nextVersion().getName());
             }
             return versionList;
         } catch (Exception e) {
@@ -279,14 +289,14 @@ public class JackrabbitService {
             session.logout();
         }
 
-return null;
+        return null;
     }
 
 
-
-    public String getpolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
+    public StringBuffer getpolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-        String result=new String();
+        StringBuffer result = new StringBuffer();
+        BufferedReader bufferedReader;
         try {
             Node policyAgreementVersionNode = session.getRootNode().getNode(AGREEMENT_TEMPLATE_PARENT_NODE + "/" + AGREEMENT_TEMPLATE_CHILD_NODE + id);
             Node currentNode;
@@ -294,8 +304,14 @@ return null;
             NodeIterator nodeIterator = version1.getNodes();
             while (nodeIterator.hasNext()) {
                 currentNode = (Node) nodeIterator.next();
-                 result = new BufferedReader(new InputStreamReader(currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getStream()))
-                        .lines().collect(Collectors.joining());
+                bufferedReader = new BufferedReader(new InputStreamReader(currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getStream()));
+                String s = bufferedReader.readLine();
+                while (s != null) {
+                    result.append(s);
+                    s = bufferedReader.readLine();
+                }
+                currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getBinary().dispose();
+
             }
         } catch (Exception e) {
 
@@ -309,12 +325,10 @@ return null;
     }
 
 
-
-
     public String getpolicyTemplateBaseVersion(BigInteger id) throws RepositoryException {
 
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-        String result=new String();
+        String result = new String();
         try {
             Node policyAgreementVersionNode = session.getRootNode().getNode(AGREEMENT_TEMPLATE_PARENT_NODE + "/" + AGREEMENT_TEMPLATE_CHILD_NODE + id);
             Node currentNode;
@@ -338,11 +352,6 @@ return null;
         return result;
 
     }
-
-
-
-
-
 
 
     public String policyAgreementTemplateFileContent(List<AgreementSectionResponseDto> sectionResponseDto, PolicyAgreementTemplate policyAgreementTemplate) {
@@ -380,8 +389,6 @@ return null;
         context.append("\n");
         return context.toString();
     }
-
-
 
 
 }

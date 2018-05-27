@@ -24,7 +24,6 @@ import static com.kairos.constant.ApiConstant.API_ORG_SEC_MEASURE_URL;
 @RestController
 @RequestMapping(API_ORG_SEC_MEASURE_URL)
 @Api(API_ORG_SEC_MEASURE_URL)
-@CrossOrigin
 public class OrganizationalSecurityMeasureController {
 
 
@@ -34,21 +33,25 @@ public class OrganizationalSecurityMeasureController {
 
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/add")
-    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId,@RequestBody List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId,orgSecurityMeasures));
+    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId, @RequestBody List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId, orgSecurityMeasures));
 
     }
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId, id));
 
     }
 
@@ -61,14 +64,12 @@ public class OrganizationalSecurityMeasureController {
     }
 
 
-
     @ApiOperation("get Organizational Security Measure by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId,name));
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId, name));
 
     }
-
 
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")

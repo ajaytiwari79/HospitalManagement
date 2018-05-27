@@ -97,7 +97,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 accountTypeService.getAccountTypeList(accountTypeIds);
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 policyAgreementTemplate.setOrganizationTypes(requestResult.getOrganizationTypes());
-                policyAgreementTemplate.setCountryId(policyAgreementTemplateDto.getCountryId());
+                policyAgreementTemplate.setCountryId(countryId);
                 policyAgreementTemplate = save(policyAgreementTemplate);
                 jackrabbitService.addAgreementTemplateJackrabbit(policyAgreementTemplate.getId(), policyAgreementTemplate, (List<AgreementSectionResponseDto>) sections.get("section"));
             } else {
@@ -209,7 +209,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public String getPolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
+    public StringBuffer getPolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
         return jackrabbitService.getpolicyTemplateVersion(id, version);
     }
 

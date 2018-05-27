@@ -21,11 +21,9 @@ import static com.kairos.constant.ApiConstant.API_HOSTING_PROVIDER_URL;
  * */
 
 
-
 @RestController
 @RequestMapping(API_HOSTING_PROVIDER_URL)
 @Api(API_HOSTING_PROVIDER_URL)
-@CrossOrigin
 public class HostingProviderController {
 
 
@@ -35,20 +33,25 @@ public class HostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/add")
-    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId,@RequestBody List<HostingProvider> hostingProviders) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId,hostingProviders));
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @RequestBody List<HostingProvider> hostingProviders) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviders));
 
     }
 
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, id));
 
     }
 
@@ -62,12 +65,10 @@ public class HostingProviderController {
 
     @ApiOperation("get all HostingProvider ")
     @GetMapping("/")
-    public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId,name));
+    public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId, name));
 
     }
-
-
 
 
     @ApiOperation("delete HostingProvider  by id")

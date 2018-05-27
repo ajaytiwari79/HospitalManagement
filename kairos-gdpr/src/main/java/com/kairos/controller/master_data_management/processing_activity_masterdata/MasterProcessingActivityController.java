@@ -1,7 +1,6 @@
 package com.kairos.controller.master_data_management.processing_activity_masterdata;
 
 
-
 import com.kairos.dto.MasterProcessingActivityDto;
 import com.kairos.service.master_data_management.processing_activity_masterdata.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
@@ -11,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import static com.kairos.constant.ApiConstant.API_MASTER_PROCESSING_ACTIVITY;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
@@ -19,9 +20,7 @@ import java.math.BigInteger;
 @RestController
 @RequestMapping(API_MASTER_PROCESSING_ACTIVITY)
 @Api(API_MASTER_PROCESSING_ACTIVITY)
-@CrossOrigin
 public class MasterProcessingActivityController {
-
 
 
     @Inject
@@ -30,8 +29,11 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "add MasterProcessingActivity asset")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<Object> createMasterProcessingActivity(@PathVariable  Long countryId, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(countryId,processingActivityDto));
+    public ResponseEntity<Object> createMasterProcessingActivity(@PathVariable Long countryId, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(countryId, processingActivityDto));
     }
 
     @ApiOperation(value = "get all MasterProcessingActivity")
@@ -42,11 +44,11 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId,@PathVariable BigInteger id, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
+    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(countryId,id,processingActivityDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(countryId, id, processingActivityDto));
     }
 
     @ApiOperation(value = "delete MasterProcessingActivity")
@@ -60,11 +62,14 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "get MasterProcessingActivity by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithData(countryId,id));
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithData(countryId, id));
     }
 
 

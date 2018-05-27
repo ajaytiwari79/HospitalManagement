@@ -6,7 +6,6 @@ import static com.kairos.constant.ApiConstant.API_CLAUSES_URL;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.dto.ClauseDto;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.enums.VersionNode;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrievedEvent;
 import com.kairos.utils.ResponseHandler;
@@ -34,7 +33,6 @@ import java.util.*;
 @RestController
 @RequestMapping(API_CLAUSES_URL)
 @Api(API_CLAUSES_URL)
-@CrossOrigin
 public class ClauseController {
 
     @Inject
@@ -45,7 +43,7 @@ public class ClauseController {
 
 
     @ApiOperation("add new clause")
-    @PostMapping("/add_clause")
+    @PostMapping("/add")
     public ResponseEntity<Object> createClause(@PathVariable Long countryId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId,clauseDto));
     }

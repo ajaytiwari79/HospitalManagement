@@ -24,7 +24,6 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_FORMAT_URL;
 @RestController
 @RequestMapping(API_STORAGE_FORMAT_URL)
 @Api(API_STORAGE_FORMAT_URL)
-@CrossOrigin
 public class StorageFormatController {
 
 
@@ -34,20 +33,25 @@ public class StorageFormatController {
 
     @ApiOperation("add StorageFormat")
     @PostMapping("/add")
-    public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId,@RequestBody List<StorageFormat> storageFormat) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(countryId,storageFormat));
+    public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId, @RequestBody List<StorageFormat> storageFormat) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(countryId, storageFormat));
 
     }
 
 
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getStorageFormat(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(countryId, id));
 
     }
 
@@ -62,8 +66,8 @@ public class StorageFormatController {
 
     @ApiOperation("get StorageFormat by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getStorageFormatByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormatByName(countryId,name));
+    public ResponseEntity<Object> getStorageFormatByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormatByName(countryId, name));
 
     }
 

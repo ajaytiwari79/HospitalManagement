@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.constant.ApiConstant.API_ACCESSOR_PARTY_URL;
 /*
  *
@@ -19,11 +21,9 @@ import static com.kairos.constant.ApiConstant.API_ACCESSOR_PARTY_URL;
  * */
 
 
-
 @RestController
 @RequestMapping(API_ACCESSOR_PARTY_URL)
 @Api(API_ACCESSOR_PARTY_URL)
-@CrossOrigin
 public class AccessorPartyController {
 
     @Inject
@@ -32,20 +32,25 @@ public class AccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId,@RequestBody List<AccessorParty> accessorParties) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(countryId,accessorParties));
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @RequestBody List<AccessorParty> accessorParties) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(countryId, accessorParties));
 
     }
 
 
     @ApiOperation("get AccessorParty by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId, id));
 
     }
 
@@ -59,8 +64,11 @@ public class AccessorPartyController {
 
     @ApiOperation("get AccessorParty by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyByName(countryId,name));
+    public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId, @RequestParam String name) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyByName(countryId, name));
 
     }
 

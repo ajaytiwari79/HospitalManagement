@@ -12,7 +12,7 @@ import java.util.List;
 public interface MasterProcessingActivityRepository extends MongoRepository<MasterProcessingActivity,BigInteger>,CustomMasterProcessingActivity {
 
 
-    @Query("{deleted:false,countryId:?0,'_id':?1}")
+    @Query("{deleted:false,countryId:?0,_id:?1}")
     MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")

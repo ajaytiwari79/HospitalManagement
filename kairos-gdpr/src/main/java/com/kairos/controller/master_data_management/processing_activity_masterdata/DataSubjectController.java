@@ -24,7 +24,6 @@ import static com.kairos.constant.ApiConstant.API_DATASUBJECT_URL;
 @RestController
 @RequestMapping(API_DATASUBJECT_URL)
 @Api(API_DATASUBJECT_URL)
-@CrossOrigin
 public class DataSubjectController {
 
 
@@ -34,19 +33,25 @@ public class DataSubjectController {
 
     @ApiOperation("add DataSubject")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSubject(@PathVariable Long countryId,@RequestBody List<DataSubject> dataSubjects) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.createDataSubject(countryId,dataSubjects));
+    public ResponseEntity<Object> createDataSubject(@PathVariable Long countryId, @RequestBody List<DataSubject> dataSubjects) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.createDataSubject(countryId, dataSubjects));
 
     }
 
 
     @ApiOperation("get DataSubject by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataSubject(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataSubject(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.getDataSubject(countryId,id));
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.getDataSubject(countryId, id));
 
     }
 
@@ -60,8 +65,8 @@ public class DataSubjectController {
 
     @ApiOperation("get dataSource by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDataSubjectByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.getDataSubjectByName(countryId,name));
+    public ResponseEntity<Object> getDataSubjectByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.getDataSubjectByName(countryId, name));
 
     }
 

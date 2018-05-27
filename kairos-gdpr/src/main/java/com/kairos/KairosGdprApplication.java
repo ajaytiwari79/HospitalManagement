@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.client.RestTemplate;
 
 import javax.jcr.Repository;
@@ -33,7 +32,9 @@ import java.time.format.DateTimeFormatter;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
-
+//@EnableEurekaClient
+//@EnableAspectJAutoProxy
+//@EnableCircuitBreaker
 @SpringBootApplication
 public class KairosGdprApplication {
 

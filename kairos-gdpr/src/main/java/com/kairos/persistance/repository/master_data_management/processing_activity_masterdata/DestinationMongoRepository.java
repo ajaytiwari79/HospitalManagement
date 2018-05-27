@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface DestinationMongoRepository extends MongoRepository<Destination,BigInteger> {
 
-    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    @Query("{countryId:?0,_id:?1,deleted:false}")
     Destination findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
@@ -20,7 +20,7 @@ public interface DestinationMongoRepository extends MongoRepository<Destination,
 
     Destination findByid(BigInteger id);
 
-    @Query("{'_id':{$in:?0},deleted:false}")
+    @Query("{_id:{$in:?0},deleted:false}")
     List<Destination> destinationList(List<BigInteger> ids);
 
 

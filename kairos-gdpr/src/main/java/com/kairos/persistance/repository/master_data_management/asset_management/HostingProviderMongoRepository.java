@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface HostingProviderMongoRepository extends MongoRepository<HostingProvider,BigInteger> {
 
-    @Query("{countryId:?0,'_id':?1,deleted:false}")
+    @Query("{countryId:?0,_id:?1,deleted:false}")
     HostingProvider findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{deleted:false,countryId:?0,name:?1}")

@@ -52,7 +52,10 @@ public class AgreementSection extends MongoBaseEntity {
         this.clauseIds=clauseIds;
         this.countryId=countryId;
     }
+public AgreementSection()
+{
 
+}
 
 
 }

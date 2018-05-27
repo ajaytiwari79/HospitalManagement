@@ -8,9 +8,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.constant.ApiConstant.API_DESTINATION;
 /*
  *
@@ -18,11 +20,9 @@ import static com.kairos.constant.ApiConstant.API_DESTINATION;
  * */
 
 
-
 @RestController
 @RequestMapping(API_DESTINATION)
 @Api(API_DESTINATION)
-@CrossOrigin
 public class DestinationController {
 
 
@@ -32,19 +32,26 @@ public class DestinationController {
 
     @ApiOperation("add Destination")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDestination(@PathVariable Long countryId,@RequestBody List<Destination> destinations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.createDestination(countryId,destinations));
+    public ResponseEntity<Object> createDestination(@PathVariable Long countryId, @RequestBody List<Destination> destinations) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.createDestination(countryId, destinations));
 
     }
 
 
     @ApiOperation("get Destination by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDestination(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDestination(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestination(countryId,id));
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestination(countryId, id));
 
     }
 
@@ -58,8 +65,8 @@ public class DestinationController {
 
     @ApiOperation("get Destination by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDestinationByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(countryId,name));
+    public ResponseEntity<Object> getDestinationByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(countryId, name));
 
     }
 
@@ -80,7 +87,7 @@ public class DestinationController {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.updateDestination(id,destination));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.updateDestination(id, destination));
 
     }
 

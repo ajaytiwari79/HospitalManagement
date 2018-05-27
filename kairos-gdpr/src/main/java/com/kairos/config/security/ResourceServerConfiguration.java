@@ -30,7 +30,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/resources/**", "/configuration/ui","/configuration/security","/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs").permitAll()
+                .antMatchers("/resources/**", "/configuration/ui",  "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs","/webjars/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/**").authenticated();
     }
@@ -41,8 +41,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     }
 
 
-
-
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
@@ -51,15 +49,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
-    	    /*Resource resource = new ClassPathResource("public.txt");
-    	    String publicKey = null;
-    	    try {
-    	        publicKey = IOUtils.toString(resource.getInputStream(),"UTF-8");
-    	    } catch (final IOException e) {
-    	        throw new RuntimeException(e);
-    	    }
-          converter.setVerifierKey(publicKey);*/
-        //anilm2 use commented code if certificate not install
         converter.setSigningKey("123456");
         return converter;
     }

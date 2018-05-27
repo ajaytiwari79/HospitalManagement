@@ -61,11 +61,13 @@ public class ClauseService extends MongoBaseService {
 
     public Clause createClause(Long countryId, ClauseDto clauseDto) throws RepositoryException {
 
+        System.err.println("++++++++++++++++++++++++++"+countryId+"fddss"+ clauseDto.getTitle());
 
-        if (clauseRepository.findByTitle(countryId,clauseDto.getTitle()) != null) {
+        if (clauseRepository.findByTitleAndCountry(countryId,clauseDto.getTitle()) != null) {
 
             throw new DuplicateDataException("clause with name title " + clauseDto.getTitle() + " already Exist");
         }
+        System.err.println("++++++++++++++++++++++++++");
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
         orgTypeIds = clauseDto.getOrganizationTypes();
         orgSubTypeIds = clauseDto.getOrganizationSubTypes();
@@ -216,7 +218,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public String getClauseVersion(BigInteger id, String version) throws RepositoryException {
+    public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
         return jackrabbitService.getClauseVersion(id, version);
 
     }

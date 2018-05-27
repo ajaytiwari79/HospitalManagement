@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+
 import static com.kairos.constant.ApiConstant.API_RESPONSIBILITY_TYPE;
 /*
  *
@@ -19,11 +21,9 @@ import static com.kairos.constant.ApiConstant.API_RESPONSIBILITY_TYPE;
  * */
 
 
-
 @RestController
 @RequestMapping(API_RESPONSIBILITY_TYPE)
 @Api(API_RESPONSIBILITY_TYPE)
-@CrossOrigin
 public class ResponsibilityTypeController {
 
 
@@ -33,19 +33,25 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("add ResponsibilityType  ")
     @PostMapping("/add")
-    public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId,@RequestBody List<ResponsibilityType> responsibilityTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId,responsibilityTypes));
+    public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @RequestBody List<ResponsibilityType> responsibilityTypes) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, responsibilityTypes));
 
     }
 
 
     @ApiOperation("get ResponsibilityType  by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId,id));
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId, id));
 
     }
 
@@ -59,12 +65,10 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("get ResponsibilityType by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(countryId,name));
+    public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(countryId, name));
 
     }
-
-
 
 
     @ApiOperation("delete ResponsibilityType  by id")
@@ -83,7 +87,7 @@ public class ResponsibilityTypeController {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(id,responsibilityType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(id, responsibilityType));
 
     }
 

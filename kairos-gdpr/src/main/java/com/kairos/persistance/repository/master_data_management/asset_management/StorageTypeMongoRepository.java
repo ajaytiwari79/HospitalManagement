@@ -15,7 +15,7 @@ public interface StorageTypeMongoRepository extends MongoRepository<StorageType,
 
 
 
-    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    @Query("{'countryId':?0,_id:?1,deleted:false}")
     StorageType findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")

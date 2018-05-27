@@ -13,14 +13,14 @@ import java.util.Set;
 @Repository
 public interface AgreementSectionMongoRepository extends MongoRepository<AgreementSection, BigInteger>, CustomAgreementSectionRepository {
 
-    @Query("{'_id':?0,deleted:false}")
+    @Query("{_id:?0,deleted:false}")
     AgreementSection findByIdAndNonDeleted(BigInteger id);
 
     AgreementSection findByid(BigInteger id);
 
     AgreementSection findByTitle(String name);
 
-    @Query("{'_id':{$in:?0},deleted:false}")
+    @Query("{_id:{$in:?0},deleted:false}")
     List<AgreementSection> findAgreementSectionByIds(Set<BigInteger> ids);
 
 

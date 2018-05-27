@@ -24,7 +24,6 @@ import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
 @RestController
 @RequestMapping(API_DATASOURCE_URL)
 @Api(API_DATASOURCE_URL)
-@CrossOrigin
 public class DataSourceController {
 
 
@@ -34,20 +33,25 @@ public class DataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@RequestBody List<DataSource> dataSource) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId,dataSource));
+    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId, @RequestBody List<DataSource> dataSource) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource));
 
     }
 
 
     @ApiOperation("get dataSource by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        }
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId,id));
+        } else
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId, id));
 
     }
 
@@ -61,8 +65,8 @@ public class DataSourceController {
 
     @ApiOperation("get dataSource by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getDataSourceByName(@PathVariable Long countryId,@RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(countryId,name));
+    public ResponseEntity<Object> getDataSourceByName(@PathVariable Long countryId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(countryId, name));
 
     }
 
@@ -85,7 +89,7 @@ public class DataSourceController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(id,dataSource));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(id, dataSource));
 
     }
 

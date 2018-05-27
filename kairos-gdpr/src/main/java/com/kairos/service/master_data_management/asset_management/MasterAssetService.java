@@ -35,7 +35,7 @@ public class MasterAssetService extends MongoBaseService {
     public MasterAsset addMasterAsset(Long countryId,MasterAssetDto masterAsset) {
 
         MasterAsset newAsset = new MasterAsset();
-        if (masterAssetMongoRepository.findByName(countryId,masterAsset.getName()) != null) {
+        if (masterAssetMongoRepository.findByNameAndCountry(countryId,masterAsset.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAsset.getName() + " exists");
         } else {
             Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;

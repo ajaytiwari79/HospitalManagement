@@ -17,24 +17,22 @@ import java.util.Set;
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>{
 
 
-    @Query("{'countryId':?0,'title':?1,deleted:false}")
-    Clause findByTitle(Long countryId,String title);
+    @Query("{deleted:false,countryId:?0,title:?1}")
+    Clause findByTitleAndCountry(Long countryId,String title);
 
     Clause findByid(BigInteger id);
 
-
-
-    @Query("{'countryId':?0,'_id':?1,deleted:false}")
+    @Query("{deleted:false,countryId:?0,_id:?1}")
     Clause findByIdAndNonDeleted(Long countryId,BigInteger id);
 
 
-    @Query("{deleted:false,'countryId':?0}")
+    @Query("{deleted:false,countryId:?0}")
     List<Clause>  findAllClause(Long countryId);
 
-    @Query("{deleted:false,'countryId':?0,'_id':{$in:?1}}")
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<Clause>  getClauseListByIds(Long countryId, Set<BigInteger> ids);
 
-    @Query("{'accountType':?0}")
+    @Query("{accountType:?0}")
     List<Clause> getClauseByAccountType(String accountType);
 
 
