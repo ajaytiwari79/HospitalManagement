@@ -8,6 +8,8 @@ import com.kairos.persistance.model.master_data_management.asset_management.Orga
 import com.kairos.persistance.repository.master_data_management.asset_management.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,6 +19,8 @@ import java.util.*;
 
 @Service
 public class OrganizationalSecurityMeasureService extends MongoBaseService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationalSecurityMeasureService.class);
 
     @Inject
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;

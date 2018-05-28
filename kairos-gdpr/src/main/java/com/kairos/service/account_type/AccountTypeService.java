@@ -8,6 +8,8 @@ import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -19,6 +21,7 @@ import java.util.Set;
 @Service
 public class AccountTypeService extends MongoBaseService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeService.class);
 
     @Inject
     private AccountTypeMongoRepository accountTypeRepository;
