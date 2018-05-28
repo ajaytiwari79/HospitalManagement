@@ -4,6 +4,7 @@ import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.activity.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,10 @@ import java.util.Optional;
 public class ExpertiseNightWorkerSettingService extends MongoBaseService {
 
     @Inject
-    ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
+    private ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
+
+    @Inject
+    private ExceptionService exceptionService;
 
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
@@ -28,7 +32,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long countryId, Long expertiseId){
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByCountryAndExpertise(countryId, expertiseId);
         if(!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()){
-            throw new DataNotFoundByIdException("Night Worker setting not found for expertise : "+expertiseId);
+            exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", expertiseId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
@@ -36,7 +40,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting   = expertiseNightWorkerSettingRepository.findByCountryAndExpertise(countryId, expertiseId);
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
-            throw new DataNotFoundByIdException("Night Worker setting not found for expertise : "+expertiseId);
+            exceptionService.dataNotFoundByIdException("message.nightWorker.setting.notFound", expertiseId);
         }
         expertiseNightWorkerSetting.setTimeSlot(nightWorkerSettingDTO.getTimeSlot());
         expertiseNightWorkerSetting.setMinMinutesToCheckNightShift(nightWorkerSettingDTO.getMinMinutesToCheckNightShift());
