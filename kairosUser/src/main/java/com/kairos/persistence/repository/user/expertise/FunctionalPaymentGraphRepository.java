@@ -32,7 +32,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " match(seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
             "with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,pga,collect({functionId:id(function),amount:function_amt.amount}) as functions \n" +
             "with functionalPaymentMatrix ,functions,seniorityLevelFunction,seniorityLevel,collect (id(pga)) as payGroupAreaIds \n" +
-            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),functions:functions}) as seniorityLevelFunctions \n" +
+            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunctions \n" +
             " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
     List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrix(Long functionalPaymentId);
 
@@ -43,7 +43,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             " match(seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
             "with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,pga,collect({functionId:id(function),amount:function_amt.amount}) as functions \n" +
             "with functionalPaymentMatrix ,functions,seniorityLevelFunction,seniorityLevel,collect (id(pga)) as payGroupAreaIds \n" +
-            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),functions:functions}) as seniorityLevelFunctions \n" +
+            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunctions \n" +
             " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
     FunctionalPaymentMatrix getFunctionalPaymentMatrixById(Long functionalPaymentMatrixId);
 

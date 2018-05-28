@@ -18,7 +18,7 @@ public class FunctionalPaymentDTO {
     private LocalDate startDate;
     @Convert(LocalDateConverter.class)
     private LocalDate endDate;
-    private PaidOutFrequencyEnum paidOutFrequency;
+    private PaidOutFrequencyEnum paymentUnit;
     private boolean published;
 
 
@@ -60,12 +60,12 @@ public class FunctionalPaymentDTO {
         this.id = id;
     }
 
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
+    public PaidOutFrequencyEnum getPaymentUnit() {
+        return paymentUnit;
     }
 
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
+    public void setPaymentUnit(PaidOutFrequencyEnum paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 
     public boolean isPublished() {

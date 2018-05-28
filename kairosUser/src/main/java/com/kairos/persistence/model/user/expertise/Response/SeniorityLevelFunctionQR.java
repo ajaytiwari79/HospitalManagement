@@ -7,6 +7,9 @@ import java.util.List;
 @QueryResult
 public class SeniorityLevelFunctionQR {
     private Long seniorityLevelId;
+    private Integer from; // added these 2 fields just FE needs them
+    private Integer to;
+
     private List<FunctionQR> functions;
 
 
@@ -28,5 +31,21 @@ public class SeniorityLevelFunctionQR {
 
     public void setFunctions(List<FunctionQR> functions) {
         this.functions = functions;
+    }
+
+    public Integer getFrom() {
+        return from;
+    }
+
+    public void setFrom(Integer from) {
+        this.from = from;
+    }
+
+    public Integer getTo() {
+        return to;
+    }
+
+    public void setTo(Integer to) {
+        this.to = to;
     }
 }

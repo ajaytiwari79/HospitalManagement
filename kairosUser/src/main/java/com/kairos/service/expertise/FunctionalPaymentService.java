@@ -78,7 +78,7 @@ public class FunctionalPaymentService extends UserBaseService {
                 .and(new IsFunctionalPaymentAvailable(functionalPaymentFromDb, exceptionService));
 
         isGreaterThanStartDateAndToday.isSatisfied(functionalPaymentDTO);
-        FunctionalPayment functionalPayment = new FunctionalPayment(expertise, functionalPaymentDTO.getStartDate(), functionalPaymentDTO.getEndDate(), functionalPaymentDTO.getPaidOutFrequency());
+        FunctionalPayment functionalPayment = new FunctionalPayment(expertise, functionalPaymentDTO.getStartDate(), functionalPaymentDTO.getEndDate(), functionalPaymentDTO.getPaymentUnit());
         return functionalPayment;
     }
 
@@ -90,7 +90,7 @@ public class FunctionalPaymentService extends UserBaseService {
         if (!functionalPayment.get().getStartDate().equals(functionalPaymentDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.functionalPayment.uneditable", "startdate");
         }
-        functionalPayment.get().setPaymentUnit(functionalPaymentDTO.getPaidOutFrequency());
+        functionalPayment.get().setPaymentUnit(functionalPaymentDTO.getPaymentUnit());
         functionalPayment.get().setEndDate(functionalPaymentDTO.getEndDate());
         save(functionalPayment.get());
         functionalPaymentDTO.setId(functionalPayment.get().getId());
