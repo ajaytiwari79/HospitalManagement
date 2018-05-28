@@ -19,12 +19,10 @@ public class IsFunctionalPaymentAvailable extends AbstractSpecification<Function
 
     @Override
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
-        if (Optional.ofNullable(functionalPayment).isPresent()) {
-            if (functionalPayment.getEndDate() != null) {
-                long daysBetween = DAYS.between(functionalPaymentDTO.getStartDate(), functionalPayment.getEndDate());
-                if (daysBetween != -1L) {
-                    exceptionService.actionNotPermittedException("message.startdate.allowed", functionalPayment.getEndDate().plusDays(1L));
-                }
+        if (Optional.ofNullable(functionalPayment).isPresent() && functionalPayment.getEndDate() != null) {
+            long daysBetween = DAYS.between(functionalPaymentDTO.getStartDate(), functionalPayment.getEndDate());
+            if (daysBetween != -1L) {
+                exceptionService.actionNotPermittedException("message.startdate.allowed", functionalPayment.getEndDate().plusDays(1L));
             } else {
                 exceptionService.actionNotPermittedException("message.functionalPayment.alreadyactive");
             }
