@@ -236,7 +236,7 @@ public class AppConstants {
     // Staff Questionnaire
     public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
 
-    // Default Unit Settings for Night Worker
-    public static final int ELIGIBLE_MIN_AGE = 18;
-    public static final int ELIGIBLE_MAX_AGE = 62;
+    // Default Unit Age Settings
+    public static final int YOUNGER_AGE = 18;
+    public static final int OLDER_AGE = 62;
 }
