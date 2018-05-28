@@ -9,12 +9,12 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
@@ -28,14 +28,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Expertise extends UserBaseEntity {
-
-    @NotEmpty(message = "error.Expertise.name.notEmpty")
-    @NotNull(message = "error.Expertise.name.notnull")
+    @NotBlank(message = "error.Expertise.name.notnull")
     private String name;
-
-    //@NotEmpty(message = "error.Expertise.description.notEmpty") @NotNull(message = "error.Expertise.description.notnull")
     private String description;
-
 
     @Relationship(type = BELONGS_TO)
     Country country;
@@ -56,10 +51,7 @@ public class Expertise extends UserBaseEntity {
     private Organization union;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
-
-
     private PaymentSettingsMode paymentSettingsMode;
-
     @Relationship(type = VERSION_OF)
     private Expertise parentExpertise;
 

@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.domain.wta;
+package com.kairos.persistence.model.enums;
 
 public enum IntervalUnit {
     DAYS("Days"),WEEKS("Weeks"), MONTHS("Months"),YEARS("Years");

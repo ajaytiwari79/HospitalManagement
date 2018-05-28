@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 public class UnitPositionWtaDTO {

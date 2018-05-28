@@ -293,6 +293,13 @@ public class StaffService extends UserBaseService {
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
         staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
+
+        // Set if user is female and pregnant
+        User user = userGraphRepository.getUserByStaffId(staffId);
+        user.setGender(staffPersonalDetail.getGender());
+        user.setPregnant( user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
+        save(user);
+        staffPersonalDetail.setPregnant(user.isPregnant());
         return staffPersonalDetail;
     }
 
@@ -344,6 +351,7 @@ public class StaffService extends UserBaseService {
 
 
     public Map<String, Object> retrievePersonalInfo(Staff staff) {
+        User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
@@ -357,6 +365,8 @@ public class StaffService extends UserBaseService {
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
+        map.put("gender", user.getGender());
+        map.put("pregnant", user.isPregnant());
 
 
         List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
@@ -1025,7 +1035,7 @@ public class StaffService extends UserBaseService {
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
-        staff.setGender(user.getGender());
+//        staff.setGender(user.getGender());
         plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
         return staff;
     }
@@ -1826,6 +1836,10 @@ public class StaffService extends UserBaseService {
             }
         }
         return nextSeniorityLevelInMonths;
+    }
+
+    public List<UnitStaffQueryResult> getUnitWiseStaffList(){
+        return staffGraphRepository.getStaffListOfUnitWithBasicInfo();
     }
 
 }
