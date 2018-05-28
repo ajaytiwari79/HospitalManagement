@@ -18,18 +18,22 @@ public class NightWorker extends MongoBaseEntity{
     private PersonType personType;
     private int questionnaireFrequencyInMonths;
     private Long staffId;
+    private Long unitId;
     private List<BigInteger> staffQuestionnairesId;
+    private boolean eligibleNightWorker;
 
     public NightWorker(){
         // default constructor
     }
 
-    public NightWorker(boolean nightWorker, LocalDate startDate, PersonType personType, int questionnaireFrequencyInMonths, Long staffId){
+    public NightWorker(boolean nightWorker, LocalDate startDate, PersonType personType, int questionnaireFrequencyInMonths, Long staffId, Long unitId, boolean eligibleNightWorker){
         this.nightWorker = nightWorker;
         this.startDate = startDate;
         this.personType = personType;
         this.questionnaireFrequencyInMonths = questionnaireFrequencyInMonths;
         this.staffId = staffId;
+        this.unitId = unitId;
+        this.eligibleNightWorker = eligibleNightWorker;
     }
 
     public boolean isNightWorker() {
@@ -80,4 +84,19 @@ public class NightWorker extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public boolean isEligibleNightWorker() {
+        return eligibleNightWorker;
+    }
+
+    public void setEligibleNightWorker(boolean eligibleNightWorker) {
+        this.eligibleNightWorker = eligibleNightWorker;
+    }
 }
