@@ -102,6 +102,7 @@ public class PresenceTypeService extends UserBaseService {
         }
 
         presenceType.setName(presenceTypeDTO.getName());
+        presenceType.setBreakAllowed(presenceTypeDTO.isBreakAllowed());
         save(presenceType);
         return presenceTypeDTO;
     }
@@ -117,20 +118,6 @@ public class PresenceTypeService extends UserBaseService {
         presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false));
       //  presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(countryId));
         return presenceTypeWithTimeTypes;
-    }
-
-
-    public Organization fetchParentOrganization(Long unitId) {
-        Organization parent = null;
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
-        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        } else {
-            parent = unit;
-        }
-        return parent;
     }
 
 

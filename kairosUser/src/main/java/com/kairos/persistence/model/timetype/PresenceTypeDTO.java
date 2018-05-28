@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -13,11 +14,16 @@ import javax.validation.constraints.NotNull;
 @QueryResult
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PresenceTypeDTO {//extends UserBaseEntity {
-    @NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty")
-    @NotNull(message = "error.PresenceTypeDTO.name.notnull")
+public class PresenceTypeDTO {
+
+    @NotBlank(message = "error.PresenceTypeDTO.name.notnull")
     private String name;
     private Long id;
+    private boolean breakAllowed;
+
+    public PresenceTypeDTO() {
+        //dc
+    }
 
     public String getName() {
         return name;
@@ -27,9 +33,6 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
         this.name = name;
     }
 
-
-    public PresenceTypeDTO() {
-    }
 
     public PresenceTypeDTO(String name) {
         this.name = name;
@@ -41,6 +44,14 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isBreakAllowed() {
+        return breakAllowed;
+    }
+
+    public void setBreakAllowed(boolean breakAllowed) {
+        this.breakAllowed = breakAllowed;
     }
 
     @Override

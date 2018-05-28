@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.shift.PaymentSettingsMode;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
 import org.joda.time.DateTime;
 
@@ -50,6 +51,9 @@ public class CountryExpertiseDTO {
 
     private List<Long> tags;
     private Boolean published;
+
+    @NotBlank(message="Please select payment type")
+    private PaymentSettingsMode paymentSettingsMode;
 
     public Boolean isPublished() {
         return published;
@@ -194,5 +198,13 @@ public class CountryExpertiseDTO {
             return dateValue;
         }
         return true;
+    }
+
+    public PaymentSettingsMode getPaymentSettingsMode() {
+        return paymentSettingsMode;
+    }
+
+    public void setPaymentSettingsMode(PaymentSettingsMode paymentSettingsMode) {
+        this.paymentSettingsMode = paymentSettingsMode;
     }
 }
