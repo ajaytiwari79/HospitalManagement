@@ -24,7 +24,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public OpenShiftIntervalDTO createInterval(Long countryId, OpenShiftIntervalDTO openShiftIntervalDTO) {
-        boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo());
+        boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo(),null);
         if(isIntervalInValid){
             exceptionService.actionNotPermittedException("exception.overlap.interval");
         }
@@ -47,7 +47,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
         if (!Optional.ofNullable(openShiftInterval).isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.noOpenShiftIntervalFound", "OpenShiftInterval", openShiftIntervalId);
         }
-        boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo());
+        boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo(),openShiftIntervalId);
         if(isIntervalInValid){
             exceptionService.actionNotPermittedException("exception.overlap.interval");
         }

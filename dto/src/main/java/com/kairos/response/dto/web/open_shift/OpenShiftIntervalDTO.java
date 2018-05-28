@@ -58,7 +58,7 @@ public class OpenShiftIntervalDTO{
 
     @AssertTrue(message = "from can't be less than to")
     public boolean isValid() {
-        return (this.from>this.to)?false:true;
+        return this.to>this.from;
     }
 
 }
