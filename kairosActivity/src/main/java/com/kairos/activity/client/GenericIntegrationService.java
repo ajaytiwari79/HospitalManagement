@@ -15,16 +15,13 @@ import java.util.List;
 public class GenericIntegrationService {
     @Autowired GenericRestClient genericRestClient;
 
-    public List<EmploymentTypeDTO> getAllEmploymentType(Long countryId){
-        return genericRestClient.publish(null, countryId,false, IntegrationOperation.GET, "/employment_type", null);
-    }
     public Long getUnitPositionId(Long unitId, Long staffId,Long expertiseId){
       Integer value=  genericRestClient.publish(null, unitId,true, IntegrationOperation.GET, "/staff/{staffId}/expertise/{expertiseId}/unitPositionId", null,staffId,expertiseId);
       return  value.longValue();
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmployment(Long countryId){
-        return ObjectMapperUtils.copyProperties(genericRestClient.publish(null, countryId,false, IntegrationOperation.GET, "/employment_type_and_expertise", null),PriorityGroupDefaultData.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId,false, IntegrationOperation.GET, "/employment_type_and_expertise", null), PriorityGroupDefaultData.class);
     }
 
 

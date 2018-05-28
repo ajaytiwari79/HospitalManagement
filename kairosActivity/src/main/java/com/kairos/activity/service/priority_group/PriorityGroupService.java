@@ -41,7 +41,6 @@ public class PriorityGroupService extends MongoBaseService {
 
     public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByCountryIdAndDeletedFalse(countryId);
-        //List<EmploymentTypeDTO> employmentTypeDTOS=genericIntegrationService.getAllEmploymentType(countryId);
         PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmployment(countryId);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
         PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
