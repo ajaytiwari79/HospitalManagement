@@ -4,6 +4,8 @@ package com.kairos.controller.exception_handler;
 import com.kairos.custome_exception.*;
 import com.kairos.controller.exception_handler.dto.FieldErrorDTO;
 import com.kairos.controller.exception_handler.dto.ResponseEnvelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,7 +36,7 @@ import java.util.Map;
 @Order(1)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {

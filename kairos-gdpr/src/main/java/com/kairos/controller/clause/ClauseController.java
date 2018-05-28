@@ -11,6 +11,8 @@ import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrie
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,8 @@ import java.util.*;
 @Api(API_CLAUSES_URL)
 @CrossOrigin
 public class ClauseController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClauseController.class);
 
     @Inject
     private ClauseService clauseService;

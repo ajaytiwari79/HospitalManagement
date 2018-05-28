@@ -1,6 +1,8 @@
 package com.kairos.controller;
 
 import com.kairos.service.DocumentVersioningService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import java.io.IOException;
 @RestController
 public class DocumentController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentController.class);
 
     @Autowired
     DocumentVersioningService documentVersioningService;

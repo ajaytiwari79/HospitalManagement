@@ -5,6 +5,8 @@ import com.kairos.service.processing_activity.HostingLocationService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import static com.kairos.constant.ApiConstant.API_HOSTING_LOCATION_URL;
 @Api(API_HOSTING_LOCATION_URL)
 public class HostingLocationController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HostingLocationController.class);
 
     @Inject
     private HostingLocationService hostingLocationService;
