@@ -8,8 +8,9 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
-import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -215,7 +216,9 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return employmentType")
     List<EmploymentType> getEmploymentTypeByCountry(long countryId, Boolean isDeleted);
 
-
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level) IN {1} return level")
     List<Level> getLevelsByIdsIn(long countryId,List<Long> levelIds);
+
+    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return id(employmentType) as id ,employmentType.name as name")
+    List<EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
 }

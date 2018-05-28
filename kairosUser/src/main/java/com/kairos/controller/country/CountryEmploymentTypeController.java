@@ -79,4 +79,13 @@ public class CountryEmploymentTypeController {
     public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId , @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId,selectedDate));
     }
+
+    @RequestMapping(value = COUNTRY_URL + "/employment_type_and_expertise", method = RequestMethod.GET)
+    @ApiOperation("get employment type of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getExpertiseAndEmployment (@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getExpertiseAndEmployment(countryId, false));
+    }
+
+
 }

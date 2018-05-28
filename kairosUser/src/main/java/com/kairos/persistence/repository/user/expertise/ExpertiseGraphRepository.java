@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
+import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -195,4 +196,10 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "match(expertise)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]-(orgSubType:OrganizationType) where id(orgSubType) = {1} \n" +
             "return id(expertise) as id, expertise.name as name order by expertise.creationDate")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId,Long selectedDateMillis);
+
+    @Query("MATCH (country:Country) where id(country)={0}  " +
+            "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  expertise.startDateMillis<={1} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {1}) " +
+            "return id(expertise) as id , expertise.name as name")
+    List<ExpertiseResponseDTO> getAllExpertiseByCountryAndDate(long countryId, Long selectedDateMillis);
+
 }
