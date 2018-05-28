@@ -9,6 +9,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SeniorityLevelFunctionDTO {
     private Long seniorityLevelId;
+    private Integer from; // added these 2 fields just FE needs them
+    private Integer to;
+
     private List<FunctionsDTO> functions;
 
 
@@ -29,5 +32,21 @@ public class SeniorityLevelFunctionDTO {
 
     public void setFunctions(List<FunctionsDTO> functions) {
         this.functions = functions;
+    }
+
+    public Integer getFrom() {
+        return from;
+    }
+
+    public void setFrom(Integer from) {
+        this.from = from;
+    }
+
+    public Integer getTo() {
+        return to;
+    }
+
+    public void setTo(Integer to) {
+        this.to = to;
     }
 }
