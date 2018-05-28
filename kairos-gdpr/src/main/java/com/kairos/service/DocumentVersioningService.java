@@ -1,6 +1,8 @@
 package com.kairos.service;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.jcr.*;
@@ -13,6 +15,7 @@ import java.util.Calendar;
 @Service
 public class DocumentVersioningService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentVersioningService.class);
 
     public Node importFile(Node folderNode, File file, Session session) throws RepositoryException, IOException {
 

@@ -1,6 +1,8 @@
 package com.kairos.service.clause.paginated_result_service;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -10,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @Component
 public class PaginatedResultsRetrievedEventDiscoverabilityListener implements ApplicationListener<PaginatedResultsRetrievedEvent> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaginatedResultsRetrievedEventDiscoverabilityListener.class);
+
     @Override
     public void onApplicationEvent(PaginatedResultsRetrievedEvent event) {
         Preconditions.checkNotNull(event);

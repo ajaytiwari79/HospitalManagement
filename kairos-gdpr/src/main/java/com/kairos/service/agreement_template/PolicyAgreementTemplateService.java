@@ -20,6 +20,8 @@ import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -31,6 +33,7 @@ import java.util.*;
 @Service
 public class PolicyAgreementTemplateService extends MongoBaseService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateService.class);
 
     @Inject
     private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;

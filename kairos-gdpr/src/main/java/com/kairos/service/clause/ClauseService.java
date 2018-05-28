@@ -19,6 +19,8 @@ import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +37,8 @@ import java.util.List;
 
 @Service
 public class ClauseService extends MongoBaseService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClauseService.class);
 
     @Autowired
     private ClauseMongoRepository clauseRepository;

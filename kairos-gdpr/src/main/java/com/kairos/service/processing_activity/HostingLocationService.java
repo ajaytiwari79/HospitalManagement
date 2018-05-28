@@ -8,6 +8,8 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.processing_activity.HostingLocation;
 import com.kairos.persistance.repository.processing_activity.HostingLocationMongoRepository;
 import com.kairos.service.MongoBaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +21,7 @@ import java.util.Optional;
 @Service
 public class HostingLocationService  extends MongoBaseService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HostingLocationService.class);
 
 @Inject
     private HostingLocationMongoRepository hostingLocationMongoRepository;

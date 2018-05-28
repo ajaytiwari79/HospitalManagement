@@ -36,12 +36,11 @@ import static com.kairos.constant.JackRabbitConstant.JCR_DATA;
 @Component
 public class JackrabbitService {
 
-
     @Inject
     private Repository repository;
 
 
-    Logger logger = LoggerFactory.getLogger(JackrabbitService.class);
+    private static final Logger logger = LoggerFactory.getLogger(JackrabbitService.class);
 
     public Boolean addClauseToJackrabbit(BigInteger id, Clause clause) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));

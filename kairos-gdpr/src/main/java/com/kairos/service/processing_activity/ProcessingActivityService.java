@@ -14,6 +14,8 @@ import com.kairos.persistance.repository.processing_activity.ProcessingActivityM
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.master_data_management.processing_activity_masterdata.DataSubjectService;
 import com.kairos.service.master_data_management.processing_activity_masterdata.ProcessingPurposeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -23,6 +25,7 @@ import java.util.Optional;
 @Service
 public class ProcessingActivityService extends MongoBaseService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingActivityService.class);
 
     @Inject
     private ProcessingActivityMongoRepository processingActivityMongoRepository;
