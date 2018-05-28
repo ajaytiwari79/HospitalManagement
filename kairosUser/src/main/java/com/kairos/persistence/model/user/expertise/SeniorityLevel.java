@@ -19,13 +19,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel> {
     private Integer from;
     private Integer to;
-    private Integer moreThan;
 
     @Relationship(type = HAS_BASE_PAY_GRADE)
     private PayGrade payGrade;  // this is payGrade which is coming from payTable
 
-    @Relationship(type = HAS_PAY_GROUP_AREA)
-    private List<PayGroupArea> payGroupAreas;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
@@ -60,28 +57,12 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
         this.to = to;
     }
 
-    public Integer getMoreThan() {
-        return moreThan;
-    }
-
-    public void setMoreThan(Integer moreThan) {
-        this.moreThan = moreThan;
-    }
-
     public PayGrade getPayGrade() {
         return payGrade;
     }
 
     public void setPayGrade(PayGrade payGrade) {
         this.payGrade = payGrade;
-    }
-
-    public List<PayGroupArea> getPayGroupAreas() {
-        return payGroupAreas;
-    }
-
-    public void setPayGroupAreas(List<PayGroupArea> payGroupAreas) {
-        this.payGroupAreas = payGroupAreas;
     }
 
     public BigDecimal getPensionPercentage() {

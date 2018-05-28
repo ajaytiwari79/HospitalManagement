@@ -3,7 +3,7 @@ package com.kairos.service.integration;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
-import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

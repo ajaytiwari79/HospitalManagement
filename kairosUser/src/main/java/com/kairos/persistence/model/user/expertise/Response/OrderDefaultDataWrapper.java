@@ -1,10 +1,11 @@
-package com.kairos.persistence.model.user.expertise;
+package com.kairos.persistence.model.user.expertise.Response;
 
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;

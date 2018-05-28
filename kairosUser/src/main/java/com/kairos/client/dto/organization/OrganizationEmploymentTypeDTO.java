@@ -1,6 +1,6 @@
 package com.kairos.client.dto.organization;
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
 
 import javax.validation.constraints.NotNull;
 

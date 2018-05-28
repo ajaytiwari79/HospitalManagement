@@ -2,8 +2,6 @@ package com.kairos.service.agreement.cta;
 
 import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -14,7 +12,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
