@@ -5,6 +5,8 @@ import com.kairos.service.processing_activity.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import static com.kairos.constant.ApiConstant.API_ASSET_TYPE_URL;
 @Api(API_ASSET_TYPE_URL)
 public class AssetTypeController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeController.class);
 
     @Inject
     private AssetTypeService assetTypeService;

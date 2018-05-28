@@ -5,6 +5,8 @@ import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +26,7 @@ import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 @Api(API_AGREEMENT_TEMPLATE_URl)
 public class PolicyAgreementTemplateController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateController.class);
 
     @Inject
     private PolicyAgreementTemplateService policyAgreementTemplateService;
