@@ -52,7 +52,7 @@ public class CountryExpertiseDTO {
     private List<Long> tags;
     private Boolean published;
 
-    @NotBlank(message="Please select payment type")
+    @NotNull(message="Please select payment type")
     private PaymentSettingsMode paymentSettingsMode;
 
     public Boolean isPublished() {

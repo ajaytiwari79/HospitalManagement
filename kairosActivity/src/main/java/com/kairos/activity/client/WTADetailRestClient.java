@@ -2,13 +2,10 @@ package com.kairos.activity.client;
 
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.util.RestClientUrlUtil;
-import com.kairos.activity.util.userContext.UserContext;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
-import com.sun.javafx.fxml.builder.URLBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;

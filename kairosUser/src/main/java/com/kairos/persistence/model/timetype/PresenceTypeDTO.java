@@ -19,7 +19,7 @@ public class PresenceTypeDTO {
     @NotBlank(message = "error.PresenceTypeDTO.name.notnull")
     private String name;
     private Long id;
-    private boolean breakAllowed;
+
 
     public PresenceTypeDTO() {
         //dc
@@ -46,13 +46,6 @@ public class PresenceTypeDTO {
         this.id = id;
     }
 
-    public boolean isBreakAllowed() {
-        return breakAllowed;
-    }
-
-    public void setBreakAllowed(boolean breakAllowed) {
-        this.breakAllowed = breakAllowed;
-    }
 
     @Override
     public String toString() {

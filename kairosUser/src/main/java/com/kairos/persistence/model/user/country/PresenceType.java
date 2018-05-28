@@ -17,7 +17,7 @@ public class PresenceType extends UserBaseEntity {
     private String name;
     @Relationship(type = BELONGS_TO, direction = Relationship.OUTGOING)
     private Country country;
-    private boolean breakAllowed;
+
 
     public String getName() {
         return name;
@@ -35,13 +35,6 @@ public class PresenceType extends UserBaseEntity {
         this.country = country;
     }
 
-    public boolean isBreakAllowed() {
-        return breakAllowed;
-    }
-
-    public void setBreakAllowed(boolean breakAllowed) {
-        this.breakAllowed = breakAllowed;
-    }
 
     public PresenceType() {
     }
@@ -49,7 +42,6 @@ public class PresenceType extends UserBaseEntity {
     public PresenceType(String name, Country country) {
         this.name = name;
         this.country = country;
-        this.breakAllowed = false;
     }
 
     @Override

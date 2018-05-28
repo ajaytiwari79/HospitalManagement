@@ -18,7 +18,7 @@ public interface PresenceTypeRepository extends Neo4jBaseRepository<PresenceType
     @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={2} AND presenceType.name =~ {0} AND presenceType.deleted={1} return presenceType")
     PresenceType findByNameAndDeletedAndCountryId(String name, boolean deleted, Long countryId);
 
-    @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={0} AND presenceType.deleted={1} return id(presenceType) as id,presenceType.name as name,presenceType.breakAllowed as breakAllowed ")
+    @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={0} AND presenceType.deleted={1} return id(presenceType) as id,presenceType.name as name")
     List<PresenceTypeDTO> getAllPresenceTypeByCountryId(Long countryId, boolean deleted);
 
     @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={0} AND presenceType.deleted={3} AND Id(presenceType) <> {1} AND presenceType.name =~ {2} \n"+

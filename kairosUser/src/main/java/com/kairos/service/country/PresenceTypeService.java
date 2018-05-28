@@ -102,7 +102,6 @@ public class PresenceTypeService extends UserBaseService {
         }
 
         presenceType.setName(presenceTypeDTO.getName());
-        presenceType.setBreakAllowed(presenceTypeDTO.isBreakAllowed());
         save(presenceType);
         return presenceTypeDTO;
     }
