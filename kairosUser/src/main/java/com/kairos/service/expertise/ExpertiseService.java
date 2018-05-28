@@ -2,9 +2,12 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.client.priority_group.PriorityGroupRestClient;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.common.TimeSlot;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -32,6 +35,7 @@ import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.*;
+import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
@@ -95,6 +99,8 @@ public class ExpertiseService extends UserBaseService {
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private PriorityGroupRestClient priorityGroupRestClient;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -141,6 +147,12 @@ public class ExpertiseService extends UserBaseService {
                 expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
             }
         }
+
+        TimeSlot timeSlot =  new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
+        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
+                null,null,null,null, countryId,expertise.getId() );
+        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
+                "/expertise/"+expertise.getId()+"/night_worker_setting",null, null);
 
         return expertiseResponseDTO;
     }
