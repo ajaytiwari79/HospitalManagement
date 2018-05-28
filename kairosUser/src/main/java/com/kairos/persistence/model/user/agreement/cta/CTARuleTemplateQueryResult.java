@@ -46,6 +46,7 @@ public class CTARuleTemplateQueryResult {
     private List<Long> dayTypeIds;
     private List<DayTypeDTO> dayTypes;
     private boolean calculateScheduledHours;
+    private CalculationFor calculationFor;
 
     public CTARuleTemplateQueryResult() {
     }
@@ -281,6 +282,14 @@ public class CTARuleTemplateQueryResult {
 
     public void setDayTypeIds(List<Long> dayTypeIds) {
         this.dayTypeIds = dayTypeIds;
+    }
+
+    public CalculationFor getCalculationFor() {
+        return calculationFor;
+    }
+
+    public void setCalculationFor(CalculationFor calculationFor) {
+        this.calculationFor = calculationFor;
     }
 
     @Override
