@@ -1,11 +1,13 @@
 package com.kairos.service.country;
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
+import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -217,9 +219,11 @@ public class EmploymentTypeService extends UserBaseService {
         return organizationMappingDTO;
     }
     public PriorityGroupDefaultData getExpertiseAndEmployment(long countryId, boolean isDeleted) {
-        List<com.kairos.response.dto.web.cta.EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,false);
-        List<ExpertiseResponseDTO> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId,DateUtil.getCurrentDateMillis());
-        return new PriorityGroupDefaultData(employmentTypes,expertise);
+        List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
+        List<ExpertiseDTO> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId,DateUtil.getCurrentDateMillis());
+        List<com.kairos.response.dto.web.cta.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyProperties(employmentTypes, com.kairos.response.dto.web.cta.EmploymentTypeDTO.class);
+        List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyProperties(expertise,ExpertiseResponseDTO.class);
+        return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
     }
 
 }

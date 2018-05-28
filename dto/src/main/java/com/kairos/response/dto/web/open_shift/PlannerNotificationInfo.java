@@ -1,26 +1,39 @@
 package com.kairos.response.dto.web.open_shift;
 
+import com.kairos.persistence.model.enums.InformationReciever;
+
+import java.util.List;
+
 public class PlannerNotificationInfo {
-        private Integer missingPersonNotifyBefore; //in days
-        private Integer notifyForUnassignedShiftBefore; // in days
+        private List<InformationReciever> informationReceivers;
+        private DurationFields sendNotificationOnCandidateMissingBeforeTime; //in Hours
+        private DurationFields notifyForUnassignedShiftBeforeTime; // in Hours
 
     public PlannerNotificationInfo() {
         //Default Constructor
     }
 
-    public Integer getMissingPersonNotifyBefore() {
-        return missingPersonNotifyBefore;
+    public DurationFields getSendNotificationOnCandidateMissingBeforeTime() {
+        return sendNotificationOnCandidateMissingBeforeTime;
     }
 
-    public void setMissingPersonNotifyBefore(Integer missingPersonNotifyBefore) {
-        this.missingPersonNotifyBefore = missingPersonNotifyBefore;
+    public void setSendNotificationOnCandidateMissingBeforeTime(DurationFields sendNotificationOnCandidateMissingBeforeTime) {
+        this.sendNotificationOnCandidateMissingBeforeTime = sendNotificationOnCandidateMissingBeforeTime;
     }
 
-    public Integer getNotifyForUnassignedShiftBefore() {
-        return notifyForUnassignedShiftBefore;
+    public DurationFields getNotifyForUnassignedShiftBeforeTime() {
+        return notifyForUnassignedShiftBeforeTime;
     }
 
-    public void setNotifyForUnassignedShiftBefore(Integer notifyForUnassignedShiftBefore) {
-        this.notifyForUnassignedShiftBefore = notifyForUnassignedShiftBefore;
+    public void setNotifyForUnassignedShiftBeforeTime(DurationFields notifyForUnassignedShiftBeforeTime) {
+        this.notifyForUnassignedShiftBeforeTime = notifyForUnassignedShiftBeforeTime;
+    }
+
+    public List<InformationReciever> getInformationReceivers() {
+        return informationReceivers;
+    }
+
+    public void setInformationReceivers(List<InformationReciever> informationReceivers) {
+        this.informationReceivers = informationReceivers;
     }
 }

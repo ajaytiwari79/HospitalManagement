@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.PICKABLE;
-import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.SHOW_INTEREST_PLANNER_WILL_CHOOSE;
+import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.SHOW_INTEREST_APPROVAL_BY_PLANNER;
 
 @Service
 @Transactional
@@ -163,7 +163,7 @@ public class OpenShiftService extends MongoBaseService {
             shiftService.createShift(unitId,shiftDTO,"Organization",false);
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()-1);
 
-        } else if (ShiftAssignmentCriteria.values().equals(SHOW_INTEREST_PLANNER_WILL_CHOOSE)) {
+        } else if (ShiftAssignmentCriteria.values().equals(SHOW_INTEREST_APPROVAL_BY_PLANNER)) {
             openShift.getInterestedStaff().add(staffId);
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()+1);
         }

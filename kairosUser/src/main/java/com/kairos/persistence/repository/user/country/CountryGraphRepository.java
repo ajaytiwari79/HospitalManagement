@@ -220,5 +220,5 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<Level> getLevelsByIdsIn(long countryId,List<Long> levelIds);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return id(employmentType) as id ,employmentType.name as name")
-    List<EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
+    List<com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
 }

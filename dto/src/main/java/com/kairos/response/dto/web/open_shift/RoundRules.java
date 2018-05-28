@@ -5,19 +5,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundRules {
     private Integer candidatesPerRound;
-    private Integer waitingTimeBeforeNextRoundInDays;
-    private Integer checkAnswersInDays;// Time to check answer after enquiry
+    private DurationFields waitingTimeBeforeNextRound;
+    private DurationFields checkAnswersTime;// Time to check answer after enquiry
     private Integer minimumCandidateBeforeSelection;
 
     public RoundRules() {
         //Default Constructor
     }
 
-    public RoundRules(Integer maximumConcurrentEnquiries, Integer candidatesPerRound, Integer waitingTimeBeforeNextRoundInDays, Integer minimumCandidateBeforeSelection) {
-        this.candidatesPerRound = candidatesPerRound;
-        this.waitingTimeBeforeNextRoundInDays = waitingTimeBeforeNextRoundInDays;
-        this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
-    }
+
 
     public Integer getCandidatesPerRound() {
         return candidatesPerRound;
@@ -27,12 +23,12 @@ public class RoundRules {
         this.candidatesPerRound = candidatesPerRound;
     }
 
-    public Integer getWaitingTimeBeforeNextRoundInDays() {
-        return waitingTimeBeforeNextRoundInDays;
+    public DurationFields getWaitingTimeBeforeNextRound() {
+        return waitingTimeBeforeNextRound;
     }
 
-    public void setWaitingTimeBeforeNextRoundInDays(Integer waitingTimeBeforeNextRoundInDays) {
-        this.waitingTimeBeforeNextRoundInDays = waitingTimeBeforeNextRoundInDays;
+    public void setWaitingTimeBeforeNextRound(DurationFields waitingTimeBeforeNextRound) {
+        this.waitingTimeBeforeNextRound = waitingTimeBeforeNextRound;
     }
 
     public Integer getMinimumCandidateBeforeSelection() {
@@ -43,11 +39,11 @@ public class RoundRules {
         this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
     }
 
-    public Integer getCheckAnswersInDays() {
-        return checkAnswersInDays;
+    public DurationFields getCheckAnswersTime() {
+        return checkAnswersTime;
     }
 
-    public void setCheckAnswersInDays(Integer checkAnswersInDays) {
-        this.checkAnswersInDays = checkAnswersInDays;
+    public void setCheckAnswersTime(DurationFields checkAnswersTime) {
+        this.checkAnswersTime = checkAnswersTime;
     }
 }

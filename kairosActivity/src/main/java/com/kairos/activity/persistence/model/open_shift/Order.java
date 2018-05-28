@@ -41,7 +41,7 @@ public class Order extends MongoBaseEntity {
     private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
     private PlannerNotificationInfo plannerNotificationInfo;
-    private List<InformationReciever> informationReceivers;
+
 
 
     public List<DayOfWeek> getDayType() {
@@ -275,11 +275,4 @@ public class Order extends MongoBaseEntity {
         this.plannerNotificationInfo = plannerNotificationInfo;
     }
 
-    public List<InformationReciever> getInformationReceivers() {
-        return informationReceivers;
-    }
-
-    public void setInformationReceivers(List<InformationReciever> informationReceivers) {
-        this.informationReceivers = informationReceivers;
-    }
 }

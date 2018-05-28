@@ -200,6 +200,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (country:Country) where id(country)={0}  " +
             "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  expertise.startDateMillis<={1} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {1}) " +
             "return id(expertise) as id , expertise.name as name")
-    List<ExpertiseResponseDTO> getAllExpertiseByCountryAndDate(long countryId, Long selectedDateMillis);
+    List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId, Long selectedDateMillis);
 
 }
