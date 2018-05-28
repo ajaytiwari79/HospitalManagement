@@ -24,6 +24,7 @@ import static com.kairos.constant.ApiConstant.API_ACCESSOR_PARTY_URL;
 @RestController
 @RequestMapping(API_ACCESSOR_PARTY_URL)
 @Api(API_ACCESSOR_PARTY_URL)
+@CrossOrigin
 public class AccessorPartyController {
 
     @Inject

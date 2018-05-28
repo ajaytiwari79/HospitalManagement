@@ -13,9 +13,10 @@ public class ClauseTag extends MongoBaseEntity {
     @NotNullOrEmpty(message = "error.name.cannotbe.null.or.empty")
     private String name;
 
+    @NotNull
     private Long countryId;
 
-    @NotNull
+
     public Long getCountryId() {
         return countryId;
     }

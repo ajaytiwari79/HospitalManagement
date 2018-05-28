@@ -9,6 +9,7 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -22,10 +23,13 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
     private String description;
 
+    @NotNull
     private Set<BigInteger> accountTypes;
 
+    @NotNull
     private List<BigInteger> agreementSections;
 
+    @NotNull
     private Long countryId;
 
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;

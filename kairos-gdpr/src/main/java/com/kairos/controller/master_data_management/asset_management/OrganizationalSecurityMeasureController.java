@@ -24,6 +24,7 @@ import static com.kairos.constant.ApiConstant.API_ORG_SEC_MEASURE_URL;
 @RestController
 @RequestMapping(API_ORG_SEC_MEASURE_URL)
 @Api(API_ORG_SEC_MEASURE_URL)
+@CrossOrigin
 public class OrganizationalSecurityMeasureController {
 
 

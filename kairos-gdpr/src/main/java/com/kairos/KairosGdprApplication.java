@@ -19,10 +19,7 @@ import org.apache.jackrabbit.oak.spi.blob.FileBlobStore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -35,9 +32,9 @@ import java.time.format.DateTimeFormatter;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
-@EnableEurekaClient
-@EnableAspectJAutoProxy
-@EnableCircuitBreaker
+//@EnableEurekaClient
+//@EnableAspectJAutoProxy
+//@EnableCircuitBreaker
 @SpringBootApplication
 public class KairosGdprApplication {
 

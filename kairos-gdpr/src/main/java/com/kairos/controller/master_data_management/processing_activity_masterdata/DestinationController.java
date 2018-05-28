@@ -23,6 +23,7 @@ import static com.kairos.constant.ApiConstant.API_DESTINATION;
 @RestController
 @RequestMapping(API_DESTINATION)
 @Api(API_DESTINATION)
+@CrossOrigin
 public class DestinationController {
 
 

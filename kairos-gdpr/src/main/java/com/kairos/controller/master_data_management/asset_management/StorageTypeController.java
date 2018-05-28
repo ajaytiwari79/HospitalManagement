@@ -24,6 +24,7 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
 @RestController
 @RequestMapping(API_STORAGE_TYPE_URL)
 @Api(API_STORAGE_TYPE_URL)
+@CrossOrigin
 public class StorageTypeController {
     @Inject
     private StorageTypeService storageTypeService;

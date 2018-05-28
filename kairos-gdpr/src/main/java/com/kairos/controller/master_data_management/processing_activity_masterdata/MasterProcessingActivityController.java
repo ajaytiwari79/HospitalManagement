@@ -20,6 +20,7 @@ import java.math.BigInteger;
 @RestController
 @RequestMapping(API_MASTER_PROCESSING_ACTIVITY)
 @Api(API_MASTER_PROCESSING_ACTIVITY)
+@CrossOrigin
 public class MasterProcessingActivityController {
 
 

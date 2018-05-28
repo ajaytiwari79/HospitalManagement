@@ -60,14 +60,10 @@ public class ClauseService extends MongoBaseService {
     private ClauseTagService clauseTagService;
 
     public Clause createClause(Long countryId, ClauseDto clauseDto) throws RepositoryException {
-
-        System.err.println("++++++++++++++++++++++++++"+countryId+"fddss"+ clauseDto.getTitle());
-
         if (clauseRepository.findByTitleAndCountry(countryId,clauseDto.getTitle()) != null) {
 
             throw new DuplicateDataException("clause with name title " + clauseDto.getTitle() + " already Exist");
         }
-        System.err.println("++++++++++++++++++++++++++");
         Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
         orgTypeIds = clauseDto.getOrganizationTypes();
         orgSubTypeIds = clauseDto.getOrganizationSubTypes();

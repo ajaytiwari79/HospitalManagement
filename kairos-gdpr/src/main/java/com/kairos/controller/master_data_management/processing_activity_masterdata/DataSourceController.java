@@ -24,6 +24,7 @@ import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
 @RestController
 @RequestMapping(API_DATASOURCE_URL)
 @Api(API_DATASOURCE_URL)
+@CrossOrigin
 public class DataSourceController {
 
 

@@ -20,12 +20,18 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
+
+    @NotNull
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
+    @NotNull
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    @NotNull
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
+    @NotNull
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
+    @NotNull
     private List<BigInteger> subProcessingActivityIds;
 
     @NotNull(message = "error.message.countryId.cannot.be.null")

@@ -33,6 +33,7 @@ import java.util.*;
 @RestController
 @RequestMapping(API_CLAUSES_URL)
 @Api(API_CLAUSES_URL)
+@CrossOrigin
 public class ClauseController {
 
     @Inject

@@ -24,6 +24,7 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_FORMAT_URL;
 @RestController
 @RequestMapping(API_STORAGE_FORMAT_URL)
 @Api(API_STORAGE_FORMAT_URL)
+@CrossOrigin
 public class StorageFormatController {
 
 

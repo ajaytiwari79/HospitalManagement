@@ -18,10 +18,15 @@ public class MasterAsset extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
+
+    @NotNull(message = "error.message.cannot.be.null")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
+    @NotNull
     private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    @NotNull
     private List <OrganizationTypeAndServiceBasicDto>organizationServices;
+    @NotNull
     private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     @NotNull(message = "error.message.countryId.cannot.be.null")

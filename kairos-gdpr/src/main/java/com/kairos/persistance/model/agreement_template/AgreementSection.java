@@ -5,6 +5,7 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +18,10 @@ public class AgreementSection extends MongoBaseEntity {
     @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
     private String title;
 
+    @NotNull
     private List<BigInteger> clauseIds;
 
+    @NotNull
     private Long countryId;
 
     public Long getCountryId() {

@@ -25,6 +25,7 @@ import java.util.Set;
 @RestController
 @Api(API_ACCOUNT_TYPE_URL)
 @RequestMapping(API_ACCOUNT_TYPE_URL)
+@CrossOrigin
 public class AccountTypeController {
 
 

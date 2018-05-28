@@ -5,6 +5,7 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
+import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
@@ -16,9 +17,11 @@ import java.util.List;
 @Document(collection = "clause")
 public class Clause extends MongoBaseEntity {
 
+    @NotNullOrEmpty
     private String title;
-
+    @NotNull
     private List<ClauseTag> tags = new ArrayList<>();
+    @NotNull
     private String description;
 
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;

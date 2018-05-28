@@ -25,6 +25,7 @@ import static com.kairos.constant.ApiConstant.API_TRANSFER_METHOD;
 @RestController
 @RequestMapping(API_TRANSFER_METHOD)
 @Api(API_TRANSFER_METHOD)
+@CrossOrigin
 public class TransferMethodController {
 
     @Inject

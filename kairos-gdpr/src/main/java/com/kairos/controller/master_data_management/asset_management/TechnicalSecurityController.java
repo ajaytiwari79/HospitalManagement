@@ -23,6 +23,7 @@ import static com.kairos.constant.ApiConstant.API_TECH_SECURITY_MEASURE_URL;
 @RestController
 @RequestMapping(API_TECH_SECURITY_MEASURE_URL)
 @Api(API_TECH_SECURITY_MEASURE_URL)
+@CrossOrigin
 public class TechnicalSecurityController {
 
     @Inject

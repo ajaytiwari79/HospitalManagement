@@ -23,6 +23,7 @@ import static com.kairos.constant.ApiConstant.API_DATA_DISPOSAL_URL;
 @RestController
 @RequestMapping(API_DATA_DISPOSAL_URL)
 @Api(API_DATA_DISPOSAL_URL)
+@CrossOrigin
 public class DataDisposalController {
 
 
