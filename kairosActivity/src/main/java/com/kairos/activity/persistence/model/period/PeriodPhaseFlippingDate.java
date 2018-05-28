@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class PeriodPhaseFlippingDate {
     private BigInteger phaseId;
-//    private Date flippingDate;
     private LocalDate flippingDate;
 
     public PeriodPhaseFlippingDate(){
@@ -24,11 +23,6 @@ public class PeriodPhaseFlippingDate {
         this.phaseId = phaseId;
         this.flippingDate = flippingDate;
     }
-
-    /*public PeriodPhaseFlippingDate(BigInteger phaseId, Date flippingDate){
-        this.phaseId = phaseId;
-        this.flippingDate = flippingDate;
-    }*/
 
     public BigInteger getPhaseId() {
         return phaseId;
@@ -46,11 +40,4 @@ public class PeriodPhaseFlippingDate {
         this.flippingDate = flippingDate;
     }
 
-    /*public Date getFlippingDate() {
-        return flippingDate;
-    }
-
-    public void setFlippingDate(Date flippingDate) {
-        this.flippingDate = flippingDate;
-    }*/
 }

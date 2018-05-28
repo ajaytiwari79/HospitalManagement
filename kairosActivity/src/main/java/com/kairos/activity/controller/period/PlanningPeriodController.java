@@ -73,7 +73,6 @@ public class PlanningPeriodController {
     @PutMapping(value = "/period/{periodId}/flip_phase/{timestamp}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable LocalDate date) {
-//        Date date = new Date(timestamp);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, date));
 
     }

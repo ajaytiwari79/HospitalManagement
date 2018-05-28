@@ -18,8 +18,6 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriod extends MongoBaseEntity {
 
-//    private Date startDate;
-//    private Date endDate;
     private LocalDate startDate;
     private LocalDate endDate;
     private String name;
@@ -58,22 +56,6 @@ public class PlanningPeriod extends MongoBaseEntity {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
-
-    /*public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }*/
 
     public Long getUnitId() {
         return unitId;
