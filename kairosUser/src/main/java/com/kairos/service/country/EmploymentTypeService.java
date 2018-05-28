@@ -7,7 +7,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
-import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

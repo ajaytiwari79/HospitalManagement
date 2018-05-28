@@ -3,9 +3,7 @@ package com.kairos.persistence.model.user.unit_position;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
-import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -20,7 +18,7 @@ public class PositionCtaWtaQueryResult {
     private List<CostTimeAgreement> cta;
     private List<WTAResponseDTO> wta;
     private Expertise expertise;
-    private FunctionAndSeniorityLevelQueryResult applicableSeniorityLevel;
+    private SeniorityLevelQueryResult applicableSeniorityLevel;
     private Organization union;
 
     public PositionCtaWtaQueryResult() {
@@ -51,11 +49,11 @@ public class PositionCtaWtaQueryResult {
         this.expertise = expertise;
     }
 
-    public FunctionAndSeniorityLevelQueryResult getApplicableSeniorityLevel() {
+    public SeniorityLevelQueryResult getApplicableSeniorityLevel() {
         return applicableSeniorityLevel;
     }
 
-    public void setApplicableSeniorityLevel(FunctionAndSeniorityLevelQueryResult applicableSeniorityLevel) {
+    public void setApplicableSeniorityLevel(SeniorityLevelQueryResult applicableSeniorityLevel) {
         this.applicableSeniorityLevel = applicableSeniorityLevel;
     }
 

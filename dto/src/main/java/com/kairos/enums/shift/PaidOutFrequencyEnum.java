@@ -1,4 +1,4 @@
-package com.kairos.response.dto.web.experties;
+package com.kairos.enums.shift;
 
 /**
  * Created by vipul on 27/3/18.

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.expertise;
+package com.kairos.persistence.model.user.expertise.Response;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 

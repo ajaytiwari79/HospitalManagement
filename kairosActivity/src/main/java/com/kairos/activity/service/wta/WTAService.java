@@ -549,21 +549,7 @@ public class WTAService extends MongoBaseService {
     }
 
     public WTADefaultDataInfoDTO getDefaultWtaInfo(Long countryId) {
-        List<Activity> activities = activityMongoRepository.findByDeletedFalseAndUnitId(countryId);
-        List<ActivityDTO> activityDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(activities, ActivityDTO.class);
-        /*activities.forEach(a -> {
-            ActivityDTO activityDTO = new ActivityDTO();
-            try {
-                PropertyUtils.copyProperties(activityDTO, a);
-                activityDTOS.add(activityDTO);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        });*/
+        List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndCountryId(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfo(countryId);
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
@@ -572,10 +558,9 @@ public class WTAService extends MongoBaseService {
     }
 
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
-        OrganizationDTO organizationDTO = organizationRestClient.getOrganizationWithCountryId(unitId);
-        List<ActivityDTO> activities = activityMongoRepository.findAllActivityByUnitId(unitId);
-        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
-        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfo(organizationDTO.getCountryId());
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfoByUnitId();
+        List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activities);
         return wtaDefaultDataInfoDTO;

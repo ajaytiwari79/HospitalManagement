@@ -1,11 +1,11 @@
-package com.kairos.persistence.model.user.expertise;
+package com.kairos.persistence.model.user.expertise.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.pay_table.PayTable;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -28,8 +28,6 @@ public class ExpertiseQueryResult {
     private Boolean history;
     private List<CareDays> seniorDays;
     private List<CareDays> childCareDays;
-
-
     private Level organizationLevel;
     private List<OrganizationService> organizationService;
     //TODO in current unwinded property cant be set to any nested domain to QueryResult DTO , We will change if in feature this will handle

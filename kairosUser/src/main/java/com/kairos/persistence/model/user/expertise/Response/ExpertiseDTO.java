@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.expertise;
+package com.kairos.persistence.model.user.expertise.Response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
