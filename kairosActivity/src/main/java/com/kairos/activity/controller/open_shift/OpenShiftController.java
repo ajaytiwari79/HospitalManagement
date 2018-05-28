@@ -63,6 +63,4 @@ public class OpenShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId));
 
     }
-
-
 }

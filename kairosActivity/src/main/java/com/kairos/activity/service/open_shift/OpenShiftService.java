@@ -165,7 +165,6 @@ public class OpenShiftService extends MongoBaseService {
 
         } else if (ShiftAssignmentCriteria.values().equals(SHOW_INTEREST_APPROVAL_BY_PLANNER)) {
             openShift.getInterestedStaff().add(staffId);
-            openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()+1);
         }
         save(openShift);
         OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
