@@ -18,4 +18,11 @@ public interface ActivitySpecification<T> {
      * @return A new specification.
      */
     ActivitySpecification<T> and(ActivitySpecification<T> activitySpecification);
+
+    /**
+     * Create a new specification that is the OR operation of {@code this} specification and another specification.
+     * @param activitySpecification Specification to OR.
+     * @return A new specification.
+     */
+    ActivitySpecification<T> or(ActivitySpecification<T> activitySpecification);
 }

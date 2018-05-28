@@ -3,6 +3,7 @@ package com.kairos.activity.controller.night_worker;
 import com.kairos.activity.service.night_worker.NightWorkerService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.response.dto.web.night_worker.NightWorkerUnitSettingsDTO;
 import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,4 +56,25 @@ public class NightWorkerController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerQuestionnaire(unitId, staffId, questionnaireId, questionnaireAnswerResponseDTO));
     }
 
+    @ApiOperation(value = "get night worker unit settings")
+    @GetMapping(value = "/night_worker_setting")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getNightWorkerUnitSettings(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.getNightWorkerSettings(unitId));
+    }
+
+    @ApiOperation(value = "update night worker unit settings")
+    @PutMapping(value = "/night_worker_setting")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNightWorkerUnitSettings(@PathVariable Long unitId,
+                                                                            @RequestBody @Valid NightWorkerUnitSettingsDTO nightWorkerUnitSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerSettings(unitId,  nightWorkerUnitSettingsDTO));
+    }
+
+    @ApiOperation(value = "update night worker eligibility status")
+    @PutMapping(value = "/night_worker/eligibility_status")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNightWorkerEligibilityOfStaff() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerEligibilityOfStaff());
+    }
 }

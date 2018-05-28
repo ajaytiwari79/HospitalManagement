@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.client;
 
+import java.time.Period;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,9 +13,10 @@ import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.util.DateConverter;
+import java.time.LocalDate;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
+import com.kairos.util.CPRUtil;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -741,7 +743,7 @@ public class Client extends User {
         map.put("lastName", this.lastName);
         map.put("nameAmongStaff", this.nameAmongStaff);
     //    map.put("civilianStatus", this.civilianStatus);
-        map.put("age", this.age);
+        map.put("age", Period.between(CPRUtil.getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears());
         map.put("gender", this.gender);
         map.put("profilePic", this.profilePic);
         map.put("citizenDead", this.citizenDead);

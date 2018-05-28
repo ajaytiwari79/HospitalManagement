@@ -25,7 +25,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private double maximumVetoPercentage;
     private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<BigInteger> activityIds ;
     private int numberOfWeeks;
     private LocalDate validationStartDate;
     private List<PartOfDay> partOfDays = new ArrayList<>();

@@ -5,6 +5,7 @@ import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.StaffCreationDTO;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
+
 /**
  * Created by oodles on 23/10/17.
  */
@@ -32,7 +35,8 @@ public class StaffServiceTest {
     TestRestTemplate restTemplate;
     @Autowired
     private StaffService staffService;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     @Test
     public void addStaffFavouriteFilters() throws Exception {
@@ -81,9 +85,10 @@ public class StaffServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("ogranization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 
 }

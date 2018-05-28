@@ -20,6 +20,7 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
     private String shortName;
     private Long startDateMillis;
     private Long endDateMillis;
+    private String paymentUnit;
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
@@ -110,7 +111,7 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.editable = editable;
     }
 
-    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Long endDateMillis, Boolean published, Boolean editable) {
+    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Long endDateMillis, Boolean published, String paymentUnit, Boolean editable) {
         this.name = name;
         this.published = published;
         this.description = description;
@@ -118,6 +119,8 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.startDateMillis = startDateMillis;
         this.editable = editable;
         this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
+
 
     }
 
@@ -140,5 +143,13 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         Long compareQuantity = ((PayTableResponse) payTableResponse).getStartDateMillis();
         //ascending order
         return this.getStartDateMillis().compareTo(compareQuantity);
+    }
+
+    public String getPaymentUnit() {
+        return paymentUnit;
+    }
+
+    public void setPaymentUnit(String paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 }

@@ -27,7 +27,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         this.recommendedValue = recommendedValue;
     }
 
-    protected float recommendedValue;
+    private float recommendedValue;
 
     public boolean isCarryForwardLeave() {
         return carryForwardLeave;
@@ -50,7 +50,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         //Default Constructor
     }
 
-    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activitieIds,
+    public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,
                                         LocalDate validationStartDate, Long numberOfWeeks) {
         super(name , description);
         this.disabled=disabled;

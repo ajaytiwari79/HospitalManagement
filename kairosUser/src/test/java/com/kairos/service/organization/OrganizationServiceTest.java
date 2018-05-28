@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.OrganizationDTO;
 import com.kairos.persistence.model.organization.ParentOrganizationDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 
 /**
@@ -31,7 +33,8 @@ public class OrganizationServiceTest {
     private String url ;
     @Autowired
     TestRestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     @Test
     public void createOrganization(){
@@ -67,8 +70,9 @@ public class OrganizationServiceTest {
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         }else{
-            throw new UnsupportedOperationException("ogranization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 }

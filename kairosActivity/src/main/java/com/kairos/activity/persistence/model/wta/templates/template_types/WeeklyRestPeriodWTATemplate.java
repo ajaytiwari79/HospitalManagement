@@ -24,7 +24,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     private String intervalUnit;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
+    private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
 

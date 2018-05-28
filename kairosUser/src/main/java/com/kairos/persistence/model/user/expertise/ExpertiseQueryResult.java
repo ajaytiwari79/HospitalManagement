@@ -26,7 +26,6 @@ public class ExpertiseQueryResult {
     private Long id;
     private Boolean published;
     private Boolean history;
-    private PaidOutFrequencyEnum paidOutFrequency;
     private List<CareDays> seniorDays;
     private List<CareDays> childCareDays;
 
@@ -100,14 +99,6 @@ public class ExpertiseQueryResult {
 
     public void setPublished(Boolean published) {
         this.published = published;
-    }
-
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
     }
 
     public Level getOrganizationLevel() {
