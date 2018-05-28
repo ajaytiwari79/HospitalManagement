@@ -14,6 +14,7 @@ import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.response.dto.time_bank.*;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -166,10 +167,10 @@ public class TimeBankCalculationService {
                         int ctaTimeBankMin = 0;
                         if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())))) {
                             if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
-                                if (ruleTemplate.isCalculateScheduledHours() && interval.contains(shift.getStartDate().getTime())) {
+                                if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
                                     dailyScheduledMin += shift.getScheduledMinutes();
                                     totalDailyTimebank+=dailyScheduledMin;
-                                } else {
+                                } if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)){
                                     for (CTAIntervalDTO ctaIntervalDTO : ruleTemplate.getCtaIntervalDTOS()) {
                                         Interval ctaInterval = getCTAInterval(ctaIntervalDTO, interval);
                                         if (ctaInterval.overlaps(shiftInterval)) {
