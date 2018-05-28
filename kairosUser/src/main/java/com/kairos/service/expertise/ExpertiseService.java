@@ -9,7 +9,6 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
@@ -327,11 +326,6 @@ public class ExpertiseService extends UserBaseService {
         } else {
             expertise.getSeniorityLevel().add(seniorityLevel);
         }
-//        if (!Optional.ofNullable(expertise.getSeniorityLevel()).isPresent()) {
-//            expertise.setSeniorityLevel(Arrays.asList(seniorityLevel));
-//        } else {
-//            expertise.getSeniorityLevel().add(seniorityLevel);
-//        }
         save(seniorityLevel);
         return seniorityLevel;
     }
@@ -424,7 +418,7 @@ public class ExpertiseService extends UserBaseService {
 
     private void updateCurrentSeniorityLevel(SeniorityLevelDTO seniorityLevelDTO, SeniorityLevel seniorityLevel) {
 
-        SeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevel.getId());
+        SeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getPayGradeBySeniorityLevelId(seniorityLevel.getId());
         seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
         seniorityLevel.setTo(seniorityLevelDTO.getTo());
         seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());

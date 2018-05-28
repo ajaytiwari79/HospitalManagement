@@ -220,7 +220,6 @@ public class FunctionalPaymentService extends UserBaseService {
                 } else {
                     functionalPaymentMatrix
                             = functionalPaymentMatrixRepository.findOne(functionalPaymentMatrixDTO.getId());
-
                     Set<Long> payGroupAreaIds = functionalPaymentMatrix.getPayGroupAreas().stream().map
                             (pay -> pay.getId()).collect(Collectors.toSet());
 
@@ -230,6 +229,7 @@ public class FunctionalPaymentService extends UserBaseService {
                         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(functionalPaymentMatrixDTO.getPayGroupAreasIds());
                         functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
                     }
+
                     functionalPaymentMatrix.setSeniorityLevelFunction(getSeniorityLevelFunction(functionalPaymentMatrixDTO.getSeniorityLevelFunction(), seniorityLevels, functions));
                     // find object by db and update in that
                 }

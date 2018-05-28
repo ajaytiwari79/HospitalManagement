@@ -18,37 +18,17 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<SeniorityLevel, Long> {
     @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
             "match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
-            "optional match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]-(function:Function)\n" +
-            "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
-            "return case when function IS NOT NULL then collect(distinct{functionId:id(function),name:function.name ,description:function.description," +
-            "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,payGrade as payGrade,collect(DISTINCT pga) as payGroupAreas")
-    SeniorityLevelQueryResult getFunctionAndPayGroupAreaBySeniorityLevelId(Long seniorityLevelId);
-
-    @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
-            "match(seniorityLevel)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea) detach delete rel")
-    void removeAllPreviousPayGroupAreaFromSeniorityLevel(Long seniorityLevelId);
+            "return payGrade as payGrade")
+    SeniorityLevelQueryResult getPayGradeBySeniorityLevelId(Long seniorityLevelId);
 
     @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
             "match(seniorityLevel)-[rel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) detach delete rel")
     void removePreviousPayGradeFromSeniorityLevel(Long seniorityLevelId);
 
     @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
-            "match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]-(function:Function) detach delete rel\n")
-    void removeAllPreviousFunctionsFromSeniorityLevel(Long seniorityLevelId);
-
-    @Query("match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) where id(expertise)={0} AND id(seniorityLevel)<>{1} \n" +
-            "match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade) where id(payGradeData)={2}  " +
-            "with count(payGradeData) as payGradeDataCount  " +
-            "RETURN case when payGradeDataCount>0 THEN  true ELSE false END as response")
-    Boolean checkPayGradeInSeniorityLevel(Long expertiseId, Long currentSeniorityLevelId, Long payGradeId);
-
-    @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
             "match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
-            "optional match(seniorityLevel)-[relation:" + HAS_FUNCTION + "]-(function:Function)\n" +
-            "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
             "return id(seniorityLevel) as id,seniorityLevel.from as from,seniorityLevel.pensionPercentage as pensionPercentage,seniorityLevel.freeChoicePercentage as freeChoicePercentage," +
-            "seniorityLevel.freeChoiceToPension as freeChoiceToPension,seniorityLevel.to as to,case when function IS NOT NULL then collect(distinct{id:id(function),amount:relation.amount,name:function.name ,description:function.description," +
-            "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,payGrade as payGrade,collect(DISTINCT pga) as payGroupAreas")
+            "seniorityLevel.freeChoiceToPension as freeChoiceToPension,seniorityLevel.to as to,payGrade as payGrade")
     SeniorityLevelQueryResult getSeniorityLevelById(Long seniorityLevelId);
 
     @Query("match(seniorityLevel:SeniorityLevel{deleted:false}) where id(seniorityLevel) IN {0}\n" +
