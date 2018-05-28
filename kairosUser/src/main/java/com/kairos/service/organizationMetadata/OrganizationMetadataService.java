@@ -176,35 +176,9 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
 
     public PaymentSettingsQueryResult getPaymentSettings(Long unitId) {
         PaymentSettingsQueryResult paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
-        if (!Optional.ofNullable(paymentSettings).isPresent()) {
-            logger.info("Unable to payments settings for unit ,{}", unitId);
-            exceptionService.dataNotFoundByIdException("message.unit.paymentsetting.unable", unitId);
-
-        }
-
         return paymentSettings;
     }
 
-
-//    public PaymentSettingsDTO createPaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
-//        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 1);
-//        if (!organization.isPresent()) {
-//            logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
-//           exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
-//
-//        }
-//        if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent() && !organization.get().getPaymentSettings().isEmpty()) {
-//            Optional<PaymentSettings> paymentSettingsFromDB = organization.get().getPaymentSettings().stream().filter(paymentSettings -> paymentSettings.getType().equals(paymentSettingsDTO.getType())).findFirst();
-//            if (paymentSettingsFromDB.isPresent()) {
-//                exceptionService.duplicateDataException("message.unit.paymentsetting.alreadyExist",paymentSettingsDTO.getType());
-//
-//            }
-//        }
-//        paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
-//
-//
-//        return paymentSettingsDTO;
-//    }
 
     private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
         PaymentSettings paymentSettings = updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
@@ -238,4 +212,6 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         save(paymentSettings);
         return paymentSettingsDTO;
     }
+
+
 }
