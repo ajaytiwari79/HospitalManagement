@@ -780,6 +780,7 @@ public class UnitPositionService extends UserBaseService {
 
 
             ctaRuleTemplateDTO.setCalculateScheduledHours(ruleTemplateQueryResult.isCalculateScheduledHours());
+            ctaRuleTemplateDTO.setCalculationFor(ruleTemplateQueryResult.getCalculationFor());
             ctaRuleTemplateDTO.setEmploymentTypes(ruleTemplateQueryResult.getEmploymentTypes());
             if (ruleTemplateQueryResult.getPlannedTimeWithFactor().getAccountType() != null) {
                 ctaRuleTemplateDTO.setAccountType(ruleTemplateQueryResult.getPlannedTimeWithFactor().getAccountType().name());

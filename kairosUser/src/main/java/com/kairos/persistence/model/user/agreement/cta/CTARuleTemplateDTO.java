@@ -38,6 +38,7 @@ public class CTARuleTemplateDTO {
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private boolean calculateScheduledHours;
 //    private List<Long> timeTypes =new ArrayList<>();
+    private CalculationFor calculationFor;
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
@@ -276,6 +277,14 @@ public class CTARuleTemplateDTO {
 
     public void setPlannedTimeIds(Set<Long> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public CalculationFor getCalculationFor() {
+        return calculationFor;
+    }
+
+    public void setCalculationFor(CalculationFor calculationFor) {
+        this.calculationFor = calculationFor;
     }
 
     public CTARuleTemplateDTO cloneNew() {
