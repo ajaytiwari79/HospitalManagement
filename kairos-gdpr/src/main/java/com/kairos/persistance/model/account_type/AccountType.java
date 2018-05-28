@@ -7,6 +7,8 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
+
 
 @Document(collection = "account_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,6 +20,16 @@ public class AccountType extends MongoBaseEntity {
     @UniqueElements
     private String typeOfAccount;
 
+    @NotNull
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public String getTypeOfAccount() {
         return typeOfAccount;

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import static com.kairos.constant.ApiConstant.API_ACCOUNT_TYPE_URL;
 import static com.kairos.constant.ApiConstant.PARENT_ORGABNIZATION;
 
@@ -19,9 +20,9 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Set;
 /*
-*
-*  created by bobby 20/4/2018
-* */
+ *
+ *  created by bobby 20/4/2018
+ * */
 
 
 @RestController
@@ -36,20 +37,25 @@ public class AccountTypeController {
     private AccountTypeService accountTypeService;
 
 
-    @ApiOperation(value ="create new account type" )
-    @PostMapping("/add_account")
-    public ResponseEntity<Object> createAccountType( @RequestBody AccountType accountType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(accountType));
-
+    @ApiOperation(value = "create new account type")
+    @PostMapping("/add")
+    public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @RequestBody AccountType accountType) {
+        if (countryId != null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
+        }
+        return ResponseHandler.invalidResponse(HttpStatus.OK, true, "country id can not be null");
     }
 
-    @ApiOperation(value ="account type by name" )
+    @ApiOperation(value = "account type by name")
     @GetMapping("/")
-    public ResponseEntity<Object> getAccount(@RequestParam String typeOfAccount) {
+    public ResponseEntity<Object> getAccount(@PathVariable Long countryId, @RequestParam String typeOfAccount) {
         if (StringUtils.isBlank(typeOfAccount)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null");
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountByName(typeOfAccount));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountByName(countryId, typeOfAccount));
 
     }
 
@@ -65,10 +71,23 @@ public class AccountTypeController {
 */
 
 
-    @ApiOperation(value ="all account type " )
+    @ApiOperation(value = "all account type ")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseEntity<Object> getAllAccounts() {
-          return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType());
+
+    }
+
+    @ApiOperation(value = "account type by name")
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getAccountType(@PathVariable Long countryId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountTypeById(countryId, id));
 
     }
 
