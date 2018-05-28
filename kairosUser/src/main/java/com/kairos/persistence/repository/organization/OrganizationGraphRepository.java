@@ -755,5 +755,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithUrl(String desiredUrl);
 
+    @Query("MATCH (org:Organization) where org.name={0}\n" +
+            "RETURN case when count(org)>0 THEN  true ELSE false END as response")
+    Boolean checkOrgExistWithName(String name);
+
 
 }
