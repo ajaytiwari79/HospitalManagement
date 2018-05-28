@@ -16,7 +16,7 @@ import java.util.List;
 public class GenericIntegrationService {
     @Autowired GenericRestClient genericRestClient;
 
-    @Async
+
     public Long getUnitPositionId(Long unitId, Long staffId,Long expertiseId){
       Integer value=  genericRestClient.publish(null, unitId,true, IntegrationOperation.GET, "/staff/{staffId}/expertise/{expertiseId}/unitPositionId", null,staffId,expertiseId);
       return  value.longValue();

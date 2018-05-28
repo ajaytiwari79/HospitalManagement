@@ -35,7 +35,7 @@ public class GenericRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl +id + getURI(t,uri,queryParams),
+                            baseUrl + getURI(t,uri,queryParams),
                             getHttpMethod(integrationOperation),
                             t==null?null:new HttpEntity<>(t), typeReference,pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();

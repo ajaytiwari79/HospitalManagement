@@ -12,6 +12,7 @@ import java.util.List;
 public class OpenShift extends MongoBaseEntity {
 
     private LocalDate startDate;
+    private LocalDate endDate;
     private LocalTime fromTime;
     private LocalTime toTime;
     private Integer noOfPersonRequired;
@@ -96,5 +97,11 @@ public class OpenShift extends MongoBaseEntity {
         this.declinedBy = declinedBy;
     }
 
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
 }

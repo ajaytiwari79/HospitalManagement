@@ -171,7 +171,7 @@ public class ShiftService extends MongoBaseService {
                 timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
             }
             shifts.add(shift);
-            //timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+            timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
             boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
 
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null, isShiftForPreence));
@@ -310,11 +310,11 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification); //
 
         List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
-        if (dayTypeIds != null) {
-            List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
-            ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
-            activitySpecification.and(activityDayTypeSpec);
-        }
+//        if (dayTypeIds != null) {
+//            List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
+//            ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
+//            activitySpecification.and(activityDayTypeSpec);
+//        }
 
         activitySpecification.isSatisfied(activity);
 

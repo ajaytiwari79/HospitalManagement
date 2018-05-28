@@ -47,15 +47,15 @@ public class OrganizationRestClient {
      */
     public OrganizationDTO getOrganization(long unitId) {
 
-        final String baseUrl = RestClientUrlUtil.getBaseUrl(false);
+        final String baseUrl = RestClientUrlUtil.getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<OrganizationDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}",
-                            HttpMethod.GET, null, typeReference, unitId);
+                            baseUrl ,
+                            HttpMethod.GET, null, typeReference);
             RestTemplateResponseEnvelope<OrganizationDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
