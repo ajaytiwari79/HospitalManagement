@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web.open_shift;
 
+import com.kairos.persistence.model.enums.DurationType;
+
 import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
 
@@ -8,6 +10,7 @@ public class OpenShiftIntervalDTO{
     private int from;
     private int to;
     private Long countryId;
+    private DurationType type;
 
     public OpenShiftIntervalDTO() {
         //Default Constructor
@@ -43,6 +46,14 @@ public class OpenShiftIntervalDTO{
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
+    }
+
+    public DurationType getType() {
+        return type;
+    }
+
+    public void setType(DurationType type) {
+        this.type = type;
     }
 
     @AssertTrue(message = "from can't be less than to")

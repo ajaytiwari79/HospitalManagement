@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.open_shift;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.enums.DurationType;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 //Domain name can be changed
@@ -8,6 +9,7 @@ public class OpenShiftInterval extends MongoBaseEntity implements Comparable<Ope
     private int from;
     private int to;
     private Long countryId;
+    private DurationType type;
 
     public OpenShiftInterval() {
         //Default Constructor
@@ -35,6 +37,14 @@ public class OpenShiftInterval extends MongoBaseEntity implements Comparable<Ope
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
+    }
+
+    public DurationType getType() {
+        return type;
+    }
+
+    public void setType(DurationType type) {
+        this.type = type;
     }
 
     @Override
