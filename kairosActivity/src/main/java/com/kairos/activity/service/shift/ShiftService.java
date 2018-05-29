@@ -254,7 +254,6 @@ public class ShiftService extends MongoBaseService {
         if (startDateAsString != null) {
             DateFormat dateISOFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
             Date startDate = dateISOFormat.parse(startDateAsString);
-
             startDateInISO = new DateTime(startDate).toDate();
             if (endDateAsString != null) {
                 Date endDate = dateISOFormat.parse(endDateAsString);
