@@ -8,6 +8,10 @@ import org.springframework.data.mongodb.repository.Query;
 import java.math.BigInteger;
 import java.util.List;
 
+/*
+ * @author: Mohit Shakya
+ * Usage: Repository class for PlannedTimeTypes
+ */
 public interface PlannedTimeTypeRepository extends MongoRepository<PlannedTimeType, BigInteger> {
     @Query("{'name':{$regex:?0,$options:'i'}, 'deleted':?1, 'countryId':?2}")
     PlannedTimeType findByNameAndDeletedAndCountryId(String name, boolean deleted, Long countryId);
@@ -15,7 +19,7 @@ public interface PlannedTimeTypeRepository extends MongoRepository<PlannedTimeTy
     @Query("{'countryId':?0, 'deleted':?1}")
     List<PresenceTypeDTO> getAllPresenceTypeByCountryId(Long countryId, boolean deleted);
 
-    @Query("'countryId':?0, 'name':{$regex:?1,$options:'i'}, 'deleted':?2}")
+    @Query("{'countryId':?0, 'name':{$regex:?1,$options:'i'}, 'deleted':?2}")
     List<PlannedTimeType> findByNameAndDeletedAndCountryIdExcludingCurrent(Long countryId, String presenceTyName, boolean deleted);
 
 }

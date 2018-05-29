@@ -24,6 +24,10 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 
+/*
+ * @author: mohit shakya
+ * @usage: Integration test cases for planned time type functionality.
+ */
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -44,7 +48,6 @@ public class PlannedTimeTypeIntegrationTest {
     @Test
     public void case1_createPlannedTimeType() throws Exception{
         String baseUrl = getBaseUrl(24L, 4L);
-        System.out.println("baseUrl: "+baseUrl);
         PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType01"+(new Date().getTime()));
         HttpEntity<PresenceTypeDTO> requestEntity = new HttpEntity<>(presenceTypeDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> typeReference =
@@ -57,8 +60,7 @@ public class PlannedTimeTypeIntegrationTest {
 
     @Test
     public void case2_getAllPlannedTimeType() throws Exception{
-        String baseUrl = "http://localhost:8090/kairos/activity/api/v1/organization/{organizationId}/country/{countryId}/plannedTimeType";//getBaseUrl(24L, 4L);
-        System.out.println("baseUrl: "+baseUrl);
+        String baseUrl = getBaseUrl(24L, 4L);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>>() {
         };
         ResponseEntity<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>> response = testRestTemplate.exchange(baseUrl, HttpMethod.GET, null, typeReference,24,4);
@@ -82,7 +84,6 @@ public class PlannedTimeTypeIntegrationTest {
     @Test
     public void case4_deletePlannedTimeType() throws Exception {
         String baseUrl = getBaseUrl(24L, 4L)+"/"+createdId;
-        System.out.println("baseUrl: "+baseUrl);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> responseRef = new ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>>() {
         };
         ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = testRestTemplate.exchange(baseUrl, HttpMethod.DELETE, null, responseRef);

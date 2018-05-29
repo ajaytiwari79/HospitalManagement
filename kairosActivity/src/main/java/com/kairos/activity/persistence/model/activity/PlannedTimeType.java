@@ -2,6 +2,11 @@ package com.kairos.activity.persistence.model.activity;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
+/*
+ * @author: Mohit Shakya
+ * @usage: This domain is for category Planned time type.
+ *
+ */
 public class PlannedTimeType extends MongoBaseEntity {
     private String name;
     private Long countryId;
