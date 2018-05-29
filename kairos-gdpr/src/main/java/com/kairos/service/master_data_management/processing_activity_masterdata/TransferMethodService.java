@@ -26,28 +26,32 @@ public class TransferMethodService extends MongoBaseService {
     private TransferMethodMongoRepository transferMethodDestinationRepository;
 
 
-    public Map<String, List<TransferMethod>> createTransferMethod(Long countryId,List<TransferMethod> transferMethods) {
+    public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, List<TransferMethod> transferMethods) {
         Map<String, List<TransferMethod>> result = new HashMap<>();
         List<TransferMethod> existing = new ArrayList<>();
         List<TransferMethod> newTransferMethods = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (transferMethods.size() != 0) {
             for (TransferMethod transferMethod : transferMethods) {
                 if (!StringUtils.isBlank(transferMethod.getName())) {
-                    TransferMethod exist = transferMethodDestinationRepository.findByName(countryId,transferMethod.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        TransferMethod newTransferMethod = new TransferMethod();
-                        newTransferMethod.setName(transferMethod.getName());
-                        newTransferMethod.setCountryId(countryId);
-                        newTransferMethods.add(save(newTransferMethod));
-                    }
+                    names.add(transferMethod.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
+            existing = transferMethodDestinationRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
+            if (names.size()!=0) {
+                for (String name : names) {
+                    TransferMethod newTransferMethod = new TransferMethod();
+                    newTransferMethod.setName(name);
+                    newTransferMethod.setCountryId(countryId);
+                    newTransferMethods.add(newTransferMethod);
 
+                }
+
+                newTransferMethods = save(newTransferMethods);
+            }
             result.put("existing", existing);
             result.put("new", newTransferMethods);
             return result;
@@ -58,11 +62,12 @@ public class TransferMethodService extends MongoBaseService {
     }
 
     public List<TransferMethod> getAllTransferMethod() {
-       return transferMethodDestinationRepository.findAllTransferMethods(UserContext.getCountryId());
+        return transferMethodDestinationRepository.findAllTransferMethods(UserContext.getCountryId());
     }
-    public TransferMethod getTransferMethod(Long countryId,BigInteger id) {
 
-        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(countryId,id);
+    public TransferMethod getTransferMethod(Long countryId, BigInteger id) {
+
+        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -101,11 +106,11 @@ public class TransferMethodService extends MongoBaseService {
     }
 
 
-    public TransferMethod getTransferMethodByName(Long countryId,String name) {
+    public TransferMethod getTransferMethodByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            TransferMethod exist = transferMethodDestinationRepository.findByName(countryId,name);
+            TransferMethod exist = transferMethodDestinationRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

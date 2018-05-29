@@ -26,29 +26,34 @@ public class DataDisposalService extends MongoBaseService {
     private DataDisposalMongoRepository dataDisposalMongoRepository;
 
 
-    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId,List<DataDisposal> dataDisposals) {
+    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, List<DataDisposal> dataDisposals) {
         Map<String, List<DataDisposal>> result = new HashMap<>();
-        List<DataDisposal> existTechnicalMeasure = new ArrayList<>();
+        List<DataDisposal> existing = new ArrayList<>();
         List<DataDisposal> newDataDisposals = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (dataDisposals.size() != 0) {
             for (DataDisposal dataDisposal : dataDisposals) {
-
                 if (!StringUtils.isBlank(dataDisposal.getName())) {
-                    DataDisposal exist = dataDisposalMongoRepository.findByName(countryId,dataDisposal.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existTechnicalMeasure.add(exist);
-
-                    } else {
-                        DataDisposal newDataDisposal = new DataDisposal();
-                        newDataDisposal.setName(dataDisposal.getName());
-                        newDataDisposal.setCountryId(countryId);
-                        newDataDisposals.add(save(newDataDisposal));
-                    }
+                    names.add(dataDisposal.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            result.put("existing", existTechnicalMeasure);
+            existing = dataDisposalMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
+            if (names.size() != 0) {
+                for (String name : names) {
+
+                    DataDisposal newDataDisposal = new DataDisposal();
+                    newDataDisposal.setName(name);
+                    newDataDisposal.setCountryId(countryId);
+                    newDataDisposals.add(newDataDisposal);
+
+                }
+
+                newDataDisposals = save(newDataDisposals);
+            }
+            result.put("existing", existing);
             result.put("new", newDataDisposals);
             return result;
         } else
@@ -58,13 +63,13 @@ public class DataDisposalService extends MongoBaseService {
     }
 
     public List<DataDisposal> getAllDataDisposal() {
-     return dataDisposalMongoRepository.findAllDataDisposals(UserContext.getCountryId());
-          }
+        return dataDisposalMongoRepository.findAllDataDisposals(UserContext.getCountryId());
+    }
 
 
-    public DataDisposal getDataDisposalById(Long countryId,BigInteger id) {
+    public DataDisposal getDataDisposalById(Long countryId, BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId,id);
+        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -102,11 +107,11 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public DataDisposal getDataDisposalByName(Long countryId,String name) {
+    public DataDisposal getDataDisposalByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId,name);
+            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

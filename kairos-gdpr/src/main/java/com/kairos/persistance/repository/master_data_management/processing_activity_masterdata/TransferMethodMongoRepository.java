@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface TransferMethodMongoRepository extends MongoRepository<TransferMethod,BigInteger> {
@@ -21,4 +22,11 @@ public interface TransferMethodMongoRepository extends MongoRepository<TransferM
 
     @Query("{countryId:?0,deleted:false}")
     List<TransferMethod> findAllTransferMethods(Long countryId);
+
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<TransferMethod>  findByCountryAndNameList(Long countryId, Set<String> name);
+
+
+
 }

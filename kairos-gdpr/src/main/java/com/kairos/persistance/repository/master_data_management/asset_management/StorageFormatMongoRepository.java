@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface StorageFormatMongoRepository extends MongoRepository<StorageFormat,BigInteger> {
@@ -24,6 +25,7 @@ public interface StorageFormatMongoRepository extends MongoRepository<StorageFor
     @Query("{countryId:?0,deleted:false}")
     List<StorageFormat> findAllStorageFormats(Long countryId);
 
-
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<StorageFormat>  findByCountryAndNameList(Long countryId,Set<String> name);
 
 }

@@ -24,6 +24,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
@@ -105,6 +108,7 @@ public class KairosGdprApplication {
                 .build();
         return template;
     }*/
+
 
 
 }

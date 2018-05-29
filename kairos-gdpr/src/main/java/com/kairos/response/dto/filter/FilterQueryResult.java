@@ -4,33 +4,68 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilterQueryResult {
 
-    @NotNull
-    private String name;
+    private BigInteger id;
 
-    @NotNullOrEmpty
-    private String title;
+    private List<FilterAttributes> organizationTypes;
 
-    @NotNull
-    private List<FilterAttributes> values;
+    private List<FilterAttributes> organizationSubTypes;
+    private List<FilterAttributes> organizationServices;
+    private List<FilterAttributes> organizationSubServices;
+    private List<FilterAttributes> accountTypes;
 
-    public String getName() {
-        return name;
+    public List<FilterAttributes> getAccountTypes() {
+        return accountTypes;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public BigInteger getId() {
+        return id;
     }
 
-    public String getTitle() {
-        return title;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setAccountTypes(List<FilterAttributes> accountTypes) {
+        this.accountTypes = accountTypes;
     }
+
+    public List<FilterAttributes> getOrganizationTypes() {
+        return organizationTypes;
+    }
+
+    public void setOrganizationTypes(List<FilterAttributes> organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
+
+    public List<FilterAttributes> getOrganizationSubTypes() {
+        return organizationSubTypes;
+    }
+
+    public void setOrganizationSubTypes(List<FilterAttributes> organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
+    }
+
+    public List<FilterAttributes> getOrganizationServices() {
+        return organizationServices;
+    }
+
+    public void setOrganizationServices(List<FilterAttributes> organizationServices) {
+        this.organizationServices = organizationServices;
+    }
+
+    public List<FilterAttributes> getOrganizationSubServices() {
+        return organizationSubServices;
+    }
+
+    public void setOrganizationSubServices(List<FilterAttributes> organizationSubServices) {
+        this.organizationSubServices = organizationSubServices;
+    }
+
+
 }

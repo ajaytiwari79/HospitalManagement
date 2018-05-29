@@ -26,27 +26,34 @@ public class DataSubjectService extends MongoBaseService {
     private DataSubjectMongoRepository dataSubjectMongoRepository;
 
 
-    public Map<String, List<DataSubject>> createDataSubject(Long countryId,List<DataSubject> dataSubjects) {
+    public Map<String, List<DataSubject>> createDataSubject(Long countryId, List<DataSubject> dataSubjects) {
         Map<String, List<DataSubject>> result = new HashMap<>();
         List<DataSubject> existing = new ArrayList<>();
         List<DataSubject> newDataSubjects = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (dataSubjects.size() != 0) {
             for (DataSubject dataSubject : dataSubjects) {
                 if (!StringUtils.isBlank(dataSubject.getName())) {
-                    DataSubject exist = dataSubjectMongoRepository.findByName(countryId,dataSubject.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        DataSubject newDataSubject = new DataSubject();
-                        newDataSubject.setName(dataSubject.getName());
-                        newDataSubject.setCountryId(countryId);
-                        newDataSubjects.add(save(newDataSubject));
-                    }
+                    names.add(dataSubject.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
+            existing = dataSubjectMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
+
+            if (names.size()!=0) {
+                for (String name : names) {
+
+                    DataSubject newDataSubject = new DataSubject();
+                    newDataSubject.setName(name);
+                    newDataSubject.setCountryId(countryId);
+                    newDataSubjects.add(newDataSubject);
+
+                }
+
+                newDataSubjects = save(newDataSubjects);
+            }
             result.put("existing", existing);
             result.put("new", newDataSubjects);
             return result;
@@ -57,13 +64,13 @@ public class DataSubjectService extends MongoBaseService {
     }
 
     public List<DataSubject> getAllDataSubject() {
-       return dataSubjectMongoRepository.findAllDataSubjects(UserContext.getCountryId());
-          }
+        return dataSubjectMongoRepository.findAllDataSubjects(UserContext.getCountryId());
+    }
 
 
-    public DataSubject getDataSubject(Long countryId,BigInteger id) {
+    public DataSubject getDataSubject(Long countryId, BigInteger id) {
 
-        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(countryId,id);
+        DataSubject exist = dataSubjectMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -101,17 +108,17 @@ public class DataSubjectService extends MongoBaseService {
         }
     }
 
-    public List<DataSubject> getDataSubjectList(Long countryId,List<BigInteger> ids) {
+    public List<DataSubject> getDataSubjectList(Long countryId, List<BigInteger> ids) {
 
-        return dataSubjectMongoRepository.getDataSubjectList(countryId,ids);
+        return dataSubjectMongoRepository.getDataSubjectList(countryId, ids);
     }
 
 
-    public DataSubject getDataSubjectByName(Long countryId,String name) {
+    public DataSubject getDataSubjectByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSubject exist = dataSubjectMongoRepository.findByName(countryId,name);
+            DataSubject exist = dataSubjectMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

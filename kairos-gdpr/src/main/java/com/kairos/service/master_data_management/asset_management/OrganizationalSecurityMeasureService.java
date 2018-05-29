@@ -26,27 +26,31 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;
 
 
-    public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId,List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+    public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
         Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
         List<OrganizationalSecurityMeasure> existing = new ArrayList<>();
         List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (orgSecurityMeasures.size() != 0) {
             for (OrganizationalSecurityMeasure securityMeasure : orgSecurityMeasures) {
                 if (!StringUtils.isBlank(securityMeasure.getName())) {
-                    OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(countryId,securityMeasure.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        OrganizationalSecurityMeasure newSecurityMeasure = new OrganizationalSecurityMeasure();
-                        newSecurityMeasure.setName(securityMeasure.getName());
-                        newSecurityMeasure.setCountryId(countryId);
-                        newOrgSecurityMeasures.add(save(newSecurityMeasure));
-                    }
+                    names.add(securityMeasure.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            existing = organizationalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
+            if (names.size() != 0) {
+                for (String name : names) {
 
+                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure();
+                    newOrganizationalSecurityMeasure.setName(name);
+                    newOrganizationalSecurityMeasure.setCountryId(countryId);
+                    newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
+
+                }
+                newOrgSecurityMeasures = save(newOrgSecurityMeasures);
+            }
             result.put("existing", existing);
             result.put("new", newOrgSecurityMeasures);
             return result;
@@ -61,9 +65,9 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId,BigInteger id) {
+    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId, BigInteger id) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId,id);
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -100,11 +104,11 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(Long countryId,String name) {
+    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(countryId,name);
+            OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

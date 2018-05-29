@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,BigInteger> {
+public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,BigInteger> ,CustomMasterAssetRepository{
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
@@ -24,8 +24,6 @@ public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,
 
     MasterAsset findByid(BigInteger id);
 
-    @Query()
-    List<FilterAttributes> findDistinct(Long countryId);
 
 
 

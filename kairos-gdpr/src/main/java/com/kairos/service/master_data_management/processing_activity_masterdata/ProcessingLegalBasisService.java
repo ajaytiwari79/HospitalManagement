@@ -26,29 +26,34 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
 
-    public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long countryId,List<ProcessingLegalBasis> legalBases) {
+    public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long countryId, List<ProcessingLegalBasis> legalBases) {
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
         List<ProcessingLegalBasis> existing = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
         if (legalBases.size() != 0) {
             for (ProcessingLegalBasis legalBasis : legalBases) {
                 if (!StringUtils.isBlank(legalBasis.getName())) {
-
-                    ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(countryId,legalBasis.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis();
-                        newProcessingLegalBasis.setName(legalBasis.getName());
-                        newProcessingLegalBasis.setCountryId(countryId);
-                        newProcessingLegalBasisList.add(save(newProcessingLegalBasis));
-                    }
+                    names.add(legalBasis.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
+            existing = legalBasisMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
 
+            if (names.size() != 0) {
+                for (String name : names) {
+
+                    ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis();
+                    newProcessingLegalBasis.setName(name);
+                    newProcessingLegalBasis.setCountryId(countryId);
+                    newProcessingLegalBasisList.add(newProcessingLegalBasis);
+
+                }
+
+                newProcessingLegalBasisList = save(newProcessingLegalBasisList);
+            }
             result.put("existing", existing);
             result.put("new", newProcessingLegalBasisList);
             return result;
@@ -62,9 +67,9 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         return legalBasisMongoRepository.findAllProcessingLegalBases(UserContext.getCountryId());
     }
 
-    public ProcessingLegalBasis getProcessingLegalBasis(Long countryId,BigInteger id) {
+    public ProcessingLegalBasis getProcessingLegalBasis(Long countryId, BigInteger id) {
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByIdAndNonDeleted(countryId,id);
+        ProcessingLegalBasis exist = legalBasisMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -103,11 +108,11 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-    public ProcessingLegalBasis getProcessingLegalBasisByName(Long countryId,String name) {
+    public ProcessingLegalBasis getProcessingLegalBasisByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(countryId,name);
+            ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

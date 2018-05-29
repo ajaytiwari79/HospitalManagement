@@ -25,27 +25,33 @@ public class AccessorPartyService extends MongoBaseService {
     private AccessorPartyMongoRepository accessorPartyMongoRepository;
 
 
-    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId,List<AccessorParty> accessorPartys) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorParty> accessorPartys) {
         Map<String, List<AccessorParty>> result = new HashMap<>();
         List<AccessorParty> existing = new ArrayList<>();
         List<AccessorParty> newAccessorPartys = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (accessorPartys.size() != 0) {
             for (AccessorParty accessorParty : accessorPartys) {
                 if (!StringUtils.isBlank(accessorParty.getName())) {
-                    AccessorParty exist = accessorPartyMongoRepository.findByName(countryId,accessorParty.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        AccessorParty newAccessorParty = new AccessorParty();
-                        newAccessorParty.setName(accessorParty.getName());
-                        newAccessorParty.setCountryId(countryId);
-                        newAccessorPartys.add(save(newAccessorParty));
-                    }
+                    names.add(accessorParty.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            existing = accessorPartyMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
 
+            if (names.size()!=0) {
+                for (String name : names) {
+                AccessorParty newAccessorParty = new AccessorParty();
+                newAccessorParty.setName(newAccessorParty.getName());
+                newAccessorParty.setCountryId(countryId);
+                newAccessorPartys.add(newAccessorParty);
+
+            }
+
+
+            newAccessorPartys = save(newAccessorPartys);
+        }
             result.put("existing", existing);
             result.put("new", newAccessorPartys);
             return result;
@@ -56,14 +62,14 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorParty> getAllAccessorParty() {
-     return accessorPartyMongoRepository.findAllAccessorParties(UserContext.getCountryId());
+        return accessorPartyMongoRepository.findAllAccessorParties(UserContext.getCountryId());
 
     }
 
 
-    public AccessorParty getAccessorParty(Long countryId,BigInteger id) {
+    public AccessorParty getAccessorParty(Long countryId, BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId,id);
+        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -102,11 +108,11 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
-    public AccessorParty getAccessorPartyByName(Long countryId,String name) {
+    public AccessorParty getAccessorPartyByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId,name);
+            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

@@ -29,24 +29,31 @@ public class HostingTypeService extends MongoBaseService {
     public Map<String, List<HostingType>> createHostingType(Long countryId,List<HostingType> hostingTypes) {
         Map<String, List<HostingType>> result = new HashMap<>();
         List<HostingType> existing = new ArrayList<>();
+        Set<String> names=new HashSet<>();
         List<HostingType> newHostingTypes = new ArrayList<>();
         if (hostingTypes.size() != 0) {
             for (HostingType hostingType : hostingTypes) {
                 if (!StringUtils.isBlank(hostingType.getName())) {
-                    HostingType exist = hostingTypeMongoRepository.findByName(countryId,hostingType.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        HostingType newHostingType = new HostingType();
-                        newHostingType.setName(hostingType.getName());
-                        newHostingType.setCountryId(countryId);
-                        newHostingTypes.add(save(newHostingType));
-                    }
+                    names.add(hostingType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            existing = hostingTypeMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
 
+            if (names.size()!=0) {
+                for (String name : names) {
+
+                    HostingType newHostingType = new HostingType();
+                    newHostingType.setName(name);
+                    newHostingType.setCountryId(countryId);
+                    newHostingTypes.add(newHostingType);
+
+                }
+
+
+                newHostingTypes = save(newHostingTypes);
+            }
             result.put("existing", existing);
             result.put("new", newHostingTypes);
             return result;

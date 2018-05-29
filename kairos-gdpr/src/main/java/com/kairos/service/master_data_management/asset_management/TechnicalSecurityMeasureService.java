@@ -26,27 +26,34 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
 
-    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId,List<TechnicalSecurityMeasure> techSecurityMeasures) {
+    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
         List<TechnicalSecurityMeasure> existing = new ArrayList<>();
         List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (techSecurityMeasures.size() != 0) {
             for (TechnicalSecurityMeasure technicalSecurityMeasure : techSecurityMeasures) {
                 if (!StringUtils.isBlank(technicalSecurityMeasure.getName())) {
-                    TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(countryId,technicalSecurityMeasure.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        TechnicalSecurityMeasure newTechnicalMeasure = new TechnicalSecurityMeasure();
-                        newTechnicalMeasure.setName(technicalSecurityMeasure.getName());
-                        newTechnicalMeasure.setCountryId(countryId);
-                        newTechnicalMeasures.add(save(newTechnicalMeasure));
-                    }
+                    names.add(technicalSecurityMeasure.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            existing = technicalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
 
+            if (names.size() != 0) {
+                for (String name : names) {
+
+                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure();
+                    newTechnicalSecurityMeasure.setName(name);
+                    newTechnicalSecurityMeasure.setCountryId(countryId);
+                    newTechnicalMeasures.add(newTechnicalSecurityMeasure);
+
+                }
+
+
+                newTechnicalMeasures = save(newTechnicalMeasures);
+            }
             result.put("existing", existing);
             result.put("new", newTechnicalMeasures);
             return result;
@@ -58,13 +65,13 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public List<TechnicalSecurityMeasure> getAllTechnicalSecurityMeasure() {
-       return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(UserContext.getCountryId());
-         }
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(UserContext.getCountryId());
+    }
 
 
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId,BigInteger id) {
+    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId,id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -100,11 +107,11 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId,String name) {
+    public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(countryId,name);
+            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

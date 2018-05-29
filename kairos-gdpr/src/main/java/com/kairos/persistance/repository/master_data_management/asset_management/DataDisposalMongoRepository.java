@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface DataDisposalMongoRepository extends MongoRepository<DataDisposal,BigInteger> {
@@ -24,4 +25,7 @@ public interface DataDisposalMongoRepository extends MongoRepository<DataDisposa
 
     @Query("{deleted:false,countryId:?0}")
     List<DataDisposal> findAllDataDisposals(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<DataDisposal>  findByCountryAndNameList(Long countryId,Set<String> name);
 }

@@ -11,12 +11,19 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilterAttributes {
 
-
-    @NotNullOrEmpty
-    private String name;
+    @NotNull
+    private Long id;
 
     @NotNull
-    private List<String> value;
+    private String name;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -24,13 +31,5 @@ public class FilterAttributes {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<String> getValue() {
-        return value;
-    }
-
-    public void setValue(List<String> value) {
-        this.value = value;
     }
 }
