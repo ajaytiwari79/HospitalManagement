@@ -15,7 +15,7 @@ public interface PlannedTimeTypeRepository extends MongoRepository<PlannedTimeTy
     @Query("{'countryId':?0, 'deleted':?1}")
     List<PresenceTypeDTO> getAllPresenceTypeByCountryId(Long countryId, boolean deleted);
 
-    @Query("'countryId':?0, 'name':{$regex:?1,$options:'i'}, 'deleted':?2}")
+    @Query("{'countryId':?0, 'name':{$regex:?1,$options:'i'}, 'deleted':?2}")
     List<PlannedTimeType> findByNameAndDeletedAndCountryIdExcludingCurrent(Long countryId, String presenceTyName, boolean deleted);
 
 }
