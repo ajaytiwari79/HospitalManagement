@@ -21,7 +21,6 @@ import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.organization.OrganizationService;
@@ -48,11 +47,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 

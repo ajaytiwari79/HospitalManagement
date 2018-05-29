@@ -68,11 +68,9 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
-
-import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -204,8 +202,6 @@ public class OrganizationService extends UserBaseService {
     DayTypeService dayTypeService;
     @Inject
     private AccessPageService accessPageService;
-    @Inject private PresenceTypeService presenceTypeService;
-
     //@Inject
     //private WTAService wtaService;
     @Inject
@@ -1672,7 +1668,7 @@ public class OrganizationService extends UserBaseService {
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId){
         Organization organization = organizationGraphRepository.findOne(unitId);
         Country country = organizationGraphRepository.getCountry(organization.getId());
-        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(country.getId());
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(country.getId());
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(country.getId());
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);
