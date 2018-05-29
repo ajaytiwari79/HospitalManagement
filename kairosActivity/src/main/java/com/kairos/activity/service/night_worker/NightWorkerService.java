@@ -2,14 +2,13 @@ package com.kairos.activity.service.night_worker;
 
 import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.night_worker.NightWorker;
-import com.kairos.activity.persistence.model.night_worker.NightWorkerUnitSettings;
 import com.kairos.activity.persistence.model.night_worker.QuestionAnswerPair;
 import com.kairos.activity.persistence.model.night_worker.StaffQuestionnaire;
+import com.kairos.activity.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.activity.persistence.repository.night_worker.NightWorkerMongoRepository;
-import com.kairos.activity.persistence.repository.night_worker.NightWorkerUnitSettingsMongoRepository;
 import com.kairos.activity.persistence.repository.night_worker.StaffQuestionnaireMongoRepository;
+import com.kairos.activity.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.spec.ActivitySpecification;
@@ -19,7 +18,6 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.StaffDTO;
 import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
-import com.kairos.response.dto.web.night_worker.NightWorkerUnitSettingsDTO;
 import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
 import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
 import com.kairos.response.dto.web.staff.UnitStaffResponseDTO;
@@ -41,16 +39,16 @@ public class NightWorkerService extends MongoBaseService {
     @Inject
     NightWorkerMongoRepository nightWorkerMongoRepository;
     @Inject
-    ExceptionService exceptionService;
+    private ExceptionService exceptionService;
 
     @Inject
-    StaffQuestionnaireMongoRepository staffQuestionnaireMongoRepository;
+    private StaffQuestionnaireMongoRepository staffQuestionnaireMongoRepository;
 
     @Inject
-    NightWorkerUnitSettingsMongoRepository nightWorkerUnitSettingsMongoRepository;
+    private StaffRestClient staffRestClient;
 
     @Inject
-    StaffRestClient staffRestClient;
+    private UnitAgeSettingMongoRepository unitAgeSettingMongoRepository;
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaire(Long unitId, Long staffId){
         return nightWorkerMongoRepository.getNightWorkerQuestionnaireDetails(staffId);
@@ -146,32 +144,6 @@ public class NightWorkerService extends MongoBaseService {
         save(nightWorker);
     }
 
-    public NightWorkerUnitSettings createDefaultNightWorkerSettings(Long unitId) {
-        NightWorkerUnitSettings nightWorkerSettings = new NightWorkerUnitSettings(AppConstants.ELIGIBLE_MIN_AGE,AppConstants.ELIGIBLE_MAX_AGE, unitId);
-        save(nightWorkerSettings);
-        return nightWorkerSettings;
-    }
-
-    public NightWorkerUnitSettingsDTO getNightWorkerSettings(Long unitId){
-        NightWorkerUnitSettings nightWorkerSettings = nightWorkerUnitSettingsMongoRepository.findByUnit(unitId);
-        if(!Optional.ofNullable(nightWorkerSettings).isPresent()){
-            nightWorkerSettings =  createDefaultNightWorkerSettings(unitId);
-        }
-        return ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettings, NightWorkerUnitSettingsDTO.class);
-    }
-
-    public NightWorkerUnitSettingsDTO updateNightWorkerSettings(Long unitId, NightWorkerUnitSettingsDTO unitSettingsDTO) {
-        NightWorkerUnitSettings nightWorkerSettings = nightWorkerUnitSettingsMongoRepository.findByUnit(unitId);
-        if (!Optional.ofNullable(nightWorkerSettings).isPresent()) {
-            throw new DataNotFoundByIdException("Night Worker setting not found for unit : "+unitId);
-        }
-        nightWorkerSettings.setEligibleMinAge(unitSettingsDTO.getEligibleMinAge());
-        nightWorkerSettings.setEligibleMaxAge(unitSettingsDTO.getEligibleMaxAge());
-
-        save(nightWorkerSettings);
-        return unitSettingsDTO;
-    }
-
     public void updateNightWorkerEligibilityDetails(Long unitId, Long staffId, boolean eligibleForNightWorker, List<NightWorker> nightWorkers){
 
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffAndUnitId(staffId, unitId);
@@ -204,14 +176,14 @@ public class NightWorkerService extends MongoBaseService {
         save(nightWorkers);
     }
 
-    public void checkIfStaffAreEligibleForNightWorker(NightWorkerUnitSettings nightWorkerUnitSettings, List<StaffDTO> staffList ,
+    public void checkIfStaffAreEligibleForNightWorker(UnitAgeSetting unitAgeSetting, List<StaffDTO> staffList ,
                                                       Map<Long, List<Long>> staffEligibleForNightWorker , Map<Long, List<Long>> staffNotEligibleForNightWorker ){
 
         List<Long> staffIdsEligibleForNightWorker = new ArrayList<>();
         List<Long> staffIdsNotEligibleForNightWorker = new ArrayList<>();
         staffList.stream().forEach(staffDTO -> {
-            ActivitySpecification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(nightWorkerUnitSettings.getEligibleMinAge(),
-                    nightWorkerUnitSettings.getEligibleMaxAge());
+            ActivitySpecification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(unitAgeSetting.getYounger(),
+                    unitAgeSetting.getOlder());
             ActivitySpecification<StaffDTO> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
             ActivitySpecification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.and(nightWorkerPregnancySpecification);
 
@@ -222,10 +194,10 @@ public class NightWorkerService extends MongoBaseService {
             }
         });
         if(!staffIdsEligibleForNightWorker.isEmpty()){
-            staffEligibleForNightWorker.put(nightWorkerUnitSettings.getUnitId(), staffIdsEligibleForNightWorker);
+            staffEligibleForNightWorker.put(unitAgeSetting.getUnitId(), staffIdsEligibleForNightWorker);
         }
         if(!staffIdsNotEligibleForNightWorker.isEmpty()){
-            staffNotEligibleForNightWorker.put(nightWorkerUnitSettings.getUnitId(), staffIdsNotEligibleForNightWorker);
+            staffNotEligibleForNightWorker.put(unitAgeSetting.getUnitId(), staffIdsNotEligibleForNightWorker);
         }
 
     }
@@ -237,8 +209,8 @@ public class NightWorkerService extends MongoBaseService {
         unitStaffResponseDTOs.stream().forEach(unitStaffResponseDTO ->{
             listOfUnitIds.add(unitStaffResponseDTO.getUnitId());
         });
-        List<NightWorkerUnitSettings> nightWorkerUnitSettings = nightWorkerUnitSettingsMongoRepository.findByUnitIds(listOfUnitIds);
-        Map<Long, NightWorkerUnitSettings> nightWorkerUnitSettingsMap = new HashMap<>();
+        List<UnitAgeSetting> nightWorkerUnitSettings = unitAgeSettingMongoRepository.findByUnitIds(listOfUnitIds);
+        Map<Long, UnitAgeSetting> nightWorkerUnitSettingsMap = new HashMap<>();
         nightWorkerUnitSettings.stream().forEach(nightWorkerUnitSetting -> {
             nightWorkerUnitSettingsMap.put(nightWorkerUnitSetting.getUnitId(), nightWorkerUnitSetting);
         });

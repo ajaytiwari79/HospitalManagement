@@ -32,6 +32,7 @@ import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -47,6 +48,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
@@ -235,6 +237,8 @@ public class OrganizationService extends UserBaseService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private PresenceTypeRepository presenceTypeRepository;
+    @Inject
+    private UnitPositionGraphRepository unitPositionGraphRepository;
 
 
     public Organization getOrganizationById(long id) {
@@ -1656,12 +1660,13 @@ public class OrganizationService extends UserBaseService {
         return orderDefaultDataWrapper;
     }
 
-    public Object initialOptaplannerSync(Long organisationId, Long unitId) {
-        List<Staff> staff = staffGraphRepository.getAllStaffByUnitId(unitId);
-        plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
+    public Object initialOptaplannerSync(Long organizationId, Long unitId) {
+        List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
+        plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
+        List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(organizationId);
+        plannerSyncService.publishAllUnitPositions(organizationId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
         phaseRestClient.initialOptaplannerSync(unitId);
         return null;
-
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
