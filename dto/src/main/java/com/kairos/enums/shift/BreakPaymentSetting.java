@@ -1,5 +1,5 @@
 package com.kairos.enums.shift;
 
-public enum PaymentSettingsMode {
+public enum BreakPaymentSetting {
     PAID, UNPAID
 }

@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.shift.PaymentSettingsMode;
+import com.kairos.enums.shift.BreakPaymentSetting;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +31,7 @@ public class ExpertiseResponseDTO {
     private List<Long> tags;
     private Boolean published;
     private Boolean editable;
-    private PaymentSettingsMode paymentSettingsMode;
+    private BreakPaymentSetting breakPaymentSetting;
 
     public ExpertiseResponseDTO() {
     }
@@ -157,11 +157,11 @@ public class ExpertiseResponseDTO {
         this.editable = editable;
     }
 
-    public PaymentSettingsMode getPaymentSettingsMode() {
-        return paymentSettingsMode;
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
     }
 
-    public void setPaymentSettingsMode(PaymentSettingsMode paymentSettingsMode) {
-        this.paymentSettingsMode = paymentSettingsMode;
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }

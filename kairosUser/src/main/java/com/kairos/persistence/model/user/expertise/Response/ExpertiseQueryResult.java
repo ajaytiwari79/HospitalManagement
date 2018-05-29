@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.shift.PaymentSettingsMode;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
@@ -35,7 +35,7 @@ public class ExpertiseQueryResult {
     private Organization union;
     private PayTable payTable;
     private List<Map<String, Object>> seniorityLevels;
-    private PaymentSettingsMode paymentSettingsMode;
+    private BreakPaymentSetting breakPaymentSetting;
 
     public String getName() {
         return name;
@@ -169,11 +169,11 @@ public class ExpertiseQueryResult {
         this.childCareDays = childCareDays;
     }
 
-    public PaymentSettingsMode getPaymentSettingsMode() {
-        return paymentSettingsMode;
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
     }
 
-    public void setPaymentSettingsMode(PaymentSettingsMode paymentSettingsMode) {
-        this.paymentSettingsMode = paymentSettingsMode;
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }

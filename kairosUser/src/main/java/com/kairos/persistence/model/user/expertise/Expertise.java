@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.shift.PaymentSettingsMode;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -51,7 +51,7 @@ public class Expertise extends UserBaseEntity {
     private Organization union;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
-    private PaymentSettingsMode paymentSettingsMode;
+    private BreakPaymentSetting breakPaymentSetting;
     @Relationship(type = VERSION_OF)
     private Expertise parentExpertise;
 
@@ -252,12 +252,12 @@ public class Expertise extends UserBaseEntity {
 
     }
 
-    public PaymentSettingsMode getPaymentSettingsMode() {
-        return paymentSettingsMode;
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
     }
 
-    public void setPaymentSettingsMode(PaymentSettingsMode paymentSettingsMode) {
-        this.paymentSettingsMode = paymentSettingsMode;
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 
     public Map<String, Object> retrieveDetails() {
