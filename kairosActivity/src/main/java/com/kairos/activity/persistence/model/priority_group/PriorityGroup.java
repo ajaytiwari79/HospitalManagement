@@ -25,6 +25,7 @@ public class PriorityGroup extends MongoBaseEntity {
     private DecisionCriteria decisionCriteria;
     private BigInteger ruleTemplateId;
     private List<Long> employmentTypeIds;
+    private List<Long> expertiseIds;
 
 
     public PriorityGroup() {
@@ -147,4 +148,11 @@ public class PriorityGroup extends MongoBaseEntity {
         this.employmentTypeIds = employmentTypeIds;
     }
 
+    public List<Long> getExpertiseIds() {
+        return expertiseIds;
+    }
+
+    public void setExpertiseIds(List<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
+    }
 }

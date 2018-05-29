@@ -21,6 +21,7 @@ public class PriorityGroupDTO {
     private BigInteger parentId;
     private DecisionCriteria decisionCriteria;
     private List<Long> employmentTypeIds;
+    private List<Long> expertiseIds;
 
 
     public PriorityGroupDTO() {
@@ -135,5 +136,13 @@ public class PriorityGroupDTO {
 
     public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
         this.employmentTypeIds = employmentTypeIds;
+    }
+
+    public List<Long> getExpertiseIds() {
+        return expertiseIds;
+    }
+
+    public void setExpertiseIds(List<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
     }
 }

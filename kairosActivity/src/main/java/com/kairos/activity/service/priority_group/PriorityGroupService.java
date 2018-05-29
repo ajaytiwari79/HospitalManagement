@@ -160,8 +160,8 @@ public class PriorityGroupService extends MongoBaseService {
         return priorityGroupDTOs;
     }
 
-    public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId) {
-        return priorityGroupRepository.findByUnitIdAndDeletedFalse(unitId);
+    public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId,BigInteger ruleTemplateId) {
+        return priorityGroupRepository.findByUnitIdAndRuleTemplateIdDeletedFalse(unitId,ruleTemplateId);
     }
 
 

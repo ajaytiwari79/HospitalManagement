@@ -33,6 +33,7 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
     private Integer minimumShiftHours;
     private Integer maximumShiftHours;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
+    private List<OpenShiftInterval> openShiftIntervals;
 
 
     public OpenShiftRuleTemplate() {
@@ -222,5 +223,13 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
 
     public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
         this.shiftAssignmentCriteria = shiftAssignmentCriteria;
+    }
+
+    public List<OpenShiftInterval> getOpenShiftIntervals() {
+        return openShiftIntervals;
+    }
+
+    public void setOpenShiftIntervals(List<OpenShiftInterval> openShiftIntervals) {
+        this.openShiftIntervals = openShiftIntervals;
     }
 }
