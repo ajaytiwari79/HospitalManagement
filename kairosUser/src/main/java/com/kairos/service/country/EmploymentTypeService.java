@@ -1,9 +1,6 @@
 package com.kairos.service.country;
 
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
@@ -20,7 +17,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;

@@ -5,6 +5,7 @@ import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRep
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by prerna on 8/5/18.
@@ -13,4 +14,10 @@ public interface NightWorkerMongoRepository extends MongoBaseRepository<NightWor
 
     @Query(value = "{ staffId:?0, deleted:false }")
     NightWorker findByStaffId(Long staffId);
+
+    @Query(value = "{ staffId:?0, unitId:?1, deleted:false }")
+    NightWorker findByStaffAndUnitId(Long staffId, Long unitId);
+
+    @Query(value = "{ 'unitId':{ '$in' : ?0 } ,deleted:false}")
+    List<NightWorker> findByUnitIds(List<Long> unitIds);
 }

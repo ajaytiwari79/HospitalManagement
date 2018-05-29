@@ -5,6 +5,7 @@ import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.client.dto.staff.StaffDTO;
 import com.kairos.activity.util.userContext.UserContext;
+import com.kairos.response.dto.web.staff.UnitStaffResponseDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,30 @@ public class StaffRestClient {
                             baseUrl + "/staff/{staffId}",
                             HttpMethod.GET, null, typeReference, staffId);
             RestTemplateResponseEnvelope<StaffDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+    }
+
+    public List<UnitStaffResponseDTO> getUnitWiseStaffList() {
+
+        final String baseUrl = getBaseUrl(true);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitStaffResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitStaffResponseDTO>>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<List<UnitStaffResponseDTO>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/staff/unitwise",
+                            HttpMethod.GET, null, typeReference);
+            RestTemplateResponseEnvelope<List<UnitStaffResponseDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

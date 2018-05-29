@@ -23,7 +23,14 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+
+    // in Minutes
+    private Integer earliestStartTime;
+    private Integer latestStartTime;
+    private Integer shortestTime;
+    private Integer longestTime;
     private boolean eligibleForCopy;
+
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -73,8 +80,11 @@ public class RulesActivityTab implements Serializable{
 
     }
 
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest,  boolean eligibleAgainstTimeRules,  boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules,boolean eligibleForStaffingLevel, boolean eligibleForPresence,boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed,boolean eligibleForCopy) {
+    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
+
+                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
+    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy) {
+
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
         this.eligibleForRequest = eligibleForRequest;
@@ -88,6 +98,10 @@ public class RulesActivityTab implements Serializable{
         this.eligibleForAbsence=eligibleForAbsence;
         this.breakAllowed = breakAllowed;
         this.approvalAllowed = approvalAllowed;
+        this.earliestStartTime=earliestStartTime;
+        this.latestStartTime=latestStartTime;
+        this.shortestTime = shortestTime;
+        this.longestTime = longestTime;
         this.eligibleForCopy=eligibleForCopy;
     }
 
@@ -171,11 +185,44 @@ public class RulesActivityTab implements Serializable{
         this.approvalAllowed = approvalAllowed;
     }
 
+
+    public Integer getEarliestStartTime() {
+        return earliestStartTime;
+    }
+
+    public void setEarliestStartTime(Integer earliestStartTime) {
+        this.earliestStartTime = earliestStartTime;
+    }
+
+    public Integer getLatestStartTime() {
+        return latestStartTime;
+    }
+
+    public void setLatestStartTime(Integer latestStartTime) {
+        this.latestStartTime = latestStartTime;
+    }
+
+    public Integer getShortestTime() {
+        return shortestTime;
+    }
+
+    public void setShortestTime(Integer shortestTime) {
+        this.shortestTime = shortestTime;
+    }
+
+    public Integer getLongestTime() {
+        return longestTime;
+    }
+
+    public void setLongestTime(Integer longestTime) {
+        this.longestTime = longestTime;
+    }
+
     public boolean isEligibleForCopy() {
         return eligibleForCopy;
     }
 
     public void setEligibleForCopy(boolean eligibleForCopy) {
         this.eligibleForCopy = eligibleForCopy;
-    }
+        }
 }

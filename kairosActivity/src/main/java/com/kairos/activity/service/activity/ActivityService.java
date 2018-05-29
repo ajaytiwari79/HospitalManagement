@@ -11,6 +11,7 @@ import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.TimeType;
@@ -22,7 +23,6 @@ import com.kairos.activity.persistence.repository.activity.TimeTypeMongoReposito
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
-import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
@@ -36,9 +36,8 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
-import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.persistence.model.enums.DurationType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -163,7 +162,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, "hours", 1, false);
         activity.setCommunicationActivityTab(communicationActivityTab);
 
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false,false);
+        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(AppConstants.MAX_ONE_ACTIVITY_PER_SHIFT ,0,true);
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
 
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
@@ -607,11 +606,10 @@ public class ActivityService extends MongoBaseService {
 
     //optaPlannerSettings tab
 
-    public ActivityTabsWrapper updateOptaPlannerSettingsTabOfActivity(OptaPlannerSettingActivityTabDTO optaPlannerSettingActivityTabDTO) {
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = optaPlannerSettingActivityTabDTO.buildOptaPlannerSettingTab();
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(optaPlannerSettingActivityTabDTO.getActivityId())));
+    public ActivityTabsWrapper updateOptaPlannerSettingsTabOfActivity(BigInteger activityId,OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
+        Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", optaPlannerSettingActivityTabDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         save(activity);

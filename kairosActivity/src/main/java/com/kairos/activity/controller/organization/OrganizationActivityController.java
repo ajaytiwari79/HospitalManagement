@@ -1,5 +1,6 @@
 package com.kairos.activity.controller.organization;
 
+import com.kairos.activity.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.SkillActivityDTO;
@@ -238,10 +239,10 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation("update Opta PlannerSetting  details  of activity Type")
-    @PutMapping(value = "/activity/opta_planner_settings")
+    @PutMapping(value = "/activity/{activityId}/opta_planner_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OptaPlannerSettingActivityTabDTO optaPlannerSettingActivityTabDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(optaPlannerSettingActivityTabDTO));
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId,@RequestBody OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId,optaPlannerSettingActivityTab));
     }
 
     // cta_wta_settings
@@ -300,6 +301,12 @@ public class OrganizationActivityController {
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
+    }
+    @ApiOperation(value = "Init optplanner integration")
+    @RequestMapping(value = "/planner_integration", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organizationId,unitId));
     }
 
     @ApiOperation("Get all activity based on unitId")

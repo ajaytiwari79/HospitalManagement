@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface UnitPositionRepository  extends MongoBaseRepository<UnitPosition,String> {
-    List<UnitPosition> getAllUnitPositionsByUnit(Long unit);
+    List<UnitPosition> getAllUnitPositionsByUnitId(Long unit);
 }

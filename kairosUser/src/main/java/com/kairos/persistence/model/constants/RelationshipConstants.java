@@ -244,6 +244,10 @@ public abstract class RelationshipConstants {
     public final static String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
     public final static String HAS_SENIOR_DAYS = "HAS_SENIOR_DAYS";
     public final static String HAS_CHILD_CARE_DAYS = "HAS_CHILD_CARE_DAYS";
+    public static final String APPLICABLE_FOR_EXPERTISE = "APPLICABLE_FOR_EXPERTISE";
+    public static final String SENIORITY_LEVEL_FUNCTIONS = "SENIORITY_LEVEL_FUNCTIONS";
+    public final static String HAS_FUNCTIONAL_AMOUNT = "HAS_FUNCTIONAL_AMOUNT";
+    public final static String FUNCTIONAL_PAYMENT_MATRIX = "FUNCTIONAL_PAYMENT_MATRIX";
 
 
 
