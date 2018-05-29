@@ -144,7 +144,6 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroup getPriorityGroupOfUnitById(Long unitId, BigInteger priorityGroupId){
         return priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId,unitId);
     }
-
     public List<PriorityGroupDTO> createPriorityGroups(BigInteger orderId,List<PriorityGroupDTO> priorityGroupDTOs) {
         priorityGroupDTOs.forEach(priorityGroupDTO -> {
             priorityGroupDTO.setParentId(priorityGroupDTO.getId());
@@ -161,5 +160,10 @@ public class PriorityGroupService extends MongoBaseService {
         return priorityGroupDTOs;
     }
 
+    public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId) {
+        return priorityGroupRepository.findByUnitIdAndDeletedFalse(unitId);
+    }
+
 
 }
+

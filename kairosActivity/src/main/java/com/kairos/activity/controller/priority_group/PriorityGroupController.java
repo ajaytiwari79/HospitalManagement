@@ -100,5 +100,12 @@ public class PriorityGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupOfUnitById(unitId,priorityGroupId));
     }
 
+    @ApiOperation("Get  Priority  Group  based on ruleTemplateId")
+    @GetMapping(value = UNIT_URL+"/priority_groups/rule_template/{ruleTemplateId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPriorityGroupsByRuleTemplate(@PathVariable Long unitId,@PathVariable BigInteger ruleTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupsByRuleTemplate(unitId,ruleTemplateId));
+    }
+
 
 }

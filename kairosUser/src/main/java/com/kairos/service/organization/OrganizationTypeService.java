@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
@@ -80,14 +81,9 @@ public class OrganizationTypeService extends UserBaseService {
 
     }
 
-    public List<Object> getAllWTAWithOrganization(long countryId) {
-        List<Map<String, Object>> map = organizationTypeGraphRepository.getAllWTAWithOrganization(countryId);
-        List<Object> objectList = new ArrayList<>();
-        for (Map<String, Object> result : map) {
-            objectList.add(result.get("result"));
+    public List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId) {
+        return organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
         }
-        return objectList;
-    }
 
 
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
