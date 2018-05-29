@@ -9,7 +9,7 @@ package com.kairos.persistance.model.enums;
 public enum FilterType {
 
 
-    ORGANIZATION_TYPE("Organization Type"), ORGANIZATION_SUB_TYPE("Organization Sub Type "), ORGANIZATION_SERVICE("Organization Service"), ORGANIZATION_SUB_SERVICE("Organization Sub Services");
+    ORGANIZATION_TYPE("Organization Type"), ORGANIZATION_SUB_TYPE("Organization Sub Type "), ORGANIZATION_SERVICE("Organization Service"), ORGANIZATION_SUB_SERVICE("Organization Sub Services"),ACCOUNT_TYPE("Account Type");
 
     public String value;
 

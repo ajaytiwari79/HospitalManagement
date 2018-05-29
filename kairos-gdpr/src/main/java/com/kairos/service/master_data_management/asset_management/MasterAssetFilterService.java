@@ -17,4 +17,21 @@ public class MasterAssetFilterService extends MongoBaseService {
     @Inject
     private FilterGroupMongoRepository  filterGroupMongoRepository;
 
+
+
+public void getAllMasterAssetFilter()
+{
+
+
+
+
+
+
+}
+
+
+
+
+
+
 }

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This the default configuration path of logback if you want to modify 
+    the location please provide its entry in application.properties file as value 
+    of logging.config key -->
+
+<configuration scan="false">
+    <property name="logPattern"
+        value="%-4relative [%thread] %-5level %logger{35} - %msg%n" />
+    <property name="logEncoding" value="UTF-8" />
+    <property name="logDirectory" value="logs" />
+    <property name="file_base_name" value="gdpr" />
+    <property name="archive" value="archive" />
+    <timestamp key="current_date" datePattern="yyyy-MM-dd" />
+
+    <!-- Shut down hook registered to close logging factory Elegantly . -->
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook" />
+    
+
+    <appender name="fileAppender"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDirectory}/${file_base_name}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logDirectory}/${archive}/${file_base_name}_%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <charset>${logEncoding}</charset>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="ANALYTICS-FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDirectory}/${file_base_name}_error</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logDirectory}/${archive}/${file_base_name}_error_%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <charset>${logEncoding}</charset>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!--<logger name="analytics" level="INFO" additivity="false">-->
+        <!--<appender-ref ref="ANALYTICS-FILE"/>-->
+    <!--</logger>-->
+    <!-- <appender name="ASYNC500" class="ch.qos.logback.classic.AsyncAppender"> 
+        <appender-ref ref="fileAppender"/> <queueSize>5000</queueSize> <discardingThreshold>0</discardingThreshold> 
+        <appender-ref ref="FILE" /> </appender> -->
+
+
+    <!-- Only use this appender when you are developing your application but 
+        during production it is advisable to disable logging to console to reduce 
+        latency in logging as it costs more I/O time. -->
+        
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} %highlight(%-5level)
+                %logger{36}.%M - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configuration for loggers ,Loggers who do not have logging level defined 
+     will inherit levels from root
+    -->
+    <root level="error">
+        <appender-ref ref="ANALYTICS-FILE"/>
+    </root>
+
+    <root level="info" additivity="false">
+        <appender-ref ref="ANALYTICS-FILE"/>
+    </root>
+    <!--        -->
+
+    <root level="WARN" additivity="false">
+        <appender-ref ref="fileAppender" />
+        <appender-ref ref="stdout" />
+    </root>
+    
+    <logger name="com.kairos" level="DEBUG" additivity="false">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="stdout" />
+    </logger>
+
+    <logger name="org.springframework.web" level="WARN" additivity="false">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="stdout" />
+    </logger>
+    <logger name="org.apache.commons.beanutils.converters" level="WARN" additivity="false">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="stdout" />
+    </logger>
+
+
+</configuration>
+
+
+

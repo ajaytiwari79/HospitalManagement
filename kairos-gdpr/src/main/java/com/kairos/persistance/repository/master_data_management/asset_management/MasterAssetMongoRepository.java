@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.asset_management;
 
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
+import com.kairos.response.dto.filter.FilterAttributes;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,10 @@ public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,
     MasterAsset findByNameAndCountry(Long countryId,String name);
 
     MasterAsset findByid(BigInteger id);
+
+    @Query()
+    List<FilterAttributes> findDistinct(Long countryId);
+
 
 
 }
