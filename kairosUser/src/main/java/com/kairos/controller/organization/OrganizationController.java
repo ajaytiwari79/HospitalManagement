@@ -10,9 +10,9 @@ import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
@@ -48,7 +48,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -103,8 +106,6 @@ public class OrganizationController {
     private LanguageService languageService;
     @Inject
     private ClientBatchService clientBatchService;
-    @Inject
-    private PresenceTypeService presenceTypeService;
     @Inject
     private CountryService countryService;
     @Inject
