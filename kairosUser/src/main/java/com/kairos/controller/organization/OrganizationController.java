@@ -1363,7 +1363,7 @@ public class OrganizationController {
 
     }
 
-    @RequestMapping(value = UNIT_URL + "/unit_position/expertise", method = RequestMethod.POST)
+    @RequestMapping(value = UNIT_URL + "/unit_position/expertise", method = RequestMethod.GET)
     @ApiOperation("fetch Map of unit position id and expertise id")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>>  getExpertiseOfUnitPosition(@PathVariable Long unitId) {
