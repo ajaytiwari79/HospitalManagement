@@ -16,6 +16,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -239,4 +240,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(org)  as unitId ")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
+
+    @Query("MATCH (unit:Organization) WHERE id(unit)={0} \n" +
+            "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise) \n" +
+            "RETURN id(unitPosition) as unitPositionId, id(expertise) as expertiseId")
+    List<Map<Long, Long>> getMapOfUnitPositionAndExpertiseId(Long unitId);
 }

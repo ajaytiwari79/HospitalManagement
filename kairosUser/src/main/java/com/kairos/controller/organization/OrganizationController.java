@@ -31,6 +31,7 @@ import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
@@ -111,6 +112,8 @@ public class OrganizationController {
     private CountryService countryService;
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject
+    private UnitPositionService unitPositionService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -1358,6 +1361,13 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getWtaTemplateDefaultDataInfoByUnitId(unitId));
 
+    }
+
+    @RequestMapping(value = UNIT_URL + "/unit_position/expertise", method = RequestMethod.GET)
+    @ApiOperation("fetch Map of unit position id and expertise id")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>>  getExpertiseOfUnitPosition(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionExpertiseMap(unitId));
     }
 }
 
