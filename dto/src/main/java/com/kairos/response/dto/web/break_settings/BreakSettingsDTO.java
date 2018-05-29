@@ -1,16 +1,16 @@
-package com.kairos.activity.persistence.model.break_settings;
+package com.kairos.response.dto.web.break_settings;
 
-import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.math.BigInteger;
 
-@Document
-public class BreakSettings extends MongoBaseEntity {
+public class BreakSettingsDTO {
     private Long unitId;
     private Long shiftDurationInMinute;
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
+    private BigInteger id;
 
-    public BreakSettings() {
+    public BreakSettingsDTO() {
+        //
     }
 
     public Long getUnitId() {
@@ -45,10 +45,11 @@ public class BreakSettings extends MongoBaseEntity {
         this.numberOfBreaks = numberOfBreaks;
     }
 
-    public BreakSettings(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
-        this.unitId = unitId;
-        this.shiftDurationInMinute = shiftDurationInMinute;
-        this.breakDurationInMinute = breakDurationInMinute;
-        this.numberOfBreaks = numberOfBreaks;
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 }
