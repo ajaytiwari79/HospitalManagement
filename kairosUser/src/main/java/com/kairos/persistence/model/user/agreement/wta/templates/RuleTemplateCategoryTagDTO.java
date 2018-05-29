@@ -1,18 +1,11 @@
 package com.kairos.persistence.model.user.agreement.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.tag.Tag;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TAG;
 
 /**
  * Created by prerna on 29/11/17.

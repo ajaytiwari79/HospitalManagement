@@ -15,12 +15,13 @@ public class PayTableUpdateDTO {
     private String shortName;
     private String description;
     @NotNull(message = "Start date can't be null")
-
     private Date startDateMillis;
 
     private Date endDateMillis;
     @NotNull(message = "Level can not be null")
     private Long levelId;
+    @NotNull(message = "Please provide payment unit type")
+    private String paymentUnit;
 
     public PayTableUpdateDTO() {
         //Default cons
@@ -82,12 +83,21 @@ public class PayTableUpdateDTO {
         this.levelId = levelId;
     }
 
-    public PayTableUpdateDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, Long levelId) {
+    public PayTableUpdateDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, String paymentUnit, Long levelId) {
         this.name = name;
         this.shortName = shortName;
         this.description = description;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
         this.levelId=levelId;
+    }
+
+    public String getPaymentUnit() {
+        return paymentUnit;
+    }
+
+    public void setPaymentUnit(String paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 }

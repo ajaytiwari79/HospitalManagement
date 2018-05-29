@@ -229,10 +229,16 @@ public class AppConstants {
     // Default Settings of period for unit
     public static final int PRESENCE_LIMIT_IN_YEAR = 1;
     public static final int ABSENCE_LIMIT_IN_YEAR = 2;
+    public static final int ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE = 1;
+    public static final int ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE = 2;
+
 
     // Staff Questionnaire
     public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
     public static final int MAX_ONE_ACTIVITY_PER_SHIFT = 10;
 
 
+    // Default Unit Age Settings
+    public static final int YOUNGER_AGE = 18;
+    public static final int OLDER_AGE = 62;
 }

@@ -16,6 +16,7 @@ import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
 import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,9 @@ public class EquipmentService extends UserBaseService {
     @Inject
     private OrganizationService organizationService;
 
+    @Inject
+    private ExceptionService exceptionService;
+
     public List<EquipmentCategory> getListOfEquipmentCategories(Long countryId){
         return equipmentCategoryGraphRepository.getEquipmentCategories();
     }
@@ -60,10 +64,11 @@ public class EquipmentService extends UserBaseService {
     public Equipment addCountryEquipment(Long countryId, EquipmentDTO equipmentDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
         if( equipmentGraphRepository.isEquipmentExistsWithSameName(equipmentDTO.getName(), countryId, false) ){
-            throw new DuplicateDataException("Equipment already exists with same name " +equipmentDTO.getName() );
+            exceptionService.duplicateDataException("message.equipment.name.alreadyExist",equipmentDTO.getName());
+
         }
         Equipment equipment = new Equipment();
         equipment.setName(equipmentDTO.getName());
@@ -77,15 +82,18 @@ public class EquipmentService extends UserBaseService {
     public Equipment updateEquipment(Long countryId, Long equipmentId, EquipmentDTO equipmentDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         Equipment equipment = equipmentGraphRepository.getEquipmentById(equipmentId, countryId, false);
         if( equipment == null) {
-            throw new DataNotFoundByIdException("Equipment does not exist with id " +equipmentId );
+            exceptionService.dataNotFoundByIdException("message.equipment.id.notExist",equipmentId);
+
         }
 
         if( ! ( equipment.getName().equalsIgnoreCase(equipmentDTO.getName()) ) && equipmentGraphRepository.isEquipmentExistsWithSameName(equipmentDTO.getName(), countryId, false) ){
-            throw new DuplicateDataException("Equipment already exists with name " +equipmentDTO.getName() );
+            exceptionService.duplicateDataException("message.equipment.name.alreadyExist",equipmentDTO.getName());
+
         }
         equipment.setName(equipmentDTO.getName());
         equipment.setDescription(equipmentDTO.getDescription());
@@ -99,11 +107,13 @@ public class EquipmentService extends UserBaseService {
     public Boolean deleteEquipment(Long countryId, Long equipmentId){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         Equipment equipment = equipmentGraphRepository.getEquipmentById(equipmentId, countryId, false);
         if( equipment == null) {
-            throw new DataNotFoundByIdException("Equipment does not exist with id " + equipmentId);
+            exceptionService.dataNotFoundByIdException("message.equipment.id.notExist", equipmentId);
+
         }
         equipment.setDeleted(true);
         save(equipment);
@@ -113,7 +123,8 @@ public class EquipmentService extends UserBaseService {
     public HashMap<String,Object> getListOfEquipments(Long countryId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
 
         if(filterText == null){
@@ -130,7 +141,8 @@ public class EquipmentService extends UserBaseService {
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
 
         if(filterText == null){
@@ -160,7 +172,8 @@ public class EquipmentService extends UserBaseService {
     public HashMap<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
         Organization organization = organizationGraphRepository.findOne(organizationId,1);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect organization id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",organizationId);
+
         }
         HashMap<String, List<EquipmentQueryResult>> featuresData = new HashMap<>();
         featuresData.put("availableEquipments",equipmentGraphRepository.getListOfEquipment(organization.getCountry().getId(), false, ""));
@@ -171,11 +184,13 @@ public class EquipmentService extends UserBaseService {
     public Resource updateEquipmentsOfResource(Long organizationId, Long resourceId, VehicleEquipmentDTO vehicleEquipmentDTO){
         Resource resource = resourceGraphRepository.getResourceOfOrganizationById(organizationId, resourceId, false);
         if (resource == null) {
-            throw new DataNotFoundByIdException("Incorrect resource id " + resourceId);
+            exceptionService.dataNotFoundByIdException("message.equipment.resource.id.notFound",resourceId);
+
         }
         Organization organization = organizationGraphRepository.findOne(organizationId,1);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Incorrect organization id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",organizationId);
+
         }
         List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(organization.getCountry().getId(), false, vehicleEquipmentDTO.getEquipments());
         equipmentGraphRepository.detachResourceEquipments(resourceId);

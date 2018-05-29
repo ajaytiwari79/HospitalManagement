@@ -2,7 +2,6 @@ package com.kairos.activity.persistence.model.priority_group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -15,7 +14,7 @@ public class StaffIncludeFilter {
     private boolean allowForVolunteers;
     private boolean allowForFlexPool;
     private List<Long> expertiseIds;
-    private Integer shiftDuration; //In Minutes
+    private boolean fullAvailability; //In Minutes
     private Float staffAvailability; // In Percentage
     private Integer distanceFromUnit; //In meter
 
@@ -24,14 +23,14 @@ public class StaffIncludeFilter {
     }
 
     public StaffIncludeFilter(boolean allowForFullTimeEmployees, boolean allowForPartTimeEmployees, boolean allowForHourlyPaidEmployees,
-                              boolean allowForVolunteers, boolean allowForFlexPool,  List<Long> expertiseIds,Integer shiftDuration,Float staffAvailability,Integer distanceFromUnit) {
+                              boolean allowForVolunteers, boolean allowForFlexPool, List<Long> expertiseIds, boolean fullAvailability, Float staffAvailability, Integer distanceFromUnit) {
         this.allowForFullTimeEmployees = allowForFullTimeEmployees;
         this.allowForPartTimeEmployees = allowForPartTimeEmployees;
         this.allowForHourlyPaidEmployees = allowForHourlyPaidEmployees;
         this.allowForVolunteers = allowForVolunteers;
         this.allowForFlexPool = allowForFlexPool;
         this.expertiseIds = expertiseIds;
-        this.shiftDuration=shiftDuration;
+        this.fullAvailability = fullAvailability;
         this.staffAvailability=staffAvailability;
         this.distanceFromUnit=distanceFromUnit;
     }
@@ -84,12 +83,12 @@ public class StaffIncludeFilter {
         this.expertiseIds = expertiseIds;
     }
 
-    public Integer getShiftDuration() {
-        return shiftDuration;
+    public boolean isFullAvailability() {
+        return fullAvailability;
     }
 
-    public void setShiftDuration(Integer shiftDuration) {
-        this.shiftDuration = shiftDuration;
+    public void setFullAvailability(boolean fullAvailability) {
+        this.fullAvailability = fullAvailability;
     }
 
     public Float getStaffAvailability() {

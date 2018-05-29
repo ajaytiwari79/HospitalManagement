@@ -8,14 +8,15 @@ import org.neo4j.ogm.annotation.StartNode;
 
 import java.math.BigDecimal;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FUNCTION;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FUNCTIONAL_AMOUNT;
 
 /**
  * Created by vipul on 28/3/18.
  */
-@RelationshipEntity(type=HAS_FUNCTION)
-public class SeniorityLevelFunctionsRelationship extends UserBaseEntity{
-    @StartNode private SeniorityLevel seniorityLevel;
+@RelationshipEntity(type = HAS_FUNCTIONAL_AMOUNT)
+public class SeniorityLevelFunctionsRelationship extends UserBaseEntity {
+    @StartNode
+    private SeniorityLevelFunction seniorityLevelFunction;
     @EndNode
     private Function function;
     private BigDecimal amount;
@@ -23,12 +24,12 @@ public class SeniorityLevelFunctionsRelationship extends UserBaseEntity{
     public SeniorityLevelFunctionsRelationship() {
     }
 
-    public SeniorityLevel getSeniorityLevel() {
-        return seniorityLevel;
+    public SeniorityLevelFunction getSeniorityLevelFunction() {
+        return seniorityLevelFunction;
     }
 
-    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
+    public void setSeniorityLevelFunction(SeniorityLevelFunction seniorityLevelFunction) {
+        this.seniorityLevelFunction = seniorityLevelFunction;
     }
 
     public Function getFunction() {
@@ -47,8 +48,8 @@ public class SeniorityLevelFunctionsRelationship extends UserBaseEntity{
         this.amount = amount;
     }
 
-    public SeniorityLevelFunctionsRelationship(SeniorityLevel seniorityLevel, Function function, BigDecimal amount) {
-        this.seniorityLevel = seniorityLevel;
+    public SeniorityLevelFunctionsRelationship(Function function, SeniorityLevelFunction seniorityLevelFunction, BigDecimal amount) {
+        this.seniorityLevelFunction = seniorityLevelFunction;
         this.function = function;
         this.amount = amount;
     }

@@ -11,5 +11,6 @@ import java.math.BigInteger;
 @Repository
 public interface TableSettingMongoRepository extends MongoRepository<TableSetting,BigInteger> {
 
+
     TableSetting findByUserIdAndOrganizationId(long userId, long organizationId);
 }

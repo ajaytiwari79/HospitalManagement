@@ -18,6 +18,7 @@ public class PayTableQueryResult {
     private Long startDateMillis;
     @DateLong
     private Date endDateMillis;
+    private String paymentUnit;
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
@@ -114,8 +115,17 @@ public class PayTableQueryResult {
         sb.append(", shortName='").append(shortName).append('\'');
         sb.append(", startDateMillis=").append(startDateMillis);
         sb.append(", endDateMillis=").append(endDateMillis);
+        sb.append(", paymentUnit=").append(paymentUnit);
         sb.append(", description='").append(description).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    public String getPaymentUnit() {
+        return paymentUnit;
+    }
+
+    public void setPaymentUnit(String paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 }

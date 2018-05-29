@@ -77,7 +77,7 @@ public class OrganizationActivityController {
     @GetMapping(value = "/activity/{activityId}/general")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable Long unitId,@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getGeneralTabOfActivity(activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getGeneralTabOfActivity(activityId, unitId));
     }
 
 
@@ -307,6 +307,13 @@ public class OrganizationActivityController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId,@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organizationId,unitId));
+    }
+
+    @ApiOperation("Get all activity based on unitId")
+    @GetMapping(value = "/orders_and_activities")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivitiesWithBalanceSettings(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithBalanceSettings(unitId));
     }
 
 }

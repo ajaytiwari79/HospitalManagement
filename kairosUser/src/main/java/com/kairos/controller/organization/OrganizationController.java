@@ -52,6 +52,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
@@ -64,8 +65,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class
-OrganizationController {
+public class OrganizationController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -1337,11 +1337,27 @@ OrganizationController {
     public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
     }
+
+    @ApiOperation(value = "Get Default data for Orders")
+    @RequestMapping(value = UNIT_URL+"/order/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForOrder(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
+    }
     @ApiOperation(value = "Init optplanner integration")
     @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.initialOptaplannerSync(organizationId,unitId));
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organisationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.initialOptaplannerSync(organisationId,unitId));
+
+    }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @RequestMapping(value = "/unit/{unitId}/getWtaTemplateDefaultDataInfoByUnitId", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getWtaTemplateDefaultDataInfoByUnitId(unitId));
+
     }
 }
 

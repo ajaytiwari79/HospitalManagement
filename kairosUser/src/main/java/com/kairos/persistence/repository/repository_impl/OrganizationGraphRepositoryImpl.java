@@ -124,7 +124,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                 "firstName:staff.firstName,lastName:staff.lastName,employedSince :staff.employedSince,"+
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId,"+
                 "cprNumber:staff.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
-                "gender:user.gender, profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) } as staff\n";
+                "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) } as staff ORDER BY staff.id\n";
 
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
     }
