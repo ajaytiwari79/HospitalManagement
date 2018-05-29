@@ -478,8 +478,8 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
 //
 //
 //        if(dateTimeInfo.get("startDate")!=null && dateTimeInfo.get("endDate")!=null) {
-//            workSchedule.setStartDateMillis(getXMLGregorianCalendarDate((Date) dateTimeInfo.get("startDate")));
-//            workSchedule.setEndDateMillis(getXMLGregorianCalendarDate((Date) dateTimeInfo.get("endDate")));
+//            workSchedule.setStartDate(getXMLGregorianCalendarDate((Date) dateTimeInfo.get("startDate")));
+//            workSchedule.setEndDate(getXMLGregorianCalendarDate((Date) dateTimeInfo.get("endDate")));
 //        }
 //        if(dateTimeInfo.get("startTime")!=null && dateTimeInfo.get("endTime")!=null){
 //            workSchedule.setStartTime(getXMLGregorianCalendarTime( (int)dateTimeInfo.get("startTime"), 0));

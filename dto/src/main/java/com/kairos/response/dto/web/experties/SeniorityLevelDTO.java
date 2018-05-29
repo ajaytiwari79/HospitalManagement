@@ -22,10 +22,8 @@ public class SeniorityLevelDTO {
     @Min(value = 0,message = "can't be less than 0")
     private Integer from;
     private Integer to;
-    private List<FunctionsDTO> functions;
     @NotNull(message = "PayGradeId  can not be null")
     private Long payGradeId;  // this is payGrade Id which is coming from payTable
-    private Set<Long> payGroupAreasIds;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
@@ -52,13 +50,6 @@ public class SeniorityLevelDTO {
         this.parentId = parentId;
     }
 
-    public Set<Long> getPayGroupAreasIds() {
-        return payGroupAreasIds;
-    }
-
-    public void setPayGroupAreasIds(Set<Long> payGroupAreasIds) {
-        this.payGroupAreasIds = payGroupAreasIds;
-    }
 
     public Integer getFrom() {
         return from;
@@ -76,14 +67,6 @@ public class SeniorityLevelDTO {
         this.to = to;
     }
 
-
-    public List<FunctionsDTO> getFunctions() {
-        return functions;
-    }
-
-    public void setFunctions(List<FunctionsDTO> functions) {
-        this.functions = functions;
-    }
 
     public Long getPayGradeId() {
         return payGradeId;
