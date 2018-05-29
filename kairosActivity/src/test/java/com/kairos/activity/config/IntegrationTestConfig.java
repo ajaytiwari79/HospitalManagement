@@ -30,30 +30,9 @@ public class IntegrationTestConfig {
     @Primary
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         restTemplateBuilder = restTemplateBuilder
-        .interceptors(new TestUserContextInterceptor())
-        .messageConverters(mappingJackson2HttpMessageConverter());
+        .interceptors(new TestUserContextInterceptor());
         TestRestTemplate restTemplate = new TestRestTemplate(restTemplateBuilder);
         return restTemplate;
-    }
-
-    @Bean("objectMapperJackson")
-    @Primary
-    public ObjectMapper serializingObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(javaTimeModule);
-        return objectMapper;
-    }
-    @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        mappingJackson2HttpMessageConverter.setObjectMapper(serializingObjectMapper());
-        mappingJackson2HttpMessageConverter.setPrettyPrint(true);
-        return mappingJackson2HttpMessageConverter;
     }
 
     class TestUserContextInterceptor implements ClientHttpRequestInterceptor {
