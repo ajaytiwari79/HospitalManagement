@@ -730,13 +730,14 @@ public class CostTimeAgreementService extends UserBaseService {
                organization.getCostTimeAgreements().add(newCostTimeAgreement);
 //               newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
                collectiveTimeAgreementGraphRepository.linkParentCountryCTAToOrganization(costTimeAgreement.getId(), newCostTimeAgreement.getId());
-               save(organization);
+            // save(organization);
            } catch (Exception e){
                // Exception occured
                logger.info("Exception occured on setting cta to organization");
            }
 
         });
+        save(organizations);
         return true;
     }
 
