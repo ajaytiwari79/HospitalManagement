@@ -28,7 +28,7 @@ public class BreakSettingsController {
     @PostMapping(value = "/break")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long unitId, @RequestBody BreakSettingsDTO breakSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, breakSettingsService.createBreakSettings(unitId, breakSettingsDTO));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, breakSettingsService.createBreakSettings(unitId, breakSettingsDTO));
     }
 
     @ApiOperation("Get all break settings ")

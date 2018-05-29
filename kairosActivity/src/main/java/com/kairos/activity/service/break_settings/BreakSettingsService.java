@@ -21,6 +21,7 @@ public class BreakSettingsService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public BreakSettingsDTO createBreakSettings(Long unitId, BreakSettingsDTO breakSettingsDTO) {
+
         BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(unitId, breakSettingsDTO.getShiftDurationInMinute());
         if (Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());

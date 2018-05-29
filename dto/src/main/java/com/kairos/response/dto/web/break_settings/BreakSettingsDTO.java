@@ -52,4 +52,11 @@ public class BreakSettingsDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    public BreakSettingsDTO(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
+        this.unitId = unitId;
+        this.shiftDurationInMinute = shiftDurationInMinute;
+        this.breakDurationInMinute = breakDurationInMinute;
+        this.numberOfBreaks = numberOfBreaks;
+    }
 }
