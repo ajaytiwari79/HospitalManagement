@@ -26,10 +26,12 @@ import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
-import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.open_shift.RuleTemplateDefaultData;
+
+import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.expertise.Response.OrderDefaultDataWrapper;
+
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -51,9 +53,19 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+
 import com.kairos.response.dto.web.*;
+
+import com.kairos.response.dto.web.CountryDTO;
+import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
+
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
+import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -64,6 +76,7 @@ import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
 
+import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -78,6 +91,7 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +101,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -196,6 +211,7 @@ public class OrganizationService extends UserBaseService {
     DayTypeService dayTypeService;
     @Inject
     private AccessPageService accessPageService;
+    @Inject private PresenceTypeService presenceTypeService;
 
     //@Inject
     //private WTAService wtaService;
@@ -1657,13 +1673,37 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public RuleTemplateDefaultData getDefaultDataForRuleTemplate(long countryId){
-        List<OrganizationTypeAndSubType> organizationTypeAndSubTypes=organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
-        List<Skill> skills=skillGraphRepository.findAllSkillsByCountryId(countryId);
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS= priorityGroupIntegrationService.getAllActivitiesAndTimeTypes(countryId);
 
-        RuleTemplateDefaultData ruleTemplateDefaultData=new RuleTemplateDefaultData(organizationTypeAndSubTypes,skills,activityWithTimeTypeDTOS.getTimeTypeDTOS(),activityWithTimeTypeDTOS.getActivityDTOS());
+    public RuleTemplateDefaultData getDefaultDataForRuleTemplate(long countryId) {
+        List<OrganizationTypeAndSubType> organizationTypeAndSubTypes = organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
+        List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypes(countryId);
+
+        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS());
         return ruleTemplateDefaultData;
+    }
+    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId){
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        Country country = organizationGraphRepository.getCountry(organization.getId());
+        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(country.getId());
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(country.getId());
+        List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);
+        List<com.kairos.response.dto.web.wta.PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new com.kairos.response.dto.web.wta.PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());
+        dayTypes.forEach(dayType -> {
+            DayTypeDTO dayTypeDTO = new DayTypeDTO();
+            try {
+                PropertyUtils.copyProperties(dayTypeDTO,dayType);
+                dayTypeDTOS.add(dayTypeDTO);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        });
+        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1,timeSlotDTOS,country.getId());
     }
 }
 

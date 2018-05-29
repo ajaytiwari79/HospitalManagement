@@ -38,6 +38,7 @@ public class User extends UserBaseEntity {
     protected String firstName;
     protected String lastName;
     protected Gender gender;
+    private boolean pregnant;
     private String email;
     private Long lastSelectedParentOrgId;
     private Long lastSelectedChildOrgId;
@@ -445,5 +446,13 @@ public class User extends UserBaseEntity {
 
     public void setLastSelectedChildOrgId(Long lastSelectedChildOrgId) {
         this.lastSelectedChildOrgId = lastSelectedChildOrgId;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
     }
 }

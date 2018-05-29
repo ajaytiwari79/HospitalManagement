@@ -52,6 +52,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
@@ -1352,8 +1353,13 @@ public class OrganizationController {
 
     }
 
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @RequestMapping(value = "/unit/{unitId}/getWtaTemplateDefaultDataInfoByUnitId", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getWtaTemplateDefaultDataInfoByUnitId(unitId));
 
-
+    }
 
     @ApiOperation(value = "Get Default data for Rule Template")
     @RequestMapping(value = "/country/{countryId}/rule_template/default-data", method = RequestMethod.GET)

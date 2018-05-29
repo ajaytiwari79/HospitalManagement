@@ -28,7 +28,7 @@ public class RestClientURLUtil {
         }
     }
     public final static String getBaseUrl(){
-            return userServiceUrl;
+        return userServiceUrl;
     }
 
     public static final String getPlannerBaseUrl(){

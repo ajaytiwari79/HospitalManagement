@@ -1,17 +1,15 @@
 package com.kairos.service.integration;
 
 import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
-import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,7 +17,6 @@ import java.util.Map;
 public class PriorityGroupIntegrationService {
     @Autowired
     PriorityGroupRestClient priorityGroupRestClient;
-
 
     public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) { Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);

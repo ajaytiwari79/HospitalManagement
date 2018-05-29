@@ -59,4 +59,11 @@ public class PhaseTemplateValue implements Serializable {
 
     }
 
+    public PhaseTemplateValue(BigInteger phaseId, String name, String description, boolean eligibleForStaff, boolean eligibleForManagement) {
+        this.phaseId = phaseId;
+        this.name = name;
+        this.description = description;
+        this.eligibleForStaff = eligibleForStaff;
+        this.eligibleForManagement = eligibleForManagement;
+    }
 }

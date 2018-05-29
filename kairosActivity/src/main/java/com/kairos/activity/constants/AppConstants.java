@@ -236,4 +236,7 @@ public class AppConstants {
     // Staff Questionnaire
     public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
 
+    // Default Unit Age Settings
+    public static final int YOUNGER_AGE = 18;
+    public static final int OLDER_AGE = 62;
 }

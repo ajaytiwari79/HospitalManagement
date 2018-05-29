@@ -120,4 +120,8 @@ public class FunctionService extends UserBaseEntity{
         functionGraphRepository.save(function);
         return true;
     }
+    public List<FunctionDTO> getFunctionsByExpertiseId(long expertiseId){
+        return functionGraphRepository.getFunctionsByExpertiseId(expertiseId);
+
+    }
 }
