@@ -156,7 +156,7 @@ public class ExpertiseService extends UserBaseService {
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
                 null,null,null,null, countryId,expertise.getId() );
         priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
-                "/expertise/"+expertise.getId()+"/night_worker_setting",null, null);
+                "/expertise/"+expertise.getId()+"/night_worker_setting",null);
 
         return expertiseResponseDTO;
     }

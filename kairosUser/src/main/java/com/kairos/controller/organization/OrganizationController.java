@@ -1,6 +1,5 @@
 package com.kairos.controller.organization;
 
-import com.kairos.client.dto.unit_position.UnitPositionIdListDTO;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
