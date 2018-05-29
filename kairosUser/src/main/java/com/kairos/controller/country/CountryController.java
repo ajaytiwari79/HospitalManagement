@@ -1249,7 +1249,7 @@ public class CountryController {
 
     }
 
-    @ApiOperation(value = "Get DayType and Presence Type")
+    @ApiOperation(value = "Get functions by expertise id")
     @RequestMapping(value =  "/function", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getFunctionsByExpertiseId(@RequestParam(value = "expertise") Long expertiseId) {
