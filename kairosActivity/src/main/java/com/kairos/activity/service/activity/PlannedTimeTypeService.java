@@ -33,17 +33,20 @@ public class PlannedTimeTypeService extends MongoBaseService {
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
-    public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
-
+    public void verifyCountry(Long countryId){
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Country not found by Id while creating Presence type in country" + countryId);
+            logger.error("Country not found by Id while creating Planned Time type in country" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
+    }
+
+    public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
+        verifyCountry(countryId);
         PlannedTimeType plannedTimeType = plannedTimeTypeRepository.findByNameAndDeletedAndCountryId("(?i)" + presenceTypeDTO.getName(), false, countryId);
         if (Optional.ofNullable(plannedTimeType).isPresent()) {
-            logger.error("Presence type already exist in country By Name " + presenceTypeDTO.getName());
+            logger.error("Planned Time type already exist in country By Name " + presenceTypeDTO.getName());
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist",presenceTypeDTO.getName());
         }
         plannedTimeType = new PlannedTimeType();
@@ -56,12 +59,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
     }
 
     public List<PresenceTypeDTO> getAllPresenceTypeByCountry(Long countryId) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
-        if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Country not found by Id while creating Presence type in country" + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
-
-        }
+        verifyCountry(countryId);
         List<PresenceTypeDTO> presenceTypeDTOList =
                 plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         return presenceTypeDTOList;
@@ -87,7 +85,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         }
         Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(BigInteger.valueOf(presenceTypeId));
         if (!presenceTypeOptional.isPresent()) {
-            logger.error("Presence type not found by Id removing" + presenceTypeId);
+            logger.error("Planned Time type not found by Id removing" + presenceTypeId);
             exceptionService.dataNotFoundByIdException("message.presenceType.id.notFound");
         }
         PlannedTimeType plannedTimeType = presenceTypeOptional.get();
