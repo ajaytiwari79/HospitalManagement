@@ -47,7 +47,7 @@ public class ExpertiseUpdateDTO {
     private List<Long> tags;
     private Boolean published;
 
-    @NotBlank(message="Please select payment type")
+    @NotNull(message="Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
     public ExpertiseUpdateDTO() {
         //default cons
