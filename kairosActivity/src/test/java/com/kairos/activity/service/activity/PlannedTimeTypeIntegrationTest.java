@@ -37,10 +37,6 @@ public class PlannedTimeTypeIntegrationTest {
     private String url;
     @Inject
     private TestRestTemplate testRestTemplate;
-    /*
-    @Inject
-    private RestTemplate testRestTemplate;
-    */
     @Inject
     private ExceptionService exceptionService;
     static Long createdId;
@@ -72,7 +68,7 @@ public class PlannedTimeTypeIntegrationTest {
     public void case3_updatePlannedTimeType() throws Exception{
         String baseUrl = getBaseUrl(24L, 4L)+"/"+createdId;
         System.out.println("baseUrl: "+baseUrl);
-        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType-updated", createdId);
+        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType-updated"+createdId, createdId);
         HttpEntity<PresenceTypeDTO> requestEntity = new HttpEntity<>(presenceTypeDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> responseRef = new ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>>() {
         };
