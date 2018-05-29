@@ -15,6 +15,10 @@ import java.util.Map;
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.activity.constants.ApiConstants.COUNTRY_URL;
 
+/*
+ * @author: Mohit Shakya
+ * @usage: planned time type operations controller
+ */
 @RestController
 @RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL+"/plannedTimeType")
 public class PlannedTimeTypeController {
