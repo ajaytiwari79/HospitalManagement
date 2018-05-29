@@ -805,7 +805,7 @@ public class EmploymentService extends UserBaseService {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
 
-        // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
+        // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDate()?maxEndDate:unitPositionDTO.getEndDate());
         return saveEmploymentEndDate(unit,employmentEndDate,staffId,reasonCodeId,endDateMillis,accessGroupId);
     }
 

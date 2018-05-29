@@ -144,8 +144,8 @@ public class PayGroupAreaService extends UserBaseService {
                     if (new DateTime(payGroupAreas.get(i).getStartDateMillis()).isBefore(new DateTime(payGroupAreaDTO.getEndDateMillis()))
                             && new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
                         exceptionService.actionNotPermittedException("message.paygroup.daterange.overlap1",new DateTime(payGroupAreas.get(i).getStartDateMillis()),(new DateTime(payGroupAreaDTO.getEndDateMillis())), new DateTime(payGroupAreas.get(i).getEndDateMillis()),(new DateTime(payGroupAreaDTO.getStartDateMillis())));
-                        //throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDateMillis())
-                        //        + " " + (new DateTime(payGroupAreaDTO.getEndDateMillis())) + " " + new DateTime(payGroupAreas.get(i).getEndDateMillis()) + " " + (new DateTime(payGroupAreaDTO.getStartDateMillis())));
+                        //throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDate())
+                        //        + " " + (new DateTime(payGroupAreaDTO.getEndDate())) + " " + new DateTime(payGroupAreas.get(i).getEndDate()) + " " + (new DateTime(payGroupAreaDTO.getStartDate())));
                     }
                 } else {
                     if (new DateTime(payGroupAreaDTO.getEndDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {

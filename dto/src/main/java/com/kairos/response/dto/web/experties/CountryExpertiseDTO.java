@@ -1,13 +1,13 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +50,9 @@ public class CountryExpertiseDTO {
 
     private List<Long> tags;
     private Boolean published;
+
+    @NotNull(message="Please select payment type")
+    private BreakPaymentSetting breakPaymentSetting;
 
     public Boolean isPublished() {
         return published;
@@ -194,5 +197,13 @@ public class CountryExpertiseDTO {
             return dateValue;
         }
         return true;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }
