@@ -8,13 +8,14 @@ import com.planner.domain.common.BaseEntity;
 ////import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 public class StaffingLevel extends MongoBaseEntity {
     private  BigInteger unitId;
     private Long phaseId;
-    private Date currentDate;
+    private LocalDate date;
     private Long weekCount;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
@@ -22,9 +23,9 @@ public class StaffingLevel extends MongoBaseEntity {
     public StaffingLevel() {
     }
 
-    public StaffingLevel(BigInteger unitId, Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelInterval> presenceStaffingLevelInterval,List<StaffingLevelInterval> absenceStaffingLevelInterval,BigInteger kariosId) {
+    public StaffingLevel(BigInteger unitId, Long phaseId, LocalDate date, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelInterval> presenceStaffingLevelInterval,List<StaffingLevelInterval> absenceStaffingLevelInterval,BigInteger kariosId) {
         this.phaseId = phaseId;
-        this.currentDate = currentDate;
+        this.date = date;
         this.weekCount = weekCount;
         this.staffingLevelSetting = staffingLevelSetting;
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
@@ -41,13 +42,6 @@ public class StaffingLevel extends MongoBaseEntity {
         this.phaseId = phaseId;
     }
 
-    public Date getCurrentDate() {
-        return currentDate;
-    }
-
-    public void setCurrentDate(Date currentDate) {
-        this.currentDate = currentDate;
-    }
 
     public Long getWeekCount() {
         return weekCount;
@@ -86,5 +80,13 @@ public class StaffingLevel extends MongoBaseEntity {
 
     public void setAbsenceStaffingLevelInterval(List<StaffingLevelInterval> absenceStaffingLevelInterval) {
         this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }
