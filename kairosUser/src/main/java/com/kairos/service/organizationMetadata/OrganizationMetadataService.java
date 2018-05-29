@@ -212,6 +212,4 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         save(paymentSettings);
         return paymentSettingsDTO;
     }
-
-
 }
