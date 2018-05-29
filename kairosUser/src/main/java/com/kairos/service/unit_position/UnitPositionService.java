@@ -976,5 +976,8 @@ public class UnitPositionService extends UserBaseService {
 
     }
 
+    public List<Map<Long,Long>> getUnitPositionExpertiseMap(Long unitId){
+        return unitPositionGraphRepository.getMapOfUnitPositionAndExpertiseId(unitId);
+    }
 
 }
