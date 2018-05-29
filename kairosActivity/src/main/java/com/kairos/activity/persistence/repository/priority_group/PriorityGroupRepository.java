@@ -27,5 +27,11 @@ public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGro
 
     PriorityGroupDTO findByIdAndDeletedFalse(BigInteger priorityGroupId);
 
-    List<PriorityGroupDTO> findByUnitIdAndRuleTemplateIdDeletedFalse(Long unitId,BigInteger ruleTemplateId);
+    List<PriorityGroupDTO> findByUnitIdAndRuleTemplateIdAndDeletedFalse(Long unitId,BigInteger ruleTemplateId);
+
+    List<PriorityGroup> findAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(Long countryId);
+
+    List<PriorityGroup> findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(long unitId);
+
+    List<PriorityGroupDTO> findByUnitIdAndOrderIdAndDeletedFalse(Long unitId,BigInteger orderId);
 }

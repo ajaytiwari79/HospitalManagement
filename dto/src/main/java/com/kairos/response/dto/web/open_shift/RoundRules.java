@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundRules {
     private Integer candidatesPerRound;
-    private DurationFields waitingTimeBeforeNextRound;
-    private DurationFields checkAnswersTime;// Time to check answer after enquiry
+    private Integer waitingTimeBeforeNextRound;
+    private Integer checkAnswersTime;// Time to check answer after enquiry
     private Integer minimumCandidateBeforeSelection;
 
     public RoundRules() {
@@ -23,14 +23,6 @@ public class RoundRules {
         this.candidatesPerRound = candidatesPerRound;
     }
 
-    public DurationFields getWaitingTimeBeforeNextRound() {
-        return waitingTimeBeforeNextRound;
-    }
-
-    public void setWaitingTimeBeforeNextRound(DurationFields waitingTimeBeforeNextRound) {
-        this.waitingTimeBeforeNextRound = waitingTimeBeforeNextRound;
-    }
-
     public Integer getMinimumCandidateBeforeSelection() {
         return minimumCandidateBeforeSelection;
     }
@@ -39,11 +31,19 @@ public class RoundRules {
         this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
     }
 
-    public DurationFields getCheckAnswersTime() {
+    public Integer getWaitingTimeBeforeNextRound() {
+        return waitingTimeBeforeNextRound;
+    }
+
+    public void setWaitingTimeBeforeNextRound(Integer waitingTimeBeforeNextRound) {
+        this.waitingTimeBeforeNextRound = waitingTimeBeforeNextRound;
+    }
+
+    public Integer getCheckAnswersTime() {
         return checkAnswersTime;
     }
 
-    public void setCheckAnswersTime(DurationFields checkAnswersTime) {
+    public void setCheckAnswersTime(Integer checkAnswersTime) {
         this.checkAnswersTime = checkAnswersTime;
     }
 }

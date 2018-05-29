@@ -19,8 +19,8 @@ public interface OpenShiftRuleTemplateRepository extends MongoBaseRepository<Ope
 
     OpenShiftRuleTemplate findByIdAndUnitIdAndDeletedFalse(BigInteger id,long unitId);
 
-    @Query("{'deleted': false,  'activitiesPerTimeTypes.selectedActivities.id' : ?0, 'unitId' : ?1}")
+    @Query("{'deleted': false,  'activitiesPerTimeTypes.selectedActivities' : ?0, 'unitId' : ?1}")
     List<OpenShiftRuleTemplateDTO> findByUnitIdAndActivityId(BigInteger activityId,Long unitId);
 
-
+    boolean existsByNameIgnoreCaseAndDeletedFalseAndCountryId(String name,Long countryId);
 }

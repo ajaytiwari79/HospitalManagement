@@ -2,10 +2,13 @@ package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.persistence.model.open_shift.OpenShiftRuleTemplate;
 import com.kairos.activity.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
+import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftRuleTemplateRepository;
+import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -16,14 +19,25 @@ import java.util.Optional;
 @Service
 public class OpenShiftRuleTemplateService extends MongoBaseService {
     @Inject
-    OpenShiftRuleTemplateRepository openShiftRuleTemplateRepository;
+    private OpenShiftRuleTemplateRepository openShiftRuleTemplateRepository;
     @Inject
-    ExceptionService exceptionService;
+    private ExceptionService exceptionService;
+    @Inject private PriorityGroupRepository priorityGroupRepository;
 
     public OpenShiftRuleTemplateDTO createRuleTemplateForOpenShift(long countryId, OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
+        boolean isExistWithSameName=openShiftRuleTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndCountryId(openShiftRuleTemplateDTO.getName(),countryId);
+        if(isExistWithSameName){
+            exceptionService.duplicateDataException("exception.duplicate.openShiftRuleTemplate",openShiftRuleTemplateDTO.getName());
+        }
         OpenShiftRuleTemplate openShiftRuleTemplate = new OpenShiftRuleTemplate();
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO, openShiftRuleTemplate);
         save(openShiftRuleTemplate);
+        List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
+        priorityGroups.forEach(priorityGroup -> {
+            priorityGroup.setId(null);
+            priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
+        });
+        save(priorityGroups);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplate, openShiftRuleTemplateDTO);
         return openShiftRuleTemplateDTO;
     }
@@ -53,10 +67,10 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         return true;
     }
 
-    public boolean copyRuleTemplateForUnit(long unitId,List<Long> ids){
-        List<OpenShiftRuleTemplate> openShiftRuleTemplates = openShiftRuleTemplateRepository.findAllByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndDeletedFalse(ids.get(0),ids.get(1),ids.get(2));
+    public boolean copyRuleTemplateForUnit(long unitId,OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO){
+        List<OpenShiftRuleTemplate> openShiftRuleTemplates = openShiftRuleTemplateRepository.findAllByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndDeletedFalse(orgTypeAndSubTypeDTO.getCountryId(),orgTypeAndSubTypeDTO.getOrganizationTypeId(),orgTypeAndSubTypeDTO.getOrganizationSubTypeId());
         openShiftRuleTemplates.forEach(openShiftRuleTemplate -> {
-            openShiftRuleTemplate.setCountryParentId(openShiftRuleTemplate.getId());
+            openShiftRuleTemplate.setParentId(openShiftRuleTemplate.getId());
             openShiftRuleTemplate.setUnitId(unitId);
             openShiftRuleTemplate.setId(null);
             openShiftRuleTemplate.setCountryId(null);
@@ -100,6 +114,21 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
 
     public List<OpenShiftRuleTemplateDTO> findByUnitIdAndActivityId(BigInteger activityId,Long unitId){
        return openShiftRuleTemplateRepository.findByUnitIdAndActivityId(activityId,unitId);
+    }
+
+    public OpenShiftRuleTemplateDTO createRuleTemplateForUnit(Long unitId,OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO){
+        OpenShiftRuleTemplate openShiftRuleTemplate=new OpenShiftRuleTemplate();
+        openShiftRuleTemplateDTO.setUnitId(unitId);
+        ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
+        save(openShiftRuleTemplate);
+        List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
+        priorityGroups.forEach(priorityGroup -> {
+            priorityGroup.setId(null);
+            priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
+        });
+        save(priorityGroups);
+        openShiftRuleTemplateDTO.setId(openShiftRuleTemplate.getId());
+        return openShiftRuleTemplateDTO;
     }
 
 }

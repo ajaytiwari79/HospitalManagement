@@ -3,6 +3,8 @@ package com.kairos.service.integration;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
+import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,10 @@ public class PriorityGroupIntegrationService {
     @Autowired
     PriorityGroupRestClient priorityGroupRestClient;
 
-    public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) { Map<String, Object> countryDetail = new HashMap<>();
+    public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
+        Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
-        priorityGroupRestClient.publish(null, unitId,true, IntegrationOperation.CREATE, "/copy_priority_group", countryDetail);
+        priorityGroupRestClient.publish(null, unitId,false, IntegrationOperation.CREATE, "/unit/"+unitId+"/priority_groups", countryDetail);
     }
 
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId) {
@@ -30,6 +33,12 @@ public class PriorityGroupIntegrationService {
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId){
         return priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/activities_with_time_types",null);
     }
+
+    public void createDefaultOpenShiftRuleTemplate(OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, long unitId) {
+        priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,false, IntegrationOperation.CREATE, "/unit/"+unitId+"/open_shit/copy_rule_template", null);
+    }
+
+
 
 }
 

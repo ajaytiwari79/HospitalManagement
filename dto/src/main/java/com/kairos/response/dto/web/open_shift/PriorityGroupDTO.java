@@ -22,6 +22,7 @@ public class PriorityGroupDTO {
     private DecisionCriteria decisionCriteria;
     private List<Long> employmentTypeIds;
     private List<Long> expertiseIds;
+    private BigInteger ruleTemplateId;
 
 
     public PriorityGroupDTO() {
@@ -139,10 +140,18 @@ public class PriorityGroupDTO {
     }
 
     public List<Long> getExpertiseIds() {
-        return expertiseIds;
+        return expertiseIds=Optional.ofNullable(expertiseIds).orElse(new ArrayList<>());
     }
 
     public void setExpertiseIds(List<Long> expertiseIds) {
         this.expertiseIds = expertiseIds;
+    }
+
+    public BigInteger getRuleTemplateId() {
+        return ruleTemplateId;
+    }
+
+    public void setRuleTemplateId(BigInteger ruleTemplateId) {
+        this.ruleTemplateId = ruleTemplateId;
     }
 }

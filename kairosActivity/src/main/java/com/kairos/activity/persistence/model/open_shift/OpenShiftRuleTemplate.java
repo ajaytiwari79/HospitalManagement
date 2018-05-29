@@ -1,8 +1,10 @@
 package com.kairos.activity.persistence.model.open_shift;
 
-import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.enums.AllowedLength;
+import com.kairos.persistence.model.enums.OpenShiftRuleTemplateType;
 import com.kairos.response.dto.web.open_shift.ActivitiesPerTimeType;
+import com.kairos.response.dto.web.open_shift.PlannerNotificationInfo;
 import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
 
 import java.math.BigInteger;
@@ -13,28 +15,22 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
     private String name;
     private Long organizationTypeId;
     private Long organizationSubTypeId;
+    private OpenShiftRuleTemplateType ruleTemplateType;
     private List<ActivitiesPerTimeType> activitiesPerTimeTypes;
     private List<Long> selectedSkills;
-    private boolean underStaffingBeforeStart;
-    private Integer underStaffingBeforeStartDays;
-    private boolean overStaffingBeforeStart;
-    private Integer overStaffingBeforeStartDays;
-    private boolean skillMissingBeforeStart;
-    private Integer skillMissingBeforeStartDays;
-    private boolean skillMissingPromptPlanner;
-    private boolean overStaffingPromptPlanner;
-    private boolean underStaffingPromptPlanner;
+    private boolean promptPlanner;
     private Long unitId;
     private Long countryId;
-    private BigInteger countryParentId;
+    private BigInteger parentId;
     private FeatureRules featureRules;
     private NotificationWay notificationWay;
-    private boolean singeLongerShift;
+    private AllowedLength allowedLength;
     private Integer minimumShiftHours;
     private Integer maximumShiftHours;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
-    private List<OpenShiftInterval> openShiftIntervals;
-
+    private BigInteger openShiftIntervalId;
+    private Integer minOpenShiftHours;
+    private PlannerNotificationInfo plannerNotificationInfo;
 
     public OpenShiftRuleTemplate() {
         //Default Constructor
@@ -80,78 +76,6 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.selectedSkills = selectedSkills;
     }
 
-    public boolean isUnderStaffingBeforeStart() {
-        return underStaffingBeforeStart;
-    }
-
-    public void setUnderStaffingBeforeStart(boolean underStaffingBeforeStart) {
-        this.underStaffingBeforeStart = underStaffingBeforeStart;
-    }
-
-    public Integer getUnderStaffingBeforeStartDays() {
-        return underStaffingBeforeStartDays;
-    }
-
-    public void setUnderStaffingBeforeStartDays(Integer underStaffingBeforeStartDays) {
-        this.underStaffingBeforeStartDays = underStaffingBeforeStartDays;
-    }
-
-    public boolean isUnderStaffingPromptPlanner() {
-        return underStaffingPromptPlanner;
-    }
-
-    public void setUnderStaffingPromptPlanner(boolean underStaffingPromptPlanner) {
-        this.underStaffingPromptPlanner = underStaffingPromptPlanner;
-    }
-
-    public boolean isOverStaffingBeforeStart() {
-        return overStaffingBeforeStart;
-    }
-
-    public void setOverStaffingBeforeStart(boolean overStaffingBeforeStart) {
-        this.overStaffingBeforeStart = overStaffingBeforeStart;
-    }
-
-    public Integer getOverStaffingBeforeStartDays() {
-        return overStaffingBeforeStartDays;
-    }
-
-    public void setOverStaffingBeforeStartDays(Integer overStaffingBeforeStartDays) {
-        this.overStaffingBeforeStartDays = overStaffingBeforeStartDays;
-    }
-
-    public boolean isOverStaffingPromptPlanner() {
-        return overStaffingPromptPlanner;
-    }
-
-    public void setOverStaffingPromptPlanner(boolean overStaffingPromptPlanner) {
-        this.overStaffingPromptPlanner = overStaffingPromptPlanner;
-    }
-
-    public boolean isSkillMissingBeforeStart() {
-        return skillMissingBeforeStart;
-    }
-
-    public void setSkillMissingBeforeStart(boolean skillMissingBeforeStart) {
-        this.skillMissingBeforeStart = skillMissingBeforeStart;
-    }
-
-    public Integer getSkillMissingBeforeStartDays() {
-        return skillMissingBeforeStartDays;
-    }
-
-    public void setSkillMissingBeforeStartDays(Integer skillMissingBeforeStartDays) {
-        this.skillMissingBeforeStartDays = skillMissingBeforeStartDays;
-    }
-
-    public boolean isSkillMissingPromptPlanner() {
-        return skillMissingPromptPlanner;
-    }
-
-    public void setSkillMissingPromptPlanner(boolean skillMissingPromptPlanner) {
-        this.skillMissingPromptPlanner = skillMissingPromptPlanner;
-    }
-
     public Long getUnitId() {
         return unitId;
     }
@@ -168,12 +92,12 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public BigInteger getCountryParentId() {
-        return countryParentId;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setCountryParentId(BigInteger countryParentId) {
-        this.countryParentId = countryParentId;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public FeatureRules getFeatureRules() {
@@ -192,12 +116,12 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.notificationWay = notificationWay;
     }
 
-    public boolean isSingeLongerShift() {
-        return singeLongerShift;
+    public AllowedLength getAllowedLength() {
+        return allowedLength;
     }
 
-    public void setSingeLongerShift(boolean singeLongerShift) {
-        this.singeLongerShift = singeLongerShift;
+    public void setAllowedLength(AllowedLength allowedLength) {
+        this.allowedLength = allowedLength;
     }
 
     public Integer getMinimumShiftHours() {
@@ -225,11 +149,43 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.shiftAssignmentCriteria = shiftAssignmentCriteria;
     }
 
-    public List<OpenShiftInterval> getOpenShiftIntervals() {
-        return openShiftIntervals;
+    public BigInteger getOpenShiftIntervalId() {
+        return openShiftIntervalId;
     }
 
-    public void setOpenShiftIntervals(List<OpenShiftInterval> openShiftIntervals) {
-        this.openShiftIntervals = openShiftIntervals;
+    public void setOpenShiftIntervalId(BigInteger openShiftIntervalId) {
+        this.openShiftIntervalId = openShiftIntervalId;
+    }
+
+    public boolean isPromptPlanner() {
+        return promptPlanner;
+    }
+
+    public void setPromptPlanner(boolean promptPlanner) {
+        this.promptPlanner = promptPlanner;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
+    }
+
+    public PlannerNotificationInfo getPlannerNotificationInfo() {
+        return plannerNotificationInfo;
+    }
+
+    public void setPlannerNotificationInfo(PlannerNotificationInfo plannerNotificationInfo) {
+        this.plannerNotificationInfo = plannerNotificationInfo;
+    }
+
+    public OpenShiftRuleTemplateType getRuleTemplateType() {
+        return ruleTemplateType;
+    }
+
+    public void setRuleTemplateType(OpenShiftRuleTemplateType ruleTemplateType) {
+        this.ruleTemplateType = ruleTemplateType;
     }
 }

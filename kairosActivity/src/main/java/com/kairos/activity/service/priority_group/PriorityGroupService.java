@@ -63,9 +63,7 @@ public class PriorityGroupService extends MongoBaseService {
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
-//        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isDeActivated(),
-//                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRules(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
-    }
+ }
 
     public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
@@ -78,7 +76,7 @@ public class PriorityGroupService extends MongoBaseService {
     }
 
     public boolean copyPriorityGroupsForUnit(long unitId,long countryId){
-        List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalse(countryId);
+        List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
         if(!priorityGroups.isEmpty()) {
             priorityGroups.forEach(priorityGroup -> {
                 priorityGroup.setParentId(priorityGroup.getId());
@@ -113,9 +111,7 @@ public class PriorityGroupService extends MongoBaseService {
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
-//        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isDeActivated(),
-//                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRules(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
-    }
+  }
 
     public boolean deletePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
@@ -129,7 +125,7 @@ public class PriorityGroupService extends MongoBaseService {
 
 
     public boolean copyPriorityGroupsForOrder(long unitId, BigInteger orderId){
-        List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalse(unitId);
+        List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
 
         priorityGroups.forEach(priorityGroup -> {
             priorityGroup.setOrderId(orderId);
@@ -161,9 +157,12 @@ public class PriorityGroupService extends MongoBaseService {
     }
 
     public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId,BigInteger ruleTemplateId) {
-        return priorityGroupRepository.findByUnitIdAndRuleTemplateIdDeletedFalse(unitId,ruleTemplateId);
+        return priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(unitId,ruleTemplateId);
     }
 
+    public List<PriorityGroupDTO> getPriorityGroupsByOrderId(long unitId,BigInteger orderId) {
+        return priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
+    }
 
 }
 

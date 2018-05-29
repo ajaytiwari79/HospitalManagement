@@ -38,6 +38,7 @@ import com.kairos.activity.util.timeCareShift.Transstatus;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

@@ -11,6 +11,17 @@ public class OrganizationTypeAndSubTypeDTO {
     private Long unitId;
     boolean isParent=false;
     private Long parentOrganizationId;
+    private Long countryId;
+
+    public OrganizationTypeAndSubTypeDTO() {
+        //Default Constructor
+    }
+
+    public OrganizationTypeAndSubTypeDTO(List<Long> organizationTypes, List<Long> organizationSubTypes, Long countryId) {
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.countryId = countryId;
+    }
 
     public Long getParentOrganizationId() {
         return parentOrganizationId;
@@ -51,5 +62,13 @@ public class OrganizationTypeAndSubTypeDTO {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }

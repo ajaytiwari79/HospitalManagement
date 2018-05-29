@@ -1,7 +1,10 @@
 package com.kairos.activity.persistence.model.open_shift;
 
-import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
+import com.kairos.persistence.model.enums.AllowedLength;
+import com.kairos.persistence.model.enums.OpenShiftRuleTemplateType;
 import com.kairos.response.dto.web.open_shift.ActivitiesPerTimeType;
+import com.kairos.response.dto.web.open_shift.PlannerNotificationInfo;
+import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -11,24 +14,22 @@ public class OpenShiftRuleTemplateDTO {
     private String name;
     private Long organizationTypeId;
     private Long organizationSubTypeId;
-    private List<ActivitiesPerTimeType> selectedSets;
+    private OpenShiftRuleTemplateType ruleTemplateType;
+    private List<ActivitiesPerTimeType> activitiesPerTimeTypes;
     private List<Long> selectedSkills;
-    private boolean underStaffingBeforeStart;
-    private String underStaffingBeforeStartDays;
-    private boolean underStaffingPromptPlanner;
-    private boolean overStaffingBeforeStart;
-    private String overStaffingBeforeStartDays;
-    private boolean overStaffingPromptPlanner;
-    private boolean skillMissingBeforeStart;
-    private String skillMissingBeforeStartDays;
-    private boolean skillMissingPromptPlanner;
-    private ShiftSelectionType shiftSelectionType;
+    private boolean promptPlanner;
+    private Long unitId;
+    private Long countryId;
+    private BigInteger parentId;
     private FeatureRules featureRules;
     private NotificationWay notificationWay;
-    private boolean singeLongerShift;
+    private AllowedLength allowedLength;
     private Integer minimumShiftHours;
     private Integer maximumShiftHours;
-    private List<BigInteger> priorityGroupIds;
+    private ShiftAssignmentCriteria shiftAssignmentCriteria;
+    private BigInteger openShiftIntervalId;
+    private Integer minOpenShiftHours;
+    private PlannerNotificationInfo plannerNotificationInfo;
 
 
     public OpenShiftRuleTemplateDTO() {
@@ -67,12 +68,12 @@ public class OpenShiftRuleTemplateDTO {
         this.organizationSubTypeId = organizationSubTypeId;
     }
 
-    public List<ActivitiesPerTimeType> getSelectedSets() {
-        return selectedSets;
+    public List<ActivitiesPerTimeType> getActivitiesPerTimeTypes() {
+        return activitiesPerTimeTypes;
     }
 
-    public void setSelectedSets(List<ActivitiesPerTimeType> selectedSets) {
-        this.selectedSets = selectedSets;
+    public void setActivitiesPerTimeTypes(List<ActivitiesPerTimeType> activitiesPerTimeTypes) {
+        this.activitiesPerTimeTypes = activitiesPerTimeTypes;
     }
 
     public List<Long> getSelectedSkills() {
@@ -83,86 +84,36 @@ public class OpenShiftRuleTemplateDTO {
         this.selectedSkills = selectedSkills;
     }
 
-    public boolean isUnderStaffingBeforeStart() {
-        return underStaffingBeforeStart;
+    public boolean isPromptPlanner() {
+        return promptPlanner;
     }
 
-    public void setUnderStaffingBeforeStart(boolean underStaffingBeforeStart) {
-        this.underStaffingBeforeStart = underStaffingBeforeStart;
+    public void setPromptPlanner(boolean promptPlanner) {
+        this.promptPlanner = promptPlanner;
     }
 
-    public String getUnderStaffingBeforeStartDays() {
-        return underStaffingBeforeStartDays;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setUnderStaffingBeforeStartDays(String underStaffingBeforeStartDays) {
-        this.underStaffingBeforeStartDays = underStaffingBeforeStartDays;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
-    public boolean isUnderStaffingPromptPlanner() {
-        return underStaffingPromptPlanner;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setUnderStaffingPromptPlanner(boolean underStaffingPromptPlanner) {
-        this.underStaffingPromptPlanner = underStaffingPromptPlanner;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
-    public boolean isOverStaffingBeforeStart() {
-        return overStaffingBeforeStart;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setOverStaffingBeforeStart(boolean overStaffingBeforeStart) {
-        this.overStaffingBeforeStart = overStaffingBeforeStart;
-    }
-
-    public String getOverStaffingBeforeStartDays() {
-        return overStaffingBeforeStartDays;
-    }
-
-    public void setOverStaffingBeforeStartDays(String overStaffingBeforeStartDays) {
-        this.overStaffingBeforeStartDays = overStaffingBeforeStartDays;
-    }
-
-    public boolean isOverStaffingPromptPlanner() {
-        return overStaffingPromptPlanner;
-    }
-
-    public void setOverStaffingPromptPlanner(boolean overStaffingPromptPlanner) {
-        this.overStaffingPromptPlanner = overStaffingPromptPlanner;
-    }
-
-    public boolean isSkillMissingBeforeStart() {
-        return skillMissingBeforeStart;
-    }
-
-    public void setSkillMissingBeforeStart(boolean skillMissingBeforeStart) {
-        this.skillMissingBeforeStart = skillMissingBeforeStart;
-    }
-
-    public String getSkillMissingBeforeStartDays() {
-        return skillMissingBeforeStartDays;
-    }
-
-    public void setSkillMissingBeforeStartDays(String skillMissingBeforeStartDays) {
-        this.skillMissingBeforeStartDays = skillMissingBeforeStartDays;
-    }
-
-    public boolean isSkillMissingPromptPlanner() {
-        return skillMissingPromptPlanner;
-    }
-
-    public void setSkillMissingPromptPlanner(boolean skillMissingPromptPlanner) {
-        this.skillMissingPromptPlanner = skillMissingPromptPlanner;
-    }
-
-
-
-    public ShiftSelectionType getShiftSelectionType() {
-        return shiftSelectionType;
-    }
-
-    public void setShiftSelectionType(ShiftSelectionType shiftSelectionType) {
-        this.shiftSelectionType = shiftSelectionType;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public FeatureRules getFeatureRules() {
@@ -181,12 +132,12 @@ public class OpenShiftRuleTemplateDTO {
         this.notificationWay = notificationWay;
     }
 
-    public boolean isSingeLongerShift() {
-        return singeLongerShift;
+    public AllowedLength getAllowedLength() {
+        return allowedLength;
     }
 
-    public void setSingeLongerShift(boolean singeLongerShift) {
-        this.singeLongerShift = singeLongerShift;
+    public void setAllowedLength(AllowedLength allowedLength) {
+        this.allowedLength = allowedLength;
     }
 
     public Integer getMinimumShiftHours() {
@@ -205,11 +156,43 @@ public class OpenShiftRuleTemplateDTO {
         this.maximumShiftHours = maximumShiftHours;
     }
 
-    public List<BigInteger> getPriorityGroupIds() {
-        return priorityGroupIds;
+    public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
+        return shiftAssignmentCriteria;
     }
 
-    public void setPriorityGroupIds(List<BigInteger> priorityGroupIds) {
-        this.priorityGroupIds = priorityGroupIds;
+    public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
+        this.shiftAssignmentCriteria = shiftAssignmentCriteria;
+    }
+
+    public BigInteger getOpenShiftIntervalId() {
+        return openShiftIntervalId;
+    }
+
+    public void setOpenShiftIntervalId(BigInteger openShiftIntervalId) {
+        this.openShiftIntervalId = openShiftIntervalId;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
+    }
+
+    public PlannerNotificationInfo getPlannerNotificationInfo() {
+        return plannerNotificationInfo;
+    }
+
+    public void setPlannerNotificationInfo(PlannerNotificationInfo plannerNotificationInfo) {
+        this.plannerNotificationInfo = plannerNotificationInfo;
+    }
+
+    public OpenShiftRuleTemplateType getRuleTemplateType() {
+        return ruleTemplateType;
+    }
+
+    public void setRuleTemplateType(OpenShiftRuleTemplateType ruleTemplateType) {
+        this.ruleTemplateType = ruleTemplateType;
     }
 }

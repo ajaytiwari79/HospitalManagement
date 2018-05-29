@@ -23,6 +23,6 @@ public class GenericIntegrationService {
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmployment(Long countryId){
-        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId,false, IntegrationOperation.GET, "/employment_type_and_expertise", null), PriorityGroupDefaultData.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId,false, IntegrationOperation.GET, "/country/"+countryId+"/employment_type_and_expertise", null), PriorityGroupDefaultData.class);
     }
 }

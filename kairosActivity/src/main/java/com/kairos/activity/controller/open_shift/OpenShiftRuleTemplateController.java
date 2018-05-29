@@ -3,6 +3,8 @@ package com.kairos.activity.controller.open_shift;
 import com.kairos.activity.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.activity.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -59,10 +61,17 @@ public class OpenShiftRuleTemplateController {
     }
 
     @ApiOperation("Copy Rule templates for Unit")
+    @PostMapping(value = UNIT_URL+"/open_shit/rule_template")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createRuleTemplateForUnit(@PathVariable Long unitId, @RequestBody OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.createRuleTemplateForUnit(unitId,openShiftRuleTemplateDTO));
+    }
+
+    @ApiOperation("Copy Rule templates for Unit")
     @PostMapping(value = UNIT_URL+"/open_shit/copy_rule_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> copyRuleTemplateForUnit(@PathVariable Long unitId, @RequestBody List<Long> ids) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.copyRuleTemplateForUnit(unitId,ids));
+    public ResponseEntity<Map<String, Object>> copyRuleTemplateForUnit(@PathVariable Long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.copyRuleTemplateForUnit(unitId,orgTypeAndSubTypeDTO));
     }
 
     @ApiOperation("Get all Rule templates based on unitId")
