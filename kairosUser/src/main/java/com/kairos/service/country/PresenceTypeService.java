@@ -120,20 +120,6 @@ public class PresenceTypeService extends UserBaseService {
     }
 
 
-    public Organization fetchParentOrganization(Long unitId) {
-        Organization parent = null;
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
-        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        } else {
-            parent = unit;
-        }
-        return parent;
-    }
-
-
     public PresenceTypeWithTimeTypeDTO getAllPresenceTypeAndTimeTypesByUnitId(Long unitId) {
         Organization organization = organizationService.fetchParentOrganization(unitId);
         Country country= organizationGraphRepository.getCountry(organization.getId());
