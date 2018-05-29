@@ -72,7 +72,7 @@ public class PriorityGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.updatePriorityGroupOfUnit(unitId,priorityGroupId, priorityGroupDTO));
     }
 
-    @ApiOperation("delete Priority Group based on countryId")
+    @ApiOperation("delete Priority Group based on unitId")
     @DeleteMapping(value = UNIT_URL+"/priority_groups/{priorityGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deletePriorityGroupOfUnit(@PathVariable Long unitId, @PathVariable BigInteger priorityGroupId) {

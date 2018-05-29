@@ -3,6 +3,7 @@ package com.kairos.activity.persistence.model.open_shift;
 import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.response.dto.web.open_shift.ActivitiesPerTimeType;
+import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,23 +17,22 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
     private List<Long> selectedSkills;
     private boolean underStaffingBeforeStart;
     private Integer underStaffingBeforeStartDays;
-    private boolean underStaffingPromptPlanner;
     private boolean overStaffingBeforeStart;
     private Integer overStaffingBeforeStartDays;
-    private boolean overStaffingPromptPlanner;
     private boolean skillMissingBeforeStart;
     private Integer skillMissingBeforeStartDays;
     private boolean skillMissingPromptPlanner;
+    private boolean overStaffingPromptPlanner;
+    private boolean underStaffingPromptPlanner;
     private Long unitId;
     private Long countryId;
     private BigInteger countryParentId;
-    private ShiftSelectionType shiftSelectionType;
     private FeatureRules featureRules;
     private NotificationWay notificationWay;
     private boolean singeLongerShift;
     private Integer minimumShiftHours;
     private Integer maximumShiftHours;
-    private List<BigInteger> priorityGroupIds;
+    private ShiftAssignmentCriteria shiftAssignmentCriteria;
 
 
     public OpenShiftRuleTemplate() {
@@ -175,14 +175,6 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.countryParentId = countryParentId;
     }
 
-    public ShiftSelectionType getShiftSelectionType() {
-        return shiftSelectionType;
-    }
-
-    public void setShiftSelectionType(ShiftSelectionType shiftSelectionType) {
-        this.shiftSelectionType = shiftSelectionType;
-    }
-
     public FeatureRules getFeatureRules() {
         return featureRules;
     }
@@ -223,11 +215,12 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
         this.maximumShiftHours = maximumShiftHours;
     }
 
-    public List<BigInteger> getPriorityGroupIds() {
-        return priorityGroupIds;
+
+    public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
+        return shiftAssignmentCriteria;
     }
 
-    public void setPriorityGroupIds(List<BigInteger> priorityGroupIds) {
-        this.priorityGroupIds = priorityGroupIds;
+    public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
+        this.shiftAssignmentCriteria = shiftAssignmentCriteria;
     }
 }

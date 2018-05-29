@@ -2,7 +2,6 @@ package com.kairos.persistence.model.user.open_shift;
 
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.persistence.model.user.country.TimeType;
 import com.kairos.persistence.model.user.skill.Skill;
 
 import java.util.List;
