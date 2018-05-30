@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -88,7 +89,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("update processing purpose by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id, @Validated @RequestBody ProcessingPurpose processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id, @Valid @RequestBody ProcessingPurpose processingPurpose) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

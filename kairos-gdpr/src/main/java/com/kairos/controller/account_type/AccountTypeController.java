@@ -17,6 +17,7 @@ import static com.kairos.constant.ApiConstant.API_ACCOUNT_TYPE_URL;
 import static com.kairos.constant.ApiConstant.PARENT_ORGABNIZATION;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Set;
 /*
@@ -38,7 +39,7 @@ public class AccountTypeController {
 
     @ApiOperation(value = "create new account type")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @RequestBody AccountType accountType) {
+    public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (countryId != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
         }

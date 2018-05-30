@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class DataSubjectController {
 
     @ApiOperation("update DataSubject by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataSubject(@PathVariable BigInteger id, @RequestBody DataSubject dataSubject) {
+    public ResponseEntity<Object> updateDataSubject(@PathVariable BigInteger id, @Valid @RequestBody DataSubject dataSubject) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

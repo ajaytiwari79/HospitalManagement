@@ -101,7 +101,6 @@ public class ProcessingLegalBasisService extends MongoBaseService {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
             exist.setName(legalBasis.getName());
-
             return save(exist);
 
         }

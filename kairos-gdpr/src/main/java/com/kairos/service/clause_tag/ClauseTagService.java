@@ -11,6 +11,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,6 +28,8 @@ public class ClauseTagService extends MongoBaseService {
 
     @Inject
     ClauseTagMongoRepository clauseTagMongoRepository;
+    @Inject private
+    MessageSource messageSource;
 
 
     public ClauseTag createClauseTag(Long countryId, String clauseTag) {
@@ -83,8 +86,7 @@ public class ClauseTagService extends MongoBaseService {
 
 
     public ClauseTag updateClauseTag(BigInteger id, String clauseTag) {
-
-        if (StringUtils.isBlank(clauseTag)) {
+                if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
 
         }

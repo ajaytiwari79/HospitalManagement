@@ -94,7 +94,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 }
                 if (agreementSection.size() != 0) {
                     sections = agreementSectionService.createAgreementSections(agreementSection);
-                    policyAgreementTemplate.setAgreementSections((List<BigInteger>) sections.get("ids"));
+                    policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
                 }
                 comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
                 accountTypeService.getAccountTypeList(accountTypeIds);
@@ -187,7 +187,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 if (agreementSection.size() != 0) {
                     sections = agreementSectionService.createAgreementSections(agreementSection);
-                    exist.setAgreementSections((List<BigInteger>) sections.get("ids"));
+                    exist.setAgreementSections((Set<BigInteger>) sections.get("ids"));
                 }
                 accountTypeService.getAccountTypeList(accountTypeIds);
                 exist.setAccountTypes(accountTypeIds);

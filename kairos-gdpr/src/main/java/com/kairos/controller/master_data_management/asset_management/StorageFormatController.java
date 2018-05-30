@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class StorageFormatController {
 
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable BigInteger id, @RequestBody StorageFormat storageFormat) {
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable BigInteger id,  @Valid @RequestBody StorageFormat storageFormat) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateResponsibilityType(@PathVariable BigInteger id, @RequestBody ResponsibilityType responsibilityType) {
+    public ResponseEntity<Object> updateResponsibilityType(@PathVariable BigInteger id,@Valid @RequestBody ResponsibilityType responsibilityType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

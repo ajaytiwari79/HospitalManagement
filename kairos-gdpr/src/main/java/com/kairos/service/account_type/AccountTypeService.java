@@ -7,6 +7,7 @@ import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,18 +27,22 @@ public class AccountTypeService extends MongoBaseService {
     @Inject
     private AccountTypeMongoRepository accountTypeRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
+
 
     public AccountType createAccountType(Long countryId,AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByTypeOfAccount(countryId,accountType.getTypeOfAccount());
         if (Optional.ofNullable(exists).isPresent()) {
-            throw new DuplicateDataException("Account  Already Exists for name" + accountType.getTypeOfAccount());
+            exceptionService.duplicateDataException("message.duplicate","message.accountType",accountType.getTypeOfAccount());
         } else {
             AccountType newAccount = new AccountType();
             newAccount.setTypeOfAccount(accountType.getTypeOfAccount());
             newAccount.setCountryId(countryId);
             return save(newAccount);
         }
+        return null;
     }
 
 
@@ -69,11 +74,10 @@ public class AccountTypeService extends MongoBaseService {
 
         AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exists).isPresent()) {
-            throw new DataNotFoundByIdException("Account  type not Exists for id" + id);
-        } else {
-
-            return exists;
+          exceptionService.dataNotFoundByIdException("message.dataNotFound","message.accountType",id);
         }
+        return exists;
+
     }
 
 

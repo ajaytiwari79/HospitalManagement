@@ -20,8 +20,8 @@ public interface AgreementSectionMongoRepository extends MongoRepository<Agreeme
 
     AgreementSection findByTitle(String name);
 
-    @Query("{_id:{$in:?0},deleted:false}")
-    List<AgreementSection> findAgreementSectionByIds(Set<BigInteger> ids);
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<AgreementSection> findAgreementSectionByIds(Long countryId,Set<BigInteger> ids);
 
 
 }

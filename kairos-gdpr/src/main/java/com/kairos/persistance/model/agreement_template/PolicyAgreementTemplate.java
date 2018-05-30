@@ -17,20 +17,21 @@ import java.util.Set;
 @Document(collection = "agreement_template")
 public class PolicyAgreementTemplate extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String name;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "error.agreement.description.cannot.be.empty.or.null")
     private String description;
 
-    @NotNull
+    @NotNull(message = "error.list.cannot.be.empty")
     private Set<BigInteger> accountTypes;
 
-    @NotNull
-    private List<BigInteger> agreementSections;
+    @NotNull(message = "error.list.cannot.be.empty")
+    private Set<BigInteger> agreementSections;
 
-    @NotNull
+    @NotNull(message = "error.countryId.cannot.be.null")
     private Long countryId;
+
 
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
@@ -72,11 +73,11 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.accountTypes = accountTypes;
     }
 
-    public List<BigInteger> getAgreementSections() {
+    public Set<BigInteger> getAgreementSections() {
         return agreementSections;
     }
 
-    public void setAgreementSections(List<BigInteger> agreementSections) {
+    public void setAgreementSections(Set<BigInteger> agreementSections) {
         this.agreementSections = agreementSections;
     }
 

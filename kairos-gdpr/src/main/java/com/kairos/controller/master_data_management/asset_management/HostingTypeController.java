@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import static com.kairos.constant.ApiConstant.API_HOSTING_TYPE_URL;
@@ -86,7 +87,7 @@ public class HostingTypeController {
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable BigInteger id, @RequestBody HostingType hostingtype) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable BigInteger id, @Valid @RequestBody HostingType hostingtype) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

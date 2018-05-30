@@ -9,10 +9,10 @@ import javax.validation.constraints.NotNull;
 
 @Document(collection = "storage_type")
 public class StorageType extends MongoBaseEntity {
-    @NotNullOrEmpty
+
+    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
     private String name;
 
-    @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {

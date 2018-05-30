@@ -16,10 +16,10 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyAgreementTemplateDto {
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String name;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
 
 

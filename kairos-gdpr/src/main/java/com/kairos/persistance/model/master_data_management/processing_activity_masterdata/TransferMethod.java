@@ -11,10 +11,9 @@ import javax.validation.constraints.NotNull;
 public class TransferMethod extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
     private String name;
 
-   @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {
