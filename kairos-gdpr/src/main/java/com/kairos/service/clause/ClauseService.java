@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -234,10 +236,10 @@ public class ClauseService extends MongoBaseService {
 
 
 
+
+
+
 /*
-
-
-
 
     public List<Clause> getClause(ClauseGetQueryDto clauseQueryDto) {
         Query query = new Query();
@@ -267,12 +269,11 @@ public class ClauseService extends MongoBaseService {
                 query.addCriteria((Criteria.where(whereQuery).in(organizationTypes)));
 
             }
-           */
-/* if (organizationSubServices!=null) {
+ if (organizationSubServices!=null) {
                 whereQuery = "organizationServices";
                 query.addCriteria(Criteria.where(whereQuery).in(organizationSubServices));
 
-            }*//*
+            }
 
             if (clauseQueryDto.getTags() != null) {
                 whereQuery = "tags";

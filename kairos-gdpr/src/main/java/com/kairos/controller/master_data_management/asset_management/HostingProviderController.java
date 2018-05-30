@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_HOSTING_PROVIDER_URL;
 @RestController
 @RequestMapping(API_HOSTING_PROVIDER_URL)
 @Api(API_HOSTING_PROVIDER_URL)
-@CrossOrigin
 public class HostingProviderController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingProviderController.class);

@@ -43,12 +43,10 @@ public class StorageTypeService extends MongoBaseService {
 
             if (names.size() != 0) {
                 for (String name : names) {
-
                     StorageType newStorageType = new StorageType();
                     newStorageType.setName(name);
                     newStorageType.setCountryId(countryId);
                     newStorageTypes.add(newStorageType);
-
                 }
 
                 newStorageTypes = save(newStorageTypes);

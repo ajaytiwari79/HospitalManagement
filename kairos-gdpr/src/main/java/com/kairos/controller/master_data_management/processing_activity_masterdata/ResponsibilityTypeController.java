@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_RESPONSIBILITY_TYPE;
 @RestController
 @RequestMapping(API_RESPONSIBILITY_TYPE)
 @Api(API_RESPONSIBILITY_TYPE)
-@CrossOrigin
 public class ResponsibilityTypeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponsibilityTypeController.class);

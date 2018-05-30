@@ -69,8 +69,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
             masterProcessingActivity.setOrganizationSubServices(orgSubServices);
 
         }
-        if ( masterProcessingActivityDto.getSubProcessingActivity().size()>1) {
-            masterProcessingActivity.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivity(), orgTypeAndServices));
+        if ( masterProcessingActivityDto.getSubProcessingActivities()!=null&&masterProcessingActivityDto.getSubProcessingActivities().size()>1) {
+            masterProcessingActivity.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), orgTypeAndServices));
         }
         comparisonUtils.checkOrgTypeAndService(orgTypeIds, orgTypeAndServices.getOrganizationTypes());
         masterProcessingActivity.setOrganizationTypes(orgTypeAndServices.getOrganizationTypes());
@@ -159,7 +159,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         }
         comparisonUtils.checkOrgTypeAndService(orgTypeIds, orgTypeAndServices.getOrganizationTypes());
         exists.setOrganizationTypes(orgTypeAndServices.getOrganizationTypes());
-        exists.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivity(), orgTypeAndServices));
+        exists.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), orgTypeAndServices));
         exists.setName(masterProcessingActivityDto.getName());
         exists.setDescription(masterProcessingActivityDto.getDescription());
         return save(exists);

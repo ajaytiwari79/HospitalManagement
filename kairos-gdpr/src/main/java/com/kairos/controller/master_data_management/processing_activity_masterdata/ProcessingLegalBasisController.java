@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_PROCESSING_LEGAL_BASIS;
 @RestController
 @RequestMapping(API_PROCESSING_LEGAL_BASIS)
 @Api(API_PROCESSING_LEGAL_BASIS)
-@CrossOrigin
 public class ProcessingLegalBasisController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingLegalBasisController.class);

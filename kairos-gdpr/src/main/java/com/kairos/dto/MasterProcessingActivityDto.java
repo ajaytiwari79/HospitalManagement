@@ -33,16 +33,15 @@ public class MasterProcessingActivityDto {
     private List<MasterProcessingActivityDto> subProcessingActivities;
 
 
-
-    public List<MasterProcessingActivityDto> getSubProcessingActivity() {
+    public List<MasterProcessingActivityDto> getSubProcessingActivities() {
         return subProcessingActivities;
     }
 
-    public void setSubProcessingActivity(List<MasterProcessingActivityDto> subProcessingActivities) {
+    public void setSubProcessingActivities(List<MasterProcessingActivityDto> subProcessingActivities) {
         this.subProcessingActivities = subProcessingActivities;
     }
 
-     public String getName() {
+    public String getName() {
         return name;
     }
 

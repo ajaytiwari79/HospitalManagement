@@ -23,7 +23,6 @@ import java.math.BigInteger;
 @RestController
 @RequestMapping(API_CLAUSE_TAG_URL)
 @Api(API_CLAUSE_TAG_URL)
-@CrossOrigin
 public class ClauseTagController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseTagController.class);

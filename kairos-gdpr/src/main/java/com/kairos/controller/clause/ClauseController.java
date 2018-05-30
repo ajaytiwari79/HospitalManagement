@@ -35,7 +35,6 @@ import java.util.*;
 @RestController
 @RequestMapping(API_CLAUSES_URL)
 @Api(API_CLAUSES_URL)
-@CrossOrigin
 public class ClauseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseController.class);

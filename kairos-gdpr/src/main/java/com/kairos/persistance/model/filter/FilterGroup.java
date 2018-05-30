@@ -1,6 +1,7 @@
 package com.kairos.persistance.model.filter;
 
 
+import com.kairos.dto.ModuleIdDto;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.enums.FilterType;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @Document(collection = "filterGroup")
 public class FilterGroup extends MongoBaseEntity {
-
 
     @NotNull
     private List<ModuleIdDto> accessModule;

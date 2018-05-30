@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.filter;
+package com.kairos.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

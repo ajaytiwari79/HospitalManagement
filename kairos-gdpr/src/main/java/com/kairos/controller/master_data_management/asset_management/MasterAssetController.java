@@ -28,7 +28,6 @@ import static com.kairos.constant.ApiConstant.COUNTRY_URL;
 @RestController
 @RequestMapping(API_MASTER_ASSET_URL)
 @Api(API_MASTER_ASSET_URL)
-@CrossOrigin
 public class MasterAssetController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetController.class);

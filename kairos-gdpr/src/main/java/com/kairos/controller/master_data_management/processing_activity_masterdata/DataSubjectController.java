@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_DATASUBJECT_URL;
 @RestController
 @RequestMapping(API_DATASUBJECT_URL)
 @Api(API_DATASUBJECT_URL)
-@CrossOrigin
 public class DataSubjectController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSubjectController.class);

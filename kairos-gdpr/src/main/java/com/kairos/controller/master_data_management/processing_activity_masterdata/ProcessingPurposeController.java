@@ -28,7 +28,6 @@ import static com.kairos.constant.ApiConstant.API_PROCESSING_PURPOSE;
 @RestController
 @RequestMapping(API_PROCESSING_PURPOSE)
 @Api(API_PROCESSING_PURPOSE)
-@CrossOrigin
 public class ProcessingPurposeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPurposeController.class);

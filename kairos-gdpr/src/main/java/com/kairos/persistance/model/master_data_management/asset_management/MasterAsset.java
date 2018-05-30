@@ -25,7 +25,7 @@ public class MasterAsset extends MongoBaseEntity {
     @NotNull
     private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
     @NotNull
-    private List <OrganizationTypeAndServiceBasicDto>organizationServices;
+    private List <OrganizationTypeAndServiceBasicDto> organizationServices;
     @NotNull
     private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
