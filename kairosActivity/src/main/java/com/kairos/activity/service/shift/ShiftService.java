@@ -183,39 +183,72 @@ public class ShiftService extends MongoBaseService {
         return shiftQueryResult;
     }
 
+    private Shift getShiftObject(ShiftDTO shiftDTO, String name, BigInteger activityId, Date startDate, Date endDate) {
+        Shift childShift = new Shift(null, name, startDate, endDate, shiftDTO.getBid(), shiftDTO.getpId(), shiftDTO.getBonusTimeBank()
+                , shiftDTO.getAmount(), shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), activityId, shiftDTO.getStaffId(), shiftDTO.getUnitId(), shiftDTO.getUnitPositionId());
+        childShift.setShiftState(ShiftState.UNPUBLISHED);
+        childShift.setMainShift(false);
+        return childShift;
+
+    }
+
     private List<ShiftQueryResult> addBreakInShifts(Shift mainShift, ShiftDTO shiftDTO, Activity breakActivity, List<BreakSettings> breakSettings, Long shiftDurationInMinute) {
 
         Long startDateMillis = mainShift.getStartDate().getTime();
+        Long endDateMillis = null;
+        Long breakAllowedAfterMinute = 0L;
+        Long allowedBreakDurationInMinute = 0L;
         List<Shift> shifts = new ArrayList<>();
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
         for (int i = 0; i < breakSettings.size(); i++) {
-            Long endDateMillis = startDateMillis + (breakSettings.get(i).getShiftDurationInMinute() * ONE_MINUTE);
-            if (shiftDurationInMinute > breakSettings.get(i).getShiftDurationInMinute()) {
-                Shift childShift = new Shift(null, shiftDTO.getName(), new Date(startDateMillis), new Date(endDateMillis), shiftDTO.getBid(), shiftDTO.getpId(), shiftDTO.getBonusTimeBank()
-                        , shiftDTO.getAmount(), shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), mainShift.getStaffId(), mainShift.getUnitId(), mainShift.getUnitPositionId());
-                childShift.setShiftState(ShiftState.UNPUBLISHED);
-                childShift.setMainShift(false);
-                shifts.add(childShift);
+
+            /**
+             * The first eligible break hours after.It specifies you can take first break after this duration
+             **/
+            breakAllowedAfterMinute = (i == 0) ? breakSettings.get(i).getShiftDurationInMinute() : breakSettings.get(i).getShiftDurationInMinute() - breakSettings.get(i - 1).getShiftDurationInMinute();
+            endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
+            if (shiftDurationInMinute > breakAllowedAfterMinute) {
+                shifts.add(getShiftObject(shiftDTO, shiftDTO.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis)));
                 // we have added a sub shift now adding the break for remaining period
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
-                // if still after substraction the shift is greater than
-                if (shiftDurationInMinute >= breakSettings.get(i).getBreakDurationInMinute()) {
-                    logger.info("A------", shiftDurationInMinute);
+                // if still after subtraction the shift is greater than
+                allowedBreakDurationInMinute = breakSettings.get(i).getBreakDurationInMinute();
+                startDateMillis = endDateMillis;
+                if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
+
+                    endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
+                    shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis)));
                     startDateMillis = endDateMillis;
-                    endDateMillis = endDateMillis + (breakSettings.get(i).getBreakDurationInMinute() * ONE_MINUTE);
-                    Shift breakShift = new Shift(null, shiftDTO.getName(), new Date(startDateMillis), new Date(endDateMillis), shiftDTO.getBid(), shiftDTO.getpId(), shiftDTO.getBonusTimeBank()
-                            , shiftDTO.getAmount(), shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), breakActivity.getId(), mainShift.getStaffId(), mainShift.getUnitId(), mainShift.getUnitPositionId());
-                    breakShift.setShiftState(ShiftState.UNPUBLISHED);
-                    breakShift.setMainShift(false);
-                    shifts.add(breakShift);
                     shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 } else {
-                    logger.info("B", shiftDurationInMinute);
+                    logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for ", breakSettings.get(i).getBreakDurationInMinute());
                     // add break and increase main shift duration by remaining minute
                 }
             } else {
                 break;
             }
+        }
+        /**
+         * still shift is greater than break We need to repeat last break until shift duration is less
+         **/
+        while (shiftDurationInMinute > breakAllowedAfterMinute) {
+            // last end date is now start date
+            startDateMillis = endDateMillis;
+            endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
+            shifts.add(getShiftObject(shiftDTO, shiftDTO.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis)));
+            shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+
+            if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
+                startDateMillis = endDateMillis;
+                endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
+                shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis)));
+                shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+
+            } else {
+                logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for {} ", allowedBreakDurationInMinute);
+                // add break and increase main shift duration by remaining minute
+            }
+
         }
         save(shifts);
         mainShift.setSubShifts(shifts.stream().map(Shift::getId).collect(Collectors.toSet()));
