@@ -119,18 +119,18 @@ public class StaffRestClient {
         }
     }
 
-    public List<Map<Long,Long>> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
+    public Map<Long,Long> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
 
         final String baseUrl = getBaseUrl(organizationId, unitId, null);
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<Long,Long>>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<Long,Long>>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<List<Map<Long,Long>>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<Map<Long,Long>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/unit_position/expertise",
                             HttpMethod.GET, null, typeReference);
-            RestTemplateResponseEnvelope<List<Map<Long,Long>>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<Map<Long,Long>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

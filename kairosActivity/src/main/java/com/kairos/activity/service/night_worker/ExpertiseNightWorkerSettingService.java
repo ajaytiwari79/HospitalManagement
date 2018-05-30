@@ -12,13 +12,12 @@ import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
+import com.kairos.response.dto.web.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -67,8 +66,35 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
     }
 
     public Boolean updateNightWorkerStatusByUnitId(Long unitId){
-        List<Map<Long,Long>> unitPositionIdAndExpertiseMap = staffRestClient.getUnitPositionExpertiseMap(unitId, unitId);
+        Map<Long,Long> unitPositionIdAndExpertiseMap = staffRestClient.getUnitPositionExpertiseMap(unitId, unitId);
         List<ShiftQueryResult> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
+        Map<Long, List<ShiftQueryResult>> shiftsOfStaff = new HashMap<>();
+
+        shifts.forEach(shiftQueryResult -> {
+            shiftQueryResult.setExpertiseId(unitPositionIdAndExpertiseMap.get(shiftQueryResult.getUnitPositionId()));
+
+            if(shiftsOfStaff.containsKey(shiftQueryResult.getStaffId())){
+                shiftsOfStaff.get(shiftQueryResult.getStaffId()).add(shiftQueryResult);
+            } else {
+                shiftsOfStaff.put(shiftQueryResult.getStaffId(), new ArrayList<>(Arrays.asList(shiftQueryResult)));
+            }
+        });
+
+        List<Long> expertiseIds =  (List<Long>) unitPositionIdAndExpertiseMap.values();
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByCountryAndExpertiseIds(expertiseIds);
+
+        Map<Long, ExpertiseNightWorkerSettingDTO> expertiseSettingMap = new HashMap<>();
+        expertiseNightWorkerSettings.stream().forEach(expertiseNightWorkerSetting -> {
+            expertiseSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),
+                    ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class)
+                    );
+        });
+
+        shiftsOfStaff.forEach((staffId, shiftQueryResults) -> {
+            ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO = new ShiftAndExpertiseNightWorkerSettingDTO(shifts, expertiseSettingMap);
+            // DO trigger for night Worker as per staffId and unitId
+        });
+
         return true;
     }
 
