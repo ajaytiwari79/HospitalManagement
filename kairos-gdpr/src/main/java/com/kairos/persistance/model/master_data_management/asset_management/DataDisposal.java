@@ -9,10 +9,9 @@ import javax.validation.constraints.NotNull;
 @Document(collection = "data_disposal")
 public class DataDisposal extends MongoBaseEntity {
 
-    @NotNullOrEmpty
+    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
     private String name;
 
-    @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class OrganizationalSecurityMeasureController {
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable BigInteger id, @RequestBody OrganizationalSecurityMeasure orgSecurityMeasure) {
+    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable BigInteger id,  @Valid @RequestBody OrganizationalSecurityMeasure orgSecurityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

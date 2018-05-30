@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.agreement_template.AgreementSectionMong
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,10 @@ public class AgreementSectionService extends MongoBaseService {
 
     @Inject
     private ClauseMongoRepository clauseMongoRepository;
+
+
+    @Inject
+    private ExceptionService exceptionService;
 
 
     public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {

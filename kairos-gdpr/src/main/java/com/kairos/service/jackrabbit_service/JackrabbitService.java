@@ -5,8 +5,14 @@ import com.kairos.custome_exception.ClauseNotFoundJackRabbitException;
 import com.kairos.custome_exception.JackrabbitNodeNotFoundException;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.model.clause.Clause;
+import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
+import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
+import com.kairos.persistance.repository.clause.ClauseMongoRepository;
+import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
 import com.kairos.response.dto.clause.ClauseBasicResponseDto;
+import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,9 +46,22 @@ public class JackrabbitService {
     private Repository repository;
 
 
+    @Inject
+    private ClauseMongoRepository clauseMongoRepository;
+
+    @Inject
+    private ClauseTagMongoRepository clauseTagMongoRepository;
+
+    @Inject
+    private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
+
+    @Inject
+    private AgreementSectionMongoRepository agreementSectionMongoRepository;
+
+
     private static final Logger logger = LoggerFactory.getLogger(JackrabbitService.class);
 
-    public Boolean addClauseToJackrabbit(BigInteger id, Clause clause) throws RepositoryException {
+    public Boolean addClauseNodeToJackrabbit(BigInteger id, Clause clause) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
         try {
@@ -73,8 +92,14 @@ public class JackrabbitService {
             return true;
 
         } catch (RepositoryException e) {
+            clauseMongoRepository.delete(clause);
+            clauseTagMongoRepository.deleteAll(clause.getTags());
+            logger.warn(e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
+            clauseMongoRepository.delete(clause);
+            clauseTagMongoRepository.deleteAll(clause.getTags());
+            logger.warn(e.getMessage());
             e.printStackTrace();
         } finally {
             session.logout();
@@ -114,8 +139,12 @@ public class JackrabbitService {
 
 
         } catch (RepositoryException e) {
+
+            logger.warn(e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
+
+            logger.warn(e.getMessage());
             e.printStackTrace();
         } finally {
             session.logout();
@@ -151,6 +180,8 @@ public class JackrabbitService {
 
 
         } catch (Exception e) {
+
+            logger.warn(e.getMessage());
             e.printStackTrace();
         } finally {
             session.logout();
@@ -175,6 +206,8 @@ public class JackrabbitService {
             return versionList;
 
         } catch (Exception e) {
+
+            logger.warn(e.getMessage());
             e.printStackTrace();
         } finally {
             session.logout();
@@ -215,10 +248,13 @@ public class JackrabbitService {
 
         } catch (RepositoryException e) {
 
+            agreementSectionMongoRepository.deleteAll(agreementSectionMongoRepository.findAgreementSectionByIds(UserContext.getCountryId(),agreementTemplate.getAgreementSections()));
+            policyAgreementTemplateRepository.delete(agreementTemplate);
             logger.warn(e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
-
+            agreementSectionMongoRepository.deleteAll(agreementSectionMongoRepository.findAgreementSectionByIds(UserContext.getCountryId(),agreementTemplate.getAgreementSections()));
+            policyAgreementTemplateRepository.delete(agreementTemplate);
             logger.warn(e.getMessage());
             e.printStackTrace();
         } finally {
@@ -283,7 +319,7 @@ public class JackrabbitService {
             }
             return versionList;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } finally {
             session.logout();
         }
@@ -313,9 +349,7 @@ public class JackrabbitService {
 
             }
         } catch (Exception e) {
-
-            e.printStackTrace();
-            logger.warn(e.getMessage());
+            logger.error(e.getMessage());
         } finally {
             session.logout();
         }
@@ -341,9 +375,8 @@ public class JackrabbitService {
 
 
         } catch (Exception e) {
-
-            e.printStackTrace();
             logger.warn(e.getMessage());
+            e.printStackTrace();
         } finally {
             session.logout();
         }

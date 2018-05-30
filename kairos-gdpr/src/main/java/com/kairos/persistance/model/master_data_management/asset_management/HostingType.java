@@ -8,10 +8,10 @@ import javax.validation.constraints.NotNull;
 
 @Document(collection = "hosting_type")
 public class HostingType extends MongoBaseEntity {
-    @NotNullOrEmpty
+
+    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
     private String name;
 
-    @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {

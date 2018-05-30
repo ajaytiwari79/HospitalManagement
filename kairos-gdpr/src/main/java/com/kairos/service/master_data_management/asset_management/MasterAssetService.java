@@ -10,6 +10,7 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
@@ -35,48 +36,38 @@ public class MasterAssetService extends MongoBaseService {
     @Inject
     ComparisonUtils comparisonUtils;
 
-    public MasterAsset addMasterAsset(Long countryId,MasterAssetDto masterAsset) {
+    @Inject
+    private ExceptionService exceptionService;
+
+
+    public MasterAsset addMasterAsset(Long countryId, MasterAssetDto masterAssetDto) {
 
         MasterAsset newAsset = new MasterAsset();
-        if (masterAssetMongoRepository.findByNameAndCountry(countryId,masterAsset.getName()) != null) {
-            throw new DuplicateDataException("master asset for name " + masterAsset.getName() + " exists");
+        if (masterAssetMongoRepository.findByNameAndCountry(countryId, masterAssetDto.getName()) != null) {
+            throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         } else {
-            Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-            orgTypeIds = masterAsset.getOrganizationTypes();
-            orgSubTypeIds = masterAsset.getOrganizationSubTypes();
-            orgServiceIds = masterAsset.getOrganizationServices();
-            orgSubServiceIds = masterAsset.getOrganizationSubServices();
 
-            OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
-            OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-
-            if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
-
-                List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
-                comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-                newAsset.setOrganizationSubTypes(orgSubTypes);
+            if (masterAssetDto.getOrganizationTypes()!=null&&masterAssetDto.getOrganizationTypes().size()!=0) {
+                newAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
 
             }
-            if (orgServiceIds != null && orgServiceIds.size() != 0) {
-                List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
-                comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-                newAsset.setOrganizationServices(orgServices);
-
+            if (masterAssetDto.getOrganizationSubTypes()!=null&&masterAssetDto.getOrganizationSubTypes().size()!=0) {
+                newAsset.setOrganizationSubTypes(masterAssetDto.getOrganizationSubTypes());
 
             }
-            if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
-                List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
-                comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-                newAsset.setOrganizationSubServices(orgSubServices);
+            if (masterAssetDto.getOrganizationServices()!=null&&masterAssetDto.getOrganizationServices().size()!=0) {
+                newAsset.setOrganizationServices(masterAssetDto.getOrganizationServices());
 
             }
-            comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
-            newAsset.setOrganizationTypes(requestResult.getOrganizationTypes());
+            if (masterAssetDto.getOrganizationSubServices()!=null&&masterAssetDto.getOrganizationSubServices().size()!=0) {
+                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+
+            }
 
         }
-        newAsset.setName(masterAsset.getName());
+        newAsset.setName(masterAssetDto.getName());
         newAsset.setCountryId(countryId);
-        newAsset.setDescription(masterAsset.getDescription());
+        newAsset.setDescription(masterAssetDto.getDescription());
         return save(newAsset);
 
 
@@ -92,41 +83,34 @@ public class MasterAssetService extends MongoBaseService {
 
 
         MasterAsset exists = masterAssetMongoRepository.findByid(id);
+
         if (!Optional.of(exists).isPresent()) {
-            throw new DataNotFoundByIdException("asset not Exist for id " + id);
-        }
-        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterAssetDto.getOrganizationTypes();
-        orgSubTypeIds = masterAssetDto.getOrganizationSubTypes();
-        orgServiceIds = masterAssetDto.getOrganizationServices();
-        orgSubServiceIds = masterAssetDto.getOrganizationSubServices();
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
-        OrganizationTypeAndServiceResultDto requestResult = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
-        if (orgSubTypeIds != null && orgServiceIds.size() != 0) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","master.asset",id);
+        } else {
+            if (masterAssetDto.getOrganizationTypes() != null && masterAssetDto.getOrganizationTypes().size() != 0) {
+                exists.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
 
-            List<OrganizationTypeAndServiceBasicDto> orgSubTypes = requestResult.getOrganizationSubTypes();
-            comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-            exists.setOrganizationSubTypes(orgSubTypes);
+            }
+            if (masterAssetDto.getOrganizationSubTypes() != null && masterAssetDto.getOrganizationSubTypes().size() != 0) {
+                exists.setOrganizationSubTypes(masterAssetDto.getOrganizationSubTypes());
 
-        }
-        if (orgServiceIds != null && orgServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgServices = requestResult.getOrganizationServices();
-            comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-            exists.setOrganizationServices(orgServices);
+            }
+            if (masterAssetDto.getOrganizationServices() != null && masterAssetDto.getOrganizationServices().size() != 0) {
+                exists.setOrganizationServices(masterAssetDto.getOrganizationServices());
 
-        }
-        if (orgSubServiceIds != null && orgSubServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgSubServices = requestResult.getOrganizationSubServices();
-            comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-            exists.setOrganizationSubServices(orgSubServices);
+            }
+            if (masterAssetDto.getOrganizationSubServices() != null && masterAssetDto.getOrganizationSubServices().size() != 0) {
+                exists.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+
+            }
+            exists.setName(masterAssetDto.getName());
+            exists.setDescription(masterAssetDto.getDescription());
 
         }
-        comparisonUtils.checkOrgTypeAndService(orgTypeIds, requestResult.getOrganizationTypes());
-        exists.setOrganizationTypes(requestResult.getOrganizationTypes());
-        exists.setName(masterAssetDto.getName());
-        exists.setDescription(masterAssetDto.getDescription());
         return save(exists);
     }
+
+
 
 
     public Boolean deleteMasterAsset(BigInteger id) {
@@ -140,8 +124,8 @@ public class MasterAssetService extends MongoBaseService {
 
     }
 
-    public MasterAsset getMasterAssetById(Long countryId,BigInteger id) {
-        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(countryId,id);
+    public MasterAsset getMasterAssetById(Long countryId, BigInteger id) {
+        MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("master asset not Exist for id " + id);
 

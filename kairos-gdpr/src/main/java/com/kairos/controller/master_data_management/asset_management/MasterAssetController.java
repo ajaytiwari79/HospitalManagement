@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constant.ApiConstant.API_MASTER_ASSET_URL;
@@ -53,7 +54,7 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id, @RequestBody MasterAssetDto asset) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id,  @Valid @RequestBody MasterAssetDto asset) {
 
         if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(id, asset));

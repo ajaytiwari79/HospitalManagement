@@ -7,9 +7,9 @@ import java.util.List;
 
 public class ProcessingActivityDto {
 
-    @NotNullOrEmpty(message = "ProcessingActivity.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
     String name;
-    @NotNullOrEmpty(message = "ProcessingActivity.description.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "error.message.description.cannot.be.null.or.empty")
     String description;
     Long managingDepartmentOrganization;
     Long hostingCountryId;

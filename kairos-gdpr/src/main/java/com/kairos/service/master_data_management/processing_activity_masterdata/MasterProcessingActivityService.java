@@ -33,55 +33,50 @@ public class MasterProcessingActivityService extends MongoBaseService {
     MasterProcessingActivityRepository masterProcessingActivityRepository;
 
 
-    @Inject
-    ComparisonUtils comparisonUtils;
-
     public MasterProcessingActivity createMasterProcessingActivity(Long countryId, MasterProcessingActivityDto masterProcessingActivityDto) {
 
         if (masterProcessingActivityRepository.findByNameAndCountryId(countryId,masterProcessingActivityDto.getName()) != null) {
 
             throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
         }
-        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterProcessingActivityDto.getOrganizationTypes();
-        orgSubTypeIds = masterProcessingActivityDto.getOrganizationSubTypes();
-        orgServiceIds = masterProcessingActivityDto.getOrganizationServices();
-        orgSubServiceIds = masterProcessingActivityDto.getOrganizationSubServices();
-
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
-        OrganizationTypeAndServiceResultDto orgTypeAndServices = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(countryId,masterProcessingActivityDto.getName(),masterProcessingActivityDto.getDescription());
-        if (orgServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgSubTypes = orgTypeAndServices.getOrganizationSubTypes();
-            comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-            masterProcessingActivity.setOrganizationSubTypes(orgSubTypes);
 
-        }
-        if (orgServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgServices = orgTypeAndServices.getOrganizationServices();
-            comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-            masterProcessingActivity.setOrganizationServices(orgServices);
+       try {
+           if (masterProcessingActivityDto.getOrganizationTypes() != null && masterProcessingActivityDto.getOrganizationTypes().size() != 0) {
+               masterProcessingActivity.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
 
-        }
-        if (orgSubServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgSubServices = orgTypeAndServices.getOrganizationSubServices();
-            comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-            masterProcessingActivity.setOrganizationSubServices(orgSubServices);
+           }
 
-        }
-        if ( masterProcessingActivityDto.getSubProcessingActivities()!=null&&masterProcessingActivityDto.getSubProcessingActivities().size()>1) {
-            masterProcessingActivity.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), orgTypeAndServices));
-        }
-        comparisonUtils.checkOrgTypeAndService(orgTypeIds, orgTypeAndServices.getOrganizationTypes());
-        masterProcessingActivity.setOrganizationTypes(orgTypeAndServices.getOrganizationTypes());
-        masterProcessingActivity.setCountryId(countryId);
-        return save(masterProcessingActivity);
+           if (masterProcessingActivityDto.getOrganizationSubTypes() != null && masterProcessingActivityDto.getOrganizationSubTypes().size() != 0) {
+               masterProcessingActivity.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());
 
+           }
+           if (masterProcessingActivityDto.getOrganizationServices() != null && masterProcessingActivityDto.getOrganizationServices().size() != 0) {
+               masterProcessingActivity.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
 
+           }
+           if (masterProcessingActivityDto.getOrganizationSubServices() != null && masterProcessingActivityDto.getOrganizationSubServices().size() != 0) {
+               masterProcessingActivity.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationTypes());
+
+           }
+           if (masterProcessingActivityDto.getSubProcessingActivities() != null && masterProcessingActivityDto.getSubProcessingActivities().size() > 1) {
+               masterProcessingActivity.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto));
+           }
+
+           masterProcessingActivity.setCountryId(countryId);
+           masterProcessingActivity= save(masterProcessingActivity);
+       }
+       catch (NullPointerException e)
+       {
+           LOGGER.warn(e.getMessage());
+           e.printStackTrace();
+       }
+
+       return masterProcessingActivity;
     }
 
 
-    public List<BigInteger> addSubProcessingActivity(Long countryId, List<MasterProcessingActivityDto> subProcessingActivities, OrganizationTypeAndServiceResultDto orgTypeAndServices) {
+    public List<BigInteger> addSubProcessingActivity(Long countryId, List<MasterProcessingActivityDto> subProcessingActivities, MasterProcessingActivityDto processingActivityDto) {
 
         List<String> checkDuplicateInSubProcess = new ArrayList<>();
         List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
@@ -91,10 +86,10 @@ public class MasterProcessingActivityService extends MongoBaseService {
             }
             checkDuplicateInSubProcess.add(activity.getName());
             MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(countryId, activity.getName(), activity.getDescription());
-            subProcessingActivity.setOrganizationTypes(orgTypeAndServices.getOrganizationTypes());
-            subProcessingActivity.setOrganizationSubTypes(orgTypeAndServices.getOrganizationSubTypes());
-            subProcessingActivity.setOrganizationServices(orgTypeAndServices.getOrganizationServices());
-            subProcessingActivity.setOrganizationSubServices(orgTypeAndServices.getOrganizationSubServices());
+            subProcessingActivity.setOrganizationTypes(processingActivityDto.getOrganizationTypes());
+            subProcessingActivity.setOrganizationSubTypes(processingActivityDto.getOrganizationSubTypes());
+            subProcessingActivity.setOrganizationServices(processingActivityDto.getOrganizationServices());
+            subProcessingActivity.setOrganizationSubServices(processingActivityDto.getOrganizationSubServices());
             subProcessingActivityList.add(subProcessingActivity);
         }
 
@@ -108,18 +103,16 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
 
-
-
-
     public void checkForDuplicacyByName(Long countryId,List<String> subProcessingAcitivityNames) {
 
         List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(countryId,subProcessingAcitivityNames);
-        System.err.println("size"+processingActivities.size());
-
-        if (processingActivities.size() != 0) {
+         if (processingActivities.size() != 0) {
             throw new DuplicateDataException(" sub processing acitvity " + processingActivities.get(0).getName() + " exist");
         }
     }
+
+
+
     public List<MasterProcessingActivity> getAllmasterProcessingActivity() {
         return masterProcessingActivityRepository.getAllMasterProcessingsctivity(UserContext.getCountryId());
 
@@ -131,40 +124,37 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         }
-        System.err.println("_++++++"+exists.getName());
-        Set<Long> orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds;
-        orgTypeIds = masterProcessingActivityDto.getOrganizationTypes();
-        orgSubTypeIds = masterProcessingActivityDto.getOrganizationSubTypes();
-        orgServiceIds = masterProcessingActivityDto.getOrganizationServices();
-        orgSubServiceIds = masterProcessingActivityDto.getOrganizationSubServices();
+       else {
 
-        OrganizationTypeAndServiceRestClientRequestDto requestDto = new OrganizationTypeAndServiceRestClientRequestDto(orgTypeIds, orgSubTypeIds, orgServiceIds, orgSubServiceIds);
-        OrganizationTypeAndServiceResultDto orgTypeAndServices = organizationTypeAndServiceRestClient.getOrganizationTypeAndServices(requestDto);
+            if (masterProcessingActivityDto.getOrganizationTypes() != null && masterProcessingActivityDto.getOrganizationTypes().size() != 0) {
+                exists.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
 
-        if (orgServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgSubTypes = orgTypeAndServices.getOrganizationSubTypes();
-            comparisonUtils.checkOrgTypeAndService(orgSubTypeIds, orgSubTypes);
-            exists.setOrganizationSubTypes(orgSubTypes);
-        }
-        if (orgServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgServices = orgTypeAndServices.getOrganizationServices();
-            comparisonUtils.checkOrgTypeAndService(orgServiceIds, orgServices);
-            exists.setOrganizationServices(orgServices);
-        }
-        if (orgSubServiceIds.size() != 0) {
-            List<OrganizationTypeAndServiceBasicDto> orgSubServices = orgTypeAndServices.getOrganizationSubServices();
-            comparisonUtils.checkOrgTypeAndService(orgSubServiceIds, orgSubServices);
-            exists.setOrganizationSubServices(orgSubServices);
+            }
+
+            if (masterProcessingActivityDto.getOrganizationSubTypes() != null && masterProcessingActivityDto.getOrganizationSubTypes().size() != 0) {
+                exists.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());
+
+            }
+            if (masterProcessingActivityDto.getOrganizationServices() != null && masterProcessingActivityDto.getOrganizationServices().size() != 0) {
+                exists.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
+
+            }
+            if (masterProcessingActivityDto.getOrganizationSubServices() != null && masterProcessingActivityDto.getOrganizationSubServices().size() != 0) {
+                exists.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationTypes());
+
+            }
+            if (masterProcessingActivityDto.getSubProcessingActivities() != null && masterProcessingActivityDto.getSubProcessingActivities().size() > 1) {
+                exists.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto));
+            }
+
+
+            exists.setDescription(masterProcessingActivityDto.getDescription());
+            exists.setName(masterProcessingActivityDto.getName());
+
 
         }
-        comparisonUtils.checkOrgTypeAndService(orgTypeIds, orgTypeAndServices.getOrganizationTypes());
-        exists.setOrganizationTypes(orgTypeAndServices.getOrganizationTypes());
-        exists.setSubProcessingActivityIds(addSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), orgTypeAndServices));
-        exists.setName(masterProcessingActivityDto.getName());
-        exists.setDescription(masterProcessingActivityDto.getDescription());
         return save(exists);
     }
-
 
     public MasterProcessingActivityResponseDto getMasterProcessingActivityWithData(Long countryId, BigInteger id) {
         MasterProcessingActivityResponseDto result = masterProcessingActivityRepository.getMasterProcessingActivityWithData(countryId,id);

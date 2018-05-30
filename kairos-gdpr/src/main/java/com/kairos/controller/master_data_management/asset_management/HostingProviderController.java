@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class HostingProviderController {
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable BigInteger id, @RequestBody HostingProvider hostingProvider) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable BigInteger id, @Valid @RequestBody HostingProvider hostingProvider) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

@@ -11,6 +11,8 @@ import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -96,13 +98,11 @@ public class DataSourceService extends MongoBaseService {
 
     public DataSource updateDataSource(BigInteger id, DataSource dataSource) {
 
-
         DataSource exist = dataSourceMongoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
             exist.setName(dataSource.getName());
-
             return save(exist);
 
         }

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable BigInteger id, @RequestBody ProcessingLegalBasis legalBasis) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable BigInteger id,@Valid @RequestBody ProcessingLegalBasis legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

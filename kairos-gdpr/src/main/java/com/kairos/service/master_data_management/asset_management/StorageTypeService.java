@@ -40,13 +40,14 @@ public class StorageTypeService extends MongoBaseService {
             }
             existing = storageTypeMongoRepository.findByCountryAndNameList(countryId, names);
             existing.forEach(item -> names.remove(item.getName()));
-
-            if (names.size() != 0) {
+            if (names.size()!=0) {
                 for (String name : names) {
+
                     StorageType newStorageType = new StorageType();
                     newStorageType.setName(name);
                     newStorageType.setCountryId(countryId);
                     newStorageTypes.add(newStorageType);
+
                 }
 
                 newStorageTypes = save(newStorageTypes);
