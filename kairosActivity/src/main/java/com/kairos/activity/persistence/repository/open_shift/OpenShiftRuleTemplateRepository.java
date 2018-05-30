@@ -23,4 +23,10 @@ public interface OpenShiftRuleTemplateRepository extends MongoBaseRepository<Ope
     List<OpenShiftRuleTemplateDTO> findByUnitIdAndActivityId(BigInteger activityId,Long unitId);
 
     boolean existsByNameIgnoreCaseAndDeletedFalseAndCountryId(String name,Long countryId);
+
+    OpenShiftRuleTemplateDTO getByIdAndCountryIdAndDeletedFalse(BigInteger id,long countryId);
+
+    OpenShiftRuleTemplateDTO getByIdAndUnitIdAndDeletedFalse(BigInteger id,long unitId);
+
+
 }

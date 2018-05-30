@@ -38,4 +38,3 @@ public class PriorityGroupIntegrationService {
         priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,true, IntegrationOperation.CREATE, "/open_shit/copy_rule_template", null);
     }
 }
-

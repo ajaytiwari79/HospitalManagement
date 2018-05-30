@@ -20,6 +20,7 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.TimeTypeMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
@@ -40,6 +41,7 @@ import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
+import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -106,6 +108,7 @@ public class ActivityService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private StaffRestClient  staffRestClient;
+    @Inject private OpenShiftIntervalRepository openShiftIntervalRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -1053,7 +1056,8 @@ public class ActivityService extends MongoBaseService {
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId){
        List<ActivityDTO> activityDTOS =activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
        List<TimeTypeDTO> timeTypeDTOS=timeTypeService.getAllTimeType(null,countryId);
-       ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS);
+       List<OpenShiftIntervalDTO> intervals=openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
+       ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals);
        return activityWithTimeTypeDTO;
        }
 }

@@ -1,6 +1,7 @@
 package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.persistence.model.open_shift.OpenShiftRuleTemplate;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftRuleTemplateAndPriorityGroupWrapper;
 import com.kairos.activity.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftRuleTemplateRepository;
@@ -9,6 +10,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -108,9 +110,22 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
        return  openShiftRuleTemplateRepository.findByIdAndUnitIdAndDeletedFalse(ruleTemplateId,unitId);
     }
 
+    public OpenShiftRuleTemplateAndPriorityGroupWrapper getRuleTemplateAndPriorityGroupByIdAtUnit(BigInteger ruleTemplateId, long countryId) {
+        OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO=  openShiftRuleTemplateRepository.getByIdAndUnitIdAndDeletedFalse(ruleTemplateId,countryId);
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(countryId,ruleTemplateId);
+        return new OpenShiftRuleTemplateAndPriorityGroupWrapper(openShiftRuleTemplateDTO,priorityGroupDTOS);
+    }
+
     public OpenShiftRuleTemplate getRuleTemplateByIdAtCountry(BigInteger ruleTemplateId,long countryId) {
         return  openShiftRuleTemplateRepository.findByIdAndCountryIdAndDeletedFalse(ruleTemplateId,countryId);
     }
+
+    public OpenShiftRuleTemplateAndPriorityGroupWrapper getRuleTemplateAndPriorityGroupByIdAtCountry(BigInteger ruleTemplateId, long countryId) {
+        OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO=  openShiftRuleTemplateRepository.getByIdAndCountryIdAndDeletedFalse(ruleTemplateId,countryId);
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByCountryIdAndRuleTemplateIdAndDeletedFalse(countryId,ruleTemplateId);
+        return new OpenShiftRuleTemplateAndPriorityGroupWrapper(openShiftRuleTemplateDTO,priorityGroupDTOS);
+    }
+
 
     public List<OpenShiftRuleTemplateDTO> findByUnitIdAndActivityId(BigInteger activityId,Long unitId){
        return openShiftRuleTemplateRepository.findByUnitIdAndActivityId(activityId,unitId);
@@ -130,5 +145,6 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         openShiftRuleTemplateDTO.setId(openShiftRuleTemplate.getId());
         return openShiftRuleTemplateDTO;
     }
+
 
 }

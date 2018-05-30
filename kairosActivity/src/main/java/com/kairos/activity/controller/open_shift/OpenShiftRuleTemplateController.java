@@ -26,80 +26,80 @@ public class OpenShiftRuleTemplateController {
     OpenShiftRuleTemplateService openShiftRuleTemplateService;
 
     @ApiOperation("Create Rule template for automatic open shift")
-    @PostMapping(value = COUNTRY_URL+"/open_shit/rule_template")
+    @PostMapping(value = COUNTRY_URL+"/open_shift/rule_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createRuleTemplateForOpenShift(@PathVariable Long countryId, @RequestBody OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.createRuleTemplateForOpenShift(countryId,openShiftRuleTemplateDTO));
     }
 
     @ApiOperation("Get all Rule templates based on countryId")
-    @GetMapping(value = COUNTRY_URL+"/open_shit/rule_templates")
+    @GetMapping(value = COUNTRY_URL+"/open_shift/rule_templates")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getRuleTemplateForOpenShift(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.findAllRuleTemplateForOpenShift(countryId));
     }
 
     @ApiOperation("Update Rule templates ")
-    @PutMapping(value = COUNTRY_URL+"/open_shit/rule_template/{ruleTemplateId}")
+    @PutMapping(value = COUNTRY_URL+"/open_shift/rule_template/{ruleTemplateId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateRuleTemplateForOpenShift(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId, @RequestBody OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.updateRuleTemplateForOpenShift(countryId,ruleTemplateId, openShiftRuleTemplateDTO));
     }
 
     @ApiOperation("delete Rule template based on countryId")
-    @DeleteMapping(value = COUNTRY_URL+"/open_shit/rule_template/{ruleTemplateId}")
+    @DeleteMapping(value = COUNTRY_URL+"/open_shift/rule_template/{ruleTemplateId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteRuleTemplateForOpenShift(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.deleteRuleTemplateForOpenShift(countryId,ruleTemplateId));
     }
 
     @ApiOperation("Get  Rule template based on ruleTemplateId")
-    @GetMapping(value = COUNTER_URL+"/open_shit/rule_template/{ruleTemplateId}")
+    @GetMapping(value = COUNTRY_URL+"/open_shift/rule_template/{ruleTemplateId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getRuleTemplateByIdAtCountry(@PathVariable Long countryId,@PathVariable BigInteger ruleTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.getRuleTemplateByIdAtCountry(ruleTemplateId,countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.getRuleTemplateAndPriorityGroupByIdAtCountry(ruleTemplateId,countryId));
     }
 
     @ApiOperation("Copy Rule templates for Unit")
-    @PostMapping(value = UNIT_URL+"/open_shit/rule_template")
+    @PostMapping(value = UNIT_URL+"/open_shift/rule_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createRuleTemplateForUnit(@PathVariable Long unitId, @RequestBody OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.createRuleTemplateForUnit(unitId,openShiftRuleTemplateDTO));
     }
 
     @ApiOperation("Copy Rule templates for Unit")
-    @PostMapping(value = UNIT_URL+"/open_shit/copy_rule_template")
+    @PostMapping(value = UNIT_URL+"/open_shift/copy_rule_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyRuleTemplateForUnit(@PathVariable Long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.copyRuleTemplateForUnit(unitId,orgTypeAndSubTypeDTO));
     }
 
     @ApiOperation("Get all Rule templates based on unitId")
-    @GetMapping(value = UNIT_URL+"/open_shit/rule_templates")
+    @GetMapping(value = UNIT_URL+"/open_shift/rule_templates")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getRuleTemplatesOfUnit(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.getRuleTemplatesOfUnit(unitId));
     }
 
     @ApiOperation("Update Rule template")
-    @PutMapping(value = UNIT_URL+"/open_shit/rule_template/{ruleTemplateId}")
+    @PutMapping(value = UNIT_URL+"/open_shift/rule_template/{ruleTemplateId}")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateRuleTemplateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger ruleTemplateId, @RequestBody OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.updateRuleTemplateOfUnit(unitId,ruleTemplateId, openShiftRuleTemplateDTO));
     }
 
     @ApiOperation("delete Rule template based on countryId")
-    @DeleteMapping(value = UNIT_URL+"/open_shit/rule_template/{ruleTemplateId}")
+    @DeleteMapping(value = UNIT_URL+"/open_shift/rule_template/{ruleTemplateId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteRuleTemplateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger ruleTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.deleteRuleTemplateOfUnit(ruleTemplateId,unitId));
     }
 
     @ApiOperation("Get  Rule template based on ruleTemplateId")
-    @GetMapping(value = UNIT_URL+"/open_shit/rule_template/{ruleTemplateId}")
+    @GetMapping(value = UNIT_URL+"/open_shift/rule_template/{ruleTemplateId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getRuleTemplateById(@PathVariable Long unitId,@PathVariable BigInteger ruleTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.getRuleTemplateByIdAndUnitId(ruleTemplateId,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.getRuleTemplateAndPriorityGroupByIdAtUnit(ruleTemplateId,unitId));
     }
 
     @ApiOperation("Get  Rule templates by ActivityId")
