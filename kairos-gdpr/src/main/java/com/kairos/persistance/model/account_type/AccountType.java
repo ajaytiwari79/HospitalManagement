@@ -17,10 +17,8 @@ public class AccountType extends MongoBaseEntity {
 
 
     @NotNullOrEmpty
-    @UniqueElements
     private String typeOfAccount;
 
-    @NotNull
     private Long countryId;
 
     public Long getCountryId() {
