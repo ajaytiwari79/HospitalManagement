@@ -9,6 +9,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.*;
@@ -113,7 +114,8 @@ public class CountryService extends UserBaseService {
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
     private @Inject OrganizationService organizationService;
-    private @Inject PresenceTypeService presenceTypeService;
+    @Inject
+    private PlannedTimeTypeRestClient plannedTimeTypeRestClient;
     private @Autowired FunctionService functionService;
     @Inject
     private ExceptionService exceptionService;
@@ -491,7 +493,7 @@ public class CountryService extends UserBaseService {
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
          TimeTypeDTO timeType= timeTypeRestClient.getAllTimeTypes(countryId).stream().filter(t->t.getTimeTypes().equals(TimeTypes.WORKING_TYPE.toValue())).findFirst().get();
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
-         List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
+         List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
          List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
          List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
@@ -534,7 +536,7 @@ public class CountryService extends UserBaseService {
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId){
-        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(countryId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<com.kairos.response.dto.web.wta.PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new com.kairos.response.dto.web.wta.PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());

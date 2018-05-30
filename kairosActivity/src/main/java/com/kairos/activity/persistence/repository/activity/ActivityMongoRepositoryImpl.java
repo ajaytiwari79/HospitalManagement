@@ -93,6 +93,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
 
         );
@@ -113,6 +114,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
