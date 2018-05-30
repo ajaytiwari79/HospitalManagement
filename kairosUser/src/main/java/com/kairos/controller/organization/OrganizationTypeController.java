@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.client.dto.gdpr.OrganizationTypeAndServiceRequestDto;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
@@ -89,6 +90,20 @@ public class OrganizationTypeController {
         organizationTypeService.deleteLinkingOfOrganizationTypeAndService(orgTypeId,organizationServiceId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
+
+
+
+    @ApiOperation(value = "Get  Organization Types by set ids")
+    @RequestMapping(value = "/org_types_and_services/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> organizationTypesAndServicesAndSubTypes(@RequestBody OrganizationTypeAndServiceRequestDto requestDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.organizationTypesAndServicesAndSubTypes(requestDto));
+    }
+
+    @ApiOperation(value = "get organization and services")
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/all", method = RequestMethod.GET)
+   ResponseEntity<Map<String, Object>> getOrgTypeAndOrgServicesResponseDto(@PathVariable Long countryId) {
+           return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId) );
+          }
 
 
 

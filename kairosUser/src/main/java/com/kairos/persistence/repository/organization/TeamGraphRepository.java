@@ -157,8 +157,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization\n" +
             "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:EXPERTISE_HAS_SKILLS{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
             "Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags            \n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(clause_tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE clause_tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as ctags            \n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(clause_tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as otags\n" +
             "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
             "return {availableSkills:collect(availableSkills)} as data\n" +
             "UNION\n" +
@@ -168,8 +168,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization,team\n" +
             "Match (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team,organization\n" +
             "match (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(clause_tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE clause_tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(clause_tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as otags\n" +
             "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true,tags:ctags+otags})} as selectedSkills\n" +
             "return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String,Object>> getSkillsOfTeam(long teamId);

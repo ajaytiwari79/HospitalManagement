@@ -36,21 +36,21 @@ public class TagController {
     TagService tagService;
 
     @ApiOperation(value = "Create a New Tag in Country")
-    @RequestMapping(value = COUNTRY_URL + "/tag", method = RequestMethod.POST)
+    @RequestMapping(value = COUNTRY_URL + "/clause_tag", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addCountryTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,tagService.addCountryTag(countryId,tagDTO));
     }
 
     @ApiOperation(value = "Update a Country Tag")
-    @RequestMapping(value = COUNTRY_URL + "/tag/{tagId}", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/clause_tag/{tagId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateCountryTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long countryId, @PathVariable long tagId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateCountryTag(countryId, tagId, tagDTO));
     }
 
     @ApiOperation(value = "Get list of Country Tag")
-    @RequestMapping(value = COUNTRY_URL + "/tag", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/clause_tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId,
                                                              @RequestParam(value = "filterText",required = false) String filterText,
@@ -59,28 +59,28 @@ public class TagController {
     }
 
     @ApiOperation(value = "Delete Country Tag")
-    @RequestMapping(value = COUNTRY_URL + "/tag/{tagId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = COUNTRY_URL + "/clause_tag/{tagId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteCountryTag(@PathVariable long countryId, @PathVariable long tagId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteCountryTag(countryId, tagId));
     }
 
     @ApiOperation(value = "Create a New Tag in Organization")
-    @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.POST)
+    @RequestMapping(value = UNIT_URL + "/clause_tag", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,tagService.addOrganizationTag(unitId,tagDTO, type));
     }
 
     @ApiOperation(value = "Update a Organization Tag")
-    @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.PUT)
+    @RequestMapping(value = UNIT_URL + "/clause_tag/{tagId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @PathVariable long tagId, @RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateOrganizationTag(unitId, tagId, tagDTO, type));
     }
 
     @ApiOperation(value = "Get list of Organization Tag")
-    @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL + "/clause_tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId,
                                                                   @RequestParam(value = "filterText",required = false) String filterText,
@@ -89,7 +89,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "Delete Organization Tag")
-    @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = UNIT_URL + "/clause_tag/{tagId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteOrganizationTag(@PathVariable long unitId, @PathVariable long tagId, @RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteOrganizationTag(unitId, tagId, type));
@@ -104,7 +104,7 @@ public class TagController {
 
     // TO get tags of skill
     @ApiOperation(value = "Get list of Tags of Skill")
-    @RequestMapping(value = COUNTRY_URL + "/skill/{skillId}/tag", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/skill/{skillId}/clause_tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsOfSkill(@PathVariable long countryId, @PathVariable long skillId,
                                                              @RequestParam(value = "filterText",required = false) String filterText) {
@@ -112,15 +112,17 @@ public class TagController {
     }
 
     @ApiOperation(value = "Get list of Tags of Expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/tag", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/clause_tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsOfExpertise(@PathVariable long countryId, @PathVariable long expertiseId,
                                                               @RequestParam(value = "filterText",required = false) String filterText) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfExpertise(countryId, expertiseId, filterText));
     }
 
+
     /*@ApiOperation(value = "Get list of Tags of WTA")
     @RequestMapping(value = COUNTRY_URL + "/wta/{wtaId}/tag", method = RequestMethod.GET)
+>>>>>>> 4d75638a92211c68b490abe14444c9db668b1417
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsOfWTA(@PathVariable long countryId, @PathVariable long wtaId,
                                                               @RequestParam(value = "filterText",required = false) String filterText) {
@@ -128,7 +130,7 @@ public class TagController {
     }*/
 
     @ApiOperation(value = "Get list of Tags of rule Template Category")
-    @RequestMapping(value = COUNTRY_URL + "/rule_template_category/{ruleTemplateCategoryId}/tag", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/rule_template_category/{ruleTemplateCategoryId}/clause_tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsOfRuleTemplateCategory(@PathVariable long countryId, @PathVariable long ruleTemplateCategoryId,
                                                               @RequestParam(value = "filterText",required = false) String filterText) {

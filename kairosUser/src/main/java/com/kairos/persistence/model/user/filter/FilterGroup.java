@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class FilterGroup extends UserBaseEntity {
+public class  FilterGroup extends UserBaseEntity {
 
     @Relationship(type = APPLICABLE_FOR)
     private List<AccessPage> accessPages;

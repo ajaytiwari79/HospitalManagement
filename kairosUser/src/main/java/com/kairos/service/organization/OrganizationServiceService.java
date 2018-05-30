@@ -2,10 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
-import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.country.Country;
@@ -512,6 +509,16 @@ public class OrganizationServiceService extends UserBaseService {
         }
         return organizationService;
     }
+
+
+    public List<OrganizationBasicResponse> getAllOrganizationServicesByIds(Set<Long> orgServiceIds) {
+
+        List<OrganizationBasicResponse> organizationService = organizationServiceRepository.getAllOrganizationServicesByIds(orgServiceIds);
+//        List<OrganizationBasicResponse> organizationServices=organizationServiceRepository.getAllOrganizationServicesByIds(orgTypeId7);
+        return organizationService;
+    }
+
+
 
 
 }
