@@ -4,12 +4,14 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
 import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -25,4 +27,10 @@ public class PriorityGroupIntegrationService {
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){
         return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
         }
+
+    public Set<Long> getStaffIdsByPriorityGroupIncludeFilter(StaffIncludeFilter staffIncludeFilter, Long unitId) {
+
+        Set<Long> staffIds = priorityGroupRestClient.publish(null,unitId,IntegrationOperation.UPDATE,"/staff/priority_group",null);
+        return  staffIds;
+    }
 }

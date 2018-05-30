@@ -436,4 +436,41 @@ public class DateUtils {
         }
         return dates;
     }
+
+    public static Date getISOEndOfWeekDate(LocalDate date) {
+
+       Date endOfWeek  = Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                ZoneId.systemDefault()).with(DayOfWeek.SUNDAY).toInstant());
+
+        return endOfWeek;
+    }
+
+    public static Long getISOStartOfWeek(LocalDate date) {
+
+        Date startOfWeek  = Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                ZoneId.systemDefault()).with(DayOfWeek.MONDAY).toInstant());
+        return startOfWeek.getTime();
+    }
+
+
+    public static Long getLongFromLocalDate(LocalDate date) {
+       return date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public static LocalDate getDateFromEpoch(Long dateLong) {
+        LocalDate date = null;
+        if(Optional.ofNullable(dateLong).isPresent()) {
+            date = Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return date;
+    }
+
+    public static Date asDateEndOfDay(LocalDate localDate) {
+        return Date.from(localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date asDate(LocalDate localDate, LocalTime localTime) {
+        return Date.from(localDate.atTime(localTime).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
 }

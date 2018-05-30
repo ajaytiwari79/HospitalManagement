@@ -4,6 +4,7 @@ import com.kairos.activity.persistence.model.activity.Shift;
 
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.response.dto.web.ShiftCountDTO;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,4 +83,20 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
         return result.getMappedResults();
     }
+
+    public List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match( Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate)),
+                       group("unitPositionId").count().as("count"),
+                project("unitPositionId").and("count"),
+                sort(Sort.Direction.DESC, "count")
+
+        );
+
+        AggregationResults<ShiftCountDTO> shiftCounts = mongoTemplate.aggregate(aggregation,Shift.class,ShiftCountDTO.class);
+
+        return shiftCounts.getMappedResults();
+
+    }
+
 }

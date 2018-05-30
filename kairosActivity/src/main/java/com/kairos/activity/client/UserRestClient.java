@@ -1,10 +1,7 @@
-package com.kairos.client.priority_group;
+package com.kairos.activity.client;
 
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
-import com.kairos.response.dto.web.UnitPositionWtaDTO;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,25 +18,24 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.client.RestClientURLUtil.getBaseUrl;
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
 
 @Service
-public class PriorityGroupRestClient {
-    private static Logger logger = LoggerFactory.getLogger(PriorityGroupRestClient.class);
+public class UserRestClient {
+    private static Logger logger = LoggerFactory.getLogger(UserRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;
 
-    public <T, V> V publish(T t, Long unitId, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
-
-        final String baseUrl = getBaseUrl(false);
+    public <T, V> V publish(T t, Long id,Long parentOrganizationId,boolean hasUnitInUrl,IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
+        final String baseUrl = getBaseUrl(id,hasUnitInUrl,parentOrganizationId);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl +"/unit/"+ unitId + getURI(t,uri,queryParams,pathParams),
+                            baseUrl + getURI(t,uri,queryParams,pathParams),
                             getHttpMethod(integrationOperation),
                             t==null?null:new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();

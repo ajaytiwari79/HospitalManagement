@@ -46,6 +46,7 @@ import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -1832,7 +1833,7 @@ public class StaffService extends UserBaseService {
         return nextSeniorityLevelInMonths;
     }
 
-    public Set<Long> getStaffByStaffIncludeFilterForPriorityGroups(StaffIncludeFilter staffIncludeFilter, Long unitId) {
+    public List<StaffUnitPositionQueryResult> getStaffByStaffIncludeFilterForPriorityGroups(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
 
 /*
         String staffFilterQuery = "Match (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition)-[:"+IN_UNIT+"]-(org:Organization) where id(org)={unitId}";
@@ -1879,11 +1880,11 @@ public class StaffService extends UserBaseService {
             }
         }*/
 
-        Set<Long> staffIds = staffGraphRepository.getStaffByPriorityGroupStaffIncludeFilter(staffIncludeFilter, unitId);
+        List<StaffUnitPositionQueryResult> staffsUnitPositions = staffGraphRepository.getStaffByPriorityGroupStaffIncludeFilter(staffIncludeFilterDTO, unitId);
 
 
 
-        return null;
+        return staffsUnitPositions;
     }
 
 }

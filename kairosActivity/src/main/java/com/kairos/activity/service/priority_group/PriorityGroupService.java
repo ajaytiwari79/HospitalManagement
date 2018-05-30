@@ -6,6 +6,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -122,4 +124,14 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroup getPriorityGroupOfUnitById(Long unitId, BigInteger priorityGroupId){
         return priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId,unitId);
     }
+
+    public Set<Long> getStaffByPriorityGroup(BigInteger priorityGroupId){
+        PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
+
+        PriorityGroupFilter priorityGroupFilter = new PriorityGroupFilter(priorityGroup);
+       // Set<Long> staffIds = priorityGroupFilter.getStaffByPriorityGroupIncludeFilter();
+        return null;
+
+    }
+
 }

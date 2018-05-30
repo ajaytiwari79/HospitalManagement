@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGroup,BigInteger> {
+public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGroup,BigInteger>,CustomPriorityGroupRepository {
 
     List<PriorityGroupDTO> findByCountryIdAndDeletedFalse(long countryId);
 
@@ -26,4 +26,6 @@ public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGro
     List<PriorityGroup> findAllByUnitIdAndDeActivatedFalseAndDeletedFalse(long unitId);
 
     PriorityGroupDTO findByIdAndDeletedFalse(BigInteger priorityGroupId);
+
+
 }
