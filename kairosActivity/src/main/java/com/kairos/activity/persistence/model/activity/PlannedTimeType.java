@@ -11,6 +11,15 @@ public class PlannedTimeType extends MongoBaseEntity {
     private String name;
     private Long countryId;
 
+    public PlannedTimeType(){
+
+    }
+    
+    public PlannedTimeType(String name, Long countryId){
+        this.name = name;
+        this.countryId = countryId;
+    }
+
     public String getName() {
         return name;
     }

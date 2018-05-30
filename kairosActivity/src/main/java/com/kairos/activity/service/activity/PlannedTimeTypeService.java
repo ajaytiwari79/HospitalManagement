@@ -49,9 +49,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
             logger.error("Planned Time type already exist in country By Name " + presenceTypeDTO.getName());
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist",presenceTypeDTO.getName());
         }
-        plannedTimeType = new PlannedTimeType();
-        plannedTimeType.setName(presenceTypeDTO.getName());
-        plannedTimeType.setCountryId(countryId);
+        plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
         save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId().longValue());
         logger.info(plannedTimeType.toString());
