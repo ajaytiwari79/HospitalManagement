@@ -21,7 +21,7 @@ public interface AccountTypeMongoRepository extends  MongoRepository<AccountType
    @Query("{deleted:false,_id:{$in:?0}}")
    List<AccountType> getAccountTypeList(Set<BigInteger> ids);
 
-   @Query("{typeOfAccount:?0,countryId:?1}")
+   @Query("{typeOfAccount:?1,countryId:?0}")
    AccountType findByTypeOfAccount(Long countryId,String typeOfAccount);
 
 }
