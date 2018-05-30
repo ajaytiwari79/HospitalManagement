@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
 @RestController
 @RequestMapping(API_DATASOURCE_URL)
 @Api(API_DATASOURCE_URL)
-@CrossOrigin
 public class DataSourceController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceController.class);
@@ -68,7 +67,7 @@ public class DataSourceController {
     }
 
     @ApiOperation("get dataSource by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getDataSourceByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(countryId, name));
 

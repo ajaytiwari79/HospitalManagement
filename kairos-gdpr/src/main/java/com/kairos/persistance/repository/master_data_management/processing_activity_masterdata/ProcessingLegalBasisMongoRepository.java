@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public interface ProcessingLegalBasisMongoRepository extends MongoRepository<ProcessingLegalBasis, BigInteger> {
 
@@ -23,5 +24,9 @@ public interface ProcessingLegalBasisMongoRepository extends MongoRepository<Pro
 
     @Query("{countryId:?0,deleted:false}")
     List<ProcessingLegalBasis> findAllProcessingLegalBases(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<ProcessingLegalBasis>  findByCountryAndNameList(Long countryId, Set<String> name);
+
 
 }

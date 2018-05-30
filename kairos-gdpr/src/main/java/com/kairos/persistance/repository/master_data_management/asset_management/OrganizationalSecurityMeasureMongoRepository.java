@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepository<OrganizationalSecurityMeasure,BigInteger> {
@@ -23,5 +24,8 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepos
 
     @Query("{deleted:false,countryId:?0}")
     List<OrganizationalSecurityMeasure> findAllOrganizationalSecurityMeasures(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<OrganizationalSecurityMeasure>  findByCountryAndNameList(Long countryId,Set<String> name);
 
 }

@@ -25,7 +25,6 @@ import static com.kairos.constant.ApiConstant.API_DESTINATION;
 @RestController
 @RequestMapping(API_DESTINATION)
 @Api(API_DESTINATION)
-@CrossOrigin
 public class DestinationController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DestinationController.class);
@@ -68,7 +67,7 @@ public class DestinationController {
     }
 
     @ApiOperation("get Destination by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getDestinationByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(countryId, name));
 

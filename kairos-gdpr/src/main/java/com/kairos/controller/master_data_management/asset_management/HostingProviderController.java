@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_HOSTING_PROVIDER_URL;
 @RestController
 @RequestMapping(API_HOSTING_PROVIDER_URL)
 @Api(API_HOSTING_PROVIDER_URL)
-@CrossOrigin
 public class HostingProviderController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingProviderController.class);
@@ -67,13 +66,12 @@ public class HostingProviderController {
 
     }
 
-    @ApiOperation("get all HostingProvider ")
-    @GetMapping("/")
+    @ApiOperation("get hosting provider by name ")
+    @GetMapping("/name")
     public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId, name));
 
     }
-
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/delete/{id}")

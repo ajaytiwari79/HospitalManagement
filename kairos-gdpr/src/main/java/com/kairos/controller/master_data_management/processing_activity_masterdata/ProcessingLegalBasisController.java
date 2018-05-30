@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_PROCESSING_LEGAL_BASIS;
 @RestController
 @RequestMapping(API_PROCESSING_LEGAL_BASIS)
 @Api(API_PROCESSING_LEGAL_BASIS)
-@CrossOrigin
 public class ProcessingLegalBasisController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingLegalBasisController.class);
@@ -68,7 +67,7 @@ public class ProcessingLegalBasisController {
     }
 
     @ApiOperation("get ProcessingLegalBasis by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId, name));
 

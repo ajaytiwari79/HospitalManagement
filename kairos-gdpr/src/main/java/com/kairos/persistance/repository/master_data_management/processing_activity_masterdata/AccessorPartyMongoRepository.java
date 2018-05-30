@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -24,5 +25,9 @@ public interface AccessorPartyMongoRepository extends MongoRepository<AccessorPa
     AccessorParty findByid(BigInteger id);
     @Query("{countryId:?0,deleted:false}")
     List<AccessorParty> findAllAccessorParties(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<AccessorParty>  findByCountryAndNameList(Long countryId,Set<String> name);
+
 
 }

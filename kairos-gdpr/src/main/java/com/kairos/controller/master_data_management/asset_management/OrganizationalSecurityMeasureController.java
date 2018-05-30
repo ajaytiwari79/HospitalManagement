@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_ORG_SEC_MEASURE_URL;
 @RestController
 @RequestMapping(API_ORG_SEC_MEASURE_URL)
 @Api(API_ORG_SEC_MEASURE_URL)
-@CrossOrigin
 public class OrganizationalSecurityMeasureController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationalSecurityMeasureController.class);
@@ -69,7 +68,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get Organizational Security Measure by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId, name));
 

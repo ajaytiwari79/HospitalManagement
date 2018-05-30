@@ -25,27 +25,33 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
-    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId,List<StorageFormat> storageFormats) {
+    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormat> storageFormats) {
         Map<String, List<StorageFormat>> result = new HashMap<>();
         List<StorageFormat> existing = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         List<StorageFormat> newStorageFormats = new ArrayList<>();
         if (storageFormats.size() != 0) {
             for (StorageFormat storageFormat : storageFormats) {
                 if (!StringUtils.isBlank(storageFormat.getName())) {
-                    StorageFormat exist = storageFormatMongoRepository.findByName(countryId,storageFormat.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        StorageFormat newStorageFormat = new StorageFormat();
-                        newStorageFormat.setName(storageFormat.getName());
-                        newStorageFormat.setCountryId(countryId);
-                        newStorageFormats.add(save(newStorageFormat));
-                    }
+                    names.add(storageFormat.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
+            if (names.size() != 0) {
+                for (String name : names) {
 
+                    StorageFormat newStorageFormat = new StorageFormat();
+                    newStorageFormat.setName(name);
+                    newStorageFormat.setCountryId(countryId);
+                    newStorageFormats.add(newStorageFormat);
+
+                }
+
+
+                newStorageFormats = save(newStorageFormats);
+            }
             result.put("existing", existing);
             result.put("new", newStorageFormats);
             return result;
@@ -61,9 +67,9 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat getStorageFormat(Long countryId,BigInteger id) {
+    public StorageFormat getStorageFormat(Long countryId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId,id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -100,11 +106,11 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat getStorageFormatByName(Long countryId,String name) {
+    public StorageFormat getStorageFormatByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByName(countryId,name);
+            StorageFormat exist = storageFormatMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

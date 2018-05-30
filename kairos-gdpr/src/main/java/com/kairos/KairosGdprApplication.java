@@ -19,11 +19,17 @@ import org.apache.jackrabbit.oak.spi.blob.FileBlobStore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
@@ -32,9 +38,9 @@ import java.time.format.DateTimeFormatter;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
-//@EnableEurekaClient
-//@EnableAspectJAutoProxy
-//@EnableCircuitBreaker
+@EnableEurekaClient
+@EnableAspectJAutoProxy
+@EnableCircuitBreaker
 @SpringBootApplication
 public class KairosGdprApplication {
 
@@ -105,6 +111,7 @@ public class KairosGdprApplication {
                 .build();
         return template;
     }*/
+
 
 
 }

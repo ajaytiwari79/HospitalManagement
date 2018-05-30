@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface DestinationMongoRepository extends MongoRepository<Destination,BigInteger> {
@@ -26,6 +27,9 @@ public interface DestinationMongoRepository extends MongoRepository<Destination,
 
     @Query("{countryId:?0,deleted:false}")
     List<Destination> findAllDestinations(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<Destination>  findByCountryAndNameList(Long countryId, Set<String> name);
 
 
 }

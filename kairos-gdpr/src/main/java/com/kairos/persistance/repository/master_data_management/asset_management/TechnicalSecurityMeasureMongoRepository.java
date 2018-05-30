@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository<TechnicalSecurityMeasure,BigInteger> {
@@ -25,5 +26,6 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository
     List<TechnicalSecurityMeasure> findAllTechnicalSecurityMeasures(Long countryId);
 
 
-
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<TechnicalSecurityMeasure>  findByCountryAndNameList(Long countryId,Set<String> name);
 }

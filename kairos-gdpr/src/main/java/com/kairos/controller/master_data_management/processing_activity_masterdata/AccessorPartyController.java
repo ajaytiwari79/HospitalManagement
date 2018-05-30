@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_ACCESSOR_PARTY_URL;
 @RestController
 @RequestMapping(API_ACCESSOR_PARTY_URL)
 @Api(API_ACCESSOR_PARTY_URL)
-@CrossOrigin
 public class AccessorPartyController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessorPartyController.class);
@@ -68,7 +67,7 @@ public class AccessorPartyController {
     }
 
     @ApiOperation("get AccessorParty by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");

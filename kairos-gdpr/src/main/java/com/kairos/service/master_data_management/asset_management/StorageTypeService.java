@@ -26,26 +26,31 @@ public class StorageTypeService extends MongoBaseService {
     private StorageTypeMongoRepository storageTypeMongoRepository;
 
 
-    public Map<String, List<StorageType>> createStorageType(Long countryId,List<StorageType> storageTypes) {
+    public Map<String, List<StorageType>> createStorageType(Long countryId, List<StorageType> storageTypes) {
         Map<String, List<StorageType>> result = new HashMap<>();
         List<StorageType> existing = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         List<StorageType> newStorageTypes = new ArrayList<>();
         if (storageTypes.size() != 0) {
             for (StorageType storageType : storageTypes) {
                 if (!StringUtils.isBlank(storageType.getName())) {
-                    StorageType exist = storageTypeMongoRepository.findByName(countryId,storageType.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-                    } else {
-                        StorageType newStorageType = new StorageType();
-                        newStorageType.setName(storageType.getName());
-                        newStorageType.setCountryId(countryId);
-                        newStorageTypes.add(save(newStorageType));
-                    }
+
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            existing = storageTypeMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
 
+            if (names.size() != 0) {
+                for (String name : names) {
+                    StorageType newStorageType = new StorageType();
+                    newStorageType.setName(name);
+                    newStorageType.setCountryId(countryId);
+                    newStorageTypes.add(newStorageType);
+                }
+
+                newStorageTypes = save(newStorageTypes);
+            }
             result.put("existing", existing);
             result.put("new", newStorageTypes);
             return result;
@@ -57,12 +62,12 @@ public class StorageTypeService extends MongoBaseService {
 
     public List<StorageType> getAllStorageType() {
         return storageTypeMongoRepository.findAllStorageTypes(UserContext.getCountryId());
-           }
+    }
 
 
-    public StorageType getStorageType(Long countryId,BigInteger id) {
+    public StorageType getStorageType(Long countryId, BigInteger id) {
 
-        StorageType exist = storageTypeMongoRepository.findByIdAndNonDeleted(countryId,id);
+        StorageType exist = storageTypeMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -98,11 +103,11 @@ public class StorageTypeService extends MongoBaseService {
     }
 
 
-    public StorageType getStorageTypeByName(Long countryId,String name) {
+    public StorageType getStorageTypeByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageType exist = storageTypeMongoRepository.findByName(countryId,name);
+            StorageType exist = storageTypeMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

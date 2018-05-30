@@ -25,11 +25,9 @@ import static com.kairos.constant.ApiConstant.API_DATA_DISPOSAL_URL;
 @RestController
 @RequestMapping(API_DATA_DISPOSAL_URL)
 @Api(API_DATA_DISPOSAL_URL)
-@CrossOrigin
 public class DataDisposalController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalController.class);
-
 
     @Inject
     private DataDisposalService dataDisposalService;
@@ -68,14 +66,14 @@ public class DataDisposalController {
     }
 
     @ApiOperation("get DataDisposal by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId, name));
 
     }
 
 
-    @ApiOperation("delete HostingProvider  by id")
+    @ApiOperation("delete data disposal by id")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataDisposal(@PathVariable BigInteger id) {
         if (id == null) {

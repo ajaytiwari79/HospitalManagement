@@ -29,7 +29,6 @@ import static com.kairos.constant.ApiConstant.API_AGREEMENT_SECTION_URL;
 @RestController
 @RequestMapping(API_AGREEMENT_SECTION_URL)
 @Api(API_AGREEMENT_SECTION_URL)
-@CrossOrigin
 public class AgreementSectionController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionController.class);

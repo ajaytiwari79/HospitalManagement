@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.processing_activity_masterdata;
 
 
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSource;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSubject;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -25,6 +26,9 @@ public interface DataSubjectMongoRepository extends MongoRepository<DataSubject,
     DataSubject findByid(BigInteger id);
 
 
-    @Query("{'countryId':?0,'deleted':false}")
+    @Query("{countryId:?0,deleted:false}")
     List<DataSubject> findAllDataSubjects(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<DataSubject>  findByCountryAndNameList(Long countryId, Set<String> name);
 }

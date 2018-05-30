@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_RESPONSIBILITY_TYPE;
 @RestController
 @RequestMapping(API_RESPONSIBILITY_TYPE)
 @Api(API_RESPONSIBILITY_TYPE)
-@CrossOrigin
 public class ResponsibilityTypeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponsibilityTypeController.class);
@@ -68,7 +67,7 @@ public class ResponsibilityTypeController {
     }
 
     @ApiOperation("get ResponsibilityType by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(countryId, name));
 

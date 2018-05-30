@@ -27,7 +27,6 @@ import static com.kairos.constant.ApiConstant.API_TRANSFER_METHOD;
 @RestController
 @RequestMapping(API_TRANSFER_METHOD)
 @Api(API_TRANSFER_METHOD)
-@CrossOrigin
 public class TransferMethodController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodController.class);
@@ -70,7 +69,7 @@ public class TransferMethodController {
     }
 
     @ApiOperation("get transfer Method by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethodByName(countryId, name));
 

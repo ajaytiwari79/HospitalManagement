@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ResponsibilityTypeMongoRepository extends MongoRepository<ResponsibilityType,BigInteger> {
@@ -27,6 +28,9 @@ public interface ResponsibilityTypeMongoRepository extends MongoRepository<Respo
     List<ResponsibilityType> findAllResponsibilityTypes(Long countryId);
 
 
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<ResponsibilityType>  findByCountryAndNameList(Long countryId, Set<String> name);
 
 
 

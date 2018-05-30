@@ -26,7 +26,6 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_FORMAT_URL;
 @RestController
 @RequestMapping(API_STORAGE_FORMAT_URL)
 @Api(API_STORAGE_FORMAT_URL)
-@CrossOrigin
 public class StorageFormatController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageFormatController.class);
@@ -69,7 +68,7 @@ public class StorageFormatController {
 
 
     @ApiOperation("get StorageFormat by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getStorageFormatByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormatByName(countryId, name));
 

@@ -35,7 +35,6 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 group("$id").
                         first("$name").as("name").
                         first("$description").as("description").
-
                         first("accountTypes").as("accountTypes").
                         addToSet("agreementSections").as("agreementSections")
 

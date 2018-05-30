@@ -26,28 +26,34 @@ public class ResponsibilityTypeService extends MongoBaseService {
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
 
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,List<ResponsibilityType> rsponsibilityTypes) {
+    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId, List<ResponsibilityType> rsponsibilityTypes) {
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
         List<ResponsibilityType> existing = new ArrayList<>();
         List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
+        Set<String> names = new HashSet<>();
         if (rsponsibilityTypes.size() != 0) {
             for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId,responsibilityType.getName());
-                    if (Optional.ofNullable(exist).isPresent()) {
-                        existing.add(exist);
-
-                    } else {
-                        ResponsibilityType newResponsibilityType = new ResponsibilityType();
-                        newResponsibilityType.setName(responsibilityType.getName());
-                        newResponsibilityType.setCountryId(countryId);
-                        newResponsibilityTypes.add(save(newResponsibilityType));
-                    }
+                    names.add(responsibilityType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
+            existing = responsibilityTypeMongoRepository.findByCountryAndNameList(countryId, names);
+            existing.forEach(item -> names.remove(item.getName()));
+            if (names.size() != 0) {
+                for (String name : names) {
 
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType();
+                    newResponsibilityType.setName(name);
+                    newResponsibilityType.setCountryId(countryId);
+                    newResponsibilityTypes.add(newResponsibilityType);
+
+                }
+
+                newResponsibilityTypes = save(newResponsibilityTypes);
+
+            }
             result.put("existing", existing);
             result.put("new", newResponsibilityTypes);
             return result;
@@ -58,13 +64,13 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
     public List<ResponsibilityType> getAllResponsibilityType() {
-       return responsibilityTypeMongoRepository.findAllResponsibilityTypes(UserContext.getCountryId());
+        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(UserContext.getCountryId());
     }
 
 
-    public ResponsibilityType getResponsibilityType(Long countryId,BigInteger id) {
+    public ResponsibilityType getResponsibilityType(Long countryId, BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId,id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -103,11 +109,11 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public ResponsibilityType getResponsibilityTypeByName(Long countryId,String name) {
+    public ResponsibilityType getResponsibilityTypeByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId,name);
+            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

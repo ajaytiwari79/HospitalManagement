@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public interface HostingTypeMongoRepository extends MongoRepository<HostingType,BigInteger> {
 
@@ -19,5 +20,11 @@ public interface HostingTypeMongoRepository extends MongoRepository<HostingType,
 
     @Query("{countryId:?0,deleted:false}")
     List<HostingType> findAllHostingTypes(Long countryId);
+
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<HostingType>  findByCountryAndNameList(Long countryId,Set<String> name);
 }
+
+
 

@@ -24,7 +24,6 @@ import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 @RestController
 @RequestMapping(API_AGREEMENT_TEMPLATE_URl)
 @Api(API_AGREEMENT_TEMPLATE_URl)
-@CrossOrigin
 public class PolicyAgreementTemplateController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateController.class);
