@@ -156,7 +156,7 @@ public class ExpertiseService extends UserBaseService {
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
                 null,null,null,null, countryId,expertise.getId() );
         priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
-                "/expertise/"+expertise.getId()+"/night_worker_setting",null, null);
+                "/expertise/"+expertise.getId()+"/night_worker_setting",null);
 
         return expertiseResponseDTO;
     }
@@ -455,6 +455,7 @@ public class ExpertiseService extends UserBaseService {
         expertise.setDescription(expertiseDTO.getDescription());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
+        expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         if (!expertise.getOrganizationLevel().getId().equals(expertiseDTO.getOrganizationLevelId())) {
             Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {

@@ -980,5 +980,8 @@ public class UnitPositionService extends UserBaseService {
        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId,staffId,expertiseId,System.currentTimeMillis());
    }
 
+    public List<Map<Long,Long>> getUnitPositionExpertiseMap(Long unitId){
+        return unitPositionGraphRepository.getMapOfUnitPositionAndExpertiseId(unitId);
+    }
 
 }

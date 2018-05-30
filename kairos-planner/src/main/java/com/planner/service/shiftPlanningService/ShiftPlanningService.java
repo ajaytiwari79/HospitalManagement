@@ -228,9 +228,9 @@ public class ShiftPlanningService {
 
     public ShiftRequestPhasePlanningSolution createShiftPlanningProblem(Long unitId,List<LocalDate> dates){
         ShiftRequestPhasePlanningSolution problem= new ShiftRequestPhasePlanningSolution();
-        List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitAndDates(unitId,dates);
+        List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitIdAndBetweenDate(unitId,dates);
         List<Activity> activities= activityRepository.getActivitiesByUnitId(unitId);
-        List<UnitPosition> unitPositions=unitPositionRepository.getAllUnitPositionsByUnit(unitId);
+        List<UnitPosition> unitPositions=unitPositionRepository.getAllUnitPositionsByUnitId(unitId);
         List<String> staffIds=unitPositions.stream().map(up->up.getStaffId()).collect(Collectors.toList());
         Iterable<Staff> staff= staffRepository.findAllById(staffIds);
         Map<String, Staff> staffMap=new HashMap<>();
@@ -272,7 +272,8 @@ public class ShiftPlanningService {
 
     private List<ActivityLineInterval> getActivityLineIntervals(Map<Long, ActivityPlannerEntity> kairosIdActivities, Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities, StaffingLevel staffingLevel,boolean presence) {
         List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
-        org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getCurrentDate());
+        //org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getDate());
+        org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getDate());
         List<StaffingLevelInterval> psli=presence?staffingLevel.getPresenceStaffingLevelInterval():staffingLevel.getAbsenceStaffingLevelInterval();
         //loops to be sl-> per_interval -> per_activity -> number_of_staff
         for(StaffingLevelInterval sli: psli){
@@ -285,7 +286,7 @@ public class ShiftPlanningService {
                     perDayActivities.get(date).add(kairosIdActivities.get(sla.getActivityId()));
                 }
                 for (int i = 1; i <= sla.getMaxNoOfStaff(); i++) {
-                    ActivityLineInterval ali= new ActivityLineInterval(UUID.randomUUID().toString(),DateUtils.getDateTime(staffingLevel.getCurrentDate(),sli.getStaffingLevelDuration().getFrom()),sli.getStaffingLevelDuration().getDuration(),i <= sla.getMinNoOfStaff(),kairosIdActivities.get(sla.getActivityId()),i);
+                    ActivityLineInterval ali= new ActivityLineInterval(UUID.randomUUID().toString(),JodaTimeUtil.getDateTime(staffingLevel.getDate(),sli.getStaffingLevelDuration().getFrom()),sli.getStaffingLevelDuration().getDuration(),i <= sla.getMinNoOfStaff(),kairosIdActivities.get(sla.getActivityId()),i);
                     activityLineIntervals.add(ali);
                 }
             }

@@ -11,6 +11,7 @@ import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.TimeType;
@@ -163,7 +164,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, "hours", 1, false);
         activity.setCommunicationActivityTab(communicationActivityTab);
 
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false,false);
+        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(AppConstants.MAX_ONE_ACTIVITY_PER_SHIFT ,0,true);
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
 
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
@@ -607,11 +608,10 @@ public class ActivityService extends MongoBaseService {
 
     //optaPlannerSettings tab
 
-    public ActivityTabsWrapper updateOptaPlannerSettingsTabOfActivity(OptaPlannerSettingActivityTabDTO optaPlannerSettingActivityTabDTO) {
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = optaPlannerSettingActivityTabDTO.buildOptaPlannerSettingTab();
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(optaPlannerSettingActivityTabDTO.getActivityId())));
+    public ActivityTabsWrapper updateOptaPlannerSettingsTabOfActivity(BigInteger activityId,OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
+        Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", optaPlannerSettingActivityTabDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         save(activity);
