@@ -31,14 +31,11 @@ public class PriorityGroupIntegrationService {
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId){
-        return priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/activities_with_time_types",null);
+        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/country/"+countryId+"/activities_with_time_types",null),ActivityWithTimeTypeDTO.class);
     }
 
     public void createDefaultOpenShiftRuleTemplate(OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, long unitId) {
-        priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,false, IntegrationOperation.CREATE, "/unit/"+unitId+"/open_shit/copy_rule_template", null);
+        priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,true, IntegrationOperation.CREATE, "/open_shit/copy_rule_template", null);
     }
-
-
-
 }
 
