@@ -68,14 +68,14 @@ public class DataDisposalController {
     }
 
     @ApiOperation("get DataDisposal by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId, name));
 
     }
 
 
-    @ApiOperation("delete HostingProvider  by id")
+    @ApiOperation("delete data disposal by id")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataDisposal(@PathVariable BigInteger id) {
         if (id == null) {

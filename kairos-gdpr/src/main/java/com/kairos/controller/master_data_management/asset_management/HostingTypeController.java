@@ -67,7 +67,7 @@ public class HostingTypeController {
 
 
     @ApiOperation("get HostingType by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getHostingTypeByName(@PathVariable Long countryId,@RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingTypeByName(countryId,name));
 

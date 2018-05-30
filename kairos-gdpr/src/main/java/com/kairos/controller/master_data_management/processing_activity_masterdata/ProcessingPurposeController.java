@@ -37,7 +37,7 @@ public class ProcessingPurposeController {
     private ProcessingPurposeService processingPurposeService;
 
 
-    @ApiOperation("add pocessing purpose")
+    @ApiOperation("add processing purpose")
     @PostMapping("/add")
     public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @RequestBody List<ProcessingPurpose> processingPurposes) {
         if (countryId == null) {
@@ -48,7 +48,7 @@ public class ProcessingPurposeController {
     }
 
 
-    @ApiOperation("get pocessing purpose by id")
+    @ApiOperation("get processing purpose by id")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
@@ -62,22 +62,22 @@ public class ProcessingPurposeController {
     }
 
 
-    @ApiOperation("get all pocessing purpose")
+    @ApiOperation("get all processing purpose")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllProcessingPurpose() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose());
 
     }
 
-    @ApiOperation("get ProcessingPurpose by name")
-    @GetMapping("/")
+    @ApiOperation("get Processing purpose by name")
+    @GetMapping("/name")
     public ResponseEntity<Object> getProcessingPurposeByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(countryId, name));
 
     }
 
 
-    @ApiOperation("delete pocessing purpose by id")
+    @ApiOperation("delete processing purpose by id")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable BigInteger id) {
         if (id == null) {
@@ -87,7 +87,7 @@ public class ProcessingPurposeController {
 
     }
 
-    @ApiOperation("update pocessing purpose by id")
+    @ApiOperation("update processing purpose by id")
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id, @Validated @RequestBody ProcessingPurpose processingPurpose) {
         if (id == null) {

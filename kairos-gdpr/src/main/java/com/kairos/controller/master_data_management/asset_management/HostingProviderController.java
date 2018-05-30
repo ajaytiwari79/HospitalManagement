@@ -67,13 +67,12 @@ public class HostingProviderController {
 
     }
 
-    @ApiOperation("get all HostingProvider ")
-    @GetMapping("/")
+    @ApiOperation("get hosting provider by name ")
+    @GetMapping("/name")
     public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId, name));
 
     }
-
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/delete/{id}")

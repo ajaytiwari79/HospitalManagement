@@ -46,7 +46,7 @@ public class StorageTypeController {
     }
 
 
-    @ApiOperation("get StorageFormat by id")
+    @ApiOperation("get StorageType by id")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getStorageType(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
@@ -60,7 +60,7 @@ public class StorageTypeController {
     }
 
 
-    @ApiOperation("get all StorageFormat ")
+    @ApiOperation("get all StorageType ")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllStorageType() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAllStorageType());
@@ -69,14 +69,14 @@ public class StorageTypeController {
 
 
     @ApiOperation("get StorageType by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(countryId, name));
 
     }
 
 
-    @ApiOperation("delete StorageFormat  by id")
+    @ApiOperation("delete StorageType  by id")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteStorageType(@PathVariable BigInteger id) {
         if (id == null) {

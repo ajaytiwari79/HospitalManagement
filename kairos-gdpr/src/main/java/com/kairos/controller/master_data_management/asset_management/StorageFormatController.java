@@ -69,7 +69,7 @@ public class StorageFormatController {
 
 
     @ApiOperation("get StorageFormat by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getStorageFormatByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormatByName(countryId, name));
 

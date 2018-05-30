@@ -68,7 +68,7 @@ public class AccessorPartyController {
     }
 
     @ApiOperation("get AccessorParty by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
