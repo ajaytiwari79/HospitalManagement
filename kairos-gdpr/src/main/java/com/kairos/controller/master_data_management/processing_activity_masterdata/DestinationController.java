@@ -68,7 +68,7 @@ public class DestinationController {
     }
 
     @ApiOperation("get Destination by name")
-    @GetMapping("/")
+    @GetMapping("/name")
     public ResponseEntity<Object> getDestinationByName(@PathVariable Long countryId, @RequestParam String name) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestinationByName(countryId, name));
 
