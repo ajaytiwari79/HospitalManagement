@@ -2,7 +2,6 @@ package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
@@ -107,14 +106,6 @@ public class OpenShiftService extends MongoBaseService {
         }
         save(openShifts);
     }
-
-
-
-
-
-
-
-
 
     public void deleteOpenShift(BigInteger openShiftId) {
 

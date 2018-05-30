@@ -1,6 +1,5 @@
 package com.kairos.activity.controller.open_shift;
 
-import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
 import com.kairos.activity.service.open_shift.OpenShiftService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;

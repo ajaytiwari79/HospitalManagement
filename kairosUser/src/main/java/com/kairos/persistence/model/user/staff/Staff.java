@@ -504,15 +504,6 @@ public class Staff extends UserBaseEntity {
         return age;
     }
 
-/*    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-<<<<<<< HEAD
-    }
-
     public StaffPreferences getStaffPreferences() {
         return staffPreferences;
     }
@@ -520,7 +511,15 @@ public class Staff extends UserBaseEntity {
     public void setStaffPreferences(StaffPreferences staffPreferences) {
         this.staffPreferences = staffPreferences;
     }
-=======
+
+/*    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
     }*/
 
 }
