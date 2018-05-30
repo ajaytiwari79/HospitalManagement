@@ -1362,7 +1362,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Default data for Rule Template")
-    @RequestMapping(value = "/country/{countryId}/rule_template/default-data", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/rule_template/default_data", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));
