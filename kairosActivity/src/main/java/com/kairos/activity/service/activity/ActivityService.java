@@ -7,6 +7,7 @@ import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
@@ -84,6 +85,8 @@ public class ActivityService extends MongoBaseService {
     private ShiftService shiftService;
     @Autowired
     private PhaseService phaseService;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
     @Inject
     private TagMongoRepository tagMongoRepository;
     @Inject
@@ -290,7 +293,8 @@ public class ActivityService extends MongoBaseService {
 
 
     public ActivityTabsWrapper getBalanceSettingsTabOfActivity(BigInteger activityId, Long countryId) {
-        PresenceTypeWithTimeTypeDTO presenceType = organizationRestClient.getPresenceTypeAndTimeTypeByCountry(countryId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
