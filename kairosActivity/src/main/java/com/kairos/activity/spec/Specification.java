@@ -12,7 +12,7 @@ public interface Specification<T> {
      * @param t Object to test.
      * @return {@code true} if {@code t} satisfies the specification.
      */
-    boolean isSatisfied(T t, ExceptionService exceptionService);
+    boolean isSatisfied(T t);
 
     /**
      * Create a new specification that is the AND operation of {@code this} specification and another specification.
@@ -20,4 +20,12 @@ public interface Specification<T> {
      * @return A new specification.
      */
     Specification<T> and(Specification<T> specification);
+
+    /**
+     * Create a new specification that is the OR operation of {@code this} specification and another specification.
+     * @param activitySpecification Specification to OR.
+     * @return A new specification.
+     */
+    Specification<T> or(Specification<T> activitySpecification);
+
 }

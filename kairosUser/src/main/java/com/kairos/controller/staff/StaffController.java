@@ -613,5 +613,11 @@ public class StaffController {
 
     }
 
+    @RequestMapping(value = "/unitwise", method = RequestMethod.GET)
+    @ApiOperation("fetch unit wise staff list ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitWiseStaff() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitWiseStaffList());
+    }
 
 }

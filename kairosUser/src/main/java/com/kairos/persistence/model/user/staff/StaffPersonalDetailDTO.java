@@ -39,6 +39,12 @@ public class StaffPersonalDetailDTO {
     private Boolean unitPosition;
     private Integer age;
     private String privatePhone;
+    private LocalDate dateOfBirth;
+    private Boolean pregnant;
+
+    public StaffPersonalDetailDTO() {
+        // default constructor
+    }
 
     public long getId() {
         return id;
@@ -235,5 +241,25 @@ public class StaffPersonalDetailDTO {
 
     public void setPrivatePhone(String privatePhone) {
         this.privatePhone = privatePhone;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public Boolean getPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(Boolean pregnant) {
+        this.pregnant = pregnant;
     }
 }

@@ -9,9 +9,14 @@ public abstract class AbstractSpecification<T> implements Specification<T> {
     /**
      * {@inheritDoc}
      */
-    public abstract boolean isSatisfied(T t, ExceptionService exceptionService);
+    public abstract boolean isSatisfied(T t);
 
     public Specification<T> and(final Specification<T> specification) {
         return new AndActivitySpecification<T>(this, specification);
     }
+
+    public Specification<T> or(final Specification<T> specification) {
+        return new OrActivitySpecification<T>(this, specification);
+    }
+
 }

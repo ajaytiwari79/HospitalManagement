@@ -30,7 +30,7 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
 
 
     @Override
-    public boolean isSatisfied(ShiftWithActivityDTO shift,ExceptionService exceptionService) {
+    public boolean isSatisfied(ShiftWithActivityDTO shift) {
         ruleTemplateWrappers.forEach(ruleTemplateWrapper -> {
             ruleTemplateWrapper.isSatisfied(ruleTemplateSpecificInfo);
         });

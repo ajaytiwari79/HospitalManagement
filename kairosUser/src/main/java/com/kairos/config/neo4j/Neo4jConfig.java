@@ -64,4 +64,4 @@ public class Neo4jConfig implements EnvironmentAware {
     public void setEnvironment(Environment environment) {
         this.environment = environment;
     }
-}
+  }
