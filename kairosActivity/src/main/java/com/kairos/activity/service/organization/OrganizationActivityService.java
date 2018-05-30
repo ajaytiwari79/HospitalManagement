@@ -221,7 +221,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
-        if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
+        if(!activityFromDatabase.get().getPermissionsActivityTab().isEligibleForCopy()){
             exceptionService.actionNotPermittedException("Activity is not eligible for copy");
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
