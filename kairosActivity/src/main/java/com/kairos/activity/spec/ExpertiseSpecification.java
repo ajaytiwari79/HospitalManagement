@@ -1,8 +1,8 @@
 package com.kairos.activity.spec;
 
 
-import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.shift.Expertise;
 import com.kairos.activity.service.exception.ExceptionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +14,19 @@ import java.util.Set;
 /**
  * Created by vipul on 31/1/18.
  */
-public class ActivityExpertiseSpecification extends AbstractActivitySpecification<Activity> {
+public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
     private Set<Long> expertiseIds = new HashSet<>();
     private Expertise expertise;
 
-    public ActivityExpertiseSpecification(Expertise expertise) {
+    public ExpertiseSpecification(Expertise expertise) {
         this.expertise = expertise;
     }
-    @Autowired
-    ExceptionService exceptionService;
 
     @Override
-    public boolean isSatisfied(Activity activity) {
-        if (Optional.ofNullable(activity.getExpertises()).isPresent() && !activity.getExpertises().isEmpty()) {
-            expertiseIds.addAll(activity.getExpertises());
+    public boolean isSatisfied(ShiftWithActivityDTO shift,ExceptionService exceptionService) {
+        if (Optional.ofNullable(shift.getActivity().getExpertises()).isPresent() && !shift.getActivity().getExpertises().isEmpty()) {
+            expertiseIds.addAll(shift.getActivity().getExpertises());
             if (expertiseIds.contains(expertise.getId())) {
                 return true;
             }

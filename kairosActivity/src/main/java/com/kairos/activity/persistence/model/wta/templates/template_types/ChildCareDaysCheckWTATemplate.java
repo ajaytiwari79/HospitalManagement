@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -69,6 +70,11 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     public ChildCareDaysCheckWTATemplate() {
        this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return false;
     }
 
     public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,

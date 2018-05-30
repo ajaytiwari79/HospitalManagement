@@ -2,8 +2,11 @@ package com.kairos.persistence.model.user.staff;
 
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.UserDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
@@ -31,7 +34,16 @@ public class StaffAdditionalInfoQueryResult {
     private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
     private List<TimeSlotWrapper> timeSlotSets;
-    private UserDTO user;
+    private UserAccessRoleDTO user;
+
+
+    public UserAccessRoleDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserAccessRoleDTO user) {
+        this.user = user;
+    }
 
     public List<TimeSlotWrapper> getTimeSlotSets() {
         return timeSlotSets;

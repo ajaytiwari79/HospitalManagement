@@ -2,8 +2,8 @@ package com.kairos.activity.persistence.repository.activity;
 
 import com.kairos.activity.persistence.model.activity.Shift;
 
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitEmploymentPositionId)
                         .and("startDate").lte(endDate).and("endDate").gte(startDate)),
@@ -71,7 +71,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                         .andInclude("subShift.activity")
                         .and("activity").arrayElementAt(0).as("activity")
         );
-        AggregationResults<ShiftQueryResultWithActivity> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResultWithActivity.class);
+        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
 

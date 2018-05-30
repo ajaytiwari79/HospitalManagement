@@ -127,7 +127,7 @@ public class RuleTemplateService extends MongoBaseService {
         numberOfPartOfDayShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(numberOfPartOfDayShiftsWTATemplate);
 
-        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period",false,"Minimum number of days off per period",12, localDate, 12, week);
+        DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period",false,"Minimum number of days off per period",12,  week);
         daysOffInPeriodWTATemplate.setCountryId(countryDTO.getId());
         daysOffInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         daysOffInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

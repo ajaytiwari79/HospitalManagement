@@ -20,7 +20,15 @@ public class StaffWTACounter extends MongoBaseEntity{
     private Long unitPositionId;
     private Long unitId;
     private int count;
+    private String phaseName;
 
+    public String getPhaseName() {
+        return phaseName;
+    }
+
+    public void setPhaseName(String phaseName) {
+        this.phaseName = phaseName;
+    }
 
     public LocalDate getStartDate() {
         return startDate;

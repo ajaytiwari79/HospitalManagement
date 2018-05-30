@@ -165,6 +165,10 @@ public class DateTimeInterval {
         }
     }
 
+    public boolean containsInterval(DateTimeInterval interval){
+        return this.start>=interval.getStartMillis() && this.end>=interval.getEndMillis();
+    }
+
     public int getMinutes(){
         return (int) (this.start - this.end)/60000;
     }

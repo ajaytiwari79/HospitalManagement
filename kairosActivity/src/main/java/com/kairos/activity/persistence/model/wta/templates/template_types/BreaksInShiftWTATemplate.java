@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.BreakTemplateValue;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -40,6 +41,12 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
     public BreaksInShiftWTATemplate() {
         this.wtaTemplateType = WTATemplateType.BREAK_IN_SHIFT;
     }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return false;
+    }
+
     public BreaksInShiftWTATemplate(String name,  boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {
         this.name = name;
         //this.templateType = WTATemplateType.;

@@ -6,4 +6,5 @@ package com.kairos.response.dto.web;
  */
 
 public class UserDTO {
+
 }

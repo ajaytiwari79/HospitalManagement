@@ -46,10 +46,12 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
@@ -1602,7 +1604,11 @@ public class StaffService extends UserBaseService {
         staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoQueryResult.setTimeSlotSets(timeSlotWrappers);
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
-
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        staffAdditionalInfoQueryResult.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes,DayTypeDTO.class));
+        UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
+        staffAdditionalInfoQueryResult.setUser(userAccessRole);
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
             //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);

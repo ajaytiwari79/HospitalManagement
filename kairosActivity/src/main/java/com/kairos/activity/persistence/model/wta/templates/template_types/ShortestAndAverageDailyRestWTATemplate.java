@@ -7,6 +7,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -130,6 +131,26 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     }
     public ShortestAndAverageDailyRestWTATemplate() {
         wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+         /*  public static int checkConstraints(List<ShiftWithActivityDTO> shifts,ShortestAndAverageDailyRestWTATemplate ruleTemplate){
+        if(shifts.size()<2) return 0;
+        List<DateTimeInterval> intervals= getSortedIntervals(shifts);
+        int restingTimeUnder=0;
+        int totalRestAllShifts=0;
+        for(int i=1;i<intervals.size();i++){
+            ZonedDateTime lastEnd=intervals.get(i-1).getEnd();
+            ZonedDateTime thisStart=intervals.get(i).getStart();
+            long totalRest=(thisStart.getMillisOfDay()-lastEnd.toInstant().toEpochMilli())/60000;
+            restingTimeUnder=(int)(continuousDayRestingTime >totalRest? continuousDayRestingTime -totalRest:0);
+            totalRestAllShifts+=totalRest;
+        }
+        float averageRestingTime=totalRestAllShifts/shifts.size();
+        return  (restingTimeUnder + (int)(averageRest>averageRestingTime?averageRest-averageRestingTime:0));
+    }*/
+        return false;
     }
 
 }

@@ -2,15 +2,20 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.util.TimeInterval;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -77,6 +82,29 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     public ShiftLengthWTATemplate() {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
+        if(timeInterval!=null){
+            if(isValidForDay(dayTypeIds,infoWrapper)) {
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getShift().getMinutes());
+                if (!isValid) {
+                    if(limitAndCounter[1]!=null) {
+                        int counterValue =  limitAndCounter[1] - 1;
+                        if(counterValue<0){
+                            new InvalidRequestException(getName() + " is Broken");
+                            infoWrapper.getCounterMap().put(getId()+"-"+infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                        }
+                    }else {
+                        new InvalidRequestException(getName() + " is Broken");
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public ShiftLengthWTATemplate(String name, String description, long timeLimit) {

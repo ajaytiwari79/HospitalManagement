@@ -2,13 +2,24 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.util.TimeInterval;
 
+import java.time.DayOfWeek;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 
 
 /**
@@ -168,20 +179,76 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.disabled = disabled;
         this.description = description;
 
-        this.numberShiftsPerPeriod=numberShiftsPerPeriod;
-        this.numberOfWeeks=numberOfWeeks;
-        this.proportional=proportional;
-        this.fromDayOfWeek=fromDayOfWeek;
-        this.fromTime=fromTime;
-        this.toDayOfWeek=toDayOfWeek;
-        this.toTime=toTime;
+        this.numberShiftsPerPeriod = numberShiftsPerPeriod;
+        this.numberOfWeeks = numberOfWeeks;
+        this.proportional = proportional;
+        this.fromDayOfWeek = fromDayOfWeek;
+        this.fromTime = fromTime;
+        this.toDayOfWeek = toDayOfWeek;
+        this.toTime = toTime;
         wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
-
 
 
     }
+
     public NumberOfWeekendShiftsInPeriodWTATemplate() {
         wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
+
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+        if (timeInterval != null) {
+            int count = 0;
+            DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
+            shifts.add(infoWrapper.getShift());
+            List<DateTimeInterval> intervals = getSortedIntervals(shifts);
+            if (intervals.size() > 2) {
+                for (int i = 1; i < intervals.size(); i++) {
+                    DateTimeInterval interval = intervals.get(i - 1);
+                    interval = isRestingTimeAllowed ? getNextDayInterval(interval.getEnd().plusHours(restingTime)) : getNextDayInterval(interval.getEnd());
+
+                    if (!interval.overlaps(intervals.get(i))) {
+                        count++;
+                    }
+                }
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
+                if (!isValid) {
+                    if (limitAndCounter[1] != null) {
+                        int counterValue = limitAndCounter[1] - 1;
+                        if (counterValue < 0) {
+                            new InvalidRequestException(getName() + " is Broken");
+                            infoWrapper.getCounterMap().put(getId() + "-" + infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        }
+                    } else {
+                        new InvalidRequestException(getName() + " is Broken");
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private DateTimeInterval getNextDayInterval(ZonedDateTime dateTime) {
+        return new DateTimeInterval(dateTime.plusDays(1).truncatedTo(ChronoUnit.DAYS), dateTime.plusDays(2).truncatedTo(ChronoUnit.DAYS));
+    }
+
+    private List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts) {
+        List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
+        shifts.forEach(s -> {
+            if (dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.contains(s.getEndDate())) {
+                updatedShifts.add(s);
+            }
+        });
+        return updatedShifts;
+    }
+
+    private DateTimeInterval getIntervalOFWeekEnd(DateTimeInterval interval) {
+        return new DateTimeInterval(interval.getStart().with(DayOfWeek.valueOf(fromDayOfWeek)).plusHours(fromTime), interval.getEnd().with(DayOfWeek.valueOf(toDayOfWeek)).plusHours(toTime));
 
     }
 

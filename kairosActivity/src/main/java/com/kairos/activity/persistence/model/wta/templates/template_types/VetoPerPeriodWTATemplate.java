@@ -6,6 +6,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -119,6 +120,11 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     public VetoPerPeriodWTATemplate() {
         wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return false;
     }
 
 }

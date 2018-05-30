@@ -2,6 +2,8 @@ package com.kairos.activity.client.dto.staff;
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.UserDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import org.joda.time.DateTimeZone;
@@ -25,10 +27,21 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
+    //These are the all day type of country
     private List<DayTypeDTO> dayTypes;
+    private UserAccessRoleDTO user;
+    //This is unit TimeZone
     private ZoneId unitTimeZone;
+    //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
     private List<TimeSlotWrapper> timeSlotSets;
 
+    public UserAccessRoleDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserAccessRoleDTO user) {
+        this.user = user;
+    }
 
     public List<TimeSlotWrapper> getTimeSlotSets() {
         return timeSlotSets;

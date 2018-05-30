@@ -2,17 +2,25 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.util.TimeInterval;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -116,6 +124,38 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     public ConsecutiveWorkWTATemplate() {
         wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        if(isDisabled()) {
+            if ((timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) || plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()))) {
+                TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+                if (timeInterval != null) {
+                    List<ShiftWithActivityDTO> shiftQueryResultWithActivities = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
+                    DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                    shiftQueryResultWithActivities = getShiftsByInterval(dateTimeInterval, shiftQueryResultWithActivities, timeInterval);
+                    shiftQueryResultWithActivities.add(infoWrapper.getShift());
+                    List<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities, infoWrapper.getShift());
+                    int consecutiveDays = getConsecutiveDays(shiftDates);
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), getId());
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
+                    if (!isValid) {
+                        if (limitAndCounter[1] != null) {
+                            int counterValue = limitAndCounter[1] - 1;
+                            if (counterValue < 0) {
+                                new InvalidRequestException(getName() + " is Broken");
+                                infoWrapper.getCounterMap().put(getId()+"-"+infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                                infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            }
+                        } else {
+                            new InvalidRequestException(getName() + " is Broken");
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {

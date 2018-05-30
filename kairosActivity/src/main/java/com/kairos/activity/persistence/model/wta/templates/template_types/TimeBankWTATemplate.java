@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -64,6 +65,11 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     public TimeBankWTATemplate() {
         wtaTemplateType = WTATemplateType.TIME_BANK;
         //Default Constructor
+    }
+
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return false;
     }
 
     public TimeBankWTATemplate(String name, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {

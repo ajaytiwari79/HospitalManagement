@@ -19,7 +19,7 @@ import java.util.List;
 *
 * */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ShiftQueryResultWithActivity {
+public class ShiftWithActivityDTO {
 
     private BigInteger id;
     private String name;
@@ -43,14 +43,14 @@ public class ShiftQueryResultWithActivity {
     private Activity activity;
     private int scheduledMinutes;
     private int durationMinutes;
-    private ShiftQueryResultWithActivity subShift;
+    private ShiftWithActivityDTO subShift;
     private List<BigInteger> brokenRuleTemplateIds;
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
     }
 
-    public ShiftQueryResultWithActivity() {
+    public ShiftWithActivityDTO() {
     }
 
 
@@ -62,7 +62,7 @@ public class ShiftQueryResultWithActivity {
         this.brokenRuleTemplateIds = brokenRuleTemplateIds;
     }
 
-    public ShiftQueryResultWithActivity(Date startDate, Date endDate, Activity activity) {
+    public ShiftWithActivityDTO(Date startDate, Date endDate, Activity activity) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activity = activity;
@@ -92,11 +92,11 @@ public class ShiftQueryResultWithActivity {
         this.durationMinutes = durationMinutes;
     }
 
-    public ShiftQueryResultWithActivity getSubShift() {
+    public ShiftWithActivityDTO getSubShift() {
         return subShift;
     }
 
-    public void setSubShift(ShiftQueryResultWithActivity subShift) {
+    public void setSubShift(ShiftWithActivityDTO subShift) {
         this.subShift = subShift;
     }
 
@@ -210,7 +210,7 @@ public class ShiftQueryResultWithActivity {
     }
 
     public static void setOverrideWeekCount(boolean overrideWeekCount) {
-        ShiftQueryResultWithActivity.overrideWeekCount = overrideWeekCount;
+        ShiftWithActivityDTO.overrideWeekCount = overrideWeekCount;
     }
 
     public Long getUnitId() {

@@ -5,7 +5,7 @@ import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.activity.persistence.model.pay_out.PayOutCTADistribution;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.pay_out.*;
@@ -38,21 +38,21 @@ public class PayOutCalculationService {
     * It is for SelfRostering Tab It calculate PayOut for UpcomingDays
     * on the basis of currentCta
     * */
-    public List<CalculatedPayOutByDateDTO> getPayOutByDates(UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftQueryResultWithActivity> shifts, int days) {
+    public List<CalculatedPayOutByDateDTO> getPayOutByDates(UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftWithActivityDTO> shifts, int days) {
         shifts = getFutureShifts();
-        Map<String, List<ShiftQueryResultWithActivity>> shiftQueryResultMap = getMapOfShiftByInterval(shifts, 1);
+        Map<String, List<ShiftWithActivityDTO>> shiftQueryResultMap = getMapOfShiftByInterval(shifts, 1);
         List<CalculatedPayOutByDateDTO> calculatedPayOutByDateDTOS = new ArrayList<>(days);
         for (int i = 0; i < days; i++) {
             DateTime dateTime = new DateTime().withTimeAtStartOfDay().plusDays(i);
             Interval interval = new Interval(dateTime, dateTime.plusDays(1));
-            List<ShiftQueryResultWithActivity> shiftQueryResults = shiftQueryResultMap.get(interval.toString());
+            List<ShiftWithActivityDTO> shiftQueryResults = shiftQueryResultMap.get(interval.toString());
             int totalPayOut = getPayOutByInterval(ctaDto, interval, shiftQueryResults, null).getTotalPayOutMin();
             calculatedPayOutByDateDTOS.add(new CalculatedPayOutByDateDTO(interval.getStart().toLocalDate(), totalPayOut));
         }
         return calculatedPayOutByDateDTOS;
     }
 
-    public DailyPayOutEntry getPayOutByInterval(UnitPositionWithCtaDetailsDTO ctaDto, Interval interval, List<ShiftQueryResultWithActivity> shifts, DailyPayOutEntry dailyPayOutEntry) {
+    public DailyPayOutEntry getPayOutByInterval(UnitPositionWithCtaDetailsDTO ctaDto, Interval interval, List<ShiftWithActivityDTO> shifts, DailyPayOutEntry dailyPayOutEntry) {
         if (shifts != null && !shifts.isEmpty()) {
             calculateDailyPayOut(interval, ctaDto, shifts, dailyPayOutEntry);
         } else {
@@ -77,13 +77,13 @@ public class PayOutCalculationService {
     }
 
     //TODO complete review by Sachin and need Test cases
-    public DailyPayOutEntry calculateDailyPayOut(Interval interval, UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftQueryResultWithActivity> shifts, DailyPayOutEntry dailyPayOutEntry) {
+    public DailyPayOutEntry calculateDailyPayOut(Interval interval, UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftWithActivityDTO> shifts, DailyPayOutEntry dailyPayOutEntry) {
         int totalDailyPayOut = 0;
         int dailyScheduledMin = 0;
         int payOutMinWithoutCta = 0;
         int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? ctaDto.getContractedMinByWeek() / ctaDto.getWorkingDaysPerWeek() : 0;
         Map<Long, Integer> ctaPayOutMinMap = new HashMap<>();
-        for (ShiftQueryResultWithActivity shift : shifts) {
+        for (ShiftWithActivityDTO shift : shifts) {
             Interval shiftInterval = new Interval(new DateTime(shift.getStartDate().getTime()).withZone(ctaDto.getUnitDateTimeZone()), new DateTime(shift.getEndDate().getTime()).withZone(ctaDto.getUnitDateTimeZone()));
             shiftInterval = interval.overlap(shiftInterval);
             totalDailyPayOut += dailyScheduledMin;
@@ -144,8 +144,8 @@ public class PayOutCalculationService {
         return payOutCTADistributions;
     }
 
-    public Map<String, List<ShiftQueryResultWithActivity>> getMapOfShiftByInterval(List<ShiftQueryResultWithActivity> shifts, int intervalValue) {
-        Map<String, List<ShiftQueryResultWithActivity>> shiftQueryResultMap = new HashMap<>();
+    public Map<String, List<ShiftWithActivityDTO>> getMapOfShiftByInterval(List<ShiftWithActivityDTO> shifts, int intervalValue) {
+        Map<String, List<ShiftWithActivityDTO>> shiftQueryResultMap = new HashMap<>();
         for (int i = 0; i < shifts.size() - 1; i++) {
             DateTime startDateTime = new DateTime().plusDays(i).withTimeAtStartOfDay();
             Interval interval = new Interval(startDateTime, startDateTime.plusDays(intervalValue));
@@ -155,8 +155,8 @@ public class PayOutCalculationService {
     }
 
 
-    private List<ShiftQueryResultWithActivity> getShiftsByDate(Interval interval, List<ShiftQueryResultWithActivity> shifts) {
-        List<ShiftQueryResultWithActivity> shifts1 = new ArrayList<>();
+    private List<ShiftWithActivityDTO> getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts) {
+        List<ShiftWithActivityDTO> shifts1 = new ArrayList<>();
         shifts.forEach(s -> {
             if (interval.contains(s.getStartDate().getTime()) || interval.contains(s.getEndDate().getTime())) {
                 shifts1.add(s);
@@ -165,10 +165,10 @@ public class PayOutCalculationService {
         return shifts1;
     }
 
-    private List<ShiftQueryResultWithActivity> getFutureShifts() {
-        List<ShiftQueryResultWithActivity> shifts = new ArrayList<>(30);
+    private List<ShiftWithActivityDTO> getFutureShifts() {
+        List<ShiftWithActivityDTO> shifts = new ArrayList<>(30);
         IntStream.range(0, 29).forEachOrdered(i -> {
-            ShiftQueryResultWithActivity shift = new ShiftQueryResultWithActivity();
+            ShiftWithActivityDTO shift = new ShiftWithActivityDTO();
             shift.setId(new BigInteger("" + i));
             shift.setActivityId(new BigInteger("123"));
             shift.setStartDate(new DateTime().plusDays(i).toDate());
@@ -178,7 +178,7 @@ public class PayOutCalculationService {
         return shifts;
     }
 
-    public PayOutDTO getAdvanceViewPayOut(int totalPayOutBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftQueryResultWithActivity> shifts, List<DailyPayOutEntry> dailyPayOutEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS) {
+    public PayOutDTO getAdvanceViewPayOut(int totalPayOutBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyPayOutEntry> dailyPayOutEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS) {
         PayOutDTO payOutDTO = new PayOutDTO();
         payOutDTO.setCostTimeAgreement(unitPositionWithCtaDetailsDTO);
         payOutDTO.setStartDate(startDate);
@@ -186,7 +186,7 @@ public class PayOutCalculationService {
         List<Interval> intervals = getAllIntervalsBetweenDates(startDate, endDate, query);
         Interval interval = new Interval(startDate.getTime(), endDate.getTime());
         Map<Interval, List<DailyPayOutEntry>> payOutsIntervalMap = getPayOutIntervalsMap(intervals, dailyPayOutEntries);
-        Map<Interval, List<ShiftQueryResultWithActivity>> shiftsintervalMap = getShiftsIntervalMap(intervals, shifts);
+        Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = getShiftsIntervalMap(intervals, shifts);
         payOutDTO.setStaffId(unitPositionWithCtaDetailsDTO.getStaffId());
         payOutDTO.setWorkingDaysInWeek(unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
         payOutDTO.setUnitPositionId(unitPositionWithCtaDetailsDTO.getUnitPositionId());
@@ -388,10 +388,10 @@ public class PayOutCalculationService {
     }
 
 
-    public List<PayOutIntervalDTO> getTimeIntervals(int totalPayOutBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftQueryResultWithActivity>> shiftsintervalMap, Map<Interval, List<DailyPayOutEntry>> payOutsIntervalMap, List<TimeTypeDTO> timeTypeDTOS, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+    public List<PayOutIntervalDTO> getTimeIntervals(int totalPayOutBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap, Map<Interval, List<DailyPayOutEntry>> payOutsIntervalMap, List<TimeTypeDTO> timeTypeDTOS, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<PayOutIntervalDTO> payOutIntervalDTOS = new ArrayList<>(intervals.size());
         for (Interval interval : intervals) {
-            List<ShiftQueryResultWithActivity> shifts = shiftsintervalMap.get(interval);
+            List<ShiftWithActivityDTO> shifts = shiftsintervalMap.get(interval);
             List<DailyPayOutEntry> dailyPayOutEntries = payOutsIntervalMap.get(interval);
             PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate());
             int payOutOfInterval = calculatePayOutForInterval(interval, unitPositionWithCtaDetailsDTO,false,dailyPayOutEntries,false);
@@ -462,7 +462,7 @@ public class PayOutCalculationService {
         return "";
     }
 
-    public ScheduleTimeByTimeTypeDTO getWorkingTimeType(Interval interval, List<ShiftQueryResultWithActivity> shifts, List<TimeTypeDTO> timeTypeDTOS) {
+    public ScheduleTimeByTimeTypeDTO getWorkingTimeType(Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         ScheduleTimeByTimeTypeDTO scheduleTimeByTimeTypeDTO = new ScheduleTimeByTimeTypeDTO(0);
         List<ScheduleTimeByTimeTypeDTO> parentTimeTypes = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
@@ -477,7 +477,7 @@ public class PayOutCalculationService {
                     totalScheduledMin += children.stream().mapToInt(c -> c.getTotalMin()).sum();
                 }
                 if (shifts != null && !shifts.isEmpty()) {
-                    for (ShiftQueryResultWithActivity shift : shifts) {
+                    for (ShiftWithActivityDTO shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
                             totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
                         }
@@ -492,7 +492,7 @@ public class PayOutCalculationService {
         return scheduleTimeByTimeTypeDTO;
     }
 
-    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType(Interval interval, List<ShiftQueryResultWithActivity> shifts, List<TimeTypeDTO> timeTypeDTOS) {
+    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType(Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         ScheduleTimeByTimeTypeDTO scheduleTimeByTimeTypeDTO = new ScheduleTimeByTimeTypeDTO(0);
         List<ScheduleTimeByTimeTypeDTO> parentTimeTypes = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
@@ -507,7 +507,7 @@ public class PayOutCalculationService {
                     totalScheduledMin += children.stream().mapToInt(c -> c.getTotalMin()).sum();
                 }
                 if (shifts != null && !shifts.isEmpty()) {
-                    for (ShiftQueryResultWithActivity shift : shifts) {
+                    for (ShiftWithActivityDTO shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
                             totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
                         }
@@ -523,7 +523,7 @@ public class PayOutCalculationService {
     }
 
 
-    public List<ScheduleTimeByTimeTypeDTO> getTimeTypeDTOS(BigInteger timeTypeId, Interval interval, List<ShiftQueryResultWithActivity> shifts, List<TimeTypeDTO> timeTypeDTOS) {
+    public List<ScheduleTimeByTimeTypeDTO> getTimeTypeDTOS(BigInteger timeTypeId, Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         List<ScheduleTimeByTimeTypeDTO> scheduleTimeByTimeTypeDTOS = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
             int totalScheduledMin = 0;
@@ -538,7 +538,7 @@ public class PayOutCalculationService {
                 }
 
                 if (shifts != null && !shifts.isEmpty()) {
-                    for (ShiftQueryResultWithActivity shift : shifts) {
+                    for (ShiftWithActivityDTO shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.overlaps(shift.getInterval())) {
                             totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
                         }
@@ -577,8 +577,8 @@ public class PayOutCalculationService {
         return dailyPayOuts1Entry;
     }
 
-    private Map<Interval, List<ShiftQueryResultWithActivity>> getShiftsIntervalMap(List<Interval> intervals, List<ShiftQueryResultWithActivity> shifts) {
-        Map<Interval, List<ShiftQueryResultWithActivity>> shiftsintervalMap = new HashMap<>(intervals.size());
+    private Map<Interval, List<ShiftWithActivityDTO>> getShiftsIntervalMap(List<Interval> intervals, List<ShiftWithActivityDTO> shifts) {
+        Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = new HashMap<>(intervals.size());
         intervals.forEach(i -> {
             shiftsintervalMap.put(i, getShiftsByDate(i, shifts));
         });

@@ -6,11 +6,15 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getIntervalByRuleTemplate;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -129,6 +133,18 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
     }
 
+    @Override
+    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        int totalScheduledTime = 0;
+        DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
+        for (ShiftWithActivityDTO shift1:infoWrapper.getShifts()) {
+            if(interval.overlaps(shift1.getDateTimeInterval())){
+                totalScheduledTime+=interval.overlap(shift1.getDateTimeInterval()).getMinutes();
+            }
+        }
+        //int scheduledTime = totalScheduledTime>wtaTemplate.getMaximumAvgTime()?totalScheduledTime-(int)wtaTemplate.getMaximumAvgTime():0;
+        return false;
+    }
 
 
 }

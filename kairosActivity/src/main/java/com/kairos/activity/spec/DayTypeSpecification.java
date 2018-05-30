@@ -1,7 +1,6 @@
 package com.kairos.activity.spec;
 
 import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.staffing_level.Day;
 import com.kairos.activity.service.exception.ExceptionService;
@@ -14,7 +13,7 @@ import static com.kairos.activity.persistence.model.staffing_level.Day.*;
 /**
  * Created by oodles on 30/11/17.
  */
-public class ActivityDayTypeSpecification extends AbstractActivitySpecification<Activity> {
+public class DayTypeSpecification extends AbstractSpecification<Activity> {
 
 
     private List<DayType> dayTypes;
@@ -23,7 +22,7 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
     @Autowired
     private ExceptionService exceptionService;
 
-    public ActivityDayTypeSpecification(List<DayType> dayTypes, Date shiftStartDateTime) {
+    public DayTypeSpecification(List<DayType> dayTypes, Date shiftStartDateTime) {
         this.dayTypes = dayTypes;
         this.shiftStartDateTime = shiftStartDateTime;
     }

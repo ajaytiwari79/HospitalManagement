@@ -8,10 +8,10 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.response.dto.time_bank.*;
 import com.kairos.activity.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,21 +48,21 @@ public class TimeBankCalculationService {
     * It is for SelfRostering Tab It calculate timebank for UpcomingDays
     * on the basis of currentCta
     * */
-    public List<CalculatedTimeBankByDateDTO> getTimeBankByDates(UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftQueryResultWithActivity> shifts, int days) {
+    public List<CalculatedTimeBankByDateDTO> getTimeBankByDates(UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftWithActivityDTO> shifts, int days) {
         shifts = getFutureShifts();
-        Map<String, List<ShiftQueryResultWithActivity>> shiftQueryResultMap = getMapOfShiftByInterval(shifts, 1);
+        Map<String, List<ShiftWithActivityDTO>> shiftQueryResultMap = getMapOfShiftByInterval(shifts, 1);
         List<CalculatedTimeBankByDateDTO> calculatedTimeBankByDateDTOS = new ArrayList<>(days);
         for (int i = 0; i < days; i++) {
             DateTime dateTime = new DateTime().withTimeAtStartOfDay().plusDays(i);
             Interval interval = new Interval(dateTime, dateTime.plusDays(1));
-            List<ShiftQueryResultWithActivity> shiftQueryResults = shiftQueryResultMap.get(interval.toString());
+            List<ShiftWithActivityDTO> shiftQueryResults = shiftQueryResultMap.get(interval.toString());
             //int totalTimeBank = getTimeBankByInterval(ctaDto, interval, shiftQueryResults, null).getTotalTimeBankMin();
            // calculatedTimeBankByDateDTOS.add(new CalculatedTimeBankByDateDTO(interval.getStart().toLocalDate(), totalTimeBank));
         }
         return calculatedTimeBankByDateDTOS;
     }
 
-    public DailyTimeBankEntry getTimeBankByInterval(UnitPositionWithCtaDetailsDTO ctaDto, Interval interval, List<ShiftQueryResultWithActivity> shifts) {
+    public DailyTimeBankEntry getTimeBankByInterval(UnitPositionWithCtaDetailsDTO ctaDto, Interval interval, List<ShiftWithActivityDTO> shifts) {
         DailyTimeBankEntry dailyTimeBank = null;
         if (shifts != null && !shifts.isEmpty()) {
             dailyTimeBank = new DailyTimeBankEntry(ctaDto.getUnitPositionId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
@@ -81,12 +81,12 @@ public class TimeBankCalculationService {
         return dailyTimeBank;
     }
 
-    public List<ShiftQueryResultWithActivity> filterSubshifts(List<ShiftQueryResultWithActivity> shifts){
-        List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
-        for (ShiftQueryResultWithActivity shift : shifts) {
+    public List<ShiftWithActivityDTO> filterSubshifts(List<ShiftWithActivityDTO> shifts){
+        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
+        for (ShiftWithActivityDTO shift : shifts) {
             if (shift.getSubShift() != null && shift.getSubShift().getStartDate() != null) {
-                ShiftQueryResultWithActivity shiftQueryResultWithActivity = new ShiftQueryResultWithActivity(shift.getStartDate(), shift.getEndDate(), shift.getActivity());
-                shiftQueryResultWithActivities.add(shiftQueryResultWithActivity);
+                ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO(shift.getStartDate(), shift.getEndDate(), shift.getActivity());
+                shiftQueryResultWithActivities.add(shiftWithActivityDTO);
             } else {
                 shiftQueryResultWithActivities.add(shift);
             }
@@ -149,13 +149,13 @@ public class TimeBankCalculationService {
     }
 
     //TODO complete review by Sachin and need Test cases
-    public DailyTimeBankEntry calculateDailyTimebank(Interval interval, UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftQueryResultWithActivity> shifts, DailyTimeBankEntry dailyTimeBankEntry) {
+    public DailyTimeBankEntry calculateDailyTimebank(Interval interval, UnitPositionWithCtaDetailsDTO ctaDto, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry) {
         int totalDailyTimebank = 0;
         int dailyScheduledMin = 0;
         int timeBankMinWithoutCta = 0;
         int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? ctaDto.getContractedMinByWeek() / ctaDto.getWorkingDaysPerWeek() : 0;
         Map<Long, Integer> ctaTimeBankMinMap = new HashMap<>();
-        for (ShiftQueryResultWithActivity shift : shifts) {
+        for (ShiftWithActivityDTO shift : shifts) {
             Interval shiftInterval = new Interval(new DateTime(shift.getStartDate().getTime()), new DateTime(shift.getEndDate().getTime()));
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
@@ -224,8 +224,8 @@ public class TimeBankCalculationService {
         return timeBankCTADistributions;
     }
 
-    public Map<String, List<ShiftQueryResultWithActivity>> getMapOfShiftByInterval(List<ShiftQueryResultWithActivity> shifts, int intervalValue) {
-        Map<String, List<ShiftQueryResultWithActivity>> shiftQueryResultMap = new HashMap<>();
+    public Map<String, List<ShiftWithActivityDTO>> getMapOfShiftByInterval(List<ShiftWithActivityDTO> shifts, int intervalValue) {
+        Map<String, List<ShiftWithActivityDTO>> shiftQueryResultMap = new HashMap<>();
         for (int i = 0; i < shifts.size() - 1; i++) {
             DateTime startDateTime = new DateTime().plusDays(i).withTimeAtStartOfDay();
             Interval interval = new Interval(startDateTime, startDateTime.plusDays(intervalValue));
@@ -235,8 +235,8 @@ public class TimeBankCalculationService {
     }
 
 
-    private List<ShiftQueryResultWithActivity> getShiftsByDate(Interval interval, List<ShiftQueryResultWithActivity> shifts) {
-        List<ShiftQueryResultWithActivity> shifts1 = new ArrayList<>();
+    private List<ShiftWithActivityDTO> getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts) {
+        List<ShiftWithActivityDTO> shifts1 = new ArrayList<>();
         shifts.forEach(s -> {
             if (interval.contains(s.getStartDate().getTime()) || interval.contains(s.getEndDate().getTime())) {
                 shifts1.add(s);
@@ -245,10 +245,10 @@ public class TimeBankCalculationService {
         return shifts1;
     }
 
-    private List<ShiftQueryResultWithActivity> getFutureShifts() {
-        List<ShiftQueryResultWithActivity> shifts = new ArrayList<>(30);
+    private List<ShiftWithActivityDTO> getFutureShifts() {
+        List<ShiftWithActivityDTO> shifts = new ArrayList<>(30);
         IntStream.range(0, 29).forEachOrdered(i -> {
-            ShiftQueryResultWithActivity shift = new ShiftQueryResultWithActivity();
+            ShiftWithActivityDTO shift = new ShiftWithActivityDTO();
             shift.setId(new BigInteger("" + i));
             shift.setActivityId(new BigInteger("123"));
             shift.setStartDate(new DateTime().plusDays(i).toDate());
@@ -258,7 +258,7 @@ public class TimeBankCalculationService {
         return shifts;
     }
 
-    public TimeBankDTO getAdvanceViewTimeBank(int totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftQueryResultWithActivity> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS) {
+    public TimeBankDTO getAdvanceViewTimeBank(int totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS) {
         TimeBankDTO timeBankDTO = new TimeBankDTO();
         timeBankDTO.setCostTimeAgreement(unitPositionWithCtaDetailsDTO);
         timeBankDTO.setStartDate(startDate);
@@ -266,7 +266,7 @@ public class TimeBankCalculationService {
         List<Interval> intervals = getAllIntervalsBetweenDates(startDate, endDate, query);
         Interval interval = new Interval(startDate.getTime(), endDate.getTime());
         Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap = getTimebankIntervalsMap(intervals, dailyTimeBankEntries);
-        Map<Interval, List<ShiftQueryResultWithActivity>> shiftsintervalMap = getShiftsIntervalMap(intervals, shifts);
+        Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = getShiftsIntervalMap(intervals, shifts);
         timeBankDTO.setStaffId(unitPositionWithCtaDetailsDTO.getStaffId());
         timeBankDTO.setWorkingDaysInWeek(unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
         timeBankDTO.setUnitPositionId(unitPositionWithCtaDetailsDTO.getUnitPositionId());
@@ -469,10 +469,10 @@ public class TimeBankCalculationService {
     }
 
 
-    public List<TimeBankIntervalDTO> getTimeIntervals(int totalTimeBankBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftQueryResultWithActivity>> shiftsintervalMap, Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap, List<TimeTypeDTO> timeTypeDTOS, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+    public List<TimeBankIntervalDTO> getTimeIntervals(int totalTimeBankBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap, Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap, List<TimeTypeDTO> timeTypeDTOS, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = new ArrayList<>(intervals.size());
         for (Interval interval : intervals) {
-            List<ShiftQueryResultWithActivity> shifts = shiftsintervalMap.get(interval);
+            List<ShiftWithActivityDTO> shifts = shiftsintervalMap.get(interval);
             List<DailyTimeBankEntry> dailyTimeBankEntries = timeBanksIntervalMap.get(interval);
             TimeBankIntervalDTO timeBankIntervalDTO = new TimeBankIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate());
             int timeBankOfInterval = calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
@@ -544,7 +544,7 @@ public class TimeBankCalculationService {
         return "";
     }
 
-    public ScheduleTimeByTimeTypeDTO getWorkingTimeType(Interval interval, List<ShiftQueryResultWithActivity> shifts, List<TimeTypeDTO> timeTypeDTOS) {
+    public ScheduleTimeByTimeTypeDTO getWorkingTimeType(Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         ScheduleTimeByTimeTypeDTO scheduleTimeByTimeTypeDTO = new ScheduleTimeByTimeTypeDTO(0);
         List<ScheduleTimeByTimeTypeDTO> parentTimeTypes = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
@@ -559,7 +559,7 @@ public class TimeBankCalculationService {
                     totalScheduledMin += children.stream().mapToInt(c -> c.getTotalMin()).sum();
                 }
                 if (shifts != null && !shifts.isEmpty()) {
-                    for (ShiftQueryResultWithActivity shift : shifts) {
+                    for (ShiftWithActivityDTO shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                             totalScheduledMin += shift.getScheduledMinutes();
                         }
@@ -575,7 +575,7 @@ public class TimeBankCalculationService {
         return scheduleTimeByTimeTypeDTO;
     }
 
-    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType(Interval interval, List<ShiftQueryResultWithActivity> shifts, List<TimeTypeDTO> timeTypeDTOS) {
+    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType(Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         ScheduleTimeByTimeTypeDTO scheduleTimeByTimeTypeDTO = new ScheduleTimeByTimeTypeDTO(0);
         List<ScheduleTimeByTimeTypeDTO> parentTimeTypes = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
@@ -590,7 +590,7 @@ public class TimeBankCalculationService {
                     totalScheduledMin += children.stream().mapToInt(c -> c.getTotalMin()).sum();
                 }
                 if (shifts != null && !shifts.isEmpty()) {
-                    for (ShiftQueryResultWithActivity shift : shifts) {
+                    for (ShiftWithActivityDTO shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                             totalScheduledMin += interval.overlap(shift.getInterval()).toDuration().getStandardMinutes();
                         }
@@ -606,7 +606,7 @@ public class TimeBankCalculationService {
     }
 
 
-    public List<ScheduleTimeByTimeTypeDTO> getTimeTypeDTOS(BigInteger timeTypeId, Interval interval, List<ShiftQueryResultWithActivity> shifts, List<TimeTypeDTO> timeTypeDTOS) {
+    public List<ScheduleTimeByTimeTypeDTO> getTimeTypeDTOS(BigInteger timeTypeId, Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         List<ScheduleTimeByTimeTypeDTO> scheduleTimeByTimeTypeDTOS = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
             int totalScheduledMin = 0;
@@ -621,7 +621,7 @@ public class TimeBankCalculationService {
                 }
 
                 if (shifts != null && !shifts.isEmpty()) {
-                    for (ShiftQueryResultWithActivity shift : shifts) {
+                    for (ShiftWithActivityDTO shift : shifts) {
                         if (timeType.getId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                             totalScheduledMin += shift.getScheduledMinutes();
                         }
@@ -635,7 +635,7 @@ public class TimeBankCalculationService {
     }
 
 /*
-    public List<TimeTypeIntervalDTO> getTimeTypeInterval(Interval interval, List<ShiftQueryResultWithActivity> shifts) {
+    public List<TimeTypeIntervalDTO> getTimeTypeInterval(Interval interval, List<ShiftWithActivityDTO> shifts) {
         List<TimeTypeIntervalDTO> timeTypeIntervalDTOS = new ArrayList<>();
 
         return timeTypeIntervalDTOS;
@@ -694,8 +694,8 @@ public class TimeBankCalculationService {
         return totalTimeBank;
     }
 
-    private Map<Interval, List<ShiftQueryResultWithActivity>> getShiftsIntervalMap(List<Interval> intervals, List<ShiftQueryResultWithActivity> shifts) {
-        Map<Interval, List<ShiftQueryResultWithActivity>> shiftsintervalMap = new HashMap<>(intervals.size());
+    private Map<Interval, List<ShiftWithActivityDTO>> getShiftsIntervalMap(List<Interval> intervals, List<ShiftWithActivityDTO> shifts) {
+        Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = new HashMap<>(intervals.size());
         intervals.forEach(i -> {
             shiftsintervalMap.put(i, getShiftsByDate(i, shifts));
         });
@@ -757,29 +757,29 @@ public class TimeBankCalculationService {
     }
 
 
-    private List<ShiftQueryResultWithActivity> getShifts() {
-        List<ShiftQueryResultWithActivity> shifts = new ArrayList<>(3);
-        ShiftQueryResultWithActivity shiftQueryResultWithActivity = new ShiftQueryResultWithActivity();
-        shiftQueryResultWithActivity.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(7).toDate());
-        shiftQueryResultWithActivity.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
-        shiftQueryResultWithActivity.setActivityId(new BigInteger("123"));
-        shiftQueryResultWithActivity.setActivity(new Activity());
-        shiftQueryResultWithActivity.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
-        shifts.add(shiftQueryResultWithActivity);
-        shiftQueryResultWithActivity = new ShiftQueryResultWithActivity();
-        shiftQueryResultWithActivity.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(7).toDate());
-        shiftQueryResultWithActivity.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
-        shiftQueryResultWithActivity.setActivityId(new BigInteger("123"));
-        shiftQueryResultWithActivity.setActivity(new Activity());
-        shiftQueryResultWithActivity.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
-        shifts.add(shiftQueryResultWithActivity);
-        shiftQueryResultWithActivity = new ShiftQueryResultWithActivity();
-        shiftQueryResultWithActivity.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
-        shiftQueryResultWithActivity.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(27).toDate());
-        shiftQueryResultWithActivity.setActivityId(new BigInteger("123"));
-        shiftQueryResultWithActivity.setActivity(new Activity());
-        shiftQueryResultWithActivity.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
-        shifts.add(shiftQueryResultWithActivity);
+    private List<ShiftWithActivityDTO> getShifts() {
+        List<ShiftWithActivityDTO> shifts = new ArrayList<>(3);
+        ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO();
+        shiftWithActivityDTO.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(7).toDate());
+        shiftWithActivityDTO.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
+        shiftWithActivityDTO.setActivityId(new BigInteger("123"));
+        shiftWithActivityDTO.setActivity(new Activity());
+        shiftWithActivityDTO.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
+        shifts.add(shiftWithActivityDTO);
+        shiftWithActivityDTO = new ShiftWithActivityDTO();
+        shiftWithActivityDTO.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(7).toDate());
+        shiftWithActivityDTO.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
+        shiftWithActivityDTO.setActivityId(new BigInteger("123"));
+        shiftWithActivityDTO.setActivity(new Activity());
+        shiftWithActivityDTO.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
+        shifts.add(shiftWithActivityDTO);
+        shiftWithActivityDTO = new ShiftWithActivityDTO();
+        shiftWithActivityDTO.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
+        shiftWithActivityDTO.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(27).toDate());
+        shiftWithActivityDTO.setActivityId(new BigInteger("123"));
+        shiftWithActivityDTO.setActivity(new Activity());
+        shiftWithActivityDTO.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
+        shifts.add(shiftWithActivityDTO);
         return shifts;
 
     }

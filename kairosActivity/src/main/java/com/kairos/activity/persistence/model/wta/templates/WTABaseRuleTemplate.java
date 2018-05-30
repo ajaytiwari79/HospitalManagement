@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates;
 
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 
 @Document(collection = "wtaBaseRuleTemplate")
-public class WTABaseRuleTemplate extends MongoBaseEntity{
+public abstract class WTABaseRuleTemplate extends MongoBaseEntity{
 
     protected String name;
     protected String description;
@@ -106,4 +107,5 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         return target;
     }
 
+    public abstract boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper);
 }

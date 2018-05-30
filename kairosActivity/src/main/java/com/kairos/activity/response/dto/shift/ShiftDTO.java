@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.enums.shift.ShiftState;
 import org.hibernate.validator.constraints.Range;
@@ -314,8 +314,8 @@ public class ShiftDTO {
         return shift;
     }
 
-    public ShiftQueryResultWithActivity buildResponse() {
-        return new ShiftQueryResultWithActivity(this.startDate, this.endDate);
+    public ShiftWithActivityDTO buildResponse() {
+        return new ShiftWithActivityDTO(this.startDate, this.endDate);
     }
 
     public Long getUnitPositionId() {
