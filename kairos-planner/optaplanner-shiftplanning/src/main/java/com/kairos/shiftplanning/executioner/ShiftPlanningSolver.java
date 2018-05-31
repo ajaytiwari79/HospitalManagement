@@ -95,6 +95,7 @@ public class ShiftPlanningSolver {
     }
     public Object[] getSolution(ShiftRequestPhasePlanningSolution unsolvedSolution) throws Exception{
         //int i=(int)new Object();
+
         if(unsolvedSolution==null) {
             unsolvedSolution = getUnsolvedSolution(readFromFile);
         }
