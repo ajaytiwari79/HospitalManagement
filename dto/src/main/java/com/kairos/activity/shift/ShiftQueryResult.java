@@ -37,11 +37,14 @@ public class ShiftQueryResult {
     private Integer weekCount;
     private static boolean overrideWeekCount;
     private Long unitId;
-    private List<ShiftQueryResult> subShifts= new ArrayList<>();
+    private List<ShiftQueryResult> subShifts = new ArrayList<>();
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
     private ShiftState shiftState;
+    private Long allowedBreakDurationInMinute;
+    private Long expertiseId;
+
 
 
     public int getDurationMinutes() {
@@ -235,6 +238,14 @@ public class ShiftQueryResult {
         this.shiftState = shiftState;
     }
 
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+    }
+
     public ShiftQueryResult(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
         this.name = name;
@@ -261,5 +272,12 @@ public class ShiftQueryResult {
         return subShifts;
     }
 
+    public Long getExpertiseId() {
+        return expertiseId;
+    }
+
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
+    }
 }
 
