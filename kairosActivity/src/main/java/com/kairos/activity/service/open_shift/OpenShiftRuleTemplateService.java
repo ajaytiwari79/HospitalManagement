@@ -71,13 +71,16 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
 
     public boolean copyRuleTemplateForUnit(long unitId,OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO){
         List<OpenShiftRuleTemplate> openShiftRuleTemplates = openShiftRuleTemplateRepository.findAllByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndDeletedFalse(orgTypeAndSubTypeDTO.getCountryId(),orgTypeAndSubTypeDTO.getOrganizationTypeId(),orgTypeAndSubTypeDTO.getOrganizationSubTypeId());
-        openShiftRuleTemplates.forEach(openShiftRuleTemplate -> {
-            openShiftRuleTemplate.setParentId(openShiftRuleTemplate.getId());
-            openShiftRuleTemplate.setUnitId(unitId);
-            openShiftRuleTemplate.setId(null);
-            openShiftRuleTemplate.setCountryId(null);
-        });
-        save(openShiftRuleTemplates);
+        if (!openShiftRuleTemplates.isEmpty()){
+            openShiftRuleTemplates.forEach(openShiftRuleTemplate -> {
+                openShiftRuleTemplate.setParentId(openShiftRuleTemplate.getId());
+                openShiftRuleTemplate.setUnitId(unitId);
+                openShiftRuleTemplate.setId(null);
+                openShiftRuleTemplate.setCountryId(null);
+            });
+            save(openShiftRuleTemplates);
+        }
+
         return true;
     }
 
@@ -137,11 +140,13 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
         save(openShiftRuleTemplate);
         List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
-        priorityGroups.forEach(priorityGroup -> {
-            priorityGroup.setId(null);
-            priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
-        });
-        save(priorityGroups);
+        if(!priorityGroups.isEmpty()){
+            priorityGroups.forEach(priorityGroup -> {
+                priorityGroup.setId(null);
+                priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
+            });
+            save(priorityGroups);
+        }
         openShiftRuleTemplateDTO.setId(openShiftRuleTemplate.getId());
         return openShiftRuleTemplateDTO;
     }

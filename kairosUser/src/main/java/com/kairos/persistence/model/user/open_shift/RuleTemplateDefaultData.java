@@ -3,6 +3,8 @@ package com.kairos.persistence.model.user.open_shift;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
+import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 
 import java.util.List;
@@ -13,6 +15,8 @@ public class RuleTemplateDefaultData {
     private List<TimeTypeDTO> timeTypes;
     private List<ActivityDTO> activities;
     private List<OpenShiftIntervalDTO> intervals;
+    private List<EmploymentTypeDTO> employmentTypes;
+    private List<ExpertiseResponseDTO> expertise;
 
     public RuleTemplateDefaultData() {
         //Default Constructor
@@ -24,6 +28,25 @@ public class RuleTemplateDefaultData {
         this.timeTypes = timeTypes;
         this.activities = activities;
         this.intervals = intervals;
+    }
+
+    public RuleTemplateDefaultData(List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertise) {
+        this.skills = skills;
+        this.timeTypes = timeTypes;
+        this.activities = activities;
+        this.intervals = intervals;
+        this.employmentTypes = employmentTypes;
+        this.expertise = expertise;
+    }
+
+    public RuleTemplateDefaultData(List<OrganizationTypeAndSubType> organizationTypeAndSubType, List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertise) {
+        this.organizationTypeAndSubType = organizationTypeAndSubType;
+        this.skills = skills;
+        this.timeTypes = timeTypes;
+        this.activities = activities;
+        this.intervals = intervals;
+        this.employmentTypes = employmentTypes;
+        this.expertise = expertise;
     }
 
     public List<OrganizationTypeAndSubType> getOrganizationTypeAndSubType() {
@@ -64,5 +87,21 @@ public class RuleTemplateDefaultData {
 
     public void setIntervals(List<OpenShiftIntervalDTO> intervals) {
         this.intervals = intervals;
+    }
+
+    public List<EmploymentTypeDTO> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
+        this.employmentTypes = employmentTypes;
+    }
+
+    public List<ExpertiseResponseDTO> getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(List<ExpertiseResponseDTO> expertise) {
+        this.expertise = expertise;
     }
 }

@@ -226,4 +226,14 @@ public class EmploymentTypeService extends UserBaseService {
         return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
     }
 
+    public PriorityGroupDefaultData getExpertiseAndEmploymentForUnit(long unitId, boolean isDeleted) {
+        Long countryId=countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
+        List<ExpertiseDTO> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId,DateUtil.getCurrentDateMillis());
+        List<com.kairos.response.dto.web.cta.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyProperties(employmentTypes, com.kairos.response.dto.web.cta.EmploymentTypeDTO.class);
+        List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyProperties(expertise,ExpertiseResponseDTO.class);
+        return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
+    }
+
+
 }

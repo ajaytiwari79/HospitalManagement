@@ -5,24 +5,24 @@ import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import java.util.List;
 
 public class OpenShiftRuleTemplateAndPriorityGroupWrapper {
-    private OpenShiftRuleTemplateDTO ruleTemplates;
+    private OpenShiftRuleTemplateDTO ruleTemplate;
     private List<PriorityGroupDTO> priorityGroups;
 
     public OpenShiftRuleTemplateAndPriorityGroupWrapper() {
         //Default Constructor
     }
 
-    public OpenShiftRuleTemplateAndPriorityGroupWrapper(OpenShiftRuleTemplateDTO ruleTemplates, List<PriorityGroupDTO> priorityGroups) {
-        this.ruleTemplates = ruleTemplates;
+    public OpenShiftRuleTemplateAndPriorityGroupWrapper(OpenShiftRuleTemplateDTO ruleTemplate, List<PriorityGroupDTO> priorityGroups) {
+        this.ruleTemplate = ruleTemplate;
         this.priorityGroups = priorityGroups;
     }
 
-    public OpenShiftRuleTemplateDTO getRuleTemplates() {
-        return ruleTemplates;
+    public OpenShiftRuleTemplateDTO getRuleTemplate() {
+        return ruleTemplate;
     }
 
-    public void setRuleTemplates(OpenShiftRuleTemplateDTO ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
+    public void setRuleTemplate(OpenShiftRuleTemplateDTO ruleTemplate) {
+        this.ruleTemplate = ruleTemplate;
     }
 
     public List<PriorityGroupDTO> getPriorityGroups() {

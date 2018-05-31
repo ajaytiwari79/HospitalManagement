@@ -42,4 +42,6 @@ public interface CustomActivityMongoRepository {
     List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
 
     List<ActivityDTO> findAllActivitiesWithTimeTypes(long countryId);
+
+    List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId);
 }

@@ -241,5 +241,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
+    public List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "balanceSettingsActivityTab.timeType"),
+                match(Criteria.where("balanceSettingsActivityTab.timeType.timeTypes").is(WORKING_TYPE)),
+                project("balanceSettingsActivityTab","name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
+
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
 
 }

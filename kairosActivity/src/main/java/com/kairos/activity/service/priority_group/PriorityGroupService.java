@@ -40,7 +40,7 @@ public class PriorityGroupService extends MongoBaseService {
     }
 
     public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
-        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByCountryIdAndDeletedFalse(countryId);
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
         PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmployment(countryId);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
         PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
@@ -92,7 +92,7 @@ public class PriorityGroupService extends MongoBaseService {
     }
 
     public List<PriorityGroupDTO> getPriorityGroupsOfUnit(long unitId) {
-        return priorityGroupRepository.findByUnitIdAndDeletedFalse(unitId);
+        return priorityGroupRepository.getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
     }
 
     public PriorityGroupDTO updatePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
@@ -159,9 +159,23 @@ public class PriorityGroupService extends MongoBaseService {
     public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId,BigInteger ruleTemplateId) {
         return priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(unitId,ruleTemplateId);
     }
-
+    public PriorityGroupWrapper getPriorityGroupsByRuleTemplateForUnit(Long unitId,BigInteger ruleTemplateId){
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(unitId,ruleTemplateId);
+        PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
+        PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
+        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
+        return priorityGroupWrapper;
+    }
     public List<PriorityGroupDTO> getPriorityGroupsByOrderId(long unitId,BigInteger orderId) {
         return priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
+    }
+
+    public PriorityGroupWrapper getPriorityGroupsByOrderIdForUnit(Long unitId,BigInteger orderId){
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
+        PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
+        PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
+        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
+        return priorityGroupWrapper;
     }
 
 }

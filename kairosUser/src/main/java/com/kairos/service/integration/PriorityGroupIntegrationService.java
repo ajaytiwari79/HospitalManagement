@@ -23,7 +23,7 @@ public class PriorityGroupIntegrationService {
     public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
-        priorityGroupRestClient.publish(null, unitId,false, IntegrationOperation.CREATE, "/unit/"+unitId+"/priority_groups", countryDetail);
+        priorityGroupRestClient.publish(null, unitId,true, IntegrationOperation.CREATE, "/priority_groups", countryDetail);
     }
 
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId) {
@@ -31,10 +31,16 @@ public class PriorityGroupIntegrationService {
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId){
-        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/country/"+countryId+"/activities_with_time_types",null),ActivityWithTimeTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/activities_with_time_types",null),ActivityWithTimeTypeDTO.class);
+    }
+
+    public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId,Long countryId){
+        Map<String, Object> countryDetail = new HashMap<>();
+        countryDetail.put("countryId", countryId);
+        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/activities_with_time_types",countryDetail),ActivityWithTimeTypeDTO.class);
     }
 
     public void createDefaultOpenShiftRuleTemplate(OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, long unitId) {
-        priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,true, IntegrationOperation.CREATE, "/open_shit/copy_rule_template", null);
+        priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,true, IntegrationOperation.CREATE, "/open_shift/copy_rule_template", null);
     }
 }

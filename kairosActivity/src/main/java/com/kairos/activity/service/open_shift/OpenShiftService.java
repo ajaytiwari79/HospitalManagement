@@ -154,5 +154,9 @@ public class OpenShiftService extends MongoBaseService {
         return openShiftResponseDTO;
     }
 
+    List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId,BigInteger orderId){
+       return openShiftMongoRepository.getOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+    }
+
 }
 

@@ -8,6 +8,14 @@ public class OrderOpenshiftResponseDTO {
     List<OpenShiftResponseDTO> openshifts;
     List<PriorityGroupDTO> priorityGroups;
 
+    public OrderOpenshiftResponseDTO() {
+    }
+
+    public OrderOpenshiftResponseDTO(List<OpenShiftResponseDTO> openshifts, List<PriorityGroupDTO> priorityGroups) {
+        this.openshifts = openshifts;
+        this.priorityGroups = priorityGroups;
+    }
+
     public OrderResponseDTO getOrder() {
         return order;
     }

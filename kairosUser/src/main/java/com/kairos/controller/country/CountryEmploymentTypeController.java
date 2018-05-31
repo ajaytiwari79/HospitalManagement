@@ -87,5 +87,12 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getExpertiseAndEmployment(countryId, false));
     }
 
+    @RequestMapping(value = UNIT_URL + "/employment_type_and_expertise", method = RequestMethod.GET)
+    @ApiOperation("get employment type of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getExpertiseAndEmploymentForUnit (@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getExpertiseAndEmploymentForUnit(unitId, false));
+    }
+
 
 }

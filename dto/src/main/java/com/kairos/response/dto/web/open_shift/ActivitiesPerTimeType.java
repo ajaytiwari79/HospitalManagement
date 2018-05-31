@@ -1,8 +1,13 @@
 package com.kairos.response.dto.web.open_shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.math.BigInteger;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivitiesPerTimeType {
     private BigInteger timeTypeId;
     private String timeTypeName;

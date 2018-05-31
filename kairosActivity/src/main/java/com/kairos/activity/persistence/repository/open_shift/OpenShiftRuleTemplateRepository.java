@@ -15,6 +15,7 @@ public interface OpenShiftRuleTemplateRepository extends MongoBaseRepository<Ope
 
     List<OpenShiftRuleTemplate> findAllByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndDeletedFalse(long countryId,long organizationTypeId,long organizationSubTypeId);
 
+    @Query("{'deleted': false, 'unitId' : ?0}")
     List<OpenShiftRuleTemplateDTO> findByUnitIdAndDeletedFalse(long unitId);
 
     OpenShiftRuleTemplate findByIdAndUnitIdAndDeletedFalse(BigInteger id,long unitId);

@@ -52,6 +52,13 @@ public class OrderController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.getOrdersByUnitId(unitId));
     }
 
+    @ApiOperation(value = "Get All PriorityGroup and OpenShifts by orderId")
+    @RequestMapping(value = "/{orderId}/openshifts", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPriorityGroupAndOrdersByUnitId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.getPriorityGroupAndOpenShiftsByOrderId(unitId,orderId));
+    }
+
 
 
 }

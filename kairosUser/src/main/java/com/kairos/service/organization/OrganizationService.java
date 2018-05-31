@@ -63,6 +63,7 @@ import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
@@ -72,11 +73,8 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
-import com.kairos.service.country.CitizenStatusService;
-import com.kairos.service.country.CurrencyService;
-import com.kairos.service.country.DayTypeService;
+import com.kairos.service.country.*;
 
-import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -247,6 +245,7 @@ public class OrganizationService extends UserBaseService {
     private PresenceTypeRepository presenceTypeRepository;
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
+    @Inject private EmploymentTypeService employmentTypeService;
 
 
     public Organization getOrganizationById(long id) {
@@ -1684,10 +1683,11 @@ public class OrganizationService extends UserBaseService {
 
     public RuleTemplateDefaultData getDefaultDataForRuleTemplate(long countryId) {
         List<OrganizationTypeAndSubType> organizationTypeAndSubTypes = organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
+        PriorityGroupDefaultData priorityGroupDefaultData1=employmentTypeService.getExpertiseAndEmployment(countryId,false);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypes(countryId);
 
-        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals());
+        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
         return ruleTemplateDefaultData;
     }
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId){
@@ -1712,5 +1712,14 @@ public class OrganizationService extends UserBaseService {
             }
         });
         return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS1, timeSlotDTOS, country.getId());
+    }
+
+    public RuleTemplateDefaultData getDefaultDataForRuleTemplateByUnit(Long unitId) {
+        Long countryId=countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId,countryId);
+        PriorityGroupDefaultData priorityGroupDefaultData1=employmentTypeService.getExpertiseAndEmployment(countryId,false);
+        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData( skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
+        return ruleTemplateDefaultData;
     }
 }

@@ -1,6 +1,7 @@
 package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
@@ -89,5 +90,11 @@ public class OrderService extends MongoBaseService {
 
         List<Order> orders = orderMongoRepository.findOrdersByUnitId(unitId);
         return orders;
+    }
+
+   public OrderOpenshiftResponseDTO getPriorityGroupAndOpenShiftsByOrderId(Long unitId,BigInteger orderId){
+       List<OpenShiftResponseDTO> openShiftResponseDTOS=openShiftService.getOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+       List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupService.getPriorityGroupsByOrderId(unitId,orderId);
+        return  new OrderOpenshiftResponseDTO(openShiftResponseDTOS,priorityGroupDTOS);
     }
 }

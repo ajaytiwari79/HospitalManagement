@@ -1379,4 +1379,11 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));
     }
+
+    @ApiOperation(value = "Get Default data for Rule Template based on UnitId")
+    @RequestMapping(value = "/unit/{unitId}/rule_template/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplateByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplateByUnit(unitId));
+    }
 }
