@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
@@ -75,10 +74,4 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true}) where id(organizationService) IN {0}" +
             " return organizationService")
     Set<OrganizationService> findAllOrganizationServicesByIds(Set<Long> organizationServicesIds);
-
-
-    @Query("MATCH (n:OrganizationService) where id(n) IN {0} return id(n) as id,  n.name as name")
-    List<OrganizationBasicResponse> getAllOrganizationServicesByIds(Set<Long> orgServiceIds);
-
-
 }
