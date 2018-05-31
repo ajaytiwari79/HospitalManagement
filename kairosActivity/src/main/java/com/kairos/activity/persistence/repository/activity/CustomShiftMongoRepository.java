@@ -14,7 +14,7 @@ public interface CustomShiftMongoRepository {
 
     void updatePhasesOfActivities(Long orgId, Date startDateInISO, Date endDateInISO, String phaseName, String PhaseDescription);
 
-    List<ShiftQueryResult> findAllActivityBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
+    List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
 
     List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate);
 
