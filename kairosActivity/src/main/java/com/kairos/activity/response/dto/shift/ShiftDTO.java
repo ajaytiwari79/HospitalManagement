@@ -78,17 +78,6 @@ public class ShiftDTO {
         this.endTime=endTime;
     }
 
-    public ShiftDTO(String name, Date startDate, Date endDate, @Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.activityId = activityId;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
-    }
-
-
     public LocalDate getStartLocalDate() {
         return startLocalDate;
     }

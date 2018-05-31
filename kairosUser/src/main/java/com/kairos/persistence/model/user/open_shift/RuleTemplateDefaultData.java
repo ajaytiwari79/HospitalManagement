@@ -22,14 +22,6 @@ public class RuleTemplateDefaultData {
         //Default Constructor
     }
 
-    public RuleTemplateDefaultData(List<OrganizationTypeAndSubType> organizationTypeAndSubType, List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals) {
-        this.organizationTypeAndSubType = organizationTypeAndSubType;
-        this.skills = skills;
-        this.timeTypes = timeTypes;
-        this.activities = activities;
-        this.intervals = intervals;
-    }
-
     public RuleTemplateDefaultData(List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises) {
         this.skills = skills;
         this.timeTypes = timeTypes;

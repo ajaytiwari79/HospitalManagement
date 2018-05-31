@@ -103,9 +103,6 @@ public class Staff extends UserBaseEntity {
     private Integer age;
 //    private Gender gender;
 
-    @Relationship(type = HAS_STAFF_PREFERENCES)
-    private StaffPreferences staffPreferences;
-
 
     public Staff(String firstName) {
         this.firstName = firstName;
@@ -504,13 +501,6 @@ public class Staff extends UserBaseEntity {
         return age;
     }
 
-    public StaffPreferences getStaffPreferences() {
-        return staffPreferences;
-    }
-
-    public void setStaffPreferences(StaffPreferences staffPreferences) {
-        this.staffPreferences = staffPreferences;
-    }
 
 /*    public Gender getGender() {
         return gender;
