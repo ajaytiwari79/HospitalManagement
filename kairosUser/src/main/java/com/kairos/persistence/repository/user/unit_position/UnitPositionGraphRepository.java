@@ -139,7 +139,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.salary as salary,id(reasonCode) as reasonCodeId,unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
             "{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType, \n" +
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(subOrg) as unitId UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(org),name:org.name} as unitInformation UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
@@ -156,7 +156,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
             "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, \n" +
-            "id(org) as parentUnitId,id(org) as unitId")
+            "id(org) as parentUnitId,id(org) as unitId,\n"+
+            "{id:id(org),name:org.name} as unitInformation")
     List<UnitPositionQueryResult> getAllUnitPositionsByUser(long userId);
    /*
     @Query("match(staff:Staff)-[r1:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={1} \n" +
