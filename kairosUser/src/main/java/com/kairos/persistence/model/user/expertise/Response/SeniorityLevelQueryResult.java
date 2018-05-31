@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_table.PayGrade;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -20,6 +21,7 @@ public class SeniorityLevelQueryResult {
     private Integer from;
     private Integer to;
     private Long id;
+    private List<FunctionDTO> functions;
 
     public SeniorityLevelQueryResult() {
         //default
@@ -79,5 +81,13 @@ public class SeniorityLevelQueryResult {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<FunctionDTO> getFunctions() {
+        return functions;
+    }
+
+    public void setFunctions(List<FunctionDTO> functions) {
+        this.functions = functions;
     }
 }

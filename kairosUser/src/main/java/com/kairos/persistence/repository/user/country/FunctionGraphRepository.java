@@ -45,4 +45,12 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "match(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(slf:SeniorityLevelFunction) match(slf)-[:" + HAS_FUNCTIONAL_AMOUNT + "]-(fn:Function) \n" +
             "return distinct id(fn) as id ,fn.name as name")
     List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
+
+
+    @Query("match(e:Expertise) where id(e)={0} \n" +
+            "match(e)-[:FOR_SENIORITY_LEVEL]->(sl:SeniorityLevel) where id(sl)={1} \n" +
+            "optional match(sl)<-[:FOR_SENIORITY_LEVEL]-(slf:SeniorityLevelFunction) \n" +
+            "optional match(slf)-[:HAS_FUNCTIONAL_AMOUNT]-(fun:Function) \n" +
+            "return collect(distinct fun) as fun")
+    List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId,Long seniorityLevelId);
 }

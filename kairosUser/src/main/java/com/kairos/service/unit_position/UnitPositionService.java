@@ -7,7 +7,7 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
@@ -23,10 +23,7 @@ import com.kairos.response.dto.web.wta.WTADTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
-import com.kairos.persistence.model.user.country.EmploymentType;
 
-import com.kairos.persistence.model.user.country.Function;
-import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
@@ -638,9 +635,19 @@ public class UnitPositionService extends UserBaseService {
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
         SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
-        SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
-        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
+        //SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
+        //positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
         positionCtaWtaQueryResult.setUnion(currentExpertise.get().getUnion());
+
+        SeniorityLevelQueryResult seniorityLevel = null;
+        if(appliedSeniorityLevel != null){
+            seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
+
+            List<FunctionDTO> functionDTOs =  functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(),appliedSeniorityLevel.getId());
+            seniorityLevel.setFunctions(functionDTOs);
+        }
+        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
+
 
         return positionCtaWtaQueryResult;
     }
