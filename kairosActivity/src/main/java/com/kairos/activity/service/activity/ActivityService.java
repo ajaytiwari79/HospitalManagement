@@ -7,6 +7,7 @@ import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
@@ -84,6 +85,8 @@ public class ActivityService extends MongoBaseService {
     private ShiftService shiftService;
     @Autowired
     private PhaseService phaseService;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
     @Inject
     private TagMongoRepository tagMongoRepository;
     @Inject
@@ -167,6 +170,8 @@ public class ActivityService extends MongoBaseService {
 
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
+
+        activity.setPermissionsActivityTab(new PermissionsActivityTab());
 
         activity.setNotesActivityTab(new NotesActivityTab());
 
@@ -290,7 +295,8 @@ public class ActivityService extends MongoBaseService {
 
 
     public ActivityTabsWrapper getBalanceSettingsTabOfActivity(BigInteger activityId, Long countryId) {
-        PresenceTypeWithTimeTypeDTO presenceType = organizationRestClient.getPresenceTypeAndTimeTypeByCountry(countryId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
@@ -511,6 +517,29 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getBonusActivityTab());
+        return activityTabsWrapper;
+    }
+
+    // PERMISSIONS
+
+    public ActivityTabsWrapper updatePermissionsTabOfActivity(PermissionsActivityTabDTO permissionsActivityTabDTO) {
+        PermissionsActivityTab permissionsActivityTab = new PermissionsActivityTab(permissionsActivityTabDTO.isEligibleForCopy());
+        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(permissionsActivityTabDTO.getActivityId())));
+        if (!Optional.ofNullable(activity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.id",permissionsActivityTabDTO.getActivityId());
+        }
+        activity.setPermissionsActivityTab(permissionsActivityTab);
+        save(activity);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(permissionsActivityTab);
+        return activityTabsWrapper;
+    }
+
+    public ActivityTabsWrapper getPermissionsTabOfActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        if (!Optional.ofNullable(activity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
+        }
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getPermissionsActivityTab());
         return activityTabsWrapper;
     }
 
@@ -990,8 +1019,8 @@ public class ActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
            exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
-        if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
-            exceptionService.actionNotPermittedException("Activity is not eligible for copy");
+        if(!activityFromDatabase.get().getPermissionsActivityTab().isEligibleForCopy()){
+            exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
         }
 
 

@@ -20,4 +20,8 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftQueryResult> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
+    List<Long> getUnitIdListOfShiftBeforeDate(Date date);
+
+    List<ShiftQueryResult> getShiftsByUnitBeforeDate(Long unitId, Date endDate);
+
 }

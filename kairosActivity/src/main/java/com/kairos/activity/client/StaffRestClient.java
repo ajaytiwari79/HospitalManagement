@@ -119,6 +119,30 @@ public class StaffRestClient {
         }
     }
 
+    public Map<Long,Long> getUnitPositionExpertiseMap(Long organizationId, Long unitId) {
+
+        final String baseUrl = getBaseUrl(organizationId, unitId, null);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Long>>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<Map<Long,Long>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/unit_position/expertise",
+                            HttpMethod.GET, null, typeReference);
+            RestTemplateResponseEnvelope<Map<Long,Long>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+    }
+
 
     /**
      * @return
