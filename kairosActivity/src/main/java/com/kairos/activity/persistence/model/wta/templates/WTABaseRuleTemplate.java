@@ -15,7 +15,7 @@ import java.util.List;
  */
 
 @Document(collection = "wtaBaseRuleTemplate")
-public abstract class WTABaseRuleTemplate extends MongoBaseEntity{
+public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     protected String name;
     protected String description;
@@ -107,5 +107,7 @@ public abstract class WTABaseRuleTemplate extends MongoBaseEntity{
         return target;
     }
 
-    public abstract boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper);
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper){
+        return "";
+    }
 }

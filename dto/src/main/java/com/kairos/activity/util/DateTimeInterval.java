@@ -30,7 +30,7 @@ public class DateTimeInterval {
     }
 
     public ZonedDateTime getStart() {
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), ZoneId.systemDefault());
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(start), ZoneId.systemDefault());
     }
 
     public long getStartMillis() {
@@ -46,7 +46,7 @@ public class DateTimeInterval {
     }
 
     public ZonedDateTime getEnd() {
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(end), ZoneId.systemDefault());
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(end), ZoneId.systemDefault());
     }
 
     public long getEndMillis() {

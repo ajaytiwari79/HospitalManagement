@@ -85,26 +85,28 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
         if(timeInterval!=null){
             if(isValidForDay(dayTypeIds,infoWrapper)) {
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getShift().getMinutes());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0]*60, infoWrapper.getShift().getMinutes());
                 if (!isValid) {
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
                         if(counterValue<0){
-                            new InvalidRequestException(getName() + " is Broken");
-                            infoWrapper.getCounterMap().put(getId()+"-"+infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        }else {
+                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                         }
                     }else {
-                        new InvalidRequestException(getName() + " is Broken");
+                        throw new InvalidRequestException(getName() + " is Broken");
                     }
                 }
             }
         }
-        return false;
+        return "";
     }
 
     public ShiftLengthWTATemplate(String name, String description, long timeLimit) {

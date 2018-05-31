@@ -40,7 +40,7 @@ public class WTABuilderService extends MongoBaseService {
     }
 
     public static WTABaseRuleTemplate copyRuleTemplate(WTABaseRuleTemplateDTO ruleTemplate,Boolean isIdnull){
-        WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
+        WTABaseRuleTemplate wtaBaseRuleTemplate = null;
         switch (ruleTemplate.getWtaTemplateType()) {
             case SHIFT_LENGTH:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ShiftLengthWTATemplate.class);

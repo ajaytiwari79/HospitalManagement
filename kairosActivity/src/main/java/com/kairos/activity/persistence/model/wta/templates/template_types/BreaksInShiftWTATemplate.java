@@ -16,7 +16,7 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
+public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
     private List<BreakTemplateValue> breakTemplateValues;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();;
@@ -43,8 +43,8 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return false;
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public BreaksInShiftWTATemplate(String name,  boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {

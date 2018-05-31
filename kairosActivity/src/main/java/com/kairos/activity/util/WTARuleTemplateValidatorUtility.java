@@ -307,7 +307,7 @@ public class WTARuleTemplateValidatorUtility {
         TimeInterval timeInterval = null;
         for (PartOfDay partOfDay:partOfDays) {
             for (TimeSlotWrapper timeSlotWrapper : timeSlotWrappers) {
-                if (partOfDay.equals(timeSlotWrapper.getName())) {
+                if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     TimeInterval interval = new TimeInterval(((timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute()), ((timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute()));
                     if(interval.contains(DateUtils.getZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY))){
                         timeInterval = interval;
@@ -368,8 +368,9 @@ public class WTARuleTemplateValidatorUtility {
         Integer[] limitAndCounter = new Integer[2];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if(infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName()) && !phaseTemplateValue.isDisabled()){
-                limitAndCounter[0] = (int)(infoWrapper.getUserPostion().equals("Staff") ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
+                limitAndCounter[0] = (int)(infoWrapper.getUser().getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
                 limitAndCounter[1] = getCounterValue(infoWrapper,phaseTemplateValue,ruleTemplateId);
+                break;
             }
         }
         return limitAndCounter;
@@ -472,8 +473,8 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftWithActivityDTO shift, List<ShiftWithActivityDTO> shifts, String phase, PlanningPeriod planningPeriod, List<StaffWTACounter> staffWTACounters){
-        Map<String,Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(sc->sc.getRuleTemplateId()+"-"+sc.getPhaseName(),sc->sc.getCount()));
-        return new RuleTemplateSpecificInfo(shifts,shift,staffAdditionalInfoDTO.getTimeSlotSets(),phase,new DateTimeInterval(planningPeriod.getStartDate().getTime(),planningPeriod.getEndDate().getTime()),staffWTACounterMap,staffAdditionalInfoDTO.getDayTypes());
+        Map<BigInteger,Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(sc->sc.getRuleTemplateId(),sc->sc.getCount()));
+        return new RuleTemplateSpecificInfo(shifts,shift,staffAdditionalInfoDTO.getTimeSlotSets(),phase,new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(),DateUtils.asDate(planningPeriod.getEndDate()).getTime()),staffWTACounterMap,staffAdditionalInfoDTO.getDayTypes(),staffAdditionalInfoDTO.getUser());
     }
 
     public static List<DayOfWeek> getDayOfWeekByDayType(List<Long> dayTypeIds,List<DayTypeDTO> dayTypeDTOS){

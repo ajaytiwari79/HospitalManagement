@@ -23,13 +23,13 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
     }
 
     @Override
-    public boolean isSatisfied(ShiftWithActivityDTO shift,ExceptionService exceptionService) {
+    public boolean isSatisfied(ShiftWithActivityDTO shift) {
         if (Optional.ofNullable(shift.getActivity().getEmploymentTypes()).isPresent() && !shift.getActivity().getEmploymentTypes().isEmpty()) {
             employmentTypeIds.addAll(shift.getActivity().getEmploymentTypes());
             if (employmentTypeIds.contains(employmentType.getId())) {
                 return true;
             }
-            exceptionService.invalidRequestException("message.activity.employement-type-match");
+            //exceptionService.invalidRequestException("message.activity.employement-type-match");
         }
         return true;
 

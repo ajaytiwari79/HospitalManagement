@@ -134,7 +134,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         int totalScheduledTime = 0;
         DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
         for (ShiftWithActivityDTO shift1:infoWrapper.getShifts()) {
@@ -143,7 +143,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
             }
         }
         //int scheduledTime = totalScheduledTime>wtaTemplate.getMaximumAvgTime()?totalScheduledTime-(int)wtaTemplate.getMaximumAvgTime():0;
-        return false;
+        return "";
     }
 
 

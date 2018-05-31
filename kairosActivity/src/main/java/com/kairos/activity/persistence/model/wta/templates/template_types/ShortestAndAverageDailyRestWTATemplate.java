@@ -134,7 +134,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
          /*  public static int checkConstraints(List<ShiftWithActivityDTO> shifts,ShortestAndAverageDailyRestWTATemplate ruleTemplate){
         if(shifts.size()<2) return 0;
         List<DateTimeInterval> intervals= getSortedIntervals(shifts);
@@ -150,7 +150,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         float averageRestingTime=totalRestAllShifts/shifts.size();
         return  (restingTimeUnder + (int)(averageRest>averageRestingTime?averageRest-averageRestingTime:0));
     }*/
-        return false;
+        return "";
     }
 
 }

@@ -6,9 +6,11 @@ import com.kairos.activity.persistence.model.phase.Phase;
 
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.enums.shift.ShiftState;
 import org.joda.time.Interval;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +46,17 @@ public class ShiftWithActivityDTO {
     private int scheduledMinutes;
     private int durationMinutes;
     private ShiftWithActivityDTO subShift;
-    private List<BigInteger> brokenRuleTemplateIds;
+    private ShiftState shiftState;
+    private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
+
+
+    public ShiftState getShiftState() {
+        return shiftState;
+    }
+
+    public void setShiftState(ShiftState shiftState) {
+        this.shiftState = shiftState;
+    }
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
@@ -62,6 +74,24 @@ public class ShiftWithActivityDTO {
         this.brokenRuleTemplateIds = brokenRuleTemplateIds;
     }
 
+
+    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId,  Long staffId,Long unitEmploymentPositionId, Long unitId, Activity activity) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bonusTimeBank = bonusTimeBank;
+        this.amount = amount;
+        this.probability = probability;
+        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+        this.remarks = remarks;
+        this.activityId = activityId;
+        this.unitEmploymentPositionId = unitEmploymentPositionId;
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.activity = activity;
+    }
+
     public ShiftWithActivityDTO(Date startDate, Date endDate, Activity activity) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -73,7 +103,7 @@ public class ShiftWithActivityDTO {
     }
 
     public int getMinutes(){
-        return ((int)(this.startDate.getTime() - this.endDate.getTime())/3600000);
+        return ((int)(this.endDate.getTime() - this.startDate.getTime())/60000);
     }
 
     public int getScheduledMinutes() {

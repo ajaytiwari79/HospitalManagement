@@ -24,13 +24,13 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     }
 
     @Override
-    public boolean isSatisfied(ShiftWithActivityDTO shift,ExceptionService exceptionService) {
+    public boolean isSatisfied(ShiftWithActivityDTO shift) {
         if (Optional.ofNullable(shift.getActivity().getExpertises()).isPresent() && !shift.getActivity().getExpertises().isEmpty()) {
             expertiseIds.addAll(shift.getActivity().getExpertises());
             if (expertiseIds.contains(expertise.getId())) {
                 return true;
             }
-            exceptionService.invalidRequestException("message.activity.expertise.match");
+            //exceptionService.invalidRequestException("message.activity.expertise.match");
         }
         return true;
     }

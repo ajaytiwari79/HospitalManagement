@@ -106,7 +106,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
         if (timeInterval != null) {
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
@@ -117,7 +117,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
                         new InvalidRequestException(getName() + " is Broken");
-                        infoWrapper.getCounterMap().put(getId()+"-"+infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                         infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                     }
                 } else {
@@ -126,7 +126,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
             }
 
         }
-        return false;
+        return "";
     }
 
 

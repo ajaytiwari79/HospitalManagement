@@ -127,7 +127,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         if(isDisabled()) {
             if ((timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) || plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()))) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
@@ -141,21 +141,22 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), getId());
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     if (!isValid) {
-                        if (limitAndCounter[1] != null) {
-                            int counterValue = limitAndCounter[1] - 1;
-                            if (counterValue < 0) {
-                                new InvalidRequestException(getName() + " is Broken");
-                                infoWrapper.getCounterMap().put(getId()+"-"+infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                        if(limitAndCounter[1]!=null) {
+                            int counterValue =  limitAndCounter[1] - 1;
+                            if(counterValue<0){
+                                throw new InvalidRequestException(getName() + " is Broken");
+                            }else {
+                                infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                                 infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                             }
-                        } else {
-                            new InvalidRequestException(getName() + " is Broken");
+                        }else {
+                            throw new InvalidRequestException(getName() + " is Broken");
                         }
                     }
                 }
             }
         }
-        return false;
+        return "";
     }
 
     public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {

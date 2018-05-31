@@ -65,8 +65,8 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return false;
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public EmployeesWithIncreasedRiskWTATemplate(String name, boolean disabled, String description, int belowYear, int aboveYear, boolean pregnant) {

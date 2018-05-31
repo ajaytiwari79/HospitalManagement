@@ -22,7 +22,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     }
 
     @Override
-    public boolean isSatisfied(ShiftWithActivityDTO shift,ExceptionService exceptionService) {
+    public boolean isSatisfied(ShiftWithActivityDTO shift) {
         /*if (!shift.getActivity().getSkillActivityTab().getActivitySkills().isEmpty()) {
             shift.getActivity().getSkillActivityTab().getActivitySkills().forEach(
                     activityTypeSkill -> activitySkills.add(activityTypeSkill.getSkillId()));

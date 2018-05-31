@@ -68,8 +68,8 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return false;
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public TimeBankWTATemplate(String name, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {

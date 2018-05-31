@@ -3,8 +3,10 @@ package com.kairos.activity.persistence.model.wta.wrapper;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +22,12 @@ public class RuleTemplateSpecificInfo {
     private List<TimeSlotWrapper> timeSlotWrappers;
     private String phase;
     private DateTimeInterval planningPeriod;
-    private Map<String,Integer> counterMap;
+    private Map<BigInteger,Integer> counterMap;
     private List<DayTypeDTO> dayTypes;
-    private String userPostion;
+    private UserAccessRoleDTO user;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<String,Integer> counterMap, List<DayTypeDTO> dayTypes) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrappers = timeSlotWrappers;
@@ -33,14 +35,15 @@ public class RuleTemplateSpecificInfo {
         this.planningPeriod = planningPeriod;
         this.counterMap = counterMap;
         this.dayTypes = dayTypes;
+        this.user = user;
     }
 
-    public String getUserPostion() {
-        return userPostion;
+    public UserAccessRoleDTO getUser() {
+        return user;
     }
 
-    public void setUserPostion(String userPostion) {
-        this.userPostion = userPostion;
+    public void setUser(UserAccessRoleDTO user) {
+        this.user = user;
     }
 
     public List<DayTypeDTO> getDayTypes() {
@@ -51,11 +54,11 @@ public class RuleTemplateSpecificInfo {
         this.dayTypes = dayTypes;
     }
 
-    public Map<String, Integer> getCounterMap() {
+    public Map<BigInteger, Integer> getCounterMap() {
         return counterMap;
     }
 
-    public void setCounterMap(Map<String, Integer> counterMap) {
+    public void setCounterMap(Map<BigInteger, Integer> counterMap) {
         this.counterMap = counterMap;
     }
 

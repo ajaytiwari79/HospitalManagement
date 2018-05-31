@@ -102,7 +102,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         int timefromPrevShift = 0;
         List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
         shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
@@ -115,15 +115,16 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 if(limitAndCounter[1]!=null) {
                     int counterValue =  limitAndCounter[1] - 1;
                     if(counterValue<0){
-                        new InvalidRequestException(getName() + " is Broken");
-                        infoWrapper.getCounterMap().put(getId()+"-"+infoWrapper.getPhase(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                        throw new InvalidRequestException(getName() + " is Broken");
+                    }else {
+                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                         infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                     }
                 }else {
-                    new InvalidRequestException(getName() + " is Broken");
+                    throw new InvalidRequestException(getName() + " is Broken");
                 }
             }
         }
-        return false;
+        return "";
     }
 }

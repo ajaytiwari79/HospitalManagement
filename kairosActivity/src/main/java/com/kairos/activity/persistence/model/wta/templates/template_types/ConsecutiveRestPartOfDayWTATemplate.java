@@ -114,7 +114,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
        /* if(shifts.size()<2) return true;
         WTARuleTemplateValidatorUtility.sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
@@ -137,7 +137,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
             }
             l++;
         }*/
-        return false;
+        return "";
     }
 
 }

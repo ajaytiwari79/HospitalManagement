@@ -123,8 +123,8 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public boolean isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return false;
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
 }

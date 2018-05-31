@@ -16,7 +16,7 @@ public class OrActivitySpecification<T> extends AbstractActivitySpecification<T>
 
 
     @Override
-    public boolean isSatisfied(T t, ExceptionService exceptionService) {
+    public boolean isSatisfied(T t) {
         return specification1.isSatisfied(t) || specification2.isSatisfied(t);
     }
 }
