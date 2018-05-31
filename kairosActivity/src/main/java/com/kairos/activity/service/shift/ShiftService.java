@@ -199,7 +199,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public ShiftQueryResult updateShift(Long organizationId, ShiftDTO shiftDTO, String type) {
+    public ShiftWithActivityDTO updateShift(Long organizationId, ShiftDTO shiftDTO, String type) {
 
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         if (!Optional.ofNullable(shift).isPresent()) {
@@ -227,21 +227,9 @@ public class ShiftService extends MongoBaseService {
         Shift oldStateOfShift = new Shift();
         BeanUtils.copyProperties(shift, oldStateOfShift);
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-
-        shift.setActivityId(shiftDTO.getActivityId());
-        shift.setBid(shiftDTO.getBid());
-        shift.setpId(shiftDTO.getpId());
-        shift.setBonusTimeBank(shiftDTO.getBonusTimeBank());
-        shift.setAmount(shiftDTO.getAmount());
-        shift.setRemarks(shiftDTO.getRemarks());
-        shift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getStartLocalDate(), shiftDTO.getStartTime()));
-        shift.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getEndLocalDate(), shiftDTO.getEndTime()));
-        shift.setName(activity.getName());
-        shift.setDurationMinutes(shiftDTO.getDurationMinutes());
         ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
-        shiftWithActivityDTO.setActivity(activity);
         validateShiftWithActivity(wtaQueryResultDTO,shiftWithActivityDTO, staffAdditionalInfoDTO);
-        Shift shift = buildShift(shiftWithActivityDTO);
+        shift = buildShift(shiftWithActivityDTO);
         shift.setMainShift(true);
         timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
         save(shift);
@@ -254,11 +242,9 @@ public class ShiftService extends MongoBaseService {
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
                 true, oldStateOfShift, isShiftForPreence, false, activityChangeStatus(activityOld, activity) == ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE
                 , activityChangeStatus(activityOld, activity) == ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE));
-        ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
-        shiftQueryResult.setName(activity.getName());
-        shiftQueryResult.setDurationMinutes(shift.getDurationMinutes());
-        shiftQueryResult.setScheduledMinutes(shift.getScheduledMinutes());
-        return shiftQueryResult;
+        shiftWithActivityDTO.setDurationMinutes(shift.getDurationMinutes());
+        shiftWithActivityDTO.setScheduledMinutes(shift.getScheduledMinutes());
+        return shiftWithActivityDTO;
     }
 
     public List<ShiftQueryResult> getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week, Long unitPositionId, String type) throws ParseException {
