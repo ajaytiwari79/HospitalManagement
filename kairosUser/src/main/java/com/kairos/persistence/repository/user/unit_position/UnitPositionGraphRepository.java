@@ -139,7 +139,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.salary as salary,id(reasonCode) as reasonCodeId,unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
             "{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType, \n" +
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(org),name:org.name} as unitInformation UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInformation UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
@@ -221,7 +221,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.salary as salary,id(reasonCode) as reasonCodeId,unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
             "{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType, \n" +
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(subOrg)  as unitId " +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(subOrg)  as unitId,{id:id(subOrg),name:subOrg.name} as unitInformation " +
             "UNION "+
             "match(staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) where id(staff)={0} " +
             "match(subOrg)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false})<-[:" + BELONGS_TO_STAFF + "]-(staff) " +
@@ -239,7 +239,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.salary as salary,id(reasonCode) as reasonCodeId,unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
             "{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType, \n" +
             "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(org)  as unitId ")
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(org)  as unitId ,\n"+
+            "{id:id(org),name:org.name} as unitInformation")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
 
     @Query("MATCH (unit:Organization) WHERE id(unit)={0} \n" +
