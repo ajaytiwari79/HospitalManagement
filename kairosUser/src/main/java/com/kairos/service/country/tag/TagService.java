@@ -75,7 +75,7 @@ public class TagService extends UserBaseService {
 
         }
 
-        /*if(! ( clause_tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
+        /*if(! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), false) != null ){
             throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
         }*/
         if( ! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
@@ -137,6 +137,7 @@ public class TagService extends UserBaseService {
         Tag tag = tagGraphRepository.getCountryTag(countryId, tagId, false);
         if( tag == null) {
             exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
+
         }
         tag.setDeleted(true);
         save(tag);
@@ -197,6 +198,7 @@ public class TagService extends UserBaseService {
         Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, false);
         if( tag == null) {
             exceptionService.dataNotFoundByIdException("message.tab.id.notFound",tagId);
+
         }
         tag.setDeleted(true);
         save(tag);

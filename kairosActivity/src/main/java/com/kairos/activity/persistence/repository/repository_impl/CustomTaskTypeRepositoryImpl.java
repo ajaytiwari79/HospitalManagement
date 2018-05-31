@@ -117,7 +117,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("isEnabled").is(true).and("organizationId").is(0)),
                 unwind("tags", true),
-                lookup("clause_tag","tags","_id","tags_data"),
+                lookup("tag","tags","_id","tags_data"),
                 unwind("tags_data",true),
                 group("$id")
                         .first("$title").as("title")
@@ -139,7 +139,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("isEnabled").is(true).and("organizationId").is(organizationId).and("subServiceId").is(subServiceId)),
                 unwind("tags", true),
-                lookup("clause_tag","tags","_id","tags_data"),
+                lookup("tag","tags","_id","tags_data"),
                 unwind("tags_data",true),
                 group("$id")
                         .first("$title").as("title")
@@ -161,7 +161,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("isEnabled").is(true).and("teamId").is(teamId).and("subServiceId").is(subServiceId)),
                 unwind("tags", true),
-                lookup("clause_tag","tags","_id","tags_data"),
+                lookup("tag","tags","_id","tags_data"),
                 unwind("tags_data",true),
                 group("$id")
                         .first("$title").as("title")
@@ -183,7 +183,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("isEnabled").is(true).and("subServiceId").is(subServiceId).and("organizationId").is(0)),
                 unwind("tags", true),
-                lookup("clause_tag","tags","_id","tags_data"),
+                lookup("tag","tags","_id","tags_data"),
                 unwind("tags_data",true),
                 group("$id")
                         .first("$title").as("title")
