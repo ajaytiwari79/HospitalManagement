@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -65,6 +67,14 @@ public class PlanningPeriodController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId));
+    }
+
+    @ApiOperation(value = "update period's flipping Date")
+    @PutMapping(value = "/period/{periodId}/flip_phase/{timestamp}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable LocalDate date) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, date));
+
     }
 
 }

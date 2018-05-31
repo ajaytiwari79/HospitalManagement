@@ -5,7 +5,7 @@ import com.planner.domain.staff.PlanningShift;
 import com.planner.domain.staff.PlanningStaff;
 import com.planner.enums.ShiftType;
 import com.planner.repository.staffRepository.ShiftRepository;
-import com.planner.repository.staffRepository.StaffRepository;
+import com.planner.repository.staffRepository.TaskStaffRepository;
 import com.planner.responseDto.staffDto.OptaShiftDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ public class ShiftService {
     @Autowired
     private ShiftRepository shiftRepository;
     @Autowired
-    private StaffService staffService;
-    @Autowired private StaffRepository staffRepository;
+    private TaskStaffService taskStaffService;
+    @Autowired private TaskStaffRepository taskStaffRepository;
 
 
     public void saveList(List<PlanningShift> planningShifts) {
@@ -39,7 +39,7 @@ public class ShiftService {
     public List<OptaShiftDTO> saveShifts(List<OptaShiftDTO> optaShiftDTOS) {
         List<OptaShiftDTO> updatedOptaShiftDtos = new ArrayList<>();
         for (OptaShiftDTO optaShiftDto : optaShiftDTOS) {
-            if (staffService.exits(optaShiftDto.getKairosId(),optaShiftDto.getUnitId())) {
+            if (taskStaffService.exits(optaShiftDto.getKairosId(),optaShiftDto.getUnitId())) {
                 PlanningShift planningShift = new PlanningShift();
                 planningShift.setUnitId(optaShiftDto.getUnitId());
                 planningShift.setExternalId(optaShiftDto.getKairosId());
@@ -58,7 +58,7 @@ public class ShiftService {
     }
 
     private String getStaffId(OptaShiftDTO optaShiftDTO){
-        PlanningStaff planningStaff = staffRepository.findByExternalId(optaShiftDTO.getKairosId(),optaShiftDTO.getUnitId(),PlanningStaff.class);
+        PlanningStaff planningStaff = taskStaffRepository.findByExternalId(optaShiftDTO.getKairosId(),optaShiftDTO.getUnitId(),PlanningStaff.class);
         return planningStaff.getId();
     }
     public PlanningShift findOne(String id) {

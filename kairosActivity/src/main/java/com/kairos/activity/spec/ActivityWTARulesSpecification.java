@@ -8,12 +8,15 @@ import com.kairos.activity.enums.RuleTemplates;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.response.dto.shift.RuleTemplateCategoryDTO;
-import com.kairos.activity.response.dto.shift.WTAResponseDTO;
+
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,8 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     private Shift shift;
     private Phase phase;
     private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
+    @Autowired
+    private ExceptionService exceptionService;
 
     public ActivityWTARulesSpecification(WTAResponseDTO wtaResponseDTO, Phase phase, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.wtaResponseDTO = wtaResponseDTO;
@@ -38,9 +43,9 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     @Override
     public boolean isSatisfied(Activity activity) {
         if (wtaResponseDTO.getEndDateMillis()!=null && new DateTime(wtaResponseDTO.getEndDateMillis()).isBefore(shift.getEndDate().getTime())) {
-            throw new ActionNotPermittedException("WTA is Expired for unit employment.");
+            exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
-        List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplates();
+       /* List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplates();
         for (int i = 0; i < ruleTemplates.size(); i++) {
             RuleTemplateCategoryDTO currentWTARuleTemplate = ruleTemplates.get(i);
             String currentTemplateType=getTemplateType(currentWTARuleTemplate.getTemplateType());
@@ -89,7 +94,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     break;
                 case MINIMUM_REST_AFTER_CONSECUTIVE_DAYS_WORKED:
                     break;
-                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //MaximumNightShiftLengthWTATemplate
+                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //ShiftLengthWTATemplateDTO
 //                    if (!currentWTARuleTemplate.getCheckAgainstTimeRules()) {
 //                        continue;
 //                    } else {
@@ -137,10 +142,12 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     break;
                 case MINIMUM_TIME_BANK:
                     break;
+                case BREAKS_IN_SHIFT:
+                    break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
-        }
+        }*/
         return true;
     }
     private String getTemplateType(String templateType){

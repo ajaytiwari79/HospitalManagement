@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.M7'
+		//springBootVersion = '2.0.2.RELEASE'
 		swaggerVersion = '2.5.0'
 		jacksonVersion= '2.9.2'
         projectVersion="0.0.1"
@@ -11,6 +12,7 @@ buildscript {
 		jcenter()
 		maven { url "https://repo.spring.io/snapshot" }
 		maven { url "https://repo.spring.io/milestone" }
+
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -34,6 +36,7 @@ repositories {
 	jcenter()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url "http://repo.spring.io/release/"}
 	/*maven { url 'http://localhost:8080/repository/local.kairos/'
 		credentials {
 			username = "admin"
@@ -78,7 +81,9 @@ dependencies {
 	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
 	compile group: 'org.json', name: 'json', version: '20160810'
 	compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
-	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
+//	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
+	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
+
 	compile group: 'log4j', name: 'log4j', version: '1.2.17'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')

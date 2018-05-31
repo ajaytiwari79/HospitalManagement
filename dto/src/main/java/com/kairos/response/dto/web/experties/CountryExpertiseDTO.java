@@ -1,15 +1,18 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by prerna on 14/11/17.
@@ -19,7 +22,7 @@ public class CountryExpertiseDTO {
 
     private Long id;
 
-    @NotNull(message = "error.Expertise.name.notnull")
+    @NotBlank(message="Expertise name is required")
     private String name;
 
     private String description;
@@ -35,22 +38,21 @@ public class CountryExpertiseDTO {
     private Long organizationLevelId;
 
     @NotNull(message = "services can not be null")
-    private Long serviceId;
+    private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
     private Long unionId;
     private Integer fullTimeWeeklyMinutes ; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
-    @NotNull(message = "Paid Out Frequency can not be null")
-    private PaidOutFrequencyEnum paidOutFrequency;
-
     @Valid
     private SeniorityLevelDTO seniorityLevel;
 
-
     private List<Long> tags;
     private Boolean published;
+
+    @NotNull(message="Please select payment type")
+    private BreakPaymentSetting breakPaymentSetting;
 
     public Boolean isPublished() {
         return published;
@@ -125,12 +127,12 @@ public class CountryExpertiseDTO {
         this.organizationLevelId = organizationLevelId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Set<Long> getOrganizationServiceIds() {
+        return organizationServiceIds;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
+        this.organizationServiceIds = organizationServiceIds;
     }
 
     public Long getUnionId() {
@@ -147,15 +149,6 @@ public class CountryExpertiseDTO {
 
     public void setFullTimeWeeklyMinutes(Integer fullTimeWeeklyMinutes) {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
     }
 
     public SeniorityLevelDTO getSeniorityLevel() {
@@ -179,17 +172,16 @@ public class CountryExpertiseDTO {
     }
 
 
-    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Long serviceId, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {
+    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @Valid SeniorityLevelDTO seniorityLevel) {
         this.name = name;
         this.description = description;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.organizationLevelId = organizationLevelId;
-        this.serviceId = serviceId;
+        this.organizationServiceIds = organizationServiceIds;
         this.unionId = unionId;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.paidOutFrequency = paidOutFrequency;
         this.seniorityLevel = seniorityLevel;
     }
 
@@ -205,5 +197,13 @@ public class CountryExpertiseDTO {
             return dateValue;
         }
         return true;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }

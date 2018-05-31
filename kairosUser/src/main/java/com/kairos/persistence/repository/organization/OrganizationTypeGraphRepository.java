@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -17,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 14/10/16.
  */
 @Repository
-public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<OrganizationType,Long> {
+public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<OrganizationType, Long> {
 
     @Override
     List<OrganizationType> findAll();
@@ -57,6 +56,14 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (pot:OrganizationType),(ot:OrganizationType) WHERE id(ot)={0} AND id(pot)={1} Create (pot)-[:HAS_SUB_TYPE]->(ot) return ot")
     OrganizationType createSubTypeRelation(Long subTypeId, Long parentTypeId);
 
+    @Query("match(c:Country) where id(c)={0}\n" +
+            "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType{isEnable:true})\n" +
+            "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType{isEnable:true})\n" +
+            "with or,ora\n" +
+            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name}) ELSE [] END} as orga\n" +
+            "RETURN orga as result")
+    List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
+
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
             "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
@@ -80,16 +87,16 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (orgType:OrganizationType),(expertise:Expertise) where id(orgType)={0} AND id(expertise)={1} match (orgType)-[r:" + ORG_TYPE_HAS_EXPERTISE + "]->(expertise) set r.isEnabled=false,r.lastModificationDate={2} return r")
     void deleteOrgTypeExpertise(long orgTypeId, long expertiseId, long lastModificationDate);
 
-    @Query("Match (expertise:Expertise{deleted:false})-[:BELONGS_TO]->(country:Country) where id(country)={0} with expertise, country\n" +
-            "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} WITH expertise,country,r\n"+
-            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(country)  with r,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n"+
+    @Query("Match (expertise:Expertise{deleted:false})-[:BELONGS_TO]->(country:Country) where id(country)={0}  AND expertise.startDateMillis<={2} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {2}) with expertise, country\n" +
+            "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} WITH expertise,country,r\n" +
+            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(country)  with r,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
             "return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as expertise")
-    OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId);
+    OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId, Long selectedDateMillis);
 
-    @Query("match(ost:OrganizationType) where  id(ost) in {0} match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO_ORG_SUB_TYPE]->(ost)\n" +
+   /* @Query("match(ost:OrganizationType) where  id(ost) in {0} match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO_ORG_SUB_TYPE]->(ost)\n" +
             "MATCH(workingTimeAgreement)-[:HAS_EXPERTISE_IN]-(expertise:Expertise)\n" +
             "return workingTimeAgreement,expertise")
-    List<WTAAndExpertiseQueryResult> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);
+    List<WTAAndExpertiseQueryResult> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);*/
 
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
@@ -116,16 +123,16 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "RETURN organizationType as result")
     List<Map<String, Object>> getAllOrganizationTypeWithSubTypeByCountryId(Long countryId);
 
-    @Query("match(country:Country) where id(country)={0} \n"+
+    @Query("match(country:Country) where id(country)={0} \n" +
             "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) return orgType")
     List<OrganizationType> findOrganizationTypeByCountry(Long countryId);
 
-    @Query("match(country:Country) where id(country)={0} \n"+
+    @Query("match(country:Country) where id(country)={0} \n" +
             "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) WHERE id(orgType)={1} return orgType")
     OrganizationType getOrganizationTypeById(Long countryId, Long orgTypeId);
 
 
-    @Query("match(country:Country) where id(country)={0} \n"+
+    @Query("match(country:Country) where id(country)={0} \n" +
             "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) return orgType LIMIT 1")
     OrganizationType getOneDefaultOrganizationTypeById(Long countryId);
 
@@ -136,11 +143,11 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (n:Organization{isEnable:true,isKairosHub:{1}})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationTypeAndIsKairosHub(long orgTypeId, boolean isKairosHub);
 
-    @Query("match(country:Country) where id(country)={0} \n"+
+    @Query("match(country:Country) where id(country)={0} \n" +
             "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) WHERE LOWER(orgType.name)=LOWER({1}) return orgType")
-    OrganizationType findByName(Long countryId,String name);
+    OrganizationType findByName(Long countryId, String name);
 
     @Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{deleted:false}) where id(ot)={0} AND id(level) IN {1} DETACH DELETE rel")
-    void removeLevelRelationshipFromOrganizationType(Long organizationTypeId,List<Long> levelIds);
+    void removeLevelRelationshipFromOrganizationType(Long organizationTypeId, List<Long> levelIds);
 
 }

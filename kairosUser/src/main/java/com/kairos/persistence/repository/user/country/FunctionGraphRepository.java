@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ORGANIZATION_LEVEL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by pavan on 13/3/18.
@@ -22,7 +21,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "OPTIONAL MATCH(function)-[:HAS_ORGANIZATION_LEVEL]->(level:Level) " +
             "OPTIONAL MATCH(function)-[:HAS_UNION]->(union:Organization{union:true}) " +
             "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   return id(function) as id,function.name as name,function.description as description," +
-            "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels")
+            "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels,function.icon as icon")
     List<FunctionDTO> findFunctionsByCountry(long countryId);
 
     @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} return id(function) as id,function.name as name")
@@ -41,10 +40,9 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
     @Query("MATCH (level:Level)<-[:" + HAS_ORGANIZATION_LEVEL + "]-(function:Function{deleted:false}) where id(level)={0} return id(function) as id,function.name as name")
     List<FunctionDTO> getFunctionsByOrganizationLevel(Long organizationLevelId);
 
-
-    @Query("MATCH (organization:Organization)-[:" + COUNTRY + "]->(country:Country)<-[:BELONGS_TO]-(function:Function{deleted:false}) where id(organization)={0}" +
-            " return id(function) as id,function.name as name")
-    List<FunctionDTO> findFunctionsByOrganization(Long organizationId);
-
-
+    @Query("match(expertise:Expertise{deleted:false,published:true}) where id(expertise)={0}\n" +
+            "match(expertise)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(:FunctionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(fpm:FunctionalPaymentMatrix) \n" +
+            "match(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(slf:SeniorityLevelFunction) match(slf)-[:" + HAS_FUNCTIONAL_AMOUNT + "]-(fn:Function) \n" +
+            "return distinct id(fn) as id ,fn.name as name")
+    List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
 }

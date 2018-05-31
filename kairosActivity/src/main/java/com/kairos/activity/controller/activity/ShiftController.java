@@ -2,10 +2,12 @@ package com.kairos.activity.controller.activity;
 
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.service.activity.ActivityService;
-import com.kairos.activity.service.activity.ShiftService;
+import com.kairos.activity.service.shift.ShiftService;
+import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -38,19 +41,20 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShift(@RequestParam("type") String type, @PathVariable Long organizationId, @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type,false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type, false));
     }
 
     @ApiOperation("Get Shift of a staff")
     @GetMapping(value = "/shift/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,
+                                                                 @RequestParam Long unitPositionId,
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
                                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                                  @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }
 
 
@@ -88,15 +92,15 @@ public class ShiftController {
     @ApiOperation("add a sub shift for a staff")
     @PutMapping(value = "/sub-shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSubShift(@RequestParam("type") String type, @PathVariable long unitId,  @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift( unitId,shiftDTO,type));
+    public ResponseEntity<Map<String, Object>> addSubShift(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift(unitId, shiftDTO, type));
     }
 
     @ApiOperation("add a sub shifts for a staff")
     @PutMapping(value = "/sub-shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSubShifts( @RequestParam("type") String type, @PathVariable long unitId,  @RequestBody List<ShiftDTO> shiftDTOS) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts( unitId,shiftDTOS,type));
+    public ResponseEntity<Map<String, Object>> addSubShifts(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody List<ShiftDTO> shiftDTOS) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts(unitId, shiftDTOS, type));
     }
 
    /* @ApiOperation("get Average Of Shifts By Activity")
@@ -106,4 +110,18 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAverageOfShiftByActivity( unitId,staffId,activityId,fromDate,type,unitPositionId));
     }*/
 
+    @ApiOperation("publish Shifts")
+    @PutMapping(value = "/publish_shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftPublishDTO));
+    }
+
+
+    @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
+    @GetMapping(value = "/shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, selectedDate));
+    }
 }

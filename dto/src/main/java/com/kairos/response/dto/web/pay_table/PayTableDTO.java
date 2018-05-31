@@ -18,7 +18,6 @@ public class PayTableDTO {
     private Long id;
     @NotNull(message = "name can't be null")
     private String name;
-    @NotNull(message = "short name  can't be null")
     private String shortName;
     private String description;
 
@@ -30,6 +29,9 @@ public class PayTableDTO {
     private Date endDateMillis;
     @NotNull(message = "Level can not be null")
     private Long levelId;
+
+    @NotNull(message = "Please provide payment unit type")
+    private String paymentUnit;
 
     public PayTableDTO() {
     }
@@ -90,12 +92,13 @@ public class PayTableDTO {
         this.description = description;
     }
 
-    public PayTableDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, Long levelId) {
+    public PayTableDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, String paymentUnit, Long levelId) {
         this.name = name;
         this.shortName = shortName;
         this.description = description;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
         this.levelId = levelId;
     }
 
@@ -107,6 +110,7 @@ public class PayTableDTO {
         sb.append(", shortName='").append(shortName).append('\'');
         sb.append(", startDateMillis=").append(startDateMillis);
         sb.append(", endDateMillis=").append(endDateMillis);
+        sb.append(", paymentUnit=").append(paymentUnit);
         sb.append(", levelId=").append(levelId);
         sb.append('}');
         return sb.toString();
@@ -124,5 +128,13 @@ public class PayTableDTO {
             return dateValue;
         }
         return true;
+    }
+
+    public String getPaymentUnit() {
+        return paymentUnit;
+    }
+
+    public void setPaymentUnit(String paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 }

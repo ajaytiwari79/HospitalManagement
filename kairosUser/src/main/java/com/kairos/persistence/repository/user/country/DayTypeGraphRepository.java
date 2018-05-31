@@ -18,6 +18,7 @@ public interface DayTypeGraphRepository extends Neo4jBaseRepository<DayType,Long
     //@Query("MATCH (c:Country)-[:BELONGS_TO]-(dt:DayType {isEnabled:true}) where id(c)={0} return {id:id(dt), name:dt.name,validDays:dt.validDays, description:dt.description,code:dt.code, colorCode:dt.colorCode, allowTimeSettings:dt.allowTimeSettings } as result ")
     @Query("MATCH (c:Country)-[:BELONGS_TO]-(dt:DayType {isEnabled:true}) where id(c)={0} return dt")
     List<DayType> findByCountryId(long countryId);
+
     @Query("MATCH (n:DayType{isEnabled:true}) WITH n.validDays AS coll,n UNWIND coll AS x with distinct x,n WHERE x  in {days} and n.holidayType=false return n")
     List<DayType>findByValidDaysContains(@Param("days") List<String> days);
 

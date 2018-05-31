@@ -2,14 +2,17 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.kairos.enums.shift.BreakPaymentSetting;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by vipul on 30/3/18.
@@ -17,7 +20,7 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseUpdateDTO {
     private Long id;
-    @NotNull(message = "error.Expertise.name.notnull")
+    @NotBlank(message="Expertise name is required")
     private String name;
     private String description;
 
@@ -30,15 +33,12 @@ public class ExpertiseUpdateDTO {
     private Long organizationLevelId;
 
     @NotNull(message = "services can not be null")
-    private Long serviceId;
+    private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
     private Long unionId;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
-
-    @NotNull(message = "Paid Out Frequency can not be null")
-    private PaidOutFrequencyEnum paidOutFrequency;
 
     @Valid
     private SeniorityLevelDTO seniorityLevel;
@@ -47,6 +47,8 @@ public class ExpertiseUpdateDTO {
     private List<Long> tags;
     private Boolean published;
 
+    @NotNull(message="Please select payment type")
+    private BreakPaymentSetting breakPaymentSetting;
     public ExpertiseUpdateDTO() {
         //default cons
     }
@@ -99,12 +101,12 @@ public class ExpertiseUpdateDTO {
         this.organizationLevelId = organizationLevelId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Set<Long> getOrganizationServiceIds() {
+        return organizationServiceIds;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
+        this.organizationServiceIds = organizationServiceIds;
     }
 
     public Long getUnionId() {
@@ -132,14 +134,6 @@ public class ExpertiseUpdateDTO {
     }
 
 
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
-    }
-
     public SeniorityLevelDTO getSeniorityLevel() {
         return seniorityLevel;
     }
@@ -162,6 +156,14 @@ public class ExpertiseUpdateDTO {
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 
     @AssertTrue(message = "'start date' must be less than 'end date'.")

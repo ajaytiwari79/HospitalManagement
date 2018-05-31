@@ -10,6 +10,7 @@ import com.kairos.activity.persistence.model.tag.Tag;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,29 +40,31 @@ public class TagService extends MongoBaseService {
 
     @Autowired
     TagMongoRepository tagMongoRepository;
+    @Autowired
+    ExceptionService exceptionService;
 
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         if ( !countryRestClient.isCountryExists(countryId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
         if( tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)  != null){
-            throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
+           exceptionService.duplicateDataException("message.tag.name",tagDTO.getName() );
         }
-        return this.save(tagDTO.buildTag(tagDTO, true, countryId));
+        return this.save(buildTag(tagDTO, true, countryId));
     }
 
     public Tag  updateCountryTag(Long countryId, BigInteger tagId, TagDTO tagDTO) {
         if ( !countryRestClient.isCountryExists(countryId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
         Tag tag = tagMongoRepository.findTagByIdAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagId, countryId, tagDTO.getMasterDataType().toString(), false);
         if(  tag  == null){
-            throw new DataNotFoundByIdException("Tag does not exist with Id " +tagId );
+            exceptionService.dataNotFoundByIdException("message.tag.id",tagId);
         }
         if(! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) != null ){
-            throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
+            exceptionService.duplicateDataException("message.tag.name",tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
         this.save(tag);
@@ -70,7 +73,7 @@ public class TagService extends MongoBaseService {
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
         if ( !countryRestClient.isCountryExists(countryId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
         if(filterText == null){
@@ -91,17 +94,21 @@ public class TagService extends MongoBaseService {
 
     public boolean deleteCountryTag(Long countryId, BigInteger tagId){
         if ( !countryRestClient.isCountryExists(countryId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         Tag tag = tagMongoRepository.findTagByIdAndCountryIdAndDeletedAndCountryTagTrue(tagId, countryId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
+            exceptionService.dataNotFoundByIdException("message.tag.id",tagId);
         }
         tag.setDeleted(true);
         this.save(tag);
         return true;
     }
 
+
+    public List<Tag> getCountryTagsByIdsAndMasterDataType(List<BigInteger> tags, com.kairos.persistence.model.enums.MasterDataTypeEnum type){
+        return null;
+    }
 
 
 
@@ -110,13 +117,13 @@ public class TagService extends MongoBaseService {
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
         if ( !organizationRestClient.isExistOrganization(organizationId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         logger.info("tagDTO : "+tagDTO.getMasterDataType());
         if( tagMongoRepository.findTagByNameIgnoreCaseAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)  != null){
-            throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
+           exceptionService.duplicateDataException("message.tag.name",tagDTO.getName());
         }
-        return this.save(tagDTO.buildTag(tagDTO, false, organizationId));
+        return this.save(buildTag(tagDTO, false, organizationId));
     }
 
     public Tag  updateOrganizationTag(Long organizationId, BigInteger tagId, TagDTO tagDTO, String type) {
@@ -124,15 +131,15 @@ public class TagService extends MongoBaseService {
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
         if ( !organizationRestClient.isExistOrganization(organizationId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
         Tag tag = tagMongoRepository.findTagByIdAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(tagId, organizationId, tagDTO.getMasterDataType().toString(), false);
         if(  tag  == null){
-            throw new DuplicateDataException("Tag does not exist with Id " +tagId );
+            exceptionService.duplicateDataException("message.tag.id",tagId);
         }
         if(! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagMongoRepository.findTagByNameIgnoreCaseAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) != null ){
-            throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
+            exceptionService.duplicateDataException("message.tag.name",tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
         this.save(tag);
@@ -144,7 +151,7 @@ public class TagService extends MongoBaseService {
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
         if ( !organizationRestClient.isExistOrganization(organizationId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
 
         if(filterText == null){
@@ -177,11 +184,11 @@ public class TagService extends MongoBaseService {
             organizationId = organizationRestClient.getOrganizationIdByTeam(organizationId);
         }
         if ( !organizationRestClient.isExistOrganization(organizationId)) {
-            throw new DataNotFoundByIdException("Incorrect country id " + organizationId);
+            exceptionService.dataNotFoundByIdException("message.country.id",organizationId);
         }
         Tag tag = tagMongoRepository.findTagByIdAndOrganizationIdAndDeletedAndCountryTagFalse(tagId, organizationId, false);
         if( tag == null) {
-            throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
+            exceptionService.dataNotFoundByIdException("message.tag.id",tagId);
         }
         tag.setDeleted(true);
         this.save(tag);
@@ -196,5 +203,9 @@ public class TagService extends MongoBaseService {
     public Tag getOrganizationTagByName(Long orgId, String nameOfTag, MasterDataTypeEnum masterDataTypeEnum){
         return tagMongoRepository.findTagByOrganizationIdAndNameAndMasterDataTypeAndDeletedAndCountryTagFalse(orgId, nameOfTag, masterDataTypeEnum.toString(), false);
 
+    }
+
+    public static Tag buildTag(TagDTO tagDTO, boolean countryTag, long countryOrOrgId){
+        return new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), countryTag, countryOrOrgId);
     }
 }

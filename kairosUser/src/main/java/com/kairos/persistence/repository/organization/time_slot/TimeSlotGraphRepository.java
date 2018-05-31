@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization.time_slot;
 
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -69,6 +70,14 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
 
     List<TimeSlot> findBySystemGeneratedTimeSlotsIsTrue();
 
+    @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR timeSlotSet.endDate>={2}) " +
+            "AND timeSlotSet.timeSlotType ={3} with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            "Match (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
+            "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime")
+    List<TimeSlotWrapper> getShiftPlanningTimeSlotsByUnit(Long unitId, TimeSlotMode timeSlotMode, Date currentDate, TimeSlotType timeSlotType);
+
+    @Query("Match (organization:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1},deleted:false}) where id(organization)={0} AND timeSlotSet.timeSlotType={2} return timeSlotSet order by timeSlotSet.startDate")
+    List<TimeSlotSet> findTimeSlotSetsByOrganizationId(Long unitId, TimeSlotMode timeSlotMode,TimeSlotType timeSlotType);
 
 
 

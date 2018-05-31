@@ -19,7 +19,7 @@ public class AccessGroup extends UserBaseEntity {
 
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
-    private boolean isEnabled = true;
+//    private boolean isEnabled = true;
     private boolean typeOfTaskGiver;
     private String description;
 
@@ -43,14 +43,14 @@ public class AccessGroup extends UserBaseEntity {
         return name;
     }
 
-    public boolean isEnabled() {
+    /*public boolean isEnabled() {
         return isEnabled;
     }
 
     public void setEnabled(boolean enabled) {
 
         isEnabled = enabled;
-    }
+    }*/
 
     public boolean isTypeOfTaskGiver() {
         return typeOfTaskGiver;

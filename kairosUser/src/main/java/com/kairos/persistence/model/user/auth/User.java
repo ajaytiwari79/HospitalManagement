@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.profile.Profile;
+import com.kairos.persistence.model.user.user_personalized_settings.UserPersonalizedSettings;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
@@ -18,6 +19,7 @@ import java.time.Period;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ADMINS_COUNTRY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PERSONALIZED_SETTINGS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PROFILE;
 
 
@@ -36,6 +38,7 @@ public class User extends UserBaseEntity {
     protected String firstName;
     protected String lastName;
     protected Gender gender;
+    private boolean pregnant;
     private String email;
     private Long lastSelectedParentOrgId;
     private Long lastSelectedChildOrgId;
@@ -68,6 +71,10 @@ public class User extends UserBaseEntity {
 
     @Transient
     private Boolean hubMember;
+
+
+    @Relationship(type = HAS_PERSONALIZED_SETTINGS)
+    private UserPersonalizedSettings userPersonalizedSettings;
 
     public int getOtp() {
         return otp;
@@ -303,6 +310,14 @@ public class User extends UserBaseEntity {
     }
 
 
+    public UserPersonalizedSettings getUserPersonalizedSettings() {
+        return userPersonalizedSettings;
+    }
+
+    public void setUserPersonalizedSettings(UserPersonalizedSettings userPersonalizedSettings) {
+        this.userPersonalizedSettings = userPersonalizedSettings;
+    }
+
     /**
      * For Jackson parsing
      */
@@ -431,5 +446,13 @@ public class User extends UserBaseEntity {
 
     public void setLastSelectedChildOrgId(Long lastSelectedChildOrgId) {
         this.lastSelectedChildOrgId = lastSelectedChildOrgId;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
     }
 }

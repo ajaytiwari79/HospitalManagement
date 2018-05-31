@@ -1,5 +1,11 @@
 package com.kairos.persistence.model.enums;
 
+import com.kairos.response.dto.web.filter.FilterDetailDTO;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
 /**
  * Created by prabjot on 19/10/16.
  */
@@ -20,4 +26,14 @@ public enum Gender {
         }
         return null;
     }
+
+    public static List<FilterDetailDTO> getListOfGenderForFilters(){
+        List<FilterDetailDTO> genderFilterData = new ArrayList<>();
+        for(Gender gender : EnumSet.allOf(Gender.class)){
+            FilterDetailDTO filterDetailDTO = new FilterDetailDTO(gender.name(), gender.value);
+            genderFilterData.add(filterDetailDTO);
+        }
+        return genderFilterData;
+    }
+
 }

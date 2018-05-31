@@ -1,5 +1,7 @@
 package com.kairos.activity.response.dto.time_bank;
 
+import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
+
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,12 +18,14 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
     private int granularity;
     private List<BigInteger> activityIds;
     private List<BigInteger> timeTypeIds;
+    private List<Long> plannedTimeIds;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private int minutesFromCta;
     private List<BigInteger> timeTypeIdsWithParentTimeType;
     private boolean calculateScheduledHours;
+    private CalculationFor calculationFor;
 
-    private List<Long> plannedTimeIds;
+
     private List<Long> employmentTypes = new ArrayList<>();
 
 
@@ -35,6 +39,14 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
         this.name = name;
         this.granularity = granularity;
 
+    }
+
+    public CalculationFor getCalculationFor() {
+        return calculationFor;
+    }
+
+    public void setCalculationFor(CalculationFor calculationFor) {
+        this.calculationFor = calculationFor;
     }
 
     public String getAccountType() {

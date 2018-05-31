@@ -1,17 +1,10 @@
 package com.planner.repository.customRepository;
 
-import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Update;
-import com.datastax.driver.core.utils.UUIDs;
+
+import org.springframework.stereotype.Repository;
 import com.planner.domain.common.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cassandra.core.keyspace.AlterTableSpecification;
-import org.springframework.data.cassandra.core.CassandraTemplate;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,44 +14,49 @@ import java.util.List;
 public class BaseRepository {
     private static Logger log = LoggerFactory.getLogger(BaseRepository.class);
 
-    @Autowired
-    CassandraTemplate cassandraTemplate;
+   // @Autowired
+    //CassandraTemplate cassandraTemplate;
 
     public <T> T findById(String id, Class class_Name) {
-        return (T)cassandraTemplate.selectOneById(class_Name, id);
+       // return (T)cassandraTemplate.selectOneById(id, class_Name);
+        return null;
     }
 
     public Object findByIds(List<String> ids, Class class_Name) {
-        return cassandraTemplate.selectBySimpleIds(class_Name, ids);
+        return null;//cassandraTemplate.selectBySimpleIds(class_Name, ids);
     }
 
     public <T> List getAll(Class class_Name){
-        Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
+       /* Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.eq("isDeleted", false));
-        return cassandraTemplate.select(select,class_Name);
+        return cassandraTemplate.select(select,class_Name);*/
+        return null;
     }
 
     public <T> T findByExternalId(long externalId, long unitId, Class class_Name) {
-        Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
+       /* Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.eq("externalid", externalId));
         select.where(QueryBuilder.eq("unitid", unitId));
         select.where(QueryBuilder.eq("isDeleted", false));
-        return (T) findOne(select, class_Name);
+        return (T) findOne(select, class_Name);*/
+        return null;
     }
 
     public <T> List findAllByExternalId(List<Long> externalIds, long unitId, Class class_Name) {
-        Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
+        /*Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.in("externalid", externalIds));
         select.where(QueryBuilder.eq("unitid", unitId));
         select.where(QueryBuilder.eq("isDeleted", false));
-        return findAllByQuery(select, class_Name);
+        return findAllByQuery(select, class_Name);*/
+        return null;
     }
 
     public <T> List getAllByUnitId(long unitId,Class class_Name){
-        Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
+        /*Select select = QueryBuilder.select().from(class_Name.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.eq("unitid", unitId));
         select.where(QueryBuilder.eq("isDeleted", false));
-        return findAllByQuery(select,class_Name);
+        return findAllByQuery(select,class_Name);*/
+        return null;
     }
 
     public <T extends BaseEntity> boolean deleteByExternalId(Long externalId, Long unitId, Class class_Name) {
@@ -70,7 +68,7 @@ public class BaseRepository {
     }
 
     public <T extends BaseEntity> T save(T entity) {
-        log.info("save Object SuccessFully");
+        /*log.info("save Object SuccessFully");
         if (entity.getId() == null) {
             entity.setId(UUIDs.random().toString());
         }
@@ -78,16 +76,17 @@ public class BaseRepository {
             entity.setCreatedDate(new Date());
         } else {
             entity.setUpdatedDate(new Date());
-        }
-        return cassandraTemplate.insert(entity);
+        }*/
+        return null;//cassandraTemplate.insert(entity);
     }
 
     public boolean save(Object object, Class class_Name) {
-        return cassandraTemplate.exists(class_Name, object);
+      //  return cassandraTemplate.exists(object,class_Name);
+        return false;
     }
 
     public <T extends BaseEntity> List<T> saveList(List<T> entities) {
-        if (100>=entities.size()) {
+      /*  if (100>=entities.size()) {
             for (T entity : entities) {
                 if (entity.getId() == null) {
                     entity.setId(UUIDs.random().toString());
@@ -99,11 +98,12 @@ public class BaseRepository {
                 }
                 save(entity);
             }
-            return cassandraTemplate.insert(entities);
+            return null;//cassandraTemplate.insert(entities);
         }
         else {
             return saveListByPagination(entities);
-        }
+        }*/
+        return null;
     }
 
     public <T extends BaseEntity> List<T> saveListByPagination(List<T> entities) {
@@ -123,66 +123,69 @@ public class BaseRepository {
         return savedEntities;
     }
 
-    public void addColumnInTable(DataType type, String columnName) {
+   /* public void addColumnInTable(DataType type, String columnName) {
         log.info("column " + columnName + " created Successfully");
-        AlterTableSpecification alterTableSpecification = new AlterTableSpecification();
+        *//*AlterTableSpecification alterTableSpecification = new AlterTableSpecification();
         alterTableSpecification.add(columnName, type);
-        cassandraTemplate.execute(alterTableSpecification);
-    }
+        cassandraTemplate.execute(alterTableSpecification);*//*
+    }*/
 
     public void deleteById(Object id, Class class_Name) {
         log.info("Object id" + id + " Successfully " + class_Name);
-        cassandraTemplate.deleteById(class_Name, id);
+       // cassandraTemplate.deleteById(id,class_Name);
     }
 
     public void deleteByObject(Object object) {
         log.info("delete object Successfully " + object.getClass());
-        cassandraTemplate.delete(object);
+       // cassandraTemplate.delete(object);
     }
 
     public void deleteList(List objects) {
         log.info("Delete List of object Successfully " + objects.getClass());
-        cassandraTemplate.delete(objects);
+       // cassandraTemplate.delete(objects);
     }
 
-    public void delete(Update query) {
+ /*   public void delete(Update query) {
         log.info("delete by query " + query);
-        cassandraTemplate.execute(query);
+        //cassandraTemplate.execute(query);
     }
-
+*/
     public void update(Object object) {
         log.info("Update Successfully " + object.getClass());
-        cassandraTemplate.update(object);
+       // cassandraTemplate.update(object);
     }
 
     public void updateList(List objects) {
         log.info("update List Successfully " + objects.getClass());
-        cassandraTemplate.update(objects);
+       // cassandraTemplate.update(objects);
     }
 
-    public void update(Update query) {
+   /* public void update(Update query) {
         log.info("update by query " + query);
-        cassandraTemplate.execute(query);
-    }
+        //cassandraTemplate.execute(query);
+    }*/
 
-    public List findAll(Class class_Name) {
+  public List findAll(Class class_Name) {
         log.info("find All Successfully " + class_Name);
-        return cassandraTemplate.selectAll(class_Name);
+        return null;//cassandraTemplate.selectAll(class_Name);
     }
-
+ /*
     public List findAllByQuery(Select select, Class class_Name) {
         log.info("find All by Query " + select + " " + class_Name);
-        return cassandraTemplate.select(select, class_Name);
+        //return cassandraTemplate.select(select, class_Name);
+        return null;
     }
 
     public Object findOne(Select select, Class class_Name) {
         log.info("find One by query " + select + " " + class_Name);
-        return cassandraTemplate.selectOne(select, class_Name);
+        //return cassandraTemplate.selectOne(select, class_Name);
+        return null;
     }
 
     public Object findByField(Select select, Class class_Name) {
         log.info("find One by query " + select + " " + class_Name);
-        return cassandraTemplate.selectOne(select, class_Name);
-    }
+        //return cassandraTemplate.selectOne(select, class_Name);
+        return null;
+    }*/
 
 }

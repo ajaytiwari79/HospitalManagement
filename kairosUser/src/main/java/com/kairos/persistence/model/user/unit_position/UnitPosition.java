@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -14,6 +13,7 @@ import com.kairos.persistence.model.user.staff.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -32,8 +32,8 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_CTA)
     private CostTimeAgreement cta;
 
-    @Relationship(type = HAS_WTA)
-    private WorkingTimeAgreement workingTimeAgreement;
+  //  @Relationship(type = HAS_WTA)
+    private BigInteger workingTimeAgreementId;
 
     @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
@@ -153,12 +153,12 @@ public class UnitPosition extends UserBaseEntity {
         this.cta = cta;
     }
 
-    public WorkingTimeAgreement getWorkingTimeAgreement() {
-        return workingTimeAgreement;
+    public BigInteger getWorkingTimeAgreementId() {
+        return workingTimeAgreementId;
     }
 
-    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
+    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
+        this.workingTimeAgreementId = workingTimeAgreementId;
     }
 
     public Long getStartDateMillis() {

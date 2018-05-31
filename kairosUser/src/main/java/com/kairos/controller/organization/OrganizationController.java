@@ -10,9 +10,9 @@ import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
@@ -21,7 +21,6 @@ import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.organization.OrganizationService;
@@ -31,6 +30,7 @@ import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
@@ -48,8 +48,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -105,11 +107,11 @@ public class OrganizationController {
     @Inject
     private ClientBatchService clientBatchService;
     @Inject
-    private PresenceTypeService presenceTypeService;
-    @Inject
     private CountryService countryService;
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject
+    private UnitPositionService unitPositionService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -133,6 +135,14 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getOrganizationById(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationById(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization with countryId")
+    @RequestMapping(value = UNIT_URL+"/getOrganisationWithCountryId", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationWithCountryId(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationWithCountryId(unitId));
     }
 
     @ApiOperation(value = "Get Organization's showCountryTag setting by Id")
@@ -177,7 +187,7 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationDTO organizationDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createNewUnit(organizationDTO, unitId));
+                organizationService.createNewUnit(organizationDTO, unitId,false,false));
     }
 
 
@@ -500,7 +510,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = "/unit/{unitId}/general", method = RequestMethod.PUT)
-    @ApiOperation("Get general details of Client")
+    @ApiOperation("Update general details of Client")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationGeneralDetails(@PathVariable long unitId, @Validated @RequestBody OrganizationGeneral organizationGeneral) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -567,6 +577,12 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getParentOrganization(countryId));
+    }
+
+    @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
     }
 
     @RequestMapping(value = "/unit", method = RequestMethod.GET)
@@ -766,7 +782,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get integration services")
-    @RequestMapping(value = "/integration_service", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/integration_service", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getIntegrationServices() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationConfigurationService.getAllIntegrationServices());
@@ -1243,13 +1259,14 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
-    //
+    /* Not in use
     @ApiOperation(value = "Get timetype_presencetype by unitID")
     @RequestMapping(value = UNIT_URL + "/timetype_presencetype", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
     }
+    */
 
     @ApiOperation(value = "Get available time zones")
     @RequestMapping(value = UNIT_URL + "/timeZones", method = RequestMethod.GET)
@@ -1291,12 +1308,65 @@ public class OrganizationController {
                 organizationService.getEmploymentTypeWithExpertise(unitId));
     }
 
+    @RequestMapping(value ="/WTARelatedInfo", method = RequestMethod.GET)
+    @ApiOperation("get  Wta related info")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId));
+    }
+
     @RequestMapping(value = UNIT_URL + "/time_zone", method = RequestMethod.GET)
     //@ApiOperation("Get Time Zone Organization")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTimeZoneOfUnit(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getTimeZoneStringOfUnit(unitId));
+    }
+//    @Pavan
+//    Add Apis for Time slots for Shift planning
+
+    @ApiOperation(value = "Get Organization Time Slot sets")
+    @RequestMapping(value = "/unit/{unitId}/shift_planning/time_slot_set", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotSetsByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotSetsByUnit(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slots")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotSetId}/shift_planning/time_slot", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
+    }
+
+    @ApiOperation(value = "Get Default data for Orders")
+    @RequestMapping(value = UNIT_URL+"/order/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForOrder(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
+    }
+    @ApiOperation(value = "Init optplanner integration")
+    @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.initialOptaplannerSync(organizationId,unitId));
+
+    }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @RequestMapping(value = "/unit/{unitId}/getWtaTemplateDefaultDataInfoByUnitId", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getWtaTemplateDefaultDataInfoByUnitId(unitId));
+
+    }
+
+    @RequestMapping(value = UNIT_URL + "/unit_position/expertise", method = RequestMethod.GET)
+    @ApiOperation("fetch Map of unit position id and expertise id")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>>  getExpertiseOfUnitPosition(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionExpertiseMap(unitId));
     }
 }
 

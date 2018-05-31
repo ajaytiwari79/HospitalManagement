@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.repository.activity;
 
+import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithCompositeDTO;
@@ -26,7 +27,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private MongoTemplate mongoTemplate;
 
     public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId,boolean deleted) {
-        ProjectionOperation projectionOperation = Aggregation.project().and("id").as("id").and("name")
+        ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime").and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart").and("id").as("id").and("name")
                 .as("name")
                 .and("activity_type_category.id").as("categoryId").and("activity_type_category.name")
                 .as("categoryName");
@@ -92,6 +93,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
 
         );
@@ -112,6 +114,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
@@ -121,7 +124,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType"),
                 project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
+                        .and("timeType").arrayElementAt(0).as("timeType"),
+                match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
         AggregationResults<ActivityWithCTAWTASettingsDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCTAWTASettingsDTO.class);
         return result.getMappedResults();
@@ -130,7 +136,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false)),
-                project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType"),
+                project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId").and("timeType").arrayElementAt(0).as("timeType"),
+                match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
         AggregationResults<ActivityWithCTAWTASettingsDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCTAWTASettingsDTO.class);
         return result.getMappedResults();
@@ -209,6 +217,19 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public Activity getActivityByNameAndUnitId(Long unitId,String name){
         Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^"+name+"$",Pattern.CASE_INSENSITIVE)));
         return (Activity) mongoTemplate.findOne(query,Activity.class);
+    }
+
+
+    public List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId) {
+       Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "balanceSettingsActivityTab.timeType"),
+               project("balanceSettingsActivityTab","name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
+
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
     }
 
 }

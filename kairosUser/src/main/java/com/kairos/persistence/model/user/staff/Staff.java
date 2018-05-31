@@ -96,12 +96,12 @@ public class Staff extends UserBaseEntity {
     private Long kmdExternalId;
 
     @Relationship(type = HAS_FAVOURITE_FILTERS)
-    private List<StaffFavouriteFilters> staffFavouriteFiltersList;
+    private List<StaffFavouriteFilter> staffFavouriteFilterList;
     @DateLong
     private Date dateOfBirth;
     private String careOfName;
     private Integer age;
-    private Gender gender;
+//    private Gender gender;
 
 
     public Staff(String firstName) {
@@ -441,10 +441,10 @@ public class Staff extends UserBaseEntity {
         this.kmdExternalId = kmdExternalId;
     }
 
-    public void addFavouriteFilters(StaffFavouriteFilters staffFavouriteFilters){
-        List<StaffFavouriteFilters> staffFavouriteFiltersList = Optional.ofNullable(this.staffFavouriteFiltersList).orElse(new ArrayList<>());
-        staffFavouriteFiltersList.add(staffFavouriteFilters);
-        this.staffFavouriteFiltersList = staffFavouriteFiltersList;
+    public void addFavouriteFilters(StaffFavouriteFilter staffFavouriteFilter){
+        List<StaffFavouriteFilter> staffFavouriteFilterList = Optional.ofNullable(this.staffFavouriteFilterList).orElse(new ArrayList<>());
+        staffFavouriteFilterList.add(staffFavouriteFilter);
+        this.staffFavouriteFilterList = staffFavouriteFilterList;
     }
 
     public Client getClient() {
@@ -464,12 +464,12 @@ public class Staff extends UserBaseEntity {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public List<StaffFavouriteFilters> getStaffFavouriteFiltersList() {
-        return staffFavouriteFiltersList;
+    public List<StaffFavouriteFilter> getStaffFavouriteFilterList() {
+        return staffFavouriteFilterList;
     }
 
-    public void setStaffFavouriteFiltersList(List<StaffFavouriteFilters> staffFavouriteFiltersList) {
-        this.staffFavouriteFiltersList = staffFavouriteFiltersList;
+    public void setStaffFavouriteFilterList(List<StaffFavouriteFilter> staffFavouriteFilterList) {
+        this.staffFavouriteFilterList = staffFavouriteFilterList;
     }
 
     public String getCareOfName() {
@@ -501,11 +501,11 @@ public class Staff extends UserBaseEntity {
         return age;
     }
 
-    public Gender getGender() {
+/*    public Gender getGender() {
         return gender;
     }
 
     public void setGender(Gender gender) {
         this.gender = gender;
-    }
+    }*/
 }

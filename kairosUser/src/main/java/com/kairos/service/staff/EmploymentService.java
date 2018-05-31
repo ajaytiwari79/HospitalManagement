@@ -11,19 +11,20 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.country.EngineerType;
+import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.staff.*;
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -38,6 +39,8 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.TEAM;
@@ -85,7 +88,12 @@ public class EmploymentService extends UserBaseService {
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
-
+    @Inject
+    private StaffService staffService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private ExceptionService exceptionService;
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
@@ -94,16 +102,20 @@ public class EmploymentService extends UserBaseService {
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
             if(Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEarliestUnitPositionStartDateMillis())
-                throw new ActionNotPermittedException("Employment start date cant exceed Unit Position start date");
+                exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.unitpositionstartdate");
+
             if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDateMillis())
-                throw new ActionNotPermittedException("Employment start date cant exceed employment end date");
+                exceptionService.actionNotPermittedException("message.employment.startdate.cantexceed.enddate");
+
         }
 
         if (objectToUpdate == null) {
             logger.info("Staff does not found by id {}", staffId);
-            throw new DataNotFoundByIdException("Staff does not found by id");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-            throw new ActionNotPermittedException("External id can't be changed");
+           exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+
         }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
@@ -146,21 +158,25 @@ public class EmploymentService extends UserBaseService {
         Organization unit = organizationGraphRepository.findOne(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
-            throw new InternalError("unit is null");
+            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
+
         }
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+
         }
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
-            throw new DataNotFoundByIdException("staff  not found   ID: " + staffId);
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            throw new DataNotFoundByIdException("staff employment  not found   ID: " + staffId);
+            exceptionService.dataNotFoundByIdException("message.staff.employment.notFound",staffId);
+
         }
 
         boolean flsSyncStatus = false;
@@ -171,7 +187,8 @@ public class EmploymentService extends UserBaseService {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
             if(Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
-                throw new DataNotFoundByIdException("Unit permission already exist for Access Group" + staffId);
+                exceptionService.dataNotFoundByIdException("message.employment.unitpermission.alreadyexist",staffId);
+
             } else if(!Optional.ofNullable(unitPermission).isPresent()){
                 unitPermission = new UnitPermission();
                 unitPermission.setOrganization(unit);
@@ -301,14 +318,15 @@ public class EmploymentService extends UserBaseService {
 
     public List<Map<String, Object>> getEmployments(long staffId, long unitId, String type) {
 
-        Organization unit;
+        Organization unit=null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(unitId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
         } else {
-            throw new InternalError("Type can't be recognised");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
 
         Organization parent;
@@ -334,11 +352,14 @@ public class EmploymentService extends UserBaseService {
         return list;
     }
 
+
+
     public void createEmploymentForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup == null) {
-            throw new InternalError("Access group not found");
+            exceptionService.internalServerError("error.employment.accessgroup.notfound");
+
         }
         Employment employment = new Employment();
         employment.setName("Working as unit manager");
@@ -487,17 +508,19 @@ public class EmploymentService extends UserBaseService {
         if (staff == null) {
             return null;
         }
-        Organization unit;
+        Organization unit=null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(unitId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
-            System.out.println("getting unit from team" + unit.getId());
+
         } else {
-            throw new InternalError("type can not be null");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
         if (unit == null) {
-            throw new InternalError("Organization not found");
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
+
         }
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
@@ -617,16 +640,18 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            throw new InternalError("Staff is null");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
-        Organization unit;
+        Organization unit=null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(id);
         } else {
-            throw new InternalError("Type can't be recognised");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
         PartialLeave partialLeave;
         if (partialLeaveDTO.getId() != null) {
@@ -655,7 +680,8 @@ public class EmploymentService extends UserBaseService {
             }
 
             if (unitPermission == null) {
-                throw new InternalError("unit employment is null");
+                exceptionService.internalServerError("error.unit.employment.null");
+
             }
 
             partialLeave = new PartialLeave();
@@ -683,17 +709,19 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            throw new InternalError("Staff is null");
+            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+
         }
 
-        Organization unit;
+        Organization unit=null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.findOne(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
             unit = organizationGraphRepository.getOrganizationByTeamId(id);
         } else {
-            throw new InternalError("Type can't be recognised");
+            exceptionService.internalServerError("error.type.notvalid");
+
         }
         List<PartialLeave> partialLeaves = staffGraphRepository.getPartialLeaves(unit.getId(), staffId);
         List<Map<String, Object>> response = new ArrayList<>(partialLeaves.size());
@@ -716,28 +744,9 @@ public class EmploymentService extends UserBaseService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
-        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
-        if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
-        }
-        List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
-        Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
-        boolean isEndDateBlank = false;
-        //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
-        for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
-            if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
-                isEndDateBlank = true;
-                break;
-            }
-            if(maxEndDate < unitPosition.getEndDateMillis()){
-                maxEndDate = unitPosition.getEndDateMillis();
-            }
-        }
-        Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
-        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
-        employment.setEndDateMillis(employmentEndDate);
-        employmentGraphRepository.save(employment);
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId) {
+        Long employmentEndDate = getMaxEmploymentEndDate(staffId);
+        return saveEmploymentEndDate(unit,employmentEndDate, staffId,null,null,null);
     }
 
     
@@ -753,21 +762,33 @@ public class EmploymentService extends UserBaseService {
         List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
         int currentElement;
         Employment employment;
+        //List<Organization> organizationsNew = expiredEmploymentsQueryResults.stream().flatMap(e->e.getOrganizations().stream()).collect(Collectors.toList());
+       /*
+        List<Organization> organizationsNew = new ArrayList<Organization>();
+        for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult :expiredEmploymentsQueryResults) {
+            organizationsNew.addAll(expiredEmploymentsQueryResult.getOrganizations());
+        }*/
+       //List<Long> orgIds =  organizationsNew.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
             organizations = expiredEmploymentsQueryResult.getOrganizations();
             employment = expiredEmploymentsQueryResult.getEmployment();
             unitPermissions = expiredEmploymentsQueryResult.getUnitPermissions();
             currentElement = 0;
+            List<Long> orgIds =  organizations.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
-            for(AccessGroup accessGroup:expiredEmploymentsQueryResult.getAccessGroups()){
+            accessGroupRepository.createAccessGroupUnitRelation(orgIds,employment.getAccessGroupIdOnEmploymentEnd());
+            AccessGroup accessGroupDB = accessGroupRepository.findById(employment.getAccessGroupIdOnEmploymentEnd()).get();
+
+
+            for(Organization organziation:expiredEmploymentsQueryResult.getOrganizations()){
                 unitPermission = unitPermissions.get(currentElement);
                 if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
                     unitPermission.setOrganization(organizations.get(currentElement));
                     unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
                 }
-                unitPermission.setAccessGroup(accessGroup);
+                unitPermission.setAccessGroup(accessGroupDB);
                 employment.getUnitPermissions().add(unitPermission);
                 currentElement++;
             }
@@ -778,4 +799,72 @@ public class EmploymentService extends UserBaseService {
         }
     }
 
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) {
+        Long employmentEndDate = null;
+        if(Optional.ofNullable(endDateMillis).isPresent()) {
+            employmentEndDate = getMaxEmploymentEndDate(staffId);
+        }
+
+        // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDate()?maxEndDate:unitPositionDTO.getEndDate());
+        return saveEmploymentEndDate(unit,employmentEndDate,staffId,reasonCodeId,endDateMillis,accessGroupId);
+    }
+
+    private Long getMaxEmploymentEndDate(Long staffId) {
+        Long employmentEndDate = null;
+        List<Long> unitPositionsEndDateMillis = unitPositionGraphRepository.getAllUnitPositionsByStaffId(staffId);
+            if(!unitPositionsEndDateMillis.isEmpty()) {
+                Long maxEndDate = unitPositionsEndDateMillis.get(0);
+                boolean isEndDateBlank = false;
+                //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
+                for (Long unitPositionEndDateMillis : unitPositionsEndDateMillis) {
+                    if (!Optional.ofNullable(unitPositionEndDateMillis).isPresent()) {
+                        isEndDateBlank = true;
+                        break;
+                    }
+                    if (maxEndDate < unitPositionEndDateMillis) {
+                        maxEndDate = unitPositionEndDateMillis;
+                    }
+                }
+                employmentEndDate = isEndDateBlank ? null : maxEndDate;
+            }
+        return employmentEndDate;
+
+    }
+
+    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId,Long reasonCodeId, Long endDateMillis,Long accessGroupId) {
+
+        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        ReasonCode reasonCode = null;
+        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.employment.parentorganization.notfound",unit.getId());
+
+        }
+
+        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);
+        employment.setEndDateMillis(employmentEndDate);
+        if(!Optional.ofNullable(employmentEndDate).isPresent()) {
+            employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+            employment.setReasonCode(reasonCode);
+        }
+        else if(Optional.ofNullable(employmentEndDate).isPresent()&&Objects.equals(employmentEndDate,endDateMillis)) {
+            employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+            reasonCode = reasonCodeGraphRepository.findById(reasonCodeId).get();
+            employment.setReasonCode(reasonCode);
+        }
+        if(Optional.ofNullable(accessGroupId).isPresent()) {
+            employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+        }
+        employmentGraphRepository.save(employment);
+
+        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
+            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
+            moveToReadOnlyAccessGroup(employmentIds);
+        }
+        EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
+        employment.setReasonCode(employmentReasonCode.getReasonCode());
+
+        return employment;
+
+    }
 }

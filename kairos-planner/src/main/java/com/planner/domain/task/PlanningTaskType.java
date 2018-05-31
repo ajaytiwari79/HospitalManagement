@@ -1,11 +1,11 @@
 package com.planner.domain.task;
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
-@Table
+//@Table
 public class PlanningTaskType extends BaseEntity {
 
     private boolean isForbiddenAllow;

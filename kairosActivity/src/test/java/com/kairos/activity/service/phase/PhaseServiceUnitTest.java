@@ -39,8 +39,8 @@ public class PhaseServiceUnitTest {
     ArrayList<Phase> phases = new ArrayList();
 
 
-    @Before
-    public void setUp() throws Exception {
+   // @Before
+   /* public void setUp() throws Exception {
 
         Phase draftPhase = new Phase(DRAFT_PHASE_NAME, DRAFT_PHASE_DESCRIPTION, 0, DurationType.WEEKS, 4, 4L, false, null, null, null, null);
         Phase constructionPhase = new Phase(CONSTRUCTION_PHASE_NAME, CONSTRUCTION_PHASE_DESCRIPTION, 1, DurationType.WEEKS, 3, 4L, false, null, null, null, null);
@@ -59,7 +59,7 @@ public class PhaseServiceUnitTest {
         Phase requestPhase = new Phase(REQUEST_PHASE_NAME, REQUEST_PHASE_DESCRIPTION, 1, DurationType.WEEKS, 1, 4L, false, null, null, null, null);
         assertEquals(phaseService.getCurrentPhaseInUnitByDate(phases, new Date("2018/03/20")), requestPhase);
 
-    }
+    }*/
 
     @Test
     public void getDifferenceBetweenDatesInMinute() throws Exception {
@@ -68,6 +68,12 @@ public class PhaseServiceUnitTest {
 
         Long response = DateUtils.getDifferenceBetweenDatesInMinute(new Date(1516703598355L), new Date(1516704318000L));
         logger.info(response + "");
+    }
+    @Test
+    public void tp(){
+        for(int i=0;i<Integer.MAX_VALUE;i++){
+            String s="sdasdasda"+i;
+        }
     }
 
 

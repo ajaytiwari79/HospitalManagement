@@ -16,19 +16,18 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, Long> {
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where id(level)={0} AND id(payTable)<>{1}" +
-            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName ORDER BY startDateMillis DESC LIMIT 1")
+            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis DESC LIMIT 1")
     PayTableResponse findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
-            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where (payTable.name =~{2} OR payTable.shortName=~{3}) AND id(payTable)<>{1} " +
+            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where (payTable.name =~{2}) AND id(payTable)<>{1} " +
             " with count(payTable) as payTableCount\n" +
             " RETURN case when payTableCount>0 THEN  true ELSE false END as response")
-    Boolean checkPayTableNameAlreadyExitsByNameOrShortName(Long countryId, Long currentPayTableId, String payTableName, String payTableShortName);
-
+    Boolean checkPayTableNameAlreadyExitsByName(Long countryId, Long currentPayTableId, String payTableName);
     @Query("MATCH (c:Country) where id(c)={0} \n" +
             "MATCH(c)-[:HAS_LEVEL]->(level:Level{isEnabled:true})\n" +
             "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false})\n" +
-            "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,published:payTable.published,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName}) else [] end as payTables\n" +
+            "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,published:payTable.published,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName, paymentUnit:payTable.paymentUnit}) else [] end as payTables\n" +
             "with level,payTables \n OPTIONAL MATCH  (level:Level)-[:IN_LEVEL]-(payGroupArea:PayGroupArea{deleted:false})\n" +
             "return id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
             "collect({ payGroupAreaId:id(payGroupArea),name:payGroupArea.name}) else [] end as payGroupAreas,payTables as payTables")

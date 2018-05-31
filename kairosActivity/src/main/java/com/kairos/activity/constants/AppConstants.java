@@ -202,8 +202,10 @@ public class AppConstants {
     public static final String CONSTRUCTION_TO_FINAL_PHASE = "CONSTRUCTION_TO_FINAL_PHASE";
     public static final String REQUEST_TO_PUZZLE_PHASE = "REQUEST_TO_PUZZLE_PHASE";
     public static final String PUZZLE_TO_CONSTRUCTION_PHASE = "PUZZLE_TO_CONSTRUCTION_PHASE";
-    public static final Long DURATION_IN_WEEK=4L;
+    public static final Long DURATION_IN_WEEK = 4L;
+    public static final String COPY_OF = "copy of";
 
+    public static final int REQUEST_PHASE_SEQUENCE = 1;
 
     //Scheduled Hours Calculation constants
     public static final String ENTERED_TIMES = "ENTERED_TIMES";
@@ -212,7 +214,11 @@ public class AppConstants {
     public static final String FULL_DAY_CALCULATION = "FULL_DAY";
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
     public static final String FULL_WEEK = "FULL_WEEK";
+    //hours calculation types
+    public static final String FULL_TIME_WEEKLY_HOURS_TYPE = "FULL_TIME_WEEKLY_HOURS";
+    public static final String WEEKLY_HOURS_TYPE = "WEEKLY_HOURS_TYPE";
     public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
+    public static final String PAIDOUT_ACCOUNT = "PAIDOUT_ACCOUNT";
 
     //TimeCare date importing constants
     public static final String CALCULATED_TIME = "CalculatedTime";
@@ -223,5 +229,19 @@ public class AppConstants {
     // Default Settings of period for unit
     public static final int PRESENCE_LIMIT_IN_YEAR = 1;
     public static final int ABSENCE_LIMIT_IN_YEAR = 2;
+    public static final int ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE = 1;
+    public static final int ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE = 2;
 
+
+    // Staff Questionnaire
+    public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
+    public static final int MAX_ONE_ACTIVITY_PER_SHIFT = 10;
+
+
+    // Default Unit Age Settings
+    public static final int YOUNGER_AGE = 18;
+    public static final int OLDER_AGE = 62;
+
+    public static final String PAID_BREAK = "PAID BREAK";
+    public static final String UNPAID_BREAK = "UNPAID BREAK";
 }

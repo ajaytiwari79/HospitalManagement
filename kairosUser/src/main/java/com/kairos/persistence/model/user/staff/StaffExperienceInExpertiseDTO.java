@@ -18,6 +18,7 @@ public class StaffExperienceInExpertiseDTO {
     private Integer relevantExperienceInMonths;
     @DateLong
     private Date expertiseStartDate;
+    private Integer nextSeniorityLevelInMonths;
 
 
     public StaffExperienceInExpertiseDTO() {
@@ -62,6 +63,14 @@ public class StaffExperienceInExpertiseDTO {
 
     public void setExpertiseStartDate(Date expertiseStartDate) {
         this.expertiseStartDate = expertiseStartDate;
+    }
+
+    public Integer getNextSeniorityLevelInMonths() {
+        return nextSeniorityLevelInMonths;
+    }
+
+    public void setNextSeniorityLevelInMonths(Integer nextSeniorityLevelInMonths) {
+        this.nextSeniorityLevelInMonths = nextSeniorityLevelInMonths;
     }
 
     public StaffExperienceInExpertiseDTO(Long id, String name, Long expertiseId, Integer relevantExperienceInMonths, Date expertiseStartDate) {

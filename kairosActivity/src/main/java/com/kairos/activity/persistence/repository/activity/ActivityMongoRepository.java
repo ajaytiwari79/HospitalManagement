@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.activity;
 
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.activity.response.dto.ActivityDTO;
 import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -43,8 +44,14 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     Activity findByParentIdAndDeletedFalseAndUnitId(BigInteger parentId, Long unitId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'generalActivityTab':1,'compositeActivities':1,'unitId':1}")
-    List<Activity> findByDeletedFalseAndUnitId(Long unitId);
+    @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
+    List<ActivityDTO> findByDeletedFalseAndCountryId(Long countryId);
+
+    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
+    List<ActivityDTO> findByDeletedFalseAndUnitId(Long unitId);
+
+    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'compositeActivities':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
+    List<Activity> findAllActivitiesByUnitId(Long unitId);
 
     Integer countByParentIdAndDeletedFalse(BigInteger parentId);
 
@@ -56,4 +63,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
+
+    Activity findByNameIgnoreCaseAndUnitIdAndDeletedFalse(String unpaidBreak, Long unitId);
 }

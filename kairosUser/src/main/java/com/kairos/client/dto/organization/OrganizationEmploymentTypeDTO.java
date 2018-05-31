@@ -1,5 +1,9 @@
 package com.kairos.client.dto.organization;
 
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by prerna on 8/11/17.
  */
@@ -8,6 +12,8 @@ public class OrganizationEmploymentTypeDTO {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
+    @NotNull(message = "Payment Frequency can't be null")
+    private PaidOutFrequencyEnum paymentFrequency;
 
     public long getEmploymentTypeId() {
         return employmentTypeId;
@@ -39,5 +45,13 @@ public class OrganizationEmploymentTypeDTO {
 
     public void setAllowedForFlexPool(boolean allowedForFlexPool) {
         this.allowedForFlexPool = allowedForFlexPool;
+    }
+
+    public PaidOutFrequencyEnum getPaymentFrequency() {
+        return paymentFrequency;
+    }
+
+    public void setPaymentFrequency(PaidOutFrequencyEnum paymentFrequency) {
+        this.paymentFrequency = paymentFrequency;
     }
 }

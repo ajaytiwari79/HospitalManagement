@@ -194,7 +194,7 @@ public class DateUtil {
 
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
         Long date = null;
-        if(!StringUtils.isEmpty(dateReceived)) {
+        if (!StringUtils.isEmpty(dateReceived)) {
             DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
             isoFormat.setLenient(false);
             isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -230,10 +230,14 @@ public class DateUtil {
     }
 
 
-
-    public static Date getCurrentDate(){
+    public static Date getCurrentDate() {
         //TODO this cant be system's date. this gotta be unit;s date. sachin
         return new Date();
+    }
+
+
+    public static LocalDate getCurrentLocalDate() {
+        return LocalDate.now();
     }
 
     public static Long getCurrentDateMillis() {
@@ -245,7 +249,7 @@ public class DateUtil {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone(timezone));
-        DateTime dateTime = new DateTime(date).withTime(0,0,0,0);
+        DateTime dateTime = new DateTime(date).withTime(0, 0, 0, 0);
         calendar.setTime(dateTime.toDate());
 
         return calendar.getTime();
@@ -255,14 +259,22 @@ public class DateUtil {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone(timezone));
-        DateTime dateTime = new DateTime(date).withTime(23,59,59,59);
+        DateTime dateTime = new DateTime(date).withTime(23, 59, 59, 59);
         calendar.setTime(dateTime.toDate());
 
         return calendar.getTime();
     }
-    public static LocalDate getDateFromEpoch(Long dateLong) {
 
-        return Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+    public static LocalDate getDateFromEpoch(Long dateLong) {
+        LocalDate date = null;
+        if (Optional.ofNullable(dateLong).isPresent()) {
+            date = Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return date;
+    }
+
+    public static Long getDateFromEpoch(LocalDate dateLong) {
+        return dateLong.toEpochDay();
     }
 
     public static LocalDate getTimezonedCurrentDate(String timezone) {

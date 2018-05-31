@@ -1,10 +1,12 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.shift.BreakPaymentSetting;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 29/3/18.
@@ -20,16 +22,16 @@ public class ExpertiseResponseDTO {
     //@DateLong
     private Date endDateMillis;
     private Long organizationLevelId;
-    private Long serviceId;
+    private Set<Long> organizationServiceIds;
     private Long unionId;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
 
-    private PaidOutFrequencyEnum paidOutFrequency;
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;
     private Boolean published;
     private Boolean editable;
+    private BreakPaymentSetting breakPaymentSetting;
 
     public ExpertiseResponseDTO() {
     }
@@ -90,12 +92,12 @@ public class ExpertiseResponseDTO {
         this.organizationLevelId = organizationLevelId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Set<Long> getOrganizationServiceIds() {
+        return organizationServiceIds;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
+        this.organizationServiceIds = organizationServiceIds;
     }
 
     public Long getUnionId() {
@@ -122,14 +124,6 @@ public class ExpertiseResponseDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
-    }
 
     public List<SeniorityLevelDTO> getSeniorityLevels() {
         return seniorityLevels;
@@ -161,5 +155,13 @@ public class ExpertiseResponseDTO {
 
     public void setEditable(Boolean editable) {
         this.editable = editable;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }

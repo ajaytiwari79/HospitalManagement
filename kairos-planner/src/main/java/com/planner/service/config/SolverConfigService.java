@@ -1,35 +1,128 @@
 package com.planner.service.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.planner.domain.config.Category;
-import com.planner.domain.config.Constraint;
-import com.planner.domain.config.Rule;
-import com.planner.domain.config.SolverConfig;
-import com.planner.enums.SolverConfigPhase;
+import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.dto.solverconfig.SolverConfigDTO;
+import com.planner.commonUtil.StaticField;
+import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
-import com.planner.responseDto.config.CategoryDTO;
-import com.planner.responseDto.config.ConstraintDTO;
-import com.planner.responseDto.config.RuleDTO;
-import com.planner.responseDto.config.SolverConfigDTO;
+import com.planner.util.wta.FileIOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class SolverConfigService {
 
     @Autowired private SolverConfigRepository solverConfigRepository;
+    @Autowired private XmlConfigService xmlConfigService;
+    @Autowired private PathProvider pathProvider;
 
-    public List<SolverConfigDTO> getAllSolverConfig(Long unitId){
+    public void addSolverConfig(Long unitId, SolverConfigDTO solverConfigDTO){
+        SolverConfig solverConfig= new SolverConfig(solverConfigDTO.getTemplateTypes(),120,unitId);
+        solverConfigRepository.save(solverConfig);
+    }
+
+    /**
+     * Creates solver config xml at {@link PathProvider} solverConfigPath property based on wta templates for this solver config
+     * @param solverConfigId
+     */
+    public Document createShiftPlanningSolverConfig(BigInteger solverConfigId){
+        SolverConfig solverConfig=solverConfigRepository.findByKairosId(solverConfigId).get();
+        List<String> validDrls=new ArrayList<>();
+        for(WTATemplateType wtaTemplateType:solverConfig.getTemplateTypes()){
+            validDrls.add(getDrlPathForTemplateType(wtaTemplateType));
+        }
+        Document baseConfig= getBaseSolverConfig();
+        xmlConfigService.putElementsInXml(baseConfig,validDrls,StaticField.SOLVER_CONFIG_DRL_PARENT_TAG);
+        return baseConfig;
+    }
+
+    /**
+     *
+     * @returns a copy of base solver config file
+     */
+    public Document getBaseSolverConfig(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        Document doc = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+            File baseFile = new File(StaticField.BASE_SOLVER_CONFIG_FIRST_PHASE);
+            File file=new File(pathProvider.getSolverConfigXmlpath());
+            if(file.exists()){
+                file.delete();
+            }
+            file.createNewFile();
+            FileIOUtil.copyFileContent(baseFile,file);
+            doc = docBuilder.parse(file);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return doc;
+    }
+
+    private String getDrlPathForTemplateType(WTATemplateType wtaTemplateType) {
+        switch (wtaTemplateType){
+            case AVERAGE_SHEDULED_TIME:
+                return StaticField.DRL_AVERAGE_SHEDULED_TIME;
+            case CONSECUTIVE_WORKING_PARTOFDAY:
+                return StaticField.DRL_CONSECUTIVE_WORKING_PARTOFDAY;
+            case DAYS_OFF_IN_PERIOD:
+                return StaticField.DRL_DAYS_OFF_IN_PERIOD;
+            case NUMBER_OF_PARTOFDAY:
+                return StaticField.DRL_NUMBER_OF_PARTOFDAY;
+            case SHIFT_LENGTH:
+                return StaticField.DRL_SHIFT_LENGTH;
+            case NUMBER_OF_SHIFTS_IN_INTERVAL:
+                return StaticField.DRL_NUMBER_OF_SHIFTS_IN_INTERVAL;
+            case TIME_BANK:
+                return StaticField.DRL_TIME_BANK;
+            case VETO_PER_PERIOD:
+                return StaticField.DRL_VETO_PER_PERIOD;
+            case DAILY_RESTING_TIME:
+                return StaticField.DRL_DAILY_RESTING_TIME;
+            case DURATION_BETWEEN_SHIFTS:
+                return StaticField.DRL_DURATION_BETWEEN_SHIFTS;
+            case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
+                return StaticField.DRL_REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
+            case WEEKLY_REST_PERIOD:
+                return StaticField.DRL_WEEKLY_REST_PERIOD;
+            case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
+                return StaticField.DRL_NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
+            case SHORTEST_AND_AVERAGE_DAILY_REST:
+                return StaticField.DRL_SHORTEST_AND_AVERAGE_DAILY_REST;
+            case SENIOR_DAYS_PER_YEAR:
+                return StaticField.DRL_SENIOR_DAYS_PER_YEAR;
+            case CHILD_CARE_DAYS_CHECK:
+                return StaticField.DRL_CHILD_CARE_DAYS_CHECK;
+            case BREAK_IN_SHIFT:
+                return StaticField.DRL_BREAK_IN_SHIFT;
+            case DAYS_OFF_AFTER_A_SERIES:
+                return StaticField.DRL_DAYS_OFF_AFTER_A_SERIES;
+            case NO_OF_SEQUENCE_SHIFT:
+                return StaticField.DRL_NO_OF_SEQUENCE_SHIFT;
+            case EMPLOYEES_WITH_INCREASE_RISK:
+                return StaticField.DRL_EMPLOYEES_WITH_INCREASE_RISK;
+
+            default:return null;
+        }
+    }
+
+    /*public List<SolverConfigDTO> getAllSolverConfig(Long unitId){
         List<SolverConfigDTO> solverConfigDTOS = null;
         if(unitId!=null){
             List<SolverConfig> solverConfigs = solverConfigRepository.getAllByUnitId(unitId,SolverConfig.class);
@@ -204,13 +297,13 @@ public class SolverConfigService {
             constraint.setSolverConfigId(solverConfig.getId());
             constraint.setStaticRuleValues(contraintDto.getStaticRuleValues());
             Rule rule = null;
-            /*rule.setPattern(contraintDto.getRuleDTO().getPattern());
+            *//*rule.setPattern(contraintDto.getRuleDTO().getPattern());
             rule.setRuleCondition(contraintDto.getRuleDTO().getRuleCondition());
             rule.setNoOfruleValues(contraintDto.getRuleDTO().getNoOfruleValues());
             rule.setDisabled(contraintDto.getRuleDTO().isDisabled());
             rule.setRuleName(contraintDto.getRuleDTO().getRuleName());
             rule.setSalience(contraintDto.getRuleDTO().getSalience());
-            rule.setOutputValues(contraintDto.getRuleDTO().getOutputValues());*/
+            rule.setOutputValues(contraintDto.getRuleDTO().getOutputValues());*//*
             rule = solverConfigRepository.findById(contraintDto.getRuleId(),Rule.class);
             if(rule!=null){
                 constraint.setRuleId(rule.getId());
@@ -220,7 +313,7 @@ public class SolverConfigService {
             }
         }
         return true;
-        /*ObjectMapper mapper = new ObjectMapper();
+        *//*ObjectMapper mapper = new ObjectMapper();
         List<Rule> rules = new ArrayList<>();
         try {
             TypeFactory typeFactory = mapper.getTypeFactory();
@@ -231,7 +324,7 @@ public class SolverConfigService {
             e.printStackTrace();
         }
         //solverConfigRepository.saveList(rules);
-        return true;*/
-    }
+        return true;*//*
+    }*/
 
 }

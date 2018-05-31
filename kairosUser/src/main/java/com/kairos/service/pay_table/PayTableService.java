@@ -1,10 +1,6 @@
 package com.kairos.service.pay_table;
 
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.FunctionDTO;
@@ -22,10 +18,10 @@ import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
 import com.kairos.response.dto.web.pay_table.*;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -63,13 +59,16 @@ public class PayTableService extends UserBaseService {
     @Inject
     private FunctionGraphRepository functionGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
     private Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
     public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid level in country");
+            exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
+
         }
 
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
@@ -102,7 +101,8 @@ public class PayTableService extends UserBaseService {
     public List<OrganizationLevelPayTableDTO> getOrganizationLevelWisePayTables(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid country");
+            exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",countryId);
+
         }
         List<OrganizationLevelPayTableDTO> payTables = payTableGraphRepository.getOrganizationLevelWisePayTables(countryId);
         return payTables;
@@ -112,22 +112,23 @@ public class PayTableService extends UserBaseService {
         logger.info(payTableDTO.toString());
         Level level = countryGraphRepository.getLevel(countryId, payTableDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid level id " + payTableDTO.getLevelId());
+           exceptionService.dataNotFoundByIdException("message.paytable.level.notfound");
+
         }
 
-        Boolean isAlreadyExists = payTableGraphRepository.
-                checkPayTableNameAlreadyExitsByNameOrShortName(countryId, -1L, "(?i)" + payTableDTO.getName().trim(),
-                        "(?i)" + payTableDTO.getShortName().trim());
-        if (isAlreadyExists) {
-            throw new DuplicateDataException("Name " + payTableDTO.getName() + "or short Name " + payTableDTO.getShortName() + " already Exist in country " + countryId);
+       Boolean isAlreadyExists = payTableGraphRepository.
+                checkPayTableNameAlreadyExitsByName(countryId, -1L, "(?i)" + payTableDTO.getName().trim());
+         if(isAlreadyExists) {
+             exceptionService.duplicateDataException("message.payTable.name.alreadyExist",payTableDTO.getName() , countryId);
+
         }
         PayTableResponse payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), -1L);
         // if any payTable is found then only validate
         if (Optional.ofNullable(payTableToValidate).isPresent())
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
-        PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName().trim(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), true);
+        PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), payTableDTO.getPaymentUnit(), true);
         save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
         return payTableResponse;
@@ -140,10 +141,12 @@ public class PayTableService extends UserBaseService {
             Days days = Days.daysBetween(new DateTime(startDateMillis).toLocalDate(), new DateTime(payTableToValidate.getEndDateMillis()).toLocalDate());
             logger.info("difference in days" + days);
             if (days.getDays() != -1) {
-                throw new ActionNotPermittedException("The next allowed start day is " + new DateTime(payTableToValidate.getEndDateMillis() + ONE_DAY));
+                exceptionService.actionNotPermittedException("message.startdate.allowed",new DateTime(payTableToValidate.getEndDateMillis() + ONE_DAY));
+
             }
         } else {
-            throw new ActionNotPermittedException("Already a payTable is active for the date.Please set end Date on pay table. " + payTableToValidate.getName() + " " + payTableToValidate.getId());
+            exceptionService.actionNotPermittedException("message.paytable.alreadyactive",payTableToValidate.getName(),payTableToValidate.getId());
+
         }
     }
 
@@ -151,7 +154,8 @@ public class PayTableService extends UserBaseService {
         if (!payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
             // The start date is modified Now We need to compare is it less than today
             if (new DateTime(payTableDTO.getStartDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
-                throw new ActionNotPermittedException("Start Date Cant be less than current date");
+                exceptionService.actionNotPermittedException("message.startdate.lessthan");
+
             }
             payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
         }
@@ -165,7 +169,8 @@ public class PayTableService extends UserBaseService {
         // If already not present now its present    Previous its absent
         else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
             if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
-                throw new ActionNotPermittedException("end Date Cant be less than current date");
+              exceptionService.actionNotPermittedException("message.endtdate.lessthan");
+
             }
             payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
         }
@@ -174,7 +179,8 @@ public class PayTableService extends UserBaseService {
         else if (Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
             if (!payTable.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {//The end date is modified Now We need to compare is it less than today
                 if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
-                    throw new ActionNotPermittedException("end Date Cant be less than current date");
+                    exceptionService.actionNotPermittedException("message.endtdate.lessthan");
+
                 }
                 payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
             }
@@ -186,16 +192,17 @@ public class PayTableService extends UserBaseService {
     public PayTableResponse updatePayTable(Long countryId, Long payTableId, PayTableUpdateDTO payTableDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid pay grade id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         // if  name or short name is changes then only we are checking its name existance
         // skipped to current pay table it is checking weather any other payTable has same name or short name in current organization level
-        if (!payTableDTO.getName().trim().equalsIgnoreCase(payTable.getName()) || !payTableDTO.getShortName().trim().equalsIgnoreCase(payTable.getShortName())) {
+        if (!payTableDTO.getName().trim().equalsIgnoreCase(payTable.getName())) {
             Boolean isAlreadyExists = payTableGraphRepository.
-                    checkPayTableNameAlreadyExitsByNameOrShortName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim(),
-                            "(?i)" + payTableDTO.getShortName().trim());
+                    checkPayTableNameAlreadyExitsByName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim());
             if (isAlreadyExists) {
-                throw new DuplicateDataException("Name " + payTableDTO.getName() + "or short Name " + payTableDTO.getShortName() + " already Exist in country " + countryId);
+                exceptionService.duplicateDataException("message.payTable.name.alreadyExist",payTableDTO.getName(),countryId);
+
             }
         }
         PayTableResponse payTableToValidate = payTableGraphRepository.findPayTableByOrganizationLevel(payTableDTO.getLevelId(), -1L);
@@ -203,37 +210,41 @@ public class PayTableService extends UserBaseService {
         validatePayLevel(payTable, payTableToValidate, payTableDTO);
 
         payTable.setName(payTableDTO.getName().trim());
-        payTable.setShortName(payTableDTO.getShortName().trim());
+        payTable.setShortName(payTableDTO.getShortName());
         payTable.setDescription(payTableDTO.getDescription());
+        payTable.setPaymentUnit(payTableDTO.getPaymentUnit());
         prepareDates(payTable, payTableDTO);
         save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
     }
 
     private void validatePayLevel(PayTable payTableFromDatabase, PayTableResponse payTableToValidate, PayTableUpdateDTO payTableDTO) {
-
         // user is updating any mid table so in this table we wont allow to edit the dates
         if (!payTableToValidate.getId().equals(payTableFromDatabase.getId())) {
             logger.info("new  startDate{}" + payTableFromDatabase.getStartDateMillis() + "   " + payTableDTO.getStartDateMillis()
                     + " " + payTableFromDatabase.getEndDateMillis() + "  " + payTableDTO.getEndDateMillis());
             if (!payTableFromDatabase.getStartDateMillis().equals(payTableDTO.getStartDateMillis()) || !payTableFromDatabase.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {
-                throw new ActionNotPermittedException("Change in dates to this payTable is not allowed: " + payTableDTO.getName().trim());
+               exceptionService.actionNotPermittedException("message.paytable.datechange.notallowed",payTableDTO.getName().trim());
+
             }
         } else if (!payTableFromDatabase.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
-            throw new ActionNotPermittedException("Start Date is not Editable " + payTableToValidate.getName());
+            exceptionService.actionNotPermittedException("message.startdate.noteditable",payTableToValidate.getName());
+
         }
     }
 
     public List<PayGradeResponse> addPayGradeInPayTable(Long payTableId, PayGradeDTO payGradeDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid pay grade id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         Boolean isAlreadyExists = payTableGraphRepository.checkPayGradeLevelAlreadyExists(payTableId, payGradeDTO.getPayGradeLevel());
         if (isAlreadyExists) {
-            throw new DuplicateDataException("Pay grade level " + payGradeDTO.getPayGradeLevel() + " already exists");
+            exceptionService.duplicateDataException("message.paygrade.level.alreadyexist",payGradeDTO.getPayGradeLevel());
+
         }
         // payTable is not published
         List<PayGradeResponse> payGradesData = new ArrayList<>();
@@ -287,7 +298,8 @@ public class PayTableService extends UserBaseService {
 
         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreasId);
         if (payGroupAreas.size() != payGroupAreasId.size()) {
-            throw new DataNotMatchedException("unable to get all payGroup areas ");
+            exceptionService.dataNotMatchedException("message.paygrouparea.unabletoget");
+
         }
 
         PayGrade payGrade = new PayGrade(payGradeDTO.getPayGradeLevel());
@@ -331,7 +343,8 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> getPayGradesByPayTableId(Long payTableId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid pay table id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         return payTableGraphRepository.getPayGradesByPayTableId(payTableId);
     }
@@ -339,13 +352,16 @@ public class PayTableService extends UserBaseService {
     public boolean removePayGradeInPayTable(Long payTableId, Long payGradeId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid pay table id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         if (payTable.isPublished()) {
-            throw new ActionNotPermittedException("PayTable is already published so cant remove");
+            exceptionService.actionNotPermittedException("message.paytable.alreadypublished");
+
         }
         if (!Optional.ofNullable(payTable.getPayGrades()).isPresent() || payTable.getPayGrades().isEmpty()) {
-            throw new DataNotFoundByIdException("Invalid pay grade id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         boolean found = false;
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
@@ -362,10 +378,12 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> removePayTable(Long payTableId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid pay table id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         if (payTable.isPublished()) {
-            throw new ActionNotPermittedException("PayTable is already published so can't remove");
+            exceptionService.actionNotPermittedException("message.paytable.alreadypublished");
+
         }
         Long parentPayTableId = payTableGraphRepository.getParentPayTableByPayTableId(payTableId);
         List<PayGradeResponse> payGrades = new ArrayList<>();
@@ -403,7 +421,8 @@ public class PayTableService extends UserBaseService {
     public List<PayGradeResponse> updatePayGradeInPayTable(Long payTableId, Long payGradeId, PayGradeDTO payGradeDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid pay table id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         PayGrade payGrade = null;
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
@@ -413,7 +432,8 @@ public class PayTableService extends UserBaseService {
             }
         }
         if (!Optional.ofNullable(payGrade).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid pay grade id" + payGradeId);
+            exceptionService.dataNotFoundByIdException("message.paygrade.id.notfound",payGradeId);
+
         }
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         // user is updating in a unpublished payTable
@@ -488,10 +508,12 @@ public class PayTableService extends UserBaseService {
     public List<PayTable> publishPayTable(Long payTableId, Long publishedDateMillis) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            throw new DataNotFoundByIdException("Invalid pay table id");
+            exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
+
         }
         if (payTable.isPublished()) {
-            throw new ActionNotPermittedException("PayTable is already published");
+            exceptionService.actionNotPermittedException("message.paytable.published");
+
         }
         List<PayTable> response = new ArrayList<>();
 
@@ -505,7 +527,8 @@ public class PayTableService extends UserBaseService {
             response.add(parentPayTable);
 
         } else if (!new DateTime(payTable.getStartDateMillis()).toLocalDate().equals(new DateTime(publishedDateMillis).toLocalDate())) {
-            throw new ActionNotPermittedException("Can be only published on same start date");
+            exceptionService.actionNotPermittedException("message.paytable.published.samedate");
+
         }
         payTable.setPayTable(null);
         payTable.setPublished(true);

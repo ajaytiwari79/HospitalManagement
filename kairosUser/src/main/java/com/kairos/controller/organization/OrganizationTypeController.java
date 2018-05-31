@@ -64,6 +64,12 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationTypeHierarchy(countryId,orgTypeIds));
     }
 
+    @ApiOperation(value = "Get All organization and sub-organization based on CountryId")
+    @RequestMapping(value = COUNTRY_URL + "/OrganizationType", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getAllWTAWithOrganization(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllWTAWithOrganization(countryId));
+    }
+
     @RequestMapping(value = "/organization_type/{organizationTypeId}/organizations", method = RequestMethod.GET)
     @ApiOperation("Get organizations by organization type id")
     public ResponseEntity<Map<String,Object>> getOrganizationByOrganizationTypeId(@PathVariable long organizationTypeId){

@@ -6,6 +6,7 @@ package com.kairos.constants;
 public class AppConstants {
     private AppConstants() {
     }
+    public static final String TIMEZONE_UTC = "UTC";
 
     // Request methods
     public static final String GET = "GET";
@@ -193,5 +194,12 @@ public class AppConstants {
     public static final String MANAGE_COUNTRY_TAB_MODULE_ID = "module_4";
     public static final String MAIL_FROM = "info@nordicplanning.dk";
 
+    // Staff
+    public static final String UNIT_MANAGER_EMPLOYMENT_DESCRIPTION = "Working as Unit Manager";
+    public static final String CHILD_CARE="childCare";
+    public static final String SENIOR_DAYS="seniorDays";
 
+    // Module/tab id prefix for Access Page
+    public static final String MODULE_ID_PRFIX = "module_";
+    public static final String TAB_ID_PRFIX = "tab_";
 }

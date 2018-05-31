@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.integration.TimeCareGraphRepository;
 import com.kairos.persistence.repository.user.integration.TwillioGraphRepository;
 import com.kairos.persistence.repository.user.integration.VisitourGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,9 @@ public class IntegrationService {
 
     @Inject
     private OrganizationService organizationService;
+
+    @Inject
+    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -87,7 +91,8 @@ public class IntegrationService {
         if( ! Optional.ofNullable(visitour.getUsername()).isPresent() ||
                 ! Optional.ofNullable(visitour.getServerName()).isPresent() ||
                 ! Optional.ofNullable(visitour.getPassword()).isPresent()){
-            throw new InternalError("Either Username, Server name or password  is empty.");
+            exceptionService.internalServerError("error.integrationService.data.isEmpty");
+            
         }
 
         Visitour visitourCredential = visitourGraphRepository.findByOrganizationId(unitId);

@@ -14,6 +14,26 @@ public class EmploymentQueryResult {
     private Long startDateMillis;
     private Long endDateMillis;
 
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
+
+    private Long reasonCodeId;
+
+    public Long getAccessGroupIdOnEmploymentEnd() {
+        return accessGroupIdOnEmploymentEnd;
+    }
+
+    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
+        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    }
+
+    private Long accessGroupIdOnEmploymentEnd;
+
     public EmploymentQueryResult() {
 
     }
@@ -22,6 +42,13 @@ public class EmploymentQueryResult {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
 
+    }
+    public EmploymentQueryResult(Long id, Long startDateMillis, Long endDateMillis , Long reasonCodeId, Long accessGroupIdOnEmploymentEnd) {
+        this.id = id;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+        this.reasonCodeId = reasonCodeId;
     }
     public Long getId() {
         return id;

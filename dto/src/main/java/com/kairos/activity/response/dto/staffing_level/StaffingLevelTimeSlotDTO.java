@@ -6,7 +6,10 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSkill;
 
 import java.util.HashSet;
 import java.util.Set;
-
+@Deprecated
+/**
+ * Instead use {@link com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval}
+ */
 public class StaffingLevelTimeSlotDTO {
     private int sequence;
     private int minNoOfStaff;

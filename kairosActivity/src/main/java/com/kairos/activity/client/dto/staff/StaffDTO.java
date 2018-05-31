@@ -2,10 +2,12 @@ package com.kairos.activity.client.dto.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.client.dto.skill.Skill;
+import com.kairos.persistence.model.enums.Gender;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -236,4 +238,9 @@ public class StaffDTO {
     public void setContactDetail(ContactDetail contactDetail) {
         this.contactDetail = contactDetail;
     }
+
+    public void setInactiveFrom(Long inactiveFrom) {
+        this.inactiveFrom = inactiveFrom;
+    }
+
 }
