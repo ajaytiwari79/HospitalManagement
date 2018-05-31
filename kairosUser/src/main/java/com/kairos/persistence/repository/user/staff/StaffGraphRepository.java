@@ -86,8 +86,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
 
     @Query("Match (unit:Organization),(staff:Staff) where id(staff)={0} AND id(unit)={1} with staff,unit\n" +
             "Match (unit)-[orgSkillRelation:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff, orgSkillRelation,unit\n" +
-            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(clause_tag:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE clause_tag.countryTag=unit.showCountryTags with DISTINCT  skill,staff, orgSkillRelation,unit,CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(clause_tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) with  skill,staff, orgSkillRelation,ctags,CASE WHEN clause_tag IS NULL THEN [] ELSE collect({id:id(clause_tag),name:clause_tag.name,countryTag:clause_tag.countryTag}) END as otags\n" +
+            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with DISTINCT  skill,staff, orgSkillRelation,unit,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) with  skill,staff, orgSkillRelation,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "OPTIONAL MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill{isEnabled:true}) with skill,r,orgSkillRelation, ctags,otags\n" +
             "Match (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r,orgSkillRelation,ctags,otags\n" +
             "return {children:collect({id:id(skill),name:orgSkillRelation.customName,isSelected:r.isEnabled, tags:ctags+otags}),id:id(skillCategory),name:skillCategory.name} as data")
