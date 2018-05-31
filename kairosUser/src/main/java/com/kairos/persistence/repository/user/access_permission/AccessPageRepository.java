@@ -113,10 +113,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH NODES(path) AS np,g as g,unitPermission as unitPermission with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1],g:g,unitPermission:unitPermission}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.unitPermission as unitPermission\n" +
             "optional match (parent:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(parent)=id(ps.p) \n" +
             "optional match (unitPermission)-[parentCustomRel:HAS_CUSTOMIZED_PERMISSION]->(parent:AccessPage) WHERE parentCustomRel.accessGroupId={3}\n" +
-            "where id(parent)=id(ps.p) with r,parentCustomRel,ps,unitPermission,g\n" +
+            " AND id(parent)=id(ps.p) with r,parentCustomRel,ps,unitPermission,g\n" +
             "optional match (child:AccessPage)<-[r2:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(child)=id(ps.c)\n" +
             "optional match (unitPermission)-[childCustomRel:HAS_CUSTOMIZED_PERMISSION]->(child:AccessPage) WHERE childCustomRel.accessGroupId={3}\n" +
-            "where id(child)=id(ps.c) with r,r2,parentCustomRel,childCustomRel,ps\n" +
+            "AND id(child)=id(ps.c) with r,r2,parentCustomRel,childCustomRel,ps\n" +
             "return {name:ps.p.name,id:id(ps.p),\n" +
             "read:CASE WHEN parentCustomRel IS NULL THEN r.read ELSE parentCustomRel.read END ,\n" +
             "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
