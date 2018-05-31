@@ -37,7 +37,7 @@ public class TimeTypeRestClient {
                     };
             ResponseEntity<RestTemplateResponseEnvelope<List<TimeTypeDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/timeType/",
+                            baseUrl + "/timeType/",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

@@ -52,7 +52,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))
                         .and("state").nin("DRAFT")),
                 unwind("tags", true),
-                lookup("tag", "tags", "_id", "tags_data"),
+                lookup("clause_tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
@@ -84,7 +84,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").in(unitId).and("deleted").is(deleted)),
                 unwind("tags", true),
-                lookup("tag", "tags", "_id", "tags_data"),
+                lookup("clause_tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
@@ -92,6 +92,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
 
         );
@@ -103,7 +104,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").in(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
                 unwind("tags", true),
-                lookup("tag", "tags", "_id", "tags_data"),
+                lookup("clause_tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
@@ -112,6 +113,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);

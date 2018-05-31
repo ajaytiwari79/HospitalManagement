@@ -5,6 +5,7 @@ import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
@@ -73,11 +74,14 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
-import com.kairos.service.country.*;
 
+import com.kairos.service.country.*;
+import com.kairos.service.country.CitizenStatusService;
+import com.kairos.service.country.CurrencyService;
+import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -209,9 +213,6 @@ public class OrganizationService extends UserBaseService {
     DayTypeService dayTypeService;
     @Inject
     private AccessPageService accessPageService;
-    @Inject
-    private PresenceTypeService presenceTypeService;
-
     //@Inject
     //private WTAService wtaService;
     @Inject
@@ -242,7 +243,7 @@ public class OrganizationService extends UserBaseService {
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
-    private PresenceTypeRepository presenceTypeRepository;
+    private PlannedTimeTypeRestClient plannedTimeTypeRestClient;
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject private EmploymentTypeService employmentTypeService;
@@ -1663,7 +1664,7 @@ public class OrganizationService extends UserBaseService {
         List<Long> organizationServicesIds = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds, DateUtil.getCurrentDateMillis());
         List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
-        List<PresenceTypeDTO> plannedTypes = presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+        List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
@@ -1693,7 +1694,7 @@ public class OrganizationService extends UserBaseService {
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId){
         Organization organization = organizationGraphRepository.findOne(unitId);
         Country country = organizationGraphRepository.getCountry(organization.getId());
-        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(country.getId());
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(country.getId());
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(country.getId());
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);

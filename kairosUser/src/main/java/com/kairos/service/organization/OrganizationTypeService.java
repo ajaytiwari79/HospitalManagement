@@ -1,11 +1,19 @@
 package com.kairos.service.organization;
 
+
+import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.client.dto.gdpr.OrganizationTypeAndServiceRequestDto;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
+import com.kairos.response.dto.web.gdpr.OrganizationTypeAndServiceResponseDto;
+import com.kairos.response.dto.web.organizationtype_service_dto.OrganizationTypeAndSubTypeResponseDto;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
@@ -31,8 +39,15 @@ public class OrganizationTypeService extends UserBaseService {
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     CountryGraphRepository countryGraphRepository;
+
+
+    @Inject
+    OrganizationServiceRepository organizationServiceRepository;
+
+
     @Inject
     private ExceptionService exceptionService;
+
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
 
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
@@ -165,7 +180,7 @@ public class OrganizationTypeService extends UserBaseService {
      */
     public List<Map<String, Object>> getExpertise(long countryId, long orgTypeId, String selectedDate) throws ParseException {
         Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId,selectedDateInLong);
+        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId, selectedDateInLong);
         return orgTypeExpertiseQueryResult.getExpertise();
     }
 
@@ -185,5 +200,27 @@ public class OrganizationTypeService extends UserBaseService {
         organizationTypeGraphRepository.deleteRelOrganizationTypeWithService(orgTypeId, serviceId);
     }
 
+
+
+
+    public List<OrganizationTypeAndSubTypeResponseDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId) {
+        List<Map> organizationType = organizationTypeGraphRepository.getAllOrganizationTypeAndServiceAndSubServices(countryId);
+        List<OrganizationTypeAndSubTypeResponseDto> list = new ArrayList<>();
+        organizationType.forEach(o -> {
+            list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeResponseDto.class));
+        });
+        return list;
+    }
+
+
+    public OrganizationTypeAndServiceResponseDto organizationTypesAndServicesAndSubTypes(OrganizationTypeAndServiceRequestDto requestDto) {
+        OrganizationTypeAndServiceResponseDto responseDtoResult = new OrganizationTypeAndServiceResponseDto();
+        responseDtoResult.setOrganizationTypes(organizationTypeGraphRepository.getAllOrganizationTypeByIds(requestDto.getOrganizationTypeIds()));
+        responseDtoResult.setOrganizationSubTypes(organizationTypeGraphRepository.getAllOrganizationTypeByIds(requestDto.getOrganizationSubTypeIds()));
+        responseDtoResult.setOrganizationServices(organizationServiceRepository.getAllOrganizationServicesByIds(requestDto.getOrganizationServiceIds()));
+        responseDtoResult.setOrganizationSubServices(organizationServiceRepository.getAllOrganizationServicesByIds(requestDto.getOrganizationSubServiceIds()));
+        return responseDtoResult;
+
+    }
 
 }
