@@ -435,7 +435,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "RETURN  id(o) as unitId, staffData as staffList")
     List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
 
-    @Query("Match(staff:Staff{deleted:false})-[:" + HAS_STAFF_SETTINGS + "]->(staffSettings:StaffSettings)-[:" + HAS_OPEN_SHIFT_SETTINGS + "]->(staffPreferences:StaffPreferences{deleted:false}) where id(staff)={0} return staffPreferences")
-    StaffPreferences findOpenShiftPreferencesByStaff(long staffId);
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return staff")
+    Staff findByUserId(Long userId,Long unitId);
 
+    @Query("Match(staff:Staff{deleted:false}) where id(staff)={0} " +
+            "OPTIONAL MATCH(staff)-[:" + HAS_STAFF_SETTINGS + "]->(staffSettings:StaffSettings)-[:" + HAS_OPEN_SHIFT_SETTINGS + "]->(staffPreferences:StaffPreferences{deleted:false})  return id(staff) as id,staffSettings,staffPreferences")
+    StaffSettingsQueryResult fetchStaffSettingDetails(Long staffId);
 }

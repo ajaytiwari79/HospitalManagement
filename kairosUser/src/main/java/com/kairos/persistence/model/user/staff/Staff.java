@@ -504,7 +504,7 @@ public class Staff extends UserBaseEntity {
     }
 
     public StaffSettings getStaffSettings() {
-        return staffSettings;
+        return staffSettings=Optional.ofNullable(staffSettings).orElse(new StaffSettings());
     }
 
     public void setStaffSettings(StaffSettings staffSettings) {

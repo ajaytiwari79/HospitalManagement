@@ -1841,35 +1841,27 @@ public class StaffService extends UserBaseService {
         return staffGraphRepository.getStaffListOfUnitWithBasicInfo();
     }
 
-    public boolean savePersonalizedSettings(long staffId, StaffPreferencesDTO staffPreferencesDTO) throws ParseException {
-        Optional<Staff> staff=staffGraphRepository.findById(staffId);
-
-        StaffPreferences existingStaffPreferences = staffGraphRepository.findOpenShiftPreferencesByStaff(staffId);
-        StaffPreferences staffPreferences=Optional.ofNullable(existingStaffPreferences).orElse(new StaffPreferences());
+    public boolean savePersonalizedSettings(Long unitId, StaffPreferencesDTO staffPreferencesDTO) throws ParseException {
+        Organization parentOrganization=organizationService.fetchParentOrganization(unitId);
+        Staff staff=staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
+        StaffSettingsQueryResult staffSettingsQueryResult=staffGraphRepository.fetchStaffSettingDetails(staff.getId());
         switch (staffPreferencesDTO.getShiftBlockType()){
             case SHIFT:
-                staffPreferences.getActivityId().add(staffPreferencesDTO.getActivityId());
+                staffSettingsQueryResult.getStaffPreferences().getActivityId().add(staffPreferencesDTO.getActivityId());
                 break;
             case DAY:
-                staffPreferences.getDateForDay().add(DateUtil.getIsoDateInLong(staffPreferencesDTO.getStartDate()));
+                staffSettingsQueryResult.getStaffPreferences().getDateForDay().add(DateUtil.getIsoDateInLong(staffPreferencesDTO.getStartDate()));
                 break;
             case WEEK:
-                staffPreferences.getDateForWeek().add(DateUtil.getStartDateOfWeekFromDate(staffPreferencesDTO.getStartDate()));
+                staffSettingsQueryResult.getStaffPreferences().getDateForWeek().add(DateUtil.getStartDateOfWeekFromDate(staffPreferencesDTO.getStartDate()));
                 break;
             default:
                 exceptionService.actionNotPermittedException("exception.actionNotPermittedException","No Shift Block Type found");
         }
-        staff.get().getStaffSettings().setStaffPreferences(staffPreferences);
-
-//        if (staffPreferencesDTO.getShiftBlockType().equals(ShiftBlockType.WEEK)) {
-//            staffPreferences.getDateForWeek().add(DateUtil.getStartDateOfWeekFromDate(staffPreferencesDTO.getStartDate()));
-//        } else if (staffPreferencesDTO.getShiftBlockType().equals(ShiftBlockType.DAY)) {
-//            staffPreferences.getDateForDay().add((staffPreferencesDTO.getStartDate() != null) ? DateUtil.getIsoDateInLong(staffPreferencesDTO.getStartDate()) : DateUtil.getCurrentDateMillis());
-//        }
-//        else if(staffPreferencesDTO.getShiftBlockType().equals(ShiftBlockType.SHIFT)){
-//            staffPreferences.getActivityId().add(staffPreferencesDTO.getActivityId());
-//        }
-        save(staff.get());
+        StaffSettings staffSettings=staffSettingsQueryResult.getStaffSettings();
+        staffSettings.setStaffPreferences(staffSettingsQueryResult.getStaffPreferences());
+        staff.setStaffSettings(staffSettings);
+        save(staff);
         return true;
     }
 
