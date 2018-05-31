@@ -14,6 +14,8 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
+
 /**
  * Created by oodles on 1/2/17.
  */
@@ -279,6 +281,10 @@ public class DateUtil {
 
     public static LocalDate getTimezonedCurrentDate(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
+    }
+    public static Long getStartDateOfWeekFromDate(String date){
+        LocalDate localDate=LocalDate.parse(date).with(previousOrSame(DayOfWeek.MONDAY));
+        return localDate.toEpochDay();
     }
 
 }

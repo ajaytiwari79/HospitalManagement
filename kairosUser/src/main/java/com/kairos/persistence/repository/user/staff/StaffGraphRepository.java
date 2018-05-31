@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -433,5 +434,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
             "RETURN  id(o) as unitId, staffData as staffList")
     List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
+
+    @Query("Match(staff:Staff{deleted:false})-[:" + HAS_STAFF_SETTINGS + "]->(staffSettings:StaffSettings)-[:" + HAS_OPEN_SHIFT_SETTINGS + "]->(staffPreferences:StaffPreferences{deleted:false}) where id(staff)={0} return staffPreferences")
+    StaffPreferences findOpenShiftPreferencesByStaff(long staffId);
 
 }

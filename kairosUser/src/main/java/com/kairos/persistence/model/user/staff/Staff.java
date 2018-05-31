@@ -101,6 +101,8 @@ public class Staff extends UserBaseEntity {
     private Date dateOfBirth;
     private String careOfName;
     private Integer age;
+    @Relationship(type = HAS_STAFF_SETTINGS)
+    private StaffSettings staffSettings;
 //    private Gender gender;
 
 
@@ -501,7 +503,14 @@ public class Staff extends UserBaseEntity {
         return age;
     }
 
-/*    public Gender getGender() {
+    public StaffSettings getStaffSettings() {
+        return staffSettings;
+    }
+
+    public void setStaffSettings(StaffSettings staffSettings) {
+        this.staffSettings = staffSettings;
+    }
+    /*    public Gender getGender() {
         return gender;
     }
 
