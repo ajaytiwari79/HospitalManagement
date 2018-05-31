@@ -27,7 +27,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     @Inject private PriorityGroupRepository priorityGroupRepository;
 
     public OpenShiftRuleTemplateDTO createRuleTemplateForOpenShift(long countryId, OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
-        boolean isExistWithSameName=openShiftRuleTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndCountryId(openShiftRuleTemplateDTO.getName(),countryId);
+        boolean isExistWithSameName=openShiftRuleTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndCountryId(openShiftRuleTemplateDTO.getName().trim(),countryId);
         if(isExistWithSameName){
             exceptionService.duplicateDataException("exception.duplicate.openShiftRuleTemplate",openShiftRuleTemplateDTO.getName());
         }
@@ -135,6 +135,10 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
     }
 
     public OpenShiftRuleTemplateDTO createRuleTemplateForUnit(Long unitId,OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO){
+        boolean isExistWithSameName=openShiftRuleTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(openShiftRuleTemplateDTO.getName().trim(),unitId);
+        if(isExistWithSameName){
+            exceptionService.duplicateDataException("exception.duplicate.openShiftRuleTemplate",openShiftRuleTemplateDTO.getName());
+        }
         OpenShiftRuleTemplate openShiftRuleTemplate=new OpenShiftRuleTemplate();
         openShiftRuleTemplateDTO.setUnitId(unitId);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
@@ -150,6 +154,4 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         openShiftRuleTemplateDTO.setId(openShiftRuleTemplate.getId());
         return openShiftRuleTemplateDTO;
     }
-
-
 }
