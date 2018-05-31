@@ -126,35 +126,37 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
-        if(timeInterval!=null) {
-            int count = 0;
-            DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval,infoWrapper.getShifts());
-            shifts.add(infoWrapper.getShift());
-            List<DateTimeInterval> intervals = getSortedIntervals(shifts);
-            if(intervals.size()>2){
-                for (int i=1;i<intervals.size();i++){
-                    DateTimeInterval interval = intervals.get(i-1);
+        if(!isDisabled()) {
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+            if (timeInterval != null) {
+                int count = 0;
+                DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
+                shifts.add(infoWrapper.getShift());
+                List<DateTimeInterval> intervals = getSortedIntervals(shifts);
+                if (intervals.size() > 2) {
+                    for (int i = 1; i < intervals.size(); i++) {
+                        DateTimeInterval interval = intervals.get(i - 1);
                         interval = isRestingTimeAllowed ? getNextDayInterval(interval.getEnd().plusHours(restingTime)) : getNextDayInterval(interval.getEnd());
 
-                    if(!interval.overlaps(intervals.get(i))){
-                        count++;
-                    }
-                }
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
-                if (!isValid) {
-                    if(limitAndCounter[1]!=null) {
-                        int counterValue =  limitAndCounter[1] - 1;
-                        if(counterValue<0){
-                            throw new InvalidRequestException(getName() + " is Broken");
-                        }else {
-                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        if (!interval.overlaps(intervals.get(i))) {
+                            count++;
                         }
-                    }else {
-                        throw new InvalidRequestException(getName() + " is Broken");
+                    }
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
+                    if (!isValid) {
+                        if (limitAndCounter[1] != null) {
+                            int counterValue = limitAndCounter[1] - 1;
+                            if (counterValue < 0) {
+                                throw new InvalidRequestException(getName() + " is Broken");
+                            } else {
+                                infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                                infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            }
+                        } else {
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        }
                     }
                 }
             }

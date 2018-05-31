@@ -436,6 +436,10 @@ public class DateUtils {
                  ZoneId.systemDefault());
     }
 
+    public static Date getDateByZonedDateTime(ZonedDateTime dateTime){
+        return Date.from(dateTime.toInstant());
+    }
+
     public static org.joda.time.LocalDate asJodaLocalDate(Date date) {
         return new DateTime(date).toLocalDate();
     }

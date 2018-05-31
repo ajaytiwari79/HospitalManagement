@@ -103,25 +103,27 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        int timefromPrevShift = 0;
-        List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
-        shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
-        if (shifts.size() > 0) {
-            ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
-            timefromPrevShift = new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper,getPhaseTemplateValues(),getId());
-            boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
-            if (!isValid) {
-                if(limitAndCounter[1]!=null) {
-                    int counterValue =  limitAndCounter[1] - 1;
-                    if(counterValue<0){
+        if(!isDisabled()) {
+            int timefromPrevShift = 0;
+            List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
+            shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
+            if (shifts.size() > 0) {
+                ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
+                timefromPrevShift = new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), getId());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift);
+                if (!isValid) {
+                    if (limitAndCounter[1] != null) {
+                        int counterValue = limitAndCounter[1] - 1;
+                        if (counterValue < 0) {
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        } else {
+                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        }
+                    } else {
                         throw new InvalidRequestException(getName() + " is Broken");
-                    }else {
-                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                        infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                     }
-                }else {
-                    throw new InvalidRequestException(getName() + " is Broken");
                 }
             }
         }

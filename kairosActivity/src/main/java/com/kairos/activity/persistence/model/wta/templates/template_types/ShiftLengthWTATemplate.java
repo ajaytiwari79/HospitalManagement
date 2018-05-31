@@ -86,22 +86,24 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
-        if(timeInterval!=null){
-            if(isValidForDay(dayTypeIds,infoWrapper)) {
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0]*60, infoWrapper.getShift().getMinutes());
-                if (!isValid) {
-                    if(limitAndCounter[1]!=null) {
-                        int counterValue =  limitAndCounter[1] - 1;
-                        if(counterValue<0){
+        if(!isDisabled()) {
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+            if (timeInterval != null) {
+                if (isValidForDay(dayTypeIds, infoWrapper)) {
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0] * 60, infoWrapper.getShift().getMinutes());
+                    if (!isValid) {
+                        if (limitAndCounter[1] != null) {
+                            int counterValue = limitAndCounter[1] - 1;
+                            if (counterValue < 0) {
+                                throw new InvalidRequestException(getName() + " is Broken");
+                            } else {
+                                infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                                infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            }
+                        } else {
                             throw new InvalidRequestException(getName() + " is Broken");
-                        }else {
-                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                         }
-                    }else {
-                        throw new InvalidRequestException(getName() + " is Broken");
                     }
                 }
             }

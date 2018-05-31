@@ -25,6 +25,7 @@ import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 
 import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.WTARuleTemplateValidatorUtility;
 import com.kairos.enums.shift.ShiftState;
@@ -65,6 +66,7 @@ import java.util.stream.Collectors;
 import static com.kairos.activity.constants.AppConstants.*;
 import static com.kairos.activity.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getIntervalByRuleTemplates;
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getRuleTemplateSpecificInfo;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
@@ -420,7 +422,9 @@ public class ShiftService extends MongoBaseService {
         }
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(),DateUtils.asLocalDate(shift.getStartDate()));
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()),phase.getName());
-        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(staffAdditionalInfoDTO,shift,null,phase.getName(),planningPeriod,staffWTACounters);
+        DateTimeInterval interval = getIntervalByRuleTemplates(shift,wtaQueryResultDTO.getRuleTemplates());
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(),DateUtils.getDateByZonedDateTime(interval.getStart()),DateUtils.getDateByZonedDateTime(interval.getEnd()));
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(staffAdditionalInfoDTO,shift,shifts,phase.getName(),planningPeriod,staffWTACounters);
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());

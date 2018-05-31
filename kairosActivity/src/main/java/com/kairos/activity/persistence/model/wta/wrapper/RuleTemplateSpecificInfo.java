@@ -7,6 +7,7 @@ import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public class RuleTemplateSpecificInfo {
 
-    private List<ShiftWithActivityDTO> shifts;
+    private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
     private ShiftWithActivityDTO shift;
     private List<TimeSlotWrapper> timeSlotWrappers;
     private String phase;
