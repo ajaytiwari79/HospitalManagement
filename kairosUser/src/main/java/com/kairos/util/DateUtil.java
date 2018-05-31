@@ -284,7 +284,7 @@ public class DateUtil {
     }
     public static Long getStartDateOfWeekFromDate(String date){
         LocalDate localDate=LocalDate.parse(date).with(previousOrSame(DayOfWeek.MONDAY));
-        return localDate.toEpochDay();
-    }
+          return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+       }
 
 }
