@@ -2,13 +2,13 @@ package com.kairos.response.dto.web.night_worker;
 
 import com.kairos.persistence.model.common.TimeSlot;
 import com.kairos.persistence.model.enums.CalculationUnit;
-import com.kairos.persistence.model.enums.IntervalUnit;
+import com.kairos.persistence.model.enums.DurationType;
 
 public class ExpertiseNightWorkerSettingDTO {
 
     private TimeSlot timeSlot;
     private Integer minMinutesToCheckNightShift;
-    private IntervalUnit intervalUnitToCheckNightWorker;
+    private DurationType intervalUnitToCheckNightWorker;
     private Integer intervalValueToCheckNightWorker;
     private Integer minShiftsValueToCheckNightWorker;
     private CalculationUnit minShiftsUnitToCheckNightWorker;
@@ -19,7 +19,7 @@ public class ExpertiseNightWorkerSettingDTO {
         // default constructor
     }
 
-    public ExpertiseNightWorkerSettingDTO(TimeSlot timeSlot, Integer minMinutesToCheckNightShift, IntervalUnit intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker,
+    public ExpertiseNightWorkerSettingDTO(TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker,
                                        Integer minShiftsValueToCheckNightWorker, CalculationUnit minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
         this.timeSlot = timeSlot;
         this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
@@ -47,11 +47,11 @@ public class ExpertiseNightWorkerSettingDTO {
         this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
     }
 
-    public IntervalUnit getIntervalUnitToCheckNightWorker() {
+    public DurationType getIntervalUnitToCheckNightWorker() {
         return intervalUnitToCheckNightWorker;
     }
 
-    public void setIntervalUnitToCheckNightWorker(IntervalUnit intervalUnitToCheckNightWorker) {
+    public void setIntervalUnitToCheckNightWorker(DurationType intervalUnitToCheckNightWorker) {
         this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;
     }
 
