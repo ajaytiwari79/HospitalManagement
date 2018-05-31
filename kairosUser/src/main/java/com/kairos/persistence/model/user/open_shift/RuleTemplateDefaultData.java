@@ -16,7 +16,7 @@ public class RuleTemplateDefaultData {
     private List<ActivityDTO> activities;
     private List<OpenShiftIntervalDTO> intervals;
     private List<EmploymentTypeDTO> employmentTypes;
-    private List<ExpertiseResponseDTO> expertise;
+    private List<ExpertiseResponseDTO> expertises;
 
     public RuleTemplateDefaultData() {
         //Default Constructor
@@ -30,23 +30,23 @@ public class RuleTemplateDefaultData {
         this.intervals = intervals;
     }
 
-    public RuleTemplateDefaultData(List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertise) {
+    public RuleTemplateDefaultData(List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises) {
         this.skills = skills;
         this.timeTypes = timeTypes;
         this.activities = activities;
         this.intervals = intervals;
         this.employmentTypes = employmentTypes;
-        this.expertise = expertise;
+        this.expertises = expertises;
     }
 
-    public RuleTemplateDefaultData(List<OrganizationTypeAndSubType> organizationTypeAndSubType, List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertise) {
+    public RuleTemplateDefaultData(List<OrganizationTypeAndSubType> organizationTypeAndSubType, List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises) {
         this.organizationTypeAndSubType = organizationTypeAndSubType;
         this.skills = skills;
         this.timeTypes = timeTypes;
         this.activities = activities;
         this.intervals = intervals;
         this.employmentTypes = employmentTypes;
-        this.expertise = expertise;
+        this.expertises = expertises;
     }
 
     public List<OrganizationTypeAndSubType> getOrganizationTypeAndSubType() {
@@ -97,11 +97,11 @@ public class RuleTemplateDefaultData {
         this.employmentTypes = employmentTypes;
     }
 
-    public List<ExpertiseResponseDTO> getExpertise() {
-        return expertise;
+    public List<ExpertiseResponseDTO> getExpertises() {
+        return expertises;
     }
 
-    public void setExpertise(List<ExpertiseResponseDTO> expertise) {
-        this.expertise = expertise;
+    public void setExpertises(List<ExpertiseResponseDTO> expertises) {
+        this.expertises = expertises;
     }
 }
