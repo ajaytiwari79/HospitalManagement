@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +37,12 @@ public class ShiftQueryResult {
     private Integer weekCount;
     private static boolean overrideWeekCount;
     private Long unitId;
-    private List<ShiftQueryResult> subShifts;
+    private List<ShiftQueryResult> subShifts= new ArrayList<>();
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
     private ShiftState shiftState;
+    private Long expertiseId;
 
 
     public int getDurationMinutes() {
@@ -260,5 +262,12 @@ public class ShiftQueryResult {
         return subShifts;
     }
 
+    public Long getExpertiseId() {
+        return expertiseId;
+    }
+
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
+    }
 }
 

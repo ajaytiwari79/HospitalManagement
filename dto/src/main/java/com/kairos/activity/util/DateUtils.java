@@ -45,7 +45,6 @@ public class DateUtils {
                 .toInstant());
     }
 
-
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         // LocalDateTime startOfDay = localDateTime.with(LocalTime.MIN);
@@ -367,6 +366,10 @@ public class DateUtils {
 
     public static Date getDate(long millis) {
         return new Date(millis);
+    }
+
+    public static LocalDate getLocalDate(long millis){
+        return getLocalDateFromDate( getDate(millis));
     }
 
     public static LocalDate toLocalDate(DateTime date) {

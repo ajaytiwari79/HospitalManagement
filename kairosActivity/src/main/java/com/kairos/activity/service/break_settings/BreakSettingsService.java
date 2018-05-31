@@ -33,7 +33,7 @@ public class BreakSettingsService extends MongoBaseService {
     }
 
     public List<BreakSettingsDTO> getBreakSettings(Long unitId) {
-        return breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByShiftDurationInMinuteDesc(unitId);
+        return breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
     }
 
     public Boolean removeBreakSettings(Long unitId, BigInteger breakSettingsId) {

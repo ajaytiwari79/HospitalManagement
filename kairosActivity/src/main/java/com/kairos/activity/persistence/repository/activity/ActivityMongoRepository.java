@@ -63,4 +63,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
+
+    Activity findByNameIgnoreCaseAndUnitIdAndDeletedFalse(String unpaidBreak, Long unitId);
 }

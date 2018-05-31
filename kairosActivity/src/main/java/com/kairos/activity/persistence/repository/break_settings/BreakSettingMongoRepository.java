@@ -11,9 +11,11 @@ import java.util.List;
 @Repository
 public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSettings, BigInteger> {
 
-    List<BreakSettingsDTO> findAllByDeletedFalseAndUnitIdOrderByShiftDurationInMinuteDesc(Long unitId);
+    List<BreakSettingsDTO> findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(Long unitId);
 
     BreakSettings findByIdAndDeletedFalseAndUnitId(BigInteger id, Long unitId);
 
     BreakSettings findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(Long unitId, Long shiftDurationInMinute);
+
+    List<BreakSettings> findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(Long unitId, Long shiftDurationInMinute);
 }
