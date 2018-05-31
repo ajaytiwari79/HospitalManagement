@@ -207,7 +207,6 @@ public class ShiftService extends MongoBaseService {
              * The first eligible break hours after.It specifies you can take first break after this duration
              **/
             breakAllowedAfterMinute = (i == 0) ? breakSettings.get(i).getShiftDurationInMinute() : breakSettings.get(i).getShiftDurationInMinute() - breakSettings.get(i - 1).getShiftDurationInMinute();
-            logger.info("1 You will get break after {} And remaing shiftDurationInMinute = {}", breakAllowedAfterMinute, shiftDurationInMinute);
             endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
             if (shiftDurationInMinute > breakAllowedAfterMinute) {
                 shifts.add(getShiftObject(shiftDTO, shiftDTO.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
@@ -222,7 +221,6 @@ public class ShiftService extends MongoBaseService {
                     shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
                     startDateMillis = endDateMillis;
                     shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
-                    logger.info("2 break Added after {} And remaining shiftDurationInMinute = {}", allowedBreakDurationInMinute, shiftDurationInMinute);
                 } else {
                     logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for ", breakSettings.get(i).getBreakDurationInMinute());
                     // add break and increase main shift duration by remaining minute
@@ -235,7 +233,6 @@ public class ShiftService extends MongoBaseService {
          * still shift is greater than break We need to repeat last break until shift duration is less
          **/
         while (shiftDurationInMinute > breakAllowedAfterMinute) {
-            logger.info("3 You will get break after {} And remaining shiftDurationInMinute = {}", breakAllowedAfterMinute, shiftDurationInMinute);
             // last end date is now start date
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
@@ -247,7 +244,6 @@ public class ShiftService extends MongoBaseService {
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
                 shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
-                logger.info("4 break Added after {} And remaining shiftDurationInMinute = {}", allowedBreakDurationInMinute, shiftDurationInMinute);
             } else {
                 logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for {} ", allowedBreakDurationInMinute);
                 // add break and increase main shift duration by remaining minute
