@@ -42,6 +42,7 @@ public class ShiftQueryResult {
     private int scheduledMinutes;
     private int durationMinutes;
     private ShiftState shiftState;
+    private Long expertiseId;
 
 
     public int getDurationMinutes() {
@@ -261,5 +262,12 @@ public class ShiftQueryResult {
         return subShifts;
     }
 
+    public Long getExpertiseId() {
+        return expertiseId;
+    }
+
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
+    }
 }
 
