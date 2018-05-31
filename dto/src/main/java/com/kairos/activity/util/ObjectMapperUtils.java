@@ -32,7 +32,7 @@ public class ObjectMapperUtils {
         for (int i = 0; i < objects1.size(); i++) {
             try {
                 E e = (E) className.newInstance();
-                PropertyUtils.copyProperties(objects1.get(i),e);
+                PropertyUtils.copyProperties(e,objects1.get(i));
                 objects.add(e);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |InstantiationException e) {
             }
@@ -74,7 +74,7 @@ public class ObjectMapperUtils {
         return list;
     }
 
-    public static <T extends Object,E extends Object> List<E> copyPropertiesByMapper(List<T> objects1, E Objects) {
+    public static <T extends Object,E extends Object> List<E> copyPropertiesOfListByMapper(List<T> objects, Class className) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
@@ -83,8 +83,8 @@ public class ObjectMapperUtils {
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         mapper.registerModule(javaTimeModule);
         try {
-            return mapper.readValue(mapper.writeValueAsString(objects1), mapper.getTypeFactory().constructCollectionType(
-                    List.class, Objects.getClass()));
+            return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
+                    List.class, className));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +94,7 @@ public class ObjectMapperUtils {
 
 
 
-    public static <T> T copyPropertiesByMapper(Object object,Class<T> valueType){
+    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JavaTimeModule javaTimeModule = new JavaTimeModule();

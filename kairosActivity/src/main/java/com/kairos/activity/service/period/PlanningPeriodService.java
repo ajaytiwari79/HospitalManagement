@@ -258,6 +258,9 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public void addPlanningPeriodOnUpdate(Long unitId, Date endDate, Date startDate, List<PhaseDTO> phases, ZoneId zoneId){
+        if(endDate.compareTo(startDate) <= 0){
+            return;
+        }
         int duration = getDifferenceInDates(endDate, startDate);
         PlanningPeriodDTO tempPlanningPeriodDTO = new PlanningPeriodDTO(startDate.getTime(),duration,
                  DurationType.DAYS, 1, endDate, zoneId);

@@ -3,8 +3,6 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 
@@ -38,7 +36,9 @@ import java.util.List;
         @JsonSubTypes.Type(value = SeniorDaysPerYearWTATemplateDTO.class, name = "SENIOR_DAYS_PER_YEAR"),
         @JsonSubTypes.Type(value = ChildCareDaysCheckWTATemplateDTO.class, name = "CHILD_CARE_DAYS_CHECK"),
         @JsonSubTypes.Type(value = BreaksInShiftWTATemplateDTO.class, name = "BREAK_IN_SHIFT"),
-
+        @JsonSubTypes.Type(value = DaysOffAfterASeriesWTATemplateDTO.class, name = "DAYS_OFF_AFTER_A_SERIES"),
+        @JsonSubTypes.Type(value = NoOfSequenceShiftWTATemplateDTO.class, name = "NO_OF_SEQUENCE_SHIFT"),
+        @JsonSubTypes.Type(value = EmployeesWithIncreasedRiskWTATemplateDTO.class,name="EMPLOYEES_WITH_INCREASE_RISK")
 })
 public class WTABaseRuleTemplateDTO{
 

@@ -410,4 +410,5 @@ public class TimeSlotService extends UserBaseService {
     public List<TimeSlotWrapper> getShiftPlanningTimeSlotsById(Long timeSlotSetId) {
         return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
     }
+
 }

@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.enums.TimeCalaculationType;
 import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 
 import java.time.DayOfWeek;
@@ -15,6 +16,8 @@ public class TimeCalculationActivityDTO {
 
     private Long activityId;
     private String methodForCalculatingTime;
+    private TimeCalaculationType fullDayCalculationType;
+    private TimeCalaculationType fullWeekCalculationType;
     private Boolean allowBreakReduction;
     private Long fixedTimeValue;
     private Long monthsToCalculate;
@@ -65,7 +68,7 @@ public class TimeCalculationActivityDTO {
     }
 
     public TimeCalculationActivityTab buildTimeCalculationActivityTab(){
-        TimeCalculationActivityTab timeCalculationActivityTab =new TimeCalculationActivityTab(methodForCalculatingTime,allowBreakReduction,
+        TimeCalculationActivityTab timeCalculationActivityTab =new TimeCalculationActivityTab(methodForCalculatingTime, fullDayCalculationType, fullWeekCalculationType, allowBreakReduction,
                 fixedTimeValue,monthsToCalculate,methodForCalculatingTimeInMonths,balanceType,multiplyWith,multiplyWithValue,multiplyByVacationFactor,multiplyByFinalSchedule, breakTemplates,
                 dayTypes,fullWeekStart,fullWeekEnd,historyDuration,defaultStartTime);
         return timeCalculationActivityTab;
@@ -178,5 +181,21 @@ public class TimeCalculationActivityDTO {
 
     public void setDayTypes(List<Long> dayTypes) {
         this.dayTypes = dayTypes;
+    }
+
+    public TimeCalaculationType getFullDayCalculationType() {
+        return fullDayCalculationType;
+    }
+
+    public void setFullDayCalculationType(TimeCalaculationType fullDayCalculationType) {
+        this.fullDayCalculationType = fullDayCalculationType;
+    }
+
+    public TimeCalaculationType getFullWeekCalculationType() {
+        return fullWeekCalculationType;
+    }
+
+    public void setFullWeekCalculationType(TimeCalaculationType fullWeekCalculationType) {
+        this.fullWeekCalculationType = fullWeekCalculationType;
     }
 }

@@ -25,6 +25,7 @@ public class PayTable extends UserBaseEntity {
     private Date startDateMillis;
     @DateLong
     private Date endDateMillis;
+    private String paymentUnit;
     @Relationship(type = HAS_PAY_GRADE)
     private List<PayGrade> payGrades;
     private String description;
@@ -113,13 +114,14 @@ public class PayTable extends UserBaseEntity {
         this.payTable = payTable;
     }
 
-    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis,boolean editable) {
+    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis, String paymentUnit, boolean editable) {
         this.name = name;
         this.description = description;
         this.shortName = shortName;
         this.level = level;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+        this.paymentUnit = paymentUnit;
         this.editable=editable;
     }
 
@@ -137,5 +139,13 @@ public class PayTable extends UserBaseEntity {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    public String getPaymentUnit() {
+        return paymentUnit;
+    }
+
+    public void setPaymentUnit(String paymentUnit) {
+        this.paymentUnit = paymentUnit;
     }
 }

@@ -8,6 +8,7 @@ import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import com.kairos.util.userContext.UserContextInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -15,10 +16,8 @@ import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.HttpHeaders;
@@ -75,20 +74,6 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
-		/**
-		 * Set locale language to resolve text Messages
-		 * @return
-		 */
-		@Bean(name = "messageSource")
-		public ReloadableResourceBundleMessageSource messageSource() {
-			ReloadableResourceBundleMessageSource messageBundle = new ReloadableResourceBundleMessageSource();
-			messageBundle.setBasename("classpath:messages/messages");
-			messageBundle.setDefaultEncoding("UTF-8");
-			return messageBundle;
-
-
-		}
 
 
 	@Bean

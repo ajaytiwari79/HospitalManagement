@@ -6,6 +6,7 @@ import java.math.BigInteger;
 public class MongoBaseEntity {
     @Id
     protected String id;
+    protected BigInteger kairosId;
 
     public BigInteger getKairosId() {
         return kairosId;
@@ -14,9 +15,6 @@ public class MongoBaseEntity {
     public void setKairosId(BigInteger kairosId) {
         this.kairosId = kairosId;
     }
-
-    protected BigInteger kairosId;
-
     public Boolean getDeleted() {
         return deleted;
     }

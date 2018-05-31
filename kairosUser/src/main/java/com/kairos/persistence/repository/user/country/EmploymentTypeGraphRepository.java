@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
+import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -26,17 +27,18 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
 
         @Query("Match (o:Organization),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
                 "MERGE (o)-[r:"+EMPLOYMENT_TYPE_SETTINGS+"]->(et)\n" +
-                "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.creationDate = {5},r.lastModificationDate = {4}\n" +
-                "ON MATCH SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.lastModificationDate = {6} return true")
+                "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.creationDate = {6},r.lastModificationDate = {7}\n" +
+                "ON MATCH SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.lastModificationDate = {7} return true")
         Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId,
                                                          Boolean allowedForContactPerson,
                                                          boolean allowedForShiftPlan,
-                                                         boolean allowedForFlexPool, long creationDate, long lastModificationDate);
+                                                         boolean allowedForFlexPool, PaidOutFrequencyEnum paymentFrequency, long creationDate, long lastModificationDate);
 
         @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
                 "MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n"+
                 "o,et,r \n" +
-                "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
+                "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories, \n" +
+                "CASE WHEN r IS null THEN et.paymentFrequency ELSE r.paymentFrequency END as paymentFrequency, \n" +
                 "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
                 "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
                 "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")

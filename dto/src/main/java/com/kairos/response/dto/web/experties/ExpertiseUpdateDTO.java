@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseUpdateDTO {
     private Long id;
-    @NotNull(message = "error.Expertise.name.notnull")
+    @NotBlank(message="Expertise name is required")
     private String name;
     private String description;
 
@@ -37,9 +38,6 @@ public class ExpertiseUpdateDTO {
     private Long unionId;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
-
-    @NotNull(message = "Paid Out Frequency can not be null")
-    private PaidOutFrequencyEnum paidOutFrequency;
 
     @Valid
     private SeniorityLevelDTO seniorityLevel;
@@ -132,14 +130,6 @@ public class ExpertiseUpdateDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
-    }
 
     public SeniorityLevelDTO getSeniorityLevel() {
         return seniorityLevel;
