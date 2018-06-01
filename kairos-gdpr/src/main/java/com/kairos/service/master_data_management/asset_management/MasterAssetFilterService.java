@@ -16,13 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +72,6 @@ public class MasterAssetFilterService extends MongoBaseService {
     public Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations) {
         GroupOperation groupOperation = group();
         List<AggregationOperation> operations = new ArrayList<>();
-
         operations.add(aggregationOperations.get("match"));
         for (Map.Entry<String, AggregationOperation> entry : aggregationOperations.entrySet())
             if (entry.getKey().equals("match")) {
@@ -94,7 +90,7 @@ public class MasterAssetFilterService extends MongoBaseService {
     public List<MasterAsset> getMasterAssetDataWithFilter(Long countryId, String moduleId, FilterSelectionDto filterSelectionDto) {
 
         if (checkIfFilterGroupExistForMduleId(moduleId, true)) {
-           return masterAssetMongoRepository.getMasterAssetListWithFilterData(countryId,filterSelectionDto);
+            return masterAssetMongoRepository.getMasterAssetListWithFilterData(countryId, filterSelectionDto);
         } else
             throw new InvalidRequestException("invalide Request filter roup not exist for moduleId " + moduleId);
     }

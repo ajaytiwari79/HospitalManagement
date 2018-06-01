@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -54,12 +55,13 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id,  @Valid @RequestBody MasterAssetDto asset) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id, @Valid @RequestBody MasterAssetDto asset) {
 
         if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(id, asset));
 
         }
+
         return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
     }
 
@@ -80,6 +82,7 @@ public class MasterAssetController {
 
         } else
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+
     }
 
 
