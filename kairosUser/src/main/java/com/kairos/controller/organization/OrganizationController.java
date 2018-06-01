@@ -1346,6 +1346,7 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getDefaultDataForOrder(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
     }
+
     @ApiOperation(value = "Init optplanner integration")
     @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1362,12 +1363,26 @@ public class OrganizationController {
 
     }
 
+
     @RequestMapping(value = UNIT_URL + "/unit_position/expertise", method = RequestMethod.GET)
     @ApiOperation("fetch Map of unit position id and expertise id")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>>  getExpertiseOfUnitPosition(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionExpertiseMap(unitId));
     }
+
+
+    @ApiOperation(value = "Get Default data for Rule Template")
+    @RequestMapping(value = "/country/{countryId}/rule_template/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));
+    }
+
+    @ApiOperation(value = "Get Default data for Rule Template based on UnitId")
+    @RequestMapping(value = "/unit/{unitId}/rule_template/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplateByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplateByUnit(unitId));
+    }
 }
-
-

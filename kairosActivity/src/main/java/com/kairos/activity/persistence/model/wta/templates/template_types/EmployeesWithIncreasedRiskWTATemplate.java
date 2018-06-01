@@ -9,7 +9,7 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
  private int belowAge;
  private int aboveAge;
  private boolean pregnant;
- private boolean isRestingTimeAllowed;
+ private boolean restingTimeAllowed;
  private int restingTime;
 
     public int getBelowAge() {
@@ -38,13 +38,12 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     }
 
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+        this.restingTimeAllowed = restingTimeAllowed;
     }
-
     public int getRestingTime() {
         return restingTime;
     }

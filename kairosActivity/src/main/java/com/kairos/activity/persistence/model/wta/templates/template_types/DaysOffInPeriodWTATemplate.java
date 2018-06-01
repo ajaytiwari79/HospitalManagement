@@ -38,7 +38,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     private String intervalUnit;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
-    private boolean isRestingTimeAllowed;
+    private boolean restingTimeAllowed;
     private int restingTime;
     private float recommendedValue;
 
@@ -52,13 +52,12 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        this.isRestingTimeAllowed = restingTimeAllowed;
+        this.restingTimeAllowed = restingTimeAllowed;
     }
-
     public int getRestingTime() {
         return restingTime;
     }

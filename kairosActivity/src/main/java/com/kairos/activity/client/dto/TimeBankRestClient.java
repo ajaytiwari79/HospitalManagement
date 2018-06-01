@@ -29,8 +29,7 @@ public class TimeBankRestClient {
     private RestTemplate restTemplate;
 
     public UnitPositionWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
-        String baseUrl=new StringBuilder(getBaseUrl(true)).toString();
-
+        String baseUrl=getBaseUrl(true);
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>>(){};
             ResponseEntity<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>> restExchange =

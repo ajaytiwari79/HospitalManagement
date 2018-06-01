@@ -48,7 +48,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     }
 
-    public List<ShiftQueryResult> findAllActivityBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId) {
+    public List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("unitPositionId").is(unitPositionId).and("deleted").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
                         .and("startDate").gte(startDate).and("endDate").lte(endDate)),

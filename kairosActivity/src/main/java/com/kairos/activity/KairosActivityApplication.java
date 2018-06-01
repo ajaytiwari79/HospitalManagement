@@ -104,7 +104,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		registry.addInterceptor(new ExtractOrganizationAndUnitInfoInterceptor());
 	}
 
-	@Profile({"production", "stag"})
+	@Profile({"!development"})
 	@LoadBalanced
 	@Primary
 	@Bean
@@ -116,7 +116,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		return template;
 	}
 
-	@Profile({"production", "stag"})
+	@Profile({"!development"})
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
@@ -126,7 +126,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		return template;
 	}
 
-    @Profile({"test", "development"})
+    @Profile({"development"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
@@ -137,7 +137,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
         return template;
     }
 
-	@Profile({"test", "development"})
+	@Profile({"development"})
     @Bean(name ="schedulerRestTemplate")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder

@@ -12,7 +12,7 @@ import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInf
 public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
 
     //private int sequence;
-    private boolean isRestingTimeAllowed;
+    private boolean restingTimeAllowed;
     private int restingTime;
     private PartOfDay sequenceShiftFrom;
     private PartOfDay sequenceShiftTo;
@@ -26,13 +26,12 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     }*/
 
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+        this.restingTimeAllowed = restingTimeAllowed;
     }
-
     public int getRestingTime() {
         return restingTime;
     }

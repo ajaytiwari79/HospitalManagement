@@ -55,6 +55,9 @@ public class Shift extends MongoBaseEntity {
     private ShiftState shiftState;
     private List<BigInteger> brokenRuleTemplateIds;
 
+    private BigInteger parentOpenShiftId;
+    private Long allowedBreakDurationInMinute;
+
     public Shift() {
     }
 
@@ -64,6 +67,7 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.unitPositionId = unitPositionId;
     }
+
 
 
     public List<BigInteger> getBrokenRuleTemplateIds() {
@@ -287,7 +291,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
     public ShiftQueryResult getShiftQueryResult() {
         ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
                 this.startDate,
@@ -299,7 +302,7 @@ public class Shift extends MongoBaseEntity {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activityId,this.staffId, this.unitId, this.unitPositionId);
+                this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
         shiftQueryResult.setShiftState(this.getShiftState());
@@ -330,4 +333,20 @@ public class Shift extends MongoBaseEntity {
     public void setShiftState(ShiftState shiftState) {
         this.shiftState = shiftState;
     }
+
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
+
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+        }
 }
