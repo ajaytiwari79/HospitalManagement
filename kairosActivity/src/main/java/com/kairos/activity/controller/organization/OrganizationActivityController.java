@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.activity.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by vipul on 5/12/17.
@@ -331,5 +332,14 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getActivitiesWithBalanceSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithBalanceSettings(unitId));
     }
+
+    @ApiOperation(value = "Create default data for  Organization")
+    @RequestMapping(value = UNIT_URL + "/organization/default_data", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId,@RequestParam Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationActivityService.createDefaultDataForOrganization(unitId,countryId));
+    }
+
 
 }

@@ -26,7 +26,9 @@ import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
+import com.kairos.activity.service.period.PeriodSettingsService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.service.unit_settings.PhaseSettingsService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import org.slf4j.Logger;
@@ -69,6 +71,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
+    @Inject private PeriodSettingsService periodSettingsService;
+    @Inject private PhaseSettingsService phaseSettingsService;
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -243,5 +247,12 @@ public class OrganizationActivityService extends MongoBaseService {
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
         return orderAndActivityDTO;
     }
+
+   public boolean createDefaultDataForOrganization(Long unitId,Long countryId){
+        phaseService.createDefaultPhase(unitId,countryId);
+        periodSettingsService.createDefaultPeriodSettings(unitId);
+        phaseSettingsService.createDefaultPhaseSettings(unitId);
+        return true;
+   }
 
 }

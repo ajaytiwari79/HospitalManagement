@@ -18,6 +18,18 @@ public class PhaseSettings extends MongoBaseEntity {
         //Default Constructor
     }
 
+    public PhaseSettings(BigInteger phaseId, String name, String description, boolean staffEligibleForUnderStaffing, boolean staffEligibleForOverStaffing,
+                         boolean managementEligibleForUnderStaffing, boolean managementEligibleForOverStaffing, Long unitId) {
+        this.phaseId = phaseId;
+        this.name = name;
+        this.description = description;
+        this.staffEligibleForUnderStaffing = staffEligibleForUnderStaffing;
+        this.staffEligibleForOverStaffing = staffEligibleForOverStaffing;
+        this.managementEligibleForUnderStaffing = managementEligibleForUnderStaffing;
+        this.managementEligibleForOverStaffing = managementEligibleForOverStaffing;
+        this.unitId = unitId;
+    }
+
     public BigInteger getPhaseId() {
         return phaseId;
     }

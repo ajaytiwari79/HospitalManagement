@@ -25,4 +25,10 @@ public class PriorityGroupIntegrationService {
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){
         return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId, true, IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
         }
+
+        public void crateDefaultDataForOrganization(Long unitId,Long countryId){
+            Map<String,Object> countryDetail =new HashMap<>();
+            countryDetail.put("countryId",countryId);
+            priorityGroupRestClient.publish(null,unitId,true, IntegrationOperation.CREATE,"/organization/default_data",countryDetail);
+        }
 }

@@ -346,11 +346,12 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(),organization.getCountry().getId());
         // DO NOT CREATE PHASE for UNION
-        if (!orgDetails.getUnion()) {
-            phaseRestClient.createDefaultPhases(organization.getId());
-            periodRestClient.createDefaultPeriodSettings(organization.getId());
-        }
+//        if (!orgDetails.getUnion()) {
+//            phaseRestClient.createDefaultPhases(organization.getId());
+//            periodRestClient.createDefaultPeriodSettings(organization.getId());
+//        }
 
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());
 
@@ -431,10 +432,11 @@ public class OrganizationService extends UserBaseService {
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         // DO NOT CREATE PHASE for UNION
-        if (!orgDetails.getUnion()) {
-            phaseRestClient.createDefaultPhases(organization.getId());
-            periodRestClient.createDefaultPeriodSettings(organization.getId());
-        }
+//        if (!orgDetails.getUnion()) {
+//            phaseRestClient.createDefaultPhases(organization.getId());
+//            periodRestClient.createDefaultPeriodSettings(organization.getId());
+//        }
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(),organization.getCountry().getId());
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
         organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
@@ -859,8 +861,9 @@ public class OrganizationService extends UserBaseService {
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
-        phaseRestClient.createDefaultPhases(unit.getId());
-        periodRestClient.createDefaultPeriodSettings(unit.getId());
+//        phaseRestClient.createDefaultPhases(unit.getId());
+//        periodRestClient.createDefaultPeriodSettings(unit.getId());
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),unit.getCountry().getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
