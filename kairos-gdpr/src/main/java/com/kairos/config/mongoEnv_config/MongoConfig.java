@@ -13,7 +13,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
 
     @Autowired
-    private EnvironmentConfig environment;
+    private EnvConfig environment;
 
 
     @Override

@@ -1,7 +1,7 @@
 package com.kairos.config.jackrabiit_config;
 
 
-import com.kairos.config.mongoEnv_config.EnvironmentConfig;
+import com.kairos.config.mongoEnv_config.EnvConfig;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import org.apache.jackrabbit.oak.Oak;
@@ -20,7 +20,7 @@ public class JacrabbitConfig {
 
 
 @Autowired
-private EnvironmentConfig environmentConfig;
+private EnvConfig environmentConfig;
 
     @Bean
     public Repository repository() throws RepositoryException {

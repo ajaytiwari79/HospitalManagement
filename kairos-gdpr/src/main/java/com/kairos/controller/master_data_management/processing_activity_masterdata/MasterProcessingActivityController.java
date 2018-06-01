@@ -38,12 +38,12 @@ public class MasterProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createMasterProcessingActivity(countryId, processingActivityDto));
     }
-
+/*
     @ApiOperation(value = "get all MasterProcessingActivity")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseEntity<Object> getAllAsset() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllmasterProcessingActivity());
-    }
+    }*/
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/update/{id}")
@@ -72,8 +72,16 @@ public class MasterProcessingActivityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithData(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, id));
     }
 
+    @ApiOperation(value = "get MasterProcessingActivity list with Subprocessing Activity")
+    @GetMapping("/all")
+    public ResponseEntity<Object> getMasterProcessingActivityListWithSubProcessingActivity(@PathVariable Long countryId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+        } else
 
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityListWithSubProcessing(countryId));
+    }
 }

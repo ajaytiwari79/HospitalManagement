@@ -77,7 +77,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
 
 
     @RequestMapping(value = "/list",method = RequestMethod.POST)
-    public ResponseEntity<Object>  getAllAgreementSectionList(@PathVariable Long countryId,@RequestBody List<BigInteger> ids)
+    public ResponseEntity<Object>  getAllAgreementSectionList(@PathVariable Long countryId,@RequestBody Set<BigInteger> ids)
     {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAgreementSectionWithDataList(countryId,ids));
 

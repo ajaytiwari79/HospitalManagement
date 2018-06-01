@@ -4,11 +4,14 @@ import com.kairos.persistance.model.master_data_management.processing_activity_m
 import com.kairos.response.dto.MasterProcessingActivityResponseDto;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public interface CustomMasterProcessingActivity {
 
 
-   MasterProcessingActivityResponseDto getMasterProcessingActivityWithData(Long countryId,BigInteger id);
+   MasterProcessingActivityResponseDto getMasterProcessingActivityWithSubProcessingActivity(Long countryId,BigInteger id);
+
+   List<MasterProcessingActivityResponseDto> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId);
 
 
 }
