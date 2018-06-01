@@ -14,6 +14,8 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
+
 /**
  * Created by oodles on 1/2/17.
  */
@@ -192,13 +194,17 @@ public class DateUtil {
         return dayOfWeek;
     }
 
-    public static Long getIsoDateInLong(String dateReceived) throws ParseException {
+    public static Long getIsoDateInLong(String dateReceived) {
         Long date = null;
         if (!StringUtils.isEmpty(dateReceived)) {
             DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
             isoFormat.setLenient(false);
             isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            date = isoFormat.parse(dateReceived).getTime();
+            try {
+                date = isoFormat.parse(dateReceived).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         return date;
     }
@@ -280,5 +286,9 @@ public class DateUtil {
     public static LocalDate getTimezonedCurrentDate(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
     }
+    public static Long getStartDateOfWeekFromDate(LocalDate date){
+          LocalDate localDate=date.with(previousOrSame(DayOfWeek.MONDAY));
+          return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+       }
 
 }
