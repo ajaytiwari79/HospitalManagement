@@ -1,20 +1,26 @@
 package com.planner.util.wta;
 
+import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
 import com.kairos.shiftplanning.utils.JodaTimeConverter;
-import com.planner.service.taskPlanningService.PlanningService;
+import com.planner.service.taskPlanningService.PlannerService;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 
-public class ShiftPlanningUtil {
-    private static Logger log= LoggerFactory.getLogger(PlanningService.class);
-    public static void toXml(Object solution, String fileName) {
+public class FileIOUtil {
+    private static Logger log= LoggerFactory.getLogger(PlannerService.class);
+    public static void writeShiftPlanningXMLToFile(ShiftRequestPhasePlanningSolution solution, String fileName) {
         try {
             XStream xstream = new XStream(new PureJavaReflectionProvider());
             //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
@@ -29,6 +35,18 @@ public class ShiftPlanningUtil {
         }catch(Throwable e){
             log.error("soe:",e);
             throw e;
+        }
+    }
+    public static void writeXMLDocumentToFile(Document document, String fileName) {
+        try {
+            DOMSource source = new DOMSource(document);
+            FileWriter writer = new FileWriter(new File(fileName));
+            StreamResult result = new StreamResult(writer);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.transform(source, result);
+        }catch(Throwable e){
+            log.error("soe:",e);
         }
     }
     public static  void writeXml(String xmlString,String fileName){

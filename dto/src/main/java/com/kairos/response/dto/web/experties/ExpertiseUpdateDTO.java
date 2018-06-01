@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.kairos.enums.shift.BreakPaymentSetting;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;
@@ -46,6 +47,8 @@ public class ExpertiseUpdateDTO {
     private List<Long> tags;
     private Boolean published;
 
+    @NotNull(message="Please select payment type")
+    private BreakPaymentSetting breakPaymentSetting;
     public ExpertiseUpdateDTO() {
         //default cons
     }
@@ -153,6 +156,14 @@ public class ExpertiseUpdateDTO {
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 
     @AssertTrue(message = "'start date' must be less than 'end date'.")

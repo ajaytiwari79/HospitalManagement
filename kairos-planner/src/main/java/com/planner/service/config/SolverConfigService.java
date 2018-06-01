@@ -5,7 +5,7 @@ import com.kairos.dto.solverconfig.SolverConfigDTO;
 import com.planner.commonUtil.StaticField;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
-import com.planner.util.wta.ShiftPlanningUtil;
+import com.planner.util.wta.FileIOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -36,7 +36,7 @@ public class SolverConfigService {
      * Creates solver config xml at {@link PathProvider} solverConfigPath property based on wta templates for this solver config
      * @param solverConfigId
      */
-    public void createShiftPlanningSolverConfig(BigInteger solverConfigId){
+    public Document createShiftPlanningSolverConfig(BigInteger solverConfigId){
         SolverConfig solverConfig=solverConfigRepository.findByKairosId(solverConfigId).get();
         List<String> validDrls=new ArrayList<>();
         for(WTATemplateType wtaTemplateType:solverConfig.getTemplateTypes()){
@@ -44,8 +44,13 @@ public class SolverConfigService {
         }
         Document baseConfig= getBaseSolverConfig();
         xmlConfigService.putElementsInXml(baseConfig,validDrls,StaticField.SOLVER_CONFIG_DRL_PARENT_TAG);
-
+        return baseConfig;
     }
+
+    /**
+     *
+     * @returns a copy of base solver config file
+     */
     public Document getBaseSolverConfig(){
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
@@ -58,7 +63,7 @@ public class SolverConfigService {
                 file.delete();
             }
             file.createNewFile();
-            ShiftPlanningUtil.copyFileContent(baseFile,file);
+            FileIOUtil.copyFileContent(baseFile,file);
             doc = docBuilder.parse(file);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

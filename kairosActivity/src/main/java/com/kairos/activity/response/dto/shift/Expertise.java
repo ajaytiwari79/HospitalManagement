@@ -2,15 +2,17 @@ package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.shift.BreakPaymentSetting;
 
 /**
  * Created by vipul on 6/2/18.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
- @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Expertise {
     private Long id;
     private String name;
+    private BreakPaymentSetting breakPaymentSetting;
 
     public Expertise() {
     }
@@ -29,5 +31,13 @@ public class Expertise {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }

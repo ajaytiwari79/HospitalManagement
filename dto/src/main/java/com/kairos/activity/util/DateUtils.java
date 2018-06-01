@@ -44,7 +44,6 @@ public class DateUtils {
                 .toInstant());
     }
 
-
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         // LocalDateTime startOfDay = localDateTime.with(LocalTime.MIN);
@@ -368,6 +367,10 @@ public class DateUtils {
         return new Date(millis);
     }
 
+    public static LocalDate getLocalDate(long millis){
+        return getLocalDateFromDate( getDate(millis));
+    }
+
     public static LocalDate toLocalDate(DateTime date) {
         return Instant.ofEpochMilli(date.toDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
@@ -426,12 +429,7 @@ public class DateUtils {
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
     }
-    /**
-     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
-     */
-    public static DateTime getDateTime(Date date, LocalTime time){
-        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
-    }
+
 
     public static List<LocalDate> getDates(LocalDate start, LocalDate end){
         List<LocalDate> dates= new ArrayList<>();

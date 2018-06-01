@@ -27,25 +27,14 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
 
     @Query(" match(functionalPayment:FunctionalPayment) where id(functionalPayment)={0}\n" +
             " match(functionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPaymentMatrix:FunctionalPaymentMatrix)\n" +
-            " match(functionalPaymentMatrix)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
-            " match(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]-(seniorityLevel:SeniorityLevel) " +
-            " match(seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
-            "with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,pga,collect({functionId:id(function),amount:function_amt.amount}) as functions \n" +
-            "with functionalPaymentMatrix ,functions,seniorityLevelFunction,seniorityLevel,collect (id(pga)) as payGroupAreaIds \n" +
-            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunctions \n" +
-            " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
+            " match(functionalPaymentMatrix)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n " +
+            " with functionalPaymentMatrix ,collect (id(pga)) as payGroupAreaIds \n" +
+            " match(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)" +
+            " match(seniorityLevel:SeniorityLevel)<-[:" + FOR_SENIORITY_LEVEL + "]- (seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) " +
+            " with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,payGroupAreaIds, collect({functionId:id(function), amount:function_amt.amount}) as functions\n" +
+            " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunction")
     List<FunctionalPaymentMatrixQueryResult> getFunctionalPaymentMatrix(Long functionalPaymentId);
 
-
-    @Query(" match(functionalPaymentMatrix:FunctionalPaymentMatrix) where id(functionalPaymentMatrix)={0}\n" +
-            " match(functionalPaymentMatrix)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
-            " match(functionalPaymentMatrix)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(seniorityLevelFunction:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]-(seniorityLevel:SeniorityLevel) " +
-            " match(seniorityLevelFunction)-[function_amt:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
-            "with functionalPaymentMatrix ,seniorityLevel,seniorityLevelFunction,pga,collect({functionId:id(function),amount:function_amt.amount}) as functions \n" +
-            "with functionalPaymentMatrix ,functions,seniorityLevelFunction,seniorityLevel,collect (id(pga)) as payGroupAreaIds \n" +
-            "with functionalPaymentMatrix ,payGroupAreaIds,collect ({seniorityLevelId:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to,functions:functions}) as seniorityLevelFunctions \n" +
-            " return id(functionalPaymentMatrix) as id,payGroupAreaIds as payGroupAreasIds ,seniorityLevelFunctions as seniorityLevelFunction ORDER BY functionalPaymentMatrix.creationDate")
-    FunctionalPaymentMatrix getFunctionalPaymentMatrixById(Long functionalPaymentMatrixId);
 
     @Query(" MATCH(functionalPaymentMatrix:FunctionalPaymentMatrix)-[relation:" + HAS_PAY_GROUP_AREA + "]->(pga:PayGroupArea) where id(functionalPaymentMatrix)={0} " +
             " detach delete relation")
