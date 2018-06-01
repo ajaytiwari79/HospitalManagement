@@ -144,7 +144,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         openShiftRuleTemplateDTO.setUnitId(unitId);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
         save(openShiftRuleTemplate);
-        List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
+        List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
         if(!priorityGroups.isEmpty()){
             priorityGroups.forEach(priorityGroup -> {
                 priorityGroup.setParentId(priorityGroup.getId());
