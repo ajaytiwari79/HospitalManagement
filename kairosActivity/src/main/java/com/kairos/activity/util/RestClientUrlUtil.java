@@ -4,6 +4,8 @@ import com.kairos.activity.util.userContext.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * Created by vipul on 19/9/17.
  */
@@ -33,6 +35,16 @@ public class RestClientUrlUtil {
         }
 
     }
+
+    public static final String getBaseUrl(Long organizationId, Long unitId, Long countryId){
+        StringBuilder baseUrl=new StringBuilder(userServiceUrl+"organization/"+organizationId);
+        if(Optional.ofNullable(unitId).isPresent()){
+            return baseUrl.append("/unitId/").append(unitId).toString();
+        }else{
+            return baseUrl.append("/countryId/").append(countryId).toString();
+        }
+    }
+
     public static final String getBaseUrl() {
         return userServiceUrl;
     }

@@ -31,7 +31,7 @@ public class PriorityGroupRestClient {
     RestTemplate restTemplate;
 
     public <T, V> V publish(T t, Long id,boolean isUnit, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit);
+        final String baseUrl = getBaseUrl(isUnit, id);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {

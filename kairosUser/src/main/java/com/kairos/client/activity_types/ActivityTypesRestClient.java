@@ -38,7 +38,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityTypeDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityTypeDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "activity/cta_wta_setting",
+                            baseUrl + "/country/{countryId}/activity/cta_wta_setting",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
@@ -65,7 +65,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "activity/activity_categories",
+                            baseUrl + "/country/{countryId}/activity/activity_categories",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
@@ -124,7 +124,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<Long,HashMap<Long,Long>>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<HashMap<Long,HashMap<Long,Long>>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "unit_activity?parentActivityIds="+activityIdsQueryString+"&unitIds="+unitIdsQueryString,
+                            baseUrl + "/country/{countryId}/unit_activity?parentActivityIds="+activityIdsQueryString+"&unitIds="+unitIdsQueryString,
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

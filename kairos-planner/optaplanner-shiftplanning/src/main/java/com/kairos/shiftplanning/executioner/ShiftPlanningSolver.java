@@ -52,6 +52,15 @@ public class ShiftPlanningSolver {
         solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(Arrays.asList(new File(drlFilePath)));
         solver = solverFactory.buildSolver();
     }
+    public ShiftPlanningSolver(File solverConfigXml){
+        solverFactory = SolverFactory.createFromXmlFile(solverConfigXml);
+        solver = solverFactory.buildSolver();
+    }
+
+    public ShiftPlanningSolver(String xmlFilePath){
+        solverFactory = SolverFactory.createFromXmlFile(new File(xmlFilePath));
+        solver = solverFactory.buildSolver();
+    }
 
     public ShiftPlanningSolver(){
         solverFactory = SolverFactory.createFromXmlResource(config2);
@@ -72,11 +81,6 @@ public class ShiftPlanningSolver {
 
     }
 
-    public ShiftPlanningSolver(String xmlFilePath){
-        solverFactory = SolverFactory.createFromXmlFile(new File(xmlFilePath));
-        solver = solverFactory.buildSolver();
-    }
-
     public static void main(String[] s ){
         new ShiftPlanningSolver().runSolver();
     }
@@ -94,8 +98,6 @@ public class ShiftPlanningSolver {
         }
     }
     public Object[] getSolution(ShiftRequestPhasePlanningSolution unsolvedSolution) throws Exception{
-        //int i=(int)new Object();
-
         if(unsolvedSolution==null) {
             unsolvedSolution = getUnsolvedSolution(readFromFile);
         }
@@ -106,9 +108,6 @@ public class ShiftPlanningSolver {
         ShiftRequestPhasePlanningSolution solution=disablePrimarySolver?unsolvedSolution:solver.solve(unsolvedSolution);
         ShiftPlanningUtility.printStaffingLevelMatrix(ShiftPlanningUtility.reduceStaffingLevelMatrix
                 (solution.getStaffingLevelMatrix().getStaffingLevelMatrix(),solution.getShifts(),null,null,15),null);
-
-        //ShiftRequestPhasePlanningSolution solution=unsolvedSolution;
-        //log.info("SWapMoveStats: total:{}, doable:{}", ActivityLineIntervalSwapMove.i,ActivityLineIntervalSwapMove.j);
         log.info("Solver took:"+(System.currentTimeMillis()-start)/1000);
         if(!readFromFile)
             toXml(solution,"shift_solution");

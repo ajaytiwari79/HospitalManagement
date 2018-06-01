@@ -2,6 +2,7 @@ package com.kairos.activity.client.planner;
 
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
 import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
@@ -19,6 +20,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.kairos.activity.util.RestClientUrlUtil.getPlannerBaseUrl;
 @Service
@@ -31,11 +33,12 @@ public class PlannerRestClient {
         final String baseUrl = getPlannerBaseUrl();
 
         try {
+            String url=baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams),
+                            url,
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
@@ -65,12 +68,15 @@ public class PlannerRestClient {
     }
     public static <T>String getURI(T t,IntegrationOperation integrationOperation,Object... pathParams){
         String uri=null;
-        if(t instanceof StaffingLevelDto){
+        if(t instanceof StaffingLevelDTO){
             uri= "staffing_level/";
         }else if(t instanceof ActivityNoTabsDTO){
             uri= "activity/";
-        }else if(t instanceof ArrayList && t.getClass().getGenericSuperclass().equals(StaffingLevelDto.class)){
+        }else if(t instanceof ArrayList && ((List)t).get(0) instanceof StaffingLevelDTO){
             uri= "staffing_level/multiple";
+        }
+        else if(t instanceof ArrayList && ((List)t).get(0) instanceof ActivityNoTabsDTO){
+            uri= "activity/multiple";
         }
         else if(t instanceof WTAResponseDTO){
             uri= String.format("staff/%s/unitposition/%s/wta",pathParams);

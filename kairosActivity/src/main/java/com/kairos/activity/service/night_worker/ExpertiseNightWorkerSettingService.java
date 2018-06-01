@@ -1,17 +1,23 @@
 package com.kairos.activity.service.night_worker;
 
+import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.night_worker.ExpertiseNightWorkerSetting;
+import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
+import com.kairos.response.dto.web.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -22,6 +28,12 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
+
+    @Inject
+    private StaffRestClient staffRestClient;
 
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
@@ -53,4 +65,46 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
         return nightWorkerSettingDTO;
     }
 
+    public Boolean updateNightWorkerStatusByUnitId(Long unitId){
+        Map<Long,Long> unitPositionIdAndExpertiseMap = staffRestClient.getUnitPositionExpertiseMap(unitId, unitId);
+        List<ShiftQueryResult> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
+        Map<Long, List<ShiftQueryResult>> shiftsOfStaff = new HashMap<>();
+
+        shifts.forEach(shiftQueryResult -> {
+            shiftQueryResult.setExpertiseId(unitPositionIdAndExpertiseMap.get(shiftQueryResult.getUnitPositionId()));
+
+            if(shiftsOfStaff.containsKey(shiftQueryResult.getStaffId())){
+                shiftsOfStaff.get(shiftQueryResult.getStaffId()).add(shiftQueryResult);
+            } else {
+                shiftsOfStaff.put(shiftQueryResult.getStaffId(), new ArrayList<>(Arrays.asList(shiftQueryResult)));
+            }
+        });
+
+        List<Long> expertiseIds =  (List<Long>) unitPositionIdAndExpertiseMap.values();
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByCountryAndExpertiseIds(expertiseIds);
+
+        Map<Long, ExpertiseNightWorkerSettingDTO> expertiseSettingMap = new HashMap<>();
+        expertiseNightWorkerSettings.stream().forEach(expertiseNightWorkerSetting -> {
+            expertiseSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),
+                    ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class)
+                    );
+        });
+
+        shiftsOfStaff.forEach((staffId, shiftQueryResults) -> {
+            ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO = new ShiftAndExpertiseNightWorkerSettingDTO(shifts, expertiseSettingMap);
+            // DO trigger for night Worker as per staffId and unitId
+        });
+
+        return true;
+    }
+
+    // Method to be triggered when job will be executed for checking status of night worker as per the shifts done by staff
+    public boolean updateNightWorkerStatus(){
+        List<Long> unitIds = shiftMongoRepository.getUnitIdListOfShiftBeforeDate(DateUtils.getDate());
+
+        unitIds.forEach(unitId -> {
+            updateNightWorkerStatusByUnitId(unitId);
+        });
+        return true;
+    }
 }

@@ -43,6 +43,7 @@ public class ActivityTabsWrapper {
     private Set<BigInteger> compositeActivities;
     private List<TimeTypeDTO> timeTypes;
     private  LocationActivityTab locationActivityTab;
+    private PermissionsActivityTab permissionsActivityTab;
 
 
     public List<TimeTypeDTO> getTimeTypes() {
@@ -283,5 +284,16 @@ public class ActivityTabsWrapper {
 
     public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
         this.locationActivityTab = locationActivityTab;
+    }
+
+    public PermissionsActivityTab getPermissionsActivityTab() {
+        return permissionsActivityTab;
+    }
+
+    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
+    }
+    public ActivityTabsWrapper(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
     }
 }

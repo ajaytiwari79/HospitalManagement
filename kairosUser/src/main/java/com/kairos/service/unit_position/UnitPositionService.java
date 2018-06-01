@@ -976,5 +976,13 @@ public class UnitPositionService extends UserBaseService {
 
     }
 
+    public Map<Long,Long> getUnitPositionExpertiseMap(Long unitId){
+        List<Map<Long,Long>> listOfMap = unitPositionGraphRepository.getMapOfUnitPositionAndExpertiseId(unitId);
+        Map<Long,Long> mapOfUnitPositionAndExpertise = new HashMap<>(listOfMap.size());
+        listOfMap.stream().forEach(mapOfExpertise -> {
+            mapOfUnitPositionAndExpertise.putAll(mapOfExpertise);
+        });
+        return mapOfUnitPositionAndExpertise;
+    }
 
 }
