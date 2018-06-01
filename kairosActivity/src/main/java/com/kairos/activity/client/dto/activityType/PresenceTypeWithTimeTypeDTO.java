@@ -13,7 +13,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PresenceTypeWithTimeTypeDTO {
     private List<PresenceTypeDTO> presenceTypes;
-    /*private List<TimeTypeDTO> timeTypes;*/
     private Long countryId;
 
 
@@ -22,7 +21,7 @@ public class PresenceTypeWithTimeTypeDTO {
 
     public PresenceTypeWithTimeTypeDTO(List<PresenceTypeDTO> presenceTypes, Long countryId) {
         this.presenceTypes = presenceTypes;
-     //   this.timeTypes = timeTypes;
+        this.countryId = countryId;
     }
 
     public Long getCountryId() {
