@@ -2,11 +2,11 @@ package com.kairos.response.dto.web.open_shift;
 
 import com.kairos.persistence.model.enums.DurationType;
 
-public class DurationFields {
+public class DurationField {
     private Integer value;
     private DurationType type;
 
-    public DurationFields() {
+    public DurationField() {
         //Default Constructor
     }
 

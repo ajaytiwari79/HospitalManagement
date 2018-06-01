@@ -6,26 +6,26 @@ import java.util.List;
 
 public class PlannerNotificationInfo {
         private List<InformationReciever> informationReceivers;
-        private DurationFields sendNotificationOnCandidateMissingBeforeTime; //in Hours
-        private DurationFields notifyForUnassignedShiftBeforeTime; // in Hours
+        private DurationField sendNotificationOnCandidateMissingBeforeTime; //in Hours
+        private DurationField notifyForUnassignedShiftBeforeTime; // in Hours
 
     public PlannerNotificationInfo() {
         //Default Constructor
     }
 
-    public DurationFields getSendNotificationOnCandidateMissingBeforeTime() {
+    public DurationField getSendNotificationOnCandidateMissingBeforeTime() {
         return sendNotificationOnCandidateMissingBeforeTime;
     }
 
-    public void setSendNotificationOnCandidateMissingBeforeTime(DurationFields sendNotificationOnCandidateMissingBeforeTime) {
+    public void setSendNotificationOnCandidateMissingBeforeTime(DurationField sendNotificationOnCandidateMissingBeforeTime) {
         this.sendNotificationOnCandidateMissingBeforeTime = sendNotificationOnCandidateMissingBeforeTime;
     }
 
-    public DurationFields getNotifyForUnassignedShiftBeforeTime() {
+    public DurationField getNotifyForUnassignedShiftBeforeTime() {
         return notifyForUnassignedShiftBeforeTime;
     }
 
-    public void setNotifyForUnassignedShiftBeforeTime(DurationFields notifyForUnassignedShiftBeforeTime) {
+    public void setNotifyForUnassignedShiftBeforeTime(DurationField notifyForUnassignedShiftBeforeTime) {
         this.notifyForUnassignedShiftBeforeTime = notifyForUnassignedShiftBeforeTime;
     }
 

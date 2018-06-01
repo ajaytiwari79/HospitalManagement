@@ -39,7 +39,7 @@ public class OrderResponseDTO {
     private DeadlineRule deadlineRule;
     private BigInteger id;
     private PlannerNotificationInfo plannerNotificationInfo;
-    private List<InformationReciever> informationReceivers;
+
 
 
 
@@ -280,13 +280,5 @@ public class OrderResponseDTO {
 
     public void setPlannerNotificationInfo(PlannerNotificationInfo plannerNotificationInfo) {
         this.plannerNotificationInfo = plannerNotificationInfo;
-    }
-
-    public List<InformationReciever> getInformationReceivers() {
-        return informationReceivers;
-    }
-
-    public void setInformationReceivers(List<InformationReciever> informationReceivers) {
-        this.informationReceivers = informationReceivers;
     }
 }

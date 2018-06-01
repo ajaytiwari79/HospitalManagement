@@ -85,11 +85,6 @@ public class OpenShiftService extends MongoBaseService {
             openShiftCurrent = openShifts.get(currentElement);
             currentElement++;
             ObjectMapperUtils.copyProperties(openShiftCurrent, openShiftResponseDTO);
-
-
-             openShift = new OpenShift();
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
-            save(openShift);
         }
         return openShiftResponseDTOs;
     }
