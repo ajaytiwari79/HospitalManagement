@@ -27,8 +27,8 @@ public class OrderController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ApiOperation("create orders")
-    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderOpenshiftResponseDTO orderResponseDto)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,orderService.createOrder(orderResponseDto));
+    public ResponseEntity<Map<String, Object>> createOrder(@PathVariable Long unitId,@RequestBody OrderOpenshiftResponseDTO orderResponseDto)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,orderService.createOrder(unitId,orderResponseDto));
     }
 
     @RequestMapping(value = "/{orderId}", method = RequestMethod.PUT)
@@ -50,6 +50,13 @@ public class OrderController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllOrdersByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.getOrdersByUnitId(unitId));
+    }
+
+    @ApiOperation(value = "Get All PriorityGroup and OpenShifts by orderId")
+    @RequestMapping(value = "/{orderId}/openshifts", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPriorityGroupsAndOpenShiftsByOrderId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.getPriorityGroupAndOpenShiftsByOrderId(unitId,orderId));
     }
 
 

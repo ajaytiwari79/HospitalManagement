@@ -501,11 +501,15 @@ public class Staff extends UserBaseEntity {
         return age;
     }
 
+
 /*    public Gender getGender() {
         return gender;
     }
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
     }*/
+
 }
