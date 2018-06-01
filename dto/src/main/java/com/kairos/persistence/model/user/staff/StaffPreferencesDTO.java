@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class StaffPreferencesDTO {
     private ShiftBlockType shiftBlockType;
     private BigInteger activityId;
-    private String startDate;
+    private LocalDate startDate;
 
 
     public StaffPreferencesDTO() {
@@ -32,11 +32,11 @@ public class StaffPreferencesDTO {
         this.activityId = activityId;
     }
 
-    public String getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
