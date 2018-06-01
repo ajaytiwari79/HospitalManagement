@@ -5,13 +5,11 @@ import com.kairos.activity.persistence.enums.counter.CounterType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.counter.*;
 import com.kairos.activity.persistence.repository.counter.CounterRepository;
-import com.kairos.activity.response.dto.UserDetailsDTO;
 import com.kairos.activity.response.dto.counter.*;
 import com.kairos.activity.service.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -255,12 +253,6 @@ public class CounterManagementService extends MongoBaseService{
     public void updateCountersOrderForStaff(CounterOrderDTO counterOrderDTO){
 
     }
-
-    public UserDetailsDTO getUserDetails(){
-        //identify if user is 'countryAdmin', 'unitManager', 'order' with country and unit id
-        return null;
-    }
-    //////////////////////////////////////////////////
 
     private CounterService getCounterService(CounterType counterType){
         return counterStore.getService(counterType);
