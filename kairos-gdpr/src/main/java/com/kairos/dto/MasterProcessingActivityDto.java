@@ -28,8 +28,6 @@ public class MasterProcessingActivityDto {
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-
-
     private List<MasterProcessingActivityDto> subProcessingActivities;
 
 

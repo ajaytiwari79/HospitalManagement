@@ -23,7 +23,7 @@ public class MasterAssetFilterController {
     @Inject
     private MasterAssetFilterService masterAssetFilterService;
 
-    @GetMapping("/")
+    @GetMapping("/category")
     public ResponseEntity<Object> getMasterAssetFilter(@PathVariable Long countryId,@RequestParam String moduleId) {
 
         if (countryId != null) {
