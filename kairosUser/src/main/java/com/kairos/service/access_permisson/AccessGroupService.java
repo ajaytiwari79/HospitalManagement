@@ -293,7 +293,6 @@ public class AccessGroupService extends UserBaseService {
 
         accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate, read, write);
 
-        // TODO TEST KP-3059
         // Update read/write permission of successive parent tabs
         updateReadWritePermissionOfSuccessiveParentTabForAccessGroup(accessGroupId, accessPageIds.get(0));
         // Remove customized permission for accessPageIds of accessGroupId
