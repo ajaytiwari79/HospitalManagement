@@ -28,7 +28,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
         Aggregation aggregation=Aggregation.newAggregation(
 
-                match(Criteria.where("countryId").is(countryId).and("_id").is(id).and("deleted").is(false)),
+                match(Criteria.where("countryId").is(countryId).and("_id").is(id).and("deleted").is(false).and("isSubProcess").is(false)),
                 lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities")
 
         );

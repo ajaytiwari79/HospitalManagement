@@ -63,8 +63,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         if (Optional.ofNullable(filterSelectionDto.getOrganizationSubServices()).isPresent()) {
             query.addCriteria(Criteria.where(filterSelectionDto.getOrganizationSubServices().getName() + "._id").in(filterSelectionDto.getOrganizationSubServices().getValues()));
         }
+        List<MasterAsset> result=(List<MasterAsset>)mongoTemplate.find(query, MasterAsset.class);
 
-        return (List<MasterAsset>)mongoTemplate.find(query, MasterAsset.class);
-
+        return result;
     }
 }

@@ -44,9 +44,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         try {
             if (masterProcessingActivityDto.getOrganizationTypes() != null && masterProcessingActivityDto.getOrganizationTypes().size() != 0) {
                 masterProcessingActivity.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
-
             }
-
             if (masterProcessingActivityDto.getOrganizationSubTypes() != null && masterProcessingActivityDto.getOrganizationSubTypes().size() != 0) {
                 masterProcessingActivity.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());
 
@@ -64,6 +62,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             }
 
             masterProcessingActivity.setCountryId(countryId);
+            masterProcessingActivity.setSubProcess(false);
             masterProcessingActivity = save(masterProcessingActivity);
         } catch (NullPointerException e) {
             LOGGER.warn(e.getMessage());
@@ -85,6 +84,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             checkDuplicateInSubProcess.add(activity.getName());
             MasterProcessingActivity subProcessingActivity = new MasterProcessingActivity(countryId, activity.getName(), activity.getDescription());
             subProcessingActivity.setOrganizationTypes(processingActivityDto.getOrganizationTypes());
+            subProcessingActivity.setSubProcess(true);
             subProcessingActivity.setOrganizationSubTypes(processingActivityDto.getOrganizationSubTypes());
             subProcessingActivity.setOrganizationServices(processingActivityDto.getOrganizationServices());
             subProcessingActivity.setOrganizationSubServices(processingActivityDto.getOrganizationSubServices());
@@ -113,6 +113,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         return masterProcessingActivityRepository.getAllMasterProcessingsctivity(UserContext.getCountryId());
 
     }
+
 
     public MasterProcessingActivity updateMasterProcessingActivity(Long countryId, BigInteger id, MasterProcessingActivityDto masterProcessingActivityDto) {
 
