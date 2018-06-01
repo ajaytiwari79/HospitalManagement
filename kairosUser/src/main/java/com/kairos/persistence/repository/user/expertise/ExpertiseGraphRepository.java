@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
+import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -95,7 +96,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "expertise.endDateMillis as endDateMillis ,expertise.breakPaymentSetting as breakPaymentSetting,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
-            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels,seniorDays,childCareDays ")
+            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels,seniorDays,childCareDays order by expertise.creationDate")
     List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
 
 
@@ -184,4 +185,10 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "match(expertise)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]-(orgSubType:OrganizationType) where id(orgSubType) = {1} \n" +
             "return id(expertise) as id, expertise.name as name order by expertise.creationDate")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId,Long selectedDateMillis);
+
+    @Query("MATCH (country:Country) where id(country)={0}  " +
+            "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  expertise.startDateMillis<={1} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {1}) " +
+            "return id(expertise) as id , expertise.name as name")
+    List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId, Long selectedDateMillis);
+
 }

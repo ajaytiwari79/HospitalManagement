@@ -2,6 +2,7 @@ package com.kairos.activity.client.dto.activityType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 
 import java.util.List;
 
@@ -12,16 +13,15 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PresenceTypeWithTimeTypeDTO {
     private List<PresenceTypeDTO> presenceTypes;
-    /*private List<TimeTypeDTO> timeTypes;*/
     private Long countryId;
 
 
     public PresenceTypeWithTimeTypeDTO() {
     }
 
-    public PresenceTypeWithTimeTypeDTO(List<PresenceTypeDTO> presenceTypes, List<TimeTypeDTO> timeTypes) {
+    public PresenceTypeWithTimeTypeDTO(List<PresenceTypeDTO> presenceTypes, Long countryId) {
         this.presenceTypes = presenceTypes;
-     //   this.timeTypes = timeTypes;
+        this.countryId = countryId;
     }
 
     public Long getCountryId() {

@@ -35,6 +35,7 @@ public class ShiftDTO {
     private long probability;
     private long accumulatedTimeBankInMinutes;
     private String remarks;
+    private BigInteger parentOpenShiftId;
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.activityId.notnull")
     private BigInteger activityId;
@@ -59,8 +60,6 @@ public class ShiftDTO {
     private LocalTime endTime;
 
 
-
-
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activityId = activityId;
         this.unitId = unitId;
@@ -68,16 +67,16 @@ public class ShiftDTO {
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftDTO(String name, Date startDate, Date endDate, @Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime) {
         this.activityId = activityId;
         this.unitId = unitId;
         this.staffId = staffId;
         this.unitPositionId = unitPositionId;
+        this.startLocalDate=startLocalDate;
+        this.endLocalDate=endLocalDate;
+        this.startTime=startTime;
+        this.endTime=endTime;
     }
-
 
     public LocalDate getStartLocalDate() {
         return startLocalDate;
@@ -202,8 +201,8 @@ public class ShiftDTO {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
-    public Duration getDuration(){
-        return new Interval(this.getStartDate().getTime(),this.getEndDate().getTime()).toDuration();
+    public Duration getDuration() {
+        return new Interval(this.getStartDate().getTime(), this.getEndDate().getTime()).toDuration();
     }
 
     public String getRemarks() {
@@ -235,7 +234,7 @@ public class ShiftDTO {
     }
 
     public Date getStartDate() {
-        return startLocalDate!=null && startTime!=null?DateUtils.getDateByLocalDateAndLocalTime(startLocalDate,startTime):null;
+        return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(startLocalDate, startTime) : null;
     }
 
     public void setStartDate(Date startDate) {
@@ -243,7 +242,7 @@ public class ShiftDTO {
     }
 
     public Date getEndDate() {
-        return startLocalDate!=null && startTime!=null?DateUtils.getDateByLocalDateAndLocalTime(endLocalDate,endTime):null;
+        return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(endLocalDate, endTime) : null;
     }
 
     public void setEndDate(Date endDate) {
@@ -282,21 +281,12 @@ public class ShiftDTO {
         this.unitId = unitId;
     }
 
-    public ShiftDTO(String name, @NotNull(message = "error.ShiftDTO.startDate.notEmpty") Date startDate, @NotNull(message = "error.ShiftDTO.endDate.notnull") Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, @Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, List<ShiftDTO> subShifts) {
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.bid = bid;
-        this.pId = pId;
-        this.bonusTimeBank = bonusTimeBank;
-        this.amount = amount;
-        this.probability = probability;
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
-        this.remarks = remarks;
-        this.activityId = activityId;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.subShifts = subShifts;
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public ShiftDTO() {
@@ -305,25 +295,19 @@ public class ShiftDTO {
 
 
     public Shift buildShift() {
-
-        Shift shift = new Shift(this.id, this.name, DateUtils.getDateByLocalDateAndLocalTime(this.startLocalDate,this.startTime), DateUtils.getDateByLocalDateAndLocalTime(this.endLocalDate,this.endTime), this.bid, this.pId, this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId, this.unitId, this.unitPositionId);
+        Shift shift = new Shift(this.id, this.name, DateUtils.getDateByLocalDateAndLocalTime(this.startLocalDate, this.startTime), DateUtils.getDateByLocalDateAndLocalTime(this.endLocalDate, this.endTime), this.bid, this.pId, this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shift.setDurationMinutes(this.durationMinutes);
         shift.setScheduledMinutes(this.scheduledMinutes);
         shift.setShiftState(ShiftState.UNPUBLISHED);
         return shift;
     }
 
-  /*  public ShiftQueryResult buildResponse() {
-
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name, this.startDate, this.endDate, this.bid, this.pId, this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId, this.unitId, this.unitPositionId);
-        return shiftQueryResult;
-    }*/
-
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
     }
+
 }

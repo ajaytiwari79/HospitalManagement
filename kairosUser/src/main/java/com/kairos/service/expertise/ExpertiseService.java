@@ -6,35 +6,33 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
 import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.TimeSlot;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.expertise.*;
+import com.kairos.persistence.model.user.expertise.CareDays;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.pay_table.PayGrade;
 import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
-
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-
 import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
-
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.*;
@@ -44,7 +42,6 @@ import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.DateUtil;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,11 +53,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by prabjot on 28/10/16.
@@ -157,7 +149,6 @@ public class ExpertiseService extends UserBaseService {
                 null,null,null,null, countryId,expertise.getId() );
         priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
                 "/expertise/"+expertise.getId()+"/night_worker_setting",null);
-
         return expertiseResponseDTO;
     }
 

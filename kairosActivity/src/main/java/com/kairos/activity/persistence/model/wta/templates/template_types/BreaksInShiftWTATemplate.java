@@ -42,7 +42,6 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
     }
     public BreaksInShiftWTATemplate(String name,  boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {
         this.name = name;
-        //this.templateType = WTATemplateType.;
         this.disabled = disabled;
         this.description = description;
         this.breakTemplateValues=breakTemplateValues;

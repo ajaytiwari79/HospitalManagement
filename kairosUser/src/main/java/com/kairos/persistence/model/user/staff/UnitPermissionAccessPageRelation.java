@@ -21,6 +21,7 @@ public class UnitPermissionAccessPageRelation extends UserBaseEntity {
     @Property
     private boolean read;
     private boolean write;
+    private Long accessGroupId;
 
     public UnitPermission getUnitPermission() {
         return unitPermission;
@@ -52,5 +53,13 @@ public class UnitPermissionAccessPageRelation extends UserBaseEntity {
 
     public void setWrite(boolean write) {
         this.write = write;
+    }
+
+    public Long getAccessGroupId() {
+        return accessGroupId;
+    }
+
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
     }
 }
