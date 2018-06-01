@@ -92,4 +92,9 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA( unitPositionId,unitId));
     }
 
+    @ApiOperation(value = "apply function to unit position")
+    @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
+    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId, @RequestBody Map<String, Object> payload) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.applyFunction(unitPositionId, payload));
+    }
 }

@@ -992,4 +992,25 @@ public class UnitPositionService extends UserBaseService {
         return mapOfUnitPositionAndExpertise;
     }
 
+    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload){
+       String date = new ArrayList<>(payload.keySet()).get(0);
+       Map<String, Object>  functionMap = (Map<String, Object>) payload.get(date);
+        Long functionId = (Long) functionMap.get("functionId");
+
+        Function function=functionGraphRepository.findOne(functionId);
+        if(!Optional.ofNullable(function).isPresent() || function.isDeleted() == true){
+            exceptionService.dataNotFoundByIdException("message.function.id.notFound",functionId);
+        }
+
+        LocalDate localDate = LocalDate.now();
+        AppliedFunctions appliedFunctions = new AppliedFunctions(localDate, function);
+
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
+        List<AppliedFunctions> appliedFunctionses = unitPosition.getAppliedFunctions();
+        appliedFunctionses.add(appliedFunctions);
+        unitPosition.setAppliedFunctions(appliedFunctionses);
+        save(unitPosition);
+        return true;
+    }
+
 }

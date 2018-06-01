@@ -20,6 +20,7 @@ import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.service.wta.WTAService;
+import com.kairos.activity.shift.ShiftFunctionWrapper;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftWrapper;
@@ -29,6 +30,8 @@ import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftState;
+import com.kairos.response.dto.web.AppliedFunctionDTO;
+import com.kairos.response.dto.web.FunctionDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
@@ -94,7 +97,7 @@ public class ShiftService extends MongoBaseService {
     private BreakSettingMongoRepository breakSettingMongoRepository;
 
 
-    public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
+    public ShiftFunctionWrapper createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
 
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -134,7 +137,10 @@ public class ShiftService extends MongoBaseService {
 
         }
 
-        return shiftQueryResults;
+        List<AppliedFunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getAppliedFunctionDTOs();
+        Map<LocalDate,FunctionDTO> functionDTOMap = appliedFunctionDTOs.stream().collect(Collectors.toMap(appliedFunction->appliedFunction.getDate(), appliedFunction->appliedFunction.getFunctionDTO()));
+
+        return new ShiftFunctionWrapper(shiftQueryResults , functionDTOMap);
     }
 
     private ShiftQueryResult saveShift(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO) {
@@ -534,7 +540,8 @@ public class ShiftService extends MongoBaseService {
 
     public Boolean addSubShifts(Long unitId, List<ShiftDTO> shiftDTOS, String type) {
         for (ShiftDTO shiftDTO : shiftDTOS) {
-            ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization", true).get(0);
+            ShiftFunctionWrapper shiftFunctionWrapper = createShift(unitId, shiftDTO, "Organization", true);
+            ShiftQueryResult shiftQueryResult = shiftFunctionWrapper.getShiftQueryResult().get(0);
             shiftDTO.setId(shiftQueryResult.getId());
         }
 

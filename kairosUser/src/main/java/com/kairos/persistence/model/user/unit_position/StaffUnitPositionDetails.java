@@ -11,6 +11,7 @@ import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by vipul on 29/1/18.
@@ -38,6 +39,7 @@ public class StaffUnitPositionDetails {
     private BigInteger workingTimeAgreementId;
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
+    private List<AppliedFunctions> appliedFunctions;
 
     public StaffUnitPositionDetails() {
     }
@@ -187,5 +189,11 @@ public class StaffUnitPositionDetails {
         this.costTimeAgreement = costTimeAgreement;
     }
 
+    public List<AppliedFunctions> getAppliedFunctions() {
+        return appliedFunctions;
+    }
 
+    public void setAppliedFunctions(List<AppliedFunctions> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
+    }
 }

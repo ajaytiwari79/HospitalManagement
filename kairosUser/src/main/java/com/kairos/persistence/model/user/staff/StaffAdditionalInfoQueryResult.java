@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.persistence.model.user.unit_position.AppliedFunctions;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
