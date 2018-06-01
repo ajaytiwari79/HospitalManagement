@@ -1,5 +1,6 @@
 package com.kairos.config;
 
+import com.kairos.activity.util.DateUtils;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -77,6 +78,7 @@ import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -85,6 +87,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -526,7 +530,7 @@ public class BootDataService {
         johnOliver.setFirstName("John");
         johnOliver.setLastName("Oliver");
         johnOliver.setNickName("Johnny");
-        johnOliver.setAge(57);
+//        johnOliver.setAge(57);
 //        johnOliver.setCivilianStatus(ClientEnum.CivilianStatus.MARRIED);
         johnOliver.setOccupation("Stock Broker");
         johnOliver.setGender(Gender.MALE);
@@ -590,6 +594,7 @@ public class BootDataService {
         johnOliver.setClientAllergiesList(null);
         johnOliver.setClientDiagnoseList(null);
         johnOliver.setCprNumber("1508574653");
+        johnOliver.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(johnOliver.getCprNumber())));
         johnOliver.setClientDiagnoseList(Arrays.asList(new ClientDiagnose("Heart Diagnose", " Moderate Condition", "positive", "Eat Healthy"),
                 new ClientDiagnose("Lung Diagnose", " Poor Condition", "positive", "Quit Smoking")));
         johnOliver.setTranslationLanguage(new String[]{"Danish"});
@@ -715,6 +720,7 @@ public class BootDataService {
 
         admin = new User();
         admin.setCprNumber("0309514297");
+        admin.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(admin.getCprNumber())));
         admin.setUserName("ulrik@kairos.com");
         admin.setEmail("ulrik@kairos.com");
         admin.setPassword(new BCryptPasswordEncoder().encode("admin@kairos"));
@@ -724,7 +730,7 @@ public class BootDataService {
         admin.setGender(Gender.MALE);
 //        admin.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         admin.setContactDetail(new ContactDetail("ulrik_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/ulrik_cool"));
-        admin.setAge(28);
+        //        admin.setAge(28);
         admin.setCreationDate(DateUtil.getCurrentDate().getTime());
         admin.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         //userGraphRepository.save(Arrays.asList(michal, liva, alma,admin));

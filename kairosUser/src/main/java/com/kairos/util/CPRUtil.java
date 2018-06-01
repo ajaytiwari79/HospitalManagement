@@ -1,12 +1,16 @@
 package com.kairos.util;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 /**
  * Created by pavan on 14/2/18.
  */
 public class CPRUtil {
 
+    public static Integer getAgeFromCPRNumber(String cprNumber) {
+        return cprNumber != null ? Period.between(getDateOfBirthFromCPR(cprNumber), LocalDate.now()).getYears() : null;
+    }
     //Method for getting the DateOfBirth From CPR Number
     public static LocalDate getDateOfBirthFromCPR(String cprNumber) {
         LocalDate birthday=null;

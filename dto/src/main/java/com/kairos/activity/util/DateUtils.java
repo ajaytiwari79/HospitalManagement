@@ -363,6 +363,10 @@ public class DateUtils {
         return new Date();
     }
 
+    public static Date parseStringDate(String dateString, SimpleDateFormat dateFormat) throws  ParseException{
+        return dateFormat.parse(dateString);
+    }
+
     public static Date getDate(long millis) {
         return new Date(millis);
     }
@@ -422,6 +426,10 @@ public class DateUtils {
 
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),localTime.getHour(),localTime.getMinute()).toDate();
+    }
+
+    public static Date getDateByLocalDate(LocalDate localDate){
+        return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),0,0).toDate();
     }
 
     public static String getDateStringWithFormat(Date date, String dateFormat) {

@@ -1,5 +1,6 @@
 package com.kairos.service.client;
 
+import com.kairos.activity.util.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -15,6 +16,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -234,6 +236,7 @@ public class ClientBatchService {
                     client.setFirstName(firstName);
                     client.setLastName(lastName);
                     client.setCprNumber(cpr);
+                    client.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(cpr)));
                     clientService.generateAgeAndGenderFromCPR(client);
                     logger.info("Client not found in Database Creating new: " + client.getFirstName());
                     createClient = true;
