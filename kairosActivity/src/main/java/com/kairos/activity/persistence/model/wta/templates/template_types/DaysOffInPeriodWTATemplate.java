@@ -12,6 +12,7 @@ import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.TimeInterval;
+import org.joda.time.DateTime;
 
 
 import java.time.LocalTime;
@@ -19,7 +20,9 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
@@ -34,7 +37,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private long intervalLength;
     private String intervalUnit;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
     private boolean isRestingTimeAllowed;
     private int restingTime;
@@ -65,13 +67,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.restingTime = restingTime;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -97,7 +92,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     public void setIntervalUnit(String intervalUnit) {
         this.intervalUnit = intervalUnit;
     }
-
 
 
     public long getIntervalLength() {
@@ -126,37 +120,28 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()) {
-            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
-            if (timeInterval != null) {
-                int count = 0;
-                DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
-                shifts.add(infoWrapper.getShift());
-                List<DateTimeInterval> intervals = getSortedIntervals(shifts);
-                if (intervals.size() > 2) {
-                    for (int i = 1; i < intervals.size(); i++) {
-                        DateTimeInterval interval = intervals.get(i - 1);
-                        interval = isRestingTimeAllowed ? getNextDayInterval(interval.getEnd().plusHours(restingTime)) : getNextDayInterval(interval.getEnd());
-
-                        if (!interval.overlaps(intervals.get(i))) {
-                            count++;
-                        }
-                    }
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
-                    if (!isValid) {
-                        if (limitAndCounter[1] != null) {
-                            int counterValue = limitAndCounter[1] - 1;
-                            if (counterValue < 0) {
-                                throw new InvalidRequestException(getName() + " is Broken");
-                            } else {
-                                infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                                infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
-                            }
-                        } else {
+        if (!isDisabled()) {
+            int count = 0;
+            DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+            //dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
+            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
+            shifts.add(infoWrapper.getShift());
+            List<DateTimeInterval> intervals = getSortedIntervals(shifts);
+            if (intervals.size() > 2) {
+                count = getDayOFF(intervals,dateTimeInterval);
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
+                if (!isValid) {
+                    if (limitAndCounter[1] != null) {
+                        int counterValue = limitAndCounter[1] - 1;
+                        if (counterValue < 0) {
                             throw new InvalidRequestException(getName() + " is Broken");
+                        } else {
+                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                         }
+                    } else {
+                        throw new InvalidRequestException(getName() + " is Broken");
                     }
                 }
             }
@@ -164,14 +149,40 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         return "";
     }
 
-    private DateTimeInterval getNextDayInterval(ZonedDateTime dateTime){
-        return new DateTimeInterval(dateTime.plusDays(1).truncatedTo(ChronoUnit.DAYS),dateTime.plusDays(2).truncatedTo(ChronoUnit.DAYS));
+    private DateTimeInterval getNextDayInterval(ZonedDateTime dateTime) {
+        return new DateTimeInterval(dateTime.plusDays(1).truncatedTo(ChronoUnit.DAYS), dateTime.plusDays(2).truncatedTo(ChronoUnit.DAYS));
     }
 
-    private List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval,List<ShiftWithActivityDTO> shifts){
+    private int getDayOFF(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){
+        int count = 0;
+        List<DateTimeInterval> dayIntervals = getDaysIntervals(dateTimeInterval);
+        Set<DateTimeInterval> overLapsIntervals = new HashSet<>();
+        for (int i = 1; i < intervals.size(); i++) {
+            DateTimeInterval interval = intervals.get(i - 1);
+            overLapsIntervals.addAll(getOverLapsInterval(dayIntervals,interval));
+            if(isRestingTimeAllowed){
+                interval = new DateTimeInterval(interval.getStart(),interval.getEnd().plusHours(restingTime));
+                overLapsIntervals.addAll(getOverLapsInterval(dayIntervals,interval));
+            }
+
+        }
+        return dayIntervals.size() - overLapsIntervals.size();
+    }
+
+    private List<DateTimeInterval> getOverLapsInterval(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){
+        List<DateTimeInterval> overLapIntervals = new ArrayList<>();
+        intervals.forEach(interval->{
+            if(interval.overlaps(dateTimeInterval)){
+                overLapIntervals.add(interval);
+            }
+        });
+        return overLapIntervals;
+    }
+
+    private List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
-        shifts.forEach(s->{
-            if(dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.contains(s.getEndDate())){
+        shifts.forEach(s -> {
+            if (dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.contains(s.getEndDate())) {
                 updatedShifts.add(s);
             }
         });

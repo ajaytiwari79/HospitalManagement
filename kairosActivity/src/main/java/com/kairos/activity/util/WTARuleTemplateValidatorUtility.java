@@ -25,6 +25,7 @@ import com.kairos.response.dto.web.cta.DayTypeDTO;
 import java.math.BigInteger;
 import java.time.*;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -329,16 +330,32 @@ public class WTARuleTemplateValidatorUtility {
         return interval1;
     }*/
 
+    public static List<DateTimeInterval> getDaysIntervals(DateTimeInterval dateTimeInterval){
+        List<DateTimeInterval> intervals = new ArrayList<>();
+        ZonedDateTime endDate = null;
+        ZonedDateTime startDate = dateTimeInterval.getStart();
+        while (true){
+            if(startDate.isBefore(dateTimeInterval.getEnd())) {
+                endDate = startDate.plusDays(1);
+                intervals.add(new DateTimeInterval(startDate, endDate));
+                startDate = endDate;
+            }else {
+                break;
+            }
+        }
+        return intervals;
+    }
+
     public static DateTimeInterval getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue){
         DateTimeInterval interval = null;
         switch (intervalUnit){
-            case DAYS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusDays((int)intervalValue),DateUtils.getZoneDateTime(shift.getEndDate()).plusDays((int)intervalValue));
+            case DAYS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusDays((int)intervalValue).truncatedTo(ChronoUnit.DAYS),DateUtils.getZoneDateTime(shift.getEndDate()).plusDays((int)intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
-            case WEEKS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusWeeks((int)intervalValue),DateUtils.getZoneDateTime(shift.getEndDate()).plusWeeks((int)intervalValue));
+            case WEEKS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusWeeks((int)intervalValue).truncatedTo(ChronoUnit.DAYS),DateUtils.getZoneDateTime(shift.getEndDate()).plusWeeks((int)intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
-            case MONTHS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusMonths((int)intervalValue),DateUtils.getZoneDateTime(shift.getEndDate()).plusMonths((int)intervalValue));
+            case MONTHS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusMonths((int)intervalValue).truncatedTo(ChronoUnit.DAYS),DateUtils.getZoneDateTime(shift.getEndDate()).plusMonths((int)intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
-            case YEARS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusYears((int)intervalValue),DateUtils.getZoneDateTime(shift.getEndDate()).plusYears((int)intervalValue));
+            case YEARS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusYears((int)intervalValue).truncatedTo(ChronoUnit.DAYS),DateUtils.getZoneDateTime(shift.getEndDate()).plusYears((int)intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
         }
         return interval;
@@ -384,21 +401,21 @@ public class WTARuleTemplateValidatorUtility {
 
     public static List<ShiftWithActivityDTO> filterShifts(List<ShiftWithActivityDTO> shifts, List<BigInteger> timeTypeIds, List<Long> plannedTimeIds, List<BigInteger> activitieIds){
         Set<ShiftWithActivityDTO> shiftQueryResultWithActivities = new HashSet<>();
-        if(timeTypeIds!=null){
+        if(timeTypeIds!=null && !timeTypeIds.isEmpty()){
             shifts.forEach(s->{
                 if(timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())){
                     shiftQueryResultWithActivities.add(s);
                 }
             });
         }
-        if(plannedTimeIds!=null){
+        if(plannedTimeIds!=null && !plannedTimeIds.isEmpty()){
             shifts.forEach(s->{
                 if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPresenceTypeId())){
                     shiftQueryResultWithActivities.add(s);
                 }
             });
         }
-        if(activitieIds!=null){
+        if(activitieIds!=null && !activitieIds.isEmpty()){
             shifts.forEach(s->{
                 if(activitieIds.contains(s.getActivity().getId())){
                     shiftQueryResultWithActivities.add(s);
@@ -463,10 +480,7 @@ public class WTARuleTemplateValidatorUtility {
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)ruleTemplate;
                     interval = interval.addInterval(getIntervalByNumberOfWeeks(shift,childCareDaysCheckWTATemplate.getNumberOfWeeks(),childCareDaysCheckWTATemplate.getValidationStartDate()));
-
                     break;
-                default:
-                    throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
         }
         return interval;

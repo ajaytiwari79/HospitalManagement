@@ -447,7 +447,9 @@ public class ShiftService extends MongoBaseService {
         }
         List<StaffWTACounter> newStaffWTACounter = infoWrapper.getCounterMap().entrySet().stream().map(s->new StaffWTACounter(infoWrapper.getPlanningPeriod().getStartLocalDate(),infoWrapper.getPlanningPeriod().getEndLocalDate(),s.getKey(),staffAdditionalInfoDTO.getUnitPosition().getId(),staffAdditionalInfoDTO.getUnitId(),s.getValue(),infoWrapper.getPhase())).collect(Collectors.toList());
         staffWTACounters.addAll(newStaffWTACounter);
-        save(staffWTACounters);
+        if(!staffWTACounters.isEmpty()) {
+            save(staffWTACounters);
+        }
     }
 
     public ShiftQueryResult addSubShift(Long unitId, ShiftDTO shiftDTO, String type) {

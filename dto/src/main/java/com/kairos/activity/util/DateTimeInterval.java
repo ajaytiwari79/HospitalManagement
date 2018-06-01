@@ -1,6 +1,8 @@
 package com.kairos.activity.util;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 
 import java.time.*;
@@ -104,8 +106,8 @@ public class DateTimeInterval {
     }
 
     public DateTimeInterval addInterval(DateTimeInterval interval){
-        long start = Math.max(this.start, interval.getStartMillis());
-        long end = Math.min(this.end, interval.getEndMillis());
+        long start = Math.min(this.start, interval.getStartMillis());
+        long end = Math.max(this.end, interval.getEndMillis());
         return new DateTimeInterval(start, end);
     }
 
@@ -183,6 +185,29 @@ public class DateTimeInterval {
 
     public Long getMilliSeconds(){
         return (this.start - this.end);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DateTimeInterval interval = (DateTimeInterval) o;
+
+        return new EqualsBuilder()
+                .append(start, interval.start)
+                .append(end, interval.end)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(start)
+                .append(end)
+                .toHashCode();
     }
 
     @Override

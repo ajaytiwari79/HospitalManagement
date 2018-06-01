@@ -36,7 +36,7 @@ public class ShiftWithActivityDTO {
     private long accumulatedTimeBankInMinutes;
     private String remarks;
     private BigInteger activityId;
-    private Long unitEmploymentPositionId;
+    private Long unitPositionId;
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
@@ -58,8 +58,8 @@ public class ShiftWithActivityDTO {
         this.shiftState = shiftState;
     }
 
-    public Long getUnitEmploymentPositionId() {
-        return unitEmploymentPositionId;
+    public Long getUnitPositionId() {
+        return unitPositionId;
     }
 
     public ShiftWithActivityDTO() {
@@ -75,7 +75,7 @@ public class ShiftWithActivityDTO {
     }
 
 
-    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId,  Long staffId,Long unitEmploymentPositionId, Long unitId, Activity activity) {
+    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitPositionId, Long unitId, Activity activity) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -86,7 +86,7 @@ public class ShiftWithActivityDTO {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
         this.remarks = remarks;
         this.activityId = activityId;
-        this.unitEmploymentPositionId = unitEmploymentPositionId;
+        this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.unitId = unitId;
         this.activity = activity;
@@ -98,8 +98,8 @@ public class ShiftWithActivityDTO {
         this.activity = activity;
     }
 
-    public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
-        this.unitEmploymentPositionId = unitEmploymentPositionId;
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public int getMinutes(){

@@ -170,7 +170,7 @@ public class PayOutService extends MongoBaseService {
     public List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftQueryResultWithActivities.forEach(s -> {
-            if (s.getUnitEmploymentPositionId().equals(unitPositionId)) {
+            if (s.getUnitPositionId().equals(unitPositionId)) {
                 shifts.add(s);
             }
         });
