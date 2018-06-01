@@ -90,6 +90,10 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-
+    @ApiOperation(value = "get organization and services")
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/all", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getOrgTypeAndOrgServiceshierarchy(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId) );
+    }
 
 }
