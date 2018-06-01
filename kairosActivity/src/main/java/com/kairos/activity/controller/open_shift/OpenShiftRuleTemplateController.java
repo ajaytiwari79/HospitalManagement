@@ -35,7 +35,7 @@ public class OpenShiftRuleTemplateController {
     @ApiOperation("Get all Rule templates based on countryId")
     @GetMapping(value = COUNTRY_URL+"/open_shift/rule_templates")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getRuleTemplateForOpenShift(@PathVariable long countryId) {
+    public ResponseEntity<Map<String, Object>> getOpenShiftRuleTemplate(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.findAllRuleTemplateForOpenShift(countryId));
     }
 

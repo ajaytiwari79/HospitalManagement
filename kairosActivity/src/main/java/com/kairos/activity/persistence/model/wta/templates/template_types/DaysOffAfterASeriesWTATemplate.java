@@ -13,7 +13,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     private String intervalUnit;
     private int nightShiftSequence;
-    private boolean isRestingTimeAllowed;
+    private boolean restingTimeAllowed;
     private int restingTime;
 
     public long getIntervalLength() {
@@ -41,11 +41,11 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     }
 
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+        this.restingTimeAllowed = restingTimeAllowed;
     }
 
     public int getRestingTime() {

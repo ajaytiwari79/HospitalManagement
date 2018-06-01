@@ -140,7 +140,7 @@ public class OpenShiftService extends MongoBaseService {
             shiftService.createShift(unitId,shiftDTO,"Organization",false);
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()-1);
 
-        } else if (ShiftAssignmentCriteria.values().equals(SHOW_INTEREST_APPROVAL_BY_PLANNER)) {
+        } else if (order.get().getShiftAssignmentCriteria().equals(SHOW_INTEREST_APPROVAL_BY_PLANNER)) {
             openShift.getInterestedStaff().add(staffId);
         }
         save(openShift);

@@ -47,8 +47,16 @@ public class UnitPositionQueryResult {
     private Long parentUnitId;
     private Long unitId;
     private Long reasonCodeId;
+    private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
 
+    public Map<String, Object> getUnitInfo() {
+        return unitInfo;
+    }
+
+    public void setUnitInfo(Map<String, Object> unitInfo) {
+        this.unitInfo = unitInfo;
+    }
 
     public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
@@ -57,6 +65,7 @@ public class UnitPositionQueryResult {
     public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
+
 
     public BigInteger getWorkingTimeAgreementId() {
         return workingTimeAgreementId;

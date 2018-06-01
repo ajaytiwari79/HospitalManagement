@@ -310,6 +310,17 @@ public class OrganizationService extends UserBaseService {
 
         OrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
+        Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
+        if(orgExistWithUrl){
+            exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate",orgDetails.getDesiredUrl());
+        }
+
+        Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
+        if(orgExistWithName){
+            exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate",orgDetails.getName());
+        }
+
+
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
@@ -479,6 +490,21 @@ public class OrganizationService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
 
         }
+
+        if(organization.getDesiredUrl()!=null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())){
+            Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
+            if(orgExistWithUrl){
+                exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate",orgDetails.getDesiredUrl());
+            }
+        }
+
+        if(!orgDetails.getName().trim().equalsIgnoreCase(organization.getName())){
+            Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
+            if(orgExistWithName){
+                exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate",orgDetails.getName());
+            }
+        }
+
         organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
         if (!Optional.ofNullable(organization).isPresent()) {
             return null;
@@ -595,13 +621,14 @@ public class OrganizationService extends UserBaseService {
         contactAddressDTO.setLongitude(contactAddress.getLongitude());
         contactAddressDTO.setZipCodeValue(contactAddress.getZipCode().getZipCode());
         contactAddressDTO.setMunicipalityName(contactAddress.getMunicipality().getName());
+        contactAddressDTO.setMunicipalityId(contactAddress.getMunicipality().getId());
         return contactAddressDTO;
 
 
     }
 
     private Organization saveOrganizationDetails(Organization organization, OrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
-        organization.setName(WordUtils.capitalize(orgDetails.getName()));
+        organization.setName(WordUtils.capitalize(orgDetails.getName().trim()));
         if (!Optional.ofNullable(orgDetails.getUnion()).isPresent()) {
             exceptionService.actionNotPermittedException("message.organization.union.specify");
 
@@ -689,12 +716,13 @@ public class OrganizationService extends UserBaseService {
 
         }
 
-        organization.setDesiredUrl(orgDetails.getDesiredUrl());
+        organization.setDesiredUrl(orgDetails.getDesiredUrl().trim());
         organization.setShortCompanyName(orgDetails.getShortCompanyName());
         organization.setKairosCompanyId(orgDetails.getKairosCompanyId());
         organization.setCompanyCategory(companyCategory);
         organization.setCompanyType(orgDetails.getCompanyType());
         organization.setVatId(orgDetails.getVatId());
+        organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
 
         return organization;
     }

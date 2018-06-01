@@ -36,6 +36,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         save(openShiftRuleTemplate);
         List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
         priorityGroups.forEach(priorityGroup -> {
+            priorityGroup.setParentId(priorityGroup.getId());
             priorityGroup.setId(null);
             priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
         });
@@ -146,6 +147,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
         if(!priorityGroups.isEmpty()){
             priorityGroups.forEach(priorityGroup -> {
+                priorityGroup.setParentId(priorityGroup.getId());
                 priorityGroup.setId(null);
                 priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
             });
