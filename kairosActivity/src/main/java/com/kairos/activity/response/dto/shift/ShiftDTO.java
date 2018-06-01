@@ -58,6 +58,7 @@ public class ShiftDTO {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
     Long allowedBreakDurationInMinute;
+    private List<ShiftDTO> subShifts = new ArrayList<>();
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activityId = activityId;
@@ -123,7 +124,7 @@ public class ShiftDTO {
         this.durationMinutes = durationMinutes;
     }
 
-    private List<ShiftDTO> subShifts = new ArrayList<>();
+
 
     public BigInteger getId() {
         return id;
