@@ -1,6 +1,5 @@
 package com.kairos.config;
 
-import com.kairos.activity.util.DateUtils;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -87,8 +86,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -594,7 +591,7 @@ public class BootDataService {
         johnOliver.setClientAllergiesList(null);
         johnOliver.setClientDiagnoseList(null);
         johnOliver.setCprNumber("1508574653");
-        johnOliver.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(johnOliver.getCprNumber())));
+        johnOliver.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(johnOliver.getCprNumber()));
         johnOliver.setClientDiagnoseList(Arrays.asList(new ClientDiagnose("Heart Diagnose", " Moderate Condition", "positive", "Eat Healthy"),
                 new ClientDiagnose("Lung Diagnose", " Poor Condition", "positive", "Quit Smoking")));
         johnOliver.setTranslationLanguage(new String[]{"Danish"});
@@ -720,7 +717,7 @@ public class BootDataService {
 
         admin = new User();
         admin.setCprNumber("0309514297");
-        admin.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(admin.getCprNumber())));
+        admin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(admin.getCprNumber()));
         admin.setUserName("ulrik@kairos.com");
         admin.setEmail("ulrik@kairos.com");
         admin.setPassword(new BCryptPasswordEncoder().encode("admin@kairos"));

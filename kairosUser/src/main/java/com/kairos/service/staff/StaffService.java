@@ -2,7 +2,6 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.util.DateUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -751,7 +750,7 @@ public class StaffService extends UserBaseService {
                             user = new User();
                             user.setFirstName(row.getCell(20).toString());
                             user.setLastName(row.getCell(21).toString());
-                            user.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(staff.getCprNumber())));
+                            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staff.getCprNumber()));
                             user.setTimeCareExternalId(cell.getStringCellValue());
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
@@ -1062,7 +1061,7 @@ public class StaffService extends UserBaseService {
         String defaultPassword = user.getFirstName().trim() + "@kairos";
         user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
-            user.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(staffCreationDTO.getCprNumber())));
+            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
             user.setAge(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)));
         }
     }
@@ -1098,7 +1097,7 @@ public class StaffService extends UserBaseService {
         staff.setContactDetail(contactDetail);
 
         //method call for getting Date of Birth From CPR Number
-        Date dateOfBirth = DateUtil.asDate(CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber()));
+        Date dateOfBirth = CPRUtil.fetchDateOfBirthFromCPR(payload.getCprNumber());
         staff.setDateOfBirth(dateOfBirth);
         staff.setCurrentStatus(payload.getCurrentStatus());
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
@@ -1122,7 +1121,7 @@ public class StaffService extends UserBaseService {
             client.setLastName(staff.getLastName());
             client.setEmail(staff.getEmail());
             client.setCprNumber(staff.getCprNumber());
-            client.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(staff.getCprNumber())));
+            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staff.getCprNumber()));
         }
         return client;
     }

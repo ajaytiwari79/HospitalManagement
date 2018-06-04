@@ -1,7 +1,5 @@
 package com.kairos.service.client;
 
-import com.kairos.activity.util.DateUtils;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.client.Client;
@@ -118,7 +116,7 @@ public class ExternalClientService extends UserBaseService {
             detail.setWorkPhone(patientRelative.getRelatedPatient().getWorkPhoneNumber());
 
             nextToKin.setCprNumber(patientRelative.getRelatedPatient().getPatientIdentifier().getIdentifier().replace("-", ""));
-            nextToKin.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(nextToKin.getCprNumber())));
+            nextToKin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(nextToKin.getCprNumber()));
             nextToKin = clientService.generateAgeAndGenderFromCPR(nextToKin);
         }
 
@@ -278,7 +276,7 @@ public class ExternalClientService extends UserBaseService {
             client.setFirstName(patientWrapper.getFirstName());
             client.setLastName(patientWrapper.getLastName());
             client.setCprNumber(cprNumber);
-            client.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(client.getCprNumber())));
+            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(client.getCprNumber()));
             CitizenStatus citizenStatus = citizenStatusGraphRepository.findByDescription(countryGraphRepository.getCountryIdByUnitId(unitId), patientWrapper.getMaritalStatus());
 
             if (citizenStatus != null) {

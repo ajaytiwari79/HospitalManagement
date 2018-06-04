@@ -1,6 +1,5 @@
 package com.kairos.service.client;
 
-import com.kairos.activity.util.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -236,7 +235,7 @@ public class ClientBatchService {
                     client.setFirstName(firstName);
                     client.setLastName(lastName);
                     client.setCprNumber(cpr);
-                    client.setDateOfBirth(DateUtils.getDateByLocalDate(CPRUtil.getDateOfBirthFromCPR(cpr)));
+                    client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(cpr));
                     clientService.generateAgeAndGenderFromCPR(client);
                     logger.info("Client not found in Database Creating new: " + client.getFirstName());
                     createClient = true;
