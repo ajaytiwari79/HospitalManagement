@@ -341,7 +341,7 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation(value = "Create default data for  Organization")
-    @RequestMapping(value = UNIT_URL + "/organization/default_data", method = RequestMethod.POST)
+    @RequestMapping(value = "/organization_default_data", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId,@RequestParam Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

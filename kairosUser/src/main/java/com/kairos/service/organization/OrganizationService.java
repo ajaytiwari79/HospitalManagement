@@ -366,11 +366,6 @@ public class OrganizationService extends UserBaseService {
 //            periodRestClient.createDefaultPeriodSettings(organization.getId());
 //        }
 
-
-        if (!orgDetails.getUnion()) {
-            phaseRestClient.createDefaultPhases(organization.getId());
-            periodRestClient.createDefaultPeriodSettings(organization.getId());
-        }
         //Copying Priority Groups to Unit from Country
 
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());

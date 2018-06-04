@@ -33,7 +33,7 @@ public class PriorityGroupIntegrationService {
         public void crateDefaultDataForOrganization(Long unitId,Long countryId){
             Map<String,Object> countryDetail =new HashMap<>();
             countryDetail.put("countryId",countryId);
-            priorityGroupRestClient.publish(null,unitId,true, IntegrationOperation.CREATE,"/organization/default_data",countryDetail);
+            priorityGroupRestClient.publish(null,unitId,true, IntegrationOperation.CREATE,"/organization_default_data",countryDetail);
         }
 
 
