@@ -44,7 +44,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
         if(StringUtils.isNotBlank(searchText)){
             matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-            " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR staff.cprNumber STARTS WITH {searchText} )";
+            " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
             countOfSubString+= 1;
         }
         return matchQueryForStaff;
@@ -124,7 +124,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                 "firstName:staff.firstName,lastName:staff.lastName,employedSince :staff.employedSince,"+
                 "age:round ((timestamp()-user.dateOfBirth) / (365*24*60*60*1000)),"+
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId,"+
-                "cprNumber:staff.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
+                "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
                 "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) } as staff ORDER BY staff.id\n";
 
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
