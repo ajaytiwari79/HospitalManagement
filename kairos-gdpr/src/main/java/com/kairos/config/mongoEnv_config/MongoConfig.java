@@ -22,8 +22,13 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(),environment.getDataBaseName(),environment.getMongoPassword().toCharArray()));
+        /*final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(),environment.getDataBaseName(),environment.getMongoPassword().toCharArray()));
         return  new MongoClient( new ServerAddress(environment.getMongoHost(),environment.getMongoPort()) ,credentialList);
+ */
+
+        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential("n0rdicgdpr","gdpr","Ae89Y03DErtY".toCharArray()));
+        return  new MongoClient( new ServerAddress("localhost",37017) ,credentialList);
+
     }
 
     @Override

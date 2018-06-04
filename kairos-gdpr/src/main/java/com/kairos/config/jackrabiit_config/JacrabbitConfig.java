@@ -29,8 +29,12 @@ private EnvConfig environment;
 
     @Bean
     public Repository repository() throws RepositoryException {
-        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(),environment.getDataBaseName(),environment.getMongoPassword().toCharArray()));
-        DB db = new MongoClient( new ServerAddress(environment.getMongoHost(),environment.getMongoPort()) ,credentialList).getDB(environment.getDataBaseName());
+       // final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(),environment.getDataBaseName(),environment.getMongoPassword().toCharArray()));
+        //DB db = new MongoClient( new ServerAddress(environment.getMongoHost(),environment.getMongoPort()) ,credentialList).getDB(environment.getDataBaseName());
+
+
+        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential("n0rdicgdpr","gdpr","Ae89Y03DErtY".toCharArray()));
+        DB db = new MongoClient(  new ServerAddress("localhost",37017) ,credentialList).getDB("gdpr");
         DocumentNodeStore ns = new DocumentMK.Builder()
                 /*.setBlobStore((BlobStore)new FileBlobStore("mongorepository_jackrabit/blob"))*/.setMongoDB(db,1).getNodeStore();
         Repository repo = new Jcr(new Oak(ns)).createRepository();
