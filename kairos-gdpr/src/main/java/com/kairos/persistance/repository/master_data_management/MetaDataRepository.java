@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 
-@Repository
+@NoRepositoryBean
 public interface MetaDataRepository<T, ID extends Serializable> extends MongoRepository<T,ID> {
 
     T getMetedataByIdAndDeletedIsFalse(Long countryId, ID id);
