@@ -8,17 +8,20 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
+import com.kairos.activity.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
+import com.kairos.activity.service.unit_settings.PhaseSettingsService;
 import com.kairos.activity.service.wta.WTAService;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
@@ -92,6 +95,9 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
+    @Inject
+    private PhaseSettingsService phaseSettingsService;
+    @Inject private PhaseSettingsRepository phaseSettingsRepository;
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {

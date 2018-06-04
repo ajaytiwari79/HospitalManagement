@@ -24,13 +24,6 @@ public class PhaseSettingsController {
     @Inject
     private PhaseSettingsService phaseSettingsService;
 
-    @ApiOperation("Create default phase settings")
-    @PostMapping(value = "/phase_settings")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDefaultPhaseSettings(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseSettingsService.createDefaultPhaseSettings(unitId));
-    }
-
     @ApiOperation(value = "get unit phase settings")
     @GetMapping(value = "/phase_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

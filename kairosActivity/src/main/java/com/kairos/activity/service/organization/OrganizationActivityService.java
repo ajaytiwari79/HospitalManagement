@@ -8,6 +8,7 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.model.open_shift.OrderAndActivityDTO;
+import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
@@ -260,9 +261,9 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
    public boolean createDefaultDataForOrganization(Long unitId,Long countryId){
-        phaseService.createDefaultPhase(unitId,countryId);
+        List<Phase> phases= phaseService.createDefaultPhase(unitId,countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
-        phaseSettingsService.createDefaultPhaseSettings(unitId);
+        phaseSettingsService.createDefaultPhaseSettings(unitId,phases);
         return true;
    }
 

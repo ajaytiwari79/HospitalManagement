@@ -1617,6 +1617,7 @@ public class StaffService extends UserBaseService {
             }
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
+
         return staffAdditionalInfoQueryResult;
     }
 

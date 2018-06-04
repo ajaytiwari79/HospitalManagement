@@ -44,7 +44,7 @@ public class PhaseService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public void createDefaultPhase(Long unitId, Long countryId) {
+    public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
@@ -55,6 +55,7 @@ public class PhaseService extends MongoBaseService {
         if(!phases.isEmpty()){
             save(phases);
         }
+        return phases;
     }
 
     /*
