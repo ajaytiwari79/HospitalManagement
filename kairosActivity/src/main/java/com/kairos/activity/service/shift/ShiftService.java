@@ -275,7 +275,7 @@ public class ShiftService extends MongoBaseService {
                 timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
             }
             shifts.add(shift);
-            //timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+            timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
             boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
 
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null, isShiftForPreence));
@@ -358,7 +358,6 @@ public class ShiftService extends MongoBaseService {
         if (startDateAsString != null) {
             DateFormat dateISOFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
             Date startDate = dateISOFormat.parse(startDateAsString);
-
             startDateInISO = new DateTime(startDate).toDate();
             if (endDateAsString != null) {
                 Date endDate = dateISOFormat.parse(endDateAsString);
@@ -411,14 +410,15 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activityExpertiseSpecification = new ActivityExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         ActivitySpecification<Activity> activityWTARulesSpecification = new ActivityWTARulesSpecification(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement(), phase, shift, staffAdditionalInfoDTO);
 
-        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification); //
+        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification);
+          //TODO Pradeep will look into dayType
 
-        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
-        if (dayTypeIds != null) {
-            List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
-            ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
-            activitySpecification.and(activityDayTypeSpec);
-        }
+//        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
+//        if (dayTypeIds != null) {
+//            List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
+//            ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
+//            activitySpecification.and(activityDayTypeSpec);
+//        }
 
         activitySpecification.isSatisfied(activity);
 

@@ -84,7 +84,7 @@ public class KairosGdprApplication {
         return mappingJackson2HttpMessageConverter;
     }
 
-    @Profile("!dev")
+    @Profile("!development")
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
@@ -105,7 +105,7 @@ public class KairosGdprApplication {
     }*/
 
 
-    @Profile("dev")
+    @Profile("development")
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {

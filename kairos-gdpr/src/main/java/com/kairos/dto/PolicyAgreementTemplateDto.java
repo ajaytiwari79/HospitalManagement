@@ -24,19 +24,16 @@ public class PolicyAgreementTemplateDto {
 
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set<Long> organizationTypes;
-
-
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set<Long> organizationSubTypes;
-
+    private List<OrganizationTypeAndServiceBasicDto>  organizationTypes;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set<Long> organizationServices;
-
+    private List<OrganizationTypeAndServiceBasicDto>  organizationSubTypes;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private Set<Long> organizationSubServices;
+    private List<OrganizationTypeAndServiceBasicDto>  organizationServices;
+
+    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private Set<BigInteger> accountTypes;
@@ -71,35 +68,35 @@ public class PolicyAgreementTemplateDto {
         this.description = description;
     }
 
-    public Set<Long> getOrganizationTypes() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(Set<Long> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public Set<Long> getOrganizationSubTypes() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(Set<Long> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public Set<Long> getOrganizationServices() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(Set<Long> organizationServices) {
+    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public Set<Long> getOrganizationSubServices() {
+    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(Set<Long> organizationSubServices) {
+    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

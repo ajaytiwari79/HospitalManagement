@@ -18,7 +18,7 @@ public class ComparisonUtils {
         Set<Long> orgTypeAndServiceIds = new HashSet<>();
         if (ids.size() != orgTypesAndServices.size()) {
             for (OrganizationTypeAndServiceBasicDto result : orgTypesAndServices) {
-                orgTypeAndServiceIds.add(result.getValue());
+                orgTypeAndServiceIds.add(result.getId());
             }
             Set<Long> differences = difference(ids, orgTypeAndServiceIds);
             throw new DataNotFoundByIdException("data for id " + differences.iterator().next() + "not exist");

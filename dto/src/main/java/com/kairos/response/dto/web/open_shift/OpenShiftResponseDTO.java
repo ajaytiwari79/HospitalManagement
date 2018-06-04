@@ -7,6 +7,7 @@ import java.util.List;
 
 public class OpenShiftResponseDTO {
 
+    private BigInteger id;
     private LocalDate startDate;
     private LocalTime fromTime;
     private LocalTime toTime;
@@ -15,7 +16,6 @@ public class OpenShiftResponseDTO {
     private List<Long> declinedBy;
     private Long unitId;
     private BigInteger orderId;
-    private BigInteger id;
     private BigInteger activityId;
 
     public BigInteger getActivityId() {
@@ -26,6 +26,8 @@ public class OpenShiftResponseDTO {
         this.activityId = activityId;
     }
 
+    private BigInteger parentOpenShiftId;
+
     public BigInteger getId() {
         return id;
     }
@@ -33,8 +35,6 @@ public class OpenShiftResponseDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
-
-
 
     public Long getUnitId() {
         return unitId;
@@ -102,4 +102,11 @@ public class OpenShiftResponseDTO {
         this.declinedBy = declinedBy;
     }
 
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
 }

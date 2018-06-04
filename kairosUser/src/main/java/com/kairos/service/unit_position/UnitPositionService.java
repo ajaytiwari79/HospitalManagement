@@ -933,7 +933,7 @@ public class UnitPositionService extends UserBaseService {
         return appliedSeniorityLevel;
     }
 
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId, Long accessGroupId) throws ParseException {
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId, Long accessGroupId){
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtil.getIsoDateInLong(employmentEndDate);
@@ -976,13 +976,19 @@ public class UnitPositionService extends UserBaseService {
 
     }
 
-    public Map<Long,Long> getUnitPositionExpertiseMap(Long unitId){
+
+   public Long getUnitPositionIdByStaffAndExpertise(Long unitId,Long staffId,Long expertiseId){
+       return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId,staffId,expertiseId,System.currentTimeMillis());
+   }
+
+   public Map<Long,Long> getUnitPositionExpertiseMap(Long unitId){
         List<Map<Long,Long>> listOfMap = unitPositionGraphRepository.getMapOfUnitPositionAndExpertiseId(unitId);
         Map<Long,Long> mapOfUnitPositionAndExpertise = new HashMap<>(listOfMap.size());
         listOfMap.stream().forEach(mapOfExpertise -> {
             mapOfUnitPositionAndExpertise.putAll(mapOfExpertise);
         });
         return mapOfUnitPositionAndExpertise;
+
     }
 
 }

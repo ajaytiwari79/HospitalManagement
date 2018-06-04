@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class MasterProcessingActivityRepositoryImpl implements CustomMasterProcessingActivity {
 
@@ -22,16 +23,13 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
     @Override
-    public MasterProcessingActivityResponseDto getMasterProcessingActivityWithData(Long countryId, BigInteger id) {
+    public MasterProcessingActivityResponseDto getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id) {
 
 
         Aggregation aggregation=Aggregation.newAggregation(
 
-
-match(Criteria.where("countryId").is(countryId).and("_id").is(id).and("deleted").is(false)),
+                match(Criteria.where("countryId").is(countryId).and("_id").is(id).and("deleted").is(false).and("isSubProcess").is(false)),
                 lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities")
-
-
 
         );
 
@@ -39,5 +37,21 @@ match(Criteria.where("countryId").is(countryId).and("_id").is(id).and("deleted")
         AggregationResults<MasterProcessingActivityResponseDto> result=mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,MasterProcessingActivityResponseDto.class);
 
         return result.getUniqueMappedResult();
+    }
+
+    @Override
+    public List<MasterProcessingActivityResponseDto> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId) {
+        Aggregation aggregation=Aggregation.newAggregation(
+
+                match(Criteria.where("countryId").is(countryId).and("deleted").is(false)),
+                lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities")
+
+        );
+
+
+        AggregationResults<MasterProcessingActivityResponseDto> result=mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,MasterProcessingActivityResponseDto.class);
+
+        return result.getMappedResults();
+
     }
 }

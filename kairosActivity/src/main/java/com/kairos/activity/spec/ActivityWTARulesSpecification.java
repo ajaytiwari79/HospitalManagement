@@ -45,7 +45,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
         if (wtaResponseDTO.getEndDateMillis()!=null && new DateTime(wtaResponseDTO.getEndDateMillis()).isBefore(shift.getEndDate().getTime())) {
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
-       /* List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplates();
+       /* List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplate();
         for (int i = 0; i < ruleTemplates.size(); i++) {
             RuleTemplateCategoryDTO currentWTARuleTemplate = ruleTemplates.get(i);
             String currentTemplateType=getTemplateType(currentWTARuleTemplate.getTemplateType());
