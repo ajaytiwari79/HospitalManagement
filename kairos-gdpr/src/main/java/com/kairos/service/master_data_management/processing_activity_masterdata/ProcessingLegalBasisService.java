@@ -96,10 +96,11 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     public ProcessingLegalBasis updateProcessingLegalBasis(BigInteger id, ProcessingLegalBasis legalBasis) {
 
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByid(id);
+        ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(UserContext.getCountryId(),legalBasis.getName());
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
+            exist=legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
             return save(exist);
 

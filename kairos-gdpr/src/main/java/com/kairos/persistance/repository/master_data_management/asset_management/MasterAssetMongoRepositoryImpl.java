@@ -9,9 +9,11 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 
@@ -23,7 +25,6 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
     @Override
     public FilterQueryResult getMasterAssetFilter(Long countryId) {
-
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false)),
@@ -38,7 +39,6 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
                         .addToSet("organizationSubServices").as("organizationSubServices")
 
         );
-
         AggregationResults<FilterQueryResult> result = mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
         return result.getUniqueMappedResult();
 
@@ -63,8 +63,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         if (Optional.ofNullable(filterSelectionDto.getOrganizationSubServices()).isPresent()) {
             query.addCriteria(Criteria.where(filterSelectionDto.getOrganizationSubServices().getName() + "._id").in(filterSelectionDto.getOrganizationSubServices().getValues()));
         }
-        List<MasterAsset> result=(List<MasterAsset>)mongoTemplate.find(query, MasterAsset.class);
 
+        List<MasterAsset> result =  (List<MasterAsset>) mongoTemplate.find(query, MasterAsset.class);
         return result;
     }
 }
