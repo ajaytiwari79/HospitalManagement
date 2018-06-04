@@ -92,7 +92,7 @@ public class MasterAssetFilterService extends MongoBaseService {
         if (checkIfFilterGroupExistForMduleId(moduleId, true)) {
             return masterAssetMongoRepository.getMasterAssetListWithFilterData(countryId, filterSelectionDto);
         } else
-            throw new InvalidRequestException("invalide Request filter roup not exist for moduleId " + moduleId);
+            throw new InvalidRequestException("invalide Request filter group not exist for moduleId " + moduleId);
     }
 
 

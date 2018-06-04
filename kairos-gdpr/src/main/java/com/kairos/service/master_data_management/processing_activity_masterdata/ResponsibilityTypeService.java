@@ -97,12 +97,12 @@ public class ResponsibilityTypeService extends MongoBaseService {
     public ResponsibilityType updateResponsibilityType(BigInteger id, ResponsibilityType responsibilityType) {
 
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByid(id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(UserContext.getCountryId(),responsibilityType.getName());
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
+            exist=responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-
             return save(exist);
 
         }

@@ -96,10 +96,11 @@ public class DataDisposalService extends MongoBaseService {
     public DataDisposal updateDataDisposal(BigInteger id, DataDisposal dataDisposal) {
 
 
-        DataDisposal exist = dataDisposalMongoRepository.findByid(id);
+        DataDisposal exist = dataDisposalMongoRepository.findByName(UserContext.getCountryId(),dataDisposal.getName());
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
+            exist=dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
             return save(exist);
 

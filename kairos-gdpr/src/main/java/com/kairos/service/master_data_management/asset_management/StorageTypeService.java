@@ -93,10 +93,11 @@ public class StorageTypeService extends MongoBaseService {
 
     public StorageType updateStorageType(BigInteger id, StorageType storageType) {
 
-        StorageType exist = storageTypeMongoRepository.findByid(id);
+        StorageType exist = storageTypeMongoRepository.findByName(UserContext.getCountryId(),storageType.getName());
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
+            exist=storageTypeMongoRepository.findByid(id);
             exist.setName(storageType.getName());
             return save(exist);
 

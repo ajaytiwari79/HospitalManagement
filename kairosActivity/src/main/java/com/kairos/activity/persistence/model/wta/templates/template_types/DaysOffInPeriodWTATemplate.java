@@ -148,9 +148,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         return "";
     }
 
-    private DateTimeInterval getNextDayInterval(ZonedDateTime dateTime) {
-        return new DateTimeInterval(dateTime.plusDays(1).truncatedTo(ChronoUnit.DAYS), dateTime.plusDays(2).truncatedTo(ChronoUnit.DAYS));
-    }
 
     private int getDayOFF(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){
         int count = 0;
@@ -158,11 +155,10 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         Set<DateTimeInterval> overLapsIntervals = new HashSet<>();
         for (int i = 1; i < intervals.size(); i++) {
             DateTimeInterval interval = intervals.get(i - 1);
-            overLapsIntervals.addAll(getOverLapsInterval(dayIntervals,interval));
-            if(isRestingTimeAllowed){
+            if(restingTimeAllowed){
                 interval = new DateTimeInterval(interval.getStart(),interval.getEnd().plusHours(restingTime));
-                overLapsIntervals.addAll(getOverLapsInterval(dayIntervals,interval));
             }
+            overLapsIntervals.addAll(getOverLapsInterval(dayIntervals,interval));
 
         }
         return dayIntervals.size() - overLapsIntervals.size();
