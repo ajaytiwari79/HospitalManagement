@@ -23,11 +23,11 @@ public class MasterAssetFilterController {
     @Inject
     private MasterAssetFilterService masterAssetFilterService;
 
-    @GetMapping("/category")
-    public ResponseEntity<Object> getMasterAssetFilter(@PathVariable Long countryId,@RequestParam String moduleId) {
+    @GetMapping("/category/{moduleId}")
+    public ResponseEntity<Object> getMasterAssetFilter(@PathVariable Long countryId,@PathVariable String moduleId) {
 
         if (countryId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetFilterService.masterAssetfilterQueryResult(countryId,moduleId,true));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetFilterService.masterAssetfilterQueryResult(moduleId,countryId));
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "countryId cannot be null");
 

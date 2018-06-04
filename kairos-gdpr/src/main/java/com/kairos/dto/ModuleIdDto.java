@@ -13,9 +13,9 @@ public class ModuleIdDto {
     @NotNullOrEmpty
     private String moduleId;
 
-    private Boolean isModuleId = true;
+    private Boolean isModuleId ;
 
-    private Boolean active = true;
+    private Boolean active;
 
 
     public String getModuleId() {

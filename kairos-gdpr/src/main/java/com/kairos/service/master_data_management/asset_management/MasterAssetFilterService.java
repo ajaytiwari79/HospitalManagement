@@ -8,9 +8,12 @@ import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.repository.filter.FilterGroupMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
+import com.kairos.response.dto.filter.FilterAndFavouriteFilterDto;
+import com.kairos.response.dto.filter.FilterAttributes;
 import com.kairos.response.dto.filter.FilterQueryResult;
+import com.kairos.response.dto.filter.FilterResponseDto;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.filter.FilterService;
+import com.kairos.utils.userContext.UserContext;
 import org.bson.BSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MasterAssetFilterService extends MongoBaseService {
@@ -39,9 +43,6 @@ public class MasterAssetFilterService extends MongoBaseService {
     private FilterGroupMongoRepository filterGroupMongoRepository;
 
     @Inject
-    private FilterService filterService;
-
-    @Inject
     private MongoTemplate mongoTemplate;
 
 
@@ -51,40 +52,33 @@ public class MasterAssetFilterService extends MongoBaseService {
     }
 
 
-    public FilterQueryResult masterAssetfilterQueryResult(Long countryId, String moduleId, Boolean active) {
+    public FilterAndFavouriteFilterDto masterAssetfilterQueryResult(String moduleId, Long countryId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
-        FilterGroup filterGroup = filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, active);
+        FilterGroup filterGroup = filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
+        List<FilterResponseDto> filterResponseData = new ArrayList<>();
+        FilterAndFavouriteFilterDto filterAndFavouriteFilterDto=new FilterAndFavouriteFilterDto();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterService.getFilterCriterias(countryId, filterTypes);
-            Aggregation aggregation = createAggregationQueryForMasterAsset(filterCriteria);
+            filterCriteria = filterGroupMongoRepository.getFilterCriterias(countryId, filterTypes);
+            Aggregation aggregation = filterGroupMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
             AggregationResults<FilterQueryResult> result = mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
-            return result.getUniqueMappedResult();
+            FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
+            filterResponseData.add(new FilterResponseDto(FilterType.ACCOUNT_TYPES, FilterType.ACCOUNT_TYPES.value, filterQueryResult.getAccountTypes()));
+            filterResponseData.add(new FilterResponseDto(FilterType.ORGANIZATION_TYPES, FilterType.ORGANIZATION_TYPES.value, filterQueryResult.getOrganizationTypes()));
+            filterResponseData.add(new FilterResponseDto(FilterType.ORGANIZATION_SUB_TYPES, FilterType.ORGANIZATION_SUB_TYPES.value, filterQueryResult.getOrganizationSubTypes()));
+            filterResponseData.add(new FilterResponseDto(FilterType.ORGANIZATION_SERVICES, FilterType.ORGANIZATION_SERVICES.value, filterQueryResult.getOrganizationServices()));
+            filterResponseData.add(new FilterResponseDto(FilterType.ORGANIZATION_SUB_SERVICES, FilterType.ORGANIZATION_SUB_SERVICES.value, filterQueryResult.getOrganizationSubServices()));
+            filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
+            filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+            return filterAndFavouriteFilterDto;
 
         } else
-            throw new InvalidRequestException("invalide Request filter roup not exist for moduleId " + moduleId);
+            throw new InvalidRequestException("invalide Request filter group not exist for moduleId " + moduleId);
 
 
     }
 
-
-    public Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations) {
-        GroupOperation groupOperation = group();
-        List<AggregationOperation> operations = new ArrayList<>();
-        operations.add(aggregationOperations.get("match"));
-        for (Map.Entry<String, AggregationOperation> entry : aggregationOperations.entrySet())
-            if (entry.getKey().equals("match")) {
-                continue;
-            } else {
-                operations.add(entry.getValue());
-                groupOperation = groupOperation.addToSet(entry.getKey()).as(entry.getKey());
-            }
-        operations.add(groupOperation);
-        Aggregation aggregation = Aggregation.newAggregation(operations);
-        return aggregation;
-
-    }
 
 
     public List<MasterAsset> getMasterAssetDataWithFilter(Long countryId, String moduleId, FilterSelectionDto filterSelectionDto) {
@@ -98,7 +92,7 @@ public class MasterAssetFilterService extends MongoBaseService {
 
     boolean checkIfFilterGroupExistForMduleId(String moduleId, Boolean active) {
 
-        if (Optional.ofNullable(filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, active)).isPresent()) {
+        if (Optional.ofNullable(filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, UserContext.getCountryId())).isPresent()) {
             return true;
         }
         return false;

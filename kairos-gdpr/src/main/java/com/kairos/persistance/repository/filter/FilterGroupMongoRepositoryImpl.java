@@ -1,53 +1,24 @@
-package com.kairos.service.filter;
-
+package com.kairos.persistance.repository.filter;
 
 import com.kairos.custome_exception.InvalidRequestException;
-import com.kairos.dto.ModuleIdDto;
 import com.kairos.persistance.model.enums.FilterType;
-import com.kairos.persistance.model.filter.FilterGroup;
-import com.kairos.persistance.repository.filter.FilterGroupMongoRepository;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
-public class FilterService {
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
+public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoRepository {
 
-    @Inject
-    private FilterGroupMongoRepository filterGroupMongoRepository;
-
-
-  /*  public FilterGroup addFilterGroup(FilterGroup filterGroup, String moduleId) {
-        List<ModuleIdDto> moduleIdDtos = filterGroup.getAccessModule();
-        List<String> moduleids = new ArrayList<>();
-        moduleIdDtos.forEach(moduleIdDto -> moduleids.add(moduleIdDto.getModuleId()));
-
-        List<FilterGroup> filterGroups = filterGroupMongoRepository.findFilterGroupByModuleIds(moduleids, true);
-        if (filterGroups.size() != 0) {
-
-
-
-        }
-
-
-    }
-*/
-
+    @Override
     public Map<String, AggregationOperation> getFilterCriterias(Long countryId, List<FilterType> filterTypes) {
-
-
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
         aggregationOperations.put("match", match(Criteria.where("countryId").is(countryId).and("deleted").is(false)));
         filterTypes.forEach(filterType -> {
@@ -59,9 +30,8 @@ public class FilterService {
         return aggregationOperations;
     }
 
-
+    @Override
     public AggregationOperation buildAggregationQuery(FilterType filterType) {
-
         switch (filterType) {
 
             case ACCOUNT_TYPES:
@@ -81,6 +51,21 @@ public class FilterService {
 
     }
 
+    @Override
+    public Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations) {
+        GroupOperation groupOperation = group();
+        List<AggregationOperation> operations = new ArrayList<>();
+        operations.add(aggregationOperations.get("match"));
+        for (Map.Entry<String, AggregationOperation> entry : aggregationOperations.entrySet())
+            if (entry.getKey().equals("match")) {
+                continue;
+            } else {
+                operations.add(entry.getValue());
+                groupOperation = groupOperation.addToSet(entry.getKey()).as(entry.getKey());
+            }
+        operations.add(groupOperation);
+        Aggregation aggregation = Aggregation.newAggregation(operations);
+        return aggregation;
 
+    }
 }
-
