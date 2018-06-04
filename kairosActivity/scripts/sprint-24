@@ -1,0 +1,1 @@
+db.activities.update({},{$set: { "startDate" : new ISODate("2018-01-11T03:34:54Z") } }, true, true);

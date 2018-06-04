@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,8 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state=ActivityStateEnum.DRAFT;
+    private LocalDate startDate;
+    private LocalDate endDate;
     @Indexed
     private Long unitId;
     private BigInteger parentId;
@@ -62,10 +65,12 @@ public class Activity extends MongoBaseEntity implements Serializable {
     //time care id
     private String externalId;
 
-    public Activity(String name, String description, List<BigInteger> tags) {
+    public Activity(String name, String description, List<BigInteger> tags,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.description = description;
         this.tags = tags;
+        this.startDate=startDate;
+        this.endDate=endDate;
     }
 
 
@@ -311,6 +316,22 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
         this.locationActivityTab = locationActivityTab;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public static Activity copyProperties(Activity source, Activity target, String _id, String organizationType, String organizationSubType) {

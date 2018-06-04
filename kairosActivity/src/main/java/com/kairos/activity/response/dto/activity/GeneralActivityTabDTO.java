@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,8 @@ public class GeneralActivityTabDTO {
     private boolean overRuleCtaWta;
     private String payrollType;
     private String payrollSystem;
-
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public String getUltraShortName() {
         return ultraShortName;
@@ -229,7 +231,25 @@ public class GeneralActivityTabDTO {
         return payrollSystem;
     }
 
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
     public void setPayrollSystem(String payrollSystem) {
         this.payrollSystem = payrollSystem;
     }
+
+
 }

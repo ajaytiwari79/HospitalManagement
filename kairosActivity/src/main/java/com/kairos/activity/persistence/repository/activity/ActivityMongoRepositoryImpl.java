@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -254,6 +255,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
+    }
+    public Activity findByNameAndDateAndCountryId(String name,Long countryId,Date date)
+    {
+         Query query=new Query(Criteria.where("name").is(name).and("deleted").is(false).and("countryId").is(countryId).and("startDate").lt(date).orOperator(Criteria.where("endDate").gt(date),Criteria.where("endDate").exists(false)));
+         return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
 
 }

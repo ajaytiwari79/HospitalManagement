@@ -65,6 +65,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -117,11 +118,23 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         logger.info(activityDTO.getName());
-        Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
+        Date date = DateUtils.asDate(activityDTO.getStartDate());
+        if(activityDTO.getEndDate()!=null){
+        if(activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
+            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthen.startdate");
+        }}
+        Activity activity = activityMongoRepository.findByNameAndDateAndCountryId(activityDTO.getName().trim(), countryId,date);
+        //Activity activity = activityMongoRepository.findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
 
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicateData", "activity", activityDTO.getName());
+            logger.info(activity.getStartDate()+"------------"+activity.getEndDate());
+                if(!Optional.ofNullable(activity.getEndDate()).isPresent()){
+                    exceptionService.dataNotFoundException("please insert enddate");
+                }
+                else{
+                    exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
+                }
+          // exceptionService.duplicateDataException("message.duplicateData", "activity", activityDTO.getName());
         }
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId);
@@ -267,6 +280,8 @@ public class ActivityService extends MongoBaseService {
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
+        activity.setStartDate(generalDTO.getStartDate());
+        activity.setEndDate(generalDTO.getEndDate());
         save(activity);
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
@@ -1063,7 +1078,7 @@ public class ActivityService extends MongoBaseService {
         for (BigInteger tag : activityDTO.getTags()) {
             tags.add(tag);
         }
-        Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
+        Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags,activityDTO.getStartDate(),activityDTO.getEndDate());
         return activity;
     }
 
