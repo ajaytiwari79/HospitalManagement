@@ -234,6 +234,4 @@ public class EmploymentTypeService extends UserBaseService {
         List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyProperties(expertise,ExpertiseResponseDTO.class);
         return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
     }
-
-
 }
