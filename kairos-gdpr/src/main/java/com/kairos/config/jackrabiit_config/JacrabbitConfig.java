@@ -10,10 +10,10 @@ import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
 import org.apache.jackrabbit.oak.plugins.document.DocumentMK;
 import org.apache.jackrabbit.oak.plugins.document.DocumentNodeStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.inject.Inject;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import java.util.Arrays;
@@ -23,28 +23,22 @@ import java.util.List;
 public class JacrabbitConfig {
 
 
-@Autowired
-private EnvConfig environmentConfig;
-
-
-private final String username=environmentConfig.getMongoUserName();
-private final char[] password=environmentConfig.getMongoPassword().toCharArray();
-private final String databaseName=environmentConfig.getDataBaseName();
-    final String host = environmentConfig.getMongoHost();
-    final int port = environmentConfig.getMongoPort();
-
-
+@Inject
+private EnvConfig environment;
 
 
     @Bean
     public Repository repository() throws RepositoryException {
-        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createPlainCredential(username,databaseName,password));
-
-        DB db = new MongoClient( new ServerAddress(host,port),credentialList ).getDB(environmentConfig.getDataBaseName());
+        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(),environment.getDataBaseName(),environment.getMongoPassword().toCharArray()));
+        DB db = new MongoClient( new ServerAddress(environment.getMongoHost(),environment.getMongoPort()) ,credentialList).getDB(environment.getDataBaseName());
         DocumentNodeStore ns = new DocumentMK.Builder()
-                /*.setBlobStore((BlobStore)new FileBlobStore("mongorepository_jackrabit/blob"))*/.setMongoDB(db).getNodeStore();
+                /*.setBlobStore((BlobStore)new FileBlobStore("mongorepository_jackrabit/blob"))*/.setMongoDB(db,1).getNodeStore();
         Repository repo = new Jcr(new Oak(ns)).createRepository();
         return repo;
     }
+
+
+    public JacrabbitConfig()
+    {}
 
 }

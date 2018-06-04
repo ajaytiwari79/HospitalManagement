@@ -23,38 +23,38 @@ public class EnvConfig {
     @Value("${spring.data.mongodb.host}")
     private String mongoHost;
 
-    @Value("${spring.mongodb.username}")
+    @Value("${spring.data.mongodb.username}")
     private String mongoUserName;
 
-    @Value("${spring.mongodb.password}")
+    @Value("${spring.data.mongodb.password}")
     private  String mongoPassword;
 
     public String getDataBaseName() {
         return dataBaseName;
     }
 
-    public String getMongoUri() {
-        return mongoUri;
-    }
-
-    public String getMongoHost() {
-        return mongoHost;
-    }
-
-    public int getMongoPort() {
-        return mongoPort;
-    }
-
     public void setDataBaseName(String dataBaseName) {
         this.dataBaseName = dataBaseName;
+    }
+
+    public String getMongoUri() {
+        return mongoUri;
     }
 
     public void setMongoUri(String mongoUri) {
         this.mongoUri = mongoUri;
     }
 
+    public int getMongoPort() {
+        return mongoPort;
+    }
+
     public void setMongoPort(int mongoPort) {
         this.mongoPort = mongoPort;
+    }
+
+    public String getMongoHost() {
+        return mongoHost;
     }
 
     public void setMongoHost(String mongoHost) {
@@ -65,6 +65,8 @@ public class EnvConfig {
         return mongoUserName;
     }
 
+
+
     public void setMongoUserName(String mongoUserName) {
         this.mongoUserName = mongoUserName;
     }
@@ -72,6 +74,7 @@ public class EnvConfig {
     public String getMongoPassword() {
         return mongoPassword;
     }
+
 
     public void setMongoPassword(String mongoPassword) {
         this.mongoPassword = mongoPassword;

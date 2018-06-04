@@ -97,12 +97,12 @@ public class DataSubjectService extends MongoBaseService {
     public DataSubject updateDataSubject(BigInteger id, DataSubject dataSubject) {
 
 
-        DataSubject exist = dataSubjectMongoRepository.findByid(id);
+        DataSubject exist = dataSubjectMongoRepository.findByName(UserContext.getCountryId(),dataSubject.getName());
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
+            exist=dataSubjectMongoRepository.findByid(id);
             exist.setName(dataSubject.getName());
-
             return save(exist);
 
         }

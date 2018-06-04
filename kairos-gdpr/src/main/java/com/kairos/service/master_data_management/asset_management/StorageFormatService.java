@@ -95,10 +95,11 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByid(id);
+        StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(),storageFormat.getName());
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
+            exist=storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
             return save(exist);
 
