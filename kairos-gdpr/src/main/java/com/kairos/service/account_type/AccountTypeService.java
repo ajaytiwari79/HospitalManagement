@@ -46,12 +46,12 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public AccountType getAccountByName(Long countryId,String typeOfAccount) {
-        AccountType account = accountTypeRepository.findByTypeOfAccount(countryId,typeOfAccount);
+    public AccountType getAccountByName(Long countryId,String name) {
+        AccountType account = accountTypeRepository.findByTypeOfAccount(countryId,name);
         if (Optional.ofNullable(account).isPresent()) {
             return account;
         } else
-            throw new DataNotExists("Account for account type ->" + typeOfAccount + " Not exists");
+            throw new DataNotExists("Account for account type ->" + name + " Not exists");
     }
 
 
@@ -77,6 +77,31 @@ public class AccountTypeService extends MongoBaseService {
           exceptionService.dataNotFoundByIdException("message.dataNotFound","message.accountType",id);
         }
         return exists;
+
+    }
+
+    public AccountType updateAccountName(Long countryId,BigInteger id,AccountType accountType) {
+
+        AccountType exists = accountTypeRepository.findByNameAndNonDeleted(countryId,accountType.getName());
+        if (Optional.ofNullable(exists).isPresent()) {
+            throw  new DuplicateDataException("Account type exist for "+accountType.getName());
+        }
+        exists=accountTypeRepository.findByIdAndNonDeleted(countryId,id);
+        exists.setName(accountType.getName());
+        return exists;
+
+    }
+
+
+    public Boolean deleteAccountType(BigInteger id) {
+
+        AccountType exists = accountTypeRepository.findByid(id);
+        if (!Optional.ofNullable(exists).isPresent()) {
+            throw  new DataNotFoundByIdException("Account type exist for id "+id);
+        }
+        exists.setDeleted(true);
+        save(exists);
+        return true;
 
     }
 

@@ -12,6 +12,7 @@ public class ModuleIdDto {
 
     @NotNullOrEmpty
     private String name;
+
     @NotNullOrEmpty
     private String moduleId;
 

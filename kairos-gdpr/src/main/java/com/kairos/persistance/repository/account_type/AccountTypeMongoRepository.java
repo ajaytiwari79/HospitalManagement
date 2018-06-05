@@ -21,7 +21,14 @@ public interface AccountTypeMongoRepository extends  MongoRepository<AccountType
    @Query("{deleted:false,_id:{$in:?0}}")
    List<AccountType> getAccountTypeList(Set<BigInteger> ids);
 
+   AccountType findByid(BigInteger id);
+
    @Query("{typeOfAccount:?1,countryId:?0}")
    AccountType findByTypeOfAccount(Long countryId,String typeOfAccount);
+
+   @Query("{deleted:false,countryId:?0,name:?1}")
+  AccountType findByNameAndNonDeleted(Long countryId,String name);
+
+
 
 }
