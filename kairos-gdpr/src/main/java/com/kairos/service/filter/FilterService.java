@@ -1,9 +1,7 @@
-package com.kairos.service.master_data_management.asset_management;
-
+package com.kairos.service.filter;
 
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelectionDto;
-import com.kairos.dto.ModuleIdDto;
 import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
@@ -12,37 +10,27 @@ import com.kairos.persistance.repository.master_data_management.asset_management
 import com.kairos.response.dto.filter.FilterAndFavouriteFilterDto;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import com.kairos.response.dto.filter.FilterResponseDto;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.master_data_management.asset_management.MasterAssetFilterService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
 
-
 @Service
-public class MasterAssetFilterService extends MongoBaseService {
+public class FilterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetFilterService.class);
 
 
     @Inject
-    private MasterAssetMongoRepository masterAssetMongoRepository;
-
-    @Inject
     private FilterGroupMongoRepository filterGroupMongoRepository;
-
-    @Inject
-    private MongoTemplate mongoTemplate;
-
-    public FilterQueryResult getAllMasterAssetFilter(Long countryId) {
-        return masterAssetMongoRepository.getMasterAssetFilter(countryId);
-
-    }
 
     public FilterAndFavouriteFilterDto metaDatafilters(String moduleId, Long countryId) {
 
@@ -54,10 +42,10 @@ public class MasterAssetFilterService extends MongoBaseService {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
             filterCriteria = filterGroupMongoRepository.getFilterCriterias(countryId, filterTypes);
             Aggregation aggregation = filterGroupMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
-            AggregationResults<FilterQueryResult> result = filterGroupMongoRepository.getFilterAggregationResult(aggregation,filterGroup,moduleId);
+            AggregationResults<FilterQueryResult> result = filterGroupMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
             filterTypes.forEach(filterType -> {
-                filterResponseData.add(buildMasterAssetFilter(filterQueryResult, filterType));
+                filterResponseData.add(buildFilters(filterQueryResult, filterType));
             });
             filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
             filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
@@ -69,16 +57,6 @@ public class MasterAssetFilterService extends MongoBaseService {
 
     }
 
-
-    public List<MasterAsset> getMasterAssetDataWithFilter(Long countryId, String moduleId, FilterSelectionDto filterSelectionDto) {
-
-        if (checkIfFilterGroupExistForMduleId(moduleId, true)) {
-            return masterAssetMongoRepository.getMasterAssetListWithFilterData(countryId, filterSelectionDto);
-        } else
-            throw new InvalidRequestException("invalide Request filter group not exist for moduleId " + moduleId);
-    }
-
-
     boolean checkIfFilterGroupExistForMduleId(String moduleId, Boolean active) {
 
         if (Optional.ofNullable(filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, UserContext.getCountryId())).isPresent()) {
@@ -88,7 +66,7 @@ public class MasterAssetFilterService extends MongoBaseService {
     }
 
 
-    public FilterResponseDto buildMasterAssetFilter(FilterQueryResult filterQueryResult, FilterType filterType) {
+    public FilterResponseDto buildFilters(FilterQueryResult filterQueryResult, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
                 return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getAccountTypes());
@@ -129,5 +107,4 @@ public class MasterAssetFilterService extends MongoBaseService {
 
     }
 */
-
 }

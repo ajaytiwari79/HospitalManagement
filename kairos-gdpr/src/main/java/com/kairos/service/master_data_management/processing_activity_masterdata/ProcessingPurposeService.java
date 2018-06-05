@@ -98,8 +98,8 @@ public class ProcessingPurposeService extends MongoBaseService {
 
 
         ProcessingPurpose exist = processingPurposeMongoRepository.findByName(UserContext.getCountryId(),processingPurpose.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+processingPurpose.getName());
         } else {
             exist=processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());

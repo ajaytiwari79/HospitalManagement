@@ -96,8 +96,8 @@ public class HostingProviderService extends MongoBaseService {
     public HostingProvider updateHostingProvider(BigInteger id, HostingProvider hostingProvider) {
 
         HostingProvider exist = hostingProviderMongoRepository.findByName(UserContext.getCountryId(),hostingProvider.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+hostingProvider.getName());
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
