@@ -1,23 +1,27 @@
 package com.kairos.response.dto;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterAssetResponseDto {
+public class ClauseResponseDto {
 
     @NotNull
     private BigInteger id;
-
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
-    private  String name;
-
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty
+    private String title;
+    @NotNull
+    private List<ClauseTag> tags = new ArrayList<>();
+    @NotNullOrEmpty
     private String description;
 
     public BigInteger getId() {
@@ -30,20 +34,36 @@ public class MasterAssetResponseDto {
 
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    private List <OrganizationTypeAndServiceBasicDto> organizationServices;
+    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private Long countryId;
+    private List<AccountType> accountTypes;
 
-    public String getName() {
-        return name;
+    public List<AccountType> getAccountTypes() {
+        return accountTypes;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAccountTypes(List<AccountType> accountTypes) {
+        this.accountTypes = accountTypes;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<ClauseTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<ClauseTag> tags) {
+        this.tags = tags;
     }
 
     public String getDescription() {
@@ -84,13 +104,5 @@ public class MasterAssetResponseDto {
 
     public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 }

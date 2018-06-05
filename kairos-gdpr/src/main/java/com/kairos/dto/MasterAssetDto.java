@@ -11,22 +11,26 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterAssetDto {
 
-    @NotNullOrEmpty
+    @NotNullOrEmpty(message = "error.description.cannot.be.null.or.empty")
     private String name;
 
-    @NotNullOrEmpty
+    @NotNullOrEmpty(message = "error.description.cannot.be.null.or.empty")
     private String description;
 
-
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
 

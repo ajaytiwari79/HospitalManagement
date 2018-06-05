@@ -8,6 +8,6 @@ public class AppConstant {
 
     public static final String ASSET_MODULE_NAME = "Asset List";
     public static final String CLAUSE_MODULE_NAME = "Clauses";
-    public static final String PROCESSING_ACTIVITY_NAME = "Processing Activity List";
+    public static final String MASTER_PROCESSING_ACTIVITY_NAME = "Processing Activity List";
 
 }

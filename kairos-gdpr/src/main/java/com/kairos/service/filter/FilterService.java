@@ -10,11 +10,16 @@ import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
 import com.kairos.persistance.model.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
+import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistance.repository.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.response.dto.ClauseResponseDto;
+import com.kairos.response.dto.MasterAssetResponseDto;
+import com.kairos.response.dto.MasterProcessingActivityResponseDto;
 import com.kairos.response.dto.filter.FilterAndFavouriteFilterDto;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import com.kairos.response.dto.filter.FilterResponseDto;
@@ -27,17 +32,18 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.util.*;
+
 import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
 import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constant.AppConstant.PROCESSING_ACTIVITY_NAME;
+import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_NAME;
 
 @Service
 public class FilterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterService.class);
-
 
     @Inject
     private FilterMongoRepository filterMongoRepository;
@@ -53,10 +59,10 @@ public class FilterService {
     private MasterAssetMongoRepository masterAssetMongoRepository;
 
     @Inject
-    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+    private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
 
-    public FilterAndFavouriteFilterDto getFilterCategories( Long countryId,String moduleId) {
+    public FilterAndFavouriteFilterDto getFilterCategories(Long countryId, String moduleId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
@@ -131,18 +137,22 @@ public class FilterService {
 
         switch (moduleName) {
             case CLAUSE_MODULE_NAME:
-                FilterResponseWithData<List<Clause>> clauseFilterData = new FilterResponseWithData<List<Clause>>();
-                clauseFilterData.setData(clauseMongoRepository.getClauseDataWithFilterSelection(countryId, filterSelectionDto));
+                List<Clause> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, filterSelectionDto);
+                List<ClauseResponseDto> clauseResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDto.class);
+                FilterResponseWithData<List<ClauseResponseDto>> clauseFilterData = new FilterResponseWithData<>();
+                clauseFilterData.setData(clauseResponseDtos);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
-                FilterResponseWithData<List<MasterAssetDto>> assetfilterData = new FilterResponseWithData<List<MasterAssetDto>>();
                 List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, filterSelectionDto);
-                List<MasterAssetDto> masterAssetDtos = com.kairos.activity.util.ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets,MasterAssetDto.class);
-                assetfilterData.setData(masterAssetDtos);
+                List<MasterAssetResponseDto> masterAssetResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDto.class);
+                FilterResponseWithData<List<MasterAssetResponseDto>> assetfilterData = new FilterResponseWithData<>();
+                assetfilterData.setData(masterAssetResponseDtos);
                 return assetfilterData;
-            case PROCESSING_ACTIVITY_NAME:
-                FilterResponseWithData<List<ProcessingActivity>> processingActivityFilterData = new FilterResponseWithData<List<ProcessingActivity>>();
-                processingActivityFilterData.setData(null);
+            case MASTER_PROCESSING_ACTIVITY_NAME:
+                List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, filterSelectionDto);
+                List<MasterProcessingActivityResponseDto> processingActivityResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDto.class);
+                FilterResponseWithData<List<MasterProcessingActivityResponseDto>> processingActivityFilterData = new FilterResponseWithData<>();
+                processingActivityFilterData.setData(processingActivityResponseDtos);
                 return processingActivityFilterData;
             default:
                 throw new DataNotFoundByIdException("data not found by moduleName " + moduleName);

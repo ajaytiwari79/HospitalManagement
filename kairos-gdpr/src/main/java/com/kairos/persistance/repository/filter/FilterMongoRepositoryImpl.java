@@ -26,7 +26,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.grou
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
 import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constant.AppConstant.PROCESSING_ACTIVITY_NAME;
+import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_NAME;
 
 
 public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
@@ -110,8 +110,8 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
                  return mongoTemplate.aggregate(aggregation,Clause.class,FilterQueryResult.class);
             case ASSET_MODULE_NAME:
                 return mongoTemplate.aggregate(aggregation,MasterAsset.class,FilterQueryResult.class);
-            case PROCESSING_ACTIVITY_NAME:
-                return mongoTemplate.aggregate(aggregation,ProcessingActivity.class,FilterQueryResult.class);
+            case MASTER_PROCESSING_ACTIVITY_NAME:
+                return mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,FilterQueryResult.class);
                 default:
                     throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);
 
