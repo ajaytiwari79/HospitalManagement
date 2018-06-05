@@ -92,7 +92,7 @@ public class PriorityGroupService extends MongoBaseService {
     }
 
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
-        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
         PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
@@ -149,10 +149,12 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupDTO.setParentId(priorityGroupDTO.getId());
             priorityGroupDTO.setOrderId(orderId);
             priorityGroupDTO.setId(null);
+
         });
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
-        return priorityGroupDTOs;
+        ObjectMapperUtils.copyProperties(priorityGroups,priorityGroupDTOs);
+        return  priorityGroupDTOs;
     }
     public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
         List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyProperties(priorityGroupDTOs,PriorityGroup.class);
