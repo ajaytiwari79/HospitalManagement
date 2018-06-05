@@ -99,8 +99,8 @@ public class DestinationService extends MongoBaseService {
 
 
         Destination exist = destinationMongoRepository.findByName(UserContext.getCountryId(),destination.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+destination.getName());
         } else {
             exist=destinationMongoRepository.findByid(id);
             exist.setName(destination.getName());

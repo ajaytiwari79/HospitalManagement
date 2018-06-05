@@ -95,8 +95,8 @@ public class TransferMethodService extends MongoBaseService {
 
 
         TransferMethod exist = transferMethodDestinationRepository.findByName(UserContext.getCountryId(),transferMethod.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+transferMethod.getName());
         } else {
             exist=transferMethodDestinationRepository.findByid(id);
             exist.setName(transferMethod.getName());

@@ -97,8 +97,8 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
 
         ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(UserContext.getCountryId(),legalBasis.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+legalBasis.getName());
         } else {
             exist=legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
