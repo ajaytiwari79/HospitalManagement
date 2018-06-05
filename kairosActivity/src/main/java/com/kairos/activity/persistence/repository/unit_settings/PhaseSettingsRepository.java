@@ -11,4 +11,6 @@ public interface PhaseSettingsRepository extends MongoBaseRepository<PhaseSettin
 
     List<PhaseSettingsDTO> findAllByUnitIdAndDeletedFalse(Long unitId);
 
+    PhaseSettings getPhaseSettingsByUnitIdAndPhaseId(Long unitId,BigInteger phaseId);
+
 }

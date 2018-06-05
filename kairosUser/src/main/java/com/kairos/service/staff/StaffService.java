@@ -44,6 +44,7 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
@@ -1617,6 +1618,8 @@ public class StaffService extends UserBaseService {
             }
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
+        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.getStaffAccessRoles(unitId,staffId);
+        staffAdditionalInfoQueryResult.setUserAccessRoleDTO(userAccessRoleDTO);
 
         return staffAdditionalInfoQueryResult;
     }

@@ -456,7 +456,6 @@ public class OrganizationService extends UserBaseService {
 //            phaseRestClient.createDefaultPhases(organization.getId());
 //            periodRestClient.createDefaultPeriodSettings(organization.getId());
 //        }
-        priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(),organization.getCountry().getId());
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
         organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));

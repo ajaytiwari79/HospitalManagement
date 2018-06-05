@@ -2,6 +2,7 @@ package com.kairos.activity.client.dto.staff;
 
 import com.kairos.activity.persistence.model.task_demand.MonthlyFrequency;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.joda.time.DateTimeZone;
 
 import java.time.DayOfWeek;
@@ -25,6 +26,7 @@ public class StaffAdditionalInfoDTO {
     private Date organizationNightEndTimeTo;
     private List<DayOfWeek> activityDayTypes;
     private ZoneId unitTimeZone;
+    private UserAccessRoleDTO userAccessRoleDTO;
 
 
     public DateTimeZone getUnitTimeZone() {
@@ -120,5 +122,13 @@ public class StaffAdditionalInfoDTO {
 
     public void setOrganizationNightEndTimeTo(Date organizationNightEndTimeTo) {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
+    }
+
+    public UserAccessRoleDTO getUserAccessRoleDTO() {
+        return userAccessRoleDTO;
+    }
+
+    public void setUserAccessRoleDTO(UserAccessRoleDTO userAccessRoleDTO) {
+        this.userAccessRoleDTO = userAccessRoleDTO;
     }
 }
