@@ -97,8 +97,8 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(BigInteger id, TechnicalSecurityMeasure techSecurityMeasure) {
         TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(UserContext.getCountryId(),techSecurityMeasure.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+techSecurityMeasure.getName());
         } else {
             exist=technicalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(techSecurityMeasure.getName());

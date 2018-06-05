@@ -97,8 +97,8 @@ public class DataDisposalService extends MongoBaseService {
 
 
         DataDisposal exist = dataDisposalMongoRepository.findByName(UserContext.getCountryId(),dataDisposal.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new InvalidRequestException("data  exist for  "+dataDisposal.getName());
         } else {
             exist=dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
