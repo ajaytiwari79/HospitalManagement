@@ -190,8 +190,7 @@ public class ActivityTagDTO {
         this.unitId = activity.getUnitId();
         this.tags = tags;
         this.state=activity.getState();
-        this.startDate=activity.getStartDate();
-        this.endDate=activity.getEndDate();
+
         return this;
     }
 }

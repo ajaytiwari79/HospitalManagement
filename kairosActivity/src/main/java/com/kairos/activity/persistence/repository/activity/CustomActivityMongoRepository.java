@@ -50,4 +50,6 @@ public interface CustomActivityMongoRepository {
     Activity findByNameAndDateAndCountryId(String name,Long countryId,Date date);
 
     Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId,Date date);
+
+    Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,Date date);
 }
