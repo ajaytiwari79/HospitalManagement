@@ -7,7 +7,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
 import java.util.List;
 

@@ -28,7 +28,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;

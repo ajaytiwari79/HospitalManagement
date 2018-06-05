@@ -1,7 +1,6 @@
 package com.kairos.service.organization;
 
 import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
@@ -10,6 +9,8 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
+import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
@@ -65,7 +66,7 @@ import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
@@ -1701,13 +1702,18 @@ public class OrganizationService extends UserBaseService {
         return orderDefaultDataWrapper;
     }
 
-    public Object initialOptaplannerSync(Long organizationId, Long unitId) {
+    public PlannerSyncResponseDTO initialOptaplannerSync(Long organizationId, Long unitId) {
         List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
-        plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
-        List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(organizationId);
-        plannerSyncService.publishAllUnitPositions(organizationId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
-        phaseRestClient.initialOptaplannerSync(unitId);
-        return null;
+        boolean syncStarted=false;
+        if(!staff.isEmpty()){
+            plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
+            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
+            if(!unitPositionEmploymentTypeRelationShips.isEmpty()){
+                plannerSyncService.publishAllUnitPositions(unitId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
+            }
+            phaseRestClient.initialOptaplannerSync(unitId);
+        }
+        return new PlannerSyncResponseDTO(syncStarted);
     }
 
     public RuleTemplateDefaultData getDefaultDataForRuleTemplate(long countryId) {
