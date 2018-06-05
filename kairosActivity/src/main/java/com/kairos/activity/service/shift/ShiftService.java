@@ -447,6 +447,9 @@ public class ShiftService extends MongoBaseService {
         PhaseSettings phaseSettings=phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(),phase.getId());
         if(!phaseSettings.isManagementEligibleForOverStaffing() || !phaseSettings.isManagementEligibleForUnderStaffing() || !phaseSettings.isStaffEligibleForOverStaffing() || !phaseSettings.isStaffEligibleForUnderStaffing()){
             List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalseForAbsence(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
+            if(!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()){
+                exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+            }
             List<Shift> shifts=shiftMongoRepository.findShiftBetweenDuration(shift.getStartDate(),shift.getEndDate(),shift.getUnitId());
             boolean isUpdated = !checkOverStaffing ? shifts.remove(shift) : shifts.add(shift);
             for (StaffingLevel staffingLevel:staffingLevels){
