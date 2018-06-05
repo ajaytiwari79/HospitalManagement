@@ -137,7 +137,7 @@ public class FilterService {
             case ASSET_MODULE_NAME:
                 FilterResponseWithData<List<MasterAssetDto>> assetfilterData = new FilterResponseWithData<List<MasterAssetDto>>();
                 List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, filterSelectionDto);
-                List<MasterAssetDto> masterAssetDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets,MasterAssetDto.class);
+                List<MasterAssetDto> masterAssetDtos = com.kairos.activity.util.ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets,MasterAssetDto.class);
                 assetfilterData.setData(masterAssetDtos);
                 return assetfilterData;
             case PROCESSING_ACTIVITY_NAME:

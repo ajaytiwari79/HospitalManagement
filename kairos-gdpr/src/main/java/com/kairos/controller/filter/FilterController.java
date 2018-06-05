@@ -30,7 +30,7 @@ public class FilterController {
         if (countryId != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterCategories(countryId, moduleId));
         } else if (StringUtils.isBlank(moduleId)) {
-            return ResponseHandler.invalidResponse(HttpStatus.OK, true, "module id is empty or null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "module id is empty or null");
 
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "countryId cannot be null");
@@ -43,7 +43,7 @@ public class FilterController {
 
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "countryId cannot be null");
         } else if (StringUtils.isBlank(moduleId)) {
-            return ResponseHandler.invalidResponse(HttpStatus.OK, true, "module id is empty or null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, true, "module id is empty or null");
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterDataWithFilterSelection(countryId, moduleId, filterSelectionDto).getData());
