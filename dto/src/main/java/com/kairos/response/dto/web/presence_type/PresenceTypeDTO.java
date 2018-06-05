@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 
 /**
  * @author pradeep
@@ -17,7 +18,7 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
     @NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty")
     @NotNull(message = "error.PresenceTypeDTO.name.notnull")
     private String name;
-    private Long id;
+    private BigInteger id;
 
     public String getName() {
         return name;
@@ -31,7 +32,7 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
     public PresenceTypeDTO() {
     }
 
-    public PresenceTypeDTO(@NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty") @NotNull(message = "error.PresenceTypeDTO.name.notnull") String name, Long id) {
+    public PresenceTypeDTO(@NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty") @NotNull(message = "error.PresenceTypeDTO.name.notnull") String name, BigInteger id) {
         this.name = name;
         this.id = id;
     }
@@ -40,11 +41,11 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
         this.name = name;
     }
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
