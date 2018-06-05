@@ -9,6 +9,34 @@ public class StaffUnitPositionQueryResult {
     private Integer contractedMinByWeek;
     private Long startDate;
     private Long endDate;
+    private Integer accumulatedTimeBank;
+    private Integer deltaWeeklytimeBank;
+
+    public Integer getAccumulatedTimeBank() {
+        return accumulatedTimeBank;
+    }
+
+    public void setAccumulatedTimeBank(Integer accumulatedTimeBank) {
+        this.accumulatedTimeBank = accumulatedTimeBank;
+    }
+
+    public Integer getDeltaWeeklytimeBank() {
+        return deltaWeeklytimeBank;
+    }
+
+    public void setDeltaWeeklytimeBank(Integer deltaWeeklytimeBank) {
+        this.deltaWeeklytimeBank = deltaWeeklytimeBank;
+    }
+
+    public Integer getPlannedHoursWeek() {
+        return plannedHoursWeek;
+    }
+
+    public void setPlannedHoursWeek(Integer plannedHoursWeek) {
+        this.plannedHoursWeek = plannedHoursWeek;
+    }
+
+    private Integer plannedHoursWeek;
 
     public Integer getWorkingDaysPerWeek() {
         return workingDaysPerWeek;

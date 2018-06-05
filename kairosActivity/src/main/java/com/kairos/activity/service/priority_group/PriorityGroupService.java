@@ -2,11 +2,11 @@ package com.kairos.activity.service.priority_group;
 
 import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.activity.response.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +23,8 @@ public class PriorityGroupService extends MongoBaseService {
     private PriorityGroupRepository priorityGroupRepository;
     @Inject
     private  ExceptionService exceptionService;
+    @Inject
+    private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
 
 
     public boolean createPriorityGroupForCountry(long countryId,PriorityGroupDTO priorityGroupDTO) {
@@ -127,9 +129,12 @@ public class PriorityGroupService extends MongoBaseService {
 
     public Set<Long> getStaffByPriorityGroup(BigInteger priorityGroupId){
         PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
+        PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
 
-        PriorityGroupFilter priorityGroupFilter = new PriorityGroupFilter(priorityGroup);
-       // Set<Long> staffIds = priorityGroupFilter.getStaffByPriorityGroupIncludeFilter();
+        PriorityGroupRulesImplementation priorityGroupRulesImplementation = new PriorityGroupRulesImplementation();
+        ImpactWeight impactWeight = new ImpactWeight(7,4);
+        priorityGroupRulesImplementation.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
+       // Set<Long> staffIds = priorityGroupRulesImplementation.getStaffByPriorityGroupIncludeFilter();
         return null;
 
     }

@@ -12,12 +12,15 @@ import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.activity.response.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.service.priority_group.priority_group_rules.*;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.response.dto.web.StaffDTO;
 import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
+import com.kairos.response.dto.web.open_shift.FibonacciCounter;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.Interval;
@@ -28,11 +31,12 @@ import javax.inject.Inject;
 
 import static java.util.stream.Collectors.groupingBy;
 
-
-public class PriorityGroupFilter {
+@Component
+public class PriorityGroupRulesImplementation {
 
     private PriorityGroupDTO priorityGroupDTO;
-    private Map<Long,List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap;
+    private PriorityGroupRuleDataDTO priorityGroupRuleDataDTO;
+    /*private Map<Long,List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap;
     private List<StaffUnitPositionQueryResult> staffsUnitPositions;
     private TimeBankCalculationService timeBankCalculationService;
     private Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap;
@@ -44,11 +48,12 @@ public class PriorityGroupFilter {
     private Set<BigInteger> unavailableActivitySet;
     private Set<BigInteger> vetoActivitySet;
     private Set<BigInteger> stopBricksActivitySet;
+    private PriorityGroupRuleDataDTO priorityGroupRuleDataDTO;*/
 
-    public PriorityGroupFilter(PriorityGroupDTO priorityGroupDTO, Map<Long,List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap, List<StaffUnitPositionQueryResult> staffsUnitPositions,
-                               TimeBankCalculationService timeBankCalculationService, List<OpenShift> openShifts, Map<Long,Integer> assignedOpenShiftMap,
-                               List<OpenShiftNotification> openShiftNotifications,List<Shift> shifts,Set<BigInteger> unavailableActivitySet,
-                               Set<BigInteger> vetoActivitySet, Set<BigInteger> stopBricksActivitySet)
+    /*public PriorityGroupRulesImplementation(PriorityGroupDTO priorityGroupDTO, Map<Long,List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap, List<StaffUnitPositionQueryResult> staffsUnitPositions,
+                                            TimeBankCalculationService timeBankCalculationService, List<OpenShift> openShifts, Map<Long,Integer> assignedOpenShiftMap,
+                                            List<OpenShiftNotification> openShiftNotifications, List<Shift> shifts, Set<BigInteger> unavailableActivitySet,
+                                            Set<BigInteger> vetoActivitySet, Set<BigInteger> stopBricksActivitySet)
      {
         this.priorityGroupDTO = priorityGroupDTO;
         this.unitPositionDailyTimeBankEntryMap = unitPositionDailyTimeBankEntryMap;
@@ -70,9 +75,85 @@ public class PriorityGroupFilter {
         this.unavailableActivitySet = unavailableActivitySet;
         this.vetoActivitySet = vetoActivitySet;
         this.stopBricksActivitySet = stopBricksActivitySet;
+    }*/
+
+    public PriorityGroupRulesImplementation() {
+
+    }
+    public PriorityGroupRulesImplementation(PriorityGroupDTO priorityGroupDTO,PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) {
+
+        this.priorityGroupDTO = priorityGroupDTO;
+        this.priorityGroupRuleDataDTO = priorityGroupRuleDataDTO;
+    }
+    private List<PriorityGroupRuleFilter> getRulesList(PriorityGroupDTO priorityGroupDTO,PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) {
+
+        List<PriorityGroupRuleFilter> priorityGroupRules = new ArrayList<>();
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()).isPresent()||
+                Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek()).isPresent()||
+                Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime()).isPresent()) {
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new TimeBankPlannedHoursRules();
+            priorityGroupRules.add(priorityGroupRuleFilter);
+        }
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit()).isPresent()||
+                Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity()).isPresent()) {
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new LastWorkInUnitAndActivityRule(priorityGroupRuleDataDTO.getShiftUnitPositionsMap(),
+                    priorityGroupRuleDataDTO.getOpenShiftMap());
+
+            priorityGroupRules.add(priorityGroupRuleFilter);
+        }
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeBeforeShiftStart()).isPresent()||
+                Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeAfterShiftEnd()).isPresent()) {
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new RestingHoursRule(priorityGroupRuleDataDTO.getOpenShiftMap(),priorityGroupRuleDataDTO.getShifts());
+            priorityGroupRules.add(priorityGroupRuleFilter);
+        }
+        if(priorityGroupDTO.getStaffExcludeFilter().isNegativeAvailabilityInCalender()||
+                Optional.ofNullable(priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability()).isPresent()) {
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new NegativeAvailabilityAndPercentAvailabilityRule(priorityGroupRuleDataDTO.getUnavailableActivitySet(),
+                    priorityGroupRuleDataDTO.getShifts(),priorityGroupRuleDataDTO.getOpenShiftMap());
+            priorityGroupRules.add(priorityGroupRuleFilter);
+        }
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfPendingRequest()).isPresent()) {
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new PendingRequestRule(priorityGroupRuleDataDTO.getOpenShiftNotifications());
+            priorityGroupRules.add(priorityGroupRuleFilter);
+        }
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()).isPresent()||
+                Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()) {
+            PriorityGroupRuleFilter priorityGroupRuleFilter = new UnitExperienceAndAssignedOpenShiftRule(priorityGroupRuleDataDTO.getAssignedOpenShiftMap());
+            priorityGroupRules.add(priorityGroupRuleFilter);
+
+        }
+
+
+        return priorityGroupRules;
     }
 
-    public List<StaffDTO> getStaffByPriorityGroupIncludeFilter(List<StaffDTO> staffDTOS) {
+
+    public void executeRules(PriorityGroupDTO priorityGroupDTO,PriorityGroupRuleDataDTO priorityGroupRuleDataDTO, ImpactWeight impactWeight) {
+        List<PriorityGroupRuleFilter> priorityGroupRules = getRulesList(priorityGroupDTO,priorityGroupRuleDataDTO);
+        Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap = priorityGroupRuleDataDTO.getOpenShiftStaffMap();
+        for(PriorityGroupRuleFilter priorityGroupRule : priorityGroupRules) {
+            priorityGroupRule.filter(openShiftStaffMap,priorityGroupDTO);
+        }
+
+        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry:openShiftStaffMap.entrySet()) {
+            applyFibonacci(entry.getValue(),priorityGroupRuleDataDTO.getAssignedOpenShiftMap(),impactWeight);
+        }
+
+    }
+
+    public void applyFibonacci(List<StaffUnitPositionQueryResult> staffsUnitPositions,Map<Long,Integer> assignedOpenShiftMap, ImpactWeight impactWeight) {
+
+        FibonacciCounterApply fibonacciCounterApply = new FibonacciCounterApply();
+        List<FibonacciCounter> fibonacciCounters = fibonacciCounterApply.findBestCandidates(impactWeight,staffsUnitPositions, assignedOpenShiftMap);
+        Map<Long,StaffUnitPositionQueryResult> staffUnitPositionMap = staffsUnitPositions.stream().collect(Collectors.toMap(
+                StaffUnitPositionQueryResult::getStaffId,staffUnitPositionQueryResult -> staffUnitPositionQueryResult));
+        staffsUnitPositions = new ArrayList<>();
+        for(FibonacciCounter fibonacciCounter:fibonacciCounters) {
+            staffsUnitPositions.add(staffUnitPositionMap.get(fibonacciCounter.getStaffId()));
+        }
+
+    }
+    /*public List<StaffDTO> getStaffByPriorityGroupIncludeFilter(List<StaffDTO> staffDTOS) {
 
         //staffDTOS.str
         return staffDTOS;
@@ -135,7 +216,7 @@ public class PriorityGroupFilter {
                         DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));
                 timeBank = timeBankCalculationService.calculateTimeBankForInterval(new Interval(startDate,endDate),
                         unitPositionWithCtaDetailsDTO,false,unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId()), false);
-                if(timeBank<priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()) {
+                if(timeBank<priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek()) {
                     staffUnitPositionIterator.remove();
                 }
             }
@@ -205,6 +286,7 @@ public class PriorityGroupFilter {
             }
             if(shiftCount==0){
                 staffUnitPositionIterator.remove();
+
             }
         }
     }
@@ -262,8 +344,8 @@ public class PriorityGroupFilter {
             Date filterEndDate = DateUtils.asDateEndOfDay(openShiftMap.get(entry.getKey()).getStartDate());
             Date filterStartDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate());
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
-           /* Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
-                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getUnitPositionId));*/
+           *//* Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
+                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getUnitPositionId));*//*
 
             Set<Long> unitPositionIds = new HashSet<Long>();
             for(Shift shift:shifts) {
@@ -306,8 +388,8 @@ public class PriorityGroupFilter {
             Date filterStartDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(),openShiftMap.get(entry.getKey()).getFromTime());
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
 
-            /*Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
-                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getUnitPositionId));*/
+            *//*Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
+                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getUnitPositionId));*//*
             Set<Long> unitPositionIds = new HashSet<Long>();
             for(Shift shift:shifts) {
                 if(dateTimeInterval.overlaps(shift.getInterval())) {
@@ -340,5 +422,6 @@ public class PriorityGroupFilter {
                 }
             }
         }
-    }
+    }*/
+
 }
