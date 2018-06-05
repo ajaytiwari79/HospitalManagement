@@ -280,7 +280,7 @@ public class DateUtil {
     }
 
     public static Long getDateFromEpoch(LocalDate dateLong) {
-        return dateLong.toEpochDay();
+        return dateLong.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
     public static LocalDate getTimezonedCurrentDate(String timezone) {
