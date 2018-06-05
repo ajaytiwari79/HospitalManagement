@@ -18,6 +18,16 @@ public class FilterGroup extends MongoBaseEntity {
     @NotNull
     private List<FilterType> filterTypes;
 
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
     public List<ModuleIdDto> getAccessModule() {
         return accessModule;
     }

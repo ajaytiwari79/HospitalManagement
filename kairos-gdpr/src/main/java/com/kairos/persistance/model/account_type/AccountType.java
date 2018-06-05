@@ -17,7 +17,7 @@ public class AccountType extends MongoBaseEntity {
 
 
     @NotNullOrEmpty
-    private String typeOfAccount;
+    private String name;
 
     private Long countryId;
 
@@ -29,12 +29,12 @@ public class AccountType extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public String getTypeOfAccount() {
-        return typeOfAccount;
+    public String getName() {
+        return name;
     }
 
-    public void setTypeOfAccount(String typeOfAccount) {
-        this.typeOfAccount = typeOfAccount;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public AccountType(){}
