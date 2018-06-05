@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.processing_activity_masterdata
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.Destination;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DestinationMongoRepository;
@@ -100,7 +101,7 @@ public class DestinationService extends MongoBaseService {
 
         Destination exist = destinationMongoRepository.findByName(UserContext.getCountryId(),destination.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new InvalidRequestException("data  exist for  "+destination.getName());
+            throw new DuplicateDataException("data  exist for  "+destination.getName());
         } else {
             exist=destinationMongoRepository.findByid(id);
             exist.setName(destination.getName());

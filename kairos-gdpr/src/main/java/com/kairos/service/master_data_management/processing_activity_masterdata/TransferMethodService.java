@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.processing_activity_masterdata
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.TransferMethod;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.TransferMethodMongoRepository;
@@ -96,7 +97,7 @@ public class TransferMethodService extends MongoBaseService {
 
         TransferMethod exist = transferMethodDestinationRepository.findByName(UserContext.getCountryId(),transferMethod.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new InvalidRequestException("data  exist for  "+transferMethod.getName());
+            throw new DuplicateDataException("data  exist for  "+transferMethod.getName());
         } else {
             exist=transferMethodDestinationRepository.findByid(id);
             exist.setName(transferMethod.getName());

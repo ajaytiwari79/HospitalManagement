@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageType;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageTypeMongoRepository;
@@ -98,7 +99,7 @@ public class StorageTypeService extends MongoBaseService {
 
         StorageType exist = storageTypeMongoRepository.findByName(UserContext.getCountryId(),storageType.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new InvalidRequestException("data  exist for  "+storageType.getName());
+            throw new DuplicateDataException("data  exist for  "+storageType.getName());
         } else {
             exist=storageTypeMongoRepository.findByid(id);
             exist.setName(storageType.getName());
