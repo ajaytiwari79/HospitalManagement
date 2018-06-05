@@ -6,6 +6,7 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.enums.FilterType;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -13,9 +14,11 @@ import java.util.List;
 public class FilterGroup extends MongoBaseEntity {
 
     @NotNull
+    @NotEmpty
     private List<ModuleIdDto> accessModule;
 
     @NotNull
+    @NotEmpty
     private List<FilterType> filterTypes;
 
     private Long countryId;

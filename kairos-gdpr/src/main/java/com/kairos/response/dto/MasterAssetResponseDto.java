@@ -1,34 +1,30 @@
-package com.kairos.dto;
+package com.kairos.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterAssetDto {
+public class MasterAssetResponseDto {
 
-    @NotNullOrEmpty
-    private String name;
+    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    private  String name;
 
-    @NotNullOrEmpty
+    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-
 
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List <OrganizationTypeAndServiceBasicDto> organizationServices;
 
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
-
+    private Long countryId;
 
     public String getName() {
         return name;
@@ -76,5 +72,13 @@ public class MasterAssetDto {
 
     public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }

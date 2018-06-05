@@ -8,6 +8,7 @@ import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.processing_activity.ProcessingActivity;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,17 +17,19 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
+import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
+import static com.kairos.constant.AppConstant.PROCESSING_ACTIVITY_NAME;
 
-public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoRepository {
+
+public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
 
 
 
@@ -100,7 +103,20 @@ public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoReposit
         {
             throw new InvalidRequestException("module name is null");
         }
-        if (domainName.toLowerCase().contains("asset"))
+
+        switch (domainName){
+
+            case CLAUSE_MODULE_NAME:
+                 return mongoTemplate.aggregate(aggregation,Clause.class,FilterQueryResult.class);
+            case ASSET_MODULE_NAME:
+                return mongoTemplate.aggregate(aggregation,MasterAsset.class,FilterQueryResult.class);
+            case PROCESSING_ACTIVITY_NAME:
+                return mongoTemplate.aggregate(aggregation,ProcessingActivity.class,FilterQueryResult.class);
+                default:
+                    throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);
+
+        }
+       /* if (domainName.toLowerCase().contains("asset"))
         {
             return mongoTemplate.aggregate(aggregation,MasterAsset.class,FilterQueryResult.class);
         }
@@ -112,6 +128,6 @@ public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoReposit
             return mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,FilterQueryResult.class);
         }
         else
-            throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);
+            throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);*/
     }
 }
