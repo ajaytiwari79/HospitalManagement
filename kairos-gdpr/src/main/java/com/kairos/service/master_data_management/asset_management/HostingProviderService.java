@@ -4,6 +4,7 @@ package com.kairos.service.master_data_management.asset_management;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingProvider;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingProviderMongoRepository;
@@ -97,7 +98,7 @@ public class HostingProviderService extends MongoBaseService {
 
         HostingProvider exist = hostingProviderMongoRepository.findByName(UserContext.getCountryId(),hostingProvider.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new InvalidRequestException("data  exist for  "+hostingProvider.getName());
+            throw new DuplicateDataException("data  exist for  "+hostingProvider.getName());
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
