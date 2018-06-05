@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
+import com.kairos.activity.persistence.model.activity.tabs.PermissionsActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
@@ -32,6 +33,7 @@ public class ActivityTagDTO {
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
+    private PermissionsActivityTab permissionsActivityTab;
 
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
         return timeCalculationActivityTab;
@@ -152,6 +154,14 @@ public class ActivityTagDTO {
 
     public void setState(ActivityStateEnum state) {
         this.state = state;
+    }
+
+    public PermissionsActivityTab getPermissionsActivityTab() {
+        return permissionsActivityTab;
+    }
+
+    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

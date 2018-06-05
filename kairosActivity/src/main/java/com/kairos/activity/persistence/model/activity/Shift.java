@@ -49,6 +49,10 @@ public class Shift extends MongoBaseEntity {
 
     private Long unitPositionId;
     private ShiftState shiftState;
+
+    private BigInteger parentOpenShiftId;
+    Long allowedBreakDurationInMinute;
+
     public Shift() {
     }
 
@@ -60,9 +64,8 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
     public Shift(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId,Long unitPositionId) {
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
         this.name = name;
         this.id = id;
         this.startDate = startDate;
@@ -266,7 +269,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
     public ShiftQueryResult getShiftQueryResult() {
         ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
                 this.startDate,
@@ -278,7 +280,7 @@ public class Shift extends MongoBaseEntity {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activityId,this.staffId, this.unitId, this.unitPositionId);
+                this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
         shiftQueryResult.setShiftState(this.getShiftState());
@@ -309,4 +311,20 @@ public class Shift extends MongoBaseEntity {
     public void setShiftState(ShiftState shiftState) {
         this.shiftState = shiftState;
     }
+
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
+
+    public Long getAllowedBreakDurationInMinute() {
+        return allowedBreakDurationInMinute;
+    }
+
+    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+        }
 }

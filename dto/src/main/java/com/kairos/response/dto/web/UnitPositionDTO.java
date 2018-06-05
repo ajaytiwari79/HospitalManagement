@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,9 +21,9 @@ public class UnitPositionDTO {
     @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
 
-    private Long startDateMillis;
-    private Long endDateMillis;
-    private Long lastWorkingDateMillis;
+    private LocalDate startLocalDate;
+    private LocalDate endLocalDate;
+    private LocalDate lastWorkingLocalDate;
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
     private int totalWeeklyMinutes;
@@ -57,10 +58,7 @@ public class UnitPositionDTO {
     @NotNull(message = "seniorityLevel  is required for position")
     @Range(min = 0, message = "seniorityLevel  is required for position")
     private Long seniorityLevelId;
-
     private Set<Long> functionIds = new HashSet<>();
-
-
     private Long timeCareExternalId;
 
     public Long getAccessGroupIdOnEmploymentEnd() {
@@ -85,8 +83,8 @@ public class UnitPositionDTO {
         this.hourlyWages = hourlyWages;
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
+      //  this.startDateMillis = startDateMillis;
+       // this.endDateMillis = endDateMillis;
         this.employmentTypeId = employmentTypeId;
 
     }
@@ -100,8 +98,8 @@ public class UnitPositionDTO {
         this.staffId = staffId;
         this.wtaId = wtaId;
         this.ctaId = ctaId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
+        //this.startDateMillis = startDateMillis;
+        //this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
         this.timeCareExternalId = timeCareExternalId;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
@@ -150,23 +148,6 @@ public class UnitPositionDTO {
 
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
-    }
-
-
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
     }
 
     public Integer getTotalWeeklyMinutes() {
@@ -242,12 +223,12 @@ public class UnitPositionDTO {
         this.unionId = unionId;
     }
 
-    public Long getLastWorkingDateMillis() {
-        return lastWorkingDateMillis;
+    public LocalDate getLastWorkingLocalDate() {
+        return lastWorkingLocalDate;
     }
 
-    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    public void setLastWorkingLocalDate(LocalDate lastWorkingLocalDate) {
+        this.lastWorkingLocalDate = lastWorkingLocalDate;
     }
 
     public Long getUnitId() {
@@ -306,4 +287,21 @@ public class UnitPositionDTO {
     public void setFunctionIds(Set<Long> functionIds) {
         this.functionIds = functionIds;
     }
+
+    public LocalDate getStartLocalDate() {
+        return startLocalDate;
+    }
+
+    public void setStartLocalDate(LocalDate startLocalDate) {
+        this.startLocalDate = startLocalDate;
+    }
+
+    public LocalDate getEndLocalDate() {
+        return endLocalDate;
+    }
+
+    public void setEndLocalDate(LocalDate endLocalDate) {
+        this.endLocalDate = endLocalDate;
+    }
+
 }

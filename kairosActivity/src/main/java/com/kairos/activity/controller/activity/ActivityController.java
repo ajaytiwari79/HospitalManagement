@@ -257,6 +257,22 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getSkillTabOfActivity(activityId));
     }
 
+    //Permissions
+
+    @ApiOperation("Update Permissions Tab of Activity")
+    @PutMapping(value = "/activity/permission_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updatePermissionsTabOfActivity(@RequestBody PermissionsActivityTabDTO permissionsActivityTabDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePermissionsTabOfActivity(permissionsActivityTabDTO));
+    }
+
+    @ApiOperation("get Permissions Tab of Activity")
+    @GetMapping(value = "/activity/{activityId}/permission_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getPermissionsTabOfActivity(@PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getPermissionsTabOfActivity(activityId));
+    }
+
     //organization Mapping
 
     @ApiOperation("update organization Mapping details  of activity Type")
@@ -358,4 +374,18 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
     }
 
+    @ApiOperation(value = "Init optplanner integration")
+    @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organisationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organisationId, unitId));
+    }
+
+    @ApiOperation("Get all activity based on country")
+    @GetMapping(value = "/activities_with_time_types")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithTimeTypes(countryId));
+
+    }
 }

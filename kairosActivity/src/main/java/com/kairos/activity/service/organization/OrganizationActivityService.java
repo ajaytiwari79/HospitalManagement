@@ -3,35 +3,35 @@ package com.kairos.activity.service.organization;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithUnitIdDTO;
 
-import com.kairos.activity.response.dto.activity.ActivityTabsWrapper;
-import com.kairos.activity.response.dto.activity.ActivityTagDTO;
-import com.kairos.activity.response.dto.activity.ActivityWithSelectedDTO;
-import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
+import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
+import com.kairos.activity.service.activity.PlannedTimeTypeService;
 import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
+
+import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +67,11 @@ public class OrganizationActivityService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private PhaseService phaseService;
+    @Inject
+    private OpenShiftIntervalRepository openShiftIntervalRepository;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
+
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -184,7 +189,9 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
-        PresenceTypeWithTimeTypeDTO presenceType = organizationRestClient.getPresenceTypeAndTimeType(unitId);
+        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsActivityTab, presenceType);
@@ -221,8 +228,8 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             exceptionService.dataNotFoundByIdException("message.activity.id",activityId);
         }
-        if(!activityFromDatabase.get().getRulesActivityTab().isEligibleForCopy()){
-            exceptionService.actionNotPermittedException("Activity is not eligible for copy");
+        if(!activityFromDatabase.get().getPermissionsActivityTab().isEligibleForCopy()){
+            exceptionService.actionNotPermittedException("activity.not.eligible.for.copy");
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());
@@ -238,6 +245,13 @@ public class OrganizationActivityService extends MongoBaseService {
         orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
         return orderAndActivityDTO;
+    }
+    public ActivityWithTimeTypeDTO getActivitiesWithTimeTypesByUnit(Long unitId,Long countryId){
+        List<ActivityDTO> activityDTOS =activityMongoRepository.findAllActivitiesWithTimeTypesByUnit(unitId);
+        List<TimeTypeDTO> timeTypeDTOS=timeTypeService.getAllTimeType(null,countryId);
+        List<OpenShiftIntervalDTO> intervals=openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals);
+        return activityWithTimeTypeDTO;
     }
 
 }

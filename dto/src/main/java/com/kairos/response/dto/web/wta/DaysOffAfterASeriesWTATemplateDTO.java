@@ -12,7 +12,7 @@ public class DaysOffAfterASeriesWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private long intervalLength;
     private String intervalUnit;
     private int nightShiftSequence;
-    private boolean isRestingTimeAllowed;
+    private boolean restingTimeAllowed;
     private int restingTime;
 
     public long getIntervalLength() {
@@ -40,13 +40,12 @@ public class DaysOffAfterASeriesWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+        this.restingTimeAllowed = restingTimeAllowed;
     }
-
     public int getRestingTime() {
         return restingTime;
     }

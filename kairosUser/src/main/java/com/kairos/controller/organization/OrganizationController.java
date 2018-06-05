@@ -10,9 +10,9 @@ import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
@@ -21,7 +21,6 @@ import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.organization.OrganizationService;
@@ -31,6 +30,7 @@ import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
@@ -48,11 +48,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
@@ -106,11 +107,11 @@ public class OrganizationController {
     @Inject
     private ClientBatchService clientBatchService;
     @Inject
-    private PresenceTypeService presenceTypeService;
-    @Inject
     private CountryService countryService;
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject
+    private UnitPositionService unitPositionService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -1258,13 +1259,14 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
-    //
+    /* Not in use
     @ApiOperation(value = "Get timetype_presencetype by unitID")
     @RequestMapping(value = UNIT_URL + "/timetype_presencetype", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
     }
+    */
 
     @ApiOperation(value = "Get available time zones")
     @RequestMapping(value = UNIT_URL + "/timeZones", method = RequestMethod.GET)
@@ -1344,6 +1346,7 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getDefaultDataForOrder(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
     }
+
     @ApiOperation(value = "Init optplanner integration")
     @RequestMapping(value = "/unit/{unitId}/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1359,6 +1362,27 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getWtaTemplateDefaultDataInfoByUnitId(unitId));
 
     }
+
+
+    @RequestMapping(value = UNIT_URL + "/unit_position/expertise", method = RequestMethod.GET)
+    @ApiOperation("fetch Map of unit position id and expertise id")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>>  getExpertiseOfUnitPosition(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionExpertiseMap(unitId));
+    }
+
+
+    @ApiOperation(value = "Get Default data for Rule Template")
+    @RequestMapping(value = "/country/{countryId}/rule_template/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));
+    }
+
+    @ApiOperation(value = "Get Default data for Rule Template based on UnitId")
+    @RequestMapping(value = "/unit/{unitId}/rule_template/default_data", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplateByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplateByUnit(unitId));
+    }
 }
-
-
