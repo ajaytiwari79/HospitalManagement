@@ -157,6 +157,8 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
+        activityCopied.setStartDate(activity.getStartDate());
+        activityCopied.setEndDate(activity.getEndDate());
         return activityCopied;
     }
 

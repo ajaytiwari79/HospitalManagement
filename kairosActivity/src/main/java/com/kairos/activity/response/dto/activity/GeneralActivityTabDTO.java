@@ -74,7 +74,7 @@ public class GeneralActivityTabDTO {
     public GeneralActivityTab buildGeneralActivityTab() {
         GeneralActivityTab generalActivityTab =
                 new GeneralActivityTab(name, code, printoutSymbol,categoryId, colorPresent, backgroundColor, textColor, description,this.isActive,
-                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta, this.payrollSystem, this.payrollType);
+                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta, this.payrollSystem, this.payrollType,this.startDate,this.endDate);
         return generalActivityTab;
     }
 

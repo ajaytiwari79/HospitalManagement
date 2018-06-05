@@ -151,6 +151,8 @@ public class ActivityService extends MongoBaseService {
 
         GeneralActivityTab generalActivityTab = new GeneralActivityTab(activity.getName(), activity.getDescription(), "");
         generalActivityTab.setColorPresent(false);
+        generalActivityTab.setStartDate(activity.getStartDate());
+        generalActivityTab.setEndDate(activity.getEndDate());
         activity.setCountryId(countryId);
 
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
@@ -263,9 +265,22 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
-        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
+        if(generalDTO.getEndDate()!=null){
+            if(generalDTO.getEndDate().isBefore(generalDTO.getStartDate())){
+                exceptionService.actionNotPermittedException("message.activity.enddate.greaterthen.startdate");
+            }
+        }
+
+        Date date=DateUtils.asDate(generalDTO.getStartDate());
+       // Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
+        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate( generalDTO.getName().trim(), generalDTO.getActivityId(), countryId,date);
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            exceptionService.duplicateDataException("exception.duplicateData", "activity");
+            if(!Optional.ofNullable(isActivityAlreadyExists.getEndDate()).isPresent()){
+                exceptionService.dataNotFoundException("please insert enddate");
+            }
+            else{
+                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
+            }
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));

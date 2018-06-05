@@ -258,8 +258,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
     public Activity findByNameAndDateAndCountryId(String name,Long countryId,Date date)
     {
-         Query query=new Query(Criteria.where("name").is(name).and("deleted").is(false).and("countryId").is(countryId).and("startDate").lt(date).orOperator(Criteria.where("endDate").gt(date),Criteria.where("endDate").exists(false)));
+         Query query=new Query(Criteria.where("name").is(name).and("deleted").is(false).and("countryId").is(countryId).and("startDate").lte(date).orOperator(Criteria.where("endDate").gte(date),Criteria.where("endDate").exists(false)));
          return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
 
+    public Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId, Date date) {
+        Query query=new Query(Criteria.where("id").ne(activityId).and("name").is(name).and("deleted").is(false).and("countryId").is(countryId).and("startDate").lte(date).orOperator(Criteria.where("endDate").gte(date),Criteria.where("endDate").exists(false)));
+        return (Activity) mongoTemplate.findOne(query,Activity.class);
+    }
 }

@@ -48,4 +48,6 @@ public interface CustomActivityMongoRepository {
     List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId);
 
     Activity findByNameAndDateAndCountryId(String name,Long countryId,Date date);
+
+    Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId,Date date);
 }
