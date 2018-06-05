@@ -15,11 +15,15 @@ public interface CustomShiftMongoRepository {
 
     void updatePhasesOfActivities(Long orgId, Date startDateInISO, Date endDateInISO, String phaseName, String PhaseDescription);
 
-    List<ShiftQueryResult> findAllActivityBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
+    List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
 
     List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate);
 
     List<ShiftQueryResult> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
+
+    List<Long> getUnitIdListOfShiftBeforeDate(Date date);
+
+    List<ShiftQueryResult> getShiftsByUnitBeforeDate(Long unitId, Date endDate);
 
     public List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
 

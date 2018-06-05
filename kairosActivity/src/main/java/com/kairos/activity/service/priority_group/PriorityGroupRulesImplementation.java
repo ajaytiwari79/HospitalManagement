@@ -1,33 +1,15 @@
 package com.kairos.activity.service.priority_group;
 
 import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.persistence.model.open_shift.OpenShift;
-import com.kairos.activity.persistence.model.open_shift.OpenShiftNotification;
-import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
-import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.response.dto.priority_group.PriorityGroupRuleDataDTO;
-import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.service.priority_group.priority_group_rules.*;
-import com.kairos.activity.util.DateTimeInterval;
-import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.time_bank.TimeBankCalculationService;
-import com.kairos.response.dto.web.StaffDTO;
 import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.FibonacciCounter;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
-import org.apache.commons.collections.map.HashedMap;
-import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import javax.inject.Inject;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -128,7 +110,7 @@ public class PriorityGroupRulesImplementation {
     }
 
 
-    public void executeRules(PriorityGroupDTO priorityGroupDTO,PriorityGroupRuleDataDTO priorityGroupRuleDataDTO, ImpactWeight impactWeight) {
+    public void executeRules(PriorityGroupDTO priorityGroupDTO, PriorityGroupRuleDataDTO priorityGroupRuleDataDTO, ImpactWeight impactWeight) {
         List<PriorityGroupRuleFilter> priorityGroupRules = getRulesList(priorityGroupDTO,priorityGroupRuleDataDTO);
         Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap = priorityGroupRuleDataDTO.getOpenShiftStaffMap();
         for(PriorityGroupRuleFilter priorityGroupRule : priorityGroupRules) {

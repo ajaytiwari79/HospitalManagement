@@ -1,13 +1,12 @@
 package com.planner.domain.staff;
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.planner.domain.MongoBaseEntity;
 import com.planner.domain.wta.templates.WorkingTimeAgreement;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.List;
+
 @Document
 public class UnitPosition  extends MongoBaseEntity {
 

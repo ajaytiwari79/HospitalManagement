@@ -1,15 +1,9 @@
 package com.kairos.activity.service.priority_group.priority_group_rules;
 
-import com.kairos.activity.persistence.model.open_shift.OpenShift;
-import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
-import org.joda.time.Interval;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

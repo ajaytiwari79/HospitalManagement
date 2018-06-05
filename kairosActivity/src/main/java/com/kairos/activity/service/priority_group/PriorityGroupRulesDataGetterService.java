@@ -1,15 +1,10 @@
 package com.kairos.activity.service.priority_group;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAdjuster;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kairos.activity.client.UserRestClient;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.OpenShiftNotification;
@@ -26,7 +21,6 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.response.dto.web.ShiftCountDTO;
-import com.kairos.response.dto.web.StaffDTO;
 import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;

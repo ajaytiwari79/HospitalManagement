@@ -4,6 +4,8 @@ import com.kairos.util.userContext.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class RestClientURLUtil {
 
@@ -27,8 +29,19 @@ public class RestClientURLUtil {
             return baseUrl;
         }
     }
+
+    public final static String getBaseUrl(boolean hasUnitInUrl, Long id){
+        if(hasUnitInUrl){
+            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(UserContext.getUnitId()).isPresent()?UserContext.getUnitId():id)).toString();
+            return baseUrl;
+        }else{
+            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/country/").append(id).toString();
+            return baseUrl;
+        }
+    }
+
     public final static String getBaseUrl(){
-            return userServiceUrl;
+        return userServiceUrl;
     }
 
     public static final String getPlannerBaseUrl(){

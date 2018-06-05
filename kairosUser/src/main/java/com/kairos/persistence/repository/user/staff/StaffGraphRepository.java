@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -291,7 +292,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("match(user:User)  where id(user)={1} \n" +
             "match(staff:Staff)-[:BELONGS_TO]->(user) \n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
-            "return  id(staff) as id,user.gender as gender,staff.profilePic as profilePic, contactAddress.city as city,contactAddress.province as province , staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
+            "return  id(staff) as id,user.gender as gender, user.pregnant as pregnant,staff.profilePic as profilePic, contactAddress.city as city,contactAddress.province as province , staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
     List<StaffPersonalDetailDTO> getStaffInfoById(long unitId, long staffId);
 
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={0}\n" +
@@ -424,4 +425,20 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("Match(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employement)-[:"+BELONGS_TO+"]->(s:Staff) where o.id={0} return s")
     List<Staff> getAllStaffByUnitId(long unitId);
 
+    /*@Query("MATCH (org:Organization) WITH org\n" +
+            "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff{deleted:false})-[:BELONGS_TO]->(user:User) " +
+            "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,org return id(org) as id, staffData as staffList")*/
+    @Query("MATCH (org:Organization) WITH org\n" +
+            "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WITH staff, user\n" +
+            "MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:IN_UNIT]-(o:Organization)\n" +
+            "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
+            "RETURN  id(o) as unitId, staffData as staffList")
+    List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
+
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return staff")
+    Staff findByUserId(Long userId,Long unitId);
+
+    @Query("Match(staff:Staff{deleted:false}) where id(staff)={0} " +
+            "OPTIONAL MATCH(staff)-[:" + HAS_STAFF_SETTINGS + "]->(staffSettings:StaffSettings)-[:" + HAS_OPEN_SHIFT_SETTINGS + "]->(staffPreferences:StaffPreferences{deleted:false})  return id(staff) as id,staffSettings,staffPreferences")
+    StaffSettingsQueryResult fetchStaffSettingDetails(Long staffId);
 }

@@ -3,6 +3,7 @@ package com.planner.service.staffinglevel;
 import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
+import com.kairos.activity.util.DateUtils;
 import com.planner.domain.staffinglevel.StaffingLevel;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class StaffingLevelService {
     @Autowired
     private StaffingLevelRepository staffingLevelRepository;
     public void createStaffingLevel(Long unitId,  StaffingLevelDTO staffingLevelDto) {
-        StaffingLevel sl = new StaffingLevel(BigInteger.valueOf(unitId),staffingLevelDto.getPhaseId(),staffingLevelDto.getCurrentDate()
+        StaffingLevel sl = new StaffingLevel(BigInteger.valueOf(unitId),staffingLevelDto.getPhaseId(),DateUtils.getLocalDateFromDate(staffingLevelDto.getCurrentDate())
                 ,staffingLevelDto.getWeekCount(),staffingLevelDto.getStaffingLevelSetting(),staffingLevelDto.getPresenceStaffingLevelInterval(),staffingLevelDto.getAbsenceStaffingLevelInterval(),
                 staffingLevelDto.getId());
         staffingLevelRepository.save(sl);
@@ -32,7 +33,7 @@ public class StaffingLevelService {
     public void createStaffingLevels(Long unitId, List<StaffingLevelDTO> staffingLevelDtos) {
         List<StaffingLevel> staffingLevels= new ArrayList<>();
         for (StaffingLevelDTO staffingLevelDto:staffingLevelDtos){
-            StaffingLevel sl = new StaffingLevel(BigInteger.valueOf(unitId),staffingLevelDto.getPhaseId(),staffingLevelDto.getCurrentDate()
+            StaffingLevel sl = new StaffingLevel(BigInteger.valueOf(unitId),staffingLevelDto.getPhaseId(),DateUtils.getLocalDateFromDate(staffingLevelDto.getCurrentDate())
                     ,staffingLevelDto.getWeekCount(),staffingLevelDto.getStaffingLevelSetting(),staffingLevelDto.getPresenceStaffingLevelInterval(),staffingLevelDto.getAbsenceStaffingLevelInterval(),
                     staffingLevelDto.getId());
             staffingLevels.add(sl);

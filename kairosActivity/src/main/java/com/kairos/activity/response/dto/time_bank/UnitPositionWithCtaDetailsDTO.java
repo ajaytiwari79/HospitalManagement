@@ -38,7 +38,7 @@ public class UnitPositionWithCtaDetailsDTO {
     }
 
     public DateTimeZone getUnitDateTimeZone() {
-        return DateTimeZone.forID(unitTimeZone.getId());
+        return unitTimeZone!=null?DateTimeZone.forID(unitTimeZone.getId()):null;
     }
 
 

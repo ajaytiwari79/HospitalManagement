@@ -615,6 +615,12 @@ public class StaffController {
 
     }
 
+    @RequestMapping(value = "/unitwise", method = RequestMethod.GET)
+    @ApiOperation("fetch unit wise staff list ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitWiseStaff() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitWiseStaffList());
+    }
     @RequestMapping(value = "/priority_group", method = RequestMethod.PUT)
     @ApiOperation("get Staff by StaffId ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -622,4 +628,10 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByStaffIncludeFilterForPriorityGroups(staffIncludeFilterDTO,unitId));
     }
 
+    @ApiOperation(value = "Staff personalized view in daily view")
+    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.PUT)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
+    }
 }

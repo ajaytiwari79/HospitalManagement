@@ -20,13 +20,14 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.kairos.activity.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
+    public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId,boolean deleted) {
         ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime").and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart").and("id").as("id").and("name")
                 .as("name")
                 .and("activity_type_category.id").as("categoryId").and("activity_type_category.name")
@@ -92,6 +93,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$unitId").as("unitId")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
 
         );
@@ -112,6 +114,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
+                        .first("permissionsActivityTab").as("permissionsActivityTab")
                         .push("tags_data").as("tags")
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
@@ -121,8 +124,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("$id", "name", "description", "ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType"),
+                project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
                         .and("timeType").arrayElementAt(0).as("timeType"),
                 match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
@@ -133,8 +136,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                project("$id", "name", "description", "ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId").and("timeType").arrayElementAt(0).as("timeType"),
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType"),
+                project("$id","name","description","ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId").and("timeType").arrayElementAt(0).as("timeType"),
                 match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
         );
         AggregationResults<ActivityWithCTAWTASettingsDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCTAWTASettingsDTO.class);
@@ -144,7 +147,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<OrganizationActivityDTO> findAllActivityOfUnitsByParentActivity(List<BigInteger> parentActivityIds, List<Long> unitIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("isParentActivity").is(false).and("unitId").in(unitIds).and("parentId").in(parentActivityIds)),
-                project("$id", "unitId", "parentId")
+                project("$id","unitId", "parentId")
 //                group("unitId").addToSet("id").as("activityIds")
 //                group("unitId").push("$$ROOT").as("activityIds")
         );
@@ -169,24 +172,23 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
-                project("name", "generalActivityTab", "compositeActivities", "expertises", "employmentTypes", "rulesActivityTab", "skillActivityTab", "timeCalculationActivityTab"));
+                project("name", "generalActivityTab","compositeActivities","expertises","employmentTypes","rulesActivityTab","skillActivityTab","timeCalculationActivityTab"));
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
     }
 
 
-    public List<Activity> findAllByTimeTypeId(BigInteger timeTypeId) {
+    public List<Activity> findAllByTimeTypeId(BigInteger timeTypeId){
         Query query = new Query(Criteria.where("balanceSettingsActivityTab.timeTypeId").is(timeTypeId).and("deleted").is(false));
-        return mongoTemplate.find(query, Activity.class);
+        return mongoTemplate.find(query,Activity.class);
 
     }
-
-    public List<ActivityDTO> getAllActivityWithTimeType(Long unitId, List<BigInteger> activityIds) {
+    public List<ActivityDTO> getAllActivityWithTimeType(Long unitId,List<BigInteger> activityIds){
         Aggregation aggregation = Aggregation.newAggregation(
                 //"unitId").is(unitId).and(
                 match(Criteria.where("deleted").is(false).and("_id").in(activityIds)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType")
-                , project("unitId")
+                lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType")
+                ,project("unitId")
                         .andInclude("deleted")
                         .andInclude("name")
                         .andInclude("expertises")
@@ -196,12 +198,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public List<ActivityDTO> findAllActivityByUnitId(Long unitId) {
+    public List<ActivityDTO> findAllActivityByUnitId(Long unitId){
         Aggregation aggregation = Aggregation.newAggregation(
                 //"unitId").is(unitId).and(
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId))
                 //lookup("time_Type","balanceSettingsActivityTab.timeTypeId","_id","timeType")
-                , project("unitId")
+                ,project("unitId")
                         .andInclude("deleted")
                         /*.andInclude("name")
                         .andInclude("expertises")
@@ -212,18 +214,43 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     //Ignorecase
-    public Activity getActivityByNameAndUnitId(Long unitId, String name) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
-        return (Activity) mongoTemplate.findOne(query, Activity.class);
+    public Activity getActivityByNameAndUnitId(Long unitId,String name){
+        Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^"+name+"$",Pattern.CASE_INSENSITIVE)));
+        return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
 
 
     public List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId) {
+       Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "balanceSettingsActivityTab.timeType"),
+               project("balanceSettingsActivityTab","name","expertises").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
+
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
+
+    public List<ActivityDTO> findAllActivitiesWithTimeTypes(long countryId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("countryId").is(countryId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "balanceSettingsActivityTab.timeType"),
+                match(Criteria.where("balanceSettingsActivityTab.timeType.timeTypes").is(WORKING_TYPE)),
+                project("balanceSettingsActivityTab","name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
+
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
+    public List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "balanceSettingsActivityTab.timeType"),
-                project("balanceSettingsActivityTab", "name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
+                match(Criteria.where("balanceSettingsActivityTab.timeType.timeTypes").is(WORKING_TYPE)),
+                project("balanceSettingsActivityTab","name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
 
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);

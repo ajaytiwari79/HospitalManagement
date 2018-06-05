@@ -9,6 +9,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.*;
@@ -27,6 +28,7 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -47,6 +49,10 @@ import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.NIGHT_END_HOUR;
+import static com.kairos.constants.AppConstants.NIGHT_START_HOUR;
 
 /**
  * Created by oodles on 16/9/16.
@@ -108,7 +114,8 @@ public class CountryService extends UserBaseService {
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
     private @Inject OrganizationService organizationService;
-    private @Inject PresenceTypeService presenceTypeService;
+    @Inject
+    private PlannedTimeTypeRestClient plannedTimeTypeRestClient;
     private @Autowired FunctionService functionService;
     @Inject
     private ExceptionService exceptionService;
@@ -486,7 +493,7 @@ public class CountryService extends UserBaseService {
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
          TimeTypeDTO timeType= timeTypeRestClient.getAllTimeTypes(countryId).stream().filter(t->t.getTimeTypes().equals(TimeTypes.WORKING_TYPE.toValue())).findFirst().get();
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
-         List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
+         List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
          List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
          List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
@@ -529,7 +536,7 @@ public class CountryService extends UserBaseService {
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId){
-        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(countryId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<com.kairos.response.dto.web.wta.PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new com.kairos.response.dto.web.wta.PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());
@@ -546,7 +553,15 @@ public class CountryService extends UserBaseService {
                 e.printStackTrace();
             }
         });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1);
+        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1,getDefaultTimeSlot(),countryId);
+    }
+
+    public List<TimeSlotDTO> getDefaultTimeSlot(){
+        List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
+        timeSlotDTOS.add(new TimeSlotDTO(DAY,DAY_START_HOUR,00,DAY_END_HOUR,00));
+        timeSlotDTOS.add(new TimeSlotDTO(EVENING,EVENING_START_HOUR,00,EVENING_END_HOUR,00));
+        timeSlotDTOS.add(new TimeSlotDTO(NIGHT,NIGHT_START_HOUR,00,NIGHT_END_HOUR,00));
+        return timeSlotDTOS;
     }
 
 

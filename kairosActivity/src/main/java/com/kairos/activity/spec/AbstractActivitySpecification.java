@@ -12,4 +12,8 @@ public abstract class AbstractActivitySpecification<T> implements ActivitySpecif
     public ActivitySpecification<T> and(final ActivitySpecification<T> activitySpecification) {
         return new AndActivitySpecification<T>(this, activitySpecification);
     }
+
+    public ActivitySpecification<T> or(final ActivitySpecification<T> activitySpecification) {
+        return new OrActivitySpecification<T>(this, activitySpecification);
+    }
 }

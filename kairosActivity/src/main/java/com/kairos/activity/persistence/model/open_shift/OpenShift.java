@@ -12,6 +12,7 @@ import java.util.List;
 public class OpenShift extends MongoBaseEntity {
 
     private LocalDate startDate;
+    private LocalDate endDate;
     private LocalTime fromTime;
     private LocalTime toTime;
     private Integer noOfPersonRequired;
@@ -20,14 +21,7 @@ public class OpenShift extends MongoBaseEntity {
     private Long unitId;
     private BigInteger orderId;
     private BigInteger activityId;
-
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
+    private BigInteger parentOpenShiftId;
 
 
     public Long getUnitId() {
@@ -36,6 +30,14 @@ public class OpenShift extends MongoBaseEntity {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public BigInteger getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
     }
 
     public BigInteger getOrderId() {
@@ -97,4 +99,18 @@ public class OpenShift extends MongoBaseEntity {
     }
 
 
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
 }
