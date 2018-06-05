@@ -8,6 +8,8 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
+import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
@@ -1659,13 +1661,18 @@ public class OrganizationService extends UserBaseService {
         return orderDefaultDataWrapper;
     }
 
-    public Object initialOptaplannerSync(Long organizationId, Long unitId) {
+    public PlannerSyncResponseDTO initialOptaplannerSync(Long organizationId, Long unitId) {
         List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
-        plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
-        List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(organizationId);
-        plannerSyncService.publishAllUnitPositions(organizationId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
-        phaseRestClient.initialOptaplannerSync(unitId);
-        return null;
+        boolean syncStarted=false;
+        if(!staff.isEmpty()){
+            plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
+            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
+            if(!unitPositionEmploymentTypeRelationShips.isEmpty()){
+                plannerSyncService.publishAllUnitPositions(unitId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
+            }
+            phaseRestClient.initialOptaplannerSync(unitId);
+        }
+        return new PlannerSyncResponseDTO(syncStarted);
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId){

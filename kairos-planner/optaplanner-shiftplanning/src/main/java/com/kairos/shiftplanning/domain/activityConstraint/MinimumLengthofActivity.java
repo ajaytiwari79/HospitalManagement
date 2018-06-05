@@ -17,6 +17,7 @@ public class MinimumLengthofActivity implements ConstraintHandler {
     private int weight;
 
     public MinimumLengthofActivity() {
+        Class aa=MinimumLengthofActivity.class;
     }
 
     @Override

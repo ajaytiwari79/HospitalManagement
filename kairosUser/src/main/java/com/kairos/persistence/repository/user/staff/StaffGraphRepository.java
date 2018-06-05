@@ -421,8 +421,21 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             " staff.lastName as lastName, contactDetail.privatePhone as privatePhone ")
     List<StaffPersonalDetailDTO> getAllStaffWithMobileNumber(long unitId);
 
-    @Query("Match(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employement)-[:"+BELONGS_TO+"]->(s:Staff) where o.id={0} return s")
+    @Query("Match(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employment)-[:"+BELONGS_TO+"]->(s:Staff) where id(o)={0} return s")
     List<Staff> getAllStaffByUnitId(long unitId);
+
+
+    @Query("match (organization:Organization)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(organization)={0} \n" +
+            "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
+            "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization)" +
+            "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,unitPos \n" +
+            "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  with engineerType, staff,contactAddress, user ,count(unitPos) as unitPosition ORDER BY staff.firstName ASC\n" +
+            "return  distinct id(staff) as id,case  when unitPosition > 0 then TRUE else false end as unitPosition , contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
+    List<StaffPersonalDetailDTO> getAllStaffByUnitId2(Long unitId, String imageUrl);
+
+
+
+
 
     /*@Query("MATCH (org:Organization) WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff{deleted:false})-[:BELONGS_TO]->(user:User) " +
