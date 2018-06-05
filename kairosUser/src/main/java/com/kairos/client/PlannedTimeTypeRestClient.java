@@ -1,7 +1,7 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.timetype.PresenceTypeDTO;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

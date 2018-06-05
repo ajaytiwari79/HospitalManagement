@@ -2,6 +2,7 @@ package com.kairos.persistence.model.timetype;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 
 import java.util.List;
 

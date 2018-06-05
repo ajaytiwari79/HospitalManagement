@@ -11,13 +11,12 @@ import com.kairos.activity.enums.TimeTypes;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
-import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -29,6 +28,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -51,8 +51,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.NIGHT_END_HOUR;
-import static com.kairos.constants.AppConstants.NIGHT_START_HOUR;
 
 /**
  * Created by oodles on 16/9/16.
@@ -539,7 +537,7 @@ public class CountryService extends UserBaseService {
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
-        List<com.kairos.response.dto.web.wta.PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new com.kairos.response.dto.web.wta.PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());
+        List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());
         dayTypes.forEach(dayType -> {
             DayTypeDTO dayTypeDTO = new DayTypeDTO();
             try {
