@@ -1,4 +1,4 @@
-package com.kairos.response.dto.web.wta;
+package com.kairos.response.dto.web.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
