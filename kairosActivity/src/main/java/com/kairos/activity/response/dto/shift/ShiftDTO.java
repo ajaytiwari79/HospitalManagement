@@ -35,6 +35,7 @@ public class ShiftDTO {
     private long probability;
     private long accumulatedTimeBankInMinutes;
     private String remarks;
+    private BigInteger parentOpenShiftId;
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.activityId.notnull")
     private BigInteger activityId;
@@ -66,6 +67,16 @@ public class ShiftDTO {
         this.unitPositionId = unitPositionId;
     }
 
+    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime) {
+        this.activityId = activityId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.unitPositionId = unitPositionId;
+        this.startLocalDate=startLocalDate;
+        this.endLocalDate=endLocalDate;
+        this.startTime=startTime;
+        this.endTime=endTime;
+    }
 
     public LocalDate getStartLocalDate() {
         return startLocalDate;
@@ -291,5 +302,12 @@ public class ShiftDTO {
         return shift;
     }
 
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
 
 }

@@ -1,8 +1,9 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
-import org.springframework.data.neo4j.annotation.Query;
+import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -56,13 +57,12 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (pot:OrganizationType),(ot:OrganizationType) WHERE id(ot)={0} AND id(pot)={1} Create (pot)-[:HAS_SUB_TYPE]->(ot) return ot")
     OrganizationType createSubTypeRelation(Long subTypeId, Long parentTypeId);
 
-    @Query("match(c:Country) where id(c)={0}\n" +
-            "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType{isEnable:true})\n" +
-            "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType{isEnable:true})\n" +
-            "with or,ora\n" +
-            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name}) ELSE [] END} as orga\n" +
-            "RETURN orga as result")
-    List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
+    @Query("match(country:Country) where id(country)={0}\n" +
+            "match(country)<-[:" + BELONGS_TO + "]-(organizationType:OrganizationType{isEnable:true})\n" +
+            "optional match(organizationType)-[:" + HAS_SUB_TYPE + "]->(organizationSubType:OrganizationType{isEnable:true}) " +
+            "with DISTINCT organizationType, organizationSubType " +
+            "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n" )
+    List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId);
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
@@ -149,5 +149,16 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     @Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{deleted:false}) where id(ot)={0} AND id(level) IN {1} DETACH DELETE rel")
     void removeLevelRelationshipFromOrganizationType(Long organizationTypeId, List<Long> levelIds);
+
+
+    //bobby
+    @Query("match(c:Country) where id(c)={0}  " +
+            "match(c)-[:BELONGS_TO]-(or:OrganizationType{isEnable:true}) " +
+            "optional match(or)-[:HAS_SUB_TYPE]-(ora:OrganizationType{isEnable:true})" +
+            " optional match(ora)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(oras:OrganizationService)" +
+            " optional match(oras)-[:ORGANIZATION_SUB_SERVICE]-(sub:OrganizationService) with or,ora,oras,sub, {name: oras.name,id:id(oras), organizationSubServices: CASE WHEN sub IS NOT NULL THEN collect({id:id(sub),name:sub.name}) ELSE [] END} as service_subService with or,ora,{name: ora.name,id:id(ora)," +
+            "organizationServices: CASE WHEN service_subService IS NOT NULL THEN collect (service_subService) ELSE [] END} as service_SubService_ORG with or,{name: or.name,id:id(or),organizationSubTypes: CASE WHEN service_SubService_ORG IS NOT NULL THEN collect (service_SubService_ORG) ELSE [] END} as organizationType return organizationType")
+    List<Map> getAllOrganizationTypeAndServiceAndSubServices(Long countryId);
+
 
 }

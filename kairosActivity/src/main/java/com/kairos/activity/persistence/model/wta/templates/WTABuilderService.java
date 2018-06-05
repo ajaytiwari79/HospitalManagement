@@ -392,7 +392,7 @@ public class WTABuilderService extends MongoBaseService {
 
 
     /*public static List<WTARuleTemplateDTO> getRuleTemplateDTO(WTAQueryResultDTO wtaQueryResultDTO) {
-        List<WTARuleTemplateDTO> wtaRuleTemplateDTOS = copyRuleTemplatesToDTO(wtaQueryResultDTO.getRuleTemplates());
+        List<WTARuleTemplateDTO> wtaRuleTemplateDTOS = copyRuleTemplatesToDTO(wtaQueryResultDTO.getRuleTemplate());
         return wtaRuleTemplateDTOS;
     }*/
 

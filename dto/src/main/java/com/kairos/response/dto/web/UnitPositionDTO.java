@@ -21,12 +21,8 @@ public class UnitPositionDTO {
     @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
 
-    //private Long startDateMillis;
-
     private LocalDate startLocalDate;
     private LocalDate endLocalDate;
-
-   // private Long endDateMillis;
     private LocalDate lastWorkingLocalDate;
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
@@ -153,23 +149,6 @@ public class UnitPositionDTO {
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
     }
-
-
-//    public Long getStartDateMillis() {
-//        return startDateMillis;
-//    }
-//
-//    public void setStartDateMillis(Long startDateMillis) {
-//        this.startDateMillis = startDateMillis;
-//    }
-//
-//    public Long getEndDateMillis() {
-//        return endDateMillis;
-//    }
-//
-//    public void setEndDateMillis(Long endDateMillis) {
-//        this.endDateMillis = endDateMillis;
-//    }
 
     public Integer getTotalWeeklyMinutes() {
         return totalWeeklyMinutes;

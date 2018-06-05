@@ -18,4 +18,6 @@ public interface OpenShiftIntervalRepository extends MongoBaseRepository<OpenShi
 
     @Query(value = "{'from' : { '$lt' : ?1}, 'to' : { '$gt' : ?0} , deleted:false ,'_id': {'$ne' : ?2}}",exists = true)
     boolean isIntervalInValid(Integer from,Integer to,BigInteger id);
+
+    List<OpenShiftIntervalDTO> getAllByCountryIdAndDeletedFalse(Long countryId);
 }
