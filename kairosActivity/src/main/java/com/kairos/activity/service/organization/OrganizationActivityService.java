@@ -70,7 +70,7 @@ public class OrganizationActivityService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
-
+    @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
 
 
