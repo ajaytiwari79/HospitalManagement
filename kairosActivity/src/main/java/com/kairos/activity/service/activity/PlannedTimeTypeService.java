@@ -51,7 +51,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
         save(plannedTimeType);
-        presenceTypeDTO.setId(plannedTimeType.getId().longValue());
+        presenceTypeDTO.setId(plannedTimeType.getId());
         logger.info(plannedTimeType.toString());
         return presenceTypeDTO;
     }
