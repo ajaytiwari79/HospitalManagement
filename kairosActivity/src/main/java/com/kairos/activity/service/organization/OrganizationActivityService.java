@@ -3,7 +3,7 @@ package com.kairos.activity.service.organization;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
@@ -29,10 +29,9 @@ import com.kairos.persistence.model.enums.ActivityStateEnum;
 
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

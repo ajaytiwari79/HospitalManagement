@@ -9,7 +9,7 @@ import java.math.BigInteger;
 public class BalanceSettingsActivityTab {
     private Integer addTimeTo;
     private String addDayTo;
-    private Long presenceTypeId;
+    private BigInteger presenceTypeId;
     private BigInteger timeTypeId;;
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
@@ -34,11 +34,11 @@ public class BalanceSettingsActivityTab {
         this.addDayTo = addDayTo;
     }
 
-    public Long getPresenceTypeId() {
+    public BigInteger getPresenceTypeId() {
         return presenceTypeId;
     }
 
-    public void setPresenceTypeId(Long presenceTypeId) {
+    public void setPresenceTypeId(BigInteger presenceTypeId) {
         this.presenceTypeId = presenceTypeId;
     }
 

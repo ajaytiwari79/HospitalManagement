@@ -6,7 +6,7 @@ import com.kairos.activity.persistence.repository.activity.PlannedTimeTypeReposi
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.response.dto.web.CountryDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -63,8 +63,8 @@ public class PlannedTimeTypeService extends MongoBaseService {
         return presenceTypeDTOList;
     }
 
-    public boolean deletePresenceTypeById(Long presenceTypeId) {
-        Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(BigInteger.valueOf(presenceTypeId));
+    public boolean deletePresenceTypeById(BigInteger presenceTypeId) {
+        Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(presenceTypeId);
         if (!presenceTypeOptional.isPresent()) {
             logger.error("Presence type not found by Id removing" + presenceTypeId);
             exceptionService.dataNotFoundByIdException("message.presenceType.id.notFound");
@@ -76,12 +76,12 @@ public class PlannedTimeTypeService extends MongoBaseService {
         return true;
     }
 
-    public PresenceTypeDTO updatePresenceType(Long countryId, Long presenceTypeId, PresenceTypeDTO presenceTypeDTO) {
+    public PresenceTypeDTO updatePresenceType(Long countryId, BigInteger presenceTypeId, PresenceTypeDTO presenceTypeDTO) {
         List<PlannedTimeType> plannedTimeTypes = plannedTimeTypeRepository.findByNameAndDeletedAndCountryIdExcludingCurrent(countryId, presenceTypeDTO.getName(), false);
         if (plannedTimeTypes.size()>1) {
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist",presenceTypeDTO.getName());
         }
-        Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(BigInteger.valueOf(presenceTypeId));
+        Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(presenceTypeId);
         if (!presenceTypeOptional.isPresent()) {
             logger.error("Planned Time type not found by Id removing" + presenceTypeId);
             exceptionService.dataNotFoundByIdException("message.presenceType.id.notFound");
