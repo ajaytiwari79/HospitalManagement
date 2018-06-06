@@ -17,20 +17,23 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
 import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_NAME;
+import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
+import static com.kairos.constant.AppConstant.COUNTRY_ID;
+import static com.kairos.constant.AppConstant.DELETED;
 
 
 public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
-
 
 
     @Inject
@@ -39,7 +42,7 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
     @Override
     public Map<String, AggregationOperation> getFilterCriterias(Long countryId, List<FilterType> filterTypes) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
-        aggregationOperations.put("match", match(Criteria.where("countryId").is(countryId).and("deleted").is(false)));
+        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
         filterTypes.forEach(filterType -> {
                     aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
                 }
@@ -89,7 +92,7 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
     }
 
     @Override
-    public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation,FilterGroup filterGroup, String moduleId) {
+    public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
         List<ModuleIdDto> moduleIdDto = filterGroup.getAccessModule();
         String domainName = new String();
@@ -99,35 +102,20 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
                 break;
             }
         }
-        if (StringUtils.isBlank(domainName))
-        {
+        if (StringUtils.isBlank(domainName)) {
             throw new InvalidRequestException("module name is null");
         }
-
-        switch (domainName){
+        switch (domainName) {
 
             case CLAUSE_MODULE_NAME:
-                 return mongoTemplate.aggregate(aggregation,Clause.class,FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
             case ASSET_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation,MasterAsset.class,FilterQueryResult.class);
-            case MASTER_PROCESSING_ACTIVITY_NAME:
-                return mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,FilterQueryResult.class);
-                default:
-                    throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);
+                return mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
+            case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
+                return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, FilterQueryResult.class);
+            default:
+                throw new DataNotFoundByIdException("data not found by moduleId" + moduleId);
 
         }
-       /* if (domainName.toLowerCase().contains("asset"))
-        {
-            return mongoTemplate.aggregate(aggregation,MasterAsset.class,FilterQueryResult.class);
-        }
-        if (domainName.toLowerCase().contains("clauses"))
-        {
-            return mongoTemplate.aggregate(aggregation,Clause.class,FilterQueryResult.class);
-        } if (domainName.toLowerCase().contains("processing"))
-        {
-            return mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,FilterQueryResult.class);
-        }
-        else
-            throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);*/
     }
 }

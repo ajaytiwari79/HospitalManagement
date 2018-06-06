@@ -8,10 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.List;
 
 @Document(collection = "filterGroup")
 public class FilterGroup extends MongoBaseEntity {
+
 
     @NotNull
     @NotEmpty
@@ -22,6 +24,7 @@ public class FilterGroup extends MongoBaseEntity {
     private List<FilterType> filterTypes;
 
     private Long countryId;
+
 
     public Long getCountryId() {
         return countryId;
@@ -50,4 +53,12 @@ public class FilterGroup extends MongoBaseEntity {
     public FilterGroup() {
 
     }
+    public FilterGroup(List<ModuleIdDto> accessModule,List<FilterType> filterTypes,Long countryId) {
+
+        this.filterTypes=filterTypes;
+        this.accessModule=accessModule;
+        this.countryId=countryId;
+    }
+
+
 }

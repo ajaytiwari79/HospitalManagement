@@ -4,19 +4,16 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelectionDto;
-import com.kairos.dto.MasterAssetDto;
 import com.kairos.dto.ModuleIdDto;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
-import com.kairos.persistance.model.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
-import com.kairos.persistance.repository.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.response.dto.ClauseResponseDto;
 import com.kairos.response.dto.MasterAssetResponseDto;
 import com.kairos.response.dto.MasterProcessingActivityResponseDto;
@@ -38,7 +35,7 @@ import java.util.*;
 
 import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
 import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_NAME;
+import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
 
 @Service
 public class FilterService {
@@ -61,7 +58,7 @@ public class FilterService {
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
-
+//get fields with distinct values on which fiter is apply
     public FilterAndFavouriteFilterDto getFilterCategories(Long countryId, String moduleId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
@@ -74,11 +71,18 @@ public class FilterService {
             Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
             AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
-            filterTypes.forEach(filterType -> {
-                filterResponseData.add(buildFilters(filterQueryResult, filterType));
-            });
-            filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
-            filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+            if (Optional.ofNullable(filterQueryResult).isPresent()) {
+                filterTypes.forEach(filterType -> {
+                    filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType));
+                });
+                filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
+                filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+            } else {
+                filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
+                filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+
+            }
+
             return filterAndFavouriteFilterDto;
 
         } else
@@ -87,7 +91,9 @@ public class FilterService {
 
     }
 
-    public FilterResponseDto buildFilters(FilterQueryResult filterQueryResult, FilterType filterType) {
+
+    //build filter Category For asset ,clause and processing activity (response is to give different values of filter criteria)
+    public FilterResponseDto buildFiltersCategoryResponse(FilterQueryResult filterQueryResult, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
                 return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getAccountTypes());
@@ -114,6 +120,7 @@ public class FilterService {
     }
 
 
+    //get filter data on the bases of selection of data and get filterGroiup By moduleId
     public FilterResponseWithData getFilterDataWithFilterSelection(Long countryId, String moduleId, FilterSelectionDto filterSelectionDto) {
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         if (!Optional.ofNullable(filterGroup).isPresent()) {
@@ -133,6 +140,7 @@ public class FilterService {
     }
 
 
+    //Wrap filter data response on the basic and module id and filter selection
     public FilterResponseWithData getFilterDataByModuleName(Long countryId, String moduleName, FilterSelectionDto filterSelectionDto) {
 
         switch (moduleName) {
@@ -148,7 +156,7 @@ public class FilterService {
                 FilterResponseWithData<List<MasterAssetResponseDto>> assetfilterData = new FilterResponseWithData<>();
                 assetfilterData.setData(masterAssetResponseDtos);
                 return assetfilterData;
-            case MASTER_PROCESSING_ACTIVITY_NAME:
+            case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
                 List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, filterSelectionDto);
                 List<MasterProcessingActivityResponseDto> processingActivityResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDto.class);
                 FilterResponseWithData<List<MasterProcessingActivityResponseDto>> processingActivityFilterData = new FilterResponseWithData<>();

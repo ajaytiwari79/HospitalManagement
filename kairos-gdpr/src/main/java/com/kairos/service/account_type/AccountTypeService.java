@@ -55,8 +55,8 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountTypeList(Set<BigInteger> ids) {
-        return accountTypeRepository.getAccountTypeList(ids);
+    public List<AccountType> getAccountTypeList(Long countryId,Set<BigInteger> ids) {
+        return accountTypeRepository.getAccountTypeList(countryId,ids);
 
     }
 

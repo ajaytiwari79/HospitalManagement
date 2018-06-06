@@ -41,7 +41,7 @@ public class AccountTypeController {
     @PostMapping("/add")
     public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (countryId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
+            return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, accountTypeService.createAccountType(countryId, accountType));
         }
         return ResponseHandler.invalidResponse(HttpStatus.OK, true, "country id can not be null");
     }
@@ -96,7 +96,7 @@ public class AccountTypeController {
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Object> updateAccountName(@PathVariable BigInteger id, @PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (id == null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, "id cannot be null");
+            return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
 
         }
             return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.updateAccountName(countryId, id, accountType));
