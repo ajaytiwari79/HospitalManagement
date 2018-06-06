@@ -1,22 +1,17 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.wta.*;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.activity.constants.AppConstants.COPY_OF;
 
@@ -83,7 +78,7 @@ public class WTABuilderService extends MongoBaseService {
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,DurationBetweenShiftsWTATemplate.class);
                 break;
             case WEEKLY_REST_PERIOD:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,WeeklyRestPeriodWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,RestPeriodInAnIntervalWTATemplate.class);
                 break;
             case SHORTEST_AND_AVERAGE_DAILY_REST:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ShortestAndAverageDailyRestWTATemplate.class);
@@ -178,7 +173,7 @@ public class WTABuilderService extends MongoBaseService {
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,DurationBetweenShiftsWTATemplate.class);
                 break;
             case WEEKLY_REST_PERIOD:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,WeeklyRestPeriodWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,RestPeriodInAnIntervalWTATemplate.class);
                 break;
             case SHORTEST_AND_AVERAGE_DAILY_REST:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ShortestAndAverageDailyRestWTATemplate.class);

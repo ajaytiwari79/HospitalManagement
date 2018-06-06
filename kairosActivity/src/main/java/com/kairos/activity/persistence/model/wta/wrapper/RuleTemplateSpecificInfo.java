@@ -1,6 +1,8 @@
 package com.kairos.activity.persistence.model.wta.wrapper;
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
+import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.activity.persistence.model.wta.StaffWTACounter;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
@@ -26,9 +28,10 @@ public class RuleTemplateSpecificInfo {
     private Map<BigInteger,Integer> counterMap;
     private List<DayTypeDTO> dayTypes;
     private UserAccessRoleDTO user;
+    private int totalTimeBank;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user,int totalTimeBank) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrappers = timeSlotWrappers;
@@ -37,6 +40,15 @@ public class RuleTemplateSpecificInfo {
         this.counterMap = counterMap;
         this.dayTypes = dayTypes;
         this.user = user;
+        this.totalTimeBank = totalTimeBank;
+    }
+
+    public int getTotalTimeBank() {
+        return totalTimeBank;
+    }
+
+    public void setTotalTimeBank(int totalTimeBank) {
+        this.totalTimeBank = totalTimeBank;
     }
 
     public UserAccessRoleDTO getUser() {

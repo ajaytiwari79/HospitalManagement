@@ -10,6 +10,7 @@ import com.kairos.activity.persistence.model.period.PlanningPeriod;
 
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.model.wta.StaffWTACounter;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
@@ -19,11 +20,13 @@ import com.kairos.activity.persistence.repository.break_settings.BreakSettingMon
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
+import com.kairos.activity.persistence.repository.time_bank.TimeBankMongoRepository;
 import com.kairos.activity.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 
+import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -66,7 +69,6 @@ import static com.kairos.activity.constants.AppConstants.*;
 import static com.kairos.activity.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getIntervalByRuleTemplates;
-import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getRuleTemplateSpecificInfo;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -92,6 +94,8 @@ public class ShiftService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject
+    private TimeBankMongoRepository timeBankMongoRepository;
     @Inject
     private PayOutService payOutService;
     @Inject
@@ -404,12 +408,6 @@ public class ShiftService extends MongoBaseService {
     }
 
     public void validateShiftWithActivity(WTAQueryResultDTO wtaQueryResultDTO,ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-
-        Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
-        logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getStartDate()));
-
-
-
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.position");
         }
@@ -419,11 +417,7 @@ public class ShiftService extends MongoBaseService {
         if (wtaQueryResultDTO.getEndDate()!=null && new DateTime(wtaQueryResultDTO.getEndDate()).isBefore(shift.getEndDate().getTime())) {
             throw new ActionNotPermittedException("WTA is Expired for unit employment.");
         }
-        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(),DateUtils.asLocalDate(shift.getStartDate()));
-        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()),phase.getName());
-        DateTimeInterval interval = getIntervalByRuleTemplates(shift,wtaQueryResultDTO.getRuleTemplates());
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(),DateUtils.getDateByZonedDateTime(interval.getStart()),DateUtils.getDateByZonedDateTime(interval.getEnd()));
-        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(staffAdditionalInfoDTO,shift,shifts,phase.getName(),planningPeriod,staffWTACounters);
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(shift,wtaQueryResultDTO,staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
@@ -436,10 +430,26 @@ public class ShiftService extends MongoBaseService {
         }*/
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(wtaRulesSpecification);
         activitySpecification.isSatisfied(shift);
-        updateWTACounter(staffWTACounters,ruleTemplateSpecificInfo,staffAdditionalInfoDTO);
+        updateWTACounter(ruleTemplateSpecificInfo,staffAdditionalInfoDTO);
     }
 
-    private void updateWTACounter(List<StaffWTACounter> staffWTACounters,RuleTemplateSpecificInfo infoWrapper,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+    private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(ShiftWithActivityDTO shift,WTAQueryResultDTO wtaQueryResultDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
+        logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getStartDate()));
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(),DateUtils.asLocalDate(shift.getStartDate()));
+        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(DateUtils.asDate(planningPeriod.getStartDate()),DateUtils.asDate(planningPeriod.getEndDate()),phase.getName());
+        DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift,wtaQueryResultDTO.getRuleTemplates());
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(),DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getStart()),DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getEnd()));
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankMongoRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(),shift.getStartDate());
+        Map<BigInteger,Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(sc->sc.getRuleTemplateId(),sc->sc.getCount()));
+        Interval interval = new Interval(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis(),staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis()==null ? shift.getEndDate().getTime() : staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis());
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(),staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(),DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis())),DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis())));
+        int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(interval,unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
+        return new RuleTemplateSpecificInfo(shifts,shift,staffAdditionalInfoDTO.getTimeSlotSets(),phase.getName(),new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(),DateUtils.asDate(planningPeriod.getEndDate()).getTime()),staffWTACounterMap,staffAdditionalInfoDTO.getDayTypes(),staffAdditionalInfoDTO.getUser(),totalTimeBank);
+    }
+
+    private void updateWTACounter(RuleTemplateSpecificInfo infoWrapper,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(infoWrapper.getPlanningPeriod().getStartDate(),infoWrapper.getPlanningPeriod().getEndDate(),infoWrapper.getPhase());
         for (StaffWTACounter staffWTACounter : staffWTACounters) {
             staffWTACounter.setCount(infoWrapper.getCounterMap().get(staffWTACounter.getRuleTemplateId()));
             infoWrapper.getCounterMap().remove(staffWTACounter.getRuleTemplateId());

@@ -22,6 +22,13 @@ public class UnitPositionWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
 
 
+    public UnitPositionWithCtaDetailsDTO(int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+        this.contractedMinByWeek = contractedMinByWeek;
+        this.workingDaysPerWeek = workingDaysPerWeek;
+        this.unitPositionStartDate = unitPositionStartDate;
+        this.unitPositionEndDate = unitPositionEndDate;
+    }
+
     public UnitPositionWithCtaDetailsDTO(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
@@ -118,6 +125,8 @@ public class UnitPositionWithCtaDetailsDTO {
     public void setCtaRuleTemplates(List<CTARuleTemplateCalulatedTimeBankDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
+
+
 
 
 }

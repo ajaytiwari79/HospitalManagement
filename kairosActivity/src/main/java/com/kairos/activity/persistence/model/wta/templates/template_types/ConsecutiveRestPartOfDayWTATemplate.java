@@ -28,7 +28,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     private long daysWorked;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
@@ -42,11 +42,11 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 

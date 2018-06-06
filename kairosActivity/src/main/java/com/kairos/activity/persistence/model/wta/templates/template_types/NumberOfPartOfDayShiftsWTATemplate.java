@@ -35,11 +35,9 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
-    private LocalDate validationStartDate;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -77,19 +75,12 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -126,13 +117,6 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.intervalLength = intervalLength;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
 
     public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
         this.noOfPartOfDayWorked = noOfPartOfDayWorked;
@@ -151,7 +135,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
             if(timeInterval!=null) {
                 DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, activityIds);
+                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());

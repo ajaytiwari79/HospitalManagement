@@ -31,7 +31,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
@@ -46,11 +46,11 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -103,7 +103,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()) {
+        if(!isDisabled() && (plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) {
             int timefromPrevShift = 0;
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
             shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());

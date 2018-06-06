@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
-import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateTimeInterval;
-import com.kairos.activity.util.TimeInterval;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
@@ -24,12 +21,10 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
+public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
-    private long continuousWeekRest;
     private long intervalLength;
     private String intervalUnit;
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
@@ -58,14 +53,6 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
     public float getRecommendedValue() {
         return recommendedValue;
     }
@@ -82,37 +69,30 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public long getContinuousWeekRest() {
-        return continuousWeekRest;
-    }
 
-    public void setContinuousWeekRest(long continuousWeekRest) {
-        this.continuousWeekRest = continuousWeekRest;
-    }
-
-    public WeeklyRestPeriodWTATemplate(String name, boolean disabled,
-                                       String description, long continuousWeekRest) {
+    public RestPeriodInAnIntervalWTATemplate(String name, boolean disabled,
+                                             String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-
-        this.continuousWeekRest=continuousWeekRest;
         wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
 
     }
 
-    public WeeklyRestPeriodWTATemplate() {
+    public RestPeriodInAnIntervalWTATemplate() {
         wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
-        if (timeInterval != null) {
+        if(!isDisabled()){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-            int totalRestingTime = getTotalRestingTime(infoWrapper.getShifts(), dateTimeInterval);
+            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts(), null);
+            shifts.add(infoWrapper.getShift());
+            shifts = sortShifts(shifts);
+            int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), getId());
-            if (!isValid(minMaxSetting, limitAndCounter[0], totalRestingTime)) {
+            if (!isValid(minMaxSetting, limitAndCounter[0], maxRestingTime/60)) {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
@@ -124,19 +104,20 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
                     new InvalidRequestException(getName() + " is Broken");
                 }
             }
-
         }
         return "";
     }
 
 
-    public int getTotalRestingTime(List<ShiftWithActivityDTO> shifts, DateTimeInterval dateTimeInterval) {
-                if (shifts.size() < 2) return 0;
-                int totalRestTime = dateTimeInterval.getMinutes();
-                for (ShiftWithActivityDTO shift : shifts) {
-                        totalRestTime = shift.getMinutes();
-                    }
-                return totalRestTime;
+    public int getMaxRestingTime(List<ShiftWithActivityDTO> shifts) {
+        int maxRestTime = 0;
+        for (int i=1;i<shifts.size();i++) {
+            int restTime = new DateTimeInterval(shifts.get(i-1).getEndDate().getTime(),shifts.get(i).getStartDate().getTime()).getMinutes();
+            if(restTime>maxRestTime){
+                maxRestTime = restTime;
             }
+        }
+        return maxRestTime;
+    }
 
 }

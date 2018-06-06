@@ -32,10 +32,8 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;//
     private String intervalUnit;
-    private LocalDate validationStartDate;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY,PartOfDay.EVENING,PartOfDay.NIGHT);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -58,19 +56,12 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -98,13 +89,6 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -124,14 +108,12 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
 
 
     public ShiftsInIntervalWTATemplate(String name,  boolean disabled,
-                                       String description, long intervalLength, String intervalUnit,
-                                       LocalDate validationStartDate) {
+                                       String description, long intervalLength, String intervalUnit) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
-        this.validationStartDate =validationStartDate;
         wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     }
@@ -141,11 +123,11 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()){
+        if(!isDisabled() && (plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
             if(timeInterval!=null) {
                 DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, activityIds);
+                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());

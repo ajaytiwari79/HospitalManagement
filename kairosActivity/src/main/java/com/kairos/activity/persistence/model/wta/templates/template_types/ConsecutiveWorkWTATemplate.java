@@ -33,7 +33,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -65,11 +65,11 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -129,7 +129,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled()) {
-            if ((timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) || plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()))) {
+            if ((timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()))) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
                 if (timeInterval != null) {
                     List<ShiftWithActivityDTO> shiftQueryResultWithActivities = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);

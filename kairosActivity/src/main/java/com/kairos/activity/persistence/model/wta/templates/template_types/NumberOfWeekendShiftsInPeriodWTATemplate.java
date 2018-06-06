@@ -11,8 +11,10 @@ import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInf
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateTimeInterval;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -227,20 +229,25 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         return "";
     }
 
-    public static List<DateTimeInterval> getWeekendsIntervals(DateTimeInterval dateTimeInterval){
+    public List<DateTimeInterval> getWeekendsIntervals(DateTimeInterval dateTimeInterval){
         List<DateTimeInterval> intervals = new ArrayList<>();
         ZonedDateTime endDate = null;
         ZonedDateTime startDate = dateTimeInterval.getStart();
         while (true){
-            if(startDate.isBefore(dateTimeInterval.getEnd())) {
-                endDate = startDate.plusDays(1);
+            endDate = startDate.plusDays(1);
+            if(startDate.isAfter(getDayByDate(startDate,fromDayOfWeek,fromTime)) && endDate.isBefore(getDayByDate(endDate,toDayOfWeek,toTime))) {
                 intervals.add(new DateTimeInterval(startDate, endDate));
-                startDate = endDate;
-            }else {
+            }
+            if(startDate.isAfter(dateTimeInterval.getEnd())) {
                 break;
             }
+            startDate = endDate;
         }
         return intervals;
+    }
+
+    public ZonedDateTime getDayByDate(ZonedDateTime dateTime, String day, LocalTime localTime){
+        return dateTime.with(TemporalAdjusters.next(DayOfWeek.valueOf(day))).with(localTime);
     }
 
     private int getDayOFF(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){

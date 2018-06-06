@@ -7,7 +7,9 @@ import org.joda.time.DateTime;
 
 import java.time.*;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
 /**
@@ -33,6 +35,14 @@ public class DateTimeInterval {
 
     public ZonedDateTime getStart() {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(start), ZoneId.systemDefault());
+    }
+
+    public Date getStartDate(){
+        return new Date(this.start);
+    }
+
+    public Date getEndDate(){
+        return new Date(this.end);
     }
 
     public long getStartMillis() {
@@ -187,6 +197,9 @@ public class DateTimeInterval {
         return (this.start - this.end);
     }
 
+    public int getDays(){
+        return Period.between(getEnd().toLocalDate(),getStart().toLocalDate()).getDays();
+    }
 
     @Override
     public boolean equals(Object o) {

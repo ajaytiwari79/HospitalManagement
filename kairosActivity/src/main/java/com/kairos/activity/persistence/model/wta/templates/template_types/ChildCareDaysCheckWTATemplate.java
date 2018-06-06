@@ -21,7 +21,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();;
     private LocalDate validationStartDate;
     private int numberOfWeeks;
     private boolean borrowLeave;
@@ -44,11 +44,11 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
