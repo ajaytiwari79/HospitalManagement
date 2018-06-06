@@ -261,10 +261,8 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
-        if(generalDTO.getEndDate()!=null){
-            if(generalDTO.getEndDate().isBefore(generalDTO.getStartDate())){
-                exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
-            }
+        if(generalDTO.getEndDate()!=null&&generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
+            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
 
         Date date=DateUtils.asDate(generalDTO.getStartDate());
