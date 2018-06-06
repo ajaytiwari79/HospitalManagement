@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
@@ -96,10 +97,11 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(BigInteger id, TechnicalSecurityMeasure techSecurityMeasure) {
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(UserContext.getCountryId(),techSecurityMeasure.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+techSecurityMeasure.getName());
         } else {
+            exist=technicalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(techSecurityMeasure.getName());
             return save(exist);
 

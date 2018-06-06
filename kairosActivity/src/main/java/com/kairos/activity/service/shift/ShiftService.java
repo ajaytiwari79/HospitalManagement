@@ -199,6 +199,7 @@ public class ShiftService extends MongoBaseService {
         Long endDateMillis = null;
         Long breakAllowedAfterMinute = 0L;
         Long allowedBreakDurationInMinute = 0L;
+        String lastItemAdded = null;
         List<Shift> shifts = new ArrayList<>();
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
         for (int i = 0; i < breakSettings.size(); i++) {
@@ -215,14 +216,18 @@ public class ShiftService extends MongoBaseService {
                 // if still after subtraction the shift is greater than
                 allowedBreakDurationInMinute = breakSettings.get(i).getBreakDurationInMinute();
                 startDateMillis = endDateMillis;
+                logger.info("Remainig for ShiftDurationInMinute = {}", shiftDurationInMinute);
+                lastItemAdded = SHIFT;
                 if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
-
                     endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                     shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
-                    startDateMillis = endDateMillis;
+
                     shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
+                    startDateMillis = endDateMillis;
+                    logger.info("Remaining shift length after break = {}", shiftDurationInMinute);
+                    lastItemAdded = BREAK;
                 } else {
-                    logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for ", breakSettings.get(i).getBreakDurationInMinute());
+                    logger.info("Remaining shift duration {}  And we need to add break for {}", shiftDurationInMinute, breakSettings.get(i).getBreakDurationInMinute());
                     // add break and increase main shift duration by remaining minute
                 }
             } else {
@@ -238,16 +243,31 @@ public class ShiftService extends MongoBaseService {
             endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
             shifts.add(getShiftObject(shiftDTO, shiftDTO.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
             shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
-
+            lastItemAdded = SHIFT;
             if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                 startDateMillis = endDateMillis;
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
                 shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+                lastItemAdded = BREAK;
             } else {
                 logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for {} ", allowedBreakDurationInMinute);
                 // add break and increase main shift duration by remaining minute
             }
+
+        }
+        // Sometimes the break is
+        if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == SHIFT) {
+            // handle later
+            startDateMillis = endDateMillis;
+            endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
+            shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
+
+
+        } else if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
+            startDateMillis = endDateMillis;
+            endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
+            shifts.add(getShiftObject(shiftDTO, shiftDTO.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
 
         }
         save(shifts);
@@ -275,7 +295,7 @@ public class ShiftService extends MongoBaseService {
                 timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
             }
             shifts.add(shift);
-            //timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+            timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
             boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
 
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null, isShiftForPreence));
@@ -358,7 +378,6 @@ public class ShiftService extends MongoBaseService {
         if (startDateAsString != null) {
             DateFormat dateISOFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
             Date startDate = dateISOFormat.parse(startDateAsString);
-
             startDateInISO = new DateTime(startDate).toDate();
             if (endDateAsString != null) {
                 Date endDate = dateISOFormat.parse(endDateAsString);
@@ -411,14 +430,15 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activityExpertiseSpecification = new ActivityExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         ActivitySpecification<Activity> activityWTARulesSpecification = new ActivityWTARulesSpecification(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement(), phase, shift, staffAdditionalInfoDTO);
 
-        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification); //
+        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification);
+          //TODO Pradeep will look into dayType
 
-        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
-        if (dayTypeIds != null) {
-            List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
-            ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
-            activitySpecification.and(activityDayTypeSpec);
-        }
+//        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
+//        if (dayTypeIds != null) {
+//            List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
+//            ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
+//            activitySpecification.and(activityDayTypeSpec);
+//        }
 
         activitySpecification.isSatisfied(activity);
 

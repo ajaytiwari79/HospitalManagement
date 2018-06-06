@@ -98,7 +98,9 @@ public class Staff extends UserBaseEntity {
     @Relationship(type = HAS_FAVOURITE_FILTERS)
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
     private String careOfName;
-//    private Gender gender;
+
+    @Relationship(type = HAS_STAFF_SETTINGS)
+    private StaffSettings staffSettings;
 
 
     public Staff(String firstName) {
@@ -485,11 +487,23 @@ public class Staff extends UserBaseEntity {
     }
 
 
+    public StaffSettings getStaffSettings() {
+        return staffSettings=Optional.ofNullable(staffSettings).orElse(new StaffSettings());
+    }
+
+    public void setStaffSettings(StaffSettings staffSettings) {
+        this.staffSettings = staffSettings;
+    }
+    /*    public Gender getGender() {
+
 /*    public Gender getGender() {
         return gender;
     }
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
     }*/
+
 }

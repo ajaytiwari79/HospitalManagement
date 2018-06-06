@@ -9,6 +9,7 @@ import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivi
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,8 @@ public class ActivityDTO {
     private Long countryActivityId;
     private SkillActivityTab skillActivityTab;
     private TimeTypeDTO timeType;
-
+    private LocalDate startDate;
+    private LocalDate endDate;
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
     private List<Long> tags = new ArrayList<>();
@@ -182,6 +184,22 @@ public class ActivityDTO {
 
     public void setCompositeActivities(List<ActivityDTO> compositeActivities) {
         this.compositeActivities = compositeActivities;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {

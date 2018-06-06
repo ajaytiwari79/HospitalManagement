@@ -5,22 +5,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationTypeAndServiceBasicDto {
-    private Long value;
-    private String label;
+    private Long id;
+    private String name;
 
-    public Long getValue() {
-        return value;
+    public Long getId() {
+        return id;
     }
 
-    public void setValue(Long value) {
-        this.value = value;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getLabel() {
-        return label;
+    public String getName() {
+        return name;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setName(String name) {
+        this.name = name;
     }
 }

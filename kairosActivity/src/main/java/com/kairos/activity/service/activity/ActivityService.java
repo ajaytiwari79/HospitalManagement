@@ -7,8 +7,8 @@ import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
@@ -21,6 +21,7 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.TimeTypeMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
@@ -37,8 +38,12 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
+import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
+import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,6 +66,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -107,19 +113,28 @@ public class ActivityService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private StaffRestClient  staffRestClient;
+    @Inject private OpenShiftIntervalRepository openShiftIntervalRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         logger.info(activityDTO.getName());
-        Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
+        Date date = DateUtils.asDate(activityDTO.getStartDate());
+        if(activityDTO.getEndDate()!=null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
+        }
+        Activity activity = activityMongoRepository.findByNameAndDateAndCountryId(activityDTO.getName().trim(), countryId,date);
+        //Activity activity = activityMongoRepository.findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
 
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicateData", "activity", activityDTO.getName());
+                if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent()){
+                    exceptionService.dataNotFoundException("message.activity.enddate.required");
+                } else{
+                    exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
+                }
         }
         activity = buildActivity(activityDTO);
-        initializeActivityTabs(activity, countryId);
+        initializeActivityTabs(activity, countryId,activityDTO);
         save(activity);
         // Fetch tags detail
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
@@ -129,10 +144,12 @@ public class ActivityService extends MongoBaseService {
         return activityTagDTO;
     }
 
-    private void initializeActivityTabs(Activity activity, Long countryId) {
+    private void initializeActivityTabs(Activity activity, Long countryId,ActivityDTO activityDTO) {
 
         GeneralActivityTab generalActivityTab = new GeneralActivityTab(activity.getName(), activity.getDescription(), "");
         generalActivityTab.setColorPresent(false);
+        generalActivityTab.setStartDate(activityDTO.getStartDate());
+        generalActivityTab.setEndDate(activityDTO.getEndDate());
         activity.setCountryId(countryId);
 
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
@@ -245,9 +262,19 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
-        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
+        if(generalDTO.getEndDate()!=null&&generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
+            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
+        }
+
+        Date date=DateUtils.asDate(generalDTO.getStartDate());
+       // Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
+        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate( generalDTO.getName().trim(), generalDTO.getActivityId(), countryId,date);
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            exceptionService.duplicateDataException("exception.duplicateData", "activity");
+            if(!Optional.ofNullable(isActivityAlreadyExists.getGeneralActivityTab().getEndDate()).isPresent()){
+                exceptionService.dataNotFoundException("message.activity.enddate.required",generalDTO.getName());
+            } else{
+                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
+            }
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
@@ -1062,17 +1089,24 @@ public class ActivityService extends MongoBaseService {
         return activity;
     }
 
-    public Object initialOptaplannerSync(Long organisationId, Long unitId) {
-        List<Activity> activities=activityMongoRepository.findAllActivitiesByUnitId(unitId);
-        plannerSyncService.publishActivities(unitId,activities,IntegrationOperation.CREATE);
-        List<StaffingLevel> staffingLevels= staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId,DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)),DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
-        List<StaffingLevelDTO> staffingLevelDTOS= new ArrayList<>();
-        for(StaffingLevel staffingLevel:staffingLevels){
-            StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
+    public PlannerSyncResponseDTO initialOptaplannerSync(Long organisationId, Long unitId) {
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitId(unitId);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)), DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
+        plannerSyncService.publishActivities(unitId, activities, IntegrationOperation.CREATE);
+        List<StaffingLevelDTO> staffingLevelDTOS = new ArrayList<>();
+        for (StaffingLevel staffingLevel : staffingLevels) {
+            StaffingLevelDTO staffingLevelDTO = new StaffingLevelDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
             staffingLevelDTOS.add(staffingLevelDTO);
         }
-        plannerSyncService.publishStaffingLevels(unitId,staffingLevelDTOS,IntegrationOperation.CREATE);
-        return null;
+        plannerSyncService.publishStaffingLevels(unitId, staffingLevelDTOS, IntegrationOperation.CREATE);
+        return new PlannerSyncResponseDTO(true);
+    }
 
+    public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId){
+       List<ActivityDTO> activityDTOS =activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
+       List<TimeTypeDTO> timeTypeDTOS=timeTypeService.getAllTimeType(null,countryId);
+       List<OpenShiftIntervalDTO> intervals=openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
+       ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals);
+       return activityWithTimeTypeDTO;
     }
 }

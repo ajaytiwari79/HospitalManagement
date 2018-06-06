@@ -3,7 +3,7 @@ package com.kairos.activity.client;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.staff.OrganizationStaffWrapper;
 import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
@@ -47,15 +47,15 @@ public class OrganizationRestClient {
      */
     public OrganizationDTO getOrganization(long unitId) {
 
-        final String baseUrl = RestClientUrlUtil.getBaseUrl(false);
+        final String baseUrl = RestClientUrlUtil.getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<OrganizationDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}",
-                            HttpMethod.GET, null, typeReference, unitId);
+                            baseUrl ,
+                            HttpMethod.GET, null, typeReference);
             RestTemplateResponseEnvelope<OrganizationDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();

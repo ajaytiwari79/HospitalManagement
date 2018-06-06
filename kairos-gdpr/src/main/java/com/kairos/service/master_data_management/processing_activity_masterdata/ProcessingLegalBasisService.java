@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.processing_activity_masterdata
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ProcessingLegalBasisMongoRepository;
@@ -96,10 +97,11 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     public ProcessingLegalBasis updateProcessingLegalBasis(BigInteger id, ProcessingLegalBasis legalBasis) {
 
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(UserContext.getCountryId(),legalBasis.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+legalBasis.getName());
         } else {
+            exist=legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
             return save(exist);
 

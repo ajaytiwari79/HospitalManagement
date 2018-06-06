@@ -4,6 +4,7 @@ import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public interface CustomAgreementSectionRepository {
 
@@ -11,6 +12,6 @@ public interface CustomAgreementSectionRepository {
 
     List<AgreementSectionResponseDto> getAllAgreementSectionWithData(Long countryId);
 
-    List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,List<BigInteger> ids);
+    List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,Set<BigInteger> ids);
 
 }

@@ -1,6 +1,7 @@
 package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
@@ -10,6 +11,7 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderOpenshiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class OrderService extends MongoBaseService {
 
 
 
-   public OrderOpenshiftResponseDTO createOrder(OrderOpenshiftResponseDTO orderOpenshiftResponseDTO) {
+   public OrderOpenshiftResponseDTO createOrder(Long unitId,OrderOpenshiftResponseDTO orderOpenshiftResponseDTO) {
 
     Order order = new Order();
     OrderResponseDTO orderResponseDTO = orderOpenshiftResponseDTO.getOrder();
@@ -46,12 +48,11 @@ public class OrderService extends MongoBaseService {
        for(OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
            openShiftResponseDTO.setActivityId(order.getActivityId());
        }
-    openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
-
-    return orderOpenshiftResponseDTO;
-
-
-    }
+       openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
+       List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupService.createPriorityGroups(order.getId(),orderOpenshiftResponseDTO.getPriorityGroups());
+       orderOpenshiftResponseDTO.setPriorityGroups(priorityGroupDTOS);
+       return orderOpenshiftResponseDTO;
+       }
 
     public OrderOpenshiftResponseDTO updateOrder(OrderOpenshiftResponseDTO orderOpenShiftResponseDTO,BigInteger orderId) {
 
@@ -65,8 +66,11 @@ public class OrderService extends MongoBaseService {
         save(order);
         orderResponseDTO.setId(order.getId());
         openShiftResponseDTOS = openShiftService.updateOpenShift(openShiftResponseDTOS,orderId);
+        List<PriorityGroupDTO> priorityGroupDTOs=orderOpenShiftResponseDTO.getPriorityGroups();
+        priorityGroupService.updatePriorityGroupsForOrder(priorityGroupDTOs);
         orderOpenShiftResponseDTO.setOrder(orderResponseDTO);
         orderOpenShiftResponseDTO.setOpenshifts(openShiftResponseDTOS);
+        orderOpenShiftResponseDTO.setPriorityGroups(priorityGroupDTOs);
         return orderOpenShiftResponseDTO;
     }
 
@@ -86,5 +90,11 @@ public class OrderService extends MongoBaseService {
 
         List<Order> orders = orderMongoRepository.findOrdersByUnitId(unitId);
         return orders;
+    }
+
+   public OrderOpenshiftResponseDTO getPriorityGroupAndOpenShiftsByOrderId(Long unitId,BigInteger orderId){
+       List<OpenShiftResponseDTO> openShiftResponseDTOS=openShiftService.getOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+       List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupService.getPriorityGroupsByOrderId(unitId,orderId);
+        return  new OrderOpenshiftResponseDTO(openShiftResponseDTOS,priorityGroupDTOS);
     }
 }

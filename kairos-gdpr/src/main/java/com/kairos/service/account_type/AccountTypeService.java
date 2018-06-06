@@ -33,12 +33,12 @@ public class AccountTypeService extends MongoBaseService {
 
     public AccountType createAccountType(Long countryId,AccountType accountType) {
 
-        AccountType exists = accountTypeRepository.findByTypeOfAccount(countryId,accountType.getTypeOfAccount());
+        AccountType exists = accountTypeRepository.findByTypeOfAccount(countryId,accountType.getName());
         if (Optional.ofNullable(exists).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate","message.accountType",accountType.getTypeOfAccount());
+            exceptionService.duplicateDataException("message.duplicate","message.accountType",accountType.getName());
         } else {
             AccountType newAccount = new AccountType();
-            newAccount.setTypeOfAccount(accountType.getTypeOfAccount());
+            newAccount.setName(accountType.getName());
             newAccount.setCountryId(countryId);
             return save(newAccount);
         }

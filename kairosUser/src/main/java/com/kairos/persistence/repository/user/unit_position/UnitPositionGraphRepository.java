@@ -184,7 +184,11 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     UnitPositionEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
 
 
-    @Query("match(unitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(unitPosition)={0} return unitPosition,employmentRel,employmentType")
+    @Query("match(unitPosition:UnitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
+            "MATCH(unitPosition)-[:" + IN_UNIT + "]-(o:Organization) "+
+            "MATCH (unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)"+
+            "where id(o)={0}" +
+            "return unitPosition,employmentRel,employmentType")
     List<UnitPositionEmploymentTypeRelationShip> findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(Long parentOrganizationId);
 
     @Query("match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) where id(unitPosition)={0}  detach delete rel")
@@ -242,6 +246,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,id(org) as parentUnitId, id(org)  as unitId ,\n"+
             "{id:id(org),name:org.name} as unitInfo")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
+
+    @Query("MATCH(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
+            "MATCH(unitPosition)<-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) " +
+            "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={0} AND id(staff)={1} and id(expertise)={2} \n" +
+            "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
+            "return id(unitPosition)")
+    Long getUnitPositionIdByStaffAndExpertise(Long unitId,Long staffId,Long expertiseId,Long currentMillis);
 
     @Query("MATCH (unit:Organization) WHERE id(unit)={0} \n" +
             "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise) \n" +

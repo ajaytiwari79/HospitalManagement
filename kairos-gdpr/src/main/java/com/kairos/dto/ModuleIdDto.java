@@ -9,30 +9,23 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ModuleIdDto {
 
+
     @NotNullOrEmpty
     private String name;
-
-    private Boolean isModuleId;
-
     @NotNullOrEmpty
     private String moduleId;
 
+    private Boolean isModuleId ;
+
     private Boolean active;
 
-    public String getName() {
-        return name;
+
+    public String getModuleId() {
+        return moduleId;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Boolean getModuleId() {
-        return isModuleId;
-    }
-
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
+    public void setModuleId(Boolean moduleId) {
+        isModuleId = moduleId;
     }
 
     public Boolean getActive() {
@@ -43,9 +36,15 @@ public class ModuleIdDto {
         this.active = active;
     }
 
-    public void setModuleId(Boolean moduleId) {
-        isModuleId = moduleId;
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 }

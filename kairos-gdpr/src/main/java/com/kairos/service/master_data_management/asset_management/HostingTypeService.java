@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingType;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingTypeMongoRepository;
@@ -97,12 +98,12 @@ public class HostingTypeService extends MongoBaseService {
     public HostingType updateHostingType(BigInteger id, HostingType hostingType) {
 
 
-        HostingType exist = hostingTypeMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        HostingType exist = hostingTypeMongoRepository.findByName(UserContext.getCountryId(),hostingType.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+hostingType.getName());
         } else {
+            exist=hostingTypeMongoRepository.findByid(id);
             exist.setName(hostingType.getName());
-
             return save(exist);
 
         }

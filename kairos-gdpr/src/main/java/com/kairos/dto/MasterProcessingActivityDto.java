@@ -28,13 +28,21 @@ public class MasterProcessingActivityDto {
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-
+    private Boolean isSubProcess;
 
     private List<MasterProcessingActivityDto> subProcessingActivities;
 
 
     public List<MasterProcessingActivityDto> getSubProcessingActivities() {
         return subProcessingActivities;
+    }
+
+    public Boolean getSubProcess() {
+        return isSubProcess;
+    }
+
+    public void setSubProcess(Boolean subProcess) {
+        isSubProcess = subProcess;
     }
 
     public void setSubProcessingActivities(List<MasterProcessingActivityDto> subProcessingActivities) {

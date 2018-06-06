@@ -1,24 +1,29 @@
 package com.kairos.config.mongoEnv_config;
 
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class MongoConfig extends AbstractMongoConfiguration {
 
 
     @Autowired
-    private EnvironmentConfig environment;
+    private EnvConfig environment;
 
 
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient(new MongoClientURI(environment.getMongoUri()));
+        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(),environment.getDataBaseName(),environment.getMongoPassword().toCharArray()));
+        return  new MongoClient( new ServerAddress(environment.getMongoHost(),environment.getMongoPort()) ,credentialList);
     }
 
     @Override
