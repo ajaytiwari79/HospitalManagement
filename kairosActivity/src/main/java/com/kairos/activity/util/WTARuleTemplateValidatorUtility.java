@@ -81,7 +81,7 @@ public class WTARuleTemplateValidatorUtility {
         Comparator shiftStartComparator = new Comparator<ShiftWithActivityDTO>() {
             @Override
             public int compare(ShiftWithActivityDTO shift1, ShiftWithActivityDTO shift2) {
-                if (shift1.getStartDate() != null && shift2.getStartDate() != null && shift1.getStaffId().equals(shift2.getStaffId())) {
+                if (shift1.getStartDate() != null && shift2.getStartDate() != null) {
                     return shift1.getStartDate().compareTo(shift2.getStartDate());
                 } else {
                     return -1;
@@ -92,7 +92,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static boolean isValid(MinMaxSetting minMaxSetting,int limitValue,int calculatedValue){
-        return minMaxSetting.equals(MinMaxSetting.MINIMUM)? limitValue < calculatedValue : limitValue > calculatedValue;
+        return minMaxSetting.equals(MinMaxSetting.MINIMUM)? limitValue <= calculatedValue : limitValue >= calculatedValue;
     }
 
     public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift){
@@ -211,13 +211,22 @@ public class WTARuleTemplateValidatorUtility {
     public static Integer[] getValueByPhase(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues,BigInteger ruleTemplateId){
         Integer[] limitAndCounter = new Integer[2];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if(infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName()) && !phaseTemplateValue.isDisabled()){
+            if(infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName())){
                 limitAndCounter[0] = (int)(infoWrapper.getUser().getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
                 limitAndCounter[1] = getCounterValue(infoWrapper,phaseTemplateValue,ruleTemplateId);
                 break;
             }
         }
         return limitAndCounter;
+    }
+
+    public static boolean isValidForPhase(String phase, List<PhaseTemplateValue> phaseTemplateValues){
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if(phase.equals(phaseTemplateValue.getPhaseName())){
+                return !phaseTemplateValue.isDisabled();
+            }
+        }
+        return false;
     }
 
     public static Integer getCounterValue(RuleTemplateSpecificInfo infoWrapper,PhaseTemplateValue phaseTemplateValue,BigInteger ruleTemplateId){

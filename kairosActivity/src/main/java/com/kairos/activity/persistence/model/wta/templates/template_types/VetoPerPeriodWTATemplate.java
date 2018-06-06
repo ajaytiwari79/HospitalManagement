@@ -29,7 +29,7 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
-    private List<BigInteger> activityIds;
+    private List<BigInteger> activityIds = new ArrayList<>();
     private int numberOfWeeks;
     private LocalDate validationStartDate;
     private float recommendedValue;
@@ -103,7 +103,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && activityIds.contains(infoWrapper.getShift().getActivity().getId())) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivity().getId())) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
             shifts = filterShifts(shifts, null, null, activityIds);

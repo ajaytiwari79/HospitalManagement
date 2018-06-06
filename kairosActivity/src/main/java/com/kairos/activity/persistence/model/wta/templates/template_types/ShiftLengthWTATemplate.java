@@ -86,7 +86,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
             if (timeInterval != null) {
                 if (isValidForDay(dayTypeIds, infoWrapper)) {

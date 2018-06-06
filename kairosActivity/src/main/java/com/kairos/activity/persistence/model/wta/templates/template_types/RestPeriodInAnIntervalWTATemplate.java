@@ -85,7 +85,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()){
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts(), null);
             shifts.add(infoWrapper.getShift());

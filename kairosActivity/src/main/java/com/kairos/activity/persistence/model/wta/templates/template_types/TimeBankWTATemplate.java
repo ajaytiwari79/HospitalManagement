@@ -16,6 +16,7 @@ import java.util.List;
 
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getValueByPhase;
 import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValidForPhase;
 
 
 /**
@@ -59,7 +60,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()){
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
             if (!isValid) {

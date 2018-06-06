@@ -1069,16 +1069,17 @@ public class ActivityService extends MongoBaseService {
     }
 
     public PlannerSyncResponseDTO initialOptaplannerSync(Long organisationId, Long unitId) {
-        List<Activity> activities=activityMongoRepository.findAllActivitiesByUnitId(unitId);
-        List<StaffingLevel> staffingLevels= staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId,DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)),DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
-        plannerSyncService.publishActivities(unitId,activities,IntegrationOperation.CREATE);
-        List<StaffingLevelDTO> staffingLevelDTOS= new ArrayList<>();
-        for(StaffingLevel staffingLevel:staffingLevels){
-            StaffingLevelDTO staffingLevelDTO= new StaffingLevelDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitId(unitId);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)), DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
+        plannerSyncService.publishActivities(unitId, activities, IntegrationOperation.CREATE);
+        List<StaffingLevelDTO> staffingLevelDTOS = new ArrayList<>();
+        for (StaffingLevel staffingLevel : staffingLevels) {
+            StaffingLevelDTO staffingLevelDTO = new StaffingLevelDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
             staffingLevelDTOS.add(staffingLevelDTO);
         }
-        plannerSyncService.publishStaffingLevels(unitId,staffingLevelDTOS,IntegrationOperation.CREATE);
+        plannerSyncService.publishStaffingLevels(unitId, staffingLevelDTOS, IntegrationOperation.CREATE);
         return new PlannerSyncResponseDTO(true);
+    }
 
 
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId){

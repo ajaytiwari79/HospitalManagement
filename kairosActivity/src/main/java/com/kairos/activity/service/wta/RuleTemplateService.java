@@ -140,7 +140,7 @@ public class RuleTemplateService extends MongoBaseService {
         vetoPerPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(vetoPerPeriodWTATemplate);
 
-        NumberOfWeekendShiftsInPeriodWTATemplate numberofWeekendShiftsInPeriodWTATemplate = new NumberOfWeekendShiftsInPeriodWTATemplate("Weekend off Distribution",false,"Weekend off Distribution",12, 1, TUESDAY, LocalTime.of(10,30), true, TUESDAY, LocalTime.of(10,30));
+        NumberOfWeekendShiftsInPeriodWTATemplate numberofWeekendShiftsInPeriodWTATemplate = new NumberOfWeekendShiftsInPeriodWTATemplate("Weekend off Distribution",false,"Weekend off Distribution", TUESDAY, LocalTime.of(10,30), TUESDAY, LocalTime.of(10,30));
         numberofWeekendShiftsInPeriodWTATemplate.setCountryId(countryDTO.getId());
         numberofWeekendShiftsInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         numberofWeekendShiftsInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());

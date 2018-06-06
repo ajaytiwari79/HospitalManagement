@@ -182,19 +182,19 @@ public class DateTimeInterval {
     }
 
     public int getMinutes(){
-        return (int) (this.start - this.end)/60000;
+        return (int) (this.end - this.start)/60000;
     }
 
     public int getHours(){
-        return (int) (this.start - this.end)/3600000;
+        return (int) (this.end - this.start)/3600000;
     }
 
     public int getSeconds(){
-        return (int) (this.start - this.end)/1000;
+        return (int) (this.end - this.start)/1000;
     }
 
     public Long getMilliSeconds(){
-        return (this.start - this.end);
+        return (this.end - this.start);
     }
 
     public int getDays(){

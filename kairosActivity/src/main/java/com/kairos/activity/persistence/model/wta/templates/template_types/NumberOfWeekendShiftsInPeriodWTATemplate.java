@@ -33,11 +33,9 @@ import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplate {
 
-    private long numberShiftsPerPeriod;
-    private long numberOfWeeks;
+
     private String fromDayOfWeek; //(day of week)
     private LocalTime fromTime;
-    private boolean proportional;
     private LocalTime toTime;
     private String toDayOfWeek;
     private long intervalLength;
@@ -89,9 +87,6 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.minMaxSetting = minMaxSetting;
     }
 
-    public boolean isProportional() {
-        return proportional;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -134,22 +129,6 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.toDayOfWeek = toDayOfWeek;
     }
 
-    public long getNumberShiftsPerPeriod() {
-        return numberShiftsPerPeriod;
-    }
-
-    public void setNumberShiftsPerPeriod(long numberShiftsPerPeriod) {
-        this.numberShiftsPerPeriod = numberShiftsPerPeriod;
-    }
-
-    public long getNumberOfWeeks() {
-        return numberOfWeeks;
-    }
-
-    public void setNumberOfWeeks(long numberOfWeeks) {
-        this.numberOfWeeks = numberOfWeeks;
-    }
-
     public String getFromDayOfWeek() {
         return fromDayOfWeek;
     }
@@ -166,24 +145,13 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.fromTime = fromTime;
     }
 
-    public boolean getProportional() {
-        return proportional;
-    }
-
-    public void setProportional(boolean proportional) {
-        this.proportional = proportional;
-    }
 
     public NumberOfWeekendShiftsInPeriodWTATemplate(String name, boolean disabled,
-                                                    String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, LocalTime fromTime, boolean proportional,
+                                                    String description, String fromDayOfWeek, LocalTime fromTime,
                                                     String toDayOfWeek, LocalTime toTime) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-
-        this.numberShiftsPerPeriod = numberShiftsPerPeriod;
-        this.numberOfWeeks = numberOfWeeks;
-        this.proportional = proportional;
         this.fromDayOfWeek = fromDayOfWeek;
         this.fromTime = fromTime;
         this.toDayOfWeek = toDayOfWeek;
@@ -200,7 +168,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled()) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
             int count = 0;
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             //dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
@@ -235,8 +203,10 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         ZonedDateTime startDate = dateTimeInterval.getStart();
         while (true){
             endDate = startDate.plusDays(1);
-            if(startDate.isAfter(getDayByDate(startDate,fromDayOfWeek,fromTime)) && endDate.isBefore(getDayByDate(endDate,toDayOfWeek,toTime))) {
-                intervals.add(new DateTimeInterval(startDate, endDate));
+            ZonedDateTime nextStart = getDayByDate(startDate,fromDayOfWeek,fromTime);
+            ZonedDateTime nextEnd = getDayByDate(endDate,toDayOfWeek,toTime);
+            if(endDate.isAfter(nextStart) && startDate.isBefore(nextEnd)) {
+                intervals.add(new DateTimeInterval(startDate.plusDays(1), endDate.plusDays(1)));
             }
             if(startDate.isAfter(dateTimeInterval.getEnd())) {
                 break;
@@ -247,20 +217,17 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     }
 
     public ZonedDateTime getDayByDate(ZonedDateTime dateTime, String day, LocalTime localTime){
-        return dateTime.with(TemporalAdjusters.next(DayOfWeek.valueOf(day))).with(localTime);
+        return dateTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.valueOf(day))).with(localTime);
     }
 
     private int getDayOFF(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){
-        int count = 0;
         List<DateTimeInterval> dayIntervals = getWeekendsIntervals(dateTimeInterval);
         Set<DateTimeInterval> overLapsIntervals = new HashSet<>();
-        for (int i = 1; i < intervals.size(); i++) {
-            DateTimeInterval interval = intervals.get(i - 1);
+        for (DateTimeInterval interval : intervals) {
             if(restingTimeAllowed){
                 interval = new DateTimeInterval(interval.getStart(),interval.getEnd().plusHours(restingTime));
             }
             overLapsIntervals.addAll(getOverLapsInterval(dayIntervals,interval));
-
         }
         return dayIntervals.size() - overLapsIntervals.size();
     }
