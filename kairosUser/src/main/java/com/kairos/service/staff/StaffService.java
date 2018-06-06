@@ -1107,9 +1107,6 @@ public class StaffService extends UserBaseService {
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
 
-        //method call for getting Date of Birth From CPR Number
-        Date dateOfBirth = CPRUtil.fetchDateOfBirthFromCPR(payload.getCprNumber());
-        staff.setDateOfBirth(dateOfBirth);
         staff.setCurrentStatus(payload.getCurrentStatus());
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
