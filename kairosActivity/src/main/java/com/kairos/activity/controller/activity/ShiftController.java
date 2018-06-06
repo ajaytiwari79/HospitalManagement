@@ -3,6 +3,7 @@ package com.kairos.activity.controller.activity;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.shift.ShiftService;
+import com.kairos.activity.shift.CopyShiftDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -48,7 +49,8 @@ public class ShiftController {
     @GetMapping(value = "/shift/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,
-                                                                 @RequestParam Long unitPositionId,
+                                                                 @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
+
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
                                                                  @RequestParam(value = "startDate", required = false) String startDate,
@@ -123,5 +125,22 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, selectedDate));
+    }
+
+    @ApiOperation("copy shifts from 1 employee to others")
+    @PutMapping(value = "/copy_shifts")
+    //
+    public ResponseEntity<Map<String, Object>> copyShifts(@PathVariable long unitId,@RequestBody @Valid CopyShiftDTO copyShiftDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.copyShifts(unitId, copyShiftDTO));
+    }
+
+    @ApiOperation("Get Shift of a staff based upon expertise")
+    @GetMapping(value = "/shifts/staff/{staffId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftOfStaffByExpertiseId(@PathVariable Long staffId, @PathVariable Long unitId,
+                                                                            @RequestParam Long expertiseId,
+                                                                            @RequestParam(value = "startDate", required = false) String startDate,
+                                                                            @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, startDate, endDate, expertiseId));
     }
 }
