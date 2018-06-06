@@ -3,28 +3,26 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelectionDto;
+import com.kairos.dto.ModuleIdDto;
 import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.repository.filter.FilterGroupMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
+import com.kairos.response.dto.filter.FilterAndFavouriteFilterDto;
 import com.kairos.response.dto.filter.FilterQueryResult;
+import com.kairos.response.dto.filter.FilterResponseDto;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.filter.FilterService;
-import org.bson.BSON;
+import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
 import org.springframework.data.mongodb.core.aggregation.*;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
+
 
 @Service
 public class MasterAssetFilterService extends MongoBaseService {
@@ -39,50 +37,35 @@ public class MasterAssetFilterService extends MongoBaseService {
     private FilterGroupMongoRepository filterGroupMongoRepository;
 
     @Inject
-    private FilterService filterService;
-
-    @Inject
     private MongoTemplate mongoTemplate;
-
 
     public FilterQueryResult getAllMasterAssetFilter(Long countryId) {
         return masterAssetMongoRepository.getMasterAssetFilter(countryId);
 
     }
 
-
-    public FilterQueryResult masterAssetfilterQueryResult(Long countryId, String moduleId, Boolean active) {
+    public FilterAndFavouriteFilterDto metaDatafilters(String moduleId, Long countryId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
-        FilterGroup filterGroup = filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, active);
+        FilterGroup filterGroup = filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
+        List<FilterResponseDto> filterResponseData = new ArrayList<>();
+        FilterAndFavouriteFilterDto filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDto();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterService.getFilterCriterias(countryId, filterTypes);
-            Aggregation aggregation = createAggregationQueryForMasterAsset(filterCriteria);
-            AggregationResults<FilterQueryResult> result = mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
-            return result.getUniqueMappedResult();
+            filterCriteria = filterGroupMongoRepository.getFilterCriterias(countryId, filterTypes);
+            Aggregation aggregation = filterGroupMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
+            AggregationResults<FilterQueryResult> result = filterGroupMongoRepository.getFilterAggregationResult(aggregation,filterGroup,moduleId);
+            FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
+            filterTypes.forEach(filterType -> {
+                filterResponseData.add(buildMasterAssetFilter(filterQueryResult, filterType));
+            });
+            filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
+            filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+            return filterAndFavouriteFilterDto;
 
         } else
-            throw new InvalidRequestException("invalide Request filter roup not exist for moduleId " + moduleId);
+            throw new InvalidRequestException("invalide Request filter group not exist for moduleId " + moduleId);
 
-
-    }
-
-
-    public Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations) {
-        GroupOperation groupOperation = group();
-        List<AggregationOperation> operations = new ArrayList<>();
-        operations.add(aggregationOperations.get("match"));
-        for (Map.Entry<String, AggregationOperation> entry : aggregationOperations.entrySet())
-            if (entry.getKey().equals("match")) {
-                continue;
-            } else {
-                operations.add(entry.getValue());
-                groupOperation = groupOperation.addToSet(entry.getKey()).as(entry.getKey());
-            }
-        operations.add(groupOperation);
-        Aggregation aggregation = Aggregation.newAggregation(operations);
-        return aggregation;
 
     }
 
@@ -98,11 +81,53 @@ public class MasterAssetFilterService extends MongoBaseService {
 
     boolean checkIfFilterGroupExistForMduleId(String moduleId, Boolean active) {
 
-        if (Optional.ofNullable(filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, active)).isPresent()) {
+        if (Optional.ofNullable(filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, UserContext.getCountryId())).isPresent()) {
             return true;
         }
         return false;
     }
 
+
+    public FilterResponseDto buildMasterAssetFilter(FilterQueryResult filterQueryResult, FilterType filterType) {
+        switch (filterType) {
+            case ACCOUNT_TYPES:
+                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getAccountTypes());
+            case ORGANIZATION_TYPES:
+                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationTypes());
+            case ORGANIZATION_SUB_TYPES:
+                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationSubTypes());
+            case ORGANIZATION_SERVICES:
+                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationServices());
+            case ORGANIZATION_SUB_SERVICES:
+                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationSubServices());
+            default:
+                throw new InvalidRequestException("invalid request");
+
+        }
+
+
+    }
+
+
+   /* public AggregationResults<FilterQueryResult> getFilterAggregationResult(FilterGroup filterGroup, String moduleId) {
+
+        List<ModuleIdDto> moduleIdDto = filterGroup.getAccessModule();
+        String domainName;
+        for (ModuleIdDto moduleIdDto1 : moduleIdDto) {
+
+            if (moduleIdDto1.getModuleId().equalsIgnoreCase(moduleId)) {
+                domainName = moduleIdDto1.getName();
+            }
+
+        }
+
+        switch (domainName.contains()) {
+
+
+        }
+
+
+    }
+*/
 
 }

@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageFormat;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
@@ -96,8 +97,8 @@ public class StorageFormatService extends MongoBaseService {
     public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
 
         StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(),storageFormat.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+storageFormat.getName());
         } else {
             exist=storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());

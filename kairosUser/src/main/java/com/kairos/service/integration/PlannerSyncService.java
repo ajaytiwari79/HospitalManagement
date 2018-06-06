@@ -34,19 +34,19 @@ public class PlannerSyncService {
     private PlannerRestClient plannerRestClient;
     @Autowired
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
-    @Async
+    //@Async
     public void  publishStaff(Long unitId, Staff staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffDTO(staff),unitId,integrationOperation);
     }
-    @Async
+    //@Async
     public void publishAllStaff(Long unitId, List<Staff> staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffList(staff),unitId,integrationOperation);
     }
-    @Async
+    //@Async
     public void publishWTA(Long unitId,Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
         plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,unitPositionId);
     }
-    @Async
+    //@Async
     public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
         if(integrationOperation.equals(IntegrationOperation.CREATE)){
             plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId());
@@ -56,6 +56,11 @@ public class PlannerSyncService {
         else if(integrationOperation.equals(IntegrationOperation.DELETE)){
             plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
         }
+    }
+    @Async
+    public void publishAllUnitPositions(Long unitId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips, IntegrationOperation integrationOperation) {
+        plannerRestClient.publish(createUnitPositionDTOs(unitId,unitPositionEmploymentTypeRelationShips),unitId,integrationOperation);
+
     }
 
     /*@Async
@@ -106,7 +111,5 @@ public class PlannerSyncService {
 
     }
 
-    public void publishAllUnitPositions(Long organisationId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips, IntegrationOperation create) {
 
-    }
 }

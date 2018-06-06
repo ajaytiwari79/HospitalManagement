@@ -3,7 +3,7 @@ package com.kairos.activity.response.dto.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 
 import java.math.BigInteger;

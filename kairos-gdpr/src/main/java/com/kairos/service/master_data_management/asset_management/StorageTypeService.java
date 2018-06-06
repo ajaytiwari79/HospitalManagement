@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageType;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageTypeMongoRepository;
@@ -29,17 +30,18 @@ public class StorageTypeService extends MongoBaseService {
     public Map<String, List<StorageType>> createStorageType(Long countryId, List<StorageType> storageTypes) {
         Map<String, List<StorageType>> result = new HashMap<>();
         List<StorageType> existing = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> names=new HashSet<>();
         List<StorageType> newStorageTypes = new ArrayList<>();
         if (storageTypes.size() != 0) {
             for (StorageType storageType : storageTypes) {
                 if (!StringUtils.isBlank(storageType.getName())) {
-
+                    names.add(storageType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
             existing = storageTypeMongoRepository.findByCountryAndNameList(countryId, names);
             existing.forEach(item -> names.remove(item.getName()));
+
             if (names.size()!=0) {
                 for (String name : names) {
 
@@ -49,6 +51,7 @@ public class StorageTypeService extends MongoBaseService {
                     newStorageTypes.add(newStorageType);
 
                 }
+
 
                 newStorageTypes = save(newStorageTypes);
             }
@@ -60,6 +63,7 @@ public class StorageTypeService extends MongoBaseService {
 
 
     }
+
 
     public List<StorageType> getAllStorageType() {
         return storageTypeMongoRepository.findAllStorageTypes(UserContext.getCountryId());
@@ -94,8 +98,8 @@ public class StorageTypeService extends MongoBaseService {
     public StorageType updateStorageType(BigInteger id, StorageType storageType) {
 
         StorageType exist = storageTypeMongoRepository.findByName(UserContext.getCountryId(),storageType.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+storageType.getName());
         } else {
             exist=storageTypeMongoRepository.findByid(id);
             exist.setName(storageType.getName());
