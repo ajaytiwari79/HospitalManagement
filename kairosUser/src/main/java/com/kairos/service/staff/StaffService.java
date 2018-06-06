@@ -653,7 +653,8 @@ public class StaffService extends UserBaseService {
                 }
                 Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
                 if (cell != null) {
-                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
+//                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
+                    externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
                 }
             }
             List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(externalIdsOfStaffToBeSaved);
@@ -755,7 +756,10 @@ public class StaffService extends UserBaseService {
                             user = new User();
                             user.setFirstName(row.getCell(20).toString());
                             user.setLastName(row.getCell(21).toString());
-                            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staff.getCprNumber()));
+                            Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
+                            user.setCprNumber(cprNumberLong.toString());
+                            user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
+                            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             user.setTimeCareExternalId(cell.getStringCellValue());
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
@@ -764,7 +768,8 @@ public class StaffService extends UserBaseService {
                             String defaultPassword = user.getFirstName().trim() + "@kairos";
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                         }
-                        Client client = createClientObject(staff);  // here client is referred as citizen
+                        Client client = createClientObject(staff, user.getCprNumber());  // here client is referred as citizen
+
                         staff.setClient(client);
                         staff.setUser(user);
                     }
@@ -1034,7 +1039,7 @@ public class StaffService extends UserBaseService {
         }
 
         staff = createStaffObject(parent, unit, payload);
-        Client client = createClientObject(staff);
+        Client client = createClientObject(staff, payload.getCprNumber());
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
         staff.setClient(client);
@@ -1061,7 +1066,7 @@ public class StaffService extends UserBaseService {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
-        user.setGender(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE);
+        user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         user.setLastName(staffCreationDTO.getLastName());
         String defaultPassword = user.getFirstName().trim() + "@kairos";
         user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
@@ -1117,17 +1122,18 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    private Client createClientObject(Staff staff) {
-        Client client = clientGraphRepository.findByCprNumber(staff.getCprNumber());
-        logger.debug("Staff cpr number", staff.getCprNumber());
+    private Client createClientObject(Staff staff, String cprNumber) {
+        Client client = clientGraphRepository.findByCprNumber(cprNumber);
+        logger.debug("Staff cpr number", cprNumber);
         if (!Optional.ofNullable(client).isPresent()) {
-            logger.debug("NO CITIZEN found by cpr : cpr number", staff.getCprNumber());
+            logger.debug("NO CITIZEN found by cpr : cpr number", cprNumber);
             client = new Client();
             client.setFirstName(staff.getFirstName());
             client.setLastName(staff.getLastName());
             client.setEmail(staff.getEmail());
-            client.setCprNumber(staff.getCprNumber());
-            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staff.getCprNumber()));
+            client.setCprNumber(cprNumber);
+            client.setGender(CPRUtil.getGenderFromCPRNumber(client.getCprNumber()));
+            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(cprNumber));
         }
         return client;
     }

@@ -1,6 +1,7 @@
 package com.kairos.util;
 
 import com.kairos.activity.util.DateUtils;
+import com.kairos.persistence.model.enums.Gender;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -18,6 +19,11 @@ public class CPRUtil {
     public static Date fetchDateOfBirthFromCPR(String cprNumber) {
         return DateUtils.getDateByLocalDate(getDateOfBirthFromCPR(cprNumber));
     }
+
+    public static Gender getGenderFromCPRNumber(String cprNumber){
+        return Integer.valueOf(cprNumber.substring(cprNumber.length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
+    }
+
     //Method for getting the DateOfBirth From CPR Number
     public static LocalDate getDateOfBirthFromCPR(String cprNumber) {
         LocalDate birthday=null;
