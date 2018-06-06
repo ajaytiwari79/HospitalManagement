@@ -119,18 +119,16 @@ public class ActivityService extends MongoBaseService {
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         logger.info(activityDTO.getName());
         Date date = DateUtils.asDate(activityDTO.getStartDate());
-        if(activityDTO.getEndDate()!=null){
-        if(activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthen.startdate");
-        }}
+        if(activityDTO.getEndDate()!=null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
+        }
         Activity activity = activityMongoRepository.findByNameAndDateAndCountryId(activityDTO.getName().trim(), countryId,date);
         //Activity activity = activityMongoRepository.findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
 
         if (Optional.ofNullable(activity).isPresent()) {
                 if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent()){
-                    exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-                }
-                else{
+                    exceptionService.dataNotFoundException("message.activity.enddate.required");
+                } else{
                     exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
                 }
         }
@@ -265,7 +263,7 @@ public class ActivityService extends MongoBaseService {
         }
         if(generalDTO.getEndDate()!=null){
             if(generalDTO.getEndDate().isBefore(generalDTO.getStartDate())){
-                exceptionService.actionNotPermittedException("message.activity.enddate.greaterthen.startdate");
+                exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
             }
         }
 
@@ -274,9 +272,8 @@ public class ActivityService extends MongoBaseService {
         Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate( generalDTO.getName().trim(), generalDTO.getActivityId(), countryId,date);
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
             if(!Optional.ofNullable(isActivityAlreadyExists.getGeneralActivityTab().getEndDate()).isPresent()){
-                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-            }
-            else{
+                exceptionService.dataNotFoundException("message.activity.enddate.required",generalDTO.getName());
+            } else{
                 exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
             }
         }
