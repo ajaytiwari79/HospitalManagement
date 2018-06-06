@@ -3,6 +3,7 @@ package com.kairos.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
@@ -12,25 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterProcessingActivityResponseDto {
+public class ClauseResponseDto {
 
     @NotNull
     private BigInteger id;
-
     @NotNullOrEmpty
-    private String name;
-
+    private String title;
+    @NotNull
+    private List<ClauseTag> tags = new ArrayList<>();
     @NotNullOrEmpty
     private String description;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
-
-    private List<MasterProcessingActivityResponseDto> subProcessingActivities;
-
 
     public BigInteger getId() {
         return id;
@@ -40,14 +32,38 @@ public class MasterProcessingActivityResponseDto {
         this.id = id;
     }
 
-    private Long countryId;
+    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    public String getName() {
-        return name;
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+
+    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
+
+    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
+
+    private List<AccountType> accountTypes;
+
+    public List<AccountType> getAccountTypes() {
+        return accountTypes;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAccountTypes(List<AccountType> accountTypes) {
+        this.accountTypes = accountTypes;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<ClauseTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<ClauseTag> tags) {
+        this.tags = tags;
     }
 
     public String getDescription() {
@@ -89,24 +105,4 @@ public class MasterProcessingActivityResponseDto {
     public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
-
-    public List<MasterProcessingActivityResponseDto> getSubProcessingActivities() {
-        return subProcessingActivities;
-    }
-
-    public void setSubProcessingActivities(List<MasterProcessingActivityResponseDto> subProcessingActivities) {
-        this.subProcessingActivities = subProcessingActivities;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public MasterProcessingActivityResponseDto()
-    {}
-
 }

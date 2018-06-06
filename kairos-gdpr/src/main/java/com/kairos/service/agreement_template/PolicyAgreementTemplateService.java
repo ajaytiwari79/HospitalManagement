@@ -73,7 +73,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections=new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
 
-            if (accountTypeService.getAccountTypeList(accountTypeIds).size()!=0) {
+            if (accountTypeService.getAccountTypeList(countryId,accountTypeIds).size()!=0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
 
                 if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
@@ -141,7 +141,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplate updatePolicyAgreementTemplate(BigInteger id, PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
+    public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId,BigInteger id, PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
 
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -153,7 +153,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
-            if (accountTypeService.getAccountTypeList(accountTypeIds).size()!=0) {
+            if (accountTypeService.getAccountTypeList(countryId,accountTypeIds).size()!=0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
                     policyAgreementTemplate.setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes());

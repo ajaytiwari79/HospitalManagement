@@ -1,36 +1,24 @@
 package com.kairos.response.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterProcessingActivityResponseDto {
+public class MasterAssetResponseDto {
 
     @NotNull
     private BigInteger id;
 
-    @NotNullOrEmpty
-    private String name;
+    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    private  String name;
 
-    @NotNullOrEmpty
+    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
-
-    private List<MasterProcessingActivityResponseDto> subProcessingActivities;
-
 
     public BigInteger getId() {
         return id;
@@ -39,6 +27,14 @@ public class MasterProcessingActivityResponseDto {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
+
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+
+    private List <OrganizationTypeAndServiceBasicDto> organizationServices;
+
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     private Long countryId;
 
@@ -90,14 +86,6 @@ public class MasterProcessingActivityResponseDto {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public List<MasterProcessingActivityResponseDto> getSubProcessingActivities() {
-        return subProcessingActivities;
-    }
-
-    public void setSubProcessingActivities(List<MasterProcessingActivityResponseDto> subProcessingActivities) {
-        this.subProcessingActivities = subProcessingActivities;
-    }
-
     public Long getCountryId() {
         return countryId;
     }
@@ -105,8 +93,4 @@ public class MasterProcessingActivityResponseDto {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
-
-    public MasterProcessingActivityResponseDto()
-    {}
-
 }
