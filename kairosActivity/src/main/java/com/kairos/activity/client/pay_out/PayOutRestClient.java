@@ -30,7 +30,7 @@ public class PayOutRestClient {
     private RestTemplate restTemplate;
 
     public UnitPositionWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
-        String baseUrl=new StringBuilder(getBaseUrl(false)).append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+        String baseUrl=getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>>(){};

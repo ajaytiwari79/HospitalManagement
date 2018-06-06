@@ -96,7 +96,7 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift(unitId, shiftDTO, type));
     }
 
-    @ApiOperation("add a sub shifts for a staff")
+    @ApiOperation("update a sub shifts for a staff")
     @PutMapping(value = "/sub-shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addSubShifts(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody List<ShiftDTO> shiftDTOS) {

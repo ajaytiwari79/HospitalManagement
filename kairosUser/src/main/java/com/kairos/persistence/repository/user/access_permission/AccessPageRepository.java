@@ -99,9 +99,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (n:Organization),(staff:Staff) where id(n)={0} AND id(staff)={1} with n,staff,accessPage\n" +
             "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage\n" +
-            "Match (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
+            "Match (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE r.accessGroupId={4}\n" +
             "RETURN r.read as read, r.write as write")
-    AccessPageQueryResult getCustomPermissionOfTab(long organizationId, long staffId, long unitId, long accessPageId);
+    AccessPageQueryResult getCustomPermissionOfTab(long organizationId, long staffId, long unitId, long accessPageId, long accessGroupId);
 
 
 
@@ -112,11 +112,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH path=(accessPage)-[:SUB_PAGE*]->(accessPage1:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) \n" +
             "WITH NODES(path) AS np,g as g,unitPermission as unitPermission with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1],g:g,unitPermission:unitPermission}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.unitPermission as unitPermission\n" +
             "optional match (parent:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(parent)=id(ps.p) \n" +
-            "optional match (unitPermission)-[parentCustomRel:HAS_CUSTOMIZED_PERMISSION]->(parent:AccessPage)\n" +
-            "where id(parent)=id(ps.p) with r,parentCustomRel,ps,unitPermission,g\n" +
+            "optional match (unitPermission)-[parentCustomRel:HAS_CUSTOMIZED_PERMISSION]->(parent:AccessPage) WHERE parentCustomRel.accessGroupId={3}\n" +
+            " AND id(parent)=id(ps.p) with r,parentCustomRel,ps,unitPermission,g\n" +
             "optional match (child:AccessPage)<-[r2:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(child)=id(ps.c)\n" +
-            "optional match (unitPermission)-[childCustomRel:HAS_CUSTOMIZED_PERMISSION]->(child:AccessPage)\n" +
-            "where id(child)=id(ps.c) with r,r2,parentCustomRel,childCustomRel,ps\n" +
+            "optional match (unitPermission)-[childCustomRel:HAS_CUSTOMIZED_PERMISSION]->(child:AccessPage) WHERE childCustomRel.accessGroupId={3}\n" +
+            "AND id(child)=id(ps.c) with r,r2,parentCustomRel,childCustomRel,ps\n" +
             "return {name:ps.p.name,id:id(ps.p),\n" +
             "read:CASE WHEN parentCustomRel IS NULL THEN r.read ELSE parentCustomRel.read END ,\n" +
             "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
@@ -129,7 +129,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (unitPermission)-[:HAS_ACCESS_GROUP]->(g:AccessGroup) where id(g)={3} with g,unitPermission\n" +
             "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:SUB_PAGE]->() with accessPage, g, unitPermission\n" +
             "Match (accessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) with accessPage, g,r, unitPermission\n" +
-            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId={3}\n" +
             "return {name:accessPage.name,id:id(accessPage),\n" +
             "read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END, write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,\n" +
             "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
@@ -140,7 +140,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
             "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
             "Match (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with unitPermission, accessPage,r\n" +
-            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n"+
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) \n"+
             "return id(accessPage) as id,accessPage.name as name," +
             "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END  as write," +
             "accessPage.moduleId as moduleId,accessPage.active as active")
@@ -291,13 +291,13 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 //            "Match (accessPage)-[:SUB_PAGE]->(childAP:AccessPage) WHERE id(childAP)={3} with accessPage,g,unitPermission,childAP\n" +
             "MATCH (accessPage)-[:SUB_PAGE]->(childrenAccessPages:AccessPage)<-[r:HAS_ACCESS_OF_TABS]-(g) WHERE id(accessPage)={3}\n" +
             "WITH childrenAccessPages,unitPermission,r,g\n" +
-            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(childrenAccessPages:AccessPage)\n" +
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(childrenAccessPages:AccessPage) WHERE customRel.accessGroupId={4}\n" +
             "WITH r,customRel,unitPermission,childrenAccessPages,g\n" +
 //            "RETURN {name:childrenAccessPages.name, id:id(childrenAccessPages), read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END ,\n" +
 //            "write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END} as data ORDER BY data.id DESC"
             "RETURN childrenAccessPages.name as name,id(childrenAccessPages) as id, CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read ,\n" +
             "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ORDER BY id DESC")
-    List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(long orgId, long unitId, Long staffId, Long tabId);
+    List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(long orgId, long unitId, Long staffId, Long tabId, Long accessGroupId);
 
     @Query("MATCH(ac:AccessGroup) where id(ac)={1} with ac " +
             "MATCH(accessGroup:AccessGroup)-[rel:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage) where id(accessGroup)={0} with ac,accessGroup as accessGroup," +
@@ -308,6 +308,34 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (a:AccessPage) WHERE a.isModule={0} WITH id(a) as id,a.name as name,a.moduleId as moduleId, "+
             "toInt(split(a.moduleId,\"_\")[1]) as tabIdNumber return tabIdNumber ORDER BY tabIdNumber DESC LIMIT 1")
     Integer getLastTabOrModuleIdOfAccessPage(boolean isModule);
+
+
+
+
+
+    /////////////////////////////////////
+
+    @Query(" MATCH (accessPage:AccessPage) WHERE id(accessPage)={0} \n" +
+            "MATCH (parentAccessPage: AccessPage)-[:SUB_PAGE]->(accessPage) RETURN id(parentAccessPage)")
+    Long getParentAccessPageIdForAccessGroup(Long accessPageId);
+
+
+    @Query( "MATCH(accessGroup:AccessGroup) where id(accessGroup)={0} \n" +
+            "MATCH (accessPage:AccessPage) WHERE id(accessPage)={1} \n" +
+            "MATCH (accessPage)-[:SUB_PAGE]->(childrenAccessPages:AccessPage)<-[r:HAS_ACCESS_OF_TABS]-(g) \n" +
+            "RETURN childrenAccessPages.name as name,id(childrenAccessPages) as id, r.read as read ,\n" +
+            "r.write as write ORDER BY id DESC")
+    List<AccessPageQueryResult> getChildAccessPagePermissionsForAccessGroup(Long accessGroupId, Long accessPageId);
+
+    @Query( "MATCH(accessGroup:AccessGroup) where id(accessGroup)={0} \n" +
+            "MATCH (accessPage:AccessPage) WHERE id(accessPage)={1} \n" +
+            "MATCH (accessPage)<-[r:HAS_ACCESS_OF_TABS]-(g) \n" +
+            "SET r.read={2}, r.write={3} ")
+    List<AccessPageQueryResult> updateAccessPagePermissionsForAccessGroup(Long accessGroupId, Long accessPageId, Boolean readPermission, Boolean writePermission);
+
+    @Query("Match (unitPermission:UnitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPages:AccessPage) " +
+            "WHERE customRel.accessGroupId={0} AND id(accessPages) IN {1} DELETE customRel")
+    void removeCustomPermissionsForAccessGroup(Long accessGroupId, List<Long> accessPageIds);
 
 }
 

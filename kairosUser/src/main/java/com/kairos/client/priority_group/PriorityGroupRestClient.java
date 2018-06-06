@@ -38,7 +38,7 @@ public class PriorityGroupRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl +id + getURI(t,uri,queryParams,pathParams),
+                            baseUrl  + getURI(t,uri,queryParams,pathParams),
                             getHttpMethod(integrationOperation),
                             t==null?null:new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();

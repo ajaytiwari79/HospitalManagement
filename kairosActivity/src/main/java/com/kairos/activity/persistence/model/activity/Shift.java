@@ -49,6 +49,8 @@ public class Shift extends MongoBaseEntity {
 
     private Long unitPositionId;
     private ShiftState shiftState;
+
+    private BigInteger parentOpenShiftId;
     Long allowedBreakDurationInMinute;
 
     public Shift() {
@@ -282,6 +284,7 @@ public class Shift extends MongoBaseEntity {
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
         shiftQueryResult.setShiftState(this.getShiftState());
+        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         return shiftQueryResult;
     }
 
@@ -310,11 +313,19 @@ public class Shift extends MongoBaseEntity {
         this.shiftState = shiftState;
     }
 
+    public BigInteger getParentOpenShiftId() {
+        return parentOpenShiftId;
+    }
+
+    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
+
     public Long getAllowedBreakDurationInMinute() {
         return allowedBreakDurationInMinute;
     }
 
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-    }
+        }
 }
