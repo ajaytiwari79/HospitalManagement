@@ -54,6 +54,13 @@ public class OrganizationDTO {
     private  Boolean union;
     private boolean boardingCompleted;
 
+    // properties to create unit manager
+    private Long accessGroupId;
+    private String cprNumber;
+    private String firstName;
+    private String lastName;
+    private String email;
+
 
     public Long getId() {
         return id;
@@ -301,5 +308,45 @@ public class OrganizationDTO {
 
     public void setPreKairos(boolean preKairos) {
         this.preKairos = preKairos;
+    }
+
+    public Long getAccessGroupId() {
+        return accessGroupId;
+    }
+
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
+    }
+
+    public String getCprNumber() {
+        return cprNumber;
+    }
+
+    public void setCprNumber(String cprNumber) {
+        this.cprNumber = cprNumber;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

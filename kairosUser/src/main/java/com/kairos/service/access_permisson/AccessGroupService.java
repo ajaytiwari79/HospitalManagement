@@ -134,7 +134,7 @@ public class AccessGroupService extends UserBaseService {
      * this method will find the root organization, if root node exist then will return access group of root node
      * otherwise new access group will be created for organization
      */
-    public List<AccessGroup> createDefaultAccessGroups(Organization organization) {
+  /*  public List<AccessGroup> createDefaultAccessGroups(Organization organization) {
 
         //get root organization
         Organization parent;
@@ -171,13 +171,13 @@ public class AccessGroupService extends UserBaseService {
         }
         save(organization);
         return organization.getAccessGroups();
-    }
+    }*/
 
-    public AccessGroup createDefaultAccessGroupsAndGetUnitManagerAccessGroup(Organization organization, Long accessGroupIdForManager) {
+    public Map<Long,Long> createDefaultAccessGroups(Organization organization) {
 
         //get root organization
         Organization parent;
-        AccessGroup accessGroupForUnitManager = null;
+        Map<Long,Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
 
@@ -190,13 +190,12 @@ public class AccessGroupService extends UserBaseService {
             List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(organization.isUnion(), organization.isKairosHub()).toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroup countryAccessGroup : countryAccessGroups){
-                if( Optional.ofNullable(accessGroupIdForManager).isPresent() &&  countryAccessGroup.getId().equals(accessGroupIdForManager)){
-                    accessGroupForUnitManager = countryAccessGroup;
-                }
+
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 save(accessGroup);
+                countryAndOrgAccessGroupIdsMap.put(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupList.add(accessGroup);
             }
@@ -206,10 +205,6 @@ public class AccessGroupService extends UserBaseService {
             // Remove AG_COUNTRY_ADMIN access group to be copied
             List<AccessGroup> accessGroups = new ArrayList<>(parent.getAccessGroups());
             for (AccessGroup accessGroup : accessGroups){
-
-                if(Optional.ofNullable(accessGroupIdForManager).isPresent() && accessGroup.getId().equals(accessGroupIdForManager)){
-                    accessGroupForUnitManager = accessGroup;
-                }
                 if(accessGroup.getName().equals(AG_COUNTRY_ADMIN)){
                     accessGroups.remove(accessGroup);
                 }
@@ -217,7 +212,7 @@ public class AccessGroupService extends UserBaseService {
             organization.setAccessGroups(accessGroups);
         }
         save(organization);
-        return accessGroupForUnitManager;
+        return countryAndOrgAccessGroupIdsMap;
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
@@ -736,6 +731,16 @@ public class AccessGroupService extends UserBaseService {
         accessPageRepository.copyAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
         countryAccessGroupDTO.setId(accessGroup.getId());
         return countryAccessGroupDTO;
+    }
+
+    // Method to fetch list of access group by Organization category ( Hub and Organization)
+    public Map<String, List<AccessGroupQueryResult>> getCountryAccessGroupsForOrganizationCreation(Long countryId) {
+        Map<String, List<AccessGroupQueryResult>> accessGroupForParentOrganizationCreation = new HashMap<>();
+        accessGroupForParentOrganizationCreation.put("hub",
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.HUB.toString()));
+        accessGroupForParentOrganizationCreation.put("organization",
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.ORGANIZATION.toString()));
+        return accessGroupForParentOrganizationCreation;
     }
 
     public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {

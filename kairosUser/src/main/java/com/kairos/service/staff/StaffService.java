@@ -302,7 +302,7 @@ public class StaffService extends UserBaseService {
             user.setCprNumber(staffPersonalDetail.getCprNumber());
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
         }
-        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
+//        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant( user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
         save(user);
@@ -962,7 +962,7 @@ public class StaffService extends UserBaseService {
         Staff staff = new Staff();
         staff.setFirstName(data.getFirstName());
         staff.setLastName(data.getLastName());
-        staff.setCprNumber(String.valueOf(data.getCprNumber()));
+//        staff.setCprNumber(String.valueOf(data.getCprNumber()));
         staff.setFamilyName(data.getFamilyName());
         //staff.setEmployedSince(data.getEmployedSince().getTime());
         staff.setCurrentStatus(data.getCurrentStatus());
@@ -1052,14 +1052,14 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData, Long accessGroupId){
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
             user = new User();
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
         }
-        createUnitManagerAndEmployment(organizationId, user, accessGroupId);
+        createUnitManagerAndEmployment(organizationId, user, staffCreationPOJOData.getAccessGroupId());
         return user;
     }
 
@@ -1074,7 +1074,6 @@ public class StaffService extends UserBaseService {
         user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
-            user.setAge(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)));
         }
     }
 
@@ -1100,7 +1099,7 @@ public class StaffService extends UserBaseService {
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
         staff.setFamilyName(payload.getFamilyName());
-        staff.setCprNumber(payload.getCprNumber());
+//        staff.setCprNumber(payload.getCprNumber());
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         staff.setContactAddress(contactAddress);
 
@@ -1197,15 +1196,6 @@ public class StaffService extends UserBaseService {
 //        }
     }
 
-    public boolean validateAccessGroupForUnitManager(Long countryId, Long accessGroupId, Long orgId, boolean parentOrganization,
-                                                     OrganizationCategory orgCategory, Boolean isUnion, Boolean isKairosHub){
-        if(parentOrganization){
-            return accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId, organizationService.getOrganizationCategory(isUnion, isKairosHub).toString(), accessGroupId);
-        } else {
-            return accessGroupRepository.isAccessGroupOfOrganizationExists(orgId, accessGroupId);
-        }
-    }
-
     public void createUnitManagerAndEmployment(Long organizationId, User user, Long accessGroupId) {
 
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -1234,9 +1224,9 @@ public class StaffService extends UserBaseService {
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
 
         parent.getEmployments().add(employment);
-
+        save(parent);
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(parent);
+        unitPermission.setOrganization(organization);
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);

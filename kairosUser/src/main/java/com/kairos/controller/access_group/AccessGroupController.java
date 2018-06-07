@@ -223,4 +223,11 @@ public class AccessGroupController {
 
     }
 
+    @ApiOperation("Get country Access Groups for hub and organization")
+    @RequestMapping(value = COUNTRY_URL + "/access_group/hub_and_organization" , method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupsForOrganizationCreation(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
+    }
+
 }

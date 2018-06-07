@@ -9,6 +9,7 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
@@ -38,6 +39,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffCreationDTO;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.organization.*;
@@ -305,16 +307,25 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
+    public void createUnitManager(Long organizationId, OrganizationDTO  orgDetails){
+        StaffCreationDTO staffCreationPOJOData = new StaffCreationDTO(orgDetails.getFirstName(),orgDetails.getLastName(),
+                orgDetails.getCprNumber(),
+                null, orgDetails.getEmail(), null, orgDetails.getEmail(),null, orgDetails.getAccessGroupId() );
+        staffService.createUnitManagerForNewOrganization(organizationId, staffCreationPOJOData);
+
+    }
     public Map<String, OrganizationResponseWrapper> createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
 
         Map<String, OrganizationResponseWrapper> organizationResponseMap = new HashMap<>();
 
         OrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
+
         Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
         if(orgExistWithUrl){
             exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate",orgDetails.getDesiredUrl());
         }
+
 
         Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
         if(orgExistWithName){
@@ -326,6 +337,11 @@ public class OrganizationService extends UserBaseService {
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
+        }
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
+        if( !accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId,
+                getOrganizationCategory(orgDetails.getUnion(), orgDetails.isKairosHub()).toString(), orgDetails.getAccessGroupId())){
+            exceptionService.actionNotPermittedException("error.access.group.invalid", orgDetails.getAccessGroupId());
         }
         Organization organization = new Organization();
         organization.setParentOrganization(true);
@@ -352,7 +368,8 @@ public class OrganizationService extends UserBaseService {
         workingTimeAgreementRestClient.assignWTAToOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-        accessGroupService.createDefaultAccessGroups(organization);
+//        accessGroupService.createDefaultAccessGroups(organization);
+        countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         long creationDate = DateUtil.getCurrentDate().getTime();
@@ -370,15 +387,18 @@ public class OrganizationService extends UserBaseService {
         //OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOorganization.getCountry().getId());
 
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOrganizationTypes().get(0).getId(),organization.getOrganizationSubTypes().get(0).getId(),organization.getCountry().getId());
-        priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
+//        priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
 
 
-        /*// TODO Verify code to set Unit Manager of new organization
+        // TODO Verify code to set Unit Manager of new organization
         // Create Employment for Unit Manager
         // Check if user exists or Create User
-        StaffCreationPOJOData staffCreationPOJOData = new StaffCreationPOJOData("Andreas","L. Jacobsen", "0108572361",
-                "Sam", "andreas@gmail.com", Gender.MALE, "andreas@gmail.com",null, 0L );
-        User user = staffService.createUnitManagerForNewOrganization(organization.getId(), staffCreationPOJOData);*/
+        orgDetails.setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getAccessGroupId()));
+        createUnitManager(organization.getId(), orgDetails);
+//        StaffCreationDTO staffCreationPOJOData = new StaffCreationDTO(orgDetails.getFirstName(),orgDetails.getLastName(),
+//                orgDetails.getCprNumber(),
+//                null, orgDetails.getEmail(), null, orgDetails.getEmail(),null, accessGroupId );
+//        staffService.createUnitManagerForNewOrganization(organization.getId(), staffCreationPOJOData);
 
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
@@ -387,30 +407,44 @@ public class OrganizationService extends UserBaseService {
         organizationResponseMap.put("company", organizationResponseWrapper);
 
         if (organizationRequestWrapper.getWorkCenterUnit() != null) {
-            Map<String, Object> workCenterUnitMap = createNewUnit(organizationRequestWrapper.getWorkCenterUnit(), organization.getId(), true, false);
+            // Set accessGroupId as of parent organization's
+            OrganizationDTO workCenterUnitDTO = organizationRequestWrapper.getWorkCenterUnit();
+            workCenterUnitDTO.setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(workCenterUnitDTO.getAccessGroupId()));
+            Map<String, Object> workCenterUnitMap = createNewUnit(workCenterUnitDTO, organization.getId(), true, false);
             Long workCenterUnitId = Long.parseLong(workCenterUnitMap.get("id") + "");
 
             Organization workCenterUnit = organizationGraphRepository.findOne(workCenterUnitId);
             workCenterUnit.setWorkCenterUnit(true);
             organizationGraphRepository.save(workCenterUnit);
 
+            // Create Employment for Unit Manager
+            // Check if user exists or Create User
+            createUnitManager(workCenterUnit.getId(), workCenterUnitDTO);
+
             organizationResponseWrapper = new OrganizationResponseWrapper();
 
-            organizationResponseWrapper.setOrgData(organizationResponse(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit().getTypeId(), organizationRequestWrapper.getWorkCenterUnit().getSubTypeId(), organizationRequestWrapper.getWorkCenterUnit().getCompanyCategoryId()));
+            organizationResponseWrapper.setOrgData(organizationResponse(workCenterUnit, workCenterUnitDTO.getTypeId(), workCenterUnitDTO.getSubTypeId(), workCenterUnitDTO.getCompanyCategoryId()));
             organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, workCenterUnit, UserContext.getUserDetails().getId()));
             organizationResponseMap.put("workCenterUnit", organizationResponseWrapper);
         }
 
         if (organizationRequestWrapper.getGdprUnit() != null) {
-            Map<String, Object> gdprUnitMap = createNewUnit(organizationRequestWrapper.getGdprUnit(), organization.getId(), false, true);
+            OrganizationDTO gdprUnitDTO = organizationRequestWrapper.getGdprUnit();
+            // Set accessGroupId as of parent organization's
+            gdprUnitDTO.setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(gdprUnitDTO.getAccessGroupId()));
+            Map<String, Object> gdprUnitMap = createNewUnit(gdprUnitDTO, organization.getId(), false, true);
             Long gdprUnitId = Long.parseLong(gdprUnitMap.get("id") + "");
 
             Organization gdprUnit = organizationGraphRepository.findOne(gdprUnitId);
             gdprUnit.setGdprUnit(true);
             organizationGraphRepository.save(gdprUnit);
 
+            // Create Employment for Unit Manager
+            // Check if user exists or Create User
+            createUnitManager(gdprUnit.getId(), gdprUnitDTO);
+
             organizationResponseWrapper = new OrganizationResponseWrapper();
-            organizationResponseWrapper.setOrgData(organizationResponse(gdprUnit, organizationRequestWrapper.getGdprUnit().getTypeId(), organizationRequestWrapper.getGdprUnit().getSubTypeId(), organizationRequestWrapper.getGdprUnit().getCompanyCategoryId()));
+            organizationResponseWrapper.setOrgData(organizationResponse(gdprUnit, gdprUnitDTO.getTypeId(), gdprUnitDTO.getSubTypeId(), gdprUnitDTO.getCompanyCategoryId()));
             organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, gdprUnit, UserContext.getUserDetails().getId()));
             organizationResponseMap.put("gdprUnit", organizationResponseWrapper);
 
@@ -883,7 +917,7 @@ public class OrganizationService extends UserBaseService {
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
         workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getSubTypeId(), unit.getId(), country.getId());
-        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
+//        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
