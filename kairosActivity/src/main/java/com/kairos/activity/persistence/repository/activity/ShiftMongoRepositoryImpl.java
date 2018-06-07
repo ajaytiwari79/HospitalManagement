@@ -111,7 +111,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match( Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate)),
+                match( Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate).and("parentOpenShiftId").exists(true)),
                        group("unitPositionId").count().as("count"),
                 project("count").and("_id").as("unitPositionId"),
                 sort(Sort.Direction.DESC, "count")

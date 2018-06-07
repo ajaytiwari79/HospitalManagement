@@ -77,6 +77,7 @@ public class PriorityGroupRulesImplementation {
         }
 
         openShiftStaffMap = openShiftStaffMapFibonacci;
+        priorityGroupRuleDataDTO.setOpenShiftStaffMap(openShiftStaffMap);
     }
 
     public List<StaffUnitPositionQueryResult> applyFibonacci(List<StaffUnitPositionQueryResult> staffsUnitPositions,Map<Long,Integer> assignedOpenShiftMap, ImpactWeight impactWeight) {

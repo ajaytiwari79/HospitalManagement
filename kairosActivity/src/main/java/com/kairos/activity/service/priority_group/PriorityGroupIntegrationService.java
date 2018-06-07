@@ -23,7 +23,7 @@ public class PriorityGroupIntegrationService {
 
     public List<StaffUnitPositionQueryResult> getStaffIdsByPriorityGroupIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
 
-        List<StaffUnitPositionQueryResult> staffsUnitPositions = userRestClient.publish(staffIncludeFilterDTO,unitId,24L,true,IntegrationOperation.UPDATE,"/staff/priority_group",null);
+        List<StaffUnitPositionQueryResult> staffsUnitPositions = userRestClient.publish(staffIncludeFilterDTO,unitId,24L,true,IntegrationOperation.CREATE,"/staff/priority_group",null);
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffsUnitPositions,StaffUnitPositionQueryResult.class);
     }

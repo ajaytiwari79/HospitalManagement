@@ -1,31 +1,18 @@
+
 package com.kairos.response.dto.web.open_shift.priority_group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.response.dto.web.open_shift.DurationField;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundRules {
-    private Integer maximumConcurrentEnquiries;
     private Integer candidatesPerRound;
-    private Integer waitingTimeBeforeNextRoundInDays;
-    private Integer checkAnswersInDays;// Time to check answer after enquiry
+    private DurationField waitingTimeBeforeNextRound;
+    private DurationField checkAnswersTime;// Time to check answer after enquiry
     private Integer minimumCandidateBeforeSelection;
 
     public RoundRules() {
         //Default Constructor
-    }
-
-    public RoundRules(Integer maximumConcurrentEnquiries, Integer candidatesPerRound, Integer waitingTimeBeforeNextRoundInDays, Integer minimumCandidateBeforeSelection) {
-        this.maximumConcurrentEnquiries = maximumConcurrentEnquiries;
-        this.candidatesPerRound = candidatesPerRound;
-        this.waitingTimeBeforeNextRoundInDays = waitingTimeBeforeNextRoundInDays;
-        this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
-    }
-
-    public Integer getMaximumConcurrentEnquiries() {
-        return maximumConcurrentEnquiries;
-    }
-
-    public void setMaximumConcurrentEnquiries(Integer maximumConcurrentEnquiries) {
-        this.maximumConcurrentEnquiries = maximumConcurrentEnquiries;
     }
 
     public Integer getCandidatesPerRound() {
@@ -36,14 +23,6 @@ public class RoundRules {
         this.candidatesPerRound = candidatesPerRound;
     }
 
-    public Integer getWaitingTimeBeforeNextRoundInDays() {
-        return waitingTimeBeforeNextRoundInDays;
-    }
-
-    public void setWaitingTimeBeforeNextRoundInDays(Integer waitingTimeBeforeNextRoundInDays) {
-        this.waitingTimeBeforeNextRoundInDays = waitingTimeBeforeNextRoundInDays;
-    }
-
     public Integer getMinimumCandidateBeforeSelection() {
         return minimumCandidateBeforeSelection;
     }
@@ -52,11 +31,19 @@ public class RoundRules {
         this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
     }
 
-    public Integer getCheckAnswersInDays() {
-        return checkAnswersInDays;
+    public DurationField getWaitingTimeBeforeNextRound() {
+        return waitingTimeBeforeNextRound;
     }
 
-    public void setCheckAnswersInDays(Integer checkAnswersInDays) {
-        this.checkAnswersInDays = checkAnswersInDays;
+    public void setWaitingTimeBeforeNextRound(DurationField waitingTimeBeforeNextRound) {
+        this.waitingTimeBeforeNextRound = waitingTimeBeforeNextRound;
+    }
+
+    public DurationField getCheckAnswersTime() {
+        return checkAnswersTime;
+    }
+
+    public void setCheckAnswersTime(DurationField checkAnswersTime) {
+        this.checkAnswersTime = checkAnswersTime;
     }
 }

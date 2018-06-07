@@ -12,9 +12,6 @@ public class StaffIncludeFilterDTO {
     private Integer distanceFromUnit; //In meter
     private List<Long> employmentTypeIds;
     private LocalDate openShiftDate;
-
-
-
     private Long maxOpenShiftDate;
 
     public boolean isAllowForFlexPool() {

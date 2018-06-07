@@ -98,6 +98,8 @@ public class PriorityGroupRulesDataGetterService {
         StaffIncludeFilterDTO staffIncludeFilterDTO = new StaffIncludeFilterDTO();
         ObjectMapperUtils.copyProperties(staffIncludeFilter,staffIncludeFilterDTO);
         staffIncludeFilterDTO.setMaxOpenShiftDate(maxDateLong);
+        staffIncludeFilterDTO.setExpertiseIds(priorityGroupDTO.getExpertiseIds());
+        staffIncludeFilterDTO.setEmploymentTypeIds(priorityGroupDTO.getEmploymentTypeIds());
         return priorityGroupIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
 
     }
