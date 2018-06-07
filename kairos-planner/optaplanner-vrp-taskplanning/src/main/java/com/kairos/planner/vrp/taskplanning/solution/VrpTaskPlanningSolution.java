@@ -58,4 +58,7 @@ public class VrpTaskPlanningSolution {
         this.employees = employees;
         this.tasks = tasks;
     }
+
+    public VrpTaskPlanningSolution() {
+    }
 }

@@ -26,7 +26,7 @@ public class TaskService {
         taskRepository.saveAll(taskList);
     }
 
-    private List<com.kairos.planner.vrp.taskplanning.model.Task> getUniqueTask(){
+    public List<com.kairos.planner.vrp.taskplanning.model.Task> getUniqueTask(){
         List<Task> taskList = taskRepository.findAll();
         List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = new ArrayList<>();
         Map<Integer,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getIntallationNo,summingInt(Task::getDuration)));
