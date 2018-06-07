@@ -12,32 +12,32 @@ import java.util.Map;
 public class ShiftFunctionWrapper {
 
 
-    List<ShiftQueryResult> shiftQueryResult;
-    Map<LocalDate,FunctionDTO> appliedFunctions;
+    List<ShiftQueryResult> shiftList;
+    Map<LocalDate,FunctionDTO> assignedFunctionsObj;
 
 
     //default constructor
     public ShiftFunctionWrapper() {
     }
 
-    public ShiftFunctionWrapper(List<ShiftQueryResult> shiftQueryResult, Map<LocalDate, FunctionDTO> appliedFunctions) {
-        this.shiftQueryResult = shiftQueryResult;
-        this.appliedFunctions = appliedFunctions;
+    public ShiftFunctionWrapper(List<ShiftQueryResult> shiftList, Map<LocalDate, FunctionDTO> assignedFunctionsObj) {
+        this.shiftList = shiftList;
+        this.assignedFunctionsObj = assignedFunctionsObj;
     }
 
-    public List<ShiftQueryResult> getShiftQueryResult() {
-        return shiftQueryResult;
+    public List<ShiftQueryResult> getShiftList() {
+        return shiftList;
     }
 
-    public void setShiftQueryResult(List<ShiftQueryResult> shiftQueryResult) {
-        this.shiftQueryResult = shiftQueryResult;
+    public void setShiftList(List<ShiftQueryResult> shiftList) {
+        this.shiftList = shiftList;
     }
 
-    public Map<LocalDate, FunctionDTO> getAppliedFunctions() {
-        return appliedFunctions;
+    public Map<LocalDate, FunctionDTO> getAssignedFunctionsObj() {
+        return assignedFunctionsObj;
     }
 
-    public void setAppliedFunctions(Map<LocalDate, FunctionDTO> appliedFunctions) {
-        this.appliedFunctions = appliedFunctions;
+    public void setAssignedFunctionsObj(Map<LocalDate, FunctionDTO> assignedFunctionsObj) {
+        this.assignedFunctionsObj = assignedFunctionsObj;
     }
 }

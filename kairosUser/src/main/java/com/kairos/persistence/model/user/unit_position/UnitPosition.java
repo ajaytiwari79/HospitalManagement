@@ -69,8 +69,6 @@ public class UnitPosition extends UserBaseEntity {
 
     private Double salary;
     private Long timeCareExternalId;
-    @Relationship(type=APPLIED_FUNCTION)
-    private List<AppliedFunctions> appliedFunctions;
 
     public UnitPosition() {
     }
@@ -244,14 +242,6 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setFunctions(List<Function> functions) {
         this.functions = functions;
-    }
-
-    public List<AppliedFunctions> getAppliedFunctions() {
-        return appliedFunctions;
-    }
-
-    public void setAppliedFunctions(List<AppliedFunctions> appliedFunctions) {
-        this.appliedFunctions = appliedFunctions;
     }
 
     public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {

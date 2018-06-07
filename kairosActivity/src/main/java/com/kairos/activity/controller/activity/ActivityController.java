@@ -276,10 +276,10 @@ public class ActivityController {
     //organization Mapping
 
     @ApiOperation("update organization Mapping details  of activity Type")
-    @PutMapping(value = "/activity/organizationMapping")
+    @PutMapping(value = "/activity/{activityId}/organizationMapping")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingActivityDTO organizationMappingActivityDTO) {
-        activityService.updateOrgMappingDetailOfActivity(organizationMappingActivityDTO);
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingActivityDTO organizationMappingActivityDTO, @PathVariable BigInteger activityId) {
+        activityService.updateOrgMappingDetailOfActivity(organizationMappingActivityDTO, activityId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

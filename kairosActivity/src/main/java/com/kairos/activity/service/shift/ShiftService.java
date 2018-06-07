@@ -48,7 +48,9 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,7 +99,7 @@ public class ShiftService extends MongoBaseService {
     private BreakSettingMongoRepository breakSettingMongoRepository;
 
 
-    public ShiftFunctionWrapper createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
+    public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
 
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -136,11 +138,7 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResults = Arrays.asList(shiftQueryResult);
 
         }
-
-        List<AppliedFunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getAppliedFunctionDTOs();
-        Map<LocalDate,FunctionDTO> functionDTOMap = appliedFunctionDTOs.stream().collect(Collectors.toMap(appliedFunction->appliedFunction.getDate(), appliedFunction->appliedFunction.getFunctionDTO()));
-
-        return new ShiftFunctionWrapper(shiftQueryResults , functionDTOMap);
+        return shiftQueryResults;
     }
 
     private ShiftQueryResult saveShift(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO) {
@@ -354,8 +352,9 @@ public class ShiftService extends MongoBaseService {
         return shiftQueryResult;
     }
 
-    public List<ShiftQueryResult> getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week, Long unitPositionId, String type) throws ParseException {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type);
+    public ShiftFunctionWrapper getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week, Long unitPositionId, String type) throws ParseException {
+        //StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type, unitPositionId, null);
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent() || staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId, type);
         }
@@ -374,7 +373,24 @@ public class ShiftService extends MongoBaseService {
         }
         List<ShiftQueryResult> activities = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
-        return activities;
+
+
+        List<AppliedFunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+
+        Map<LocalDate,FunctionDTO> funcitonDTOMap = new HashMap();
+        if(appliedFunctionDTOs!=null && !appliedFunctionDTOs.isEmpty()) {
+            for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
+                if(appliedFunctionDTO.getAppliedDates()!=null && !appliedFunctionDTO.getAppliedDates().isEmpty()){
+                FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
+                for (Long date : appliedFunctionDTO.getAppliedDates()) {
+                    //funcitonDTOMap = new HashMap<>();
+                    funcitonDTOMap.put(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate(), functionDTO);
+                    //funcitonDTOMapList.add(funcitonMap);
+                }
+                }
+            }
+        }
+        return new ShiftFunctionWrapper(activities, funcitonDTOMap);
     }
 
     public void deleteShift(BigInteger shiftId) {
@@ -540,8 +556,7 @@ public class ShiftService extends MongoBaseService {
 
     public Boolean addSubShifts(Long unitId, List<ShiftDTO> shiftDTOS, String type) {
         for (ShiftDTO shiftDTO : shiftDTOS) {
-            ShiftFunctionWrapper shiftFunctionWrapper = createShift(unitId, shiftDTO, "Organization", true);
-            ShiftQueryResult shiftQueryResult = shiftFunctionWrapper.getShiftQueryResult().get(0);
+            ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization", true).get(0);
             shiftDTO.setId(shiftQueryResult.getId());
         }
 

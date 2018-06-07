@@ -1,32 +1,54 @@
 package com.kairos.response.dto.web;
 
+
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Created by oodles on 1/6/18.
  */
 public class AppliedFunctionDTO {
 
-    private LocalDate date;
-    private FunctionDTO functionDTO;
+
+    private Long id;
+    private String name;
+    private String icon;
+    private List<Long> appliedDates;
 
     public AppliedFunctionDTO() {
 
     }
 
-    public LocalDate getDate() {
-        return date;
+    public Long getId() {
+        return id;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public FunctionDTO getFunctionDTO() {
-        return functionDTO;
+    public String getName() {
+        return name;
     }
 
-    public void setFunctionDTO(FunctionDTO functionDTO) {
-        this.functionDTO = functionDTO;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public List<Long> getAppliedDates() {
+        return appliedDates;
+    }
+
+    public void setAppliedDates(List<Long> appliedDates) {
+        this.appliedDates = appliedDates;
     }
 }
+

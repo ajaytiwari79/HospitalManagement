@@ -30,6 +30,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match (unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
             "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
+            "optional match (unitPosition)-[rel:"+APPLIED_FUNCTION+"]->(appliedFunction:Function)  \n"+
             "return e as expertise,cta as costTimeAgreement,unitPosition.workingTimeAgreementId as workingTimeAgreementId," +
             "unitPosition.totalWeeklyHours as totalWeeklyHours," +
             "unitPosition.startDateMillis as startDateMillis," +
@@ -43,7 +44,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis," +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, "+
-            "unitPosition.appliedFunctions as appliedFunctions")
+            "Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 
 
