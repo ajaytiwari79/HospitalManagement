@@ -38,7 +38,7 @@ public class VRPGeneratorService {
         solution.setEmployees(employees);
         String json = ObjectMapperUtils.objectToJsonString(solution);
         try {
-            PrintWriter out = new PrintWriter(new File("/media/pradeep/bak/KairosMicroService/kairos-user/kairos-planner/optaplanner-vrp-taskplanning/src/main/resources/problem.json").getAbsolutePath());
+            PrintWriter out = new PrintWriter(new File(System.getProperty("user.dir")+"/optaplanner-vrp-taskplanning/src/main/resources/problem.json").getAbsolutePath());
             out.write(json);
             out.close();
         } catch (FileNotFoundException e) {
