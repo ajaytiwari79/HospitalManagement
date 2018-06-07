@@ -1,18 +1,20 @@
-package com.planner.service.excel;
+package com.planner.service.importService;
 
 import com.google.common.collect.Lists;
-import com.kairos.dto.planner.TaskDTO;
-import com.kairos.response.dto.web.Task;
+import com.planner.domain.task.Task;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.stream.Collectors.*;
 
@@ -20,8 +22,7 @@ import static java.util.stream.Collectors.*;
  * @author pradeep
  * @date - 7/6/18
  */
-@Service
-public class ExcelService {
+public class ImportService {
 
     public void readExcelFile() {
         //File file = getFile(multipartFile);
@@ -29,8 +30,8 @@ public class ExcelService {
 
     }
 
-    public List<TaskDTO> readTaskList(){
-        List<TaskDTO> taskList = new ArrayList<>(1500);
+    public List<Task> readTaskList(){
+        List<Task> taskList = new ArrayList<>(1500);
         try {
             InputStream stream = new FileInputStream(new File("/home/pradeep/Downloads/POCKamstrupVRP.xlsx"));
             //Get the workbook instance for XLS file
@@ -44,7 +45,7 @@ public class ExcelService {
                 row = rowIterator.get(i);
                 if (row.getRowNum() > 0) {
                     try {
-                        TaskDTO task = new TaskDTO();
+                        Task task = new Task();
                         task.setIntallationNo((int) row.getCell(5).getNumericCellValue());
                         task.setLattitude(row.getCell(14).getNumericCellValue());
                         task.setLongitude(row.getCell(15).getNumericCellValue());
@@ -63,26 +64,10 @@ public class ExcelService {
         return taskList;
     }
 
-    private List<Task> getUniqueTask(List<TaskDTO> taskList){
+    private List<Task> getUniqueTask(List<Task> taskList){
         List<Task> tasks = new ArrayList<>();
-        Map<Integer,Integer> intallationandDuration = taskList.stream().collect(groupingBy(TaskDTO::getIntallationNo,summingInt(TaskDTO::getDuration)));
-        Map<Integer,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(TaskDTO::getIntallationNo,mapping(TaskDTO::getSkill,toSet())));
-        return null;
-    }
-
-    public File getFile(MultipartFile multipartFile) {
-        if (!multipartFile.isEmpty()) {
-            File file = new File("");
-            try {
-                byte[] bytes = multipartFile.getBytes();
-                BufferedOutputStream stream =
-                        new BufferedOutputStream(new FileOutputStream(file));
-                stream.write(bytes);
-                stream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Map<Integer,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getIntallationNo,summingInt(Task::getDuration)));
+        Map<Integer,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getIntallationNo,mapping(Task::getSkill,toSet())));
         return null;
     }
 }

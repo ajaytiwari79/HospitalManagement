@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class PlannedTimeTypeIntegrationTest {
         ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = testRestTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, typeReference);
         System.out.println("reponse: "+response.getStatusCode());
         Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        createdId = response.getBody().getData().getId();
+        createdId = response.getBody().getData().getId().longValue();
     }
 
     @Test
@@ -67,7 +68,7 @@ public class PlannedTimeTypeIntegrationTest {
     public void case3_updatePlannedTimeType() throws Exception{
         String baseUrl = getBaseUrl(24L, 4L)+"/"+createdId;
         System.out.println("baseUrl: "+baseUrl);
-        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType-updated"+createdId, createdId);
+        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType-updated"+createdId, BigInteger.valueOf(createdId));
         HttpEntity<PresenceTypeDTO> requestEntity = new HttpEntity<>(presenceTypeDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> responseRef = new ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>>() {
         };

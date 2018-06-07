@@ -1,22 +1,19 @@
-package com.kairos.response.dto.web;
+package com.planner.domain.task;
 
-import com.planner.domain.MongoBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.util.Set;
 
 /**
  * @author pradeep
  * @date - 7/6/18
  */
 
-public class Task extends MongoBaseEntity{
+public class Task {
 
     private int intallationNo;
     private Double lattitude;
     private Double longitude;
-    private Set<String> skills;
+    private String skill;
     private int duration;
     private String streetName;
     private int houseNo;
@@ -26,11 +23,11 @@ public class Task extends MongoBaseEntity{
     private String city;
 
 
-    public Task(int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public Task(int intallationNo, Double lattitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
         this.longitude = longitude;
-        this.skills = skills;
+        this.skill = skill;
         this.duration = duration;
         this.streetName = streetName;
         this.houseNo = houseNo;
@@ -96,12 +93,12 @@ public class Task extends MongoBaseEntity{
         this.city = city;
     }
 
-    public Set<String> getSkills() {
-        return skills;
+    public String getSkill() {
+        return skill;
     }
 
-    public void setSkills(Set<String> skills) {
-        this.skills = skills;
+    public void setSkills(String skill) {
+        this.skill = skill;
     }
 
     public Task() {

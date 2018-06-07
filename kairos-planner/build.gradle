@@ -54,6 +54,7 @@ project("optaplanner-shiftplanning"){
 dependencies {
 	compile project('optaplanner-shiftplanning')
 	compile project('optaplanner-taskplanning')
+	compile project('optaplanner-vrp-taskplanning')
 	compile project('responseWrapper')
 	compile project (':dto')
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
