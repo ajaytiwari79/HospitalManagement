@@ -1,8 +1,8 @@
 package com.kairos.config.mongoEnv_config;
 
 
-import com.kairos.dto.ModuleIdDto;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.dto.master_data.ModuleIdDto;
+import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
 import com.kairos.service.MongoBaseService;

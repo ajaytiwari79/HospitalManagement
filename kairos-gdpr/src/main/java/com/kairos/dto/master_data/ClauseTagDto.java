@@ -1,4 +1,4 @@
-package com.kairos.dto;
+package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

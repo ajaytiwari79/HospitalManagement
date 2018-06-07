@@ -4,7 +4,7 @@ import static com.kairos.constant.ApiConstant.API_CLAUSES_URL;
 
 
 import com.kairos.custome_exception.DataNotExists;
-import com.kairos.dto.ClauseDto;
+import com.kairos.dto.master_data.ClauseDto;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrievedEvent;

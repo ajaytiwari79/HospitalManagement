@@ -1,6 +1,7 @@
-package com.kairos.dto;
+package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ public class ClauseDto {
 
 
     @NotEmpty(message = "error.clause.title.cannot.be.empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
     private String title;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")

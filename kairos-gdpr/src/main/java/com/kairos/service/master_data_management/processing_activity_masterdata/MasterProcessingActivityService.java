@@ -1,18 +1,13 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.OrganizationTypeAndServiceResultDto;
-import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
-import com.kairos.dto.MasterProcessingActivityDto;
+import com.kairos.dto.master_data.MasterProcessingActivityDto;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.response.dto.MasterProcessingActivityResponseDto;
 import com.kairos.service.MongoBaseService;
-import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +27,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     @Inject
     MasterProcessingActivityRepository masterProcessingActivityRepository;
-
 
     public MasterProcessingActivity createMasterProcessingActivity(Long countryId, MasterProcessingActivityDto masterProcessingActivityDto) {
 

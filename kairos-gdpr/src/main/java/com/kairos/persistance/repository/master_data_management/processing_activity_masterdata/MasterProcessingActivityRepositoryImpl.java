@@ -3,8 +3,7 @@ package com.kairos.persistance.repository.master_data_management.processing_acti
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDto;
-import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
 import com.kairos.response.dto.MasterProcessingActivityResponseDto;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,10 +18,6 @@ import static com.kairos.constant.AppConstant.ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import java.math.BigInteger;
 import java.util.List;
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.ID;
-import static com.kairos.constant.AppConstant.DELETED;
-
 
 
 public class MasterProcessingActivityRepositoryImpl implements CustomMasterProcessingActivity {
