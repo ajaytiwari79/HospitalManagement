@@ -36,7 +36,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
-    public ResponseEntity<Map<String, Object>> createUnitEmploymentPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position) {
+    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.createUnitPosition(unitId, type, position, false));
     }
 
@@ -71,7 +71,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "get unit_position's WTA")
     @GetMapping(value = "/unit_position/{unitPositionId}/wta")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
     }
 /*

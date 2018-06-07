@@ -8,14 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.utils.userContext.UserContextInterceptor;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import org.apache.jackrabbit.oak.jcr.Jcr;
-import org.apache.jackrabbit.oak.Oak;
-import org.apache.jackrabbit.oak.plugins.document.DocumentMK;
-import org.apache.jackrabbit.oak.plugins.document.DocumentNodeStore;
-import org.apache.jackrabbit.oak.spi.blob.BlobStore;
-import org.apache.jackrabbit.oak.spi.blob.FileBlobStore;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -27,13 +20,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
+import org.springframework.web.client.RestTemplate;;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -84,7 +71,7 @@ public class KairosGdprApplication {
         return mappingJackson2HttpMessageConverter;
     }
 
-    @Profile("!dev")
+    @Profile("!development")
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
@@ -105,7 +92,7 @@ public class KairosGdprApplication {
     }*/
 
 
-    @Profile("dev")
+    @Profile("development")
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
@@ -123,6 +110,8 @@ public class KairosGdprApplication {
                 .build();
         return template;
     }*/
+
+
 
 
 

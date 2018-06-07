@@ -2,10 +2,12 @@ package com.kairos.service.master_data_management.processing_activity_masterdata
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.AccessorPartyMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,6 +26,9 @@ public class AccessorPartyService extends MongoBaseService {
     @Inject
     private AccessorPartyMongoRepository accessorPartyMongoRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
+
 
     public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorParty> accessorPartys) {
         Map<String, List<AccessorParty>> result = new HashMap<>();
@@ -40,18 +45,15 @@ public class AccessorPartyService extends MongoBaseService {
             existing = accessorPartyMongoRepository.findByCountryAndNameList(countryId, names);
             existing.forEach(item -> names.remove(item.getName()));
 
-            if (names.size()!=0) {
+            if (names.size() != 0) {
                 for (String name : names) {
-                AccessorParty newAccessorParty = new AccessorParty();
-                newAccessorParty.setName(newAccessorParty.getName());
-                newAccessorParty.setCountryId(countryId);
-                newAccessorPartys.add(newAccessorParty);
-
+                    AccessorParty newAccessorParty = new AccessorParty();
+                    newAccessorParty.setName(name);
+                    newAccessorParty.setCountryId(countryId);
+                    newAccessorPartys.add(newAccessorParty);
+                }
+                newAccessorPartys = save(newAccessorPartys);
             }
-
-
-            newAccessorPartys = save(newAccessorPartys);
-        }
             result.put("existing", existing);
             result.put("new", newAccessorPartys);
             return result;
@@ -62,7 +64,7 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorParty> getAllAccessorParty() {
-        return accessorPartyMongoRepository.findAllAccessorParties(UserContext.getCountryId());
+        return accessorPartyMongoRepository.findAllAccessorPartys(UserContext.getCountryId());
 
     }
 
@@ -96,12 +98,12 @@ public class AccessorPartyService extends MongoBaseService {
     public AccessorParty updateAccessorParty(BigInteger id, AccessorParty accessorParty) {
 
 
-        AccessorParty exist = accessorPartyMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        AccessorParty exist = accessorPartyMongoRepository.findByName(UserContext.getCountryId(), accessorParty.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("Name Already Exist");
         } else {
+            exist=accessorPartyMongoRepository.findByid(id);
             exist.setName(accessorParty.getName());
-
             return save(exist);
 
         }

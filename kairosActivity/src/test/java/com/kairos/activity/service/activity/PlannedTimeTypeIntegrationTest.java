@@ -3,7 +3,7 @@ package com.kairos.activity.service.activity;
 import com.kairos.activity.KairosActivityApplication;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -18,7 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.Date;

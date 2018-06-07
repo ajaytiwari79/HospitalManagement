@@ -41,7 +41,7 @@ public class AgreementSectionService extends MongoBaseService {
     public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
 
         List<AgreementSectionResponseDto> result = new ArrayList<>();
-        List<BigInteger> ids = new ArrayList<>();
+        Set<BigInteger> ids = new HashSet<>();
         Map<String, Object> response = new HashMap<>();
 
         if (agreementSections.size() != 0) {
@@ -100,7 +100,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,List<BigInteger> ids) {
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,Set<BigInteger> ids) {
         return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId,ids);
 
     }

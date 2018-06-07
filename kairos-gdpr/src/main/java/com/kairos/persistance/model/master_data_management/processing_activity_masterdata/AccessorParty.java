@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotNull;
 
 
-@Document(collection = "access_party")
+@Document(collection = "accessor_party")
 public class AccessorParty extends MongoBaseEntity {
 
 

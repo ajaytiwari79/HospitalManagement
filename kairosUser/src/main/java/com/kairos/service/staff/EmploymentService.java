@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -10,6 +11,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.staff.*;
@@ -17,6 +19,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
@@ -94,6 +97,8 @@ public class EmploymentService extends UserBaseService {
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UserGraphRepository userGraphRepository;
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
@@ -134,6 +139,7 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> retrieveEmploymentDetails(StaffEmploymentDTO staffEmploymentDTO) {
         Staff staff = staffEmploymentDTO.getStaff();
+        User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
         //Date employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateConverter.getDate(staffEmploymentDTO.getEmploymentStartDate()) : null;
         String employedSince =  Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateUtil.getDateFromEpoch(staffEmploymentDTO.getEmploymentStartDate()).toString() : null;
@@ -146,7 +152,7 @@ public class EmploymentService extends UserBaseService {
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId", staff.getExternalId());
-        LocalDate dateOfBirth = (staff.getDateOfBirth()) == null ? null : DateUtil.asLocalDate(staff.getDateOfBirth());
+        LocalDate dateOfBirth = (user.getDateOfBirth()) == null ? null : DateUtils.getLocalDateFromDate(user.getDateOfBirth());
         map.put("dateOfBirth", dateOfBirth);
 
         return map;

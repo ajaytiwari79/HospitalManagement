@@ -11,11 +11,13 @@ import com.kairos.persistence.model.user.user_personalized_settings.UserPersonal
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Date;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ADMINS_COUNTRY;
@@ -42,6 +44,8 @@ public class User extends UserBaseEntity {
     private String email;
     private Long lastSelectedParentOrgId;
     private Long lastSelectedChildOrgId;
+    @DateLong
+    private Date dateOfBirth;
 
     //uniqueness of user
     private String timeCareExternalId;
@@ -454,5 +458,13 @@ public class User extends UserBaseEntity {
 
     public void setPregnant(boolean pregnant) {
         this.pregnant = pregnant;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

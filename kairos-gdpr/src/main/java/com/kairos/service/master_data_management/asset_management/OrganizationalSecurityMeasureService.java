@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.OrganizationalSecurityMeasureMongoRepository;
@@ -93,10 +94,11 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     public OrganizationalSecurityMeasure updateOrganizationalSecurityMeasure(BigInteger id, OrganizationalSecurityMeasure orgSecurityMeasure) {
 
-        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(UserContext.getCountryId(),orgSecurityMeasure.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data exist of "+orgSecurityMeasure.getName());
         } else {
+            exist=organizationalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(orgSecurityMeasure.getName());
             return save(exist);
 
