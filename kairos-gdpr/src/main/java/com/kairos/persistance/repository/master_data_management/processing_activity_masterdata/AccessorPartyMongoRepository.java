@@ -1,8 +1,6 @@
 package com.kairos.persistance.repository.master_data_management.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
-import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
-import com.kairos.persistance.repository.master_data_management.MetaDataRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

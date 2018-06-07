@@ -1,34 +1,38 @@
 package com.kairos.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 import java.util.Set;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterAssetDto {
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "error.description.cannot.be.null.or.empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "error.description.cannot.be.null.or.empty")
     private String description;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotNull(message = "error.message.list.cannot.be.null")
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull
+    @NotEmpty(message = "error.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
 

@@ -8,6 +8,7 @@ import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.processing_activity.ProcessingActivity;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -25,9 +26,14 @@ import java.util.Map;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
+import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
+import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
+import static com.kairos.constant.AppConstant.COUNTRY_ID;
+import static com.kairos.constant.AppConstant.DELETED;
 
-public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoRepository {
 
+public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
 
 
     @Inject
@@ -36,7 +42,7 @@ public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoReposit
     @Override
     public Map<String, AggregationOperation> getFilterCriterias(Long countryId, List<FilterType> filterTypes) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
-        aggregationOperations.put("match", match(Criteria.where("countryId").is(countryId).and("deleted").is(false)));
+        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
         filterTypes.forEach(filterType -> {
                     aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
                 }
@@ -86,7 +92,7 @@ public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoReposit
     }
 
     @Override
-    public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation,FilterGroup filterGroup, String moduleId) {
+    public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
         List<ModuleIdDto> moduleIdDto = filterGroup.getAccessModule();
         String domainName = new String();
@@ -96,22 +102,20 @@ public class FilterGroupMongoRepositoryImpl implements CustomeFilterMongoReposit
                 break;
             }
         }
-        if (StringUtils.isBlank(domainName))
-        {
+        if (StringUtils.isBlank(domainName)) {
             throw new InvalidRequestException("module name is null");
         }
-        if (domainName.toLowerCase().contains("asset"))
-        {
-            return mongoTemplate.aggregate(aggregation,MasterAsset.class,FilterQueryResult.class);
+        switch (domainName) {
+
+            case CLAUSE_MODULE_NAME:
+                return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
+            case ASSET_MODULE_NAME:
+                return mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
+            case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
+                return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, FilterQueryResult.class);
+            default:
+                throw new DataNotFoundByIdException("data not found by moduleId" + moduleId);
+
         }
-        if (domainName.toLowerCase().contains("clauses"))
-        {
-            return mongoTemplate.aggregate(aggregation,Clause.class,FilterQueryResult.class);
-        } if (domainName.toLowerCase().contains("processing"))
-        {
-            return mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,FilterQueryResult.class);
-        }
-        else
-            throw new DataNotFoundByIdException("data not found by moduleId"+moduleId);
     }
 }

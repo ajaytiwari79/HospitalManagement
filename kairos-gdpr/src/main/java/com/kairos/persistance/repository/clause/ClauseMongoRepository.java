@@ -14,7 +14,7 @@ import java.util.Set;
 
 
 @Repository
-public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>{
+public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 
     @Query("{deleted:false,countryId:?0,title:?1}")
