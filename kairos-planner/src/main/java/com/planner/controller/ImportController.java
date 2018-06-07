@@ -3,6 +3,7 @@ package com.planner.controller;
 import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.importService.ImportService;
+import com.planner.service.vrpService.VRPGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,19 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 public class ImportController {
 
     @Autowired private ImportService importService;
+    @Autowired private VRPGeneratorService vrpGeneratorService;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> importData(@PathVariable Long unitId) {
         importService.readExcelFile();
         return ResponseHandler.generateResponse("import Data sucessFully", HttpStatus.ACCEPTED);
     }
+
+    @RequestMapping(value = "/writeToJson", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> writeToJson(@PathVariable Long unitId) {
+        vrpGeneratorService.writeToJson();
+        return ResponseHandler.generateResponse("import Data sucessFully", HttpStatus.ACCEPTED);
+    }
+
+
 }

@@ -11,6 +11,9 @@ import com.planner.service.taskService.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +28,7 @@ public class VRPGeneratorService {
     @Autowired private TaskService taskService;
     @Autowired private EmployeeService employeeService;
 
-    public VrpTaskPlanningSolution getVrpTaskPlanningSolution(){
+    public VrpTaskPlanningSolution writeToJson(){
         VrpTaskPlanningSolution solution = new VrpTaskPlanningSolution();
         List<Employee> employees = ObjectMapperUtils.copyPropertiesOfListByMapper(employeeService.getEmployees(),Employee.class);
         List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = taskService.getUniqueTask();
@@ -33,8 +36,18 @@ public class VRPGeneratorService {
         solution.setTasks(tasks);
         solution.setShifts(shifts);
         solution.setEmployees(employees);
+        String json = ObjectMapperUtils.objectToJsonString(solution);
+        try {
+            PrintWriter out = new PrintWriter(new File(this.getClass().getResource("problem.json").getFile()).getAbsolutePath());
+            out.write(json);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         return solution;
     }
+
+
 
     private List<Shift> getShifts(List<Employee> employeeList){
         List<Shift> shifts = new ArrayList<>();
