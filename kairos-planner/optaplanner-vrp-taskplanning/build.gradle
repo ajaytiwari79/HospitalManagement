@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    compile project (':dto')
     compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom

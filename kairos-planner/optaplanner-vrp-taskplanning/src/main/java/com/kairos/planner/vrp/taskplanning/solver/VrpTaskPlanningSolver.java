@@ -19,4 +19,8 @@ public class VrpTaskPlanningSolver {
         solverFactory = SolverFactory.createFromXmlFile(new File(config));
         solver = solverFactory.buildSolver();
     }
+    public void solve(VrpTaskPlanningSolution problem){
+        VrpTaskPlanningSolution solution=solver.solve(problem);
+
+    }
 }
