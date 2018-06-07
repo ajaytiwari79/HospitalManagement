@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 
-public interface TAndAGracePeriodRepository extends MongoBaseRepository<TimeAttendanceGracePeriod,BigInteger> {
+public interface TimeAttendanceGracePeriodRepository extends MongoBaseRepository<TimeAttendanceGracePeriod,BigInteger> {
 
     @Query(value ="{unitId:?0,deleted:false}")
     TimeAttendanceGracePeriod findByUnitId(Long unitId);

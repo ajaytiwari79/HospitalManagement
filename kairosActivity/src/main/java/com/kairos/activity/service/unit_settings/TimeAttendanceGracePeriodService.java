@@ -1,7 +1,7 @@
 package com.kairos.activity.service.unit_settings;
 
 import com.kairos.activity.persistence.model.unit_settings.TimeAttendanceGracePeriod;
-import com.kairos.activity.persistence.repository.unit_settings.TAndAGracePeriodRepository;
+import com.kairos.activity.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
@@ -11,13 +11,13 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 @Service
-public class TAndAGracePeriodService extends MongoBaseService {
+public class TimeAttendanceGracePeriodService extends MongoBaseService {
 
    @Inject
    private ExceptionService exceptionService;
 
    @Inject
-    private TAndAGracePeriodRepository tAndAGracePeriodRepository;
+    private TimeAttendanceGracePeriodRepository tAndAGracePeriodRepository;
 
 
    public TAndAGracePeriodSettingDTO getTAndAGracePeriodSetting(Long unitId){

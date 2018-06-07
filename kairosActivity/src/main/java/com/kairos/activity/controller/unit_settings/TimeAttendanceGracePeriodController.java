@@ -1,6 +1,6 @@
 package com.kairos.activity.controller.unit_settings;
 
-import com.kairos.activity.service.unit_settings.TAndAGracePeriodService;
+import com.kairos.activity.service.unit_settings.TimeAttendanceGracePeriodService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
 import io.swagger.annotations.Api;
@@ -17,10 +17,10 @@ import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_U
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class TAndAGracePeriodController {
+public class TimeAttendanceGracePeriodController {
 
     @Inject
-    private TAndAGracePeriodService tAndAGracePeriodService;
+    private TimeAttendanceGracePeriodService tAndAGracePeriodService;
 
 
     @ApiOperation(value = "get unit T&A GracePeriod settings")
