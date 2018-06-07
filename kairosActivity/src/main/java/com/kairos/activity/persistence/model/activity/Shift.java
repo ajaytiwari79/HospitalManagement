@@ -327,4 +327,23 @@ public class Shift extends MongoBaseEntity {
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         }
+
+    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, ShiftState shiftState, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.remarks = remarks;
+        this.activityId = activityId;
+        this.staffId = staffId;
+        this.phase = phase;
+        this.unitId = unitId;
+        this.scheduledMinutes = scheduledMinutes;
+        this.durationMinutes = durationMinutes;
+        this.isMainShift = isMainShift;
+        this.externalId = externalId;
+        this.unitPositionId = unitPositionId;
+        this.shiftState = shiftState;
+        this.parentOpenShiftId = parentOpenShiftId;
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+    }
 }

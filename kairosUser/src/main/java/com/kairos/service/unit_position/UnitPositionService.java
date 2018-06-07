@@ -992,9 +992,10 @@ public class UnitPositionService extends UserBaseService {
 
     }
 
-    public List<StaffAdditionalInfoQueryResult> getStaffsUnitPosition(Long unitId,Long expertiseId,List<Long> staffId) {
-        logger.info(unitId.toString());
-        return new ArrayList<>();
+    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData =
+                staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
+        return staffData;
     }
 
 }

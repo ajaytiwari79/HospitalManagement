@@ -11,6 +11,9 @@ import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
+import java.time.ZoneId;
+import java.util.List;
 
 /**
  * Created by vipul on 29/1/18.
@@ -38,10 +41,21 @@ public class StaffUnitPositionDetails {
     private BigInteger workingTimeAgreementId;
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
+    // TODO MOVING THIS INSIDE SO THAT WE CAN REMOVE THE UPPER LEVEL WRAPPER
+    private List<DayOfWeek> activityDayTypes;
+    private ZoneId unitTimeZone;
+    private Long staffId;
 
     public StaffUnitPositionDetails() {
     }
 
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
 
     public BigInteger getWorkingTimeAgreementId() {
         return workingTimeAgreementId;
@@ -187,5 +201,19 @@ public class StaffUnitPositionDetails {
         this.costTimeAgreement = costTimeAgreement;
     }
 
+    public List<DayOfWeek> getActivityDayTypes() {
+        return activityDayTypes;
+    }
 
+    public void setActivityDayTypes(List<DayOfWeek> activityDayTypes) {
+        this.activityDayTypes = activityDayTypes;
+    }
+
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
+    }
 }

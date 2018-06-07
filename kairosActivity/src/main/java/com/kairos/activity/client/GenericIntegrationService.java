@@ -3,6 +3,7 @@ package com.kairos.activity.client;
 import com.google.inject.Inject;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
@@ -39,9 +40,9 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/employment_type_and_expertise", null), PriorityGroupDefaultData.class);
     }
 
-    public List<StaffAdditionalInfoDTO> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
-        Integer value = genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/expertise/{expertiseId}/unitPositions", null, expertiseId);
+    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
+        List<StaffUnitPositionDetails> staffData = genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/expertise/{expertiseId}/unitPositions", null, expertiseId);
 
-        return new ArrayList<>();
+        return  staffData;
     }
 }

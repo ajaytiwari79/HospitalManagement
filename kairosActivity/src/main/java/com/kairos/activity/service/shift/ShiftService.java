@@ -2,11 +2,8 @@ package com.kairos.activity.service.shift;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.GenericIntegrationService;
-import com.kairos.activity.client.GenericRestClient;
 import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
-import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
@@ -17,6 +14,7 @@ import com.kairos.activity.persistence.repository.break_settings.BreakSettingMon
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.pay_out.PayOutService;
@@ -42,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -660,7 +659,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public Map<String, List<BigInteger>> publishShifts(ShiftPublishDTO shiftPublishDTO) {
-        List<Shift> shifts = shiftMongoRepository.findByIdInAndDeletedFalse(shiftPublishDTO.getShiftIds());
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(shiftPublishDTO.getShiftIds());
 
         List<BigInteger> success = new ArrayList<>();
         List<BigInteger> error = new ArrayList<>();
@@ -691,11 +690,28 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWrapper(assignedShifts, openShifts);
     }
 
-    public Map<String, Object> copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
+    public Map<Long, List<Shift>> copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         logger.info(copyShiftDTO.toString());
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(copyShiftDTO.getShiftIds());
+        Map<Long, List<Shift>> shiftsByStaff = new HashMap<>();
+        List<StaffUnitPositionDetails> staffDataList = restClient.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
+        copyShiftDTO.getStaffIds().forEach(currentStaffId -> {
+            StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(s -> s.getStaffId().equals(currentStaffId)).findFirst().get();
+            shiftsByStaff.put(currentStaffId, copyForThisStaff(shifts, staffUnitPosition));
+        });
+        return shiftsByStaff;
+    }
 
-        List<StaffAdditionalInfoDTO> staffDataList = restClient.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
-        return new HashMap<>();
+    @Async
+    private List<Shift> copyForThisStaff(List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition) {
+        List<Shift> newShifts = new ArrayList<>(shifts.size());
+        shifts.forEach(shift -> {
+            Shift copiedShift = new Shift(shift.getName(), shift.getStartDate(), shift.getEndDate(), shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaffId(), shift.getPhase(), shift.getUnitId(),
+                    shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute());
+            newShifts.add(shift);
+        });
+        save(shifts);
+        return shifts;
     }
 
     public List<ShiftQueryResult> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, String startDateAsString, String endDateAsString, Long expertiseId) throws ParseException {

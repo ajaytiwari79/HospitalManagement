@@ -13,6 +13,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffUnitPositionDetails {
     private Expertise expertise;
+    private  Long staffId;
     private EmploymentType employmentType;
     private WTAResponseDTO workingTimeAgreement;
     private Long startDateMillis;
@@ -156,5 +157,13 @@ public class StaffUnitPositionDetails {
 
     public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }
