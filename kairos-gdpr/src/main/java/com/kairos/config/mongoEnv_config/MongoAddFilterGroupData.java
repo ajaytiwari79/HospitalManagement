@@ -5,6 +5,7 @@ import com.kairos.dto.ModuleIdDto;
 import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
+import com.kairos.service.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class MongoAddFilterGroupData implements CommandLineRunner {
+public class MongoAddFilterGroupData extends MongoBaseService implements CommandLineRunner  {
 
 
     Logger LOGGER = LoggerFactory.getLogger(MongoAddFilterGroupData.class);
@@ -95,7 +96,7 @@ public class MongoAddFilterGroupData implements CommandLineRunner {
         }
 
         if (createfilterGroups.size() != 0) {
-            filterMongoRepository.saveAll(createfilterGroups);
+            save(createfilterGroups);
         }
 
         LOGGER.info("Filter gorup save Succesfully");

@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 
 @Document(collection = "account_type")
@@ -16,6 +17,7 @@ import javax.validation.constraints.NotNull;
 public class AccountType extends MongoBaseEntity {
 
     @NotNullOrEmpty
+    @Pattern(regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
