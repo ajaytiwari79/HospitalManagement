@@ -165,6 +165,53 @@ public class AccessGroupService extends UserBaseService {
         return organization.getAccessGroups();
     }
 
+    public AccessGroup createDefaultAccessGroupsAndGetUnitManagerAccessGroup(Organization organization, Long accessGroupIdForManager) {
+
+        //get root organization
+        Organization parent;
+        AccessGroup accessGroupForUnitManager = null;
+        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+        }
+        Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
+        List<AccessGroup> accessGroupList = null;
+        if (parent == null) {
+            List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(organization.isUnion(), organization.isKairosHub()).toString());
+            accessGroupList = new ArrayList<>(countryAccessGroups.size());
+            for (AccessGroup countryAccessGroup : countryAccessGroups){
+                if( Optional.ofNullable(accessGroupIdForManager).isPresent() &&  countryAccessGroup.getId().equals(accessGroupIdForManager)){
+                    accessGroupForUnitManager = countryAccessGroup;
+                }
+                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
+                accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
+                accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+                save(accessGroup);
+                accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroup.getId(), accessGroup.getId());
+                accessGroupList.add(accessGroup);
+            }
+
+            organization.setAccessGroups(accessGroupList);
+        } else {
+            // Remove AG_COUNTRY_ADMIN access group to be copied
+            List<AccessGroup> accessGroups = new ArrayList<>(parent.getAccessGroups());
+            for (AccessGroup accessGroup : accessGroups){
+
+                if(Optional.ofNullable(accessGroupIdForManager).isPresent() && accessGroup.getId().equals(accessGroupIdForManager)){
+                    accessGroupForUnitManager = accessGroup;
+                }
+                if(accessGroup.getName().equals(AG_COUNTRY_ADMIN)){
+                    accessGroups.remove(accessGroup);
+                }
+            }
+            organization.setAccessGroups(accessGroups);
+        }
+        save(organization);
+        return accessGroupForUnitManager;
+    }
+
     public List<AccessGroup> getAccessGroups(long organizationId) {
 
        return accessGroupRepository.getAccessGroups(organizationId);
