@@ -127,6 +127,22 @@ public class ObjectMapperUtils {
         return null;
     }
 
+    public static <T> T JsonStringToObject(String jsonString,Class<T> valueType){
+        ObjectMapper objectMapper = new ObjectMapper();
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
+        objectMapper.registerModule(javaTimeModule);
+        //objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        try {
+            return objectMapper.readValue(jsonString, valueType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void copyProperties(Object source,Object destination){
         try {
             PropertyUtils.copyProperties(destination,source);
