@@ -285,6 +285,7 @@ public class Shift extends MongoBaseEntity {
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
         shiftQueryResult.setShiftState(this.getShiftState());
+        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         return shiftQueryResult;
     }
 

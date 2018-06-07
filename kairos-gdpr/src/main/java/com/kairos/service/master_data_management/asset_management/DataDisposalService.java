@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.asset_management;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.repository.master_data_management.asset_management.DataDisposalMongoRepository;
@@ -97,8 +98,8 @@ public class DataDisposalService extends MongoBaseService {
 
 
         DataDisposal exist = dataDisposalMongoRepository.findByName(UserContext.getCountryId(),dataDisposal.getName());
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+dataDisposal.getName());
         } else {
             exist=dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());

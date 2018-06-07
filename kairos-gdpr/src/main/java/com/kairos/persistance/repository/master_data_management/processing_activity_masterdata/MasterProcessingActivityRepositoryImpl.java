@@ -43,7 +43,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     public List<MasterProcessingActivityResponseDto> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId) {
         Aggregation aggregation=Aggregation.newAggregation(
 
-                match(Criteria.where("countryId").is(countryId).and("deleted").is(false)),
+                match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isSubProcess").is(false)),
                 lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities")
 
         );
