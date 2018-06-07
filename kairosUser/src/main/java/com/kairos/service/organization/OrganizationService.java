@@ -10,6 +10,7 @@ import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.constants.ApiConstants;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
@@ -375,7 +376,7 @@ public class OrganizationService extends UserBaseService {
         priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
 
         //create T&A gracePeriod default setting
-        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(2);
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(AppConstants.GRACE_PERIOD_DAYS);
         priorityGroupIntegrationService.createDefaultGracePeriodSetting(tAndAGracePeriodSettingDTO,organization.getId());
 
         /*// TODO Verify code to set Unit Manager of new organization

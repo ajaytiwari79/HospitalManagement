@@ -202,4 +202,7 @@ public class AppConstants {
     // Module/tab id prefix for Access Page
     public static final String MODULE_ID_PRFIX = "module_";
     public static final String TAB_ID_PRFIX = "tab_";
+
+    //default T&A grace period data
+    public static final int GRACE_PERIOD_DAYS=2;
 }

@@ -27,14 +27,12 @@ public class TAndAGracePeriodController {
 
     @ApiOperation(value = "get unit T&A GracePeriod settings")
     @GetMapping(value = "/grace_period_setting")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getGracePeriodSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tAndAGracePeriodService.getTAndAGracePeriodSetting(unitId));
     }
 
     @ApiOperation(value = "update unit T&A GracePeriod settings")
     @PostMapping(value = "/grace_period_setting")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateGracePeriodSettings(@PathVariable Long unitId,
                                                                          @RequestBody TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, tAndAGracePeriodService.updateTAndAGracePeriodSetting(unitId,tAndAGracePeriodSettingDTO));

@@ -20,11 +20,6 @@ public class TAndAGracePeriodService extends MongoBaseService {
    @Inject
     private TAndAGracePeriodRepository tAndAGracePeriodRepository;
 
-//   public TAndAGracePeriod createDefaultGracePeriodSetting(Long unitId) {
-//       TAndAGracePeriod tAndAGracePeriod=new TAndAGracePeriod(unitId, AppConstants.GRACE_PERIOD_DAYS);
-//       save(tAndAGracePeriod);
-//       return tAndAGracePeriod;
-//   }
 
    public TAndAGracePeriodSettingDTO getTAndAGracePeriodSetting(Long unitId){
        TAndAGracePeriod tAndAGracePeriod=tAndAGracePeriodRepository.findByUnitId(unitId);
