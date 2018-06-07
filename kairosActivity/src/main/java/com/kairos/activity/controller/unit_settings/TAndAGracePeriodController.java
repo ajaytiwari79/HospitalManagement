@@ -1,6 +1,5 @@
 package com.kairos.activity.controller.unit_settings;
 
-import com.kairos.activity.persistence.model.unit_settings.TAndAGracePeriod;
 import com.kairos.activity.service.unit_settings.TAndAGracePeriodService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;

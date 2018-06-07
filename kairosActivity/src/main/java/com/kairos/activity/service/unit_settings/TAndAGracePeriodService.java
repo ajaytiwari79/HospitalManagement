@@ -1,7 +1,6 @@
 package com.kairos.activity.service.unit_settings;
 
-import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.persistence.model.unit_settings.TAndAGracePeriod;
+import com.kairos.activity.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.activity.persistence.repository.unit_settings.TAndAGracePeriodRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
@@ -22,7 +21,7 @@ public class TAndAGracePeriodService extends MongoBaseService {
 
 
    public TAndAGracePeriodSettingDTO getTAndAGracePeriodSetting(Long unitId){
-       TAndAGracePeriod tAndAGracePeriod=tAndAGracePeriodRepository.findByUnitId(unitId);
+       TimeAttendanceGracePeriod tAndAGracePeriod=tAndAGracePeriodRepository.findByUnitId(unitId);
         if(!Optional.ofNullable(tAndAGracePeriod).isPresent()){
             exceptionService.dataNotFoundByIdException("message.unit.graceperiod.notFound",unitId);
         }
@@ -31,10 +30,9 @@ public class TAndAGracePeriodService extends MongoBaseService {
    }
 
    public TAndAGracePeriodSettingDTO updateTAndAGracePeriodSetting(Long unitId,TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO){
-        TAndAGracePeriod tAndAGracePeriod=tAndAGracePeriodRepository.findByUnitId(unitId);
+        TimeAttendanceGracePeriod tAndAGracePeriod=tAndAGracePeriodRepository.findByUnitId(unitId);
         if(!Optional.ofNullable(tAndAGracePeriod).isPresent()){
-            tAndAGracePeriod=new TAndAGracePeriod();
-            tAndAGracePeriod.setUnitId(unitId);
+            tAndAGracePeriod=new TimeAttendanceGracePeriod(unitId);
         }
         tAndAGracePeriod.setStaffGracePeriodDays(tAndAGracePeriodSettingDTO.getStaffGracePeriodDays());
         tAndAGracePeriod.setManagementGracePeriodDays(tAndAGracePeriodSettingDTO.getManagementGracePeriodDays());
