@@ -1,15 +1,21 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
+
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
+import java.util.List;
+@PlanningEntity
 public class Shift {
     private String id;
     private Employee employee;
     private LocalDate localDate;
     private LocalTime start;
     private LocalTime end;
+
+    private List<Task> tasks;
 
     public Shift(String id, Employee employee, LocalDate localDate, LocalTime start, LocalTime end) {
         this.id = id;

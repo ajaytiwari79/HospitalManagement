@@ -1,5 +1,12 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
+import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
+import org.optaplanner.core.api.domain.variable.PlanningVariable;
+import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
 import java.util.Set;
 
@@ -7,9 +14,9 @@ import java.util.Set;
  * @author pradeep
  * @date - 7/6/18
  */
-
+@PlanningEntity
 public class Task{
-
+    private String id;
     private int intallationNo;
     private Double lattitude;
     private Double longitude;
@@ -21,6 +28,14 @@ public class Task{
     private int floorNo;
     private int post;
     private String city;
+    @PlanningVariable(valueRangeProviderRefs = {
+            "tasks" }, graphType = PlanningVariableGraphType.CHAINED)
+    private Task nextTask;
+
+    @InverseRelationShadowVariable(sourceVariableName = "nextTask")
+    private Task prevTask;
+    @AnchorShadowVariable(sourceVariableName = "nextTask")
+    private Shift shift;
 
 
     public Task(int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
@@ -36,7 +51,37 @@ public class Task{
         this.post = post;
         this.city = city;
     }
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Task getNextTask() {
+        return nextTask;
+    }
+
+    public void setNextTask(Task nextTask) {
+        this.nextTask = nextTask;
+    }
+
+    public Task getPrevTask() {
+        return prevTask;
+    }
+
+    public void setPrevTask(Task prevTask) {
+        this.prevTask = prevTask;
+    }
+
+    public Shift getShift() {
+        return shift;
+    }
+
+    public void setShift(Shift shift) {
+        this.shift = shift;
+    }
     public int getDuration() {
         return duration;
     }
