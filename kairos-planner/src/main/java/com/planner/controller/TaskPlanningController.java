@@ -15,7 +15,7 @@ public class TaskPlanningController {
     @Autowired
     private LocationService locationService;
     @Autowired
-    private TaskService taskService;
+    private PlanningTaskService taskService;
     @Autowired
     private TaskTypeService taskTypeService;
     @Autowired

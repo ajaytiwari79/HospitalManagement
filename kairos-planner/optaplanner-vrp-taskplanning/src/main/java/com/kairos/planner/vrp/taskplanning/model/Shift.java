@@ -1,11 +1,9 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
-import org.optaplanner.core.api.domain.entity.PlanningEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@PlanningEntity
 public class Shift {
     private String id;
     private Employee employee;

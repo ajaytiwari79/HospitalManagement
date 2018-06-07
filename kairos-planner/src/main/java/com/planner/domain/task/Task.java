@@ -1,5 +1,6 @@
 package com.planner.domain.task;
 
+import com.planner.domain.MongoBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -8,7 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @date - 7/6/18
  */
 
-public class Task {
+public class Task extends MongoBaseEntity{
 
     private int intallationNo;
     private Double lattitude;
