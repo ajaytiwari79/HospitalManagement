@@ -1,7 +1,9 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
@@ -30,7 +32,6 @@ import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -1602,31 +1603,30 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type) {
+    public StaffAdditionalInfoDTO getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
         //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-        StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        staffAdditionalInfoQueryResult.setUnitId(organization.getId());
-        staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
-        staffAdditionalInfoQueryResult.setTimeSlotSets(timeSlotWrappers);
-        staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult,StaffAdditionalInfoDTO.class);
+       // StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionCTA(unitPositionId,unitId);
+        staffAdditionalInfoDTO.setUnitId(organization.getId());
+        staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
+        staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.activity.client.dto.TimeSlotWrapper.class));
+        staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        staffAdditionalInfoQueryResult.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes,DayTypeDTO.class));
+        staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes,DayTypeDTO.class));
         UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
-        staffAdditionalInfoQueryResult.setUser(userAccessRole);
+        staffAdditionalInfoDTO.setUser(userAccessRole);
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
-            //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
-            //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
+            staffAdditionalInfoDTO.setUnitPosition(unitPosition);
         }
-
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
-        return staffAdditionalInfoQueryResult;
+        return staffAdditionalInfoDTO;
     }
 
     public StaffAdditionalInfoQueryResult verifyStaffBelongsToUnit(long staffId, long id, String type) {

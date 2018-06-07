@@ -20,7 +20,15 @@ public class UnitPositionWithCtaDetailsDTO {
     private Long countryId;
     private int minutesFromCta;
     private ZoneId unitTimeZone;
+    private Long id;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public UnitPositionWithCtaDetailsDTO(Long unitPositionId) {
         this.unitPositionId = unitPositionId;

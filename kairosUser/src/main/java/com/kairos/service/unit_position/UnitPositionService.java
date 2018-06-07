@@ -6,10 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
-import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 
 import com.kairos.response.dto.web.UnitPositionDTO;
@@ -726,19 +726,19 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public UnitPositionWithCtaDetailsDTO getUnitPositionCTA(Long unitPositionId, Long unitId) {
-        BeanUtils.copyProperties(new Object(), new Object(), "id");
+    public StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(unitPositionId);
+        StaffUnitPositionDetails unitPositionWithCtaDetailsDTO = new StaffUnitPositionDetails();
         unitPositionWithCtaDetailsDTO.setStaffId(unitPosition.getStaff().getId());
+        unitPositionWithCtaDetailsDTO.setId(unitPosition.getId());
         unitPositionWithCtaDetailsDTO.setCountryId(countryId);
-        unitPositionWithCtaDetailsDTO.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
-        unitPositionWithCtaDetailsDTO.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
-        unitPositionWithCtaDetailsDTO.setUnitPositionStartDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        unitPositionWithCtaDetailsDTO.setTotalWeeklyMinutes(unitPosition.getTotalWeeklyMinutes());
+        unitPositionWithCtaDetailsDTO.setWorkingDaysInWeek(unitPosition.getWorkingDaysInWeek());
+        unitPositionWithCtaDetailsDTO.setStartDateMillis(unitPosition.getStartDateMillis());
         if (unitPosition.getEndDateMillis() != null) {
-            unitPositionWithCtaDetailsDTO.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
+            unitPositionWithCtaDetailsDTO.setEndDateMillis(unitPosition.getEndDateMillis());
         }
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());

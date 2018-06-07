@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -11,6 +12,8 @@ import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
+import java.time.ZoneId;
+import java.util.List;
 
 /**
  * Created by vipul on 29/1/18.
@@ -38,6 +41,43 @@ public class StaffUnitPositionDetails {
     private BigInteger workingTimeAgreementId;
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
+    private List<CTARuleTemplateDTO> ctaRuleTemplates;
+    private ZoneId unitTimeZone;
+    private Long staffId;
+    private Long countryId;
+
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
+        return ctaRuleTemplates;
+    }
+
+    public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
+        this.ctaRuleTemplates = ctaRuleTemplates;
+    }
+
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
+    }
 
     public StaffUnitPositionDetails() {
     }

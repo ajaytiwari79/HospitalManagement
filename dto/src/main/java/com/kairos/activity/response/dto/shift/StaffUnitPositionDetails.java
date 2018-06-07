@@ -1,10 +1,11 @@
 package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 public class StaffUnitPositionDetails {
     private Expertise expertise;
     private EmploymentType employmentType;
-    private WTAQueryResultDTO workingTimeAgreement;
+    private WTAResponseDTO workingTimeAgreement;
     private Long startDateMillis;
     private int workingDaysInWeek;
     private Long endDateMillis;
@@ -25,12 +26,41 @@ public class StaffUnitPositionDetails {
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
+    private Long staffId;
     private float salary;
     private int totalWeeklyMinutes;
     private BigInteger workingTimeAgreementId;
+    private List<CTARuleTemplateDTO> ctaRuleTemplates;
+    private ZoneId unitTimeZone;
+    private Long countryId;
 
     public StaffUnitPositionDetails() {
 
+    }
+
+
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
+        return ctaRuleTemplates;
+    }
+
+    public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
+        this.ctaRuleTemplates = ctaRuleTemplates;
     }
 
     public BigInteger getWorkingTimeAgreementId() {
@@ -46,6 +76,14 @@ public class StaffUnitPositionDetails {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
 
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -143,11 +181,11 @@ public class StaffUnitPositionDetails {
         this.employmentType = employmentType;
     }
 
-    public WTAQueryResultDTO  getWorkingTimeAgreement() {
+    public WTAResponseDTO  getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WTAQueryResultDTO  workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAResponseDTO  workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 

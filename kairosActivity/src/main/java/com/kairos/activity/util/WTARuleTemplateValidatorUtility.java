@@ -200,11 +200,15 @@ public class WTARuleTemplateValidatorUtility {
 
     public static DateTimeInterval getIntervalByNumberOfWeeks(ShiftWithActivityDTO shift, int numberOfWeeks, LocalDate validationStartDate){
         LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()),endDate.atStartOfDay(ZoneId.systemDefault()));
-        do {
-            validationStartDate = endDate;
+        DateTimeInterval dateTimeInterval = null;
+        while (true){
+            dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()),endDate.atStartOfDay(ZoneId.systemDefault()));
             endDate = validationStartDate.plusWeeks(numberOfWeeks);
-        }while (dateTimeInterval.contains(shift.getStartDate()));
+            if(dateTimeInterval.contains(shift.getStartDate())){
+                break;
+            }
+            validationStartDate = endDate;
+        }
         return dateTimeInterval;
     }
 
