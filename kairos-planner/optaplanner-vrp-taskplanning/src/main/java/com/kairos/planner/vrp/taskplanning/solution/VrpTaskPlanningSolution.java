@@ -1,4 +1,4 @@
-package com.kairos.planner.vrp.taskplanning.Solution;
+package com.kairos.planner.vrp.taskplanning.solution;
 
 import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Shift;

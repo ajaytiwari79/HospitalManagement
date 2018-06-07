@@ -1,6 +1,6 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
-import com.kairos.planner.vrp.taskplanning.Solution.VrpTaskPlanningSolution;
+import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.slf4j.Logger;
