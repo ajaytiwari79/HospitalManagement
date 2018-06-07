@@ -118,7 +118,6 @@ public class ObjectMapperUtils {
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         objectMapper.registerModule(javaTimeModule);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return objectMapper.writeValueAsString(object);
         } catch (IOException e) {
@@ -133,8 +132,6 @@ public class ObjectMapperUtils {
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         objectMapper.registerModule(javaTimeModule);
-        //objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return objectMapper.readValue(jsonString, valueType);
         } catch (IOException e) {
