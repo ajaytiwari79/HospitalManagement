@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class MongoAddFilterGroupData extends MongoBaseService implements CommandLineRunner  {
+public class MongoAddFilterGroupData extends MongoBaseService implements CommandLineRunner {
 
 
     Logger LOGGER = LoggerFactory.getLogger(MongoAddFilterGroupData.class);
@@ -51,46 +51,34 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
         FilterGroup assetFilterGroup = mongoTemplate.findOne(assetQuery, FilterGroup.class);
         FilterGroup processingActivityFilterGroup = mongoTemplate.findOne(processingActivityQuery, FilterGroup.class);
         List<FilterGroup> createfilterGroups = new ArrayList<>();
+        List<FilterType> filterTypes = new ArrayList<FilterType>();
+        filterTypes.add(FilterType.ORGANIZATION_TYPES);
+        filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
+        filterTypes.add(FilterType.ORGANIZATION_SERVICES);
+        filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
 
-        if (!Optional.ofNullable(clauseFilterGroup).isPresent()) {
-            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
-            ModuleIdDto moduleIdDto = new ModuleIdDto(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
-            moduleIdDtos.add(moduleIdDto);
-            List<FilterType> filterTypes = new ArrayList<FilterType>();
-            filterTypes.add(FilterType.ORGANIZATION_TYPES);
-            filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
-            filterTypes.add(FilterType.ORGANIZATION_SERVICES);
-            filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
-            filterTypes.add(FilterType.ACCOUNT_TYPES);
-            FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
-            createfilterGroups.add(filterGroup);
-
-        }
 
         if (!Optional.ofNullable(assetFilterGroup).isPresent()) {
             List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
             ModuleIdDto moduleIdDto = new ModuleIdDto(ASSET_MODULE_NAME, ASSET_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
-            List<FilterType> filterTypes = new ArrayList<FilterType>();
-            filterTypes.add(FilterType.ORGANIZATION_TYPES);
-            filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
-            filterTypes.add(FilterType.ORGANIZATION_SERVICES);
-            filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
             FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
             createfilterGroups.add(filterGroup);
 
-
         }
-
         if (!Optional.ofNullable(processingActivityFilterGroup).isPresent()) {
             List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
             ModuleIdDto moduleIdDto = new ModuleIdDto(MASTER_PROCESSING_ACTIVITY_MODULE_NAME, MASTER_PROCESSING_ACTIVITY_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
-            List<FilterType> filterTypes = new ArrayList<FilterType>();
-            filterTypes.add(FilterType.ORGANIZATION_TYPES);
-            filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
-            filterTypes.add(FilterType.ORGANIZATION_SERVICES);
-            filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
+            FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
+            createfilterGroups.add(filterGroup);
+        }
+
+        if (!Optional.ofNullable(clauseFilterGroup).isPresent()) {
+            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
+            ModuleIdDto moduleIdDto = new ModuleIdDto(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
+            moduleIdDtos.add(moduleIdDto);
+            filterTypes.add(FilterType.ACCOUNT_TYPES);
             FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
             createfilterGroups.add(filterGroup);
         }
