@@ -377,16 +377,14 @@ public class ShiftService extends MongoBaseService {
 
         List<AppliedFunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
 
-        Map<LocalDate,FunctionDTO> funcitonDTOMap = new HashMap();
-        if(appliedFunctionDTOs!=null && !appliedFunctionDTOs.isEmpty()) {
+        Map<LocalDate, FunctionDTO> funcitonDTOMap = new HashMap();
+        if (appliedFunctionDTOs != null && !appliedFunctionDTOs.isEmpty()) {
             for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
-                if(appliedFunctionDTO.getAppliedDates()!=null && !appliedFunctionDTO.getAppliedDates().isEmpty()){
-                FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
-                for (Long date : appliedFunctionDTO.getAppliedDates()) {
-                    //funcitonDTOMap = new HashMap<>();
-                    funcitonDTOMap.put(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate(), functionDTO);
-                    //funcitonDTOMapList.add(funcitonMap);
-                }
+                if (appliedFunctionDTO.getAppliedDates() != null && !appliedFunctionDTO.getAppliedDates().isEmpty()) {
+                    FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
+                    for (Long date : appliedFunctionDTO.getAppliedDates()) {
+                        funcitonDTOMap.put(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate(), functionDTO);
+                    }
                 }
             }
         }
