@@ -1,4 +1,4 @@
-package com.kairos.dto.planner;
+package com.kairos.planner.vrp.taskplanning.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -10,12 +10,12 @@ import java.util.Set;
  * @date - 7/6/18
  */
 
-public class TaskDTO {
+public class Task{
 
     private int intallationNo;
     private Double lattitude;
     private Double longitude;
-    private String skill;
+    private Set<String> skills;
     private int duration;
     private String streetName;
     private int houseNo;
@@ -25,11 +25,11 @@ public class TaskDTO {
     private String city;
 
 
-    public TaskDTO(int intallationNo, Double lattitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public Task(int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
         this.longitude = longitude;
-        this.skill = skill;
+        this.skills = skills;
         this.duration = duration;
         this.streetName = streetName;
         this.houseNo = houseNo;
@@ -95,18 +95,18 @@ public class TaskDTO {
         this.city = city;
     }
 
-    public String getSkill() {
-        return skill;
+    public Set<String> getSkills() {
+        return skills;
     }
 
-    public void setSkills(String skill) {
-        this.skill = skill;
+    public void setSkills(Set<String> skills) {
+        this.skills = skills;
     }
 
-    public TaskDTO() {
+    public Task() {
     }
 
-    public TaskDTO(int intallationNo, Double lattitude, Double longitude) {
+    public Task(int intallationNo, Double lattitude, Double longitude) {
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
         this.longitude = longitude;
@@ -142,10 +142,10 @@ public class TaskDTO {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        TaskDTO taskDTO = (TaskDTO) o;
+        Task task = (Task) o;
 
         return new EqualsBuilder()
-                .append(intallationNo, taskDTO.intallationNo)
+                .append(intallationNo, task.intallationNo)
                 .isEquals();
     }
 

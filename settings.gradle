@@ -22,6 +22,9 @@ include 'kairosActivity'
 include 'kairos-planner'
 include "kairos-planner:optaplanner-shiftplanning"
 include "kairos-planner:optaplanner-taskplanning"
+include "kairos-planner:optaplanner-vrp-taskplanning"
 include "kairos-planner:responseWrapper"
 include 'kairos-gdpr'
+include 'kairos-planner:optaplanner-vrp-taskplanning'
+findProject(':kairos-planner:optaplanner-vrp-taskplanning')?.name = 'optaplanner-vrp-taskplanning'
 
