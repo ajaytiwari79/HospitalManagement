@@ -25,6 +25,9 @@ public class Shift {
         this.end = end;
     }
 
+    public Shift() {
+    }
+
     public String getId() {
         return id;
     }

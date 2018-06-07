@@ -51,6 +51,7 @@ public class Task{
         this.post = post;
         this.city = city;
     }
+
     public String getId() {
         return id;
     }

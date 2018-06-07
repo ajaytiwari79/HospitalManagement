@@ -4,6 +4,7 @@ import java.util.Set;
 
 public class Employee {
     private String id;
+    private String name;
     private Set<String> skills;
     private int efficiency;
 
@@ -11,6 +12,17 @@ public class Employee {
         this.id = id;
         this.skills = skills;
         this.efficiency = efficiency;
+    }
+
+    public Employee() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getId() {
