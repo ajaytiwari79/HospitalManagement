@@ -21,10 +21,7 @@ import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.service.wta.WTAService;
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.activity.shift.ShiftWrapper;
+import com.kairos.activity.shift.*;
 import com.kairos.activity.spec.*;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
@@ -40,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -690,28 +686,47 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWrapper(assignedShifts, openShifts);
     }
 
-    public Map<Long, List<Shift>> copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
-        logger.info(copyShiftDTO.toString());
+    public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(copyShiftDTO.getShiftIds());
-        Map<Long, List<Shift>> shiftsByStaff = new HashMap<>();
+        CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
         List<StaffUnitPositionDetails> staffDataList = restClient.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
         copyShiftDTO.getStaffIds().forEach(currentStaffId -> {
-            StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(s -> s.getStaffId().equals(currentStaffId)).findFirst().get();
-            shiftsByStaff.put(currentStaffId, copyForThisStaff(shifts, staffUnitPosition));
+            StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition);
+
+            StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
+            StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
+
+            copyShiftResponse.getSuccessFul().add(successfullyCopied);
+            copyShiftResponse.getFailure().add(errorInCopy);
+
+
         });
-        return shiftsByStaff;
+
+        return copyShiftResponse;
     }
 
-    @Async
-    private List<Shift> copyForThisStaff(List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition) {
+
         List<Shift> newShifts = new ArrayList<>(shifts.size());
+
+        Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
+
+        List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
+        List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
+
         shifts.forEach(shift -> {
-            Shift copiedShift = new Shift(shift.getName(), shift.getStartDate(), shift.getEndDate(), shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaffId(), shift.getPhase(), shift.getUnitId(),
-                    shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute());
+            Shift copiedShift = new Shift(shift.getName(), shift.getStartDate(), shift.getEndDate(), shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaff().getId(), shift.getPhase(), shift.getUnitId(),
+                    shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute(), shift.getId());
             newShifts.add(shift);
+            successfullyCopiedShifts.add(new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList("NO CONFLICTS")));
+            errorInCopyingShifts.add(new ShiftResponse(new BigInteger("2"), "hello", Arrays.asList("WTA", "CTA")));
+
         });
+        statusMap.put("success", successfullyCopiedShifts);
+        statusMap.put("error", errorInCopyingShifts);
         save(shifts);
-        return shifts;
+        return statusMap;
     }
 
     public List<ShiftQueryResult> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, String startDateAsString, String endDateAsString, Long expertiseId) throws ParseException {

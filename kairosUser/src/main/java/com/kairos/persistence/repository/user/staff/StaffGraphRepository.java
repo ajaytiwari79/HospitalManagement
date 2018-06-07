@@ -449,9 +449,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
             "match (unitPosition)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             " match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "return id(staff) as staffId,expertise as expertise,cta as costTimeAgreement,unitPosition.workingTimeAgreementId as workingTimeAgreementId, unit.unitTimeZone as unitTimeZone," +
+            "return staff as staff,expertise as expertise,cta as costTimeAgreement,unitPosition.workingTimeAgreementId as workingTimeAgreementId,et as employmentType,unit.unitTimeZone as unitTimeZone," +
             "unitPosition.totalWeeklyHours as totalWeeklyHours, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis," +
-            "unitPosition.salary as salary,unitPosition.workingDaysInWeek as workingDaysInWeek,et as employmentType," +
+            "unitPosition.salary as salary,unitPosition.workingDaysInWeek as workingDaysInWeek," +
             "unitPosition.hourlyWages as hourlyWages,id(unitPosition) as id,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")

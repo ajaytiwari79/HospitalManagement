@@ -4,9 +4,7 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
-import com.kairos.persistence.model.user.staff.StaffDTO;
+import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.response.dto.web.UnitPositionWtaDTO;
@@ -35,11 +33,11 @@ public class PlannerSyncService {
     @Autowired
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Async
-    public void  publishStaff(Long unitId, Staff staff, IntegrationOperation integrationOperation) {
+    public void  publishStaff(Long unitId, com.kairos.persistence.model.user.staff.Staff staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffDTO(staff),unitId,integrationOperation);
     }
     @Async
-    public void publishAllStaff(Long unitId, List<Staff> staff, IntegrationOperation integrationOperation) {
+    public void publishAllStaff(Long unitId, List<com.kairos.persistence.model.user.staff.Staff> staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffList(staff),unitId,integrationOperation);
     }
     @Async
@@ -92,17 +90,17 @@ public class PlannerSyncService {
         return unitPositionWtaDTOS;
     }
 
-    private List<StaffBasicDetailsDTO> createStaffList(List<Staff> staff) {
-        List<StaffBasicDetailsDTO> dtos= new ArrayList<>();
-        for(Staff s:staff){
+    private List<Staff> createStaffList(List<com.kairos.persistence.model.user.staff.Staff> staff) {
+        List<Staff> dtos= new ArrayList<>();
+        for(com.kairos.persistence.model.user.staff.Staff s:staff){
             dtos.add(createStaffDTO(s));
         }
         return dtos;
     }
 
-    private StaffBasicDetailsDTO createStaffDTO(Staff staff){
+    private Staff createStaffDTO(com.kairos.persistence.model.user.staff.Staff staff){
 
-        return new StaffBasicDetailsDTO(staff.getId(),staff.getFirstName(),staff.getLastName(),null,staff.getCurrentStatus());
+        return new Staff(staff.getId(),staff.getFirstName(),staff.getLastName(),null,staff.getCurrentStatus());
 
     }
 

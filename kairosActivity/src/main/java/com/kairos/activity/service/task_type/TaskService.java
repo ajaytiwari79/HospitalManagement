@@ -959,7 +959,7 @@ public class TaskService extends MongoBaseService {
             if(nonSyncTasks != null) {
                 for (Map task : nonSyncTasks) {
                     Task nonSyncTask = (Task) taskService.findByExternalId(String.valueOf(task.get("externalId")));
-                    String staffId = String.valueOf(nonSyncTask.getStaffId());
+                    String staffId = String.valueOf(nonSyncTask.getStaff());
                     DateTime nonSyncTaskDate = new DateTime(nonSyncTask.getStartDate());
                     Date startDate = nonSyncTask.getStartDate();
                     Date endDate = nonSyncTask.getEndDate();
@@ -1121,7 +1121,7 @@ public class TaskService extends MongoBaseService {
                     task.setStatus(task.getStatus());
 
             }
-            // task.setStaffId(Long.parseLong(receivedTask.getFMExtID() != null ? receivedTask.getFMExtID() : "-1"));
+            // task.setStaff(Long.parseLong(receivedTask.getFMExtID() != null ? receivedTask.getFMExtID() : "-1"));
             Optional<String> receivedTaskOptional = Optional.ofNullable(receivedTask.getFMExtID());
 
             if (receivedTaskOptional.isPresent()) {

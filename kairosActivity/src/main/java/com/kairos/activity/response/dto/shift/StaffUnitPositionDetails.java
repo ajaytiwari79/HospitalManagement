@@ -1,11 +1,10 @@
 package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by vipul on 29/1/18.
@@ -13,7 +12,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffUnitPositionDetails {
     private Expertise expertise;
-    private  Long staffId;
+    private Staff staff;
     private EmploymentType employmentType;
     private WTAResponseDTO workingTimeAgreement;
     private Long startDateMillis;
@@ -159,11 +158,11 @@ public class StaffUnitPositionDetails {
         this.expertise = expertise;
     }
 
-    public Long getStaffId() {
-        return staffId;
+    public Staff getStaff() {
+        return staff;
     }
 
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 }

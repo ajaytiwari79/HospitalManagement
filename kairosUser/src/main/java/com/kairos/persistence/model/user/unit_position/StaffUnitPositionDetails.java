@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -44,17 +45,17 @@ public class StaffUnitPositionDetails {
     // TODO MOVING THIS INSIDE SO THAT WE CAN REMOVE THE UPPER LEVEL WRAPPER
     private List<DayOfWeek> activityDayTypes;
     private ZoneId unitTimeZone;
-    private Long staffId;
+    private Staff staff;
 
     public StaffUnitPositionDetails() {
     }
 
-    public Long getStaffId() {
-        return staffId;
+    public Staff getStaff() {
+        return staff;
     }
 
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 
     public BigInteger getWorkingTimeAgreementId() {
