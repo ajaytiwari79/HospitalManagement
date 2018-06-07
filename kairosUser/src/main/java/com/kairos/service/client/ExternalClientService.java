@@ -1,6 +1,5 @@
 package com.kairos.service.client;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.client.Client;
@@ -22,8 +21,10 @@ import com.kairos.response.dto.web.CurrentAddress;
 import com.kairos.response.dto.web.PatientRelative;
 import com.kairos.response.dto.web.PatientWrapper;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.region.RegionService;
 
+import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,8 @@ public class ExternalClientService extends UserBaseService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void addClientRelativeDetailsFromKmd(PatientRelative patientRelative, Client client, long unitId) {
@@ -113,6 +116,7 @@ public class ExternalClientService extends UserBaseService {
             detail.setWorkPhone(patientRelative.getRelatedPatient().getWorkPhoneNumber());
 
             nextToKin.setCprNumber(patientRelative.getRelatedPatient().getPatientIdentifier().getIdentifier().replace("-", ""));
+            nextToKin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(nextToKin.getCprNumber()));
             nextToKin = clientService.generateAgeAndGenderFromCPR(nextToKin);
         }
 
@@ -251,12 +255,14 @@ public class ExternalClientService extends UserBaseService {
     public Client createCitizenFromKmd(PatientWrapper patientWrapper, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Can't find Organization with providedId");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
 
         if (patientWrapper != null) {
 
             String cprNumber = patientWrapper.getPatientIdentifier().getIdentifier().replace("-", "");
+
             logger.info("cprNumber------------> " + cprNumber);
             Client client = clientGraphRepository.findByKmdNexusExternalId(patientWrapper.getId());
             client = (client == null) ? new Client() : client;
@@ -270,6 +276,7 @@ public class ExternalClientService extends UserBaseService {
             client.setFirstName(patientWrapper.getFirstName());
             client.setLastName(patientWrapper.getLastName());
             client.setCprNumber(cprNumber);
+            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(client.getCprNumber()));
             CitizenStatus citizenStatus = citizenStatusGraphRepository.findByDescription(countryGraphRepository.getCountryIdByUnitId(unitId), patientWrapper.getMaritalStatus());
 
             if (citizenStatus != null) {

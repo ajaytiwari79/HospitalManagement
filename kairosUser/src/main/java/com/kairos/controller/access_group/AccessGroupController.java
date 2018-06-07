@@ -215,4 +215,12 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.copyCountryAccessGroup(countryId, countryAccessGroupDTO));
     }
 
+    @RequestMapping(value = UNIT_URL+"/current_user/access_role", method = RequestMethod.GET)
+    @ApiOperation("To fetch Access Role (Staff/Management) of current logged in user")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> checkIfUserHasAccessByRoleInUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId));
+
+    }
+
 }

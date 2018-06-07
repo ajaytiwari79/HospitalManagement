@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state=ActivityStateEnum.DRAFT;
+
     @Indexed
     private Long unitId;
     private BigInteger parentId;
@@ -55,6 +57,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
     private LocationActivityTab locationActivityTab;
+    private PermissionsActivityTab permissionsActivityTab;
     @JsonIgnore
     private boolean disabled;
 
@@ -65,6 +68,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.name = name;
         this.description = description;
         this.tags = tags;
+
     }
 
 
@@ -315,6 +319,14 @@ public class Activity extends MongoBaseEntity implements Serializable {
     public static Activity copyProperties(Activity source, Activity target, String _id, String organizationType, String organizationSubType) {
         BeanUtils.copyProperties(source, target, _id, organizationSubType, organizationType);
         return target;
+    }
+
+    public PermissionsActivityTab getPermissionsActivityTab() {
+        return permissionsActivityTab;
+    }
+
+    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
     }
 
     public HashMap retrieveBasicDetails() {

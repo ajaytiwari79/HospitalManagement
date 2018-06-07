@@ -14,11 +14,13 @@ import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoR
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.response.dto.WTADTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,13 +48,15 @@ public class WTAOrganizationService extends MongoBaseService {
     @Inject private OrganizationRestClient organizationRestClient;
     @Inject private RuleTemplateService ruleTemplateService;
     @Inject private WTABuilderService wtaBuilderService;
+    @Autowired
+    private ExceptionService exceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid unit  " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
         }
         List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
@@ -71,25 +75,25 @@ public class WTAOrganizationService extends MongoBaseService {
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            throw new ActionNotPermittedException("Start date cant be less than current Date " + wtaId);
+            exceptionService.actionNotPermittedException("message.wta.start-end-date",wtaId);
         }
         boolean isWTAAlreadyExists = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
         if (isWTAAlreadyExists) {
             logger.info("Duplicate WTA name in organization :", wtaId);
-            throw new DuplicateDataException("Duplicate WTA name in organization " + updateDTO.getName());
+            exceptionService.duplicateDataException("message.wta.name.alreadyExists",updateDTO.getName());
         }
         WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
-            throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
+            exceptionService.dataNotFoundByIdException("message.wta.id",wtaId);
         }
         if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
             logger.info("Expertise cant be changed at unit level :", wtaId);
-            throw new ActionNotPermittedException("Expertise can't be changed");
+            exceptionService.actionNotPermittedException("message.expertise.unitlevel.update",wtaId);
         }
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid unit  " + unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
         }
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         BeanUtils.copyProperties(oldWta, newWta);

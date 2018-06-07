@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.period;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -8,12 +9,12 @@ import java.util.Date;
  */
 public class PeriodPhaseFlippingDateDTO {
     private BigInteger phaseId;
-    private Date flippingDate;
+    private LocalDate flippingDate;
 
     public PeriodPhaseFlippingDateDTO(){
         // default constructor
     }
-    public PeriodPhaseFlippingDateDTO( BigInteger phaseId, Date flippingDate) {
+    public PeriodPhaseFlippingDateDTO( BigInteger phaseId, LocalDate flippingDate) {
         this.phaseId = phaseId;
         this.flippingDate = flippingDate;
     }
@@ -27,11 +28,19 @@ public class PeriodPhaseFlippingDateDTO {
         this.phaseId = phaseId;
     }
 
-    public Date getFlippingDate() {
+    public LocalDate getFlippingDate() {
+        return flippingDate;
+    }
+
+    public void setFlippingDate(LocalDate flippingDate) {
+        this.flippingDate = flippingDate;
+    }
+
+    /*public Date getFlippingDate() {
         return flippingDate;
     }
 
     public void setFlippingDate(Date flippingDate) {
         this.flippingDate = flippingDate;
-    }
+    }*/
 }

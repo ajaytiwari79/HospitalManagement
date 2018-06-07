@@ -5,7 +5,6 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
-
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.EmploymentTypeService;
@@ -613,5 +612,17 @@ public class StaffController {
 
     }
 
+    @RequestMapping(value = "/unitwise", method = RequestMethod.GET)
+    @ApiOperation("fetch unit wise staff list ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitWiseStaff() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitWiseStaffList());
+    }
 
+    @ApiOperation(value = "Staff personalized view in daily view")
+    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.PUT)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
+    }
 }

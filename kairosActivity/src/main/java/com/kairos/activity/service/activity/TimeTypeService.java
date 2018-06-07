@@ -13,6 +13,7 @@ import com.kairos.activity.persistence.repository.activity.ActivityMongoReposito
 import com.kairos.activity.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -30,7 +31,10 @@ public class TimeTypeService extends MongoBaseService {
     @Inject
     private ActivityMongoRepositoryImpl activityMongoRepository;
     @Inject
+    private ExceptionService exceptionService;
+    @Inject
     private ActivityCategoryService activityCategoryService;
+
 
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
@@ -53,7 +57,7 @@ public class TimeTypeService extends MongoBaseService {
                     }
                     timeTypeDTO.setId(timeType.getId());
                 } else {
-                    throw new DuplicateDataException("Name already Exists");
+                    exceptionService.duplicateDataException("message.name");
                 }
             }
         });
@@ -73,7 +77,7 @@ public class TimeTypeService extends MongoBaseService {
                         activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
                 }
             } else {
-                throw new DuplicateDataException("Name already Exists");
+                exceptionService.duplicateDataException("message.name");
             }
         });
         return timeTypeDTOS;
@@ -175,7 +179,8 @@ public class TimeTypeService extends MongoBaseService {
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
             timeType.setDeleted(true);
             save(timeType);
-        } else throw new TimeTypeLinkedException("TimeType is Linked");
+        } else exceptionService.timeTypeLinkedException("message.timetype.linked");
+
         return false;
     }
 

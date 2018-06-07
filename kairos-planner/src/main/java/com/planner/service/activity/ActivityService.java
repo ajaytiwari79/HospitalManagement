@@ -7,13 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ActivityService  {
     @Autowired
     private ActivityRepository activityRepository;
     public void createActivity(Long unitId, ActivityNoTabsDTO activityDTO) {
-        Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getCategoryId(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId());
+        Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId(), unitId);
         activityRepository.save(activity);
     }
 
@@ -23,5 +25,13 @@ public class ActivityService  {
         activity.setEmployementTypes(activityDTO.getEmployementTypes());
         activity.setExpertises(activityDTO.getExpertises());
         activityRepository.save(activity);
+    }
+    public void createActivities(Long unitId, List<ActivityNoTabsDTO> activityDTOs) {
+        List<Activity> acts=new ArrayList<>();
+        for(ActivityNoTabsDTO activityDTO:activityDTOs){
+            Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId(), unitId);
+            acts.add(activity);
+        }
+        activityRepository.saveAll(acts);
     }
 }

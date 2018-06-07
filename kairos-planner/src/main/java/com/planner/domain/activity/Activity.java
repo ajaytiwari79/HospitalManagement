@@ -9,23 +9,23 @@ public class Activity extends MongoBaseEntity {
     private String name;
     private List<Long> expertises;
     private String description;
-    private BigInteger categoryId;
     private List<Long> activitySkills;
     private List<Long> employementTypes;
     private long minLength;
     private long maxLength;
     private long maxAllocations;
+    private Long unitId;
 
-    public Activity(String name, List<Long> expertises, String description, BigInteger categoryId, List<Long> activitySkills, List<Long> employementTypes, long minLength, long maxLength, long maxAllocations,BigInteger kairosId) {
+    public Activity(String name, List<Long> expertises, String description, List<Long> activitySkills, List<Long> employementTypes, long minLength, long maxLength, long maxAllocations, BigInteger kairosId, Long unitId) {
         this.name = name;
         this.expertises = expertises;
         this.description = description;
-        this.categoryId = categoryId;
         this.activitySkills = activitySkills;
         this.employementTypes = employementTypes;
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.maxAllocations = maxAllocations;
+        this.unitId = unitId;
         this.kairosId=kairosId;
     }
 
@@ -56,14 +56,6 @@ public class Activity extends MongoBaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public BigInteger getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(BigInteger categoryId) {
-        this.categoryId = categoryId;
     }
 
     public List<Long> getActivitySkills() {
@@ -104,5 +96,13 @@ public class Activity extends MongoBaseEntity {
 
     public void setMaxAllocations(long maxAllocations) {
         this.maxAllocations = maxAllocations;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

@@ -97,11 +97,10 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = HAS_FAVOURITE_FILTERS)
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
-    @DateLong
-    private Date dateOfBirth;
     private String careOfName;
-    private Integer age;
-    private Gender gender;
+
+    @Relationship(type = HAS_STAFF_SETTINGS)
+    private StaffSettings staffSettings;
 
 
     public Staff(String firstName) {
@@ -455,15 +454,6 @@ public class Staff extends UserBaseEntity {
         this.client = client;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
     public List<StaffFavouriteFilter> getStaffFavouriteFilterList() {
         return staffFavouriteFilterList;
     }
@@ -496,16 +486,24 @@ public class Staff extends UserBaseEntity {
         this.secondaryContactAddress = secondaryContactAddress;
     }
 
-    public Integer getAge() {
-        this.age = this.cprNumber != null ? Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears() : null;
-        return age;
+
+    public StaffSettings getStaffSettings() {
+        return staffSettings=Optional.ofNullable(staffSettings).orElse(new StaffSettings());
     }
 
-    public Gender getGender() {
+    public void setStaffSettings(StaffSettings staffSettings) {
+        this.staffSettings = staffSettings;
+    }
+    /*    public Gender getGender() {
+
+/*    public Gender getGender() {
         return gender;
     }
 
     public void setGender(Gender gender) {
         this.gender = gender;
     }
+
+    }*/
+
 }

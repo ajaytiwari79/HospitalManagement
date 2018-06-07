@@ -14,6 +14,8 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
+
 /**
  * Created by oodles on 1/2/17.
  */
@@ -192,13 +194,17 @@ public class DateUtil {
         return dayOfWeek;
     }
 
-    public static Long getIsoDateInLong(String dateReceived) throws ParseException {
+    public static Long getIsoDateInLong(String dateReceived) {
         Long date = null;
-        if(!StringUtils.isEmpty(dateReceived)) {
+        if (!StringUtils.isEmpty(dateReceived)) {
             DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
             isoFormat.setLenient(false);
             isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            date = isoFormat.parse(dateReceived).getTime();
+            try {
+                date = isoFormat.parse(dateReceived).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         return date;
     }
@@ -230,10 +236,14 @@ public class DateUtil {
     }
 
 
-
-    public static Date getCurrentDate(){
+    public static Date getCurrentDate() {
         //TODO this cant be system's date. this gotta be unit;s date. sachin
         return new Date();
+    }
+
+
+    public static LocalDate getCurrentLocalDate() {
+        return LocalDate.now();
     }
 
     public static Long getCurrentDateMillis() {
@@ -245,7 +255,7 @@ public class DateUtil {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone(timezone));
-        DateTime dateTime = new DateTime(date).withTime(0,0,0,0);
+        DateTime dateTime = new DateTime(date).withTime(0, 0, 0, 0);
         calendar.setTime(dateTime.toDate());
 
         return calendar.getTime();
@@ -255,21 +265,30 @@ public class DateUtil {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone(timezone));
-        DateTime dateTime = new DateTime(date).withTime(23,59,59,59);
+        DateTime dateTime = new DateTime(date).withTime(23, 59, 59, 59);
         calendar.setTime(dateTime.toDate());
 
         return calendar.getTime();
     }
+
     public static LocalDate getDateFromEpoch(Long dateLong) {
         LocalDate date = null;
-        if(Optional.ofNullable(dateLong).isPresent()) {
+        if (Optional.ofNullable(dateLong).isPresent()) {
             date = Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
         }
         return date;
     }
 
+    public static Long getDateFromEpoch(LocalDate dateLong) {
+        return dateLong.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    }
+
     public static LocalDate getTimezonedCurrentDate(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
     }
+    public static Long getStartDateOfWeekFromDate(LocalDate date){
+          LocalDate localDate=date.with(previousOrSame(DayOfWeek.MONDAY));
+          return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+       }
 
 }

@@ -71,7 +71,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
      * @param countryHolidayCalender
      * @return
      */
-    public Map<String, Object> updateCountryCalender(Map<String,Object> countryHolidayCalender) throws Exception{
+    public Map<String, Object> updateCountryCalender(Map<String,Object> countryHolidayCalender){
         logger.info("Data Received: "+countryHolidayCalender);
         Long id = Long.valueOf(String.valueOf(countryHolidayCalender.get("id")));
         CountryHolidayCalender calender = countryHolidayCalenderGraphRepository.findOne(id);
@@ -137,7 +137,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
     }
 
 
-    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) throws Exception {
+    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
             CountryHolidayCalender countryHolidayCalender = new CountryHolidayCalender();

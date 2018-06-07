@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain;
 
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
+import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.wta.*;
 import com.thoughtworks.xstream.annotations.XStreamAlias;

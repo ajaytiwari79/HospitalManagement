@@ -2,21 +2,31 @@ package com.kairos.activity.persistence.model.priority_group;
 
 import com.kairos.persistence.model.enums.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.response.dto.web.open_shift.DecisionCriteria;
+import com.kairos.response.dto.web.open_shift.RoundRules;
+import com.kairos.response.dto.web.open_shift.StaffExcludeFilter;
+import com.kairos.response.dto.web.open_shift.StaffIncludeFilter;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class PriorityGroup extends MongoBaseEntity {
     private boolean deActivated;
-    private OpenShiftCancelProcess openShiftCancelProcess;
+    //private OpenShiftCancelProcess openShiftCancelProcess;
     private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
     private Long countryId;
     private Long unitId;
-    private BigInteger countryParentId;
-    private PriorityGroupName name;
+    private BigInteger parentId;
+    private Integer priority;
     private BigInteger orderId;
-    private ScheduledProcess scheduledProcess;
+    private PriorityGroupName name;
+    private DecisionCriteria decisionCriteria;
+    private BigInteger ruleTemplateId;
+    private List<Long> employmentTypeIds;
+    private List<Long> expertiseIds;
+
 
     public PriorityGroup() {
         //Default Constructor
@@ -26,13 +36,11 @@ public class PriorityGroup extends MongoBaseEntity {
                          StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId,ScheduledProcess scheduledProcess) {
         this.name=name;
         this.deActivated = deActivated;
-        this.openShiftCancelProcess = openShiftCancelProcess;
         this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
         this.countryId = countryId;
         this.unitId = unitId;
-        this.scheduledProcess=scheduledProcess;
     }
 
     public boolean isDeActivated() {
@@ -41,16 +49,6 @@ public class PriorityGroup extends MongoBaseEntity {
 
     public void setDeActivated(boolean deActivated) {
         this.deActivated = deActivated;
-    }
-
-
-
-    public OpenShiftCancelProcess getOpenShiftCancelProcess() {
-        return openShiftCancelProcess;
-    }
-
-    public void setOpenShiftCancelProcess(OpenShiftCancelProcess openShiftCancelProcess) {
-        this.openShiftCancelProcess = openShiftCancelProcess;
     }
 
     public RoundRules getRoundRules() {
@@ -93,12 +91,12 @@ public class PriorityGroup extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public BigInteger getCountryParentId() {
-        return countryParentId;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setCountryParentId(BigInteger countryParentId) {
-        this.countryParentId = countryParentId;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public PriorityGroupName getName() {
@@ -109,6 +107,14 @@ public class PriorityGroup extends MongoBaseEntity {
         this.name = name;
     }
 
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
     public BigInteger getOrderId() {
         return orderId;
     }
@@ -117,11 +123,36 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
-    public ScheduledProcess getScheduledProcess() {
-        return scheduledProcess;
+
+    public DecisionCriteria getDecisionCriteria() {
+        return decisionCriteria;
     }
 
-    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
-        this.scheduledProcess = scheduledProcess;
+    public void setDecisionCriteria(DecisionCriteria decisionCriteria) {
+        this.decisionCriteria = decisionCriteria;
+    }
+
+    public BigInteger getRuleTemplateId() {
+        return ruleTemplateId;
+    }
+
+    public void setRuleTemplateId(BigInteger ruleTemplateId) {
+        this.ruleTemplateId = ruleTemplateId;
+    }
+
+    public List<Long> getEmploymentTypeIds() {
+        return employmentTypeIds;
+    }
+
+    public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
+        this.employmentTypeIds = employmentTypeIds;
+    }
+
+    public List<Long> getExpertiseIds() {
+        return expertiseIds;
+    }
+
+    public void setExpertiseIds(List<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
     }
 }

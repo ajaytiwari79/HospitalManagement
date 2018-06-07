@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.user.staff;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -39,6 +40,8 @@ public class StaffPersonalDetail {
     private Float costHourOvertime;
     private Integer capacity;
     private String careOfName;
+    private Gender gender;
+    private boolean pregnant;
 
     public String getFirstName() {
         return firstName;
@@ -214,5 +217,21 @@ public class StaffPersonalDetail {
 
     public void setExpertiseWithExperience(List<StaffExperienceInExpertiseDTO> expertiseWithExperience) {
         this.expertiseWithExperience = expertiseWithExperience;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }

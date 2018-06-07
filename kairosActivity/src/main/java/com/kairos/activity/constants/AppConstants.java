@@ -202,7 +202,7 @@ public class AppConstants {
     public static final String CONSTRUCTION_TO_FINAL_PHASE = "CONSTRUCTION_TO_FINAL_PHASE";
     public static final String REQUEST_TO_PUZZLE_PHASE = "REQUEST_TO_PUZZLE_PHASE";
     public static final String PUZZLE_TO_CONSTRUCTION_PHASE = "PUZZLE_TO_CONSTRUCTION_PHASE";
-    public static final Long DURATION_IN_WEEK=4L;
+    public static final Long DURATION_IN_WEEK = 4L;
     public static final String COPY_OF = "copy of";
 
     public static final int REQUEST_PHASE_SEQUENCE = 1;
@@ -229,8 +229,21 @@ public class AppConstants {
     // Default Settings of period for unit
     public static final int PRESENCE_LIMIT_IN_YEAR = 1;
     public static final int ABSENCE_LIMIT_IN_YEAR = 2;
+    public static final int ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE = 1;
+    public static final int ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE = 2;
+
 
     // Staff Questionnaire
     public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
+    public static final int MAX_ONE_ACTIVITY_PER_SHIFT = 10;
 
+
+    // Default Unit Age Settings
+    public static final int YOUNGER_AGE = 18;
+    public static final int OLDER_AGE = 62;
+
+    public static final String PAID_BREAK = "PAID BREAK";
+    public static final String UNPAID_BREAK = "UNPAID BREAK";
+    public static final String BREAK = "BREAK";
+    public static final String SHIFT = "SHIFT";
 }

@@ -1,19 +1,21 @@
 package com.kairos.service.organization;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.response.dto.web.OrganizationTypeAndSubTypeDto;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
 
 import javax.inject.Inject;
 import java.text.ParseException;
@@ -31,7 +33,8 @@ public class OrganizationTypeService extends UserBaseService {
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     CountryGraphRepository countryGraphRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
 
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
@@ -40,11 +43,13 @@ public class OrganizationTypeService extends UserBaseService {
     public OrganizationType createOrganizationTypeForCountry(Long countryId, OrganizationTypeDTO organizationTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         OrganizationType isAlreadyExist = organizationTypeGraphRepository.findByName(countryId, organizationTypeDTO.getName().trim());
         if (Optional.ofNullable(isAlreadyExist).isPresent()) {
-            throw new DuplicateDataException("OrganizationType already exists");
+            exceptionService.duplicateDataException("message.organizationtype.name.duplicate");
+
         }
         List<Level> levels = countryGraphRepository.getLevelsByIdsIn(countryId, organizationTypeDTO.getLevels());
 
@@ -78,20 +83,16 @@ public class OrganizationTypeService extends UserBaseService {
 
     }
 
-    public List<Object> getAllWTAWithOrganization(long countryId) {
-        List<Map<String, Object>> map = organizationTypeGraphRepository.getAllWTAWithOrganization(countryId);
-        List<Object> objectList = new ArrayList<>();
-        for (Map<String, Object> result : map) {
-            objectList.add(result.get("result"));
+    public List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId) {
+        return organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
         }
-        return objectList;
-    }
 
 
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid organization type id " + updateOrganizationTypeDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.organizationtype.id.notfound",updateOrganizationTypeDTO.getId());
+
         }
         if (!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()) {
             organizationTypeGraphRepository.removeLevelRelationshipFromOrganizationType(updateOrganizationTypeDTO.getId(), updateOrganizationTypeDTO.getLevelsToDelete());
@@ -185,6 +186,19 @@ public class OrganizationTypeService extends UserBaseService {
     public void deleteLinkingOfOrganizationTypeAndService(Set<Long> orgTypeId, long serviceId) {
         organizationTypeGraphRepository.deleteRelOrganizationTypeWithService(orgTypeId, serviceId);
     }
+
+
+
+
+    public List<OrganizationTypeAndSubTypeDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId) {
+        List<Map> organizationType = organizationTypeGraphRepository.getAllOrganizationTypeAndServiceAndSubServices(countryId);
+        List<OrganizationTypeAndSubTypeDto> list = new ArrayList<>();
+        organizationType.forEach(o -> {
+            list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeDto.class));
+        });
+        return list;
+    }
+
 
 
 }

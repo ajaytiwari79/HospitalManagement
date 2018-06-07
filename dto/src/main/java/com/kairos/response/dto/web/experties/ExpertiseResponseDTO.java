@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.shift.BreakPaymentSetting;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,11 +27,11 @@ public class ExpertiseResponseDTO {
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
 
-    private PaidOutFrequencyEnum paidOutFrequency;
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;
     private Boolean published;
     private Boolean editable;
+    private BreakPaymentSetting breakPaymentSetting;
 
     public ExpertiseResponseDTO() {
     }
@@ -124,14 +125,6 @@ public class ExpertiseResponseDTO {
     }
 
 
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
-    }
-
     public List<SeniorityLevelDTO> getSeniorityLevels() {
         return seniorityLevels;
     }
@@ -162,5 +155,13 @@ public class ExpertiseResponseDTO {
 
     public void setEditable(Boolean editable) {
         this.editable = editable;
+    }
+
+    public BreakPaymentSetting getBreakPaymentSetting() {
+        return breakPaymentSetting;
+    }
+
+    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+        this.breakPaymentSetting = breakPaymentSetting;
     }
 }

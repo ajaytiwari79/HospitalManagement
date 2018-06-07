@@ -3,12 +3,13 @@ package com.kairos.activity.persistence.repository.activity;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithCompositeDTO;
-import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.activity.ActivityWithCTAWTASettingsDTO;
 import com.kairos.activity.response.dto.activity.OrganizationActivityDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -40,4 +41,15 @@ public interface CustomActivityMongoRepository {
 
     Activity getActivityByNameAndUnitId(Long unitId,String name);
 
+    List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
+
+    List<ActivityDTO> findAllActivitiesWithTimeTypes(long countryId);
+
+    List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId);
+
+    Activity findByNameAndDateAndCountryId(String name,Long countryId,Date date);
+
+    Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId,Date date);
+
+    Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,Date date);
 }

@@ -1,7 +1,7 @@
 package com.kairos.service.auth;
 
+import com.kairos.activity.util.DateUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
@@ -15,6 +15,8 @@ import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.SmsService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -58,6 +60,8 @@ public class UserService extends UserBaseService {
     private AccessPageRepository accessPageRepository;
     @Inject
     private AccessGroupService accessGroupService;
+    @Inject
+    private ExceptionService exceptionService;
 
 
     /**
@@ -250,8 +254,9 @@ public class UserService extends UserBaseService {
             smsService.sendSms(user.getContactDetail().getMobilePhone(), message);
             return true;
         } else {
-            throw new InternalError("Mobile number not found");
+            exceptionService.dataNotFoundByIdException("message.user.mobileNumber.notFound");
         }
+        return  false;
     }
 
     public Map<String, Object> verifyOtp(int otp, String email) {
@@ -299,7 +304,8 @@ public class UserService extends UserBaseService {
         currentUser = generateTokenToUser(currentUser);
         Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
-            throw new InternalError("Couldn't find any  organization");
+            exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
         }
         Map<String, Object> map = new HashMap<>();
         map.put("id", currentUser.getId());
@@ -329,7 +335,8 @@ public class UserService extends UserBaseService {
             currentUser = generateTokenToUser(currentUser);
             Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
             if (org == null) {
-                throw new InternalError("Couldn't find any organization");
+                exceptionService.dataNotFoundByIdException("message.organisation.notFound");
+
             }
             Map<String, Object> map = new HashMap<>();
             map.put("id", currentUser.getId());
@@ -350,7 +357,8 @@ public class UserService extends UserBaseService {
         User user = userGraphRepository.findByEmail(firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             logger.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
-            throw new DataNotFoundByIdException("User not found belongs to this this email " + firstTimePasswordUpdateDTO.getEmail());
+           exceptionService.dataNotFoundByIdException("message.user.email.notFound",firstTimePasswordUpdateDTO.getEmail());
+
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getPassword2());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
@@ -571,6 +579,20 @@ public class UserService extends UserBaseService {
             currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
         }
        save(currentUser);
+        return true;
+    }
+
+
+    public boolean updateDateOfBirthOfUserByCPRNumber(){
+        List<User> users = userGraphRepository.findAll();
+
+        users.stream().forEach(user -> {
+            String cprNumber = user.getCprNumber();
+            Date dateOfBirth = Optional.ofNullable(user.getCprNumber()).isPresent() ? CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : DateUtils.getCurrentDate();
+            user.setDateOfBirth( Optional.ofNullable(user.getCprNumber()).isPresent() ?
+                    CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
+        });
+        save(users);
         return true;
     }
 }

@@ -3,7 +3,9 @@ package com.kairos.activity.response.dto.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
+import com.kairos.activity.persistence.model.activity.tabs.PermissionsActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
@@ -11,6 +13,7 @@ import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,10 @@ public class ActivityTagDTO {
     private Long unitId;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
-
+    private BalanceSettingsActivityTab balanceSettingsActivityTab;
+    private PermissionsActivityTab permissionsActivityTab;
+    private LocalDate startDate;
+    private LocalDate endDate;
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
         return timeCalculationActivityTab;
     }
@@ -46,6 +52,22 @@ public class ActivityTagDTO {
 
     public ActivityTagDTO() {
         //default constructor
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public BigInteger getId() {
@@ -152,6 +174,14 @@ public class ActivityTagDTO {
         this.state = state;
     }
 
+    public PermissionsActivityTab getPermissionsActivityTab() {
+        return permissionsActivityTab;
+    }
+
+    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
+    }
+
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
         this.id = activity.getId();
         this.name = activity.getName();
@@ -160,6 +190,7 @@ public class ActivityTagDTO {
         this.unitId = activity.getUnitId();
         this.tags = tags;
         this.state=activity.getState();
+
         return this;
     }
 }

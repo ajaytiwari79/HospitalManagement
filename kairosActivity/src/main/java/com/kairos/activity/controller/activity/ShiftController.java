@@ -7,6 +7,7 @@ import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +96,7 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShift(unitId, shiftDTO, type));
     }
 
-    @ApiOperation("add a sub shifts for a staff")
+    @ApiOperation("update a sub shifts for a staff")
     @PutMapping(value = "/sub-shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addSubShifts(@RequestParam("type") String type, @PathVariable long unitId, @RequestBody List<ShiftDTO> shiftDTOS) {
@@ -111,8 +113,15 @@ public class ShiftController {
     @ApiOperation("publish Shifts")
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid  ShiftPublishDTO shiftPublishDTO) {
-        //List<BigInteger> shiftIds= requestData.get("shiftIds");
+    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftPublishDTO));
+    }
+
+
+    @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
+    @GetMapping(value = "/shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, selectedDate));
     }
 }
