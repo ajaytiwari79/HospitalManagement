@@ -7,12 +7,11 @@ import org.springframework.data.mongodb.repository.Query;
 import java.math.BigInteger;
 import java.util.List;
 
-public interface FilterGroupMongoRepository extends MongoRepository<FilterGroup,BigInteger>,CustomeFilterMongoRepository {
+public interface FilterMongoRepository extends MongoRepository<FilterGroup, BigInteger>, CustomeFilterMongoRepository {
 
 
-   @Query("{'accessModule.moduleId':?0}")
-    FilterGroup findFilterGroupByModuleId(String moduleId,Long countryId);
-
+    @Query("{'accessModule.moduleId':?0,countryId:?1}")
+    FilterGroup findFilterGroupByModuleId(String moduleId, Long countryId);
 
 
     @Query("{'accessModule.moduleId':{$in:?0},'accessModule.active':?1}")

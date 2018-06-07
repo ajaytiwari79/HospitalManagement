@@ -1,62 +1,69 @@
-package com.kairos.dto;
+package com.kairos.response.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-public class MasterProcessingActivityDto {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClauseResponseDto {
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
-    private  String name;
-
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNull
+    private BigInteger id;
+    @NotNullOrEmpty
+    private String title;
+    @NotNull
+    private List<ClauseTag> tags = new ArrayList<>();
+    @NotNullOrEmpty
     private String description;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private Boolean isSubProcess;
+    private List<AccountType> accountTypes;
 
-    private List<MasterProcessingActivityDto> subProcessingActivities;
-
-
-    public List<MasterProcessingActivityDto> getSubProcessingActivities() {
-        return subProcessingActivities;
+    public List<AccountType> getAccountTypes() {
+        return accountTypes;
     }
 
-    public Boolean getSubProcess() {
-        return isSubProcess;
+    public void setAccountTypes(List<AccountType> accountTypes) {
+        this.accountTypes = accountTypes;
     }
 
-    public void setSubProcess(Boolean subProcess) {
-        isSubProcess = subProcess;
+    public String getTitle() {
+        return title;
     }
 
-    public void setSubProcessingActivities(List<MasterProcessingActivityDto> subProcessingActivities) {
-        this.subProcessingActivities = subProcessingActivities;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getName() {
-        return name;
+    public List<ClauseTag> getTags() {
+        return tags;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTags(List<ClauseTag> tags) {
+        this.tags = tags;
     }
 
     public String getDescription() {
@@ -98,14 +105,4 @@ public class MasterProcessingActivityDto {
     public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
-
-    public MasterProcessingActivityDto()
-    {
-
-    }
 }
-
-
-
-
-

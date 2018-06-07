@@ -48,15 +48,15 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping("/add")
-    public ResponseEntity<Object> createClause(@PathVariable Long countryId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId,clauseDto));
+    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, clauseDto));
     }
 
     @ApiOperation("get clause by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getClause(@PathVariable Long countryId,@PathVariable BigInteger id) {
-        if (id!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId,id));
+    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
+        if (id != null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId, id));
 
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null  or empty");
@@ -72,30 +72,33 @@ public class ClauseController {
     @ApiOperation("delete clause by id")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteClause(@PathVariable BigInteger id) {
-        if (id!=null)
-        {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(id));
-    }
-    else
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"id cannot be null or empty");
+        if (id != null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(id));
+        } else
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null or empty");
 
     }
 
     @ApiOperation("update clause description")
     @PutMapping("/update/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
+    public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
 
-        if (clauseId!=null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(clauseId, clauseDto));
+        if (clauseId != null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId, clauseId, clauseDto));
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clauseId cannot be null or empty");
+        else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
+
+        }
+
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clauseId cannot be null or empty");
     }
 
 
     @ApiOperation("get clause by list")
     @PostMapping("/clauses")
-    public ResponseEntity<Object> getClauseList(@PathVariable Long countryId,@RequestBody Set<BigInteger> clausesids) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(countryId,clausesids));
+    public ResponseEntity<Object> getClauseList(@PathVariable Long countryId, @RequestBody Set<BigInteger> clausesids) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(countryId, clausesids));
     }
 
     @ApiOperation("get All clauses")
@@ -105,23 +108,22 @@ public class ClauseController {
     }
 
 
-
     @ApiOperation("get specific version of clause")
     @GetMapping("/{id}/version")
     public ResponseEntity<Object> getClauseVersion(@PathVariable BigInteger id, @RequestParam String version) throws RepositoryException {
-        if (id!=null) {
+        if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseVersion(id, version));
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clause Id cannot be null or empty");
     }
 
     @ApiOperation("all version")
     @GetMapping("/{id}/versions")
     public ResponseEntity<Object> getAllClauseVersion(@PathVariable BigInteger id) throws RepositoryException {
-        if (id!=null) {
+        if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauseVersion(id));
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clause Id cannot be null or empty");
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clause Id cannot be null or empty");
     }
 
 

@@ -61,11 +61,16 @@ public class PolicyAgreementTemplateController {
     }
 
     @PutMapping("/update/{id}")
-    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDto policyAgreementTemplateDto ) throws RepositoryException {
+    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable Long countryId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDto policyAgreementTemplateDto ) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(id,policyAgreementTemplateDto));
+        else if (countryId==null)
+        {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId,id,policyAgreementTemplateDto));
 
     }
 
