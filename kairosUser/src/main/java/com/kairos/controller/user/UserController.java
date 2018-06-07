@@ -108,6 +108,14 @@ public class UserController {
     }
 
 
+    // Temporary to update User's date of birth by CPR Number
+    @ApiOperation(value = "Update a User DOB")
+    @RequestMapping(value = "/dob_by_cpr", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> updateDateOfBirthOfUserByCPRNumber() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateDateOfBirthOfUserByCPRNumber());
+    }
+
+
 
 
 }

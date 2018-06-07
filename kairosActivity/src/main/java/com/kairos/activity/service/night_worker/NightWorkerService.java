@@ -131,9 +131,11 @@ public class NightWorkerService extends MongoBaseService {
     // Function will called for scheduled job
     public void createNightWorkerQuestionnaireForStaff(Long staffId, Long unitId){
 
+        // Add default questionnaire
         StaffQuestionnaire staffQuestionnaire = addDefaultStaffQuestionnaire();
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffAndUnitId(staffId, unitId);
 
+        // Add in list of questionnaires Ids if already present or set new List with added questionnaire's Id
         if(Optional.ofNullable(nightWorker.getStaffQuestionnairesId()).isPresent()){
             nightWorker.getStaffQuestionnairesId().add(staffQuestionnaire.getId());
         } else {

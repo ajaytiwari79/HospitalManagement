@@ -3,17 +3,26 @@ package com.kairos.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityResponseDto {
 
+    @NotNull
     private BigInteger id;
+
+    @NotNullOrEmpty
     private String name;
+
+    @NotNullOrEmpty
     private String description;
+
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
@@ -22,7 +31,6 @@ public class MasterProcessingActivityResponseDto {
 
     private List<MasterProcessingActivityResponseDto> subProcessingActivities;
 
-    private Long countryId;
 
     public BigInteger getId() {
         return id;
@@ -31,6 +39,8 @@ public class MasterProcessingActivityResponseDto {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    private Long countryId;
 
     public String getName() {
         return name;
