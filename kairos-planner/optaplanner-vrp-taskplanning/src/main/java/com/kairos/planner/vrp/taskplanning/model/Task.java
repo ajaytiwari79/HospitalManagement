@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @PlanningEntity
 public class Task{
-
+    private String id;
     private int intallationNo;
     private Double lattitude;
     private Double longitude;
@@ -51,7 +51,37 @@ public class Task{
         this.post = post;
         this.city = city;
     }
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Task getNextTask() {
+        return nextTask;
+    }
+
+    public void setNextTask(Task nextTask) {
+        this.nextTask = nextTask;
+    }
+
+    public Task getPrevTask() {
+        return prevTask;
+    }
+
+    public void setPrevTask(Task prevTask) {
+        this.prevTask = prevTask;
+    }
+
+    public Shift getShift() {
+        return shift;
+    }
+
+    public void setShift(Shift shift) {
+        this.shift = shift;
+    }
     public int getDuration() {
         return duration;
     }
