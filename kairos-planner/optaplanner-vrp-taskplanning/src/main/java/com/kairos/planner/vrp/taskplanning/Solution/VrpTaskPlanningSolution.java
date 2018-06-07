@@ -1,5 +1,8 @@
-package com.kairos.planner.vrp.taskplanning.model;
+package com.kairos.planner.vrp.taskplanning.Solution;
 
+import com.kairos.planner.vrp.taskplanning.model.Employee;
+import com.kairos.planner.vrp.taskplanning.model.Shift;
+import com.kairos.planner.vrp.taskplanning.model.Task;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
