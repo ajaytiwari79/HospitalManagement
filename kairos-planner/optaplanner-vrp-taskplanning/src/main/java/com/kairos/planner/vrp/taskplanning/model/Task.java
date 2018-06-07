@@ -38,7 +38,8 @@ public class Task{
     private Shift shift;
 
 
-    public Task(int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+        this.id = id;
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
         this.longitude = longitude;

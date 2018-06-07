@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -116,6 +117,7 @@ public class ObjectMapperUtils {
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         objectMapper.registerModule(javaTimeModule);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return objectMapper.writeValueAsString(object);

@@ -32,7 +32,7 @@ public class TaskService {
         Map<Integer,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getIntallationNo,summingInt(Task::getDuration)));
         Map<Integer,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getIntallationNo,mapping(Task::getSkill,toSet())));
         taskList.forEach(t->{
-            tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(t.getIntallationNo(),t.getLattitude(),t.getLongitude(),intallationandSkill.get(t.getIntallationNo()),intallationandDuration.get(t.getIntallationNo()),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity()));
+            tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(t.getId(),t.getIntallationNo(),t.getLattitude(),t.getLongitude(),intallationandSkill.get(t.getIntallationNo()),intallationandDuration.get(t.getIntallationNo()),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity()));
         });
         return tasks;
     }
