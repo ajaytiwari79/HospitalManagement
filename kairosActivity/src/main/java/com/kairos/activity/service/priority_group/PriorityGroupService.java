@@ -191,7 +191,6 @@ public class PriorityGroupService extends MongoBaseService {
         PriorityGroupRulesImplementation priorityGroupRulesImplementation = new PriorityGroupRulesImplementation();
         ImpactWeight impactWeight = new ImpactWeight(7,4);
         priorityGroupRulesImplementation.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
-       // Set<Long> staffIds = priorityGroupRulesImplementation.getStaffByPriorityGroupIncludeFilter();
         return null;
 
     }

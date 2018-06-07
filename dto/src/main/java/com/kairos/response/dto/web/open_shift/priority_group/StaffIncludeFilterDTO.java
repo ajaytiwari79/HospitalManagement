@@ -13,6 +13,10 @@ public class StaffIncludeFilterDTO {
     private List<Long> employmentTypeIds;
     private LocalDate openShiftDate;
 
+
+
+    private Long maxOpenShiftDate;
+
     public boolean isAllowForFlexPool() {
         return allowForFlexPool;
     }
@@ -59,6 +63,13 @@ public class StaffIncludeFilterDTO {
 
     public void setOpenShiftDate(LocalDate openShiftDate) {
         this.openShiftDate = openShiftDate;
+    }
+    public Long getMaxOpenShiftDate() {
+        return maxOpenShiftDate;
+    }
+
+    public void setMaxOpenShiftDate(Long maxOpenShiftDate) {
+        this.maxOpenShiftDate = maxOpenShiftDate;
     }
 
 }

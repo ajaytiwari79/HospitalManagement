@@ -62,9 +62,10 @@ public class PriorityGroupRulesDataGetterService {
         List<BigInteger> openShiftIds = openShifts.stream().map(OpenShift:: getId).collect(Collectors.toList());
         LocalDate maxDate = openShifts.stream().map(OpenShift::getStartDate).max(LocalDate::compareTo).get();
         LocalDate minDate = openShifts.stream().map(OpenShift::getStartDate).min(LocalDate::compareTo).get();
+        Long maxDateLong = DateUtils.getLongFromLocalDate(maxDate);
 
-        List<StaffUnitPositionQueryResult> staffsUnitPositions = getStaffListByStaffIncludefilter(priorityGroupDTO,maxDate);
-        List<Long> unitPositionIds = staffsUnitPositions.stream().map(StaffUnitPositionQueryResult::getUnitPositionId).collect(Collectors.toList());
+        List<StaffUnitPositionQueryResult> staffsUnitPositions = getStaffListByStaffIncludefilter(priorityGroupDTO,maxDateLong);
+        List<Long> unitPositionIds = staffsUnitPositions.stream().map(s -> s.getUnitPositionId()).collect(Collectors.toList());
 
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankMongoRepository.findAllByUnitPositionsAndBeforDate(unitPositionIds, DateUtils.getISOEndOfWeekDate(maxDate));
         Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap= dailyTimeBankEntries.stream().collect(groupingBy(DailyTimeBankEntry::getUnitPositionId));
@@ -83,90 +84,20 @@ public class PriorityGroupRulesDataGetterService {
         Map<Long, List<Shift>> shiftUnitPositionMap = shifts.stream().collect(groupingBy(Shift::getUnitPositionId));
 
         List<OpenShiftNotification> openShiftNotifications = openShiftNotificationMongoRepository.findByOpenShiftIds(openShiftIds);
-
-        /*PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = new PriorityGroupRuleDataDTO(shiftUnitPositionMap,openShiftMap,openShiftStaffMap,shifts,
-                openShiftNotifications,assignedOpenShiftMap);*/
-
-        Set<Long> unavailableActivitySet = activityMongoRepository.findAllActivitiesByUnitIdAndUnavailableTimeType(priorityGroupDTO.getUnitId());
+        Set<BigInteger> unavailableActivitySet = activityMongoRepository.findAllActivitiesByUnitIdAndUnavailableTimeType(priorityGroupDTO.getUnitId());
         return new PriorityGroupRuleDataDTO(shiftUnitPositionMap,openShiftMap,openShiftStaffMap,shifts,
                 openShiftNotifications,assignedOpenShiftMap,unavailableActivitySet);
     }
 
 
-    /*public Object getAllDataForValidation(PriorityGroupDTO priorityGroupDTO) {
 
 
-        List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(priorityGroupDTO.getUnitId(),priorityGroupDTO.getOrderId());
-        List<BigInteger> openShiftIds = openShifts.stream().map(OpenShift:: getId).collect(Collectors.toList());
-        LocalDate maxDate = openShifts.stream().map(OpenShift::getStartDate).max(LocalDate::compareTo).get();
-        LocalDate minDate = openShifts.stream().map(OpenShift::getStartDate).min(LocalDate::compareTo).get();
+    public List<StaffUnitPositionQueryResult> getStaffListByStaffIncludefilter(PriorityGroupDTO priorityGroupDTO, Long maxDateLong ) {
 
         StaffIncludeFilter staffIncludeFilter = priorityGroupDTO.getStaffIncludeFilter();
         StaffIncludeFilterDTO staffIncludeFilterDTO = new StaffIncludeFilterDTO();
         ObjectMapperUtils.copyProperties(staffIncludeFilter,staffIncludeFilterDTO);
-        staffIncludeFilterDTO.setOpenShiftDate(maxDate);
-        Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap =  new HashMap<BigInteger, List<StaffUnitPositionQueryResult>>();
-        Map<BigInteger, OpenShift> openShiftMap = new HashMap<BigInteger, OpenShift>();
-        LocalDate filterShiftStartLocalDate;
-        Date filterShiftStartDate;
-        Date filterShiftEndDate;
-
-
-
-        List<StaffUnitPositionQueryResult> staffsUnitPositions = priorityGroupIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
-        List<Long> unitPositionIds = staffsUnitPositions.stream().map(StaffUnitPositionQueryResult::getUnitPositionId).collect(Collectors.toList());
-
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankMongoRepository.findAllByUnitPositionsAndBeforDate(unitPositionIds, DateUtils.getISOEndOfWeekDate(maxDate));
-
-        Map<Long, List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap= dailyTimeBankEntries.stream().collect(groupingBy(DailyTimeBankEntry::getUnitPositionId));
-
-        for(OpenShift openShift:openShifts) {
-            openShiftStaffMap.put(openShift.getId(),new ArrayList<>(staffsUnitPositions));
-            openShiftMap.put(openShift.getId(),openShift);
-        }
-
-       List<Long> commonUnitPositionIds =  new ArrayList<Long>(openShiftStaffMap.values().stream().flatMap(
-               staffUnitPositionQueryResults->staffUnitPositionQueryResults.stream().map(staffUnitPositionQueryResult->staffUnitPositionQueryResult.getUnitPositionId())).collect(Collectors.toSet()));
-
-        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByUnitPositionId(commonUnitPositionIds, new Date() );
-        Map<Long,Integer> assignedOpenShiftMap = shiftCountDTOS.stream().collect(Collectors.toMap(ShiftCountDTO::getUnitPositionId,ShiftCountDTO::getCount));
-                Integer lastWorkingDaysWithActivity = priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity();
-                Integer lastWorkingDaysWithUnit = priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit();
-                if(Optional.ofNullable(lastWorkingDaysWithActivity).isPresent()&&Optional.ofNullable(lastWorkingDaysWithUnit).isPresent()) {
-                        filterShiftStartLocalDate = lastWorkingDaysWithActivity>lastWorkingDaysWithUnit?minDate.minusDays(lastWorkingDaysWithActivity):minDate.minusDays(lastWorkingDaysWithUnit);
-                }
-                else {
-                    if(Optional.ofNullable(lastWorkingDaysWithActivity).isPresent()) {
-                        filterShiftStartLocalDate = minDate.minusDays(lastWorkingDaysWithActivity);
-                    }
-                    else if(Optional.ofNullable(lastWorkingDaysWithUnit).isPresent()) {
-                        filterShiftStartLocalDate = minDate.minusDays(lastWorkingDaysWithUnit);
-                    }
-                    else{
-                        filterShiftStartLocalDate = minDate;
-                    }
-                }
-        filterShiftStartDate = DateUtils.asDate(filterShiftStartLocalDate);
-        filterShiftEndDate =    DateUtils.asDate(maxDate);
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPositions(commonUnitPositionIds,filterShiftStartDate,filterShiftEndDate);
-
-        Map<Long, List<Shift>> shiftUnitPositionMap = shifts.stream().collect(groupingBy(Shift::getUnitPositionId));
-
-        List<OpenShiftNotification> openShiftNotifications = openShiftNotificationMongoRepository.findByOpenShiftIds(openShiftIds);
-
-        calculateTimeBankAndPlannedHours(unitPositionDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
-
-
-
-        return null;
-    }*/
-
-    public List<StaffUnitPositionQueryResult> getStaffListByStaffIncludefilter(PriorityGroupDTO priorityGroupDTO, LocalDate maxDate ) {
-
-        StaffIncludeFilter staffIncludeFilter = priorityGroupDTO.getStaffIncludeFilter();
-        StaffIncludeFilterDTO staffIncludeFilterDTO = new StaffIncludeFilterDTO();
-        ObjectMapperUtils.copyProperties(staffIncludeFilter,staffIncludeFilterDTO);
-        staffIncludeFilterDTO.setOpenShiftDate(maxDate);
+        staffIncludeFilterDTO.setMaxOpenShiftDate(maxDateLong);
         return priorityGroupIntegrationService.getStaffIdsByPriorityGroupIncludeFilter(staffIncludeFilterDTO,priorityGroupDTO.getUnitId());
 
     }
@@ -215,21 +146,23 @@ public class PriorityGroupRulesDataGetterService {
                 Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftMap.get(entry.getKey()).getStartDate()).getTime();
                 Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftMap.get(entry.getKey()).getStartDate());
                 UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
-                        staffUnitPositionQueryResult.getContractedMinByWeek(),staffUnitPositionQueryResult.getWorkingDaysPerWeek(),
+                        Optional.ofNullable(staffUnitPositionQueryResult.getContractedMinByWeek()).isPresent()?staffUnitPositionQueryResult.getContractedMinByWeek():0,
+                        Optional.ofNullable(staffUnitPositionQueryResult.getWorkingDaysPerWeek()).isPresent()?staffUnitPositionQueryResult.getWorkingDaysPerWeek():0,
                         DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));
                 LocalDate startDatePlanned = DateUtils.getDateFromEpoch(DateUtils.getISOStartOfWeek(openShiftMap.get(entry.getKey()).getStartDate()));
                 LocalDate endDatePlanned = DateUtils.asLocalDate(DateUtils.getISOEndOfWeekDate(openShiftMap.get(entry.getKey()).getStartDate()));
                 List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId());
 
+                dailyTimeBankEntries = Optional.ofNullable(dailyTimeBankEntries).isPresent()? dailyTimeBankEntries: new ArrayList<>();
 
                 plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMin() + d.getTimeBankMinWithCta()).sum();
-                timeBank = timeBankCalculationService.calculateTimeBankForInterval(new Interval(staffUnitPositionQueryResult.getStartDate(),endDate),
-                        unitPositionWithCtaDetailsDTO,false,unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId()),false);
+                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(new Interval(staffUnitPositionQueryResult.getStartDate(),endDate),
+                        unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
 
-                deltaTimeBank =  timeBankCalculationService.calculateTimeBankForInterval(new Interval(startDateDeltaWeek,endDateDeltaWeek),
-                        unitPositionWithCtaDetailsDTO,false,unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId()), false);
+                deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(new Interval(startDateDeltaWeek,endDateDeltaWeek),
+                        unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries, false);
 
                 staffUnitPositionQueryResult.setAccumulatedTimeBank(timeBank);
                 staffUnitPositionQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);
@@ -240,17 +173,5 @@ public class PriorityGroupRulesDataGetterService {
     }
 
 
-    /*public static void main(String[] args) {
-        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
-        System.setProperty("user.timezone", "UTC");
-        LocalDate localdate = LocalDate.now();
-        Date date1 = Date.from(localdate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-        //DateUtils..with(DayOfWeek.SATURDAY);
-        Calendar c = Calendar.getInstance();
-        c.setTime(date1);
-        int i = c.get(Calendar.DAY_OF_WEEK);
-        c.add(Calendar.DATE,-i);
-        System.out.println(ZonedDateTime.ofInstant(date1.toInstant(),
-                ZoneId.systemDefault()).with(DayOfWeek.SATURDAY));
-    }*/
+
 }

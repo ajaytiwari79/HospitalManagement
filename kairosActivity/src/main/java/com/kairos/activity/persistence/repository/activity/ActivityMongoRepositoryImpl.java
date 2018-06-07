@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.kairos.activity.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -257,16 +258,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public Set<Long> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId) {
+    public Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "balanceSettingsActivityTab.timeType"),
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
-
-                project("_id")
+                match(Criteria.where("deleted").is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
+               // match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
+               //group("unitId").addToSet("id").as("ids"),
+                project("id")
 
         );
-        AggregationResults<Long> result = mongoTemplate.aggregate(aggregation, Activity.class, Long.class);
-        return new HashSet<Long>(result.getMappedResults());
+        AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class);
+        List<Map> activityIdMap = result.getMappedResults();
+        //List<BigInteger> activityIds = activityIdMap.stream().map(Map:: get("_id")).collect(Collectors.toList());
+        Set<BigInteger> activityIds = new HashSet<>();
+        for(Map activityMap:activityIdMap) {
+            activityIds.add(new BigInteger(activityMap.get("_id").toString()));
+        }
+        //List<BigInteger> activityIds1 = activityIdMap.stream().map(Map::get("_id"))
+        return activityIds;//new HashSet<Long>(result.getMappedResults());
     }
 }

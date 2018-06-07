@@ -12,14 +12,14 @@ import java.util.*;
 
 public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityGroupRuleFilter{
 
-    private Set<Long> unavailableActivitySet;
+    private Set<BigInteger> unavailableActivitySet;
     private List<Shift> shifts;
     private Map<BigInteger,OpenShift> openShiftMap;
 
     public NegativeAvailabilityAndPercentAvailabilityRule() {
 
     }
-    public NegativeAvailabilityAndPercentAvailabilityRule(Set<Long> unavailableActivitySet, List<Shift> shifts, Map<BigInteger,OpenShift> openShiftMap) {
+    public NegativeAvailabilityAndPercentAvailabilityRule(Set<BigInteger> unavailableActivitySet, List<Shift> shifts, Map<BigInteger,OpenShift> openShiftMap) {
 
         this.unavailableActivitySet = unavailableActivitySet;
         this.shifts = shifts;
@@ -32,8 +32,8 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
             Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
             Date filterEndDate = DateUtils.asDateEndOfDay(openShiftMap.get(entry.getKey()).getStartDate());
             Date filterStartDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate());
-            Date flterStartDatePerAvailability = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(), openShiftMap.get(entry.getKey()).getToTime());
-            Date filterEndDatePerAvailability = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(), openShiftMap.get(entry.getKey()).getFromTime());
+            Date flterStartDatePerAvailability = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(), openShiftMap.get(entry.getKey()).getFromTime());
+            Date filterEndDatePerAvailability = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(), openShiftMap.get(entry.getKey()).getToTime());
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(), filterEndDate.getTime());
             DateTimeInterval dateTimeIntervalPerAvailability = new DateTimeInterval(flterStartDatePerAvailability.getTime(), filterEndDatePerAvailability.getTime());
 
@@ -47,14 +47,15 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
                     unitPositionIds.add(shift.getUnitPositionId());
                 }
                 if (Optional.ofNullable(priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability()).isPresent() && dateTimeIntervalPerAvailability.
-                        overlaps(shift.getInterval()) && (((dateTimeInterval.overlap(shift.getInterval()).getMinutes()) / (dateTimeInterval.getMinutes())) * 100)
-                        < priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability() && !unitPositionIds.contains(shift.getUnitPositionId())) {
+                        overlaps(shift.getInterval()) && (((dateTimeIntervalPerAvailability.overlap(shift.getInterval()).getMinutes()) /
+                        (dateTimeIntervalPerAvailability.getMinutes())) * 100) < priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability() &&
+                        !unitPositionIds.contains(shift.getUnitPositionId())) {
                     unitPositionIds.add(shift.getUnitPositionId());
 
                 }
-                removeStaffFromList(staffUnitPositionIterator, unitPositionIds);
-
             }
+            removeStaffFromList(staffUnitPositionIterator, unitPositionIds);
+
         }
     }
     private void removeStaffFromList(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator,Set<Long> unitPositionIds) {

@@ -1,9 +1,7 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
-import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -16,7 +14,7 @@ public class OrderDefaultDataWrapper {
     private List<OrderResponseDTO> orders;
     private List<ActivityDTO> activities;
     private List<Skill> skills;
-    private List<Expertise> expertise;
+    private List<Expertise> expertises;
    // private List<TimeType> timeTypes;
     private List<StaffPersonalDetailDTO> staffList;
     private List<PresenceTypeDTO> plannedTime;
@@ -28,12 +26,12 @@ public class OrderDefaultDataWrapper {
         //Default Constructor
     }
 
-    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
+    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertises, List<StaffPersonalDetailDTO> staffList,
                                    List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
-        this.expertise = expertise;
+        this.expertises = expertises;
        // this.timeTypes = timeTypes;
         this.staffList = staffList;
         this.plannedTime = plannedTime;
@@ -66,12 +64,12 @@ public class OrderDefaultDataWrapper {
         this.skills = skills;
     }
 
-    public List<Expertise> getExpertise() {
-        return expertise;
+    public List<Expertise> getExpertises() {
+        return expertises;
     }
 
-    public void setExpertise(List<Expertise> expertise) {
-        this.expertise = expertise;
+    public void setExpertises(List<Expertise> expertises) {
+        this.expertises = expertises;
     }
 
   /*  public List<TimeType> getTimeTypes() {

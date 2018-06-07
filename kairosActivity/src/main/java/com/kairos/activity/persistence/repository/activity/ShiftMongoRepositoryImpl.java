@@ -113,7 +113,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match( Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate)),
                        group("unitPositionId").count().as("count"),
-                project("unitPositionId").and("count"),
+                project("count").and("_id").as("unitPositionId"),
                 sort(Sort.Direction.DESC, "count")
 
         );

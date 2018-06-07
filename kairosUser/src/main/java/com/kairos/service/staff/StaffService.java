@@ -1873,54 +1873,7 @@ public class StaffService extends UserBaseService {
 
     public List<StaffUnitPositionQueryResult> getStaffByStaffIncludeFilterForPriorityGroups(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
 
-/*
-        String staffFilterQuery = "Match (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(up:UnitPosition)-[:"+IN_UNIT+"]-(org:Organization) where id(org)={unitId}";
-*/
-/*
-                +"Match(up)-[:"+ HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) where id(employmentTYpe) in ";
-*//*
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        if(Optional.ofNullable(staffIncludeFilter.getEmploymentTypeIds()).isPresent()&&!staffIncludeFilter.getEmploymentTypeIds().isEmpty()||staffIncludeFilter.isAllowForFlexPool()) {
-            stringBuilder = new StringBuilder("Match(up)-[:"+ HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) where ");
-            if(Optional.ofNullable(staffIncludeFilter.getEmploymentTypeIds()).isPresent()&&!staffIncludeFilter.getEmploymentTypeIds().isEmpty()) {
-                stringBuilder.append("id(employmentType) in {employmentTypeIds} or");
-            }
-            if(staffIncludeFilter.isAllowForFlexPool()) {
-                stringBuilder.append("employmentType.allowedForFlexPool = true or");
-            }
-
-            int index = stringBuilder.lastIndexOf("or");
-            stringBuilder.replace(index,"or".length(), "");
-
-        }
-        stringBuilder.append("return id(staff) as ids");
-        staffFilterQuery += stringBuilder.toString();
-
-
-        Map<String, Object> queryParameters = new HashMap();
-        queryParameters.put("unitId", unitId);
-        queryParameters.put("employmentTypeIds",staffIncludeFilter.getEmploymentTypeIds());
-        session.query(Map.class , query, queryParameters)
-*/
-
-
-        /*if(staffIncludeFilter.isAllowForFullTimeEmployees()||staffIncludeFilter.isAllowForPartTimeEmployees()||staffIncludeFilter.isAllowForHourlyPaidEmployees()||
-                staffIncludeFilter.isAllowForFlexPool()||staffIncludeFilter.isAllowForVolunteers()) {
-
-            stringBuilder = new StringBuilder("Match(up)-[:"+ HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) where ");
-            if(staffIncludeFilter.isAllowForFullTimeEmployees()) {
-                stringBuilder.append("employmentType.name= Full Time or ");
-            }
-            else if(staffIncludeFilter.isAllowForPartTimeEmployees()) {
-                stringBuilder.append("employmentType.name = \"\"")
-            }
-        }*/
-
         List<StaffUnitPositionQueryResult> staffsUnitPositions = staffGraphRepository.getStaffByPriorityGroupStaffIncludeFilter(staffIncludeFilterDTO, unitId);
-
-
 
         return staffsUnitPositions;
     }

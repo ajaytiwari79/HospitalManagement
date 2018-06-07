@@ -46,17 +46,19 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
         while(staffUnitPositionIterator.hasNext()) {
             StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
             List<Shift> shifts = shiftUnitPositionsMap.get(staffUnitPositionQueryResult.getUnitPositionId());
-            for(Shift shift:shifts) {
-                if(dateTimeInterval.overlaps(shift.getInterval())) {
-                    if(Optional.ofNullable(shift.getActivityId()).isPresent()&&shift.getActivityId().equals(activityId)) {
-                        shiftCount++;
-                        break;
-                    }
-                    else if(!Optional.ofNullable(shift.getActivityId()).isPresent()) {
-                        shiftCount++;
-                        break;
-                    }
+            shiftCount = 0;
+            if(Optional.ofNullable(shifts).isPresent()&&!shifts.isEmpty()) {
+                for (Shift shift : shifts) {
+                    if (dateTimeInterval.overlaps(shift.getInterval())) {
+                        if (Optional.ofNullable(activityId).isPresent() && shift.getActivityId().equals(activityId)) {
+                            shiftCount++;
+                            break;
+                        } else if (!Optional.ofNullable(activityId).isPresent()) {
+                            shiftCount++;
+                            break;
+                        }
 
+                    }
                 }
             }
             if(shiftCount==0){

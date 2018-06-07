@@ -25,7 +25,7 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         int restingHoursAfterEnd = priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeAfterShiftEnd();
 
         boolean both = false, restingBeforeStart = false, restingAfterEnd = false;
-        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeBeforeShiftStart()).isPresent()||
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeBeforeShiftStart()).isPresent()&&
                 Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinRestingTimeAfterShiftEnd()).isPresent()) {
             both = true;
             restingBeforeStart= true;

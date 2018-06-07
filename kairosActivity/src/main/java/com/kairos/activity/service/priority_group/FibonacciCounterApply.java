@@ -10,29 +10,17 @@ import com.kairos.response.dto.web.open_shift.FibonacciCounter;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class FibonacciCounterApply {
 
-    private List<FibonacciCounter> fibonacciCounters;
-    private Map<Long,Integer> assignedOpenShiftMap;
-    private Map<Long,List<DailyTimeBankEntry>> unitPositionDailyTimeBankEntryMap;
-    private TimeBankCalculationService timeBankCalculationService;
-    private ImpactWeight impactWeight;
 
 
     public FibonacciCounterApply() {
 
     }
-    public FibonacciCounterApply(ImpactWeight impactWeight) {
-        this.fibonacciCounters = new ArrayList<FibonacciCounter>();
-        this.impactWeight = impactWeight;
 
-    }
 
     public List<FibonacciCounter> calculateFibonacciCounter(List<StaffUnitPositionQueryResult> staffsUnitPositions,Map<Long,Integer> assignedOpenShiftMap) {
 
@@ -41,14 +29,9 @@ public class FibonacciCounterApply {
         Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = staffsUnitPositions.iterator();
         while(staffUnitPositionIterator.hasNext()) {
             StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-            /*Long endDate = DateUtils.getLongFromLocalDate(openShift.getStartDate());
-            UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
-                    staffUnitPositionQueryResult.getContractedMinByWeek(),staffUnitPositionQueryResult.getWorkingDaysPerWeek(),
-                    DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));*/
-/*            timeBank = timeBankCalculationService.calculateTimeBankForInterval(new Interval(staffUnitPositionQueryResult.getStartDate(),endDate),
-                    unitPositionWithCtaDetailsDTO,false,unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId()),false);*/
             FibonacciCounter fibonacciCounter = new FibonacciCounter(staffUnitPositionQueryResult.getStaffId(),staffUnitPositionQueryResult.getAccumulatedTimeBank(),
-                    assignedOpenShiftMap.get(staffUnitPositionQueryResult.getUnitPositionId()));
+                    Optional.ofNullable(assignedOpenShiftMap.get(staffUnitPositionQueryResult.getUnitPositionId())).isPresent()?
+                            assignedOpenShiftMap.get(staffUnitPositionQueryResult.getUnitPositionId()):0);
             fibonacciCounters.add(fibonacciCounter);
         }
         return fibonacciCounters;
@@ -65,8 +48,7 @@ public class FibonacciCounterApply {
                 fibonacciCounter.setFibonacciTimeBank(1*impactWeight.getTimBankImpact());
             }
             else {
-                fibonacciCounter.setFibonacciTimeBank((fibonacciCounters.get(i-2).getFibonacciTimeBank()+fibonacciCounters.get(i-1).getFibonacciTimeBank())
-                        *impactWeight.getTimBankImpact());
+                fibonacciCounter.setFibonacciTimeBank((fibonacciCounters.get(i-2).getFibonacciTimeBank()+fibonacciCounters.get(i-1).getFibonacciTimeBank()));
             }
             i++;
         }
@@ -79,7 +61,7 @@ public class FibonacciCounterApply {
             }
             else {
                 fibonacciCounter.setFibonacciAssignedOpenShifts((fibonacciCounters.get(i-2).getFibonacciAssignedOpenShifts()+
-                        fibonacciCounters.get(i-1).getFibonacciAssignedOpenShifts())*impactWeight.getAssignedOpenShiftImpact());
+                        fibonacciCounters.get(i-1).getFibonacciAssignedOpenShifts()));
             }
             fibonacciCounter.setCountersSum(fibonacciCounter.getFibonacciAssignedOpenShifts()+
                     fibonacciCounter.getFibonacciTimeBank());

@@ -12,6 +12,10 @@ public class StaffUnitPositionQueryResult {
     private Long startDate;
     private Long endDate;
 
+    public StaffUnitPositionQueryResult() {
+        // dc
+    }
+
     public Integer getWorkingDaysPerWeek() {
         return workingDaysPerWeek;
     }

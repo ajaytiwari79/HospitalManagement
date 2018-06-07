@@ -18,13 +18,13 @@ public class PriorityGroupRuleDataDTO {
     private List<Shift> shifts;
     private List<OpenShiftNotification> openShiftNotifications;
     private Map<Long,Integer> assignedOpenShiftMap;
-    private Set<Long> unavailableActivitySet;
+    private Set<BigInteger> unavailableActivitySet;
 
-    public Set<Long> getUnavailableActivitySet() {
+    public Set<BigInteger> getUnavailableActivitySet() {
         return unavailableActivitySet;
     }
 
-    public void setUnavailableActivitySet(Set<Long> unavailableActivitySet) {
+    public void setUnavailableActivitySet(Set<BigInteger> unavailableActivitySet) {
         this.unavailableActivitySet = unavailableActivitySet;
     }
 
@@ -33,7 +33,7 @@ public class PriorityGroupRuleDataDTO {
     }
     public PriorityGroupRuleDataDTO(Map<Long,List<Shift>> shiftUnitPositionsMap, Map<BigInteger, OpenShift> openShiftMap, Map<BigInteger,
             List<StaffUnitPositionQueryResult>> openShiftStaffMap,List<Shift> shifts, List<OpenShiftNotification> openShiftNotifications,
-                                    Map<Long,Integer> assignedOpenShiftMap,Set<Long> unavailableActivitySet) {
+                                    Map<Long,Integer> assignedOpenShiftMap,Set<BigInteger> unavailableActivitySet) {
         this.shiftUnitPositionsMap = shiftUnitPositionsMap;
         this.openShiftMap = openShiftMap;
         this.openShiftStaffMap = openShiftStaffMap;

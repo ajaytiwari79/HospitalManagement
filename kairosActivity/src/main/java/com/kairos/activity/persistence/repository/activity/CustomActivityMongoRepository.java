@@ -46,5 +46,5 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId);
 
-    Set<Long> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId);
+    Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId);
 }

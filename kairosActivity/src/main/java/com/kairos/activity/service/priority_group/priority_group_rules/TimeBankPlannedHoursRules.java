@@ -20,17 +20,13 @@ public class TimeBankPlannedHoursRules implements PriorityGroupRuleFilter{
             while(staffUnitPositionIterator.hasNext()) {
 
                 StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-                if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()).isPresent()&&
-                        staffUnitPositionQueryResult.getAccumulatedTimeBank()<priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()) {
-                    staffUnitPositionIterator.remove();
-                }
-                if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime()).isPresent()&&
-                        staffUnitPositionQueryResult.getPlannedHoursWeek()>priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()) {
-                    staffUnitPositionIterator.remove();
-                }
-                if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek()).isPresent()&&
-                        staffUnitPositionQueryResult.getDeltaWeeklytimeBank()>priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()) {
-                    staffUnitPositionIterator.remove();
+                if((Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank()).isPresent()&&
+                        staffUnitPositionQueryResult.getAccumulatedTimeBank()<priorityGroupDTO.getStaffExcludeFilter().getMinTimeBank())||
+                        (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime()).isPresent()&&
+                        staffUnitPositionQueryResult.getPlannedHoursWeek()>priorityGroupDTO.getStaffExcludeFilter().getMaxPlannedTime())||
+                (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek()).isPresent()&&
+                        staffUnitPositionQueryResult.getDeltaWeeklytimeBank()>priorityGroupDTO.getStaffExcludeFilter().getMaxDeltaWeeklyTimeBankPerWeek())) {
+                  //  staffUnitPositionIterator.remove();
                 }
 
 
