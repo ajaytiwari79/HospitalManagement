@@ -1,10 +1,9 @@
-package com.kairos.activity.persistence.model.priority_group;
+package com.kairos.response.dto.web.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffExcludeFilter {
-    private boolean blockedForOpenShift;
     private Integer numberOfShiftAssigned;
     private Integer numberOfPendingRequest;
     private Integer unitExperienceInWeek;
@@ -29,7 +28,6 @@ public class StaffExcludeFilter {
     public StaffExcludeFilter(boolean blockedForOpenShift, Integer numberOfShiftAssigned, Integer numberOfPendingRequest, Integer unitExperienceInWeek, Integer minTimeBank, Integer minRestingTimeBeforeShiftStart,
                               Integer minRestingTimeAfterShiftEnd, Integer maxPlannedTime, Integer maxDeltaWeeklyTimeBankPerWeek, boolean personalEntriesFoundFromPrivateCalender, Integer lastWorkingDaysInUnit,
                               Integer lastWorkingDaysWithActivity, Integer minRemainingTimeLeftInActivityPlanningPeriod, boolean negativeAvailabilityInCalender, boolean veto, boolean stopBricks) {
-        this.blockedForOpenShift = blockedForOpenShift;
         this.numberOfShiftAssigned = numberOfShiftAssigned;
         this.numberOfPendingRequest = numberOfPendingRequest;
         this.unitExperienceInWeek = unitExperienceInWeek;
@@ -47,15 +45,7 @@ public class StaffExcludeFilter {
         this.stopBricks = stopBricks;
         }
 
-    public boolean isBlockedForOpenShift() {
-        return blockedForOpenShift;
-    }
-
-    public void setBlockedForOpenShift(boolean blockedForOpenShift) {
-        this.blockedForOpenShift = blockedForOpenShift;
-    }
-
-    public Integer getNumberOfShiftAssigned() {
+        public Integer getNumberOfShiftAssigned() {
         return numberOfShiftAssigned;
     }
 

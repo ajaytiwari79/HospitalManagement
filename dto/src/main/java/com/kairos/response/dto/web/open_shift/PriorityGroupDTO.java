@@ -1,15 +1,16 @@
-package com.kairos.activity.persistence.model.priority_group;
+package com.kairos.response.dto.web.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.PriorityGroupName;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroupDTO {
     private BigInteger id;
     private boolean deActivated;
-    private OpenShiftCancelProcess openShiftCancelProcess;
     private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
@@ -17,18 +18,22 @@ public class PriorityGroupDTO {
     private Long unitId;
     private PriorityGroupName name;
     private BigInteger orderId;
-    private ScheduledProcess scheduledProcess;
+    private BigInteger parentId;
+    private DecisionCriteria decisionCriteria;
+    private List<Long> employmentTypeIds;
+    private List<Long> expertiseIds;
+    private BigInteger ruleTemplateId;
+
 
     public PriorityGroupDTO() {
         //Default Constructor
     }
 
     public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean deActivated,
-                            OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
+                             RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
                             StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
         this.id = id;
         this.deActivated = deActivated;
-        this.openShiftCancelProcess = openShiftCancelProcess;
         this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
@@ -52,13 +57,7 @@ public class PriorityGroupDTO {
         this.deActivated = deActivated;
     }
 
-    public OpenShiftCancelProcess getOpenShiftCancelProcess() {
-        return openShiftCancelProcess;
-    }
 
-    public void setOpenShiftCancelProcess(OpenShiftCancelProcess openShiftCancelProcess) {
-        this.openShiftCancelProcess = openShiftCancelProcess;
-    }
 
     public RoundRules getRoundRules() {
         return roundRules;
@@ -116,11 +115,43 @@ public class PriorityGroupDTO {
         this.name = name;
     }
 
-    public ScheduledProcess getScheduledProcess() {
-        return scheduledProcess;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
-        this.scheduledProcess = scheduledProcess;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
+    }
+
+    public DecisionCriteria getDecisionCriteria() {
+        return decisionCriteria=Optional.ofNullable(decisionCriteria).orElse(new DecisionCriteria());
+    }
+
+    public void setDecisionCriteria(DecisionCriteria decisionCriteria) {
+        this.decisionCriteria = decisionCriteria;
+    }
+
+    public List<Long> getEmploymentTypeIds() {
+        return employmentTypeIds=Optional.ofNullable(employmentTypeIds).orElse(new ArrayList<>());
+    }
+
+    public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
+        this.employmentTypeIds = employmentTypeIds;
+    }
+
+    public List<Long> getExpertiseIds() {
+        return expertiseIds=Optional.ofNullable(expertiseIds).orElse(new ArrayList<>());
+    }
+
+    public void setExpertiseIds(List<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
+    }
+
+    public BigInteger getRuleTemplateId() {
+        return ruleTemplateId;
+    }
+
+    public void setRuleTemplateId(BigInteger ruleTemplateId) {
+        this.ruleTemplateId = ruleTemplateId;
     }
 }

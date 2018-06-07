@@ -10,15 +10,13 @@ import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithUnitIdDTO;
 
-import com.kairos.activity.response.dto.activity.ActivityTabsWrapper;
-import com.kairos.activity.response.dto.activity.ActivityTagDTO;
-import com.kairos.activity.response.dto.activity.ActivityWithSelectedDTO;
-import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
+import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.PlannedTimeTypeService;
@@ -28,6 +26,9 @@ import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
+
+import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,10 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private PhaseService phaseService;
     @Inject
+    private OpenShiftIntervalRepository openShiftIntervalRepository;
+    @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
+
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -242,6 +246,13 @@ public class OrganizationActivityService extends MongoBaseService {
         orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
         return orderAndActivityDTO;
+    }
+    public ActivityWithTimeTypeDTO getActivitiesWithTimeTypesByUnit(Long unitId,Long countryId){
+        List<ActivityDTO> activityDTOS =activityMongoRepository.findAllActivitiesWithTimeTypesByUnit(unitId);
+        List<TimeTypeDTO> timeTypeDTOS=timeTypeService.getAllTimeType(null,countryId);
+        List<OpenShiftIntervalDTO> intervals=openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals);
+        return activityWithTimeTypeDTO;
     }
 
 }

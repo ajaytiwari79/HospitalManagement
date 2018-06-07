@@ -28,7 +28,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     private String toDayOfWeek;
     private long intervalLength;
     private String intervalUnit;
-    private boolean isRestingTimeAllowed;
+    private boolean restingTimeAllowed;
     private int restingTime;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
@@ -37,13 +37,12 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
 
 
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
-    public void setIsRestingTimeAllowed(boolean isRestingTimeAllowed) {
-        this.isRestingTimeAllowed = isRestingTimeAllowed;
+    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
+        this.restingTimeAllowed = restingTimeAllowed;
     }
-
     public int getRestingTime() {
         return restingTime;
     }

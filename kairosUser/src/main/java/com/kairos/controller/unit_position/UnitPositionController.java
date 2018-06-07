@@ -95,6 +95,7 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA( unitPositionId,unitId));
     }
 
+
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
     public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId, @RequestBody Map<String, Object> payload) throws ParseException {
@@ -106,4 +107,11 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date appliedDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitPositionId, appliedDate));
     }
+
+    @ApiOperation(value = "get unit_position's Id By Staff and expertise")
+    @GetMapping(value = "/staff/{staffId}/expertise/{expertiseId}/unitPositionId")
+    public ResponseEntity<Map<String, Object>> getUnitPositionIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId, @PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionIdByStaffAndExpertise(unitId,staffId,expertiseId));
+    }
+
 }

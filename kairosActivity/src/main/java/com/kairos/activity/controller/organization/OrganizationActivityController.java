@@ -331,5 +331,12 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getActivitiesWithBalanceSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithBalanceSettings(unitId));
     }
+    @ApiOperation("Get all activity based on country")
+    @GetMapping(value = "/activities_with_time_types")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long unitId,@RequestParam Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithTimeTypesByUnit(unitId,countryId));
+
+    }
 
 }
