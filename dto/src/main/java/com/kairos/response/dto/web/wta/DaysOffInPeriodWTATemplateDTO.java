@@ -3,11 +3,10 @@ package com.kairos.response.dto.web.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.enums.MinMaxSetting;
-import com.kairos.activity.persistence.enums.PartOfDay;
-import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.activity.enums.PartOfDay;
+import com.kairos.activity.enums.WTATemplateType;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

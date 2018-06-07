@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.wta;
 
-import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.activity.enums.WTATemplateType;
 
 public class EmployeesWithIncreasedRiskWTATemplateDTO extends WTABaseRuleTemplateDTO{
 

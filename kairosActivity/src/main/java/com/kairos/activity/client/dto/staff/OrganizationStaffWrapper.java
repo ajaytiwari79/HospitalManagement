@@ -1,5 +1,6 @@
 package com.kairos.activity.client.dto.staff;
 
+
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 
 /**
