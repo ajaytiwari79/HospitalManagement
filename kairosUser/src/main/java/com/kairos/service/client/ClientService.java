@@ -46,6 +46,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
@@ -216,6 +217,7 @@ public class ClientService extends UserBaseService {
                 client.setFirstName(clientMinimumDTO.getFirstName());
                 client.setLastName(clientMinimumDTO.getLastName());
                 client.setCprNumber(clientMinimumDTO.getCprnumber());
+                client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(client.getCprNumber()));
 
                 if (client.getEmail() == null) {
                     logger.debug("Creating email with CPR");
@@ -703,6 +705,7 @@ public class ClientService extends UserBaseService {
             houseHoldPeople.setFirstName(clientMinimumDTO.getFirstName());
             houseHoldPeople.setLastName(clientMinimumDTO.getLastName());
             houseHoldPeople.setCprNumber(clientMinimumDTO.getCprnumber().trim());
+            houseHoldPeople.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(houseHoldPeople.getCprNumber()));
             generateAgeAndGenderFromCPR(houseHoldPeople);
             final String email = houseHoldPeople.getCprNumber() + KAIROS;
             houseHoldPeople.setEmail(email);
