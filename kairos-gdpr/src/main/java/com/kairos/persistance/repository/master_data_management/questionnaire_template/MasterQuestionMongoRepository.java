@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface MasterQuestionMongoRepository extends MongoRepository<MasterQuestion, BigInteger> {
@@ -17,6 +19,13 @@ public interface MasterQuestionMongoRepository extends MongoRepository<MasterQue
     MasterQuestion findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     MasterQuestion findByid(BigInteger id);
+
+    @Query("{countryId:?0,deleted:false}")
+    List<MasterQuestion> getAllMasterQuestion(Long countryId);
+
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<MasterQuestion> getMasterQuestionListByIds(Long countryId, Set<BigInteger> ids);
+
 
 
 }

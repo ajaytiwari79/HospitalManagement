@@ -1,4 +1,4 @@
-package com.kairos.response.dto.account_type;
+package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

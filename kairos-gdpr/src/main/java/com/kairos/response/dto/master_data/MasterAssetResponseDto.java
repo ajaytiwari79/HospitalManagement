@@ -1,36 +1,24 @@
-package com.kairos.response.dto.agreement_template;
-
+package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.response.dto.account_type.AccountTypeBasicResponseDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PolicyAgreementTemplateResponseDto {
+public class MasterAssetResponseDto {
 
+    @NotNull
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
-    private String name;
+    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    private  String name;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private String description;
-
-    private List<AccountTypeBasicResponseDto> accountTypes;
-
-    private List<AgreementSectionResponseDto> agreementSections;
-
-    private Long countryId;
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     public BigInteger getId() {
         return id;
@@ -39,6 +27,16 @@ public class PolicyAgreementTemplateResponseDto {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
+
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+
+    private List <OrganizationTypeAndServiceBasicDto> organizationServices;
+
+    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
+
+    private Long countryId;
 
     public String getName() {
         return name;
@@ -54,30 +52,6 @@ public class PolicyAgreementTemplateResponseDto {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<AccountTypeBasicResponseDto> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(List<AccountTypeBasicResponseDto> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
-
-    public List<AgreementSectionResponseDto> getAgreementSections() {
-        return agreementSections;
-    }
-
-    public void setAgreementSections(List<AgreementSectionResponseDto> agreementSections) {
-        this.agreementSections = agreementSections;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
@@ -112,10 +86,11 @@ public class PolicyAgreementTemplateResponseDto {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplateResponseDto()
-    {
-
+    public Long getCountryId() {
+        return countryId;
     }
 
-
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 }

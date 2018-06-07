@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.agreement_template;
 
-import com.kairos.response.dto.agreement_template.PolicyAgreementTemplateResponseDto;
+import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDto;
 
 import java.math.BigInteger;
 import java.util.List;

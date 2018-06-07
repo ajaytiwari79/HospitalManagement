@@ -6,7 +6,7 @@ import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
 import com.kairos.dto.master_data.MasterProcessingActivityDto;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
-import com.kairos.response.dto.MasterProcessingActivityResponseDto;
+import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDto;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;

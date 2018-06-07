@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "questionnaire_section")
 public class MasterQuestionnaireSection extends MongoBaseEntity {
@@ -18,7 +19,7 @@ public class MasterQuestionnaireSection extends MongoBaseEntity {
 
     @NotNull(message = "list.cannot.be.null")
     @NotEmpty(message = "list.cannot.be.empty")
-    private List<BigInteger> questions;
+    private Set<BigInteger> questions;
 
     private Long countryId;
 
@@ -38,17 +39,16 @@ public class MasterQuestionnaireSection extends MongoBaseEntity {
         this.title = title;
     }
 
-    public List<BigInteger> getQuestions() {
+    public Set<BigInteger> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<BigInteger> questions) {
+    public void setQuestions(Set<BigInteger> questions) {
         this.questions = questions;
     }
 
-    public MasterQuestionnaireSection(String title, List<BigInteger> questions, Long countryId) {
+    public MasterQuestionnaireSection(String title, Long countryId) {
         this.title = title;
-        this.questions = questions;
         this.countryId = countryId;
     }
 

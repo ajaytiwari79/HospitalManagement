@@ -1,4 +1,4 @@
-package com.kairos.dto.master_data;
+package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -6,30 +6,27 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterQuestionnaireSectionDto {
+public class MasterQuestionnaireSectionResponseDto {
 
-    @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
-    @Pattern(message = "special character or numberic data not excepted",regexp = "^[a-zA-Z\\s]+$")
+    private BigInteger id;
+
+    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
     private String title;
 
-    @NotNull(message = "list.cannot.be.null")
-    @NotEmpty(message = "list.cannot.be.empty")
     private Set<BigInteger> questions;
 
     private Long countryId;
 
-    public Long getCountryId() {
-        return countryId;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -46,5 +43,13 @@ public class MasterQuestionnaireSectionDto {
 
     public void setQuestions(Set<BigInteger> questions) {
         this.questions = questions;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }

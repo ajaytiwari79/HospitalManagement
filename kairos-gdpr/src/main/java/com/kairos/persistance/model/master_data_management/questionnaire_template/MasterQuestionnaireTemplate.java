@@ -24,7 +24,7 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
     @NotNull
     private Long countryId;
 
-    private QuestionnaireType questionnaireType;
+    private String questionnaireType;
 
     public String getName() {
         return name;
@@ -34,11 +34,11 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.name = name;
     }
 
-    public QuestionnaireType getQuestionnaireType() {
+    public String getQuestionnaireType() {
         return questionnaireType;
     }
 
-    public void setQuestionnaireType(QuestionnaireType questionnaireType) {
+    public void setQuestionnaireType(String questionnaireType) {
         this.questionnaireType = questionnaireType;
     }
 
@@ -58,7 +58,7 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public MasterQuestionnaireTemplate(String name, List<BigInteger> sections, Long countryId, QuestionnaireType questionnaireType) {
+    public MasterQuestionnaireTemplate(String name, List<BigInteger> sections, Long countryId, String questionnaireType) {
         this.name = name;
         this.sections = sections;
         this.countryId = countryId;

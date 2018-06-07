@@ -17,7 +17,7 @@ import javax.validation.constraints.Pattern;
 public class AccountType extends MongoBaseEntity {
 
     @NotNullOrEmpty
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "special character and numberic data is not allowed")
     private String name;
 
     private Long countryId;

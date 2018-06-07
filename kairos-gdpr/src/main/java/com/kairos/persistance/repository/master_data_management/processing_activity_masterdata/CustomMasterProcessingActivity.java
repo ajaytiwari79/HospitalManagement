@@ -4,7 +4,7 @@ import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDto;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
-import com.kairos.response.dto.MasterProcessingActivityResponseDto;
+import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDto;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 

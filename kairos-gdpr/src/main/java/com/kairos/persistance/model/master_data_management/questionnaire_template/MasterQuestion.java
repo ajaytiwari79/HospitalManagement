@@ -15,12 +15,11 @@ public class MasterQuestion extends MongoBaseEntity {
     @NotNullOrEmpty(message = "description.cannot.be.empty.or.null")
     private String description;
 
-    private Boolean isRequired;
-
+    private Boolean isRequired=false;
     @NotNull
     private String questionType;
 
-    private Boolean isNotSureAllowed;
+    private Boolean isNotSureAllowed=false;
 
     private Long countryId;
 
@@ -70,5 +69,15 @@ public class MasterQuestion extends MongoBaseEntity {
 
     public void setQuestionType(String questionType) {
         this.questionType = questionType;
+    }
+
+    public MasterQuestion(String name, String description, @NotNull String questionType, Long countryId) {
+        this.name = name;
+        this.description = description;
+        this.questionType = questionType;
+        this.countryId = countryId;
+    }
+
+    public MasterQuestion() {
     }
 }

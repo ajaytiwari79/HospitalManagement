@@ -3,12 +3,11 @@ package com.kairos.service.agreement_template;
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDto;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;

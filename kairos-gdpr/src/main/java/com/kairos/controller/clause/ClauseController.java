@@ -57,7 +57,6 @@ public class ClauseController {
     public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId, id));
-
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null  or empty");
 
@@ -83,15 +82,13 @@ public class ClauseController {
     @PutMapping("/update/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
 
-        if (clauseId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId, clauseId, clauseDto));
-        }
-        else if (countryId == null) {
+        if (clauseId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clauseId cannot be null or empty");
+        } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
-
         }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId, clauseId, clauseDto));
 
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clauseId cannot be null or empty");
     }
 
 

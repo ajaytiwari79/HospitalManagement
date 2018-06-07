@@ -17,7 +17,7 @@ public class ClauseDto {
 
 
     @NotEmpty(message = "error.clause.title.cannot.be.empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
+    @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
