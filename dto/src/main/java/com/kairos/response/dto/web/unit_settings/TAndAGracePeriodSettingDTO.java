@@ -3,20 +3,30 @@ package com.kairos.response.dto.web.unit_settings;
 public class TAndAGracePeriodSettingDTO {
 
 
-    private int gracePeriodDays;
+    private int staffGracePeriodDays;
+    private int managementGracePeriodDays;
 
     public TAndAGracePeriodSettingDTO() {
     }
 
-    public int getGracePeriodDays() {
-        return gracePeriodDays;
+    public TAndAGracePeriodSettingDTO(int staffGracePeriodDays, int managementGracePeriodDays) {
+        this.staffGracePeriodDays = staffGracePeriodDays;
+        this.managementGracePeriodDays = managementGracePeriodDays;
     }
 
-    public void setGracePeriodDays(int gracePeriodDays) {
-        this.gracePeriodDays = gracePeriodDays;
+    public int getStaffGracePeriodDays() {
+        return staffGracePeriodDays;
     }
 
-    public TAndAGracePeriodSettingDTO(int gracePeriodDays) {
-        this.gracePeriodDays = gracePeriodDays;
+    public void setStaffGracePeriodDays(int staffGracePeriodDays) {
+        this.staffGracePeriodDays = staffGracePeriodDays;
+    }
+
+    public int getManagementGracePeriodDays() {
+        return managementGracePeriodDays;
+    }
+
+    public void setManagementGracePeriodDays(int managementGracePeriodDays) {
+        this.managementGracePeriodDays = managementGracePeriodDays;
     }
 }

@@ -376,7 +376,7 @@ public class OrganizationService extends UserBaseService {
         priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
 
         //create T&A gracePeriod default setting
-        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(AppConstants.GRACE_PERIOD_DAYS);
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS,AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         priorityGroupIntegrationService.createDefaultGracePeriodSetting(tAndAGracePeriodSettingDTO,organization.getId());
 
         /*// TODO Verify code to set Unit Manager of new organization

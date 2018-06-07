@@ -204,5 +204,6 @@ public class AppConstants {
     public static final String TAB_ID_PRFIX = "tab_";
 
     //default T&A grace period data
-    public static final int GRACE_PERIOD_DAYS=2;
+    public static final int STAFF_GRACE_PERIOD_DAYS=2;
+    public static final int MANAGEMENT_GRACE_PERIOD_DAYS=2;
 }

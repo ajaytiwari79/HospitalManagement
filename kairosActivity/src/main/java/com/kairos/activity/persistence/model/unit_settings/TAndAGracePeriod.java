@@ -5,9 +5,16 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 public class TAndAGracePeriod extends MongoBaseEntity {
 
     private Long unitId;
-    private int gracePeriodDays;
+    private int staffGracePeriodDays;
+    private int managementGracePeriodDays;
 
     public TAndAGracePeriod() {
+    }
+
+    public TAndAGracePeriod(Long unitId, int staffGracePeriodDays, int managementGracePeriodDays) {
+        this.unitId = unitId;
+        this.staffGracePeriodDays = staffGracePeriodDays;
+        this.managementGracePeriodDays = managementGracePeriodDays;
     }
 
     public Long getUnitId() {
@@ -18,16 +25,19 @@ public class TAndAGracePeriod extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public int getGracePeriodDays() {
-        return gracePeriodDays;
+    public int getStaffGracePeriodDays() {
+        return staffGracePeriodDays;
     }
 
-    public void setGracePeriodDays(int gracePeriodDays) {
-        this.gracePeriodDays = gracePeriodDays;
+    public void setStaffGracePeriodDays(int staffGracePeriodDays) {
+        this.staffGracePeriodDays = staffGracePeriodDays;
     }
 
-    public TAndAGracePeriod(Long unitId, int gracePeriodDays) {
-        this.unitId = unitId;
-        this.gracePeriodDays = gracePeriodDays;
+    public int getManagementGracePeriodDays() {
+        return managementGracePeriodDays;
+    }
+
+    public void setManagementGracePeriodDays(int managementGracePeriodDays) {
+        this.managementGracePeriodDays = managementGracePeriodDays;
     }
 }

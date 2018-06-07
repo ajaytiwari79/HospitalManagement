@@ -26,7 +26,7 @@ public class TAndAGracePeriodService extends MongoBaseService {
         if(!Optional.ofNullable(tAndAGracePeriod).isPresent()){
             exceptionService.dataNotFoundByIdException("message.unit.graceperiod.notFound",unitId);
         }
-        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(tAndAGracePeriod.getGracePeriodDays());
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(tAndAGracePeriod.getStaffGracePeriodDays(),tAndAGracePeriod.getManagementGracePeriodDays());
        return tAndAGracePeriodSettingDTO;
    }
 
@@ -36,8 +36,9 @@ public class TAndAGracePeriodService extends MongoBaseService {
             tAndAGracePeriod=new TAndAGracePeriod();
             tAndAGracePeriod.setUnitId(unitId);
         }
-        tAndAGracePeriod.setGracePeriodDays(tAndAGracePeriodSettingDTO.getGracePeriodDays());
-       save(tAndAGracePeriod);
+        tAndAGracePeriod.setStaffGracePeriodDays(tAndAGracePeriodSettingDTO.getStaffGracePeriodDays());
+        tAndAGracePeriod.setManagementGracePeriodDays(tAndAGracePeriodSettingDTO.getManagementGracePeriodDays());
+        save(tAndAGracePeriod);
        return tAndAGracePeriodSettingDTO;
    }
 

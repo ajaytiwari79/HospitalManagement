@@ -1,10 +1,10 @@
 db.activities.update({},{$set: { "generalActivityTab.startDate" : new ISODate("2018-01-21T03:34:54Z") } }, true, true);
 
-get ids of unit
-match (n:Organization) WHERE n.deleted=false RETURN id(n) LIMIT 5
+get ids of Organization
+match (n:Organization) WHERE n.deleted=false and n.isEnable=true RETURN id(n)
 
 var j=[10,20,30] //ids of unit form neo4j
 for(var i=1;i<=j.length;i++)
 {
-db.tAndAGracePeriod.insertOne({_id:NumberInt(i),unitId:NumberInt(j[i-1]),gracePeriodDays:NumberInt(2),createdAt:ISODate("2018-01-02 01:11:18.965Z"),updatedAt:ISODate("2018-10-02 01:11:18.965Z"),deleted:false,_class:"com.kairos.activity.persistence.model.unit_settings.TAndAGracePeriod"})
+db.tAndAGracePeriod.insertOne({_id:NumberInt(i),unitId:NumberInt(j[i-1]),staffGracePeriodDays:NumberInt(2),managementGracePeriodDays:NumberInt(2),createdAt:ISODate("2018-01-02 01:11:18.965Z"),updatedAt:ISODate("2018-10-02 01:11:18.965Z"),deleted:false,_class:"com.kairos.activity.persistence.model.unit_settings.TAndAGracePeriod"})
 }
