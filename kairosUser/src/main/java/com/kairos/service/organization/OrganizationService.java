@@ -387,7 +387,7 @@ public class OrganizationService extends UserBaseService {
         //OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOorganization.getCountry().getId());
 
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOrganizationTypes().get(0).getId(),organization.getOrganizationSubTypes().get(0).getId(),organization.getCountry().getId());
-//        priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
+        priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
 
 
         // TODO Verify code to set Unit Manager of new organization
@@ -917,7 +917,7 @@ public class OrganizationService extends UserBaseService {
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
         workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getSubTypeId(), unit.getId(), country.getId());
-//        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
+        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
