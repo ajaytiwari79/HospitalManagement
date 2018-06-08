@@ -52,9 +52,7 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -775,6 +773,13 @@ public class ShiftService extends MongoBaseService {
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
         shifts.forEach(shift -> {
+
+            LocalTime startTime = LocalDateTime.ofInstant(shift.getStartDate().toInstant(), ZoneId.systemDefault()).toLocalTime();
+            LocalTime endTime = LocalDateTime.ofInstant(shift.getEndDate().toInstant(), ZoneId.systemDefault()).toLocalTime();
+
+            logger.info("Shift  start from {} ",startTime," shift end from {} ",endTime);
+
+
             Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(shift.getActivityId())).findAny().get();
 
             List<String> responseMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
