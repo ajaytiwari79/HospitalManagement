@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 //@PlanningEntity
-public class Shift {
+public class Shift extends TaskOrShift{
     private String id;
     private Employee employee;
     private LocalDate localDate;

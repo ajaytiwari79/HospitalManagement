@@ -1,20 +1,9 @@
 {
   "id" : null,
   "shifts" : [ {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
-      "name" : "Tech1",
-      "skills" : [ "Varme", "El", "Vand" ],
-      "efficiency" : 100
-    },
-    "localDate" : "2018-06-07",
-    "start" : null,
-    "end" : null
-  }, {
-    "id" : "5b18f9c7016fe33f761ebe16",
-    "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
+      "id" : "5b1a368e1061973c542f0274",
       "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -23,9 +12,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
+      "id" : "5b1a368e1061973c542f0274",
       "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -34,9 +23,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
+      "id" : "5b1a368e1061973c542f0274",
       "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -45,9 +34,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
+      "id" : "5b1a368e1061973c542f0274",
       "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -56,9 +45,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
+      "id" : "5b1a368e1061973c542f0274",
       "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -67,9 +56,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe16",
+      "id" : "5b1a368e1061973c542f0274",
       "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -78,20 +67,20 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0274",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
-      "name" : "Tech2",
+      "id" : "5b1a368e1061973c542f0274",
+      "name" : "Tech1",
       "skills" : [ "Varme", "El", "Vand" ],
-      "efficiency" : 120
+      "efficiency" : 100
     },
-    "localDate" : "2018-06-07",
+    "localDate" : "2018-06-14",
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
+      "id" : "5b1a368e1061973c542f0275",
       "name" : "Tech2",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 120
@@ -100,9 +89,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
+      "id" : "5b1a368e1061973c542f0275",
       "name" : "Tech2",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 120
@@ -111,9 +100,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
+      "id" : "5b1a368e1061973c542f0275",
       "name" : "Tech2",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 120
@@ -122,9 +111,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
+      "id" : "5b1a368e1061973c542f0275",
       "name" : "Tech2",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 120
@@ -133,9 +122,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
+      "id" : "5b1a368e1061973c542f0275",
       "name" : "Tech2",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 120
@@ -144,9 +133,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe17",
+      "id" : "5b1a368e1061973c542f0275",
       "name" : "Tech2",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 120
@@ -155,20 +144,20 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0275",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
-      "name" : "Tech3",
-      "skills" : [ "El", "Vand" ],
-      "efficiency" : 150
+      "id" : "5b1a368e1061973c542f0275",
+      "name" : "Tech2",
+      "skills" : [ "Varme", "El", "Vand" ],
+      "efficiency" : 120
     },
-    "localDate" : "2018-06-07",
+    "localDate" : "2018-06-14",
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
+      "id" : "5b1a368e1061973c542f0276",
       "name" : "Tech3",
       "skills" : [ "El", "Vand" ],
       "efficiency" : 150
@@ -177,9 +166,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
+      "id" : "5b1a368e1061973c542f0276",
       "name" : "Tech3",
       "skills" : [ "El", "Vand" ],
       "efficiency" : 150
@@ -188,9 +177,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
+      "id" : "5b1a368e1061973c542f0276",
       "name" : "Tech3",
       "skills" : [ "El", "Vand" ],
       "efficiency" : 150
@@ -199,9 +188,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
+      "id" : "5b1a368e1061973c542f0276",
       "name" : "Tech3",
       "skills" : [ "El", "Vand" ],
       "efficiency" : 150
@@ -210,9 +199,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
+      "id" : "5b1a368e1061973c542f0276",
       "name" : "Tech3",
       "skills" : [ "El", "Vand" ],
       "efficiency" : 150
@@ -221,9 +210,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe18",
+      "id" : "5b1a368e1061973c542f0276",
       "name" : "Tech3",
       "skills" : [ "El", "Vand" ],
       "efficiency" : 150
@@ -232,20 +221,20 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0276",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
-      "name" : "Tech4",
-      "skills" : [ "Varme", "El" ],
-      "efficiency" : 80
+      "id" : "5b1a368e1061973c542f0276",
+      "name" : "Tech3",
+      "skills" : [ "El", "Vand" ],
+      "efficiency" : 150
     },
-    "localDate" : "2018-06-07",
+    "localDate" : "2018-06-14",
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
+      "id" : "5b1a368e1061973c542f0277",
       "name" : "Tech4",
       "skills" : [ "Varme", "El" ],
       "efficiency" : 80
@@ -254,9 +243,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
+      "id" : "5b1a368e1061973c542f0277",
       "name" : "Tech4",
       "skills" : [ "Varme", "El" ],
       "efficiency" : 80
@@ -265,9 +254,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
+      "id" : "5b1a368e1061973c542f0277",
       "name" : "Tech4",
       "skills" : [ "Varme", "El" ],
       "efficiency" : 80
@@ -276,9 +265,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
+      "id" : "5b1a368e1061973c542f0277",
       "name" : "Tech4",
       "skills" : [ "Varme", "El" ],
       "efficiency" : 80
@@ -287,9 +276,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
+      "id" : "5b1a368e1061973c542f0277",
       "name" : "Tech4",
       "skills" : [ "Varme", "El" ],
       "efficiency" : 80
@@ -298,9 +287,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe19",
+      "id" : "5b1a368e1061973c542f0277",
       "name" : "Tech4",
       "skills" : [ "Varme", "El" ],
       "efficiency" : 80
@@ -309,20 +298,20 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0277",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
-      "name" : "Tech5",
-      "skills" : [ "Varme", "El", "Vand" ],
-      "efficiency" : 100
+      "id" : "5b1a368e1061973c542f0277",
+      "name" : "Tech4",
+      "skills" : [ "Varme", "El" ],
+      "efficiency" : 80
     },
-    "localDate" : "2018-06-07",
+    "localDate" : "2018-06-14",
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
+      "id" : "5b1a368e1061973c542f0278",
       "name" : "Tech5",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -331,9 +320,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
+      "id" : "5b1a368e1061973c542f0278",
       "name" : "Tech5",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -342,9 +331,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
+      "id" : "5b1a368e1061973c542f0278",
       "name" : "Tech5",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -353,9 +342,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
+      "id" : "5b1a368e1061973c542f0278",
       "name" : "Tech5",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -364,9 +353,9 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
+      "id" : "5b1a368e1061973c542f0278",
       "name" : "Tech5",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
@@ -375,45 +364,56 @@
     "start" : null,
     "end" : null
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "employee" : {
-      "id" : "5b18f9c7016fe33f761ebe1a",
+      "id" : "5b1a368e1061973c542f0278",
       "name" : "Tech5",
       "skills" : [ "Varme", "El", "Vand" ],
       "efficiency" : 100
     },
     "localDate" : "2018-06-13",
+    "start" : null,
+    "end" : null
+  }, {
+    "id" : "5b1a368e1061973c542f0278",
+    "employee" : {
+      "id" : "5b1a368e1061973c542f0278",
+      "name" : "Tech5",
+      "skills" : [ "Varme", "El", "Vand" ],
+      "efficiency" : 100
+    },
+    "localDate" : "2018-06-14",
     "start" : null,
     "end" : null
   } ],
   "employees" : [ {
-    "id" : "5b18f9c7016fe33f761ebe16",
+    "id" : "5b1a368e1061973c542f0274",
     "name" : "Tech1",
     "skills" : [ "Varme", "El", "Vand" ],
     "efficiency" : 100
   }, {
-    "id" : "5b18f9c7016fe33f761ebe17",
+    "id" : "5b1a368e1061973c542f0275",
     "name" : "Tech2",
     "skills" : [ "Varme", "El", "Vand" ],
     "efficiency" : 120
   }, {
-    "id" : "5b18f9c7016fe33f761ebe18",
+    "id" : "5b1a368e1061973c542f0276",
     "name" : "Tech3",
     "skills" : [ "El", "Vand" ],
     "efficiency" : 150
   }, {
-    "id" : "5b18f9c7016fe33f761ebe19",
+    "id" : "5b1a368e1061973c542f0277",
     "name" : "Tech4",
     "skills" : [ "Varme", "El" ],
     "efficiency" : 80
   }, {
-    "id" : "5b18f9c7016fe33f761ebe1a",
+    "id" : "5b1a368e1061973c542f0278",
     "name" : "Tech5",
     "skills" : [ "Varme", "El", "Vand" ],
     "efficiency" : 100
   } ],
   "tasks" : [ {
-    "id" : "5b18f9b4016fe33f761ebd81",
+    "id" : "5b1a368e1061973c542f01df",
     "intallationNo" : 6661,
     "lattitude" : 56.63988443,
     "longitude" : 9.79311734,
@@ -425,11 +425,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd15",
+    "id" : "5b1a368e1061973c542f0173",
     "intallationNo" : 1002505,
     "lattitude" : 56.48895602,
     "longitude" : 10.02283599,
@@ -441,11 +440,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd12",
+    "id" : "5b1a368e1061973c542f0170",
     "intallationNo" : 1002502,
     "lattitude" : 56.48774638,
     "longitude" : 10.02134184,
@@ -457,11 +455,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb6",
+    "id" : "5b1a368e1061973c542f0214",
     "intallationNo" : 523,
     "lattitude" : 56.63627518,
     "longitude" : 9.7960116,
@@ -473,11 +470,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd10",
+    "id" : "5b1a368e1061973c542f016e",
     "intallationNo" : 1002500,
     "lattitude" : 56.48863475,
     "longitude" : 10.02367185,
@@ -489,11 +485,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc9",
+    "id" : "5b1a368e1061973c542f0227",
     "intallationNo" : 4623,
     "lattitude" : 56.63576484,
     "longitude" : 9.79802229,
@@ -505,11 +500,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd26",
+    "id" : "5b1a368e1061973c542f0184",
     "intallationNo" : 1002527,
     "lattitude" : 56.48890605,
     "longitude" : 10.0201712,
@@ -521,11 +515,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd24",
+    "id" : "5b1a368e1061973c542f0182",
     "intallationNo" : 1002525,
     "lattitude" : 56.48842071,
     "longitude" : 10.021295,
@@ -537,11 +530,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd1f",
+    "id" : "5b1a368e1061973c542f017d",
     "intallationNo" : 1002523,
     "lattitude" : 56.48804482,
     "longitude" : 10.02110625,
@@ -553,11 +545,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd1c",
+    "id" : "5b1a368e1061973c542f017a",
     "intallationNo" : 1002521,
     "lattitude" : 56.48800764,
     "longitude" : 10.02016333,
@@ -569,11 +560,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd1a",
+    "id" : "5b1a368e1061973c542f0178",
     "intallationNo" : 1002520,
     "lattitude" : 56.48887648,
     "longitude" : 10.02158317,
@@ -585,11 +575,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd18",
+    "id" : "5b1a368e1061973c542f0176",
     "intallationNo" : 1002512,
     "lattitude" : 56.48854628,
     "longitude" : 10.02240255,
@@ -601,11 +590,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb0",
+    "id" : "5b1a368e1061973c542f020e",
     "intallationNo" : 4906,
     "lattitude" : 56.63643141,
     "longitude" : 9.79567546,
@@ -617,11 +605,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdca",
+    "id" : "5b1a368e1061973c542f0228",
     "intallationNo" : 555,
     "lattitude" : 56.6356396,
     "longitude" : 9.79824642,
@@ -633,11 +620,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd2b",
+    "id" : "5b1a368e1061973c542f0189",
     "intallationNo" : 1002530,
     "lattitude" : 56.48899806,
     "longitude" : 10.02100194,
@@ -649,11 +635,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd28",
+    "id" : "5b1a368e1061973c542f0186",
     "intallationNo" : 1002529,
     "lattitude" : 56.48879115,
     "longitude" : 10.02104494,
@@ -665,11 +650,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd8b",
+    "id" : "5b1a368e1061973c542f01e9",
     "intallationNo" : 2102,
     "lattitude" : 56.6391797,
     "longitude" : 9.7934534,
@@ -681,11 +665,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd9f",
+    "id" : "5b1a368e1061973c542f01fd",
     "intallationNo" : 2615,
     "lattitude" : 56.63834967,
     "longitude" : 9.79337845,
@@ -697,11 +680,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb8",
+    "id" : "5b1a368e1061973c542f0216",
     "intallationNo" : 6463,
     "lattitude" : 56.63619445,
     "longitude" : 9.7964408,
@@ -713,11 +695,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd9b",
+    "id" : "5b1a368e1061973c542f01f9",
     "intallationNo" : 2111,
     "lattitude" : 56.63874441,
     "longitude" : 9.79348196,
@@ -729,11 +710,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdbd",
+    "id" : "5b1a368e1061973c542f021b",
     "intallationNo" : 6466,
     "lattitude" : 56.63614757,
     "longitude" : 9.79673164,
@@ -745,11 +725,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdbe",
+    "id" : "5b1a368e1061973c542f021c",
     "intallationNo" : 6467,
     "lattitude" : 56.63614757,
     "longitude" : 9.79673164,
@@ -761,11 +740,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdbf",
+    "id" : "5b1a368e1061973c542f021d",
     "intallationNo" : 10003935,
     "lattitude" : 56.636099,
     "longitude" : 9.79815781,
@@ -777,11 +755,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdbb",
+    "id" : "5b1a368e1061973c542f0219",
     "intallationNo" : 5964,
     "lattitude" : 56.63619539,
     "longitude" : 9.79758515,
@@ -793,11 +770,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc0",
+    "id" : "5b1a368e1061973c542f021e",
     "intallationNo" : 10003924,
     "lattitude" : 56.636099,
     "longitude" : 9.79815781,
@@ -809,11 +785,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc4",
+    "id" : "5b1a368e1061973c542f0222",
     "intallationNo" : 5969,
     "lattitude" : 56.63588137,
     "longitude" : 9.79849787,
@@ -825,11 +800,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd92",
+    "id" : "5b1a368e1061973c542f01f0",
     "intallationNo" : 1002074,
     "lattitude" : 56.46226953,
     "longitude" : 10.03495581,
@@ -841,11 +815,10 @@
     "floorNo" : 3,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd91",
+    "id" : "5b1a368e1061973c542f01ef",
     "intallationNo" : 1002067,
     "lattitude" : 56.46226953,
     "longitude" : 10.03495581,
@@ -857,11 +830,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd90",
+    "id" : "5b1a368e1061973c542f01ee",
     "intallationNo" : 1002066,
     "lattitude" : 56.46226953,
     "longitude" : 10.03495581,
@@ -873,11 +845,10 @@
     "floorNo" : 1,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdaa",
+    "id" : "5b1a368e1061973c542f0208",
     "intallationNo" : 4704,
     "lattitude" : 56.63657536,
     "longitude" : 9.79579897,
@@ -889,11 +860,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc1",
+    "id" : "5b1a368e1061973c542f021f",
     "intallationNo" : 10003955,
     "lattitude" : 56.636099,
     "longitude" : 9.79815781,
@@ -905,11 +875,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd93",
+    "id" : "5b1a368e1061973c542f01f1",
     "intallationNo" : 4715,
     "lattitude" : 56.63910757,
     "longitude" : 9.79357958,
@@ -921,11 +890,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdad",
+    "id" : "5b1a368e1061973c542f020b",
     "intallationNo" : 623,
     "lattitude" : 56.63648962,
     "longitude" : 9.79598531,
@@ -937,11 +905,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb4",
+    "id" : "5b1a368e1061973c542f0212",
     "intallationNo" : 1002111,
     "lattitude" : 56.46249879,
     "longitude" : 10.03441009,
@@ -953,11 +920,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdac",
+    "id" : "5b1a368e1061973c542f020a",
     "intallationNo" : 1050980,
     "lattitude" : 56.63687887,
     "longitude" : 9.79517636,
@@ -969,11 +935,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda7",
+    "id" : "5b1a368e1061973c542f0205",
     "intallationNo" : 1002104,
     "lattitude" : 56.46212643,
     "longitude" : 10.034887,
@@ -985,11 +950,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb2",
+    "id" : "5b1a368e1061973c542f0210",
     "intallationNo" : 6016,
     "lattitude" : 56.63636299,
     "longitude" : 9.79634343,
@@ -1001,11 +965,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda4",
+    "id" : "5b1a368e1061973c542f0202",
     "intallationNo" : 640,
     "lattitude" : 56.63677741,
     "longitude" : 9.79554726,
@@ -1017,11 +980,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda3",
+    "id" : "5b1a368e1061973c542f0201",
     "intallationNo" : 2176,
     "lattitude" : 56.63715242,
     "longitude" : 9.79519516,
@@ -1033,11 +995,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcf3",
+    "id" : "5b1a368e1061973c542f0151",
     "intallationNo" : 1002383,
     "lattitude" : 56.49012547,
     "longitude" : 10.0226724,
@@ -1049,11 +1010,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebce8",
+    "id" : "5b1a368e1061973c542f0146",
     "intallationNo" : 1002376,
     "lattitude" : 56.4899626,
     "longitude" : 10.0217098,
@@ -1065,11 +1025,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcdd",
+    "id" : "5b1a368e1061973c542f013b",
     "intallationNo" : 1002375,
     "lattitude" : 56.48955615,
     "longitude" : 10.02088684,
@@ -1081,11 +1040,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcdf",
+    "id" : "5b1a368e1061973c542f013d",
     "intallationNo" : 1002374,
     "lattitude" : 56.48955615,
     "longitude" : 10.02088684,
@@ -1097,11 +1055,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc8",
+    "id" : "5b1a368e1061973c542f0226",
     "intallationNo" : 1002118,
     "lattitude" : 56.46258085,
     "longitude" : 10.03426641,
@@ -1113,11 +1070,10 @@
     "floorNo" : 3,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda1",
+    "id" : "5b1a368e1061973c542f01ff",
     "intallationNo" : 650,
     "lattitude" : 56.63715242,
     "longitude" : 9.79519516,
@@ -1129,11 +1085,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc7",
+    "id" : "5b1a368e1061973c542f0225",
     "intallationNo" : 1002117,
     "lattitude" : 56.46258085,
     "longitude" : 10.03426641,
@@ -1145,11 +1100,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd99",
+    "id" : "5b1a368e1061973c542f01f7",
     "intallationNo" : 1675,
     "lattitude" : 56.63869599,
     "longitude" : 9.79370676,
@@ -1161,11 +1115,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc6",
+    "id" : "5b1a368e1061973c542f0224",
     "intallationNo" : 1002116,
     "lattitude" : 56.46258085,
     "longitude" : 10.03426641,
@@ -1177,11 +1130,10 @@
     "floorNo" : 1,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc5",
+    "id" : "5b1a368e1061973c542f0223",
     "intallationNo" : 1002115,
     "lattitude" : 56.46258085,
     "longitude" : 10.03426641,
@@ -1193,11 +1145,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda9",
+    "id" : "5b1a368e1061973c542f0207",
     "intallationNo" : 3214,
     "lattitude" : 56.63665599,
     "longitude" : 9.79565149,
@@ -1209,11 +1160,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb7",
+    "id" : "5b1a368e1061973c542f0215",
     "intallationNo" : 1002113,
     "lattitude" : 56.46219053,
     "longitude" : 10.03474252,
@@ -1225,11 +1175,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd53",
+    "id" : "5b1a368e1061973c542f01b1",
     "intallationNo" : 1041567,
     "lattitude" : 56.47982711,
     "longitude" : 10.0141149,
@@ -1241,11 +1190,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda2",
+    "id" : "5b1a368e1061973c542f0200",
     "intallationNo" : 10000649,
     "lattitude" : 56.63715242,
     "longitude" : 9.79519516,
@@ -1257,11 +1205,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd50",
+    "id" : "5b1a368e1061973c542f01ae",
     "intallationNo" : 1041566,
     "lattitude" : 56.48021599,
     "longitude" : 10.01490447,
@@ -1273,11 +1220,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd4d",
+    "id" : "5b1a368e1061973c542f01ab",
     "intallationNo" : 1041565,
     "lattitude" : 56.4797579,
     "longitude" : 10.01378816,
@@ -1289,11 +1235,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebce4",
+    "id" : "5b1a368e1061973c542f0142",
     "intallationNo" : 1002397,
     "lattitude" : 56.49138317,
     "longitude" : 10.02160198,
@@ -1305,11 +1250,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd4a",
+    "id" : "5b1a368e1061973c542f01a8",
     "intallationNo" : 1041564,
     "lattitude" : 56.48018311,
     "longitude" : 10.01453031,
@@ -1321,11 +1265,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd47",
+    "id" : "5b1a368e1061973c542f01a5",
     "intallationNo" : 1041563,
     "lattitude" : 56.4796974,
     "longitude" : 10.01349445,
@@ -1337,11 +1280,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebce2",
+    "id" : "5b1a368e1061973c542f0140",
     "intallationNo" : 1002395,
     "lattitude" : 56.49055662,
     "longitude" : 10.021596,
@@ -1353,11 +1295,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd82",
+    "id" : "5b1a368e1061973c542f01e0",
     "intallationNo" : 149,
     "lattitude" : 56.63988443,
     "longitude" : 9.79311734,
@@ -1369,11 +1310,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd44",
+    "id" : "5b1a368e1061973c542f01a2",
     "intallationNo" : 1041562,
     "lattitude" : 56.48012394,
     "longitude" : 10.01407394,
@@ -1385,11 +1325,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd41",
+    "id" : "5b1a368e1061973c542f019f",
     "intallationNo" : 1041561,
     "lattitude" : 56.479637,
     "longitude" : 10.01320058,
@@ -1401,11 +1340,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd3e",
+    "id" : "5b1a368e1061973c542f019c",
     "intallationNo" : 1041560,
     "lattitude" : 56.47999234,
     "longitude" : 10.01369715,
@@ -1417,11 +1355,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd7d",
+    "id" : "5b1a368e1061973c542f01db",
     "intallationNo" : 1041559,
     "lattitude" : 56.47993184,
     "longitude" : 10.01340328,
@@ -1433,11 +1370,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd7a",
+    "id" : "5b1a368e1061973c542f01d8",
     "intallationNo" : 1041558,
     "lattitude" : 56.47943692,
     "longitude" : 10.01238343,
@@ -1449,11 +1385,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda5",
+    "id" : "5b1a368e1061973c542f0203",
     "intallationNo" : 10000642,
     "lattitude" : 56.63677741,
     "longitude" : 9.79554726,
@@ -1465,11 +1400,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd85",
+    "id" : "5b1a368e1061973c542f01e3",
     "intallationNo" : 1690,
     "lattitude" : 56.63940699,
     "longitude" : 9.79359842,
@@ -1481,11 +1415,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd77",
+    "id" : "5b1a368e1061973c542f01d5",
     "intallationNo" : 1041557,
     "lattitude" : 56.47986227,
     "longitude" : 10.01310917,
@@ -1497,11 +1430,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd74",
+    "id" : "5b1a368e1061973c542f01d2",
     "intallationNo" : 1041556,
     "lattitude" : 56.47926797,
     "longitude" : 10.0121677,
@@ -1513,11 +1445,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd84",
+    "id" : "5b1a368e1061973c542f01e2",
     "intallationNo" : 6555,
     "lattitude" : 56.63966578,
     "longitude" : 9.79390158,
@@ -1529,11 +1460,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd71",
+    "id" : "5b1a368e1061973c542f01cf",
     "intallationNo" : 1041555,
     "lattitude" : 56.4797928,
     "longitude" : 10.01281489,
@@ -1545,11 +1475,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd80",
+    "id" : "5b1a368e1061973c542f01de",
     "intallationNo" : 1002130,
     "lattitude" : 56.462275,
     "longitude" : 10.034527,
@@ -1561,11 +1490,10 @@
     "floorNo" : 3,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd6e",
+    "id" : "5b1a368e1061973c542f01cc",
     "intallationNo" : 1041554,
     "lattitude" : 56.47975093,
     "longitude" : 10.0124405,
@@ -1577,11 +1505,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd02",
+    "id" : "5b1a368e1061973c542f0160",
     "intallationNo" : 1002386,
     "lattitude" : 56.49011181,
     "longitude" : 10.02324063,
@@ -1593,11 +1520,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd58",
+    "id" : "5b1a368e1061973c542f01b6",
     "intallationNo" : 1041553,
     "lattitude" : 56.47950677,
     "longitude" : 10.01154099,
@@ -1609,11 +1535,10 @@
     "floorNo" : 1,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd3b",
+    "id" : "5b1a368e1061973c542f0199",
     "intallationNo" : 1041552,
     "lattitude" : 56.4797549,
     "longitude" : 10.01195351,
@@ -1625,11 +1550,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdab",
+    "id" : "5b1a368e1061973c542f0209",
     "intallationNo" : 2463,
     "lattitude" : 56.63687887,
     "longitude" : 9.79517636,
@@ -1641,11 +1565,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd9c",
+    "id" : "5b1a368e1061973c542f01fa",
     "intallationNo" : 1047727,
     "lattitude" : 56.63878507,
     "longitude" : 9.79468624,
@@ -1657,11 +1580,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc2",
+    "id" : "5b1a368e1061973c542f0220",
     "intallationNo" : 1952,
     "lattitude" : 56.63602408,
     "longitude" : 9.79687985,
@@ -1673,11 +1595,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd8a",
+    "id" : "5b1a368e1061973c542f01e8",
     "intallationNo" : 1002156,
     "lattitude" : 56.46294041,
     "longitude" : 10.03315619,
@@ -1689,11 +1610,10 @@
     "floorNo" : 3,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda0",
+    "id" : "5b1a368e1061973c542f01fe",
     "intallationNo" : 675,
     "lattitude" : 56.63777082,
     "longitude" : 9.79448949,
@@ -1705,11 +1625,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd87",
+    "id" : "5b1a368e1061973c542f01e5",
     "intallationNo" : 1002155,
     "lattitude" : 56.46255674,
     "longitude" : 10.03392478,
@@ -1721,11 +1640,10 @@
     "floorNo" : 1,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcf1",
+    "id" : "5b1a368e1061973c542f014f",
     "intallationNo" : 1002410,
     "lattitude" : 56.49185365,
     "longitude" : 10.02229661,
@@ -1737,11 +1655,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcee",
+    "id" : "5b1a368e1061973c542f014c",
     "intallationNo" : 1002408,
     "lattitude" : 56.49210871,
     "longitude" : 10.02295315,
@@ -1753,11 +1670,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb3",
+    "id" : "5b1a368e1061973c542f0211",
     "intallationNo" : 10006065,
     "lattitude" : 56.64051688,
     "longitude" : 9.79363265,
@@ -1769,11 +1685,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd96",
+    "id" : "5b1a368e1061973c542f01f4",
     "intallationNo" : 425,
     "lattitude" : 56.63912616,
     "longitude" : 9.79334062,
@@ -1785,11 +1700,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcec",
+    "id" : "5b1a368e1061973c542f014a",
     "intallationNo" : 1002405,
     "lattitude" : 56.49100084,
     "longitude" : 10.02329689,
@@ -1801,11 +1715,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd61",
+    "id" : "5b1a368e1061973c542f01bf",
     "intallationNo" : 1041571,
     "lattitude" : 56.47999018,
     "longitude" : 10.01506098,
@@ -1817,11 +1730,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcea",
+    "id" : "5b1a368e1061973c542f0148",
     "intallationNo" : 1002403,
     "lattitude" : 56.49153221,
     "longitude" : 10.02313253,
@@ -1833,11 +1745,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd5e",
+    "id" : "5b1a368e1061973c542f01bc",
     "intallationNo" : 1041570,
     "lattitude" : 56.47996642,
     "longitude" : 10.0146705,
@@ -1849,11 +1760,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb5",
+    "id" : "5b1a368e1061973c542f0213",
     "intallationNo" : 6061,
     "lattitude" : 56.64051688,
     "longitude" : 9.79363265,
@@ -1865,11 +1775,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd5b",
+    "id" : "5b1a368e1061973c542f01b9",
     "intallationNo" : 1041569,
     "lattitude" : 56.47990593,
     "longitude" : 10.01437663,
@@ -1881,11 +1790,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebce6",
+    "id" : "5b1a368e1061973c542f0144",
     "intallationNo" : 1002401,
     "lattitude" : 56.49141429,
     "longitude" : 10.02218751,
@@ -1897,11 +1805,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd56",
+    "id" : "5b1a368e1061973c542f01b4",
     "intallationNo" : 1041568,
     "lattitude" : 56.48015825,
     "longitude" : 10.01537396,
@@ -1913,11 +1820,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd9a",
+    "id" : "5b1a368e1061973c542f01f8",
     "intallationNo" : 431,
     "lattitude" : 56.63890169,
     "longitude" : 9.79341759,
@@ -1929,11 +1835,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdc3",
+    "id" : "5b1a368e1061973c542f0221",
     "intallationNo" : 4272,
     "lattitude" : 56.63597553,
     "longitude" : 9.79687034,
@@ -1945,11 +1850,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcff",
+    "id" : "5b1a368e1061973c542f015d",
     "intallationNo" : 1002430,
     "lattitude" : 56.49377597,
     "longitude" : 10.02124399,
@@ -1961,11 +1865,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb1",
+    "id" : "5b1a368e1061973c542f020f",
     "intallationNo" : 178,
     "lattitude" : 56.63636299,
     "longitude" : 9.79634343,
@@ -1977,11 +1880,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcfd",
+    "id" : "5b1a368e1061973c542f015b",
     "intallationNo" : 1002429,
     "lattitude" : 56.49424468,
     "longitude" : 10.0210615,
@@ -1993,11 +1895,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcfa",
+    "id" : "5b1a368e1061973c542f0158",
     "intallationNo" : 1002428,
     "lattitude" : 56.49394984,
     "longitude" : 10.02196334,
@@ -2009,11 +1910,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd9d",
+    "id" : "5b1a368e1061973c542f01fb",
     "intallationNo" : 1718,
     "lattitude" : 56.63862936,
     "longitude" : 9.79353253,
@@ -2025,11 +1925,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcf7",
+    "id" : "5b1a368e1061973c542f0155",
     "intallationNo" : 1002425,
     "lattitude" : 56.49417408,
     "longitude" : 10.02308995,
@@ -2041,11 +1940,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd8f",
+    "id" : "5b1a368e1061973c542f01ed",
     "intallationNo" : 1002167,
     "lattitude" : 56.46265933,
     "longitude" : 10.03347331,
@@ -2057,11 +1955,10 @@
     "floorNo" : 1,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd88",
+    "id" : "5b1a368e1061973c542f01e6",
     "intallationNo" : 1976,
     "lattitude" : 56.63928466,
     "longitude" : 9.79353536,
@@ -2073,11 +1970,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd8e",
+    "id" : "5b1a368e1061973c542f01ec",
     "intallationNo" : 1002165,
     "lattitude" : 56.46266764,
     "longitude" : 10.03355468,
@@ -2089,11 +1985,10 @@
     "floorNo" : 1,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd8d",
+    "id" : "5b1a368e1061973c542f01eb",
     "intallationNo" : 1002163,
     "lattitude" : 56.46258477,
     "longitude" : 10.03379587,
@@ -2105,11 +2000,10 @@
     "floorNo" : 2,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebcf5",
+    "id" : "5b1a368e1061973c542f0153",
     "intallationNo" : 1002419,
     "lattitude" : 56.49286955,
     "longitude" : 10.02221024,
@@ -2121,11 +2015,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd8c",
+    "id" : "5b1a368e1061973c542f01ea",
     "intallationNo" : 1002162,
     "lattitude" : 56.46258477,
     "longitude" : 10.03379587,
@@ -2137,11 +2030,10 @@
     "floorNo" : 1,
     "post" : 8900,
     "city" : "Randers C",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd9e",
+    "id" : "5b1a368e1061973c542f01fc",
     "intallationNo" : 446,
     "lattitude" : 56.63834967,
     "longitude" : 9.79337845,
@@ -2153,11 +2045,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd98",
+    "id" : "5b1a368e1061973c542f01f6",
     "intallationNo" : 705,
     "lattitude" : 56.63877388,
     "longitude" : 9.79366551,
@@ -2169,11 +2060,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdb9",
+    "id" : "5b1a368e1061973c542f0217",
     "intallationNo" : 4038,
     "lattitude" : 56.63619539,
     "longitude" : 9.79758515,
@@ -2185,11 +2075,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd94",
+    "id" : "5b1a368e1061973c542f01f2",
     "intallationNo" : 713,
     "lattitude" : 56.63910757,
     "longitude" : 9.79357958,
@@ -2201,11 +2090,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd95",
+    "id" : "5b1a368e1061973c542f01f3",
     "intallationNo" : 714,
     "lattitude" : 56.63910757,
     "longitude" : 9.79357958,
@@ -2217,11 +2105,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd89",
+    "id" : "5b1a368e1061973c542f01e7",
     "intallationNo" : 718,
     "lattitude" : 56.63928466,
     "longitude" : 9.79353536,
@@ -2233,11 +2120,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd83",
+    "id" : "5b1a368e1061973c542f01e1",
     "intallationNo" : 722,
     "lattitude" : 56.63966578,
     "longitude" : 9.79390158,
@@ -2249,11 +2135,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd37",
+    "id" : "5b1a368e1061973c542f0195",
     "intallationNo" : 1002479,
     "lattitude" : 56.48626048,
     "longitude" : 10.02175662,
@@ -2265,11 +2150,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd34",
+    "id" : "5b1a368e1061973c542f0192",
     "intallationNo" : 1002477,
     "lattitude" : 56.48748159,
     "longitude" : 10.02295855,
@@ -2281,11 +2165,10 @@
     "floorNo" : 1,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdbc",
+    "id" : "5b1a368e1061973c542f021a",
     "intallationNo" : 3299,
     "lattitude" : 56.63619539,
     "longitude" : 9.79758515,
@@ -2297,11 +2180,10 @@
     "floorNo" : 4,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd32",
+    "id" : "5b1a368e1061973c542f0190",
     "intallationNo" : 1002476,
     "lattitude" : 56.48748159,
     "longitude" : 10.02295855,
@@ -2313,11 +2195,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd2f",
+    "id" : "5b1a368e1061973c542f018d",
     "intallationNo" : 1002475,
     "lattitude" : 56.48753239,
     "longitude" : 10.02224536,
@@ -2329,11 +2210,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd2d",
+    "id" : "5b1a368e1061973c542f018b",
     "intallationNo" : 1002473,
     "lattitude" : 56.48715542,
     "longitude" : 10.02218651,
@@ -2345,11 +2225,10 @@
     "floorNo" : 1,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd21",
+    "id" : "5b1a368e1061973c542f017f",
     "intallationNo" : 1002471,
     "lattitude" : 56.48594488,
     "longitude" : 10.02189413,
@@ -2361,11 +2240,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda6",
+    "id" : "5b1a368e1061973c542f0204",
     "intallationNo" : 489,
     "lattitude" : 56.63736333,
     "longitude" : 9.79466662,
@@ -2377,11 +2255,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd04",
+    "id" : "5b1a368e1061973c542f0162",
     "intallationNo" : 1002470,
     "lattitude" : 56.48560282,
     "longitude" : 10.02198253,
@@ -2393,11 +2270,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdae",
+    "id" : "5b1a368e1061973c542f020c",
     "intallationNo" : 4590,
     "lattitude" : 56.63681427,
     "longitude" : 9.79528994,
@@ -2409,11 +2285,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd0e",
+    "id" : "5b1a368e1061973c542f016c",
     "intallationNo" : 1002495,
     "lattitude" : 56.48673119,
     "longitude" : 10.02133064,
@@ -2425,11 +2300,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdaf",
+    "id" : "5b1a368e1061973c542f020d",
     "intallationNo" : 2545,
     "lattitude" : 56.63681427,
     "longitude" : 9.79528994,
@@ -2441,11 +2315,10 @@
     "floorNo" : 3,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd0c",
+    "id" : "5b1a368e1061973c542f016a",
     "intallationNo" : 1002493,
     "lattitude" : 56.48886473,
     "longitude" : 10.02410029,
@@ -2457,11 +2330,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebda8",
+    "id" : "5b1a368e1061973c542f0206",
     "intallationNo" : 10000492,
     "lattitude" : 56.63724568,
     "longitude" : 9.79482817,
@@ -2473,11 +2345,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd64",
+    "id" : "5b1a368e1061973c542f01c2",
     "intallationNo" : 1051108,
     "lattitude" : 56.47917441,
     "longitude" : 10.01157615,
@@ -2489,11 +2360,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd67",
+    "id" : "5b1a368e1061973c542f01c5",
     "intallationNo" : 1051109,
     "lattitude" : 56.47917441,
     "longitude" : 10.01157615,
@@ -2505,11 +2375,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd09",
+    "id" : "5b1a368e1061973c542f0167",
     "intallationNo" : 1002489,
     "lattitude" : 56.48783176,
     "longitude" : 10.02189613,
@@ -2521,11 +2390,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd6a",
+    "id" : "5b1a368e1061973c542f01c8",
     "intallationNo" : 1051110,
     "lattitude" : 56.47917441,
     "longitude" : 10.01157615,
@@ -2537,11 +2405,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd6c",
+    "id" : "5b1a368e1061973c542f01ca",
     "intallationNo" : 1051111,
     "lattitude" : 56.47910408,
     "longitude" : 10.01198116,
@@ -2553,11 +2420,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd07",
+    "id" : "5b1a368e1061973c542f0165",
     "intallationNo" : 1002487,
     "lattitude" : 56.4879318,
     "longitude" : 10.02284075,
@@ -2569,11 +2435,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebdba",
+    "id" : "5b1a368e1061973c542f0218",
     "intallationNo" : 3322,
     "lattitude" : 56.63619539,
     "longitude" : 9.79758515,
@@ -2585,11 +2450,10 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd39",
+    "id" : "5b1a368e1061973c542f0197",
     "intallationNo" : 1002485,
     "lattitude" : 56.48804931,
     "longitude" : 10.02383472,
@@ -2601,11 +2465,10 @@
     "floorNo" : 0,
     "post" : 8920,
     "city" : "Randers NV",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd86",
+    "id" : "5b1a368e1061973c542f01e4",
     "intallationNo" : 6653,
     "lattitude" : 56.63942343,
     "longitude" : 9.79379589,
@@ -2617,11 +2480,10 @@
     "floorNo" : 1,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
   }, {
-    "id" : "5b18f9b4016fe33f761ebd97",
+    "id" : "5b1a368e1061973c542f01f5",
     "intallationNo" : 1279,
     "lattitude" : 56.63903971,
     "longitude" : 9.79337288,
@@ -2633,8 +2495,8 @@
     "floorNo" : 2,
     "post" : 9500,
     "city" : "Hobro",
-    "nextTask" : null,
-    "prevTask" : null,
+    "prevTaskOrShift" : null,
     "shift" : null
-  } ]
+  } ],
+  "hardMediumSoftScore" : null
 }
