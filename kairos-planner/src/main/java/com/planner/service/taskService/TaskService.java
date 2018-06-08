@@ -38,7 +38,7 @@ public class TaskService {
         Map<Integer,Task> taskMap= taskList.stream().collect(Collectors.toMap(t->t.getIntallationNo(), t->t));
         intallationandDuration.entrySet().forEach(t->{
             Task task = taskMap.get(t.getKey());
-            tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(task.getId(),task.getIntallationNo(),task.getLattitude(),task.getLongitude(),intallationandSkill.get(task.getIntallationNo()),t.getValue(),task.getStreetName(),task.getHouseNo(),task.getBlock(),task.getFloorNo(),task.getPost(),task.getCity(),locationInfoMap.get(task.getIntallationNo())));
+            tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(task.getId(),task.getIntallationNo(),task.getLattitude(),task.getLongitude(),intallationandSkill.get(task.getIntallationNo()),t.getValue(),task.getStreetName(),task.getHouseNo(),task.getBlock(),task.getFloorNo(),task.getPost(),task.getCity()));
         });
         return tasks;
     }

@@ -1,10 +1,9 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
+import org.optaplanner.core.api.domain.variable.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ import java.util.Set;
  */
 @PlanningEntity
 public class Task extends TaskOrShift{
+    //TODO consider break in  sub tasks or dont consider merged tasks at all
     private String id;
     private int intallationNo;
     private Double lattitude;
@@ -30,13 +30,14 @@ public class Task extends TaskOrShift{
             "tasks","shifts" }, graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrShift prevTaskOrShift;
 
+    @CustomShadowVariable(sources = @PlanningVariableReference(variableName = "prevTaskOrShift"),variableListenerClass = VrpTaskStartTimeListener.class)
+    private LocalDateTime plannedDateTime;
+
 
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
-    private Map<Integer,LocationInfo> locationInfoMap;
 
-
-    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city,Map<Integer, LocationInfo> locationInfoMap) {
+    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
@@ -49,17 +50,9 @@ public class Task extends TaskOrShift{
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
-        this.locationInfoMap = locationInfoMap;
     }
 
 
-    public Map<Integer, LocationInfo> getLocationInfoMap() {
-        return locationInfoMap;
-    }
-
-    public void setLocationInfoMap(Map<Integer, LocationInfo> locationInfoMap) {
-        this.locationInfoMap = locationInfoMap;
-    }
 
     public String getId() {
         return id;
@@ -181,4 +174,21 @@ public class Task extends TaskOrShift{
         this.longitude = longitude;
     }
 
+    @Override
+    public String toString() {
+        return "Task{" +
+                 + intallationNo +
+                "-" + duration +
+                '}';
+    }
+
+    public double getPlannedDuration(){
+        return this.getDuration()/(this.getShift().getEmployee().getEfficiency()/100d);
+    }
+    public int getDrivingTime(){
+        if(prevTaskOrShift instanceof Shift) return 0;
+        return 0;
+
+
+    }
 }
