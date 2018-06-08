@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ public class ClauseDto {
 
 
     @NotEmpty(message = "error.clause.title.cannot.be.empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")

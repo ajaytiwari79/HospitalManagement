@@ -1,5 +1,6 @@
 package com.kairos.service.auth;
 
+import com.kairos.activity.util.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
@@ -15,6 +16,7 @@ import com.kairos.service.SmsService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -577,6 +579,20 @@ public class UserService extends UserBaseService {
             currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
         }
        save(currentUser);
+        return true;
+    }
+
+
+    public boolean updateDateOfBirthOfUserByCPRNumber(){
+        List<User> users = userGraphRepository.findAll();
+
+        users.stream().forEach(user -> {
+            String cprNumber = user.getCprNumber();
+            Date dateOfBirth = Optional.ofNullable(user.getCprNumber()).isPresent() ? CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : DateUtils.getCurrentDate();
+            user.setDateOfBirth( Optional.ofNullable(user.getCprNumber()).isPresent() ?
+                    CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
+        });
+        save(users);
         return true;
     }
 }

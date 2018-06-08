@@ -1,13 +1,16 @@
 package com.kairos.service.integration;
 
+
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import com.kairos.response.dto.web.staff.Staff;
+
+
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.response.dto.web.UnitPositionWtaDTO;
+import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +35,20 @@ public class PlannerSyncService {
     private PlannerRestClient plannerRestClient;
     @Autowired
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
-    @Async
-    public void  publishStaff(Long unitId, com.kairos.persistence.model.user.staff.Staff staff, IntegrationOperation integrationOperation) {
+
+    //@Async
+    public void  publishStaff(Long unitId, Staff staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffDTO(staff),unitId,integrationOperation);
     }
-    @Async
-    public void publishAllStaff(Long unitId, List<com.kairos.persistence.model.user.staff.Staff> staff, IntegrationOperation integrationOperation) {
+    //@Async
+    public void publishAllStaff(Long unitId, List<Staff> staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffList(staff),unitId,integrationOperation);
     }
-    @Async
+    //@Async
     public void publishWTA(Long unitId,Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
         plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,unitPositionId);
     }
-    @Async
+    //@Async
     public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
         if(integrationOperation.equals(IntegrationOperation.CREATE)){
             plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId,null),unitId,integrationOperation,unitPosition.getStaff().getId());
@@ -54,6 +58,11 @@ public class PlannerSyncService {
         else if(integrationOperation.equals(IntegrationOperation.DELETE)){
             plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
         }
+    }
+    @Async
+    public void publishAllUnitPositions(Long unitId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips, IntegrationOperation integrationOperation) {
+        plannerRestClient.publish(createUnitPositionDTOs(unitId,unitPositionEmploymentTypeRelationShips),unitId,integrationOperation);
+
     }
 
     /*@Async
@@ -90,21 +99,19 @@ public class PlannerSyncService {
         return unitPositionWtaDTOS;
     }
 
-    private List<Staff> createStaffList(List<com.kairos.persistence.model.user.staff.Staff> staff) {
+    private List<Staff> createStaffList(List<Staff> staff) {
         List<Staff> dtos= new ArrayList<>();
-        for(com.kairos.persistence.model.user.staff.Staff s:staff){
+        for(Staff s:staff){
             dtos.add(createStaffDTO(s));
         }
         return dtos;
     }
 
-    private Staff createStaffDTO(com.kairos.persistence.model.user.staff.Staff staff){
+    private Staff createStaffDTO(Staff staff){
 
         return new Staff(staff.getId(),staff.getFirstName(),staff.getLastName(),null,staff.getCurrentStatus());
 
     }
 
-    public void publishAllUnitPositions(Long organisationId, List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips, IntegrationOperation create) {
 
-    }
 }

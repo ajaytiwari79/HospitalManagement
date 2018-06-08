@@ -8,6 +8,7 @@ import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -36,7 +39,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
-    public ResponseEntity<Map<String, Object>> createUnitEmploymentPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position) {
+    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.createUnitPosition(unitId, type, position, false));
     }
 
@@ -71,7 +74,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "get unit_position's WTA")
     @GetMapping(value = "/unit_position/{unitPositionId}/wta")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
     }
 /*
@@ -95,6 +98,19 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
     }
 
+
+    @ApiOperation(value = "apply function to unit position")
+    @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
+    public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId, @RequestBody Map<String, Object> payload) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.applyFunction(unitPositionId, payload));
+    }
+
+    @ApiOperation(value = "remove function to unit position")
+    @DeleteMapping(value = "/unit_position/{unitPositionId}/applyFunction")
+    public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date appliedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitPositionId, appliedDate));
+    }
+
     @ApiOperation(value = "get unit_position's Id By Staff and expertise")
     @GetMapping(value = "/staff/{staffId}/expertise/{expertiseId}/unitPositionId")
     public ResponseEntity<Map<String, Object>> getUnitPositionIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId, @PathVariable Long expertiseId) {
@@ -106,6 +122,4 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> getStaffsUnitPosition(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getStaffsUnitPosition(unitId,expertiseId, staffList));
     }
-
-
 }

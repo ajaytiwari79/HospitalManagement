@@ -7,15 +7,15 @@ import java.util.List;
 
 public class PriorityGroupDefaultData {
     private List<EmploymentTypeDTO> employmentTypes;
-    private List<ExpertiseResponseDTO> expertise;
+    private List<ExpertiseResponseDTO> expertises;
 
     public PriorityGroupDefaultData() {
         //Default Constructor
     }
 
-    public PriorityGroupDefaultData(List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertise) {
+    public PriorityGroupDefaultData(List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises) {
         this.employmentTypes = employmentTypes;
-        this.expertise = expertise;
+        this.expertises = expertises;
     }
 
     public List<EmploymentTypeDTO> getEmploymentTypes() {
@@ -26,11 +26,11 @@ public class PriorityGroupDefaultData {
         this.employmentTypes = employmentTypes;
     }
 
-    public List<ExpertiseResponseDTO> getExpertise() {
-        return expertise;
+    public List<ExpertiseResponseDTO> getExpertises() {
+        return expertises;
     }
 
-    public void setExpertise(List<ExpertiseResponseDTO> expertise) {
-        this.expertise = expertise;
+    public void setExpertises(List<ExpertiseResponseDTO> expertises) {
+        this.expertises = expertises;
     }
 }

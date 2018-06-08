@@ -31,6 +31,7 @@ public class PlannerRestClient {
 
         try {
             String url=baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams);
+            logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =

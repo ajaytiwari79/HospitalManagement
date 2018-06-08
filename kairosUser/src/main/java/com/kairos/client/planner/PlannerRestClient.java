@@ -16,6 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+<<<<<<< HEAD
+=======
+import java.text.MessageFormat;
+import java.util.ArrayList;
+
+>>>>>>> 533dae3233220b92d5a001bbbd27604e99d06210
 import static com.kairos.client.RestClientURLUtil.getPlannerBaseUrl;
 
 
@@ -31,6 +37,7 @@ public class PlannerRestClient {
 
         try {
             String url=baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams);
+            logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
@@ -65,12 +72,24 @@ public class PlannerRestClient {
     }
     public static <T>String getURI(T t,IntegrationOperation integrationOperation,Object... pathParams){
         String uri="";
+<<<<<<< HEAD
         if(t instanceof Staff){
             uri= "staff/";
         }else if(t instanceof UnitPositionWtaDTO && integrationOperation.equals(IntegrationOperation.CREATE)){
             uri= String.format("staff/%s/unitposition/",pathParams);
         }else if(t instanceof UnitPositionWtaDTO && (integrationOperation.equals(IntegrationOperation.UPDATE)|| integrationOperation.equals(IntegrationOperation.DELETE))){
             uri= String.format("staff/%s/unitposition/%s",pathParams);
+=======
+        if(t instanceof StaffBasicDetailsDTO){
+            uri= integrationOperation.equals(IntegrationOperation.CREATE)?"staff/":String.format("staff/%s",pathParams);
+        }else if(t instanceof ArrayList && ((ArrayList)t).get(0) instanceof  StaffBasicDetailsDTO){
+            uri="/staff/multiple";
+        }else if(t instanceof UnitPositionWtaDTO){
+            uri= integrationOperation.equals(IntegrationOperation.CREATE)?
+                    String.format("staff/%s/unitposition/",pathParams):String.format("staff/%s/unitposition/%s",pathParams);
+        }else if(t instanceof UnitPositionWtaDTO && ((ArrayList)t).get(0) instanceof  UnitPositionWtaDTO){
+            uri="/unitposition/multiple";
+>>>>>>> 533dae3233220b92d5a001bbbd27604e99d06210
         }
         else if(t instanceof WTAResponseDTO){
             uri= String.format("staff/%s/unitposition/%s/wta",pathParams);

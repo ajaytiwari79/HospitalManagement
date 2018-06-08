@@ -19,8 +19,6 @@ public final class ApiConstant {
     public static final String API_ORG_SEC_MEASURE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/organization_security";
     public static final String API_DATA_DISPOSAL_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_disposal";
     public static final String API_TECH_SECURITY_MEASURE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/technical_security";
-    public static final String API_MASTER_ASSET_FILTER = API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/master_asset/filter";
-
 
     //master processing activities
     public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/master_processing_activity";
@@ -33,7 +31,6 @@ public final class ApiConstant {
     public static final String API_PROCESSING_LEGAL_BASIS= API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/legal_basis";
     public static final String API_ACCESSOR_PARTY_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/accessor_party";
 
-
     //agreement template
     public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/agreement_template";
     public static final String API_AGREEMENT_SECTION_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/agreement_section";
@@ -41,6 +38,9 @@ public final class ApiConstant {
     public static final String API_PROCESSING_ACTIVITY = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/processing_activity";
     public static final String API_ASSET_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/asset_type";
     public static final String API_HOSTING_LOCATION_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/hosting_location";
+
+    //filter
+    public static final String API_FILTER= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/filter";
 
     private ApiConstant() {
     }

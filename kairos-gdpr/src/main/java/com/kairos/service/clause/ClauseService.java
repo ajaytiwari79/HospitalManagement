@@ -74,13 +74,13 @@ public class ClauseService extends MongoBaseService {
 
 
     public Clause createClause(Long countryId, ClauseDto clauseDto) throws RepositoryException {
-
         List<ClauseTag> tagList = new ArrayList<>();
         if (clauseRepository.findByTitleAndCountry(countryId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle());
         }
+        tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
         try {
-            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(clauseDto.getAccountType());
+            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId,clauseDto.getAccountType());
             Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
             if (clauseDto.getOrganizationTypes() != null && clauseDto.getOrganizationTypes().size() != 0) {
                 newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
@@ -98,7 +98,6 @@ public class ClauseService extends MongoBaseService {
                 newclause.setOrganizationSubServices(clauseDto.getOrganizationTypes());
 
             }
-            tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
             newclause.setAccountTypes(accountTypes);
             newclause.setTags(tagList);
             newclause = save(newclause);
@@ -128,7 +127,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(BigInteger clauseId, ClauseDto clauseDto) throws RepositoryException {
+    public Clause updateClause(Long countryId,BigInteger clauseId, ClauseDto clauseDto) throws RepositoryException {
 
         List<ClauseTag> tagList = new ArrayList<>();
         Clause exists = clauseRepository.findByid(clauseId);
@@ -154,7 +153,7 @@ public class ClauseService extends MongoBaseService {
                 exists.setOrganizationSubServices(clauseDto.getOrganizationTypes());
 
             }
-            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(clauseDto.getAccountType());
+            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId,clauseDto.getAccountType());
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
             exists.setAccountTypes(accountTypes);
             exists.setDescription(clauseDto.getDescription());

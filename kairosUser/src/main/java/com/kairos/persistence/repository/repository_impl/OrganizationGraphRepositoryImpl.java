@@ -44,7 +44,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
         if(StringUtils.isNotBlank(searchText)){
             matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-            " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR staff.cprNumber STARTS WITH {searchText} )";
+            " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
             countOfSubString+= 1;
         }
         return matchQueryForStaff;
@@ -125,8 +125,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         query+= " return distinct {id:id(staff), expertiseList:expertiseList,employmentList:employmentList,city:contactAddress.city,province:contactAddress.province, "+
                 "firstName:staff.firstName,lastName:staff.lastName,employedSince :staff.employedSince,"+
+                "age:round ((timestamp()-user.dateOfBirth) / (365*24*60*60*1000)),"+
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId,"+
-                "cprNumber:staff.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
+                "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
                 "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) } as staff ORDER BY staff.id\n";
 
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
@@ -179,7 +180,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         else{
             query +=   "MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) WHERE id(lat) in {latLngs} with lat,cs,cd,ca,c,r,houseHoldRel,houseHold\n";
         }
-        query += "return {name:c.firstName+\" \" +c.lastName,id:id(c), healthStatus:c.healthStatus,age:c.age, emailId:c.email, profilePic: {imagePath} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city,";
+        query += "return {name:c.firstName+\" \" +c.lastName,id:id(c), healthStatus:c.healthStatus,age:round ((timestamp()-c.dateOfBirth) / (365*24*60*60*1000)), emailId:c.email, profilePic: {imagePath} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city,";
         query += "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, ";
         query +=   "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END,houseHoldList:case when houseHoldRel is null then [] else collect({id:id(houseHold),firstName:houseHold.firstName,lastName:houseHold.lastName}) end}  as Client ORDER BY Client.name ASC SKIP {skip} LIMIT 20 ";
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());

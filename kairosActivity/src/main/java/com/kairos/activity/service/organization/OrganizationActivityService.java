@@ -3,7 +3,7 @@ package com.kairos.activity.service.organization;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
@@ -25,14 +25,14 @@ import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
-import com.kairos.response.dto.web.wta.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +70,7 @@ public class OrganizationActivityService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
-
+    @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
 
 
@@ -157,6 +157,8 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
+        activityCopied.getGeneralActivityTab().setStartDate(activity.getGeneralActivityTab().getStartDate());
+        activityCopied.getGeneralActivityTab().setEndDate(activity.getGeneralActivityTab().getEndDate());
         return activityCopied;
     }
 
@@ -165,10 +167,19 @@ public class OrganizationActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
+        if(generalDTO.getEndDate()!=null&&generalDTO.getEndDate().isBefore(generalDTO.getStartDate())){
+           exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
+            }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
-        Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnit(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId());
+        //Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnit(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId());
+        Date date= DateUtils.asDate(generalDTO.getStartDate());
+        Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId(),date);
         if (Optional.ofNullable(IsActivityExists).isPresent()) {
-            exceptionService.duplicateDataException("message.activity.name",generalDTO.getName());
+            if(!Optional.ofNullable(IsActivityExists.getGeneralActivityTab().getEndDate()).isPresent()){
+                exceptionService.dataNotFoundException("message.activity.enddate.required",generalDTO.getName());
+            } else{
+                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
+            }
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
@@ -182,9 +193,11 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setName(generalTab.getName());
         activity.setDescription(generalTab.getDescription());
         activity.setTags(generalDTO.getTags());
+
         save(activity);
         generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(activity.getCountryId());
+        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);
         return activityTabsWrapper;
     }

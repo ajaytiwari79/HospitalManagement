@@ -5,12 +5,14 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 import java.util.Set;
 
 public class MasterProcessingActivityDto {
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$")
     private  String name;
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")

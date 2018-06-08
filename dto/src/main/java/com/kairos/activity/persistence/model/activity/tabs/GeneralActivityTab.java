@@ -6,6 +6,7 @@ import com.kairos.activity.response.dto.tag.TagDTO;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,8 @@ public class GeneralActivityTab implements Serializable {
     private String originalIconName;
     private String modifiedIconName;
     private String ultraShortName;
-
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean overRuleCtaWta;
 
     private List<TagDTO> tags = new ArrayList<>();
@@ -74,7 +76,7 @@ public class GeneralActivityTab implements Serializable {
 
 
     public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String textColor, String description,
-                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,boolean overRuleCtaWta, String payrollSystem, String payrollType) {
+                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,boolean overRuleCtaWta, String payrollSystem, String payrollType,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.code = code;
         this.printoutSymbol = printoutSymbol;
@@ -93,6 +95,8 @@ public class GeneralActivityTab implements Serializable {
         this.overRuleCtaWta=overRuleCtaWta;
         this.payrollSystem = payrollSystem;
         this.payrollType = payrollType;
+        this.startDate=startDate;
+        this.endDate=endDate;
     }
 
     public List<TagDTO> getTags() {
@@ -236,5 +240,21 @@ public class GeneralActivityTab implements Serializable {
 
     public void setPayrollSystem(String payrollSystem) {
         this.payrollSystem = payrollSystem;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

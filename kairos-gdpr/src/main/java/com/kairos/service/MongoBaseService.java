@@ -28,6 +28,7 @@ public class MongoBaseService {
 
     @Inject
     MongoTemplate mongoTemplate;
+
     @Inject
     DB database;
 
