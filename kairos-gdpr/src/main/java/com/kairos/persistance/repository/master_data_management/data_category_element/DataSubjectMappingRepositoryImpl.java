@@ -34,6 +34,8 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                         .first("organizationSubTypes").as("organizationSubTypes")
                         .first("organizationServices").as("organizationServices")
                         .first("organizationSubServices").as("organizationSubServices")
+                        .first("name").as("name")
+                        .first("description").as("description")
                         .addToSet("dataCategories").as("dataCategories")
 
         );
@@ -56,6 +58,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                         .first("organizationSubTypes").as("organizationSubTypes")
                         .first("organizationServices").as("organizationServices")
                         .first("organizationSubServices").as("organizationSubServices")
+                        .first("name").as("name")
+                        .first("description").as("description")
+
                         .addToSet("dataCategories").as("dataCategories")
 
         );

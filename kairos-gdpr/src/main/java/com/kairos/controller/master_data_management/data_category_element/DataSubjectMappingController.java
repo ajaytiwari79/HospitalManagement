@@ -55,7 +55,7 @@ public class DataSubjectMappingController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         }
