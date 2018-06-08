@@ -1,38 +1,36 @@
 package com.kairos.response.dto.web.unit_settings;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class OpenShiftPhaseSetting {
-    private BigInteger phaseId;
-    private String phaseName;
-    private boolean solveUnderStaffingOverStaffing;
+
+
+    private Integer minOpenShiftHours;
+    private List<OpenShiftPhase> openShiftPhases;
+
+    public OpenShiftPhaseSetting(Integer minOpenShiftHours, List<OpenShiftPhase> openShiftPhases) {
+        this.minOpenShiftHours = minOpenShiftHours;
+        this.openShiftPhases = openShiftPhases;
+    }
 
     public OpenShiftPhaseSetting() {
         //Default Constructor
     }
 
-    public BigInteger getPhaseId() {
-        return phaseId;
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
     }
 
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 
-    public String getPhaseName() {
-        return phaseName;
+    public List<OpenShiftPhase> getOpenShiftPhases() {
+        return openShiftPhases;
     }
 
-    public void setPhaseName(String phaseName) {
-        this.phaseName = phaseName;
+    public void setOpenShiftPhases(List<OpenShiftPhase> openShiftPhases) {
+        this.openShiftPhases = openShiftPhases;
     }
-
-    public boolean isSolveUnderStaffingOverStaffing() {
-        return solveUnderStaffingOverStaffing;
-    }
-
-    public void setSolveUnderStaffingOverStaffing(boolean solveUnderStaffingOverStaffing) {
-        this.solveUnderStaffingOverStaffing = solveUnderStaffingOverStaffing;
-    }
-
 }

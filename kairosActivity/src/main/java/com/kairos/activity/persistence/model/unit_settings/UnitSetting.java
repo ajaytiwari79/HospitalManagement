@@ -3,8 +3,9 @@ package com.kairos.activity.persistence.model.unit_settings;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.response.dto.web.unit_settings.OpenShiftPhaseSetting;
 
+import java.util.List;
+
 public class UnitSetting extends MongoBaseEntity {
-    private Integer minOpenShiftHours;
     private OpenShiftPhaseSetting openShiftPhaseSetting;
     private Long unitId;
 
@@ -12,12 +13,9 @@ public class UnitSetting extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public Integer getMinOpenShiftHours() {
-        return minOpenShiftHours;
-    }
-
-    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
-        this.minOpenShiftHours = minOpenShiftHours;
+    public UnitSetting(OpenShiftPhaseSetting openShiftPhaseSetting, Long unitId) {
+        this.openShiftPhaseSetting = openShiftPhaseSetting;
+        this.unitId = unitId;
     }
 
     public OpenShiftPhaseSetting getOpenShiftPhaseSetting() {
@@ -36,3 +34,4 @@ public class UnitSetting extends MongoBaseEntity {
         this.unitId = unitId;
     }
 }
+

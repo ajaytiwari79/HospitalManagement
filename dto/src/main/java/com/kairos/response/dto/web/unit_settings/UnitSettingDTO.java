@@ -1,12 +1,11 @@
 package com.kairos.response.dto.web.unit_settings;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class UnitSettingDTO {
     private BigInteger id;
     private OpenShiftPhaseSetting openShiftPhaseSetting;
-    private Integer minShiftHours;
-    private Long unitId;
 
     public UnitSettingDTO() {
         //Default Constructor
@@ -26,21 +25,5 @@ public class UnitSettingDTO {
 
     public void setOpenShiftPhaseSetting(OpenShiftPhaseSetting openShiftPhaseSetting) {
         this.openShiftPhaseSetting = openShiftPhaseSetting;
-    }
-
-    public Integer getMinShiftHours() {
-        return minShiftHours;
-    }
-
-    public void setMinShiftHours(Integer minShiftHours) {
-        this.minShiftHours = minShiftHours;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
     }
 }
