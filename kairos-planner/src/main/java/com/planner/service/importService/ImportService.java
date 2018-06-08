@@ -34,7 +34,7 @@ public class ImportService {
         InputStream stream = null;
         XSSFWorkbook workbook = null;
         try {
-            stream = new FileInputStream(new File("/home/pradeep/Downloads/POCKamstrupVRP.xlsx"));
+            stream = new FileInputStream(new File(System.getProperty("user.home")+"/Downloads/POCKamstrupVRP.xlsx"));
             //Get the workbook instance for XLS file
             workbook = new XSSFWorkbook(stream);
         } catch (IOException e) {

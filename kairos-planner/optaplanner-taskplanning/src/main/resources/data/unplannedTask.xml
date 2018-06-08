@@ -4860,8 +4860,8 @@
   </citizenList>
   <taskList id="956">
     <com.kairos.planning.domain.Task id="957">
-      <nextTask id="958">
-        <nextTask id="959">
+      <prevTaskOrShift id="958">
+        <prevTaskOrShift id="959">
           <taskType id="960">
             <id>653</id>
             <title>6.1. Medicingivning</title>
@@ -4889,7 +4889,7 @@
             <latitude>55.93372</latitude>
             <longitude>10.06869</longitude>
           </location>
-        </nextTask>
+        </prevTaskOrShift>
         <taskType id="966">
           <id>649</id>
           <title>2.4. Psykisk pleje</title>
@@ -4912,7 +4912,7 @@
         <id>1990714</id>
         <duration>10</duration>
         <location reference="965"/>
-      </nextTask>
+      </prevTaskOrShift>
       <taskType id="971">
         <id>656</id>
         <title>1.2. Personlig hygiejne</title>
@@ -26815,7 +26815,7 @@
   </taskTypeList>
   <employees id="6426">
     <com.kairos.planning.domain.Employee id="6427">
-      <nextTask reference="957"/>
+      <prevTaskOrShift reference="957"/>
       <id>1005</id>
       <location reference="6"/>
       <name>Alice Kentsen</name>

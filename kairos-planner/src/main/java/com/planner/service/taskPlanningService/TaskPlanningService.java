@@ -439,7 +439,7 @@ public class TaskPlanningService {
 		int i = 1;
 		for (EmployeePlanningFact emp : solution.getEmployees()) {
 			Map<String, Object> map = new HashMap<>();
-			makeEmployeeList(tasks, emp.getNextTask());
+			makeEmployeeList(tasks, emp.getPrevTaskOrShift());
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
 			map.put("employeeId", emp.getId());

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 public class VrpTaskPlanningSolver {
-    public static String config = "config/Kamstrup_Vrp_taskPlanning.solver.xml";
+    public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     Solver<VrpTaskPlanningSolution> solver;
     SolverFactory<VrpTaskPlanningSolution> solverFactory;
@@ -21,6 +21,7 @@ public class VrpTaskPlanningSolver {
     }
     public void solve(VrpTaskPlanningSolution problem){
         VrpTaskPlanningSolution solution=solver.solve(problem);
+        log.info(solution.toString());
 
     }
 }
