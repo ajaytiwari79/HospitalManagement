@@ -135,23 +135,6 @@ public class Task extends MongoBaseEntity{
         this.longitude = longitude;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
 
-        Task task = (Task) o;
-
-        return new EqualsBuilder()
-                .append(intallationNo, task.intallationNo)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(intallationNo)
-                .toHashCode();
-    }
 }

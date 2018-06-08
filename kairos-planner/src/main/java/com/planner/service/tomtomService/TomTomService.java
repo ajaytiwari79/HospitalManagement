@@ -4,6 +4,7 @@ package com.planner.service.tomtomService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.activity.util.ObjectUtils;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.planner.domain.location.LocationDistance;
 import com.planner.domain.tomtomResponse.Matrix;
@@ -32,6 +33,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author pradeep
@@ -45,14 +49,17 @@ public class TomTomService {
     @Autowired private LocationService locationService;
     @Autowired private TomTomRepository tomTomRepository;
 
+    int key = 0;
+
+    String [] keys = {"xvb1VJX66SrM187drGq52jrAo5wo1kRL","pxlAcwIFHNCPKpVODeMlmew1qoLx9ZGx","I0JgGGfWVTAipGAoCKyzwLTQ6RAaYqGF","nUocn0Xi8thXJZYGHYVbSIxpxCzK6Jca"};
+
     public void getLocationData() {
-        List<Task> tasks = taskService.getUniqueTask();
-        List<List<Task>> subTaskList = getSubLists(tasks);
-        int i = 0;
+        List<Task> tasks = taskService.getUniqueTask().stream().filter(ObjectUtils.distinctByKey(task -> task.getLattitude()+task.getLongitude())).collect(toList());
+        List<List<Task>> subTaskList = getSubLists(tasks.subList(96,tasks.size()));
+        //int i = 0;
         for (List<Task> origin : subTaskList) {
             String request = getRequestMap(origin, tasks);
-            i = i+5;
-            System.out.println(i);
+
             /*try {
                 PrintWriter out = new PrintWriter(new File(System.getProperty("user.dir") + "/location"));
                 out.write(request);
@@ -61,11 +68,17 @@ public class TomTomService {
                 e.printStackTrace();
             }*/
             TomTomResponse response = submitToTomtom(request);
-            tomTomRepository.save(response);
+            //i++;
+           // tomTomRepository.save(response);
             List<LocationDistance> locationDistances = processLocationDistance(response,origin,tasks);
             locationService.saveLocation(locationDistances);
-            break;
+            //if(i==2){
+                key++;
+            /*    i=0;
+            }*/
+            //break;
         }
+
 
     }
 
@@ -75,9 +88,14 @@ public class TomTomService {
             List<Matrix> matrices = response.getMatrix().get(i);
             for (int j=0;j<destination.size();j++){
                 Matrix matrix = matrices.get(j);
+                matrix.setFirstLatitude(origin.get(i).getLattitude());
+                matrix.setFirstLongitude(origin.get(i).getLongitude());
+                matrix.setSecondLattitude(destination.get(j).getLattitude());
+                matrix.setSecondLongitude(destination.get(j).getLongitude());
                 locationDistances.add(new LocationDistance(origin.get(i).getIntallationNo(),destination.get(j).getIntallationNo(),(double)matrix.getResponse().getRouteSummary().getLengthInMeters(),(double)matrix.getResponse().getRouteSummary().getTravelTimeInSeconds()));
             }
         }
+        tomTomRepository.save(response);
         return locationDistances;
     }
 
@@ -111,7 +129,7 @@ public class TomTomService {
         List<List<Task>> subTaskList = new ArrayList<>();
         int i = 0;
         while (true) {
-            int j = i + 5;
+            int j = i + 6;
             if (j >= tasks.size()) {
                 j = tasks.size();
                 subTaskList.add(tasks.subList(i, j));
@@ -129,7 +147,7 @@ public class TomTomService {
         try {
             builder = new URIBuilder("https://api.tomtom.com/routing/1/matrix/json");
             List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-            params.add(new BasicNameValuePair("key", "pbSlE13OWkGMuPbTGM9XciGo0es4dGik"));
+            params.add(new BasicNameValuePair("key", keys[key]));
             params.add(new BasicNameValuePair("routeType", "shortest"));
             params.add(new BasicNameValuePair("travelMode", "car"));
             builder.setParameters(params);
@@ -180,6 +198,14 @@ public class TomTomService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<Matrix> getMatrix(){
+        List<Matrix> matrices = new ArrayList<>();
+        tomTomRepository.findAll().forEach(t->{
+            matrices.addAll(t.getMatrix().stream().flatMap(t->t.stream().map(matrix -> matrix)).collect(Collectors.toList()));
+        });
+        return matrices;
     }
 
 }
