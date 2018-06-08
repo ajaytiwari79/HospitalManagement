@@ -7,11 +7,7 @@ import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.access_permission.AccessGroupPermissionDTO;
-import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.user.access_permission.AccessPermissionDTO;
+import com.kairos.persistence.model.user.access_permission.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
@@ -35,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import javax.inject.Inject;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -287,6 +284,26 @@ public class AccessGroupServiceIntegrationTest {
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
                 HttpStatus.NOT_FOUND.equals(response.getStatusCode()) ||
                 HttpStatus.CONFLICT.equals(response.getStatusCode()) );
+    }
+
+
+    @Test
+    @OrderTest(order = 9)
+    public void getAccessGroupsToCreateOrganization() throws Exception{
+        String baseUrl=getBaseUrl(organizationId,countryId, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<AccessGroupQueryResult>>>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<AccessGroupQueryResult>>>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<AccessGroupQueryResult>>>> response = restTemplate.exchange(
+                baseUrl+"/access_group/hub_and_organization",
+                HttpMethod.GET, null, resTypeReference);
+
+        logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+
+        logger.info("response.getBody().getData() : "+response.getBody().getData());
     }
 
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){

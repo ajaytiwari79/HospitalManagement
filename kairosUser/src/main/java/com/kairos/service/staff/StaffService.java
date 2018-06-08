@@ -7,6 +7,7 @@ import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
@@ -301,7 +302,7 @@ public class StaffService extends UserBaseService {
             user.setCprNumber(staffPersonalDetail.getCprNumber());
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
         }
-        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
+//        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant( user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
         save(user);
@@ -961,7 +962,7 @@ public class StaffService extends UserBaseService {
         Staff staff = new Staff();
         staff.setFirstName(data.getFirstName());
         staff.setLastName(data.getLastName());
-        staff.setCprNumber(String.valueOf(data.getCprNumber()));
+//        staff.setCprNumber(String.valueOf(data.getCprNumber()));
         staff.setFamilyName(data.getFamilyName());
         //staff.setEmployedSince(data.getEmployedSince().getTime());
         staff.setCurrentStatus(data.getCurrentStatus());
@@ -1051,14 +1052,14 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
             user = new User();
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
         }
-        createUnitManagerAndEmployment(organizationId, user);
+        createUnitManagerAndEmployment(organizationId, user, staffCreationPOJOData.getAccessGroupId());
         return user;
     }
 
@@ -1073,7 +1074,6 @@ public class StaffService extends UserBaseService {
         user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
-            user.setAge(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)));
         }
     }
 
@@ -1099,7 +1099,7 @@ public class StaffService extends UserBaseService {
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
         staff.setFamilyName(payload.getFamilyName());
-        staff.setCprNumber(payload.getCprNumber());
+//        staff.setCprNumber(payload.getCprNumber());
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         staff.setContactAddress(contactAddress);
 
@@ -1196,10 +1196,10 @@ public class StaffService extends UserBaseService {
 //        }
     }
 
-
-    private void createUnitManagerAndEmployment(Long organizationId, User user) {
+    public void createUnitManagerAndEmployment(Long organizationId, User user, Long accessGroupId) {
 
         Organization organization = organizationGraphRepository.findOne(organizationId);
+        boolean parentOrganization = false;
         Organization parent;
         if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
@@ -1207,7 +1207,8 @@ public class StaffService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organizationId);
         }
-        if (!Optional.ofNullable(parent).isPresent()) {
+        if(!Optional.ofNullable(parent).isPresent()){
+            parentOrganization = true;
             parent = organization;
         }
 
@@ -1223,10 +1224,10 @@ public class StaffService extends UserBaseService {
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
 
         parent.getEmployments().add(employment);
-
+        save(parent);
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(parent);
-        AccessGroup accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByRole(parent.getId(), AccessGroupRole.MANAGEMENT.toString()); // findOne(accessGroupId);
+        unitPermission.setOrganization(organization);
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
         }
