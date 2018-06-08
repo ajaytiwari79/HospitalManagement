@@ -1,17 +1,21 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
+import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-@PlanningEntity
+//@PlanningEntity
 public class Shift {
     private String id;
     private Employee employee;
     private LocalDate localDate;
+   // @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,
+   //         sources = @PlanningVariableReference(variableName = "activityLineIntervals"))
     private LocalTime start;
     private LocalTime end;
 

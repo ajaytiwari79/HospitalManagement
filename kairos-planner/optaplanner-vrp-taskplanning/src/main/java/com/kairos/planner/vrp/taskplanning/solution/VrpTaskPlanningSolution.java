@@ -4,21 +4,28 @@ import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Shift;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
+import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
+import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
 import java.util.List;
 @PlanningSolution
 public class VrpTaskPlanningSolution {
     private String id;
     @ProblemFactCollectionProperty
+    @ValueRangeProvider(id = "shifts")
     private List<Shift> shifts;
     @ProblemFactCollectionProperty
     private List<Employee> employees;
     @PlanningEntityCollectionProperty
     @ValueRangeProvider(id = "tasks")
     private List<Task> tasks;
+
+    @PlanningScore
+    private HardMediumSoftLongScore hardMediumSoftScore;
 
     public String getId() {
         return id;
@@ -60,5 +67,13 @@ public class VrpTaskPlanningSolution {
     }
 
     public VrpTaskPlanningSolution() {
+    }
+
+    public HardMediumSoftLongScore getHardMediumSoftScore() {
+        return hardMediumSoftScore;
+    }
+
+    public void setHardMediumSoftScore(HardMediumSoftLongScore hardMediumSoftScore) {
+        this.hardMediumSoftScore = hardMediumSoftScore;
     }
 }

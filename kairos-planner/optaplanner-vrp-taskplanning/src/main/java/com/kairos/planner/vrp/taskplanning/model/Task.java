@@ -1,10 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
-import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
@@ -15,7 +12,7 @@ import java.util.Set;
  * @date - 7/6/18
  */
 @PlanningEntity
-public class Task{
+public class Task extends TaskOrShift{
     private String id;
     private int intallationNo;
     private Double lattitude;
@@ -29,12 +26,11 @@ public class Task{
     private int post;
     private String city;
     @PlanningVariable(valueRangeProviderRefs = {
-            "tasks" }, graphType = PlanningVariableGraphType.CHAINED)
-    private Task nextTask;
+            "tasks","shifts" }, graphType = PlanningVariableGraphType.CHAINED)
+    private TaskOrShift prevTaskOrShift;
 
-    @InverseRelationShadowVariable(sourceVariableName = "nextTask")
-    private Task prevTask;
-    @AnchorShadowVariable(sourceVariableName = "nextTask")
+
+    @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
 
 
@@ -61,20 +57,12 @@ public class Task{
         this.id = id;
     }
 
-    public Task getNextTask() {
-        return nextTask;
+    public TaskOrShift getPrevTaskOrShift() {
+        return prevTaskOrShift;
     }
 
-    public void setNextTask(Task nextTask) {
-        this.nextTask = nextTask;
-    }
-
-    public Task getPrevTask() {
-        return prevTask;
-    }
-
-    public void setPrevTask(Task prevTask) {
-        this.prevTask = prevTask;
+    public void setPrevTaskOrShift(TaskOrShift prevTaskOrShift) {
+        this.prevTaskOrShift = prevTaskOrShift;
     }
 
     public Shift getShift() {
