@@ -72,6 +72,10 @@ public class Shift extends TaskOrShift{
         this.end = end;
     }
 
+    public static LocalTime getDefaultShiftStart(){
+        return LocalTime.of(7,0);
+    }
+
     @Override
     public String toString() {
         return "Shift{" +

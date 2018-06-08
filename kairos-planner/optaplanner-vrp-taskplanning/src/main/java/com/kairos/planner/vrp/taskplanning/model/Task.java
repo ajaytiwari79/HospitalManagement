@@ -1,10 +1,9 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
+import org.optaplanner.core.api.domain.variable.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +29,9 @@ public class Task extends TaskOrShift{
     @PlanningVariable(valueRangeProviderRefs = {
             "tasks","shifts" }, graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrShift prevTaskOrShift;
+
+    @CustomShadowVariable(sources = @PlanningVariableReference(variableName = "prevTaskOrShift"),variableListenerClass = VrpTaskStartTimeListener.class)
+    private LocalDateTime plannedDateTime;
 
 
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
@@ -178,5 +180,15 @@ public class Task extends TaskOrShift{
                  + intallationNo +
                 "-" + duration +
                 '}';
+    }
+
+    public double getPlannedDuration(){
+        return this.getDuration()/(this.getShift().getEmployee().getEfficiency()/100d);
+    }
+    public int getDrivingTime(){
+        if(prevTaskOrShift instanceof Shift) return 0;
+        return 0;
+
+
     }
 }
