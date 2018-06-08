@@ -39,8 +39,13 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
             return true;
         } else {
             exceptionService.invalidRequestException("message.activity.day.create");
-            }
+        }
         return true;
+    }
+
+    @Override
+    public List<String> isSatisfiedString(Activity activity) {
+        return Collections.emptyList();
     }
 
     private Day getDay(Date activityDate) {
@@ -48,7 +53,7 @@ public class ActivityDayTypeSpecification extends AbstractActivitySpecification<
         Calendar c = Calendar.getInstance();
         c.setTime(activityDate);
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        Day activityDay=null;
+        Day activityDay = null;
         switch (dayOfWeek) {
             case 1:
                 activityDay = SUNDAY;

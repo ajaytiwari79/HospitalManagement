@@ -244,4 +244,6 @@ public class AppConstants {
 
     public static final String PAID_BREAK = "PAID BREAK";
     public static final String UNPAID_BREAK = "UNPAID BREAK";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String NO_CONFLICTS = "NO CONFLICTS";
 }
