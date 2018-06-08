@@ -34,10 +34,8 @@ public class Task extends TaskOrShift{
 
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
-    private Map<Integer,LocationInfo> locationInfoMap;
 
-
-    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city,Map<Integer, LocationInfo> locationInfoMap) {
+    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
@@ -50,17 +48,9 @@ public class Task extends TaskOrShift{
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
-        this.locationInfoMap = locationInfoMap;
     }
 
 
-    public Map<Integer, LocationInfo> getLocationInfoMap() {
-        return locationInfoMap;
-    }
-
-    public void setLocationInfoMap(Map<Integer, LocationInfo> locationInfoMap) {
-        this.locationInfoMap = locationInfoMap;
-    }
 
     public String getId() {
         return id;
