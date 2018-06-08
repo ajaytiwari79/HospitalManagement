@@ -44,7 +44,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
         }
         stringBuilder.append(" Match(staff)-[:" + BELONGS_TO_STAFF + "]-(up) ");
-        stringBuilder.append("return {staffId:id(staff), unitPositionId:id(up),workingDaysPerWeek:up.workingDaysInWeek,contractedMinByWeek:up.totalWeeklyMinutes," +
+        stringBuilder.append("return {staffId:id(staff),staffEmail:staff.email,unitPositionId:id(up),workingDaysPerWeek:up.workingDaysInWeek,contractedMinByWeek:up.totalWeeklyMinutes," +
                 " startDate:up.startDateMillis, endDate:up.endDateMillis } as data ");
         staffFilterQuery += stringBuilder.toString();
         Map<String, Object> queryParameters = new HashMap();
@@ -53,8 +53,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         queryParameters.put("maxDate", staffIncludeFilterDTO.getMaxOpenShiftDate());
         queryParameters.put("employmentTypeIds", staffIncludeFilterDTO.getEmploymentTypeIds());
         List<Map> my=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
-        System.out.println(my);
-        Iterable<StaffUnitPositionQueryResult> staffsUnitPositions = session.query(StaffUnitPositionQueryResult.class, staffFilterQuery, queryParameters);
         List<StaffUnitPositionQueryResult> staffUnitPositionList = ObjectMapperUtils.copyPropertiesOfListByMapper(my,StaffUnitPositionQueryResult.class);
 
 

@@ -1,21 +1,28 @@
 package com.kairos.activity.service.priority_group;
 
 import com.kairos.activity.client.GenericIntegrationService;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.activity.response.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.service.mail.MailService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.activity.util.event.ShiftNotificationEvent;
+import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.open_shift.PriorityGroupWrapper;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,6 +35,10 @@ public class PriorityGroupService extends MongoBaseService {
     private  ExceptionService exceptionService;
     @Inject
     private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
+    @Inject
+    private MailService mailService;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Inject private GenericIntegrationService genericIntegrationService;
 
@@ -184,15 +195,13 @@ public class PriorityGroupService extends MongoBaseService {
         return priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
     }
 
-    public Set<Long> getStaffByPriorityGroup(BigInteger priorityGroupId){
+    public void notifyStaffByPriorityGroup(BigInteger priorityGroupId){
         PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
         PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
-
         PriorityGroupRulesImplementation priorityGroupRulesImplementation = new PriorityGroupRulesImplementation();
         ImpactWeight impactWeight = new ImpactWeight(7,4);
         priorityGroupRulesImplementation.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
-        return null;
-
+        applicationContext.publishEvent(priorityGroupRuleDataDTO);
     }
 
     public PriorityGroupWrapper getPriorityGroupsByOrderIdForUnit(Long unitId,BigInteger orderId){

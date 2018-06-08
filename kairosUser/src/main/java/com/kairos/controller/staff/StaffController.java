@@ -621,7 +621,7 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getUnitWiseStaff() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitWiseStaffList());
     }
-    @RequestMapping(value = "/priority_group", method = RequestMethod.PUT)
+    @RequestMapping(value = "/priority_group", method = RequestMethod.POST)
     @ApiOperation("get Staff by StaffId ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffByPriorityGroup(@PathVariable long unitId, @RequestBody StaffIncludeFilterDTO staffIncludeFilterDTO) {

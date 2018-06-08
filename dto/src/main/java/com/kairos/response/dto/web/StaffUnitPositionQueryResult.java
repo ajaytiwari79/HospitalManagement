@@ -4,6 +4,7 @@ package com.kairos.response.dto.web;
 public class StaffUnitPositionQueryResult {
 
     private Long staffId;
+    private String staffEmail;
     private Long unitPositionId;
     private Integer workingDaysPerWeek;
     private Integer contractedMinByWeek;
@@ -12,6 +13,13 @@ public class StaffUnitPositionQueryResult {
     private Integer accumulatedTimeBank;
     private Integer deltaWeeklytimeBank;
 
+    public String getStaffEmail() {
+        return staffEmail;
+    }
+
+    public void setStaffEmail(String staffEmail) {
+        this.staffEmail = staffEmail;
+    }
     public Integer getAccumulatedTimeBank() {
         return accumulatedTimeBank;
     }

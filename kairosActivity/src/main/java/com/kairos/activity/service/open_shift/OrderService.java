@@ -49,8 +49,13 @@ public class OrderService extends MongoBaseService {
        }
        openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupService.createPriorityGroups(order.getId(),orderOpenshiftResponseDTO.getPriorityGroups());
-     //  priorityGroupService.getStaffByPriorityGroup(priorityGroupDTOS.get(0).getId());
        orderOpenshiftResponseDTO.setPriorityGroups(priorityGroupDTOS);
+       BigInteger id = null;
+       for(PriorityGroupDTO priorityGroupDTO:priorityGroupDTOS) {
+           id = priorityGroupDTO.getName().equals("PRIORITY_GROUP1")?priorityGroupDTO.getId():null;
+       }
+       priorityGroupService.notifyStaffByPriorityGroup(id);
+
        return orderOpenshiftResponseDTO;
        }
 

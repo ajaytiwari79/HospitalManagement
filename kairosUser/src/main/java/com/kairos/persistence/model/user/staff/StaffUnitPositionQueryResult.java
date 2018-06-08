@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 public class StaffUnitPositionQueryResult {
 
     private Long staffId;
+    private String staffEmail;
     private Long unitPositionId;
     private Integer workingDaysPerWeek;
     private Integer contractedMinByWeek;
@@ -16,6 +17,13 @@ public class StaffUnitPositionQueryResult {
         // dc
     }
 
+    public String getStaffEmail() {
+        return staffEmail;
+    }
+
+    public void setStaffEmail(String staffEmail) {
+        this.staffEmail = staffEmail;
+    }
     public Integer getWorkingDaysPerWeek() {
         return workingDaysPerWeek;
     }

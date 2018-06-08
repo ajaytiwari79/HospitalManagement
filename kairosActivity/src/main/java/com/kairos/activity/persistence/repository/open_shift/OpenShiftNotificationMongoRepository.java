@@ -10,6 +10,6 @@ import java.math.BigInteger;
 
 public interface OpenShiftNotificationMongoRepository extends MongoBaseRepository<OpenShiftNotification, BigInteger> {
 
-    @Query("{'deleted':false, 'openShiftId':{'$in':?0},'response':{$ne: true}}")
-    public List<OpenShiftNotification> findByOpenShiftIds(List<BigInteger>openShiftIds);
+    @Query("{'deleted':false, 'staffId':{'$in':?0},'response':{$ne: true}}")
+    public List<OpenShiftNotification> findByOpenShiftIds(List<Long>staffIds);
 }

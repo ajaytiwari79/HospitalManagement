@@ -117,7 +117,8 @@ public class PriorityGroupController {
     @GetMapping(value = UNIT_URL+"/priority_groups/{priorityGroupId}/filterPriorityGroup")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffByPriorityGroups(@PathVariable Long unitId,@PathVariable BigInteger priorityGroupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getStaffByPriorityGroup(priorityGroupId));
+        priorityGroupService.notifyStaffByPriorityGroup(priorityGroupId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
 }

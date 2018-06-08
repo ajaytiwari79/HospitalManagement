@@ -269,6 +269,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Query query=new Query(Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^"+name+"$",Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date),Criteria.where("GeneralActivityTab.endDate").exists(false)));
         return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
+    public Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId, Date date) {
+        Query query=new Query(Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^"+name+"$",Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("unitId").is(unitId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date),Criteria.where("GeneralActivityTab.endDate").exists(false)));
+        return (Activity) mongoTemplate.findOne(query,Activity.class);
+    }
 
     public Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -290,4 +294,5 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         //List<BigInteger> activityIds1 = activityIdMap.stream().map(Map::get("_id"))
         return activityIds;//new HashSet<Long>(result.getMappedResults());
     }
+
 }
