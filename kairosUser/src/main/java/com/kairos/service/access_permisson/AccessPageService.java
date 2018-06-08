@@ -256,12 +256,22 @@ public class AccessPageService extends UserBaseService {
         return preparePermissionList(allPermissions);
     }*/
 
+    public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long userId){
+        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(userId, AppConstants.AG_COUNTRY_ADMIN);
+
+        if(isCountryAdmin){
+            return getPermissionForHubMember();
+        } else {
+            return null;
+        }
+    }
+
     public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long parentOrganizationId,Organization newUnit,Long userId){
         Organization parentOrganization = organizationGraphRepository.findOne(parentOrganizationId);
         if(isHubMember(userId)){
             return getPermissionForHubMember();
         }
-        List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,parentOrganization.getId());
+        List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,parentOrganizationId);
         Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupId));
         Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
         Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();

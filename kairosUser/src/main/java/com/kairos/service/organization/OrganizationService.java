@@ -406,7 +406,7 @@ public class OrganizationService extends UserBaseService {
 
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
-        organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
+        organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
 
         organizationResponseMap.put("company", organizationResponseWrapper);
 
@@ -428,7 +428,7 @@ public class OrganizationService extends UserBaseService {
             organizationResponseWrapper = new OrganizationResponseWrapper();
 
             organizationResponseWrapper.setOrgData(organizationResponse(workCenterUnit, workCenterUnitDTO.getTypeId(), workCenterUnitDTO.getSubTypeId(), workCenterUnitDTO.getCompanyCategoryId()));
-            organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, workCenterUnit, UserContext.getUserDetails().getId()));
+            organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
             organizationResponseMap.put("workCenterUnit", organizationResponseWrapper);
         }
 
@@ -449,7 +449,7 @@ public class OrganizationService extends UserBaseService {
 
             organizationResponseWrapper = new OrganizationResponseWrapper();
             organizationResponseWrapper.setOrgData(organizationResponse(gdprUnit, gdprUnitDTO.getTypeId(), gdprUnitDTO.getSubTypeId(), gdprUnitDTO.getCompanyCategoryId()));
-            organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, gdprUnit, UserContext.getUserDetails().getId()));
+            organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
             organizationResponseMap.put("gdprUnit", organizationResponseWrapper);
 
         }
@@ -493,7 +493,7 @@ public class OrganizationService extends UserBaseService {
         }
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
-        organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
+        organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
 
         return organizationResponseWrapper;
     }
@@ -929,7 +929,7 @@ public class OrganizationService extends UserBaseService {
         response.put("type", ORGANIZATION_LABEL);
         response.put("contactAddress", unit.getContactAddress());
         response.put("children", Collections.emptyList());
-        response.put("permissions", accessPageService.getPermissionOfUserInUnit(parent.getId(), unit, UserContext.getUserDetails().getId()));
+        response.put("permissions", accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
         return response;
 
     }
