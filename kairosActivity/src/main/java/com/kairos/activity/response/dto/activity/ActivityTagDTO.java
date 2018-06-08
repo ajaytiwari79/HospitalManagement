@@ -13,6 +13,7 @@ import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,8 @@ public class ActivityTagDTO {
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
     private PermissionsActivityTab permissionsActivityTab;
-
+    private LocalDate startDate;
+    private LocalDate endDate;
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
         return timeCalculationActivityTab;
     }
@@ -50,6 +52,22 @@ public class ActivityTagDTO {
 
     public ActivityTagDTO() {
         //default constructor
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public BigInteger getId() {
@@ -172,6 +190,7 @@ public class ActivityTagDTO {
         this.unitId = activity.getUnitId();
         this.tags = tags;
         this.state=activity.getState();
+
         return this;
     }
 }

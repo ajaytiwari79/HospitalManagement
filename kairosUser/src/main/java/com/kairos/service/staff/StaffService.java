@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -10,6 +11,7 @@ import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.organization.organizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
@@ -220,13 +222,13 @@ public class StaffService extends UserBaseService {
     }
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
-        Staff objectToUpdate = staffGraphRepository.findOne(staffId);
+        Staff staffToUpdate = staffGraphRepository.findOne(staffId);
 
-        if (objectToUpdate == null) {
+        if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException("message.staff.notfound");
 
         }
-        if(StaffStatusEnum.ACTIVE.equals(objectToUpdate.getCurrentStatus())&&StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus()))
+        if(StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus())&&StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus()))
         {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
 
@@ -240,7 +242,7 @@ public class StaffService extends UserBaseService {
                  id = staffExperienceInExpertiseDTO.getId();
 
             Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
-            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(id, objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate);
+            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate);
             staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
             boolean isSeniorityLevelMatched=false;
             for(SeniorityLevel seniorityLevel:expertise.getSeniorityLevel()){
@@ -260,42 +262,47 @@ public class StaffService extends UserBaseService {
         }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
-        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(objectToUpdate.getId());
-        objectToUpdate.setLanguage(language);
-        objectToUpdate.setFirstName(staffPersonalDetail.getFirstName());
-        objectToUpdate.setLastName(staffPersonalDetail.getLastName());
-        objectToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
-        objectToUpdate.setCurrentStatus(staffPersonalDetail.getCurrentStatus());
-        objectToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
-        objectToUpdate.setSpeedPercent(staffPersonalDetail.getSpeedPercent());
-        objectToUpdate.setWorkPercent(staffPersonalDetail.getWorkPercent());
-        objectToUpdate.setOvertime(staffPersonalDetail.getOvertime());
-        objectToUpdate.setCostDay(staffPersonalDetail.getCostDay());
-        objectToUpdate.setCostCall(staffPersonalDetail.getCostCall());
-        objectToUpdate.setCostKm(staffPersonalDetail.getCostKm());
-        objectToUpdate.setCostHour(staffPersonalDetail.getCostHour());
-        objectToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
-        objectToUpdate.setCapacity(staffPersonalDetail.getCapacity());
-        objectToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
+        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
+        staffToUpdate.setLanguage(language);
+        staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
+        staffToUpdate.setLastName(staffPersonalDetail.getLastName());
+        staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
+        staffToUpdate.setCurrentStatus(staffPersonalDetail.getCurrentStatus());
+//        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
+        staffToUpdate.setSpeedPercent(staffPersonalDetail.getSpeedPercent());
+        staffToUpdate.setWorkPercent(staffPersonalDetail.getWorkPercent());
+        staffToUpdate.setOvertime(staffPersonalDetail.getOvertime());
+        staffToUpdate.setCostDay(staffPersonalDetail.getCostDay());
+        staffToUpdate.setCostCall(staffPersonalDetail.getCostCall());
+        staffToUpdate.setCostKm(staffPersonalDetail.getCostKm());
+        staffToUpdate.setCostHour(staffPersonalDetail.getCostHour());
+        staffToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
+        staffToUpdate.setCapacity(staffPersonalDetail.getCapacity());
+        staffToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
         staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
 
         if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
-            objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
+            staffToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
-        objectToUpdate.setSignature(staffPersonalDetail.getSignature());
-        objectToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
-        save(objectToUpdate);
+        staffToUpdate.setSignature(staffPersonalDetail.getSignature());
+        staffToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
+        save(staffToUpdate);
 
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
-            staffGraphRepository.removeSkillsByExpertise(objectToUpdate.getId(), expertiseIds);
+            staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
 
         // Set if user is female and pregnant
         User user = userGraphRepository.getUserByStaffId(staffId);
+        if( !user.getCprNumber().equals(staffPersonalDetail.getCprNumber()) ){
+            user.setCprNumber(staffPersonalDetail.getCprNumber());
+            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
+        }
+        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant( user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
         save(user);
@@ -325,7 +332,6 @@ public class StaffService extends UserBaseService {
 
         }
 
-
         Map<String, Object> personalInfo = new HashMap<>(2);
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Expertise> expertise = new ArrayList<>();
@@ -338,8 +344,8 @@ public class StaffService extends UserBaseService {
             languages = Collections.emptyList();
             engineerTypes = Collections.emptyList();
         }
-        List<Long> organizationServicesIds = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds, DateUtil.getCurrentDateMillis());
+        organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId(), DateUtil.getCurrentDateMillis());
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
         personalInfo.put("expertise", expertise);
@@ -363,7 +369,7 @@ public class StaffService extends UserBaseService {
         map.put("inactiveFrom", inactiveFrom);
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
-        map.put("cprNumber", staff.getCprNumber());
+        map.put("cprNumber", user.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
         map.put("gender", user.getGender());
         map.put("pregnant", user.isPregnant());
@@ -648,7 +654,8 @@ public class StaffService extends UserBaseService {
                 }
                 Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
                 if (cell != null) {
-                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
+//                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
+                    externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
                 }
             }
             List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(externalIdsOfStaffToBeSaved);
@@ -750,6 +757,10 @@ public class StaffService extends UserBaseService {
                             user = new User();
                             user.setFirstName(row.getCell(20).toString());
                             user.setLastName(row.getCell(21).toString());
+                            Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
+                            user.setCprNumber(cprNumberLong.toString());
+                            user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
+                            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             user.setTimeCareExternalId(cell.getStringCellValue());
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
@@ -758,7 +769,8 @@ public class StaffService extends UserBaseService {
                             String defaultPassword = user.getFirstName().trim() + "@kairos";
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                         }
-                        Client client = createClientObject(staff);  // here client is referred as citizen
+                        Client client = createClientObject(staff, user.getCprNumber());  // here client is referred as citizen
+
                         staff.setClient(client);
                         staff.setUser(user);
                     }
@@ -1028,7 +1040,7 @@ public class StaffService extends UserBaseService {
         }
 
         staff = createStaffObject(parent, unit, payload);
-        Client client = createClientObject(staff);
+        Client client = createClientObject(staff, payload.getCprNumber());
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
         staff.setClient(client);
@@ -1055,11 +1067,13 @@ public class StaffService extends UserBaseService {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
-        user.setGender(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE);
+        user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         user.setLastName(staffCreationDTO.getLastName());
         String defaultPassword = user.getFirstName().trim() + "@kairos";
         user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+        user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
+            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
             user.setAge(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)));
         }
     }
@@ -1094,9 +1108,6 @@ public class StaffService extends UserBaseService {
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
 
-        //method call for getting Date of Birth From CPR Number
-        Date dateOfBirth = DateUtil.asDate(CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber()));
-        staff.setDateOfBirth(dateOfBirth);
         staff.setCurrentStatus(payload.getCurrentStatus());
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
@@ -1109,16 +1120,18 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    private Client createClientObject(Staff staff) {
-        Client client = clientGraphRepository.findByCprNumber(staff.getCprNumber());
-        logger.debug("Staff cpr number", staff.getCprNumber());
+    private Client createClientObject(Staff staff, String cprNumber) {
+        Client client = clientGraphRepository.findByCprNumber(cprNumber);
+        logger.debug("Staff cpr number", cprNumber);
         if (!Optional.ofNullable(client).isPresent()) {
-            logger.debug("NO CITIZEN found by cpr : cpr number", staff.getCprNumber());
+            logger.debug("NO CITIZEN found by cpr : cpr number", cprNumber);
             client = new Client();
             client.setFirstName(staff.getFirstName());
             client.setLastName(staff.getLastName());
             client.setEmail(staff.getEmail());
-            client.setCprNumber(staff.getCprNumber());
+            client.setCprNumber(cprNumber);
+            client.setGender(CPRUtil.getGenderFromCPRNumber(client.getCprNumber()));
+            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(cprNumber));
         }
         return client;
     }

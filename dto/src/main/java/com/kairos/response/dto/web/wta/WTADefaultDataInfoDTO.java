@@ -1,10 +1,10 @@
 package com.kairos.response.dto.web.wta;
 
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class WTADefaultDataInfoDTO {
         this.timeSlots = timeSlots;
     }
 
-    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes,List<TimeSlotDTO> timeSlots,Long countryID) {
+    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes, List<TimeSlotDTO> timeSlots, Long countryID) {
         this.dayTypes = dayTypes;
         this.presenceTypes = presenceTypes;
         this.timeSlots = timeSlots;

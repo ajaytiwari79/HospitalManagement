@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.processing_activity_masterdata
 
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ResponsibilityType;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
@@ -97,12 +98,12 @@ public class ResponsibilityTypeService extends MongoBaseService {
     public ResponsibilityType updateResponsibilityType(BigInteger id, ResponsibilityType responsibilityType) {
 
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(UserContext.getCountryId(),responsibilityType.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+responsibilityType.getName());
         } else {
+            exist=responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-
             return save(exist);
 
         }

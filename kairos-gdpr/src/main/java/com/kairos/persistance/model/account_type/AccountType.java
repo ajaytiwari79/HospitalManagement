@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 
 @Document(collection = "account_type")
@@ -15,9 +16,9 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountType extends MongoBaseEntity {
 
-
     @NotNullOrEmpty
-    private String typeOfAccount;
+    @Pattern(regexp = "^[a-zA-Z\\s]+$")
+    private String name;
 
     private Long countryId;
 
@@ -29,12 +30,12 @@ public class AccountType extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public String getTypeOfAccount() {
-        return typeOfAccount;
+    public String getName() {
+        return name;
     }
 
-    public void setTypeOfAccount(String typeOfAccount) {
-        this.typeOfAccount = typeOfAccount;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public AccountType(){}

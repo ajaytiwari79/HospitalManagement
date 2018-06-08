@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.timetype;
+package com.kairos.response.dto.web.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -6,14 +6,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 /**
- * Created by vipul on 13/11/17.
+ * Created by vipul on 7/12/17.
+ * updation by Mohit Shakya on Jun/05/2018
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PresenceTypeWithTimeTypeDTO {
     private List<PresenceTypeDTO> presenceTypes;
-   /* private List<TimeTypeDTO> timeTypes;*/
     private Long countryId;
+
+
+    public PresenceTypeWithTimeTypeDTO() {
+    }
+
+    public PresenceTypeWithTimeTypeDTO(List<PresenceTypeDTO> presenceTypes, Long countryId) {
+        this.presenceTypes = presenceTypes;
+        this.countryId = countryId;
+    }
 
     public Long getCountryId() {
         return countryId;
@@ -31,11 +40,4 @@ public class PresenceTypeWithTimeTypeDTO {
         this.presenceTypes = presenceTypes;
     }
 
-    /*public List<TimeTypeDTO> getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
-        this.timeTypes = timeTypes;
-    }*/
 }
