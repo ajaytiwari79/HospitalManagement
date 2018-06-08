@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface DataCategoryMongoRepository extends MongoRepository<DataCategory,BigInteger> ,CustomDataCategoryRepository{
@@ -18,6 +20,9 @@ public interface DataCategoryMongoRepository extends MongoRepository<DataCategor
 
     @Query("{deleted:false,countryId:?0,name:?1}")
     DataCategory findByCountryIdAndName(Long countryId,String name);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<DataCategory> findDataCategoryByIds(Long countryId, Set<BigInteger> ids);
 
 
 }

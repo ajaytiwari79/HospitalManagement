@@ -4,7 +4,6 @@ import com.kairos.persistance.model.master_data_management.data_category_element
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataElementMognoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -29,21 +28,17 @@ public class DataElementService extends MongoBaseService {
         });
         List<DataElement> existingDataElement = dataElementMognoRepository.findByCountryIdAndNames(countryId, dataElementNames);
         if (existingDataElement.size() != 0) {
-            existingDataElement.forEach(dataElement -> dataElementNames.remove(dataElement.getName()));
+            exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
         for (String name : dataElementNames) {
-
             DataElement newDataElement = new DataElement();
             newDataElement.setName(name);
             newDataElement.setCountryId(countryId);
             dataElementList.add(newDataElement);
-
-
             dataElementList = save(dataElementList);
         }
         List<BigInteger> dataElementids = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
-        dataElementList.addAll(existingDataElement);
         dataElementList.forEach(dataElement -> {
             dataElementids.add(dataElement.getId());
         });
@@ -51,9 +46,7 @@ public class DataElementService extends MongoBaseService {
         result.put("elements", dataElementList);
         return result;
 
-
     }
-
 
     public DataElement getDataElement(Long countryId, BigInteger id) {
         DataElement exist = dataElementMognoRepository.findByIdAndNonDeleted(countryId, id);

@@ -45,9 +45,10 @@ public final class ApiConstant {
 
 
 
-    //Data category & element
+    //Data category & element and data subject Mapping
     public static final String API_DATA_CATEGORY_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_category";
     public static final String API_DATA_ELEMENT_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_element";
+    public static final String API_DATA_SUBJECT_AND_MAPPING_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/dataSubject_mapping";
 
 
 

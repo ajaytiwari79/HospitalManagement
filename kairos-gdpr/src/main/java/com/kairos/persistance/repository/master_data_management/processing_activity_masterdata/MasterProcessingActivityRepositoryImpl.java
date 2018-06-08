@@ -36,22 +36,17 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("isSubProcess").is(false)),
                 lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities")
-
         );
-
-
         AggregationResults<MasterProcessingActivityResponseDto> result=mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,MasterProcessingActivityResponseDto.class);
 
         return result.getUniqueMappedResult();
     }
-
     @Override
     public List<MasterProcessingActivityResponseDto> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId) {
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false)),
                 lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities")
-
         );
 
 
@@ -65,7 +60,6 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     public List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId, FilterSelectionDto filterSelectionDto) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false));
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
-
             if (filterSelection.getValue().size()!=0) {
                 query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));
             }

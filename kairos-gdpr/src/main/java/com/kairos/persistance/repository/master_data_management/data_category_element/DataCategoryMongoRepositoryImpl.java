@@ -54,7 +54,6 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
                         .first(COUNTRY_ID).as(COUNTRY_ID)
                         .addToSet("dataElements").as("dataElements")
         );
-
         AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
         return result.getMappedResults();
     }

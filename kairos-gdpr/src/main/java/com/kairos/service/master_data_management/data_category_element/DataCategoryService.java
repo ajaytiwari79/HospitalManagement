@@ -41,24 +41,20 @@ public class DataCategoryService extends MongoBaseService {
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
-
         }
         Map<String, Object> dataElementList = new HashMap<>();
+        dataElementList = dataElementService.createDataElements(countryId, dataCategoryDto.getDataElements());
         try {
-            dataElementList = dataElementService.createDataElements(countryId, dataCategoryDto.getDataElements());
             DataCategory newDataCategory = new DataCategory();
             newDataCategory.setCountryId(countryId);
             newDataCategory.setName(dataCategoryDto.getName());
             newDataCategory.setDataElements((List<BigInteger>) dataElementList.get("ids"));
             dataCategory = save(newDataCategory);
-
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
             dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get("elements"));
         }
-
         return dataCategory;
-
     }
 
 
@@ -86,9 +82,24 @@ public class DataCategoryService extends MongoBaseService {
 
     //get data  category with data element
     public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId) {
-         return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
+        return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
     }
 
+
+    //get data  category with data element
+    public List<DataCategory> getDataCategoryByIds(Long countryId, Set<BigInteger> ids) {
+        List<DataCategory> dataCategories = dataCategoryMongoRepository.findDataCategoryByIds(countryId, ids);
+        Set<BigInteger> dataCategoryIds = new HashSet<>();
+        dataCategories.forEach(dataCategory -> {
+            dataCategoryIds.add(dataCategory.getId());
+        });
+        if (dataCategoryIds.size() != ids.size()) {
+            ids.removeAll(dataCategoryIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", ids.iterator().next());
+        }
+        return dataCategories;
+
+    }
 
 
     public DataCategory updateDataCategoryAndElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
