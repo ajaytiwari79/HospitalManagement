@@ -1,6 +1,5 @@
 package com.kairos.activity.client.dto.staff;
 
-import com.kairos.activity.persistence.model.task_demand.MonthlyFrequency;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import org.joda.time.DateTimeZone;
 
@@ -121,4 +120,5 @@ public class StaffAdditionalInfoDTO {
     public void setOrganizationNightEndTimeTo(Date organizationNightEndTimeTo) {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
     }
+
 }
