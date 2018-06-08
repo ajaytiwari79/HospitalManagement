@@ -41,7 +41,7 @@ public class BreakSettingsController {
     @ApiOperation("Get remove a particular break settings from unit")
     @DeleteMapping(value = "/break/{breakSettingsId}")
     public ResponseEntity<Map<String, Object>> deleteBreakSettings(@PathVariable Long unitId, @PathVariable BigInteger breakSettingsId) {
-        return ResponseHandler.generateResponse(HttpStatus.RESET_CONTENT,true,breakSettingsService.removeBreakSettings(unitId,breakSettingsId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,breakSettingsService.removeBreakSettings(unitId,breakSettingsId));
     }
     @ApiOperation("update a particular break settings for unit")
     @PutMapping(value = "/break/{breakSettingsId}")
