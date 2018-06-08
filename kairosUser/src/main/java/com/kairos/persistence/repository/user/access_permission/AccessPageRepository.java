@@ -138,7 +138,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
             "MATCH (org)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={1}  with org,emp\n" +
             "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,isEnabled:true}) with accessGroup,org,unitPermission\n" +
             "Match (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with unitPermission, accessPage,r\n" +
             "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) \n"+
             "return id(accessPage) as id,accessPage.name as name," +
@@ -149,7 +149,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (org:Organization),(pOrg:Organization) where id(org) IN {0} AND id(pOrg)={2} \n" +
             "MATCH (pOrg)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={1}  with org,emp\n" +
             "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,isEnabled:true}) with accessGroup,org,unitPermission\n" +
             "Match (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with unitPermission, accessPage,r\n" +
             "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n"+
             "return id(accessPage) as id,accessPage.name as name," +

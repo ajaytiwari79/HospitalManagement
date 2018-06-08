@@ -64,7 +64,7 @@ public class AccessGroupController {
     @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessGroups(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroups(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupsForUnit(unitId));
     }
 
     @RequestMapping(value = UNIT_URL+"/staff/{staffId}/access_group", method = RequestMethod.POST)
