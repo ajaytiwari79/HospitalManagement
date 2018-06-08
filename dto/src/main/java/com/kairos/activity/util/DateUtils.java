@@ -1,5 +1,6 @@
 package com.kairos.activity.util;
 
+import com.kairos.persistence.model.enums.DurationType;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -9,6 +10,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -35,12 +37,12 @@ public class DateUtils {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate;
     }
+
     public static Date convertLocalDateToDate(LocalDate dateToConvert) {
         return Date.from(dateToConvert.atStartOfDay()
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
     }
-
 
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -327,10 +329,6 @@ public class DateUtils {
         return add(date, Calendar.DAY_OF_MONTH, amount);
     }
 
-    public static Date addMonths(final Date date, final int amount) {
-        return add(date, Calendar.MONTH, amount);
-    }
-
     private static Date add(final Date date, final int calendarField, final int amount) {
         if (date == null) {
             throw new IllegalArgumentException("The date must not be null");
@@ -369,6 +367,10 @@ public class DateUtils {
         return new Date(millis);
     }
 
+    public static LocalDate getLocalDate(long millis){
+        return getLocalDateFromDate( getDate(millis));
+    }
+
     public static LocalDate toLocalDate(DateTime date) {
         return Instant.ofEpochMilli(date.toDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
@@ -391,6 +393,11 @@ public class DateUtils {
     public static String getDateString(Date date, String dateFormatString){
         SimpleDateFormat simpleDateFormat =  new SimpleDateFormat(dateFormatString);
         return simpleDateFormat.format(date);
+    }
+
+    public static String formatLocalDate(LocalDate localDate, String dateFormatString){
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(dateFormatString);
+        return localDate.format(formatter);
     }
 
     public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
@@ -422,12 +429,7 @@ public class DateUtils {
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
     }
-    /**
-     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
-     */
-    public static DateTime getDateTime(Date date, LocalTime time){
-        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
-    }
+
 
     public static List<LocalDate> getDates(LocalDate start, LocalDate end){
         List<LocalDate> dates= new ArrayList<>();
@@ -436,4 +438,52 @@ public class DateUtils {
         }
         return dates;
     }
+
+    public static LocalDate addDurationInLocalDateExcludingLastDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
+        LocalDate endDate = addDurationInLocalDate(localDate, duration, durationType, recurringNumber);
+        return endDate.minusDays(1);
+    }
+
+    public static Long getDurationBetweenTwoLocalDatesIncludingLastDate(LocalDate startDate, LocalDate endDate, DurationType durationType){
+        Long duration = getDurationBetweenTwoLocalDates(startDate, endDate, durationType);
+        if(Optional.ofNullable(duration).isPresent()){
+            duration += 1;
+        }
+        return duration;
+    }
+
+    public static Long getDurationBetweenTwoLocalDates(LocalDate startDate, LocalDate endDate, DurationType durationType){
+        switch (durationType){
+            // Add case for Month, Year etc
+            case DAYS: {
+                return ChronoUnit.DAYS.between(endDate, startDate);
+            }
+            default: return null;
+        }
+    }
+
+    public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
+        switch (durationType){
+            case DAYS: {
+                return localDate.plusDays(duration*recurringNumber);
+            }
+            case WEEKS: {
+                return localDate.plusDays(duration *recurringNumber * 7);
+            }
+            case MONTHS: {
+                return localDate.plusMonths(duration *recurringNumber );
+            }
+        }
+        return localDate;
+    }
+
+    public static String getDurationOfTwoLocalDates(LocalDate startDate, LocalDate endDate){
+        // Get duration of period
+        Period period = Period.between(startDate, endDate);
+        return  (period.getMonths() > 0 ? period.getMonths() + " MONTHS ": "")+
+                ( period.getDays() >= 7 ? period.getDays() / 7 + " WEEKS " : "")+
+                ( period.getDays()%7 > 0 ? period.getDays() % 7 + " DAYS " : "") ;
+
+    }
+
 }

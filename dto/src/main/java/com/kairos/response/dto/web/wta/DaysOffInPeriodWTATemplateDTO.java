@@ -25,9 +25,9 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private long daysLimit;
     private List<PartOfDay> partOfDays;
     private MinMaxSetting minMaxSetting;
-    private boolean isRestingTimeAllowed;
+    private boolean restingTimeAllowed;
     private int restingTime;
-
+    protected float recommendedValue;
     public float getRecommendedValue() {
         return recommendedValue;
     }
@@ -36,15 +36,14 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.recommendedValue = recommendedValue;
     }
 
-    protected float recommendedValue;
+
     public boolean isRestingTimeAllowed() {
-        return isRestingTimeAllowed;
+        return restingTimeAllowed;
     }
 
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        isRestingTimeAllowed = restingTimeAllowed;
+        this.restingTimeAllowed = restingTimeAllowed;
     }
-
     public int getRestingTime() {
         return restingTime;
     }

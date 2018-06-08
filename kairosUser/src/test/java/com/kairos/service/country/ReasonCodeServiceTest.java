@@ -5,6 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.response.dto.web.ReasonCodeDTO;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static com.kairos.persistence.model.enums.ReasonCodeType.ABSENCE;
@@ -40,6 +42,8 @@ public class ReasonCodeServiceTest {
     private String url ;
     @Autowired
     TestRestTemplate restTemplate;
+    @Inject
+    private ExceptionService exceptionService;
     static String baseUrlWithCountry;
     private final Logger logger = LoggerFactory.getLogger(ReasonCodeServiceTest.class);
     ReasonCodeDTO reasonCodeDTO=new ReasonCodeDTO();
@@ -111,8 +115,10 @@ public class ReasonCodeServiceTest {
                     .append("/unit/").append(unitId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
+
         }
+        return null;
     }
 
 }

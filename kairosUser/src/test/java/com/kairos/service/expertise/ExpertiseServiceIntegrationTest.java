@@ -4,11 +4,11 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
-import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
 import com.kairos.response.dto.web.experties.UnionServiceWrapper;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,6 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,8 @@ public class ExpertiseServiceIntegrationTest {
     private String url;
     @Autowired
     private TestRestTemplate restTemplate;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     static private String baseUrlWithCountry;
     static Long organizationLevelId, serviceId, unionId, payTableId, expertiseId;
@@ -158,9 +160,10 @@ public class ExpertiseServiceIntegrationTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("organization ID must not be null");
-        }
+            exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
+        }
+    return null;
     }
 
 

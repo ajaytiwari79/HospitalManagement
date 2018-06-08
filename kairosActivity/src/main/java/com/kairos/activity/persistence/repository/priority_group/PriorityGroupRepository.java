@@ -1,7 +1,7 @@
 package com.kairos.activity.persistence.repository.priority_group;
 
 import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
-import com.kairos.activity.persistence.model.priority_group.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +26,20 @@ public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGro
     List<PriorityGroup> findAllByUnitIdAndDeActivatedFalseAndDeletedFalse(long unitId);
 
     PriorityGroupDTO findByIdAndDeletedFalse(BigInteger priorityGroupId);
+
+    List<PriorityGroupDTO> findByUnitIdAndRuleTemplateIdAndDeletedFalse(Long unitId,BigInteger ruleTemplateId);
+
+    List<PriorityGroup> findAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(Long countryId);
+
+    List<PriorityGroup> findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(long unitId);
+
+    List<PriorityGroupDTO> findByUnitIdAndOrderIdAndDeletedFalse(Long unitId,BigInteger orderId);
+
+    List<PriorityGroupDTO> findByCountryIdAndRuleTemplateIdAndDeletedFalse(Long countryId,BigInteger ruleTemplateId);
+
+    List<PriorityGroupDTO> getAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(Long countryId);
+
+    List<PriorityGroupDTO> getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(long unitId);
+
+    List<PriorityGroupDTO> getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(long unitId);
 }

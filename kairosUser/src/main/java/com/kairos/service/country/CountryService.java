@@ -7,10 +7,11 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.kairos.activity.enums.TimeTypes;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
@@ -27,9 +28,11 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.FormatUtil;
@@ -46,6 +49,10 @@ import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.NIGHT_END_HOUR;
+import static com.kairos.constants.AppConstants.NIGHT_START_HOUR;
 
 /**
  * Created by oodles on 16/9/16.
@@ -107,9 +114,11 @@ public class CountryService extends UserBaseService {
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
     private @Inject OrganizationService organizationService;
-    private @Inject PresenceTypeService presenceTypeService;
+    @Inject
+    private PlannedTimeTypeRestClient plannedTimeTypeRestClient;
     private @Autowired FunctionService functionService;
-
+    @Inject
+    private ExceptionService exceptionService;
 
     /**
      * @param country
@@ -121,9 +130,12 @@ public class CountryService extends UserBaseService {
         if (countryFound == null || countryFound.isEmpty()) {
             super.save(country);
             return country.retrieveDetails();
+        } else {
+            exceptionService.duplicateDataException("message.country.name.duplicate");
+
         }
-        throw new DuplicateDataException("Can't create duplicate name country");
-    }
+        return null;
+        }
 
 
     /**
@@ -145,11 +157,13 @@ public class CountryService extends UserBaseService {
         String name = "(?i)" + country.getName();
         List<Country> duplicateCountryList = countryGraphRepository.checkDuplicateCountry(name, country.getId());
         if (!duplicateCountryList.isEmpty()) {
-            throw new DuplicateDataException("Can't create duplicate name country");
+            exceptionService.duplicateDataException("message.country.name.duplicate");
+
         }
         Country currentCountry = (Country) findOne(country.getId());
         if (country == null) {
-            throw new InternalError("Country not found");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",country.getId());
+
         }
         currentCountry.setName(country.getName());
         currentCountry.setCode(country.getCode());
@@ -211,7 +225,8 @@ public class CountryService extends UserBaseService {
         List<CountryHolidayCalender> calenderList = new ArrayList<>();
         Country country = countryGraphRepository.findOne(countryId, 2);
         if (country == null) {
-            throw new DataNotFoundByIdException("Can't find country with provided Id");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         try {
             List<Event> eventList = GoogleCalenderService.getEventsFromGoogleCalender();
@@ -327,7 +342,8 @@ public class CountryService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             logger.debug("Finding country by id::" + countryId);
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         country.addLevel(level);
         countryGraphRepository.save(country);
@@ -338,7 +354,8 @@ public class CountryService extends UserBaseService {
         Level levelToUpdate = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToUpdate == null) {
             logger.debug("Finding level by id::" + levelId);
-            throw new DataNotFoundByIdException("Incorrect level id " + levelId);
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
+
         }
         levelToUpdate.setName(level.getName());
         levelToUpdate.setDescription(level.getDescription());
@@ -349,7 +366,8 @@ public class CountryService extends UserBaseService {
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToDelete == null) {
             logger.debug("Finding level by id::" + levelId);
-            throw new DataNotFoundByIdException("Incorrect level id " + levelId);
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound",levelId);
+
         }
 
         levelToDelete.setEnabled(false);
@@ -365,7 +383,8 @@ public class CountryService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             logger.debug("Finding country by id::" + countryId);
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         List<RelationType> relationTypes = new ArrayList<RelationType>();
         //check if getRelationTypes is null then it will not add in array list.
@@ -385,7 +404,8 @@ public class CountryService extends UserBaseService {
         RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
         if (relationType == null) {
             logger.debug("Finding relation type by id::" + relationTypeId);
-            throw new DataNotFoundByIdException("Incorrect relation type id " + relationTypeId);
+            exceptionService.dataNotFoundByIdException("message.country.realtionType.id.notFound",relationTypeId);
+
         }
 
         relationType.setEnabled(false);
@@ -398,7 +418,8 @@ public class CountryService extends UserBaseService {
                 null;
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            throw new DataNotFoundByIdException("Incorrect country id");
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+
         }
         country.addResources(vehicle);
         countryGraphRepository.save(country);
@@ -408,7 +429,8 @@ public class CountryService extends UserBaseService {
     public List<Vehicle> getVehicleList(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            throw new DataNotFoundByIdException("Incorrect country id");
+            exceptionService.dataNotFoundByIdException("message.country.id.notNull");
+            //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
@@ -416,7 +438,8 @@ public class CountryService extends UserBaseService {
     public List<VehicleQueryResult> getAllVehicleListWithFeatures(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
             logger.error("Finding country by id::" + countryId);
-            throw new DataNotFoundByIdException("Incorrect country id");
+            exceptionService.dataNotFoundByIdException("message.country.id.notNull");
+            //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
@@ -426,7 +449,7 @@ public class CountryService extends UserBaseService {
                 countryGraphRepository.getResources(countryId, resourcesId):null;
         if (!Optional.ofNullable(vehicle).isPresent()) {
             logger.error("Finding vehicle by id::" + resourcesId + " Country id " + countryId);
-            throw new DataNotFoundByIdException("Incorrect vehicle id");
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
         }
         vehicle.setEnabled(false);
         save(vehicle);
@@ -438,7 +461,8 @@ public class CountryService extends UserBaseService {
                 countryGraphRepository.getResources(countryId, resourcesId) : null;
         if (!Optional.ofNullable(vehicleToUpdate).isPresent()) {
             logger.debug("Finding vehicle by id::" + resourcesId);
-            throw new DataNotFoundByIdException("Incorrect vehicle id");
+            exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
+
         }
         vehicleToUpdate.setName(vehicle.getName());
         vehicleToUpdate.setDescription(vehicle.getDescription());
@@ -467,8 +491,9 @@ public class CountryService extends UserBaseService {
 
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
-         List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
-         List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
+         TimeTypeDTO timeType= timeTypeRestClient.getAllTimeTypes(countryId).stream().filter(t->t.getTimeTypes().equals(TimeTypes.WORKING_TYPE.toValue())).findFirst().get();
+         List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
+         List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
          List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
          List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
@@ -511,7 +536,7 @@ public class CountryService extends UserBaseService {
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId){
-        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(countryId);
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<com.kairos.response.dto.web.wta.PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new com.kairos.response.dto.web.wta.PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());
@@ -528,7 +553,15 @@ public class CountryService extends UserBaseService {
                 e.printStackTrace();
             }
         });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1);
+        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1,getDefaultTimeSlot(),countryId);
+    }
+
+    public List<TimeSlotDTO> getDefaultTimeSlot(){
+        List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
+        timeSlotDTOS.add(new TimeSlotDTO(DAY,DAY_START_HOUR,00,DAY_END_HOUR,00));
+        timeSlotDTOS.add(new TimeSlotDTO(EVENING,EVENING_START_HOUR,00,EVENING_END_HOUR,00));
+        timeSlotDTOS.add(new TimeSlotDTO(NIGHT,NIGHT_START_HOUR,00,NIGHT_END_HOUR,00));
+        return timeSlotDTOS;
     }
 
 

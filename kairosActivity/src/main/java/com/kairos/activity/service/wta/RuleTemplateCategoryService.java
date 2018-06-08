@@ -13,6 +13,7 @@ import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoR
 import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.CountryDTO;
 
@@ -22,6 +23,7 @@ import com.kairos.response.dto.web.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,8 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     private CountryRestClient countryRestClient;
     @Inject
     private OrganizationRestClient organizationRestClient;
+    @Autowired
+    private ExceptionService excpExceptionService;
 
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateCategoryService.class);
 
@@ -61,7 +65,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     public RuleTemplateAndCategoryDTO createRuleTemplateCategory(long countryId, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new ActionNotPermittedException("Country not exists " + countryId);
+            excpExceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
 
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, ruleTemplateCategoryDTO.getName(), ruleTemplateCategoryDTO.getRuleTemplateCategoryType());
@@ -90,7 +94,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (country == null) {
-            throw new DataNotFoundByIdException("Country does not exist");
+            excpExceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         return ruleTemplateCategoryMongoRepository.getRuleTemplateCategoryByCountry(countryId, ruleTemplateCategoryType);
 
@@ -104,11 +108,11 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     public boolean deleteRuleTemplateCategory(long countryId, BigInteger templateCategoryId) {
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findOne(templateCategoryId);
         if (ruleTemplateCategory == null) {
-            throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist" + templateCategoryId);
+            excpExceptionService.dataNotFoundByIdException("message.ruletemplatecategory.id",templateCategoryId);
         }
 
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
+            excpExceptionService.actionNotPermittedException("message.ruletemplatecategory.delete",templateCategoryId);
         }
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
         RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
@@ -137,18 +141,18 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findById(templateCategoryId).get();
         }
         if (!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid category " + ruleTemplateCategoryDTO.getName());
+            excpExceptionService.dataNotFoundByIdException("message.ruletemplatecategory.name.notfound",ruleTemplateCategoryDTO.getName());
         }
 
         if (!ruleTemplateCategoryDTO.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())) {
             RuleTemplateCategory templateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, ruleTemplateCategoryDTO.getName(), RuleTemplateCategoryType.WTA);
             if (Optional.ofNullable(templateCategory).isPresent()) {
-                throw new DuplicateDataException("ruleTemplateCategory name already  exists " + ruleTemplateCategoryDTO.getName());
+                excpExceptionService.duplicateDataException("message.ruletemplatecategory.name.alreadyexist",ruleTemplateCategoryDTO.getName());
             }
         }
         //ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO,ruleTemplateCategoryObj);
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategoryDTO.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
+            excpExceptionService.actionNotPermittedException("message.ruletemplatecategory.name.update");
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
@@ -185,7 +189,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     public RuleTemplateCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId,RuleTemplateCategoryDTO ruleTemplateCategory){
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            throw new ActionNotPermittedException("Country not exists " + countryId);
+            excpExceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findById(templateCategoryId).get();
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());

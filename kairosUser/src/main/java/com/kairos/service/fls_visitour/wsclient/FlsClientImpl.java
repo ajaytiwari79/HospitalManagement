@@ -1,6 +1,5 @@
 package com.kairos.service.fls_visitour.wsclient;
-import com.kairos.custom_exception.FlsCredentialException;
-import com.kairos.service.fls_visitour.exceptions.scheduler.FlsCallException;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.webservice_config.WebServiceMessageSenderWithAuth;
 import com.kairos.util.FlsUrlPaths;
 import com.kairos.util.IPAddressUtil;
@@ -28,6 +27,8 @@ public class FlsClientImpl implements  FlsClient{
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    @Inject
+    private ExceptionService exceptionService;
     private static final Logger logger = LoggerFactory.getLogger(FlsClientImpl.class);
 
     /**
@@ -42,8 +43,9 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.CALL, payload);
             return response;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
         }
+        return null;
     }
 
     /**
@@ -57,12 +59,15 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(0 != payload.getFunctionCode()){ /// function code must be zero
-                throw new FlsCallException("Not A Valid StaffFunction code, Should be 0");
+               exceptionService.flsCallException("message.fls.StaffFunction.notValid",0);
+
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+           // throw new FlsCredentialException("Invalid FLS credentials");
         }
+        return null;
     }
 
     /**
@@ -86,12 +91,15 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(1 != payload.getFunctionCode()){ /// function code must be one
-                throw new FlsCallException("Not A Valid StaffFunction code, Should be 1");
+                exceptionService.flsCallException("message.fls.StaffFunction.notValid",1);
+
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+            //throw new FlsCredentialException("Invalid FLS credentials");
         }
+        return null;
     }
 
     /**
@@ -104,12 +112,15 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(2 != payload.getFunctionCode()){ /// function code must be 2
-                throw new FlsCallException("Not A Valid StaffFunction code, Should be 2");
+                exceptionService.flsCallException("message.fls.StaffFunction.notValid",2);
+
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -122,12 +133,15 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(3 != payload.getFunctionCode() &&  4 != payload.getFunctionCode() ){ /// function code must be 3, 4
-                throw new FlsCallException("Not A Valid StaffFunction code, Should be 3 or 4");
+               exceptionService.flsCallException("message.fls.StaffFunction.notValid1",3,4);
+
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -140,12 +154,15 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(5 != payload.getFunctionCode()){ /// function code must be 5
-                throw new FlsCallException("Not A Valid StaffFunction code, Should be 5");
+                exceptionService.flsCallException("message.fls.StaffFunction.notValid",5);
+
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -162,8 +179,10 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.SHOW_CALL_INFO, payload);
             return showCallInfoResponse;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -180,8 +199,10 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.GEOCODE, geocode);
             return response;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -192,15 +213,18 @@ public class FlsClientImpl implements  FlsClient{
     @Override
     public FieldManagerResponse sendFieldManagerRequest(FieldManager fieldManager, Map<String, String> flsCredentials){
         if(flsCredentials.get("flsDefaultUrl") == ""){
-            throw new FlsCredentialException("FLS URL is not present");
+            exceptionService.flsCredentialException("message.fls.url.notPresent");
+
         }
         try {
             FieldManagerResponse fieldManagerResponse =  (FieldManagerResponse) webServiceTemplate(flsCredentials)
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIELD_MANAGER, fieldManager);
             return fieldManagerResponse;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -216,8 +240,10 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIX_SCHEDULE, fixSchedule);
             return fixScheduleResponse;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -232,8 +258,10 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.WORK_SCHEDULE, workSchedule);
             return workScheduleResponse;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     /**
@@ -248,14 +276,16 @@ public class FlsClientImpl implements  FlsClient{
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.OPTIMIZE, optimize);
             return optimizeResponse;
         } catch (Exception ex){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
+
         }
+        return null;
     }
 
     public WebServiceTemplate webServiceTemplate(Map<String, String> auth) {
 
         if(auth == null || auth.get("flsDefaultUrl") == null || auth.get("flsDefaultUrl").trim().length() < 1){
-            throw new FlsCredentialException("Invalid FLS credentials");
+            exceptionService.flsCredentialException("message.fls.credentials.notfound");
         }
 
         String loggedInUser = "";

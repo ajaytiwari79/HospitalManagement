@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.organization.OrganizationMetadataReposi
 import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,8 @@ public class OrganizationMetadataService extends UserBaseService {
     @Inject
     private
     PaymentSettingRepository paymentSettingRepository;
-
+    @Inject
+    private ExceptionService exceptionService;
     private static final Logger logger = LoggerFactory.getLogger(OrganizationMetadataService.class);
 
 
@@ -174,23 +176,19 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
 
     public PaymentSettingsQueryResult getPaymentSettings(Long unitId) {
         PaymentSettingsQueryResult paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
-        if (!Optional.ofNullable(paymentSettings).isPresent()) {
-            logger.info("Unable to payments settings for unit ,{}", unitId);
-            throw new DataNotFoundByIdException("Unable to get  payments settings for unit " + unitId);
-        }
-
         return paymentSettings;
     }
 
+
     private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
-        PaymentSettings paymentSettings =  updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
+        PaymentSettings paymentSettings = updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
         organization.setPaymentSettings(paymentSettings);
         save(organization);
         return paymentSettings.getId();
 
     }
 
-    private PaymentSettings updatePaymentSettingsWithDates(PaymentSettings paymentSettings, PaymentSettingsDTO paymentSettingsDTO){
+    private PaymentSettings updatePaymentSettingsWithDates(PaymentSettings paymentSettings, PaymentSettingsDTO paymentSettingsDTO) {
         paymentSettings.setFornightlyPayDay(paymentSettingsDTO.getFornightlyPayDay());
         paymentSettings.setWeeklyPayDay(paymentSettingsDTO.getWeeklyPayDay());
         //TODO: calling date updation method
@@ -205,11 +203,13 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         }
         PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId, paymentSettingsDTO.getId());
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
-            paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
-        }else {
-            updatePaymentSettingsWithDates(paymentSettings, paymentSettingsDTO);
-            save(paymentSettings);
+
+            logger.info("Unable to payment while updating payments settings for unit ,{}", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.paymentsetting.update.unable", unitId);
+
         }
+        updatePaymentSettingsWithDates(paymentSettings, paymentSettingsDTO);
+        save(paymentSettings);
         return paymentSettingsDTO;
     }
 }

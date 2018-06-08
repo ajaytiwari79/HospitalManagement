@@ -1,8 +1,10 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.response.dto.web.skill.SkillDTO;
 
+import java.time.LocalDate;
 import java.util.Set;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 
@@ -47,10 +49,17 @@ public class StaffDTO {
     private String firstName;
 
     private String workTelephone;
+    private Gender gender;
+    private boolean pregnant;
+    private LocalDate dateOfBirth;
 
     private Long unitEmploymentPositionId;
     private CurrentAddress primaryAddress;
     private Set<SkillDTO> skillSet;
+
+    public StaffDTO() {
+        // default constructor
+    }
 
     public StaffDTO(Long id, String firstName, Set<SkillDTO> skillSet) {
         this.id = id;
@@ -264,6 +273,30 @@ public class StaffDTO {
 
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     @Override

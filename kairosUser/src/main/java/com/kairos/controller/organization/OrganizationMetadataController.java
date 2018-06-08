@@ -1,4 +1,5 @@
 package com.kairos.controller.organization;
+
 import com.kairos.persistence.model.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.service.organizationMetadata.OrganizationMetadataService;
@@ -29,56 +30,54 @@ public class OrganizationMetadataController {
 
     private static final String localAreaTagUrl = "/localAreaTags";
     private static final String organizationPaymentSettingsUrl = "/organization_payment_settings";
+    private static final String organizationBreakSettingsUrl = "/break_settings";
 
     @ApiOperation(value = "Get Local Area Tag for a unit")
-    @RequestMapping(value = localAreaTagUrl,method = RequestMethod.GET)
-   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getLocalAreaTags(@PathVariable long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,
+    @RequestMapping(value = localAreaTagUrl, method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getLocalAreaTags(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationMetadataService.findAllLocalAreaTags(unitId));
     }
 
 
     @ApiOperation(value = "Create Local Area Tag for a unit")
-    @RequestMapping(value = localAreaTagUrl,method = RequestMethod.POST)
+    @RequestMapping(value = localAreaTagUrl, method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> createLocalAreaTag(@Validated @RequestBody LocalAreaTag localAreaTag, @PathVariable long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.createNew(localAreaTag,unitId));
+    public ResponseEntity<Map<String, Object>> createLocalAreaTag(@Validated @RequestBody LocalAreaTag localAreaTag, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationMetadataService.createNew(localAreaTag, unitId));
     }
 
 
     @ApiOperation(value = "Update Local Area Tag for a unit")
-    @RequestMapping(value = localAreaTagUrl,method = RequestMethod.PUT)
+    @RequestMapping(value = localAreaTagUrl, method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> updateLocalAreaTag(@Validated  @RequestBody LocalAreaTag localAreaTag, @PathVariable long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.updateTagData(localAreaTag, unitId));
+    public ResponseEntity<Map<String, Object>> updateLocalAreaTag(@Validated @RequestBody LocalAreaTag localAreaTag, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationMetadataService.updateTagData(localAreaTag, unitId));
     }
 
 
     @ApiOperation(value = "Delete Local Area Tag for a unit")
-    @RequestMapping(value = localAreaTagUrl+"/{localAreaTagId}",method = RequestMethod.DELETE)
+    @RequestMapping(value = localAreaTagUrl + "/{localAreaTagId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> deleteLocalAreaTag(@Validated @PathVariable Long localAreaTagId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.deleteTagData(localAreaTagId));
+    public ResponseEntity<Map<String, Object>> deleteLocalAreaTag(@Validated @PathVariable Long localAreaTagId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationMetadataService.deleteTagData(localAreaTagId));
     }
 
     @ApiOperation(value = "Get Payments settings for a unit")
-    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.GET)
+    @RequestMapping(value = organizationPaymentSettingsUrl, method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getPaymentsSettings(@PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,
+    public ResponseEntity<Map<String, Object>> getPaymentsSettings(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationMetadataService.getPaymentSettings(unitId));
     }
 
 
     @ApiOperation(value = "Update Payments settings for a unit")
-    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.POST)
+    @RequestMapping(value = organizationPaymentSettingsUrl, method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> updatePaymentsSettings(@Validated  @RequestBody PaymentSettingsDTO paymentSettingsDTO, @PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.updatePaymentsSettings(paymentSettingsDTO, unitId));
+    public ResponseEntity<Map<String, Object>> updatePaymentsSettings(@Validated @RequestBody PaymentSettingsDTO paymentSettingsDTO, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationMetadataService.updatePaymentsSettings(paymentSettingsDTO, unitId));
     }
-
-
-
 
 }

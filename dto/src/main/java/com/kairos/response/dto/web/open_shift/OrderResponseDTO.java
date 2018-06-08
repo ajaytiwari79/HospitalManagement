@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web.open_shift;
 
+import com.kairos.persistence.model.enums.InformationReciever;
+
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -36,6 +38,9 @@ public class OrderResponseDTO {
     private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
     private BigInteger id;
+    private PlannerNotificationInfo plannerNotificationInfo;
+
+
 
 
     public List<DayOfWeek> getDayType() {
@@ -269,4 +274,11 @@ public class OrderResponseDTO {
         this.functionIds = functionIds;
     }
 
+    public PlannerNotificationInfo getPlannerNotificationInfo() {
+        return plannerNotificationInfo;
+    }
+
+    public void setPlannerNotificationInfo(PlannerNotificationInfo plannerNotificationInfo) {
+        this.plannerNotificationInfo = plannerNotificationInfo;
+    }
 }

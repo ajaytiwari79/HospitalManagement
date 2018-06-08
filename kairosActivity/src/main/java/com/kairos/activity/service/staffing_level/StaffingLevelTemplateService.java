@@ -9,6 +9,7 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevelTemplat
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
     @Autowired
     private OrganizationRestClient organizationRestClient;
+    @Autowired
+    private ExceptionService exceptionService;
 
     /**
      *
@@ -68,12 +71,12 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             BeanUtils.copyProperties(staffingLevelTemplate,staffingLevelTemplateDTO);
             staffingLevelTemplateDTO.setStaffingLevelInterval( staffingLevelTemplate.getStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
-            return staffingLevelTemplateDTO;
+
 
         }else{
-            throw new DataNotFoundByIdException("staffingLevelTemplate "+staffingTemplateId +"not exist");
+            exceptionService.dataNotFoundByIdException("message.staffleveltemplate",staffingTemplateId);
         }
-
+        return staffingLevelTemplateDTO;
 
     }
 

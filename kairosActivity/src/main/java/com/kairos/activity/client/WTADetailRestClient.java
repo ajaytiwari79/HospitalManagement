@@ -2,13 +2,10 @@ package com.kairos.activity.client;
 
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.util.RestClientUrlUtil;
-import com.kairos.activity.util.userContext.UserContext;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
-import com.sun.javafx.fxml.builder.URLBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +55,30 @@ public class WTADetailRestClient {
 
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(false)).append("/country/").append(countryId);
-        baseUrl.append("/getWtaTemplateDefaultDataInfo");
+        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(false)).append("/country/").append(countryId).append("/getWtaTemplateDefaultDataInfo");
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl.toString(),
+                            HttpMethod.GET, null, typeReference);
+            RestTemplateResponseEnvelope<WTADefaultDataInfoDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+    }
 
+
+    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId() {
+        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(true)).append("/getWtaTemplateDefaultDataInfoByUnitId");
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
             };

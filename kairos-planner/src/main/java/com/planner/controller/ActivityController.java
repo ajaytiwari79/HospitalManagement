@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
@@ -36,6 +37,13 @@ public class ActivityController {
     public ResponseEntity<Map<String, Object>> updateActivity(@RequestBody @Valid ActivityNoTabsDTO activityDTO,
                                                                 @PathVariable Long unitId,@PathVariable BigInteger activityKairosId) {
         activityService.updateActivity(unitId,activityKairosId,activityDTO);
+        return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
+    }
+    @RequestMapping(value = "/multiple", method = RequestMethod.POST)
+    @ApiOperation("Create ActivityPlannerEntity")
+    public ResponseEntity<Map<String, Object>> addActivity(@RequestBody List<ActivityNoTabsDTO> activityDTOs,
+                                                           @PathVariable Long unitId) {
+        activityService.createActivities(unitId,activityDTOs);
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
     }
 }

@@ -57,8 +57,8 @@ public class UnitPositionServiceTest {
 
     //
     //@Test public  void  validateW
-    /*        unitEmploymentPositionDTO.setStartDateMillis(1486020502000L);
-        unitEmploymentPositionDTO.setEndDateMillis(1488439702000L);
+    /*        unitEmploymentPositionDTO.setStartDate(1486020502000L);
+        unitEmploymentPositionDTO.setEndDate(1488439702000L);
         unitEmploymentPositionService.validateUnitPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO);
         when(unitEmploymentPositionService.validateUnitPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO)).thenThrow(new ActionNotPermittedException("Already a unit employment position_code is active with same expertise on this period."));
         /*Epoch timestamp: 1549092502
