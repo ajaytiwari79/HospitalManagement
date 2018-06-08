@@ -1,16 +1,20 @@
 package com.kairos.planner.vrp.taskplanning.solution;
 
 import com.kairos.planner.vrp.taskplanning.model.Employee;
+import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
 import com.kairos.planner.vrp.taskplanning.model.Shift;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
+import org.optaplanner.core.api.domain.solution.drools.ProblemFactProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
 import java.util.List;
+import java.util.UUID;
+
 @PlanningSolution
 public class VrpTaskPlanningSolution {
     private String id;
@@ -22,7 +26,8 @@ public class VrpTaskPlanningSolution {
     @PlanningEntityCollectionProperty
     @ValueRangeProvider(id = "tasks")
     private List<Task> tasks;
-
+    @ProblemFactProperty
+    private LocationsDistanceMatrix locationsDistanceMatrix;
     @PlanningScore
     private HardMediumSoftLongScore hardMediumSoftScore;
 
@@ -66,6 +71,7 @@ public class VrpTaskPlanningSolution {
     }
 
     public VrpTaskPlanningSolution() {
+        this.id=UUID.randomUUID().toString();
     }
 
     public HardMediumSoftLongScore getHardMediumSoftScore() {
@@ -74,5 +80,13 @@ public class VrpTaskPlanningSolution {
 
     public void setHardMediumSoftScore(HardMediumSoftLongScore hardMediumSoftScore) {
         this.hardMediumSoftScore = hardMediumSoftScore;
+    }
+
+    public LocationsDistanceMatrix getLocationsDistanceMatrix() {
+        return locationsDistanceMatrix;
+    }
+
+    public void setLocationsDistanceMatrix(LocationsDistanceMatrix locationsDistanceMatrix) {
+        this.locationsDistanceMatrix = locationsDistanceMatrix;
     }
 }

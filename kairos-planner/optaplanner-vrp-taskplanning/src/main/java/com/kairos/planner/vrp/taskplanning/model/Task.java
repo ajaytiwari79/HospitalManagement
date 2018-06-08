@@ -13,6 +13,7 @@ import java.util.Set;
  */
 @PlanningEntity
 public class Task extends TaskOrShift{
+    //TODO consider break in  sub tasks or dont consider merged tasks at all
     private String id;
     private int intallationNo;
     private Double lattitude;
@@ -169,4 +170,11 @@ public class Task extends TaskOrShift{
         this.longitude = longitude;
     }
 
+    @Override
+    public String toString() {
+        return "Task{" +
+                 + intallationNo +
+                "-" + duration +
+                '}';
+    }
 }

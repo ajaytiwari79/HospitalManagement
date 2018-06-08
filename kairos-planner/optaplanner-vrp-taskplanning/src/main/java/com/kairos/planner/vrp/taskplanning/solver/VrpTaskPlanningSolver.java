@@ -1,5 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
+import com.kairos.planner.vrp.taskplanning.model.Shift;
+import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -21,6 +23,16 @@ public class VrpTaskPlanningSolver {
     }
     public void solve(VrpTaskPlanningSolution problem){
         VrpTaskPlanningSolution solution=solver.solve(problem);
+
+        for(Shift shift: solution.getShifts()){
+            Task task=shift.getNextTask();
+            StringBuffer sb= new StringBuffer("Shift"+shift+":::");
+            while (task!=null){
+                sb.append(task+"->");
+                task=task.getNextTask();
+
+            }
+        }
         log.info(solution.toString());
 
     }

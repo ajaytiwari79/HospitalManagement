@@ -71,4 +71,14 @@ public class Shift extends TaskOrShift{
     public void setEnd(LocalTime end) {
         this.end = end;
     }
+
+    @Override
+    public String toString() {
+        return "Shift{" +
+                "" + employee.getName() +
+                "[" + localDate +
+                ":" + start +
+                "-" + end +
+                '}';
+    }
 }
