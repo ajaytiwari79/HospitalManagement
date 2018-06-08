@@ -1,5 +1,7 @@
 package com.kairos.activity.spec;
 
+import java.util.List;
+
 /**
  * Created by vipul on 30/1/18.
  */
@@ -16,4 +18,5 @@ public abstract class AbstractActivitySpecification<T> implements ActivitySpecif
     public ActivitySpecification<T> or(final ActivitySpecification<T> activitySpecification) {
         return new OrActivitySpecification<T>(this, activitySpecification);
     }
+    public abstract List<String> isSatisfiedString(T t);
 }
