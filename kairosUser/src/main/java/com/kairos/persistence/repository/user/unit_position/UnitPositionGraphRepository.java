@@ -30,6 +30,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match (unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
             "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
+            "optional match (unitPosition)-[rel:"+APPLIED_FUNCTION+"]->(appliedFunction:Function)  \n"+
             "return e as expertise,cta as costTimeAgreement,unitPosition.workingTimeAgreementId as workingTimeAgreementId," +
             "unitPosition.totalWeeklyHours as totalWeeklyHours," +
             "unitPosition.startDateMillis as startDateMillis," +
@@ -42,7 +43,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis," +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
-            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
+            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, "+
+            "Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 
 
@@ -148,7 +150,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_SENIORITY_LEVEL]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]->(payGrade:PayGrade)OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta:CostTimeAgreement) \n" +
             "optional match (expertise)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "optional match(unitPosition)-[rel:HAS_FUNCTION]->(functions:Function)with expertise ,org,reasonCode,unitPosition,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData return expertise as expertise,cta as costTimeAgreement,unionData as union, positionCode as positionCode,\n" +
+            "optional match(unitPosition)-[rel:HAS_FUNCTION]->(functions:Function)with expertise ,org,reasonCode,unitPosition,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount,icon:functions.icon }) END as functionData return expertise as expertise,cta as costTimeAgreement,unionData as union, positionCode as positionCode,\n" +
             " {id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage, freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevel, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis, unitPosition.salary as salary, id(reasonCode) as reasonCodeId,\n" +
             "unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
@@ -237,7 +239,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "optional match (unitPosition)-[:" + HAS_CTA +"]->(cta:CostTimeAgreement) \n" +
             "optional match (expertise)-[:" + SUPPORTED_BY_UNION+ "]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "optional match(unitPosition)-[rel:" + HAS_FUNCTION +"]->(functions:Function) \n" +
-            "with expertise ,org,subOrg,reasonCode,unitPosition,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData return expertise as expertise,cta as costTimeAgreement,unionData as union, positionCode as positionCode, \n" +
+            "with expertise ,org,subOrg,reasonCode,unitPosition,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount,icon:functions.icon }) END as functionData return expertise as expertise,cta as costTimeAgreement,unionData as union, positionCode as positionCode, \n" +
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage, freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevel, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis, \n" +
             "unitPosition.salary as salary,id(reasonCode) as reasonCodeId,unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +

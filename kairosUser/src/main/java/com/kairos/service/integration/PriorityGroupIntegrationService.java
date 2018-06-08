@@ -7,6 +7,7 @@ import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,12 +37,6 @@ public class PriorityGroupIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/activities_with_time_types",null),ActivityWithTimeTypeDTO.class);
     }
 
-    /*public Set<Long> getStaffIdsByPriorityGroupIncludeFilter(StaffIncludeFilter staffIncludeFilter, Long unitId) {
-
-        Set<Long> staffIds = priorityGroupRestClient.publish(null,unitId,IntegrationOperation.UPDATE,"/staff/priority_group",null);
-        return  staffIds;
-    }
-*/
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId,Long countryId){
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
@@ -50,5 +45,9 @@ public class PriorityGroupIntegrationService {
 
     public void createDefaultOpenShiftRuleTemplate(OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, long unitId) {
         priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,true, IntegrationOperation.CREATE, "/open_shift/copy_rule_template", null);
+    }
+
+    public void createDefaultGracePeriodSetting(TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO,Long unitId) {
+        priorityGroupRestClient.publish(tAndAGracePeriodSettingDTO,unitId,true,IntegrationOperation.CREATE,"/grace_period_setting",null);
     }
 }

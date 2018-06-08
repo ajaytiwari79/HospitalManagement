@@ -1623,7 +1623,6 @@ public class StaffService extends UserBaseService {
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
-
             //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
