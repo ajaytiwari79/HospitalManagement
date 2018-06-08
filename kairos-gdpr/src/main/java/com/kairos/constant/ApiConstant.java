@@ -44,6 +44,14 @@ public final class ApiConstant {
     public static final String API_MASTER_QUESTIONNAIRE_TEMPLATE= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/questionnaire_template";
 
 
+
+    //Data category & element
+    public static final String API_DATA_CATEGORY_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_category";
+    public static final String API_DATA_ELEMENT_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_element";
+
+
+
+
     public static final String API_PROCESSING_ACTIVITY = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/processing_activity";
     public static final String API_ASSET_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/asset_type";
     public static final String API_HOSTING_LOCATION_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/hosting_location";
