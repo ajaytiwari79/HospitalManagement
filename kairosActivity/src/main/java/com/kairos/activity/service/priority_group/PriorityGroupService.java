@@ -196,12 +196,15 @@ public class PriorityGroupService extends MongoBaseService {
     }
 
     public void notifyStaffByPriorityGroup(BigInteger priorityGroupId){
-        PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
-        PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
-        PriorityGroupRulesImplementation priorityGroupRulesImplementation = new PriorityGroupRulesImplementation();
-        ImpactWeight impactWeight = new ImpactWeight(7,4);
-        priorityGroupRulesImplementation.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
-        applicationContext.publishEvent(priorityGroupRuleDataDTO);
+        if(Optional.ofNullable(priorityGroupId).isPresent()) {
+            PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
+            PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
+            PriorityGroupRulesImplementation priorityGroupRulesImplementation = new PriorityGroupRulesImplementation();
+            ImpactWeight impactWeight = new ImpactWeight(7,4);
+            priorityGroupRulesImplementation.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
+            applicationContext.publishEvent(priorityGroupRuleDataDTO);
+        }
+
     }
 
     public PriorityGroupWrapper getPriorityGroupsByOrderIdForUnit(Long unitId,BigInteger orderId){
