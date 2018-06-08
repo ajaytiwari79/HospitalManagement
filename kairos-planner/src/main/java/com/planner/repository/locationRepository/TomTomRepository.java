@@ -1,6 +1,6 @@
 package com.planner.repository.locationRepository;
 
-import com.planner.domain.location.LocationDistance;
+import com.planner.domain.tomtomResponse.TomTomResponse;
 import com.planner.repository.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  * @date - 8/6/18
  */
 @Repository
-public interface LocationRepository extends MongoBaseRepository<LocationDistance,String>{
+public interface TomTomRepository extends MongoBaseRepository<TomTomResponse,String> {
 }
