@@ -7,10 +7,12 @@ import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.response.dto.web.AppliedFunctionDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by vipul on 29/1/18.
@@ -38,6 +40,7 @@ public class StaffUnitPositionDetails {
     private BigInteger workingTimeAgreementId;
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
+    private List<AppliedFunctionDTO> appliedFunctions;
 
     public StaffUnitPositionDetails() {
     }
@@ -187,5 +190,11 @@ public class StaffUnitPositionDetails {
         this.costTimeAgreement = costTimeAgreement;
     }
 
+    public List<AppliedFunctionDTO> getAppliedFunctions() {
+        return appliedFunctions;
+    }
 
+    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
+    }
 }

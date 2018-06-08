@@ -4,14 +4,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 
+import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.client.TimeBankRestClient;
 
@@ -23,10 +25,7 @@ import com.kairos.response.dto.web.wta.WTADTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
-import com.kairos.persistence.model.user.country.EmploymentType;
 
-import com.kairos.persistence.model.user.country.Function;
-import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
@@ -78,6 +77,8 @@ import java.time.DayOfWeek;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,9 @@ import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.kairos.UserServiceApplication.FORMATTER;
+import static com.kairos.activity.util.DateUtils.ONLY_DATE;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -147,6 +151,8 @@ public class UnitPositionService extends UserBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
@@ -629,9 +635,19 @@ public class UnitPositionService extends UserBaseService {
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
         SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
-        SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
-        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
+        //SeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
+        //positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
         positionCtaWtaQueryResult.setUnion(currentExpertise.get().getUnion());
+
+        SeniorityLevelQueryResult seniorityLevel = null;
+        if(appliedSeniorityLevel != null){
+            seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
+
+            List<FunctionDTO> functionDTOs =  functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(),appliedSeniorityLevel.getId());
+            seniorityLevel.setFunctions(functionDTOs);
+        }
+        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
+
 
         return positionCtaWtaQueryResult;
     }
@@ -977,6 +993,29 @@ public class UnitPositionService extends UserBaseService {
             mapOfUnitPositionAndExpertise.putAll(mapOfExpertise);
         });
         return mapOfUnitPositionAndExpertise;
+    }
+
+    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload) throws ParseException {
+
+        String dateAsString = new ArrayList<>(payload.keySet()).get(0);
+
+        Map<String, Object>  functionMap = (Map<String, Object>) payload.get(dateAsString);
+        Long functionId = new Long ((Integer)functionMap.get("id"));
+
+        Date date = DateUtils.convertToOnlyDate(dateAsString,ONLY_DATE);
+        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId, functionId,date.getTime());
+
+        if(unitPositionFunctionRelationship == null){
+            unitPositionFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId,Arrays.asList(date.getTime()));
+        } else if(unitPositionFunctionRelationship == true){
+            exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
+        }
+        return true;
+    }
+
+    public Boolean removeFunction(Long unitPositionId, Date appliedDate) throws ParseException {
+        unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, appliedDate.getTime());
+        return true;
     }
 
 }
