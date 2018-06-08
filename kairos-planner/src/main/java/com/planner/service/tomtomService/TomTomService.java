@@ -203,7 +203,7 @@ public class TomTomService {
     public List<Matrix> getMatrix(){
         List<Matrix> matrices = new ArrayList<>();
         tomTomRepository.findAll().forEach(t->{
-            matrices.addAll(t.getMatrix().stream().flatMap(t->t.stream().map(matrix -> matrix)).collect(Collectors.toList()));
+            matrices.addAll(t.getMatrix().stream().flatMap(m->m.stream().map(matrix -> matrix)).collect(Collectors.toList()));
         });
         return matrices;
     }
