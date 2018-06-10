@@ -4,14 +4,13 @@ import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDto;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Optional;
 
 import static com.kairos.constant.AppConstant.COUNTRY_ID;
 import static com.kairos.constant.AppConstant.ID;
