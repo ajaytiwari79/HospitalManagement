@@ -70,7 +70,7 @@ public class TimeBankCalculationService {
             shifts = filterSubshifts(shifts);
             calculateDailyTimebank(interval, ctaDto, shifts, dailyTimeBank);
         }/* else {
-            int dailyContractualMinutes = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? -ctaDto.getContractedMinByWeek() / ctaDto.getWorkingDaysPerWeek() : 0;
+            int dailyContractualMinutes = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? -ctaDto.getTotalWeeklyMinutes() / ctaDto.getWorkingDaysInWeek() : 0;
             dailyTimeBankEntry.setTotalTimeBankMin(dailyContractualMinutes != 0 ? -dailyContractualMinutes : 0);
             dailyTimeBankEntry.setContractualMin(dailyContractualMinutes);
             dailyTimeBankEntry.setScheduledMin(0);
@@ -269,9 +269,9 @@ public class TimeBankCalculationService {
         Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap = getTimebankIntervalsMap(intervals, dailyTimeBankEntries);
         Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = getShiftsIntervalMap(intervals, shifts);
         timeBankDTO.setStaffId(unitPositionWithCtaDetailsDTO.getStaffId());
-        timeBankDTO.setWorkingDaysInWeek(unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
-        timeBankDTO.setUnitPositionId(unitPositionWithCtaDetailsDTO.getUnitPositionId());
-        timeBankDTO.setTotalWeeklyMin(unitPositionWithCtaDetailsDTO.getContractedMinByWeek());
+        timeBankDTO.setWorkingDaysInWeek(unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
+        timeBankDTO.setUnitPositionId(unitPositionWithCtaDetailsDTO.getId());
+        timeBankDTO.setTotalWeeklyMin(unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes());
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = getTimeIntervals(totalTimeBankBeforeStartDate, query, intervals, shiftsintervalMap, timeBanksIntervalMap, timeTypeDTOS, unitPositionWithCtaDetailsDTO);
         timeBankDTO.setTimeIntervals(timeBankIntervalDTOS);
         List<TimeBankCTADistributionDTO> timeBankCTADistributions = timeBankIntervalDTOS.stream().flatMap(ti -> ti.getTimeBankDistributions().stream()).collect(Collectors.toList());
@@ -338,14 +338,14 @@ public class TimeBankCalculationService {
         int contractualMinutes = 0;
         int count = 0;
         if(interval!=null) {
-            if (unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() == 7) {
+            if (unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) {
                 while (interval.getStart().isBefore(interval.getEnd())) {
                     if(calculateContractual || !dailyTimeBanksDates.contains(interval.getStart().toLocalDate())) {
                         count++;
                     }
                     interval = interval.withStart(interval.getStart().plusDays(1));
                 }
-                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
+                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
             } else {
                 DateTime startDate = interval.getStart();
                 while (startDate.isBefore(interval.getEnd())) {
@@ -354,7 +354,7 @@ public class TimeBankCalculationService {
                     }
                     startDate = startDate.plusDays(1);
                 }
-                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
+                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
             }
         }
         return contractualMinutes;

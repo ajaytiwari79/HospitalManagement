@@ -1637,7 +1637,7 @@ public class StaffService extends UserBaseService {
         UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
         staffAdditionalInfoDTO.setUser(userAccessRole);
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
+            staffAdditionalInfoDTO.setUnitPosition(unitPosition);
             //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }

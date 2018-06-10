@@ -53,7 +53,7 @@ public class StaffAdditionalInfoDTO {
 
 
     public DateTimeZone getUnitTimeZone() {
-        return DateTimeZone.forID(unitTimeZone.getId());
+        return unitTimeZone!=null ? DateTimeZone.forID(unitTimeZone.getId()) : null;
     }
 
     public ZoneId getUnitZoneId() {

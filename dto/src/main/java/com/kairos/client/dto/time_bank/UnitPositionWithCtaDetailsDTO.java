@@ -1,7 +1,6 @@
 package com.kairos.client.dto.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.joda.time.DateTimeZone;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -10,37 +9,29 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitPositionWithCtaDetailsDTO {
 
-    private Long unitPositionId;
+    private Long id;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
-    private int contractedMinByWeek;
-    private int workingDaysPerWeek;
+    private int totalWeeklyMinutes;
+    private int workingDaysInWeek;
     private Long staffId;
     private LocalDate unitPositionStartDate;
     private LocalDate unitPositionEndDate;
     private Long countryId;
     private int minutesFromCta;
     private ZoneId unitTimeZone;
-    private Long id;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
+    public UnitPositionWithCtaDetailsDTO(Long id) {
         this.id = id;
-    }
-
-    public UnitPositionWithCtaDetailsDTO(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
     }
 
     public UnitPositionWithCtaDetailsDTO() {
     }
 
-    public UnitPositionWithCtaDetailsDTO(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
-        this.unitPositionId = unitPositionId;
-        this.contractedMinByWeek = contractedMinByWeek;
-        this.workingDaysPerWeek = workingDaysPerWeek;
+    public UnitPositionWithCtaDetailsDTO(Long id, int totalWeeklyMinutes, int workingDaysInWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+        this.id = id;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.workingDaysInWeek = workingDaysInWeek;
         this.unitPositionStartDate = unitPositionStartDate;
         this.unitPositionEndDate = unitPositionEndDate;
     }
@@ -98,28 +89,28 @@ public class UnitPositionWithCtaDetailsDTO {
         this.staffId = staffId;
     }
 
-    public int getContractedMinByWeek() {
-        return contractedMinByWeek;
+    public int getTotalWeeklyMinutes() {
+        return totalWeeklyMinutes;
     }
 
-    public void setContractedMinByWeek(int contractedMinByWeek) {
-        this.contractedMinByWeek = contractedMinByWeek;
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
-    public int getWorkingDaysPerWeek() {
-        return workingDaysPerWeek;
+    public int getWorkingDaysInWeek() {
+        return workingDaysInWeek;
     }
 
-    public void setWorkingDaysPerWeek(int workingDaysPerWeek) {
-        this.workingDaysPerWeek = workingDaysPerWeek;
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public Long getUnitPositionId() {
-        return unitPositionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplates() {

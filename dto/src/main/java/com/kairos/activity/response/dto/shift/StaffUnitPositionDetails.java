@@ -7,6 +7,7 @@ import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -37,11 +38,28 @@ public class StaffUnitPositionDetails {
     private ZoneId unitTimeZone;
     private Long countryId;
     private List<AppliedFunctionDTO> appliedFunctions;
+    private LocalDate unitPositionStartDate;
+    private LocalDate unitPositionEndDate;
 
     public StaffUnitPositionDetails() {
 
     }
 
+    public LocalDate getUnitPositionStartDate() {
+        return unitPositionStartDate;
+    }
+
+    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
+        this.unitPositionStartDate = unitPositionStartDate;
+    }
+
+    public LocalDate getUnitPositionEndDate() {
+        return unitPositionEndDate;
+    }
+
+    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
+        this.unitPositionEndDate = unitPositionEndDate;
+    }
 
     public ZoneId getUnitTimeZone() {
         return unitTimeZone;

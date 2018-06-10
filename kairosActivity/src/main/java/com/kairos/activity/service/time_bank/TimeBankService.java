@@ -21,8 +21,6 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -120,8 +118,8 @@ public class TimeBankService extends MongoBaseService {
         DateTime endDate = startDate.plusYears(3);
         List<DailyTimeBankEntry> newDailyTimeBankEntries = new ArrayList<>();
         while (startDate.isBefore(endDate)) {
-            DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.toLocalDate(startDate));
-            int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() ? unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() : 0;
+            DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek(), DateUtils.toLocalDate(startDate));
+            int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() ? unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() : 0;
             dailyTimeBankEntry.setTotalTimeBankMin(-contractualMin);
             dailyTimeBankEntry.setContractualMin(contractualMin);
             dailyTimeBankEntry.setTimeBankCTADistributionList(timeBankCalculationService.getDistribution(unitPositionWithCtaDetailsDTO));
@@ -139,8 +137,8 @@ public class TimeBankService extends MongoBaseService {
         DateTime endDate = startDate.plusYears(3);
         List<DailyTimeBankEntry> newDailyTimeBankEntries = new ArrayList<>();
         while (startDate.isBefore(endDate)) {
-            DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.toLocalDate(startDate));
-            int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() ? unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() : 0;
+            DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek(), DateUtils.toLocalDate(startDate));
+            int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() ? unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() : 0;
             dailyTimeBankEntry.setTotalTimeBankMin(-contractualMin);
             dailyTimeBankEntry.setContractualMin(contractualMin);
             dailyTimeBankEntry.setTimeBankCTADistributionList(timeBankCalculationService.getDistribution(unitPositionWithCtaDetailsDTO));
