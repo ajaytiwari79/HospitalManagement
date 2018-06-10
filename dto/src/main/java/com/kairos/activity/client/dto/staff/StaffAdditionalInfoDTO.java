@@ -147,4 +147,5 @@ public class StaffAdditionalInfoDTO {
     public void setOrganizationNightEndTimeTo(Date organizationNightEndTimeTo) {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
     }
+
 }

@@ -33,4 +33,10 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
         return true;
 
     }
+
+    @Override
+    public List<String> isSatisfiedString(Activity activity) {
+        return null;
+    }
+
 }

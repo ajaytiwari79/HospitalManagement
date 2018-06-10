@@ -9,6 +9,8 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
+import com.kairos.constants.ApiConstants;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
@@ -67,6 +69,7 @@ import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
@@ -372,6 +375,9 @@ public class OrganizationService extends UserBaseService {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOrganizationTypes().get(0).getId(),organization.getOrganizationSubTypes().get(0).getId(),organization.getCountry().getId());
         priorityGroupIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
 
+        //create T&A gracePeriod default setting
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO=new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS,AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
+        priorityGroupIntegrationService.createDefaultGracePeriodSetting(tAndAGracePeriodSettingDTO,organization.getId());
 
         /*// TODO Verify code to set Unit Manager of new organization
         // Create Employment for Unit Manager
@@ -1690,8 +1696,8 @@ public class OrganizationService extends UserBaseService {
         Long countryId = organizationGraphRepository.getCountryId(unitId);
         OrderAndActivityDTO orderAndActivityDTO = priorityGroupIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
-        List<Long> organizationServicesIds = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, organizationServicesIds, DateUtil.getCurrentDateMillis());
+        organizationServicesAndLevelQueryResult servicesAndLevel  = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(),servicesAndLevel.getLevelId(), DateUtil.getCurrentDateMillis());
         List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
         List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
@@ -1706,7 +1712,8 @@ public class OrganizationService extends UserBaseService {
         List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
         boolean syncStarted=false;
         if(!staff.isEmpty()){
-            plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
+            //TODO VIPUL check
+          //  plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
             List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
             if(!unitPositionEmploymentTypeRelationShips.isEmpty()){
                 plannerSyncService.publishAllUnitPositions(unitId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);
@@ -1722,7 +1729,7 @@ public class OrganizationService extends UserBaseService {
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypes(countryId);
 
-        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
+        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
         return ruleTemplateDefaultData;
     }
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId){
@@ -1754,7 +1761,7 @@ public class OrganizationService extends UserBaseService {
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId,countryId);
         PriorityGroupDefaultData priorityGroupDefaultData1=employmentTypeService.getExpertiseAndEmployment(countryId,false);
-        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData( skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertise());
+        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData( skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
         return ruleTemplateDefaultData;
     }
 }

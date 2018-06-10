@@ -1,20 +1,30 @@
 package com.kairos.service.filter;
 
+import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelectionDto;
+import com.kairos.dto.ModuleIdDto;
+import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
-import com.kairos.persistance.repository.filter.FilterGroupMongoRepository;
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.repository.clause.ClauseMongoRepository;
+import com.kairos.persistance.repository.filter.FilterMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
+import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
+import com.kairos.response.dto.ClauseResponseDto;
+import com.kairos.response.dto.MasterAssetResponseDto;
+import com.kairos.response.dto.MasterProcessingActivityResponseDto;
 import com.kairos.response.dto.filter.FilterAndFavouriteFilterDto;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import com.kairos.response.dto.filter.FilterResponseDto;
-import com.kairos.service.master_data_management.asset_management.MasterAssetFilterService;
+import com.kairos.response.dto.filter.FilterResponseWithData;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -23,32 +33,56 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
+import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
+import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
+
 @Service
 public class FilterService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetFilterService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilterService.class);
+
+    @Inject
+    private FilterMongoRepository filterMongoRepository;
+
+    @Inject
+    private ExceptionService exceptionService;
 
 
     @Inject
-    private FilterGroupMongoRepository filterGroupMongoRepository;
+    private ClauseMongoRepository clauseMongoRepository;
 
-    public FilterAndFavouriteFilterDto metaDatafilters(String moduleId, Long countryId) {
+    @Inject
+    private MasterAssetMongoRepository masterAssetMongoRepository;
+
+    @Inject
+    private MasterProcessingActivityRepository masterProcessingActivityRepository;
+
+//get fields with distinct values on which fiter is apply
+    public FilterAndFavouriteFilterDto getFilterCategories(Long countryId, String moduleId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
-        FilterGroup filterGroup = filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
+        FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         List<FilterResponseDto> filterResponseData = new ArrayList<>();
         FilterAndFavouriteFilterDto filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDto();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterGroupMongoRepository.getFilterCriterias(countryId, filterTypes);
-            Aggregation aggregation = filterGroupMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
-            AggregationResults<FilterQueryResult> result = filterGroupMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
+            filterCriteria = filterMongoRepository.getFilterCriterias(countryId, filterTypes);
+            Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
+            AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
-            filterTypes.forEach(filterType -> {
-                filterResponseData.add(buildFilters(filterQueryResult, filterType));
-            });
-            filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
-            filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+            if (Optional.ofNullable(filterQueryResult).isPresent()) {
+                filterTypes.forEach(filterType -> {
+                    filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType));
+                });
+                filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
+                filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+            } else {
+                filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
+                filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
+
+            }
+
             return filterAndFavouriteFilterDto;
 
         } else
@@ -57,16 +91,9 @@ public class FilterService {
 
     }
 
-    boolean checkIfFilterGroupExistForMduleId(String moduleId, Boolean active) {
 
-        if (Optional.ofNullable(filterGroupMongoRepository.findFilterGroupByModuleId(moduleId, UserContext.getCountryId())).isPresent()) {
-            return true;
-        }
-        return false;
-    }
-
-
-    public FilterResponseDto buildFilters(FilterQueryResult filterQueryResult, FilterType filterType) {
+    //build filter Category For asset ,clause and processing activity (response is to give different values of filter criteria)
+    public FilterResponseDto buildFiltersCategoryResponse(FilterQueryResult filterQueryResult, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
                 return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getAccountTypes());
@@ -80,31 +107,66 @@ public class FilterService {
                 return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationSubServices());
             default:
                 throw new InvalidRequestException("invalid request");
-
         }
-
-
     }
 
 
-   /* public AggregationResults<FilterQueryResult> getFilterAggregationResult(FilterGroup filterGroup, String moduleId) {
+    boolean checkIfFilterGroupExistForMduleId(String moduleId, Boolean active) {
 
-        List<ModuleIdDto> moduleIdDto = filterGroup.getAccessModule();
-        String domainName;
-        for (ModuleIdDto moduleIdDto1 : moduleIdDto) {
+        if (Optional.ofNullable(filterMongoRepository.findFilterGroupByModuleId(moduleId, UserContext.getCountryId())).isPresent()) {
+            return true;
+        }
+        return false;
+    }
 
-            if (moduleIdDto1.getModuleId().equalsIgnoreCase(moduleId)) {
-                domainName = moduleIdDto1.getName();
+
+    //get filter data on the bases of selection of data and get filterGroiup By moduleId
+    public FilterResponseWithData getFilterDataWithFilterSelection(Long countryId, String moduleId, FilterSelectionDto filterSelectionDto) {
+        FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
+        if (!Optional.ofNullable(filterGroup).isPresent()) {
+            exceptionService.invalidRequestException("filter group not exists for " + moduleId);
+        }
+        String domainName = null;
+        if (filterGroup.getAccessModule().size() != 0) {
+            for (ModuleIdDto moduleIdDto1 : filterGroup.getAccessModule()) {
+                if (moduleIdDto1.getModuleId().equalsIgnoreCase(moduleId)) {
+                    domainName = moduleIdDto1.getName();
+                    break;
+                }
             }
-
         }
-
-        switch (domainName.contains()) {
-
-
-        }
-
+        return getFilterDataByModuleName(countryId, domainName, filterSelectionDto);
 
     }
-*/
+
+
+    //Wrap filter data response on the basic and module id and filter selection
+    public FilterResponseWithData getFilterDataByModuleName(Long countryId, String moduleName, FilterSelectionDto filterSelectionDto) {
+
+        switch (moduleName) {
+            case CLAUSE_MODULE_NAME:
+                List<Clause> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, filterSelectionDto);
+                List<ClauseResponseDto> clauseResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDto.class);
+                FilterResponseWithData<List<ClauseResponseDto>> clauseFilterData = new FilterResponseWithData<>();
+                clauseFilterData.setData(clauseResponseDtos);
+                return clauseFilterData;
+            case ASSET_MODULE_NAME:
+                List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, filterSelectionDto);
+                List<MasterAssetResponseDto> masterAssetResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDto.class);
+                FilterResponseWithData<List<MasterAssetResponseDto>> assetfilterData = new FilterResponseWithData<>();
+                assetfilterData.setData(masterAssetResponseDtos);
+                return assetfilterData;
+            case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
+                List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, filterSelectionDto);
+                List<MasterProcessingActivityResponseDto> processingActivityResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDto.class);
+                FilterResponseWithData<List<MasterProcessingActivityResponseDto>> processingActivityFilterData = new FilterResponseWithData<>();
+                processingActivityFilterData.setData(processingActivityResponseDtos);
+                return processingActivityFilterData;
+            default:
+                throw new DataNotFoundByIdException("data not found by moduleName " + moduleName);
+        }
+    }
+
+
 }
+

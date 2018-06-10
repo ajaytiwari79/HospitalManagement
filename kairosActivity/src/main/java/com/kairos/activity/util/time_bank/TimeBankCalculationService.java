@@ -12,8 +12,8 @@ import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
-import com.kairos.activity.response.dto.time_bank.*;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.client.dto.time_bank.*;
 import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -76,7 +76,7 @@ public class TimeBankCalculationService {
             dailyTimeBankEntry.setScheduledMin(0);
             dailyTimeBankEntry.setTimeBankMinWithoutCta(0);
             dailyTimeBankEntry.setTimeBankMinWithCta(0);
-            dailyTimeBankEntry.setStaffId(ctaDto.getStaffId());
+            dailyTimeBankEntry.setStaff(ctaDto.getStaff());
             dailyTimeBankEntry.setTimeBankCTADistributionList(getDistribution(ctaDto));
         }*/
         return dailyTimeBank;
@@ -161,7 +161,7 @@ public class TimeBankCalculationService {
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
                 //totalDailyTimebank += dailyScheduledMin;
-                for (CTARuleTemplateCalulatedTimeBankDTO ruleTemplate : ctaDto.) {
+                for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
                     if (ruleTemplate.getAccountType() == null) continue;
                     if (ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)) {
                         int ctaTimeBankMin = 0;
@@ -215,9 +215,9 @@ public class TimeBankCalculationService {
         return new Interval(interval.getStart().withTimeAtStartOfDay().plusMinutes(ctaStart), interval.getStart().plusMinutes(ctaEnd));
     }
 
-    private List<TimeBankCTADistribution> getBlankTimeBankDistribution(List<CTARuleTemplateCalulatedTimeBankDTO> ctaRuleTemplateCalulatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
+    private List<TimeBankCTADistribution> getBlankTimeBankDistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalulatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
         List<TimeBankCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalulatedTimeBankDTOS.size());
-        for (CTARuleTemplateCalulatedTimeBankDTO ruleTemplate : ctaRuleTemplateCalulatedTimeBankDTOS) {
+        for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalulatedTimeBankDTOS) {
             if(!ruleTemplate.isCalculateScheduledHours()) {
                 timeBankCTADistributions.add(new TimeBankCTADistribution(ruleTemplate.getName(), ctaTimeBankMinMap.containsKey(ruleTemplate.getId()) ? ctaTimeBankMinMap.get(ruleTemplate.getId()) : 0, ruleTemplate.getId()));
             }

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.response.dto.web.UserDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;

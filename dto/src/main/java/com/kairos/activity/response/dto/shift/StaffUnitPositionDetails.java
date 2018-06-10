@@ -2,12 +2,14 @@ package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
+import com.kairos.response.dto.web.AppliedFunctionDTO;
+import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Created by vipul on 29/1/18.
@@ -15,6 +17,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffUnitPositionDetails {
     private Expertise expertise;
+    private Staff staff;
     private EmploymentType employmentType;
     private WTAResponseDTO workingTimeAgreement;
     private Long startDateMillis;
@@ -33,6 +36,7 @@ public class StaffUnitPositionDetails {
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private ZoneId unitTimeZone;
     private Long countryId;
+    private List<AppliedFunctionDTO> appliedFunctions;
 
     public StaffUnitPositionDetails() {
 
@@ -181,11 +185,11 @@ public class StaffUnitPositionDetails {
         this.employmentType = employmentType;
     }
 
-    public WTAResponseDTO  getWorkingTimeAgreement() {
+    public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WTAResponseDTO  workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
@@ -195,5 +199,21 @@ public class StaffUnitPositionDetails {
 
     public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
+
+    public List<AppliedFunctionDTO> getAppliedFunctions() {
+        return appliedFunctions;
+    }
+
+    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
     }
 }

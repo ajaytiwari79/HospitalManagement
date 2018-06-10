@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state=ActivityStateEnum.DRAFT;
+
     @Indexed
     private Long unitId;
     private BigInteger parentId;
@@ -66,6 +68,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.name = name;
         this.description = description;
         this.tags = tags;
+
     }
 
 

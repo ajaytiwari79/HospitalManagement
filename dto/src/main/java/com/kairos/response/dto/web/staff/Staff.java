@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.staff;
+package com.kairos.response.dto.web.staff;
 
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -11,12 +11,12 @@ import java.util.List;
 /**
  * Created by oodles on 3/2/17.
  */
-public class StaffBasicDetailsDTO {
+public class Staff {
 
     private Long id;
     private String firstName;
     private String lastName;
-
+    private String profilePic;
     private List<Long> skills;
     private StaffStatusEnum currentStatus;
 
@@ -60,7 +60,15 @@ public class StaffBasicDetailsDTO {
         this.currentStatus = currentStatus;
     }
 
-    public StaffBasicDetailsDTO(Long id, String firstName, String lastName, List<Long> skills, StaffStatusEnum currentStatus) {
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public Staff(Long id, String firstName, String lastName, List<Long> skills, StaffStatusEnum currentStatus) {
 
         this.id = id;
         this.firstName = firstName;
@@ -69,6 +77,6 @@ public class StaffBasicDetailsDTO {
         this.currentStatus = currentStatus;
     }
 
-    public StaffBasicDetailsDTO() {
+    public Staff() {
     }
 }

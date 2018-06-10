@@ -22,7 +22,8 @@ public class UnitPositionWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
 
 
-    public UnitPositionWithCtaDetailsDTO(int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+    public UnitPositionWithCtaDetailsDTO(Long unitPositionId,int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+        this.unitPositionId = unitPositionId;
         this.contractedMinByWeek = contractedMinByWeek;
         this.workingDaysPerWeek = workingDaysPerWeek;
         this.unitPositionStartDate = unitPositionStartDate;
