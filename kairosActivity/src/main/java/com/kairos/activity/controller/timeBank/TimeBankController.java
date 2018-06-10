@@ -56,20 +56,20 @@ public class TimeBankController {
     }
 
 
-    @RequestMapping(value = "/saveTimeBank", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/saveTimeBank", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getTimeBankIncludedTimeTypes() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.saveTimeBank());
-    }
+    }*/
 
    /* @PostMapping(value = "/createBlankTimebank")
     public ResponseEntity<Map<String,Object>> createBlankTimeBank(@RequestBody UnitPositionWithCtaDetailsDTO timebankWrapper){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.createBlankTimeBank(timebankWrapper));
     }*/
 
-    @PutMapping(value = "/updateBlankTimebank")
+    /*@PutMapping(value = "/updateBlankTimebank")
     public ResponseEntity<Map<String,Object>> updateBlankTimebank(@RequestBody UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.updateBlankTimebank(unitPositionWithCtaDetailsDTO));
-    }
+    }*/
 
 
 }

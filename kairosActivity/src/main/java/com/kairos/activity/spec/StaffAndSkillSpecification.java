@@ -35,7 +35,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     }
 
     @Override
-    public List<String> isSatisfiedString(Activity activity) {
+    public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
         return null;
     }
 

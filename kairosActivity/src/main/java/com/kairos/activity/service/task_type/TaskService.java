@@ -699,6 +699,7 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
@@ -718,7 +719,7 @@ public class TaskService extends MongoBaseService {
         }
         if (!shiftsToCreate.isEmpty()) {
             save(shiftsToCreate);
-            timeBankService.saveTimeBanks(unitPositionDTO.getId(), shiftsToCreate);
+            timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(unitPositionDTO.getId(), shiftsToCreate);
         }
     }

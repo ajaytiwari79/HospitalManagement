@@ -1,6 +1,6 @@
 package com.kairos.activity.client.dto;
 
-import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

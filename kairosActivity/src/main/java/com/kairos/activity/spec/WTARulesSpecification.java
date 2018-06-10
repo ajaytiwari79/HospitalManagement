@@ -33,4 +33,9 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
         return true;
     }
 
+    @Override
+    public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
+        return null;
+    }
+
 }
