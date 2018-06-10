@@ -181,15 +181,8 @@ public class TomTomService {
         URIBuilder builder = null;
         try {
             builder = new URIBuilder("https://api.tomtom.com"+headersUrl);
-            //List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-            //params.add(new BasicNameValuePair("key", "1FR9KYuSkBlEfgpCKpAZxadwQtaIGRg6"));
-            //params.add(new BasicNameValuePair("routeType", "shortest"));
-            //params.add(new BasicNameValuePair("travelMode", "car"));
-            //builder.setParameters(params);
             HttpGet httppost = new HttpGet(builder.build());
             httppost.setHeader("Content-Type","application/json");
-            //httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-            //httppost.setEntity(new ByteArrayEntity(requestBody.getBytes("UTF-8")));
             HttpResponse response = httpclient.execute(httppost);
             ObjectMapper mapper = new ObjectMapper();
             TomTomResponse tomTomResponse = mapper.readValue(response.getEntity().getContent(), TomTomResponse.class);
