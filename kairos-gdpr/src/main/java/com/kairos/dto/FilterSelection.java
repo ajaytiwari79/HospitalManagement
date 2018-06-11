@@ -1,7 +1,7 @@
 package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;

@@ -1,8 +1,8 @@
 package com.kairos.config.mongoEnv_config;
 
 
-import com.kairos.dto.ModuleIdDto;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.dto.master_data.ModuleIdDto;
+import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -51,17 +51,30 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
         FilterGroup assetFilterGroup = mongoTemplate.findOne(assetQuery, FilterGroup.class);
         FilterGroup processingActivityFilterGroup = mongoTemplate.findOne(processingActivityQuery, FilterGroup.class);
         List<FilterGroup> createfilterGroups = new ArrayList<>();
-        List<FilterType> filterTypes = new ArrayList<FilterType>();
-        filterTypes.add(FilterType.ORGANIZATION_TYPES);
-        filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
-        filterTypes.add(FilterType.ORGANIZATION_SERVICES);
-        filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
 
+        if (!Optional.ofNullable(clauseFilterGroup).isPresent()) {
+            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
+            ModuleIdDto moduleIdDto = new ModuleIdDto(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
+            moduleIdDtos.add(moduleIdDto);
+            List<FilterType> filterTypes = new ArrayList<FilterType>();
+            filterTypes.add(FilterType.ORGANIZATION_TYPES);
+            filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
+            filterTypes.add(FilterType.ORGANIZATION_SERVICES);
+            filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
+            filterTypes.add(FilterType.ACCOUNT_TYPES);
+            FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
+            createfilterGroups.add(filterGroup);
 
+        }
         if (!Optional.ofNullable(assetFilterGroup).isPresent()) {
             List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
             ModuleIdDto moduleIdDto = new ModuleIdDto(ASSET_MODULE_NAME, ASSET_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
+            List<FilterType> filterTypes = new ArrayList<FilterType>();
+            filterTypes.add(FilterType.ORGANIZATION_TYPES);
+            filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
+            filterTypes.add(FilterType.ORGANIZATION_SERVICES);
+            filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
             FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
             createfilterGroups.add(filterGroup);
 
@@ -70,23 +83,17 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
             List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
             ModuleIdDto moduleIdDto = new ModuleIdDto(MASTER_PROCESSING_ACTIVITY_MODULE_NAME, MASTER_PROCESSING_ACTIVITY_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
+            List<FilterType> filterTypes = new ArrayList<FilterType>();
+            filterTypes.add(FilterType.ORGANIZATION_TYPES);
+            filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
+            filterTypes.add(FilterType.ORGANIZATION_SERVICES);
+            filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
             FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
             createfilterGroups.add(filterGroup);
         }
-
-        if (!Optional.ofNullable(clauseFilterGroup).isPresent()) {
-            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
-            ModuleIdDto moduleIdDto = new ModuleIdDto(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
-            moduleIdDtos.add(moduleIdDto);
-            filterTypes.add(FilterType.ACCOUNT_TYPES);
-            FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
-            createfilterGroups.add(filterGroup);
-        }
-
         if (createfilterGroups.size() != 0) {
             save(createfilterGroups);
         }
-
         LOGGER.info("Filter gorup save Succesfully");
 
 
