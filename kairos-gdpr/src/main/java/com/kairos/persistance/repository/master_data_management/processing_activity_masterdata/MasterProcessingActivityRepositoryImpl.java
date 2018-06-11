@@ -60,10 +60,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation)
         );
-
-
         AggregationResults<MasterProcessingActivityResponseDto> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDto.class);
-
         return result.getMappedResults();
 
     }
