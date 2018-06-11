@@ -14,7 +14,7 @@ import java.util.Set;
 
 
 @Repository
-public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>{
+public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 
     @Query("{deleted:false,countryId:?0,title:?1}")
@@ -24,6 +24,10 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
 
     @Query("{deleted:false,countryId:?0,_id:?1}")
     Clause findByIdAndNonDeleted(Long countryId,BigInteger id);
+
+    @Query("{deleted:false,countryId:?0,title:?1}")
+    Clause findClauseByNameAndCountryId(Long countryId,String title);
+
 
 
     @Query("{deleted:false,countryId:?0}")

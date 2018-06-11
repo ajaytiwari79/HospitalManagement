@@ -7,6 +7,7 @@ import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,5 +43,9 @@ public class PriorityGroupIntegrationService {
 
     public void createDefaultOpenShiftRuleTemplate(OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, long unitId) {
         priorityGroupRestClient.publish(orgTypeAndSubTypeDTO, unitId,true, IntegrationOperation.CREATE, "/open_shift/copy_rule_template", null);
+    }
+
+    public void createDefaultGracePeriodSetting(TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO,Long unitId) {
+        priorityGroupRestClient.publish(tAndAGracePeriodSettingDTO,unitId,true,IntegrationOperation.CREATE,"/grace_period_setting",null);
     }
 }

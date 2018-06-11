@@ -1,5 +1,8 @@
 package com.kairos.activity.spec;
 
+import java.util.Collections;
+import java.util.List;
+
 public class OrActivitySpecification<T> extends AbstractActivitySpecification<T> {
 
     private ActivitySpecification<T> activitySpecification1;
@@ -17,4 +20,10 @@ public class OrActivitySpecification<T> extends AbstractActivitySpecification<T>
     public boolean isSatisfied(T t) {
         return activitySpecification1.isSatisfied(t) || activitySpecification2.isSatisfied(t);
     }
+
+    @Override
+    public List<String> isSatisfiedString(T t) {
+        return Collections.emptyList();
+    }
+
 }

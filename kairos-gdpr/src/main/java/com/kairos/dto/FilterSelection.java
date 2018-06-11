@@ -1,35 +1,41 @@
 package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import java.math.BigInteger;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilterSelection {
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
-    private String name;
-    private List<BigInteger> values;
+    private FilterType name;
 
+    @NotEmpty
+    @NotNull
+    private List<Long> value;
 
-    public String getName() {
+    public FilterSelection() {
+        //dv
+    }
+
+    public FilterType getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(FilterType name) {
         this.name = name;
     }
 
-    public List<BigInteger> getValues() {
-        return values;
+    public List<Long> getValue() {
+        return value;
     }
 
-    public void setValues(List<BigInteger> values) {
-        this.values = values;
+    public void setValue(List<Long> value) {
+        this.value = value;
     }
 }
 

@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRep
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
 import com.kairos.response.dto.web.filter.FilterDetailDTO;
+import com.kairos.response.dto.web.staff.StaffEmploymentWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -37,7 +38,7 @@ import java.util.*;
  */
 @Transactional
 @Service
-public class StaffFilterService extends UserBaseService{
+public class StaffFilterService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -63,7 +64,7 @@ public class StaffFilterService extends UserBaseService{
     @Inject
     private ExceptionService exceptionService;
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId){
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
 
@@ -73,7 +74,7 @@ public class StaffFilterService extends UserBaseService{
         return filtersAndFavouriteFiltersDTO;
     }
 
-    public List<FilterSelectionQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper){
+    public List<FilterSelectionQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper) {
         List<FilterSelectionQueryResult> queryResults = new ArrayList<>();
 
         filterData.forEach(filterDetailDTO -> {
@@ -82,9 +83,9 @@ public class StaffFilterService extends UserBaseService{
         return queryResults;
     }
 
-    public List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId){
-        ObjectMapper objectMapper =  new ObjectMapper();
-        switch (filterType){
+    public List<FilterSelectionQueryResult> getFilterDetailsByFilterType(com.kairos.persistence.model.enums.FilterType filterType, Long countryId, Long unitId) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        switch (filterType) {
             case EMPLOYMENT_TYPE: {
                 return getEmploymenTypeFiltersDataByCountry(countryId);
             }
@@ -102,13 +103,13 @@ public class StaffFilterService extends UserBaseService{
             }
 
             default:
-                exceptionService.invalidRequestException("message.staff.filter.entity.notfound",filterType.value);
+                exceptionService.invalidRequestException("message.staff.filter.entity.notfound", filterType.value);
 
         }
         return null;
     }
 
-    public FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId){
+    public FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
 
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
         tempFilterDTO.setName(filterType.name());
@@ -118,8 +119,8 @@ public class StaffFilterService extends UserBaseService{
     }
 
     public List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
-        FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
-        if(!Optional.ofNullable(filterGroup).isPresent()){
+        FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
+        if (!Optional.ofNullable(filterGroup).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.feature.notenabled");
 
         }
@@ -127,7 +128,7 @@ public class StaffFilterService extends UserBaseService{
 
         filterGroup.getFilterTypes().forEach(filterType -> {
             FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
-            if(tempFilterQueryResult.getFilterData().size() > 0){
+            if (tempFilterQueryResult.getFilterData().size() > 0) {
                 filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
             }
         });
@@ -138,25 +139,25 @@ public class StaffFilterService extends UserBaseService{
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, moduleId);
     }
 
-    public StaffFilterDTO addFavouriteFilter(Long organizationId, StaffFilterDTO staffFilterDTO){
+    public StaffFilterDTO addFavouriteFilter(Long organizationId, StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
 
 
-        if(!Optional.ofNullable(staffFilterDTO.getName()).isPresent()){
+        if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.name.empty");
 
         }
-        if(staffFilterDTO.getFiltersData().isEmpty()){
+        if (staffFilterDTO.getFiltersData().isEmpty()) {
             exceptionService.invalidRequestException("message.staff.filter.select");
 
         }
-        if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithName(staffFilterDTO.getModuleId(), staffFilterDTO.getName())){
-            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist",staffFilterDTO.getName());
+        if (staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithName(staffFilterDTO.getModuleId(), staffFilterDTO.getName())) {
+            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist", staffFilterDTO.getName());
 
         }
         // Fetch filter group to which access page is linked
-        FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
+        FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
 
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
                 staffFilterDTO.getFiltersData(), filterGroup);
@@ -167,44 +168,45 @@ public class StaffFilterService extends UserBaseService{
         return staffFilterDTO;
     }
 
-    public StaffFilterDTO updateFavouriteFilter(Long filterId, Long organizationId, StaffFilterDTO favouriteFilterDTO){
+    public StaffFilterDTO updateFavouriteFilter(Long filterId, Long organizationId, StaffFilterDTO favouriteFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, organizationId, filterId);
-        if(!Optional.ofNullable(staffFavouriteFilter).isPresent()){
-           exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid",filterId);
+        if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
+            exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 
         }
-        if(!Optional.ofNullable(favouriteFilterDTO.getName()).isPresent()){
+        if (!Optional.ofNullable(favouriteFilterDTO.getName()).isPresent()) {
             exceptionService.invalidRequestException("message.staff.filter.name.empty");
 
         }
-        if(favouriteFilterDTO.getFiltersData().isEmpty()){
+        if (favouriteFilterDTO.getFiltersData().isEmpty()) {
 
             exceptionService.invalidRequestException("message.staff.filter.select");
 
         }
-        if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithNameExceptId(favouriteFilterDTO.getModuleId(),
-                favouriteFilterDTO.getName(), staffFavouriteFilter.getId())){
-            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist",favouriteFilterDTO.getName());
+        if (staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithNameExceptId(favouriteFilterDTO.getModuleId(),
+                favouriteFilterDTO.getName(), staffFavouriteFilter.getId())) {
+            exceptionService.invalidRequestException("message.staff.filter.name.alreadyexist", favouriteFilterDTO.getName());
 
         }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
-        List<FilterSelection> filters =  favouriteFilterDTO.getFiltersData();
+        List<FilterSelection> filters = favouriteFilterDTO.getFiltersData();
         filters.forEach(filterSelection -> {
-            filterSelection.setId(null);});
+            filterSelection.setId(null);
+        });
         staffFavouriteFilter.setFiltersData(filters);
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         save(staffFavouriteFilter);
         return favouriteFilterDTO;
     }
 
-    public Boolean deleteFavouriteFilter(Long filterId, Long organizationId){
+    public Boolean deleteFavouriteFilter(Long filterId, Long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, organizationId, filterId);
-        if(!Optional.ofNullable(staffFavouriteFilter).isPresent()){
-            exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid",filterId);
+        if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
+            exceptionService.invalidRequestException("message.staff.filter.favouritefilterid.invalid", filterId);
 
         }
         staffFavouriteFilter.setDeleted(true);
@@ -212,28 +214,28 @@ public class StaffFilterService extends UserBaseService{
         return true;
     }
 
-    public List<FilterSelectionQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId){
+    public List<FilterSelectionQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId) {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    public Map<FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters){
-        Map<FilterType,List<String>> mapOfFilters = new HashMap<>();
+    public Map<com.kairos.persistence.model.enums.FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters) {
+        Map<com.kairos.persistence.model.enums.FilterType, List<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
-        FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
+        FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         filters.forEach(filterSelection -> {
-            if(!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
-                    filterSelection.getName() ) ){
-                mapOfFilters.put(filterSelection.getName(),filterSelection.getValue() );
+            if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
+                    filterSelection.getName())) {
+                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
 
             }
         });
         return mapOfFilters;
     }
 
-    public List<Map> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired, StaffFilterDTO staffFilterDTO) {
+    public StaffEmploymentWrapper getAllStaffByUnitId(Long unitId, Boolean allStaffRequired, StaffFilterDTO staffFilterDTO) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
@@ -243,9 +245,12 @@ public class StaffFilterService extends UserBaseService{
         }
 
         Organization organization = organizationService.fetchParentOrganization(unitId);
-        return organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(), !allStaffRequired,
+        StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
+        staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
+        staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(), !allStaffRequired,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
-                envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+                envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
+        return staffEmploymentWrapper;
 
     }
 
