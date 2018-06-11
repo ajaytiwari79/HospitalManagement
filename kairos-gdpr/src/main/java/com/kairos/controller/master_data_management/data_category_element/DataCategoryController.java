@@ -74,14 +74,14 @@ public class DataCategoryController {
     }
 
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDto dataCategoryDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.addDataCategoryAndDataElement(countryId, dataCategoryDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndElement(countryId,id, dataCategoryDto));
 
 
     }

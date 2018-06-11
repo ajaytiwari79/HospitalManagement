@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.data_category_element;
 
 import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
-import com.kairos.response.dto.master_data.DataCategoryResponseDto;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDto;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;

@@ -29,7 +29,7 @@ public class MasterQuestionController {
     private MasterQuestionService masterQuestionService;
 
 
-    @PostMapping("/add")
+   /* @PostMapping("/add")
     public ResponseEntity<Object> addMasterQuestion(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
@@ -87,5 +87,5 @@ public class MasterQuestionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.updateMasterQuestion(countryId, id, masterQuestionDto));
     }
 
-
+*/
 }
