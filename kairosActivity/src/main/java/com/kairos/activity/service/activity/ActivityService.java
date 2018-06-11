@@ -1035,7 +1035,7 @@ public class ActivityService extends MongoBaseService {
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException("message.activity.published",activityId);
         }
-        if (activity.getBalanceSettingsActivityTab().getTimeTypeId()==null || activity.getBalanceSettingsActivityTab().getPresenceTypeId()==null)) {
+        if (activity.getBalanceSettingsActivityTab().getTimeTypeId()==null || activity.getBalanceSettingsActivityTab().getPresenceTypeId()==null) {
             exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null",activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);

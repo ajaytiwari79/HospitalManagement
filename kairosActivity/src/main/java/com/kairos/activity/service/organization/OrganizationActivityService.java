@@ -4,6 +4,7 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
+import com.kairos.activity.service.unit_settings.UnitSettingService;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
@@ -80,6 +81,7 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject private PeriodSettingsService periodSettingsService;
     @Inject private PhaseSettingsService phaseSettingsService;
     @Inject private UnitSettingRepository unitSettingRepository;
+    @Inject private UnitSettingService unitSettingService;
 
 
 
@@ -283,6 +285,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<Phase> phases= phaseService.createDefaultPhase(unitId,countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId,phases);
+        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId);
         return true;
    }
 
