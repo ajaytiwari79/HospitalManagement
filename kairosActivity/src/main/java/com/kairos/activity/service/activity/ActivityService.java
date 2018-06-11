@@ -465,6 +465,11 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id",rulesActivityDTO.getActivityId());
         }
         activity.setRulesActivityTab(rulesActivityTab);
+
+        if(!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)){
+            activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        }
+
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab);
 
