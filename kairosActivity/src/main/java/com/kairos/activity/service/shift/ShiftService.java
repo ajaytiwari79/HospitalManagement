@@ -701,7 +701,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public Map<String, List<BigInteger>> publishShifts(ShiftPublishDTO shiftPublishDTO) {
-        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(shiftPublishDTO.getShiftIds());
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
 
         List<BigInteger> success = new ArrayList<>();
         List<BigInteger> error = new ArrayList<>();
@@ -735,7 +735,7 @@ public class ShiftService extends MongoBaseService {
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
 
 
-        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(copyShiftDTO.getShiftIds());
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(copyShiftDTO.getShiftIds());
 
         Set<BigInteger> activityIds = shifts.parallelStream().map(shift -> shift.getActivityId()).collect(Collectors.toSet());
         List<Activity> activities = activityRepository.findAllActivitiesByIds(activityIds);
@@ -772,14 +772,27 @@ public class ShiftService extends MongoBaseService {
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
-        shifts.forEach(shift -> {
 
-            LocalTime startTime = LocalDateTime.ofInstant(shift.getStartDate().toInstant(), ZoneId.systemDefault()).toLocalTime();
-            LocalTime endTime = LocalDateTime.ofInstant(shift.getEndDate().toInstant(), ZoneId.systemDefault()).toLocalTime();
+        int counter = 0;
 
-            logger.info("Shift  start from {} ",startTime," shift end from {} ",endTime);
+        LocalDate previousShiftLocalDate = null;
+        LocalDate currentShiftLocalDate = null;
+        LocalDate shiftCreationFirstDate = copyShiftDTO.getStartDate();
+        LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
+        while (shiftCreationLastDate.isAfter(shiftCreationFirstDate)) {
 
+            logger.info("create shift for {}", shiftCreationFirstDate);
+            shiftCreationFirstDate = shiftCreationFirstDate.plusDays(1L);
+        }
+        for (Shift shift : shifts) {
+            if (counter == 0) {
+                previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+                currentShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+            }
 
+            LocalTime startTime = DateUtils.asLocalTime(shift.getStartDate());
+            LocalTime endTime = DateUtils.asLocalTime(shift.getEndDate());
+            logger.info("Shift  start from {} ", startTime, " shift end from {} ", endTime);
             Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(shift.getActivityId())).findAny().get();
 
             List<String> responseMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
@@ -796,10 +809,10 @@ public class ShiftService extends MongoBaseService {
                 errorInCopyingShifts.add(new ShiftResponse(shift.getId(), shift.getName(), errors));
             }
 
-        });
+        }
         statusMap.put("success", successfullyCopiedShifts);
         statusMap.put("error", errorInCopyingShifts);
-        save(newShifts);
+     //   save(newShifts);
         return statusMap;
     }
 
