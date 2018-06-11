@@ -34,11 +34,11 @@ public class PhaseDTO {
     private PhaseType phaseType;
 
 
-    public long getOrganizationId() {
+    public Long getOrganizationId() {
         return organizationId;
     }
 
-    public void setOrganizationId(long organizationId) {
+    public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
     }
 
@@ -106,10 +106,6 @@ public class PhaseDTO {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
     }
 
     public BigInteger getParentCountryPhaseId() {
