@@ -746,9 +746,10 @@ public class ShiftService extends MongoBaseService {
         List<WorkingTimeAgreement> workingTimeAgreements = wtaService.findAllByIdAndDeletedFalse(wtaIds);
         List<Phase> phases = phaseService.getAllPhasesOfUnit(unitId);
 
+        Integer unCopiedShiftCount = 0;
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
 
-        copyShiftDTO.getStaffIds().forEach(currentStaffId -> {
+        for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
             WorkingTimeAgreement workingTimeAgreement = workingTimeAgreements.stream().filter(wta -> wta.getId().equals(staffUnitPosition.getWorkingTimeAgreementId())).findAny().get();
 
@@ -756,12 +757,11 @@ public class ShiftService extends MongoBaseService {
 
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
-
+            unCopiedShiftCount += response.get("error").size();
             copyShiftResponse.getSuccessFul().add(successfullyCopied);
             copyShiftResponse.getFailure().add(errorInCopy);
-
-
-        });
+        }
+        copyShiftResponse.setUnCopiedShiftCount(unCopiedShiftCount);
 
         return copyShiftResponse;
     }
@@ -770,50 +770,63 @@ public class ShiftService extends MongoBaseService {
 
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
+
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
 
         int counter = 0;
-
+        int firstshiftAdded = 0;
         LocalDate previousShiftLocalDate = null;
-        LocalDate currentShiftLocalDate = null;
         LocalDate shiftCreationFirstDate = copyShiftDTO.getStartDate();
         LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
-        while (shiftCreationLastDate.isAfter(shiftCreationFirstDate)) {
-
-            logger.info("create shift for {}", shiftCreationFirstDate);
-            shiftCreationFirstDate = shiftCreationFirstDate.plusDays(1L);
-        }
-        for (Shift shift : shifts) {
-            if (counter == 0) {
-                previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-                currentShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+        ShiftResponse shiftResponse = null;
+        while (shiftCreationLastDate.isAfter(shiftCreationFirstDate) || shiftCreationLastDate.equals(shiftCreationFirstDate)) {
+            Shift shift = shifts.get(counter);
+            if (counter++ == shifts.size() - 1) {
+                counter = 0;
             }
-
-            LocalTime startTime = DateUtils.asLocalTime(shift.getStartDate());
-            LocalTime endTime = DateUtils.asLocalTime(shift.getEndDate());
-            logger.info("Shift  start from {} ", startTime, " shift end from {} ", endTime);
             Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(shift.getActivityId())).findAny().get();
-
-            List<String> responseMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
-            if (responseMessages.isEmpty()) {
-                Shift copiedShift = new Shift(shift.getName(), shift.getStartDate(), shift.getEndDate(), shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaff().getId(), shift.getPhase(), shift.getUnitId(),
-                        shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute(), shift.getId());
-                newShifts.add(copiedShift);
-                successfullyCopiedShifts.add(new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList(NO_CONFLICTS)));
+            List<String> validationMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
+            if (firstshiftAdded == 0) {
+                firstshiftAdded = 1;
+                previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
             } else {
-                List<String> errors = new ArrayList<>();
-                responseMessages.forEach(responseMessage -> {
-                    errors.add(localeService.getMessage(responseMessage));
-                });
-                errorInCopyingShifts.add(new ShiftResponse(shift.getId(), shift.getName(), errors));
+                if (previousShiftLocalDate.equals(shift.getStartDate())) {
+                    // both shifts are of same date so create shift on same start date
+                    previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+                } else {
+                    shiftCreationFirstDate = shiftCreationFirstDate.plusDays(1L);
+                }
+            }
+            shiftResponse = addShift(validationMessages, shift, staffUnitPosition, shiftCreationFirstDate, newShifts);
+            if (shiftResponse.isSuccess()) {
+                successfullyCopiedShifts.add(shiftResponse);
+            } else {
+                errorInCopyingShifts.add(shiftResponse);
             }
 
         }
         statusMap.put("success", successfullyCopiedShifts);
         statusMap.put("error", errorInCopyingShifts);
-     //   save(newShifts);
+        save(newShifts);
         return statusMap;
+    }
+
+    private ShiftResponse addShift(List<String> responseMessages, Shift shift, StaffUnitPositionDetails staffUnitPosition, LocalDate shiftCreationFirstDate, List<Shift> newShifts) {
+        if (responseMessages.isEmpty()) {
+            Shift copiedShift = new Shift(shift.getName(), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(shift.getStartDate())), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(shift.getEndDate())),
+                    shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaff().getId(), shift.getPhase(), shift.getUnitId(),
+                    shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute(), shift.getId());
+            newShifts.add(copiedShift);
+            return new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList(NO_CONFLICTS), true);
+
+        } else {
+            List<String> errors = new ArrayList<>();
+            responseMessages.forEach(responseMessage -> {
+                errors.add(localeService.getMessage(responseMessage));
+            });
+            return new ShiftResponse(shift.getId(), shift.getName(), errors, false);
+        }
     }
 
     public List<String> validateShiftWhileCopy(Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO) {
@@ -826,6 +839,7 @@ public class ShiftService extends MongoBaseService {
         return messages;
 
     }
+
 
     public List<ShiftQueryResult> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, String startDateAsString, String endDateAsString, Long expertiseId) throws ParseException {
         Long unitPositionId = restClient.getUnitPositionId(unitId, staffId, expertiseId);
