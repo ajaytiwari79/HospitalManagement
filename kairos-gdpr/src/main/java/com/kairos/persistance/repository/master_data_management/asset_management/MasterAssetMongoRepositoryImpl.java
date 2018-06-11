@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.master_data_management.asset_managemen
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDto;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.springframework.data.mongodb.core.MongoTemplate;

@@ -3,6 +3,7 @@ package com.kairos.activity.service.organization;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
+import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
@@ -34,6 +35,7 @@ import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.response.dto.web.unit_settings.UnitSettingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -77,6 +79,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private PlannedTimeTypeService plannedTimeTypeService;
     @Inject private PeriodSettingsService periodSettingsService;
     @Inject private PhaseSettingsService phaseSettingsService;
+    @Inject private UnitSettingRepository unitSettingRepository;
+
 
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -263,13 +267,15 @@ public class OrganizationActivityService extends MongoBaseService {
         OrderAndActivityDTO orderAndActivityDTO=new OrderAndActivityDTO();
         orderAndActivityDTO.setActivities(activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId));
         orderAndActivityDTO.setOrders(orderService.getOrdersByUnitId(unitId));
+        orderAndActivityDTO.setMinOpenShiftHours(unitSettingRepository.getMinOpenShiftHours(unitId).getOpenShiftPhaseSetting().getMinOpenShiftHours());
         return orderAndActivityDTO;
     }
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypesByUnit(Long unitId,Long countryId){
         List<ActivityDTO> activityDTOS =activityMongoRepository.findAllActivitiesWithTimeTypesByUnit(unitId);
         List<TimeTypeDTO> timeTypeDTOS=timeTypeService.getAllTimeType(null,countryId);
         List<OpenShiftIntervalDTO> intervals=openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals);
+        UnitSettingDTO minOpenShiftHours=unitSettingRepository.getMinOpenShiftHours(unitId);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals,minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours());
         return activityWithTimeTypeDTO;
     }
 

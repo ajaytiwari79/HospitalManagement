@@ -2,11 +2,8 @@ package com.kairos.service.master_data_management.asset_management;
 
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.*;
-import com.kairos.dto.MasterAssetDto;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.dto.master_data.MasterAssetDto;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
 import com.kairos.service.MongoBaseService;

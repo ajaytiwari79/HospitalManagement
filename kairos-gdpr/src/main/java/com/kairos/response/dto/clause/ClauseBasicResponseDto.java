@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import java.math.BigInteger;
 
+/*
+* clause basic response dto is for Aggrement section
+*
+* */
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseBasicResponseDto {

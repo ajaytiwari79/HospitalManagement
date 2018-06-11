@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.clause;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDto;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 

@@ -104,6 +104,8 @@ public class AccessGroupService extends UserBaseService {
         }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
+        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
@@ -171,6 +173,11 @@ public class AccessGroupService extends UserBaseService {
         }
         save(organization);
         return organization.getAccessGroups();
+    }
+
+    public List<AccessGroup> getAccessGroupsForUnit(long organizationId) {
+
+        return accessGroupRepository.getAccessGroupsForUnit(organizationId);
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {

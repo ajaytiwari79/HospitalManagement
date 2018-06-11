@@ -12,7 +12,7 @@ public class AccessGroupDTO {
     private String name;
     private String description;
     private AccessGroupRole role;
-
+    private boolean enabled = true;
     public AccessGroupDTO() {
         //default constructor
     }
@@ -22,6 +22,14 @@ public class AccessGroupDTO {
         this.name = name;
         this.description = description;
         this.role = role;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Long getId() {
