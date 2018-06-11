@@ -297,7 +297,7 @@ public class DateUtils {
     }
 
     public static LocalTime asLocalTime(Date date) {
-        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalTime();
+        return   LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalTime();
     }
 
     public static Date asDate(LocalTime localTime) {
@@ -454,6 +454,14 @@ public class DateUtils {
             dates.add(ld);
         }
         return dates;
+    }
+
+    public static ZonedDateTime getZoneDateTime(Date date){
+        return ZonedDateTime.ofInstant(date.toInstant(),ZoneId.systemDefault());
+    }
+
+    public static Date getDateByZoneDateTime(ZonedDateTime zonedDateTime){
+        return Date.from(zonedDateTime.toInstant());
     }
 
     public static LocalDate addDurationInLocalDateExcludingLastDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){

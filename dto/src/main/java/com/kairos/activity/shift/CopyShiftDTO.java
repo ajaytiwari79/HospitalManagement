@@ -13,7 +13,6 @@ public class CopyShiftDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<Day> selectedDays;
-    private Integer tillWeeks;
     private Boolean copyAttachedJobs;
     private Boolean copyAttachedNotes;
     private Boolean copyChatConversation;
@@ -63,14 +62,6 @@ public class CopyShiftDTO {
 
     public void setSelectedDays(List<Day> selectedDays) {
         this.selectedDays = selectedDays;
-    }
-
-    public Integer getTillWeeks() {
-        return tillWeeks;
-    }
-
-    public void setTillWeeks(Integer tillWeeks) {
-        this.tillWeeks = tillWeeks;
     }
 
     public Boolean getCopyAttachedJobs() {

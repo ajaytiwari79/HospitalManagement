@@ -10,7 +10,6 @@ import java.util.List;
 
 public class PriorityGroup extends MongoBaseEntity {
     private boolean deActivated;
-    //private OpenShiftCancelProcess openShiftCancelProcess;
     private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;

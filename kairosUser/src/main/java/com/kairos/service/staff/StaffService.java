@@ -1,8 +1,6 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.util.DateUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -25,10 +23,10 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -40,16 +38,16 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
-import com.kairos.response.dto.web.skill.SkillDTO;
-import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -62,7 +60,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.unit_position.UnitPositionService;
-
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -96,9 +93,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_STAFF;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UNIT;
 import static com.kairos.util.FileUtil.createDirectory;
 
 /**
@@ -178,7 +172,7 @@ public class StaffService extends UserBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-  public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
+    public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             return null;
@@ -209,7 +203,7 @@ public class StaffService extends UserBaseService {
         User user = userGraphRepository.getUserByStaffId(staffId);
         if (!Optional.ofNullable(user).isPresent()) {
             logger.error("User not found belongs to this staff id " + staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.user.id.notfound",staffId);
+            exceptionService.dataNotFoundByIdException("message.staff.user.id.notfound", staffId);
 
         }
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
@@ -233,8 +227,7 @@ public class StaffService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.staff.notfound");
 
         }
-        if(StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus())&&StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus()))
-        {
+        if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             exceptionService.actionNotPermittedException("message.employ.notconvert.Fictive");
 
         }
@@ -244,21 +237,21 @@ public class StaffService extends UserBaseService {
             StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
             Long id = null;
             if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
-                 id = staffExperienceInExpertiseDTO.getId();
+                id = staffExperienceInExpertiseDTO.getId();
 
             Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
             StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate);
             staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
-            boolean isSeniorityLevelMatched=false;
-            for(SeniorityLevel seniorityLevel:expertise.getSeniorityLevel()){
-                if(staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()>=seniorityLevel.getFrom()*12 &&
-                        (seniorityLevel.getTo()==null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()<=seniorityLevel.getTo()*12)){
-                    isSeniorityLevelMatched=true;
+            boolean isSeniorityLevelMatched = false;
+            for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
+                if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 &&
+                        (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() <= seniorityLevel.getTo() * 12)) {
+                    isSeniorityLevelMatched = true;
                     break;
                 }
             }
-            if(!isSeniorityLevelMatched){
-                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound","seniorityLevel "+staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+            if (!isSeniorityLevelMatched) {
+                exceptionService.actionNotPermittedException("error.noSeniorityLevelFound", "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
             }
 
             staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
@@ -303,13 +296,13 @@ public class StaffService extends UserBaseService {
 
         // Set if user is female and pregnant
         User user = userGraphRepository.getUserByStaffId(staffId);
-        if( !user.getCprNumber().equals(staffPersonalDetail.getCprNumber()) ){
+        if (!user.getCprNumber().equals(staffPersonalDetail.getCprNumber())) {
             user.setCprNumber(staffPersonalDetail.getCprNumber());
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
         }
         staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         user.setGender(staffPersonalDetail.getGender());
-        user.setPregnant( user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
+        user.setPregnant(user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
         save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
         return staffPersonalDetail;
@@ -333,7 +326,7 @@ public class StaffService extends UserBaseService {
         }
 
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.idandunitid.notfound",staffId,type,unitId);
+            exceptionService.dataNotFoundByIdException("message.staff.idandunitid.notfound", staffId, type, unitId);
 
         }
 
@@ -350,7 +343,12 @@ public class StaffService extends UserBaseService {
             engineerTypes = Collections.emptyList();
         }
         organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId(), DateUtil.getCurrentDateMillis());
+
+        if (Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
+            expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId(), DateUtil.getCurrentDateMillis());
+        } else {
+            expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), DateUtil.getCurrentDateMillis());
+        }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
         personalInfo.put("expertise", expertise);
@@ -380,10 +378,10 @@ public class StaffService extends UserBaseService {
         map.put("pregnant", user.isPregnant());
 
 
-        List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
-        staffExpertiseQueryResults.forEach(expertiseQueryResult ->{
+        List<StaffExpertiseQueryResult> staffExpertiseQueryResults = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
+        staffExpertiseQueryResults.forEach(expertiseQueryResult -> {
             expertiseQueryResult.setRelevantExperienceInMonths((int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()));
-            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
+            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(), expertiseQueryResult.getRelevantExperienceInMonths()));
         });
 
         map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
@@ -491,13 +489,13 @@ public class StaffService extends UserBaseService {
     }
 
     /* @Modified by VIPUL
-    * */
+     * */
 
     // TODO NEED TO FIX map
     public List<Map<String, Object>> getStaffWithBasicInfo(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
         List<Map<String, Object>> staffPersonalDetailDTOS = new ArrayList<>();
@@ -508,7 +506,7 @@ public class StaffService extends UserBaseService {
     public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
@@ -538,7 +536,7 @@ public class StaffService extends UserBaseService {
 
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (unit == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.notfound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.notfound", unitId);
 
         }
 
@@ -584,7 +582,7 @@ public class StaffService extends UserBaseService {
             return null;
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId,DateUtil.getCurrentDateMillis()));
+        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId, DateUtil.getCurrentDateMillis()));
         map.put("myExpertise", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId).stream().map(Expertise::getId).collect(Collectors.toList()));
         return map;
     }
@@ -615,7 +613,7 @@ public class StaffService extends UserBaseService {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
-            exceptionService.invalidRequestException("error.staff.accessgroup.notfound",accessGroupId);
+            exceptionService.invalidRequestException("error.staff.accessgroup.notfound", accessGroupId);
 
         }
         List<Staff> staffList = new ArrayList<>();
@@ -645,7 +643,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow",0);
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 0);
 
             }
             Row header = sheet.getRow(0);
@@ -1026,7 +1024,7 @@ public class StaffService extends UserBaseService {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
         User user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
@@ -1053,7 +1051,7 @@ public class StaffService extends UserBaseService {
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
 //        staff.setGender(user.getGender());
-      //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
+        //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
         return staff;
     }
 
@@ -1145,7 +1143,7 @@ public class StaffService extends UserBaseService {
                                   Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound",accessGroupId);
+            exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
 
         }
         Employment employment;
@@ -1311,7 +1309,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow",2);
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 2);
 
             }
 
@@ -1534,7 +1532,7 @@ public class StaffService extends UserBaseService {
         Staff staff = staffGraphRepository.findOne(staffId, 0);
         if (staff == null) {
             logger.debug("Searching staff by id " + staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.id.incorrect",staffId);
+            exceptionService.dataNotFoundByIdException("message.staff.id.incorrect", staffId);
 
         }
         return staff;
@@ -1586,7 +1584,7 @@ public class StaffService extends UserBaseService {
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
 
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
@@ -1603,7 +1601,7 @@ public class StaffService extends UserBaseService {
     public List<StaffPersonalDetailDTO> getStaffInfoById(long staffId, long unitId) {
         List<StaffPersonalDetailDTO> staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, staffId);
         if (!Optional.ofNullable(staffPersonalDetailList).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staffandunit.id.notfound",staffId,unitId);
+            exceptionService.dataNotFoundByIdException("message.staffandunit.id.notfound", staffId, unitId);
 
         }
         return staffPersonalDetailList;
@@ -1635,6 +1633,9 @@ public class StaffService extends UserBaseService {
             }
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
+        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.getStaffAccessRoles(unitId,staffId);
+        staffAdditionalInfoQueryResult.setUserAccessRoleDTO(userAccessRoleDTO);
+
         return staffAdditionalInfoQueryResult;
     }
 
@@ -1677,7 +1678,7 @@ public class StaffService extends UserBaseService {
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound",staffFilterDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound", staffFilterDTO.getId());
 
         }
         /*AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
@@ -1697,7 +1698,7 @@ public class StaffService extends UserBaseService {
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound",staffFavouriteFilterId);
+            exceptionService.dataNotFoundByIdException("message.stafffavouritefilter.notfound", staffFavouriteFilterId);
 
         }
 
@@ -1844,26 +1845,26 @@ public class StaffService extends UserBaseService {
         return skills.stream().map(skill -> new SkillDTO(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toSet());
     }
 
-    private Integer nextSeniorityLevelInMonths( List<SeniorityLevel> seniorityLevels,int currentExperienceInMonths){
-        Integer nextSeniorityLevelInMonths=null;
-        for(int i=0;i<seniorityLevels.size();i++){
-            if(currentExperienceInMonths < seniorityLevels.get(i).getFrom()*12){
-                nextSeniorityLevelInMonths= seniorityLevels.get(i).getFrom()*12-currentExperienceInMonths;
+    private Integer nextSeniorityLevelInMonths(List<SeniorityLevel> seniorityLevels, int currentExperienceInMonths) {
+        Integer nextSeniorityLevelInMonths = null;
+        for (int i = 0; i < seniorityLevels.size(); i++) {
+            if (currentExperienceInMonths < seniorityLevels.get(i).getFrom() * 12) {
+                nextSeniorityLevelInMonths = seniorityLevels.get(i).getFrom() * 12 - currentExperienceInMonths;
                 break;
             }
         }
         return nextSeniorityLevelInMonths;
     }
 
-    public List<UnitStaffQueryResult> getUnitWiseStaffList(){
+    public List<UnitStaffQueryResult> getUnitWiseStaffList() {
         return staffGraphRepository.getStaffListOfUnitWithBasicInfo();
     }
 
-    public boolean savePersonalizedSettings(Long unitId, StaffPreferencesDTO staffPreferencesDTO){
-        Organization parentOrganization=organizationService.fetchParentOrganization(unitId);
-        Staff staff=staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
-        StaffSettingsQueryResult staffSettingsQueryResult=staffGraphRepository.fetchStaffSettingDetails(staff.getId());
-        switch (staffPreferencesDTO.getShiftBlockType()){
+    public boolean savePersonalizedSettings(Long unitId, StaffPreferencesDTO staffPreferencesDTO) {
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        StaffSettingsQueryResult staffSettingsQueryResult = staffGraphRepository.fetchStaffSettingDetails(staff.getId());
+        switch (staffPreferencesDTO.getShiftBlockType()) {
             case SHIFT:
                 staffSettingsQueryResult.getStaffPreferences().getActivityId().add(staffPreferencesDTO.getActivityId());
                 break;
@@ -1874,9 +1875,9 @@ public class StaffService extends UserBaseService {
                 staffSettingsQueryResult.getStaffPreferences().getDateForWeek().add(DateUtil.getStartDateOfWeekFromDate(staffPreferencesDTO.getStartDate()));
                 break;
             default:
-                exceptionService.actionNotPermittedException("exception.actionNotPermittedException","No Shift Block Type found");
+                exceptionService.actionNotPermittedException("exception.actionNotPermittedException", "No Shift Block Type found");
         }
-        StaffSettings staffSettings=staffSettingsQueryResult.getStaffSettings();
+        StaffSettings staffSettings = staffSettingsQueryResult.getStaffSettings();
         staffSettings.setStaffPreferences(staffSettingsQueryResult.getStaffPreferences());
         staff.setStaffSettings(staffSettings);
         save(staff);

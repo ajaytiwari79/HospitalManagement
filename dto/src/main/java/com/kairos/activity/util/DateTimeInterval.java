@@ -1,8 +1,16 @@
 package com.kairos.activity.util;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.joda.time.DateTime;
+
 import java.time.*;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.util.Date;
 
 /**
  * @author pradeep
@@ -26,7 +34,15 @@ public class DateTimeInterval {
     }
 
     public ZonedDateTime getStart() {
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), ZoneId.systemDefault());
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(start), ZoneId.systemDefault());
+    }
+
+    public Date getStartDate(){
+        return new Date(this.start);
+    }
+
+    public Date getEndDate(){
+        return new Date(this.end);
     }
 
     public long getStartMillis() {
@@ -42,7 +58,7 @@ public class DateTimeInterval {
     }
 
     public ZonedDateTime getEnd() {
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(end), ZoneId.systemDefault());
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(end), ZoneId.systemDefault());
     }
 
     public long getEndMillis() {
@@ -91,7 +107,7 @@ public class DateTimeInterval {
     }
 
     public DateTimeInterval overlap(DateTimeInterval interval) {
-        if (overlaps(interval) == false) {
+        if (!overlaps(interval)) {
             return null;
         }
         long start = Math.max(getStartMillis(), interval.getStartMillis());
@@ -100,8 +116,8 @@ public class DateTimeInterval {
     }
 
     public DateTimeInterval addInterval(DateTimeInterval interval){
-        long start = Math.max(this.start, interval.getStartMillis());
-        long end = Math.min(this.end, interval.getEndMillis());
+        long start = Math.min(this.start, interval.getStartMillis());
+        long end = Math.max(this.end, interval.getEndMillis());
         return new DateTimeInterval(start, end);
     }
 
@@ -132,6 +148,25 @@ public class DateTimeInterval {
         }
     }
 
+    public boolean contains(long millisInstant) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (millisInstant >= thisStart && millisInstant < thisEnd);
+    }
+
+    public boolean contains(Date date) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() < thisEnd);
+    }
+
+    public boolean containsNow() {
+        Date date = new Date();
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() < thisEnd);
+    }
+
     public boolean abuts(DateTimeInterval interval) {
         if (interval == null) {
             long now = ZonedDateTime.now().toInstant().toEpochMilli();
@@ -142,8 +177,50 @@ public class DateTimeInterval {
         }
     }
 
+    public boolean containsInterval(DateTimeInterval interval){
+        return this.start>=interval.getStartMillis() && this.end>=interval.getEndMillis();
+    }
+
     public int getMinutes(){
-        return ((getStart().getHour()*60) + getStart().getMinute()) - ((getEnd().getHour()*60)+getEnd().getMinute());
+        return (int) (this.end - this.start)/60000;
+    }
+
+    public int getHours(){
+        return (int) (this.end - this.start)/3600000;
+    }
+
+    public int getSeconds(){
+        return (int) (this.end - this.start)/1000;
+    }
+
+    public Long getMilliSeconds(){
+        return (this.end - this.start);
+    }
+
+    public int getDays(){
+        return Period.between(getEnd().toLocalDate(),getStart().toLocalDate()).getDays();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DateTimeInterval interval = (DateTimeInterval) o;
+
+        return new EqualsBuilder()
+                .append(start, interval.start)
+                .append(end, interval.end)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(start)
+                .append(end)
+                .toHashCode();
     }
 
     @Override
