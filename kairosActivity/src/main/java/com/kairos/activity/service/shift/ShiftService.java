@@ -832,7 +832,7 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activityEmploymentTypeSpecification = new ActivityEmploymentTypeSpecification(staffUnitPositionDetails.getEmploymentType());
         ActivitySpecification<Activity> activityExpertiseSpecification = new ActivityExpertiseSpecification(staffUnitPositionDetails.getExpertise());
 
-        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification;//.and(activityExpertiseSpecification);
+        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(activity);
         return messages;
 
