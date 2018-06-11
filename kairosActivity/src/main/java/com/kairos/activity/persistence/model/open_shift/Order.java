@@ -22,7 +22,6 @@ public class Order extends MongoBaseEntity {
     private LocalDate endDate;
     private LocalTime fromTime;
     private LocalTime toTime;
-    private Integer minOpenShiftHours;
     private WeekType weekType;
     private List<DayOfWeek> dayType;
     private Long reasonCodeId;
@@ -130,14 +129,6 @@ public class Order extends MongoBaseEntity {
 
     public void setToTime(LocalTime toTime) {
         this.toTime = toTime;
-    }
-
-    public Integer getMinOpenShiftHours() {
-        return minOpenShiftHours;
-    }
-
-    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
-        this.minOpenShiftHours = minOpenShiftHours;
     }
 
     public WeekType getWeekType() {
