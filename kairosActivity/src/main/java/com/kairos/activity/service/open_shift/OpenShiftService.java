@@ -74,7 +74,7 @@ public class OpenShiftService extends MongoBaseService {
             } else {
                 openShift = new OpenShift();
             }
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
+            BeanUtils.copyProperties(openShiftResponseDTO,openShift,openShiftResponseDTO.getStartDate().toString());
             openShift.setOrderId(orderId);
             openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getFromTime()):
                     DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
@@ -98,7 +98,7 @@ public class OpenShiftService extends MongoBaseService {
         for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
             openShiftResponseDTO.setOrderId(orderId);
             OpenShift openShift = new OpenShift();
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
+            BeanUtils.copyProperties(openShiftResponseDTO,openShift,openShiftResponseDTO.getStartDate().toString());
             openShift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
             openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getFromTime()):
                     DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
