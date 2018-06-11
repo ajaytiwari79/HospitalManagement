@@ -134,9 +134,9 @@ public class OpenShiftService extends MongoBaseService {
 
         return openShiftResponseDTOS;
     }
-    public List<OpenShift> getOpenShiftsByUnitIdAndCurrentDate(Long unitId, Date selectedDate,Date startDate) {
+    public List<OpenShift> getOpenShiftsByUnitIdAndCurrentDate(Long unitId, Date startDate,Date endDate) {
 
-        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, selectedDate,startDate);
+        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
 
         return openShifts;
     }

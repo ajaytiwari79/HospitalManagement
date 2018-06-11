@@ -401,11 +401,13 @@ public class ShiftService extends MongoBaseService {
 
         }
         List<ShiftQueryResult> activities = (Optional.ofNullable(unitPositionId).isPresent())?shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()):
-                shiftMongoRepository.findAllShiftsBetweenDurationOfUnit(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
+                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
 
-
-        List<AppliedFunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+        List<AppliedFunctionDTO> appliedFunctionDTOs=null;
+        if(Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()){
+             appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+        }
 
         Map<LocalDate, FunctionDTO> funcitonDTOMap = new HashMap();
         if (appliedFunctionDTOs != null && !appliedFunctionDTOs.isEmpty()) {
@@ -732,7 +734,7 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate,Date endDate) {
         List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
-        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, startDate,endDate);
+        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
         List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
         openShifts.forEach(openShift -> {
             OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();

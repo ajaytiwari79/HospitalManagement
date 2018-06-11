@@ -10,6 +10,6 @@ import java.util.List;
  * Created by vipul on 14/5/18.
  */
 public interface CustomOpenShiftMongoRepository {
-    List<OpenShift> getOpenShiftsByUnitIdAndSelectedDate(Long unitId, Date startDate, Date endDate);
+    List<OpenShift> getOpenShiftsByUnitIdAndDate(Long unitId, Date startDate, Date endDate);
 
 }
