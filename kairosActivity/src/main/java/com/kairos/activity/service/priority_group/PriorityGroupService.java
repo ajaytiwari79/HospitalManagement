@@ -91,11 +91,6 @@ public class PriorityGroupService extends MongoBaseService {
         }
     }
 
-
-//    public List<PriorityGroupDTO> getPriorityGroupsOfUnit(long unitId) {
-//        return priorityGroupRepository.getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(unitId);
-//    }
-
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
 
