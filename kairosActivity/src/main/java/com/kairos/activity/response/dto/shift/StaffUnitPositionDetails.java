@@ -2,10 +2,12 @@ package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.web.AppliedFunctionDTO;
+import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
 import java.util.List;
+
 
 /**
  * Created by vipul on 29/1/18.
@@ -13,6 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffUnitPositionDetails {
     private Expertise expertise;
+    private Staff staff;
     private EmploymentType employmentType;
     private WTAResponseDTO workingTimeAgreement;
     private Long startDateMillis;
@@ -143,11 +146,11 @@ public class StaffUnitPositionDetails {
         this.employmentType = employmentType;
     }
 
-    public WTAResponseDTO  getWorkingTimeAgreement() {
+    public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WTAResponseDTO  workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
@@ -157,6 +160,14 @@ public class StaffUnitPositionDetails {
 
     public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 
     public List<AppliedFunctionDTO> getAppliedFunctions() {

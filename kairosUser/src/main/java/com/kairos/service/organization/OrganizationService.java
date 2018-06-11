@@ -1712,7 +1712,8 @@ public class OrganizationService extends UserBaseService {
         List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
         boolean syncStarted=false;
         if(!staff.isEmpty()){
-            plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
+            //TODO VIPUL check
+          //  plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
             List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips=unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
             if(!unitPositionEmploymentTypeRelationShips.isEmpty()){
                 plannerSyncService.publishAllUnitPositions(unitId,unitPositionEmploymentTypeRelationShips,IntegrationOperation.CREATE);

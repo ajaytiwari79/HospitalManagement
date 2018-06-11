@@ -1,25 +1,29 @@
 package com.kairos.activity.service.shift;
 
 import com.kairos.activity.client.CountryRestClient;
+import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.service.locale.LocaleService;
 import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.service.wta.WTAService;
+import com.kairos.activity.shift.*;
 import com.kairos.activity.shift.ShiftFunctionWrapper;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
@@ -48,14 +52,13 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.activity.constants.AppConstants.*;
 import static com.kairos.activity.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.activity.util.DateUtils.ONLY_DATE;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -97,6 +100,11 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
+    @Inject
+    private GenericIntegrationService restClient;
+
+    @Inject
+    private LocaleService localeService;
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
@@ -451,7 +459,7 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activityWTARulesSpecification = new ActivityWTARulesSpecification(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement(), phase, shift, staffAdditionalInfoDTO);
 
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification);
-          //TODO Pradeep will look into dayType
+        //TODO Pradeep will look into dayType
 
 //        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
 //        if (dayTypeIds != null) {
@@ -693,7 +701,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public Map<String, List<BigInteger>> publishShifts(ShiftPublishDTO shiftPublishDTO) {
-        List<Shift> shifts = shiftMongoRepository.findByIdInAndDeletedFalse(shiftPublishDTO.getShiftIds());
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(shiftPublishDTO.getShiftIds());
 
         List<BigInteger> success = new ArrayList<>();
         List<BigInteger> error = new ArrayList<>();
@@ -721,7 +729,108 @@ public class ShiftService extends MongoBaseService {
         endDate.setDate(endDate.getDate() + 1);
         List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, selectedDate, endDate);
         List<OpenShiftResponseDTO> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, selectedDate);
-
         return new ShiftWrapper(assignedShifts, openShifts);
+    }
+
+    public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
+
+
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalse(copyShiftDTO.getShiftIds());
+
+        Set<BigInteger> activityIds = shifts.parallelStream().map(shift -> shift.getActivityId()).collect(Collectors.toSet());
+        List<Activity> activities = activityRepository.findAllActivitiesByIds(activityIds);
+
+        List<StaffUnitPositionDetails> staffDataList = restClient.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
+        Set<BigInteger> wtaIds = staffDataList.parallelStream().map(wta -> wta.getWorkingTimeAgreementId()).collect(Collectors.toSet());
+
+        List<WorkingTimeAgreement> workingTimeAgreements = wtaService.findAllByIdAndDeletedFalse(wtaIds);
+        List<Phase> phases = phaseService.getAllPhasesOfUnit(unitId);
+
+        CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
+
+        copyShiftDTO.getStaffIds().forEach(currentStaffId -> {
+            StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
+            WorkingTimeAgreement workingTimeAgreement = workingTimeAgreements.stream().filter(wta -> wta.getId().equals(staffUnitPosition.getWorkingTimeAgreementId())).findAny().get();
+
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, workingTimeAgreement, phases, copyShiftDTO);
+
+            StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
+            StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
+
+            copyShiftResponse.getSuccessFul().add(successfullyCopied);
+            copyShiftResponse.getFailure().add(errorInCopy);
+
+
+        });
+
+        return copyShiftResponse;
+    }
+
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition, List<Activity> activities, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO) {
+
+        List<Shift> newShifts = new ArrayList<>(shifts.size());
+        Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
+        List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
+        List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
+        shifts.forEach(shift -> {
+
+            LocalTime startTime = LocalDateTime.ofInstant(shift.getStartDate().toInstant(), ZoneId.systemDefault()).toLocalTime();
+            LocalTime endTime = LocalDateTime.ofInstant(shift.getEndDate().toInstant(), ZoneId.systemDefault()).toLocalTime();
+
+            logger.info("Shift  start from {} ",startTime," shift end from {} ",endTime);
+
+
+            Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(shift.getActivityId())).findAny().get();
+
+            List<String> responseMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
+            if (responseMessages.isEmpty()) {
+                Shift copiedShift = new Shift(shift.getName(), shift.getStartDate(), shift.getEndDate(), shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaff().getId(), shift.getPhase(), shift.getUnitId(),
+                        shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute(), shift.getId());
+                newShifts.add(copiedShift);
+                successfullyCopiedShifts.add(new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList(NO_CONFLICTS)));
+            } else {
+                List<String> errors = new ArrayList<>();
+                responseMessages.forEach(responseMessage -> {
+                    errors.add(localeService.getMessage(responseMessage));
+                });
+                errorInCopyingShifts.add(new ShiftResponse(shift.getId(), shift.getName(), errors));
+            }
+
+        });
+        statusMap.put("success", successfullyCopiedShifts);
+        statusMap.put("error", errorInCopyingShifts);
+        save(newShifts);
+        return statusMap;
+    }
+
+    public List<String> validateShiftWhileCopy(Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO) {
+        Phase phase = phaseService.getCurrentPhaseInUnitByDate(phases, DateUtils.asDate(copyShiftDTO.getStartDate()));
+        ActivitySpecification<Activity> activityEmploymentTypeSpecification = new ActivityEmploymentTypeSpecification(staffUnitPositionDetails.getEmploymentType());
+        ActivitySpecification<Activity> activityExpertiseSpecification = new ActivityExpertiseSpecification(staffUnitPositionDetails.getExpertise());
+
+        ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification;//.and(activityExpertiseSpecification);
+        List<String> messages = activitySpecification.isSatisfiedString(activity);
+        return messages;
+
+    }
+
+    public List<ShiftQueryResult> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, String startDateAsString, String endDateAsString, Long expertiseId) throws ParseException {
+        Long unitPositionId = restClient.getUnitPositionId(unitId, staffId, expertiseId);
+        Date startDateInISO = DateUtils.getDate();
+        Date endDateInISO = DateUtils.getDate();
+        if (startDateAsString != null) {
+            DateFormat dateISOFormat = new SimpleDateFormat(ONLY_DATE);
+            Date startDate = dateISOFormat.parse(startDateAsString);
+            startDateInISO = new DateTime(startDate).toDate();
+            if (endDateAsString != null) {
+                Date endDate = dateISOFormat.parse(endDateAsString);
+                endDateInISO = new DateTime(endDate).toDate();
+            }
+
+        }
+        List<ShiftQueryResult> activities = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, unitId);
+        activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
+
+        return activities;
     }
 }

@@ -55,7 +55,7 @@ public class TaskPackageService extends MongoBaseService {
         for (TaskDemand taskDemand : taskDemands) {
             TaskDemand copyObj = new TaskDemand();
             copyObj.setCitizenId(clientId);
-//            copyObj.setStaffId(staffId);
+//            copyObj.setStaff(staffId);
             copyTaskDemandObj.add(copyObj);
         }
         taskDemandService.save(copyTaskDemandObj);
