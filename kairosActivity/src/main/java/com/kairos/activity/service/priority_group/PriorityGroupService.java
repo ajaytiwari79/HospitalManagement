@@ -1,22 +1,30 @@
 package com.kairos.activity.service.priority_group;
 
 import com.kairos.activity.client.GenericIntegrationService;
-import com.kairos.activity.persistence.model.priority_group.PriorityGroup;
+import com.kairos.activity.constants.AppConstants;
+import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.activity.response.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.service.mail.MailService;
 import com.kairos.activity.util.ObjectMapperUtils;
-import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
-import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
+import com.kairos.activity.util.event.ShiftNotificationEvent;
+import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.open_shift.PriorityGroupWrapper;
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -25,6 +33,12 @@ public class PriorityGroupService extends MongoBaseService {
     private PriorityGroupRepository priorityGroupRepository;
     @Inject
     private  ExceptionService exceptionService;
+    @Inject
+    private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
+    @Inject
+    private MailService mailService;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Inject private GenericIntegrationService genericIntegrationService;
 
@@ -63,7 +77,9 @@ public class PriorityGroupService extends MongoBaseService {
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
- }
+//        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isDeActivated(),
+//                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRules(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
+    }
 
     public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
@@ -83,7 +99,7 @@ public class PriorityGroupService extends MongoBaseService {
                 priorityGroup.setUnitId(unitId);
                 priorityGroup.setId(null);
                 priorityGroup.setCountryId(null);
-                });
+            });
             save(priorityGroups);
             return true;
         } else  {
@@ -118,7 +134,9 @@ public class PriorityGroupService extends MongoBaseService {
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
-  }
+//        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isDeActivated(),
+//                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRules(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
+    }
 
     public boolean deletePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
@@ -156,6 +174,7 @@ public class PriorityGroupService extends MongoBaseService {
         });
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
+
         ObjectMapperUtils.copyProperties(priorityGroups,priorityGroupDTOs);
         return  priorityGroupDTOs;
     }
@@ -177,6 +196,18 @@ public class PriorityGroupService extends MongoBaseService {
     }
     public List<PriorityGroupDTO> getPriorityGroupsByOrderId(long unitId,BigInteger orderId) {
         return priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
+    }
+
+    public void notifyStaffByPriorityGroup(BigInteger priorityGroupId){
+        if(Optional.ofNullable(priorityGroupId).isPresent()) {
+            PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
+            PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
+            PriorityGroupRulesImplementation priorityGroupRulesImplementation = new PriorityGroupRulesImplementation();
+            ImpactWeight impactWeight = new ImpactWeight(7,4);
+            priorityGroupRulesImplementation.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
+            applicationContext.publishEvent(priorityGroupRuleDataDTO);
+        }
+
     }
 
     public PriorityGroupWrapper getPriorityGroupsByOrderIdForUnit(Long unitId,BigInteger orderId){

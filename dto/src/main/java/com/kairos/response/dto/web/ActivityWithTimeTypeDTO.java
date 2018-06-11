@@ -11,6 +11,7 @@ public class ActivityWithTimeTypeDTO {
     private List<ActivityDTO> activityDTOS;
     private List<TimeTypeDTO> timeTypeDTOS;
     private List<OpenShiftIntervalDTO> intervals;
+    private Integer minOpenShiftHours;
 
 
     public ActivityWithTimeTypeDTO() {
@@ -21,6 +22,13 @@ public class ActivityWithTimeTypeDTO {
         this.activityDTOS = activityDTOS;
         this.timeTypeDTOS = timeTypeDTOS;
         this.intervals = intervals;
+    }
+
+    public ActivityWithTimeTypeDTO(List<ActivityDTO> activityDTOS, List<TimeTypeDTO> timeTypeDTOS, List<OpenShiftIntervalDTO> intervals, Integer minOpenShiftHours) {
+        this.activityDTOS = activityDTOS;
+        this.timeTypeDTOS = timeTypeDTOS;
+        this.intervals = intervals;
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 
     public List<TimeTypeDTO> getTimeTypeDTOS() {
@@ -45,5 +53,13 @@ public class ActivityWithTimeTypeDTO {
 
     public void setIntervals(List<OpenShiftIntervalDTO> intervals) {
         this.intervals = intervals;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 }

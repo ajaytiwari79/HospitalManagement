@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web.open_shift;
 
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+
 import java.util.List;
 
 public class OrderOpenshiftResponseDTO {
