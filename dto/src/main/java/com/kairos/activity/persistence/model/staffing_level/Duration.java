@@ -8,8 +8,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
-public class StaffingLevelDuration {
+public class Duration {
     //@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
 
@@ -17,16 +18,20 @@ public class StaffingLevelDuration {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime to;
 
-    public StaffingLevelDuration() {
+    public Duration() {
         //default constructor
     }
 
-    public StaffingLevelDuration(LocalTime from, LocalTime to) {
+    public Duration(LocalTime from, LocalTime to) {
         this.from = from;
         this.to = to;
     }
-    public int getDuration(){
-        return  (int)ChronoUnit.MINUTES.between(from, to);
+
+    public int getDuration() {
+        if (Optional.ofNullable(to).isPresent() && Optional.ofNullable(from).isPresent())
+            return (int) ChronoUnit.MINUTES.between(from, to);
+        else
+            return 0;
     }
 
     public LocalTime getFrom() {
@@ -49,9 +54,9 @@ public class StaffingLevelDuration {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof StaffingLevelDuration)) return false;
+        if (!(o instanceof Duration)) return false;
 
-        StaffingLevelDuration that = (StaffingLevelDuration) o;
+        Duration that = (Duration) o;
 
         return new EqualsBuilder()
                 .append(from, that.from)
