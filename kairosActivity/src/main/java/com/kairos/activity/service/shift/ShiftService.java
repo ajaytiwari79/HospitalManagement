@@ -7,6 +7,7 @@ import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
+import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
@@ -30,6 +31,7 @@ import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftWrapper;
 import com.kairos.activity.spec.*;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.enums.shift.BreakPaymentSetting;
@@ -398,11 +400,14 @@ public class ShiftService extends MongoBaseService {
             }
 
         }
-        List<ShiftQueryResult> activities = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
+        List<ShiftQueryResult> activities = (Optional.ofNullable(unitPositionId).isPresent())?shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()):
+                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
 
-
-        List<AppliedFunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+        List<AppliedFunctionDTO> appliedFunctionDTOs=null;
+        if(Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()){
+             appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+        }
 
         Map<LocalDate, FunctionDTO> funcitonDTOMap = new HashMap();
         if (appliedFunctionDTOs != null && !appliedFunctionDTOs.isEmpty()) {
@@ -459,7 +464,9 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activityWTARulesSpecification = new ActivityWTARulesSpecification(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreement(), phase, shift, staffAdditionalInfoDTO);
 
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification);
-        //TODO Pradeep will look into dayType
+
+          //TODO Pradeep will look into dayType/shift/staff/
+
 
 //        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
 //        if (dayTypeIds != null) {
@@ -724,12 +731,21 @@ public class ShiftService extends MongoBaseService {
         return response;
     }
 
-    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date selectedDate) throws ParseException {
-        Date endDate = new Date(selectedDate.toString());
-        endDate.setDate(endDate.getDate() + 1);
-        List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, selectedDate, endDate);
-        List<OpenShiftResponseDTO> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, selectedDate);
-        return new ShiftWrapper(assignedShifts, openShifts);
+
+    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate,Date endDate) {
+        List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
+        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
+        List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
+        openShifts.forEach(openShift -> {
+            OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();
+            BeanUtils.copyProperties(openShift,openShiftResponseDTO,openShift.getStartDate().toString(),openShift.getEndDate().toString());
+            openShiftResponseDTO.setFromTime(DateUtils.asLocalTime(openShift.getStartDate()));
+            openShiftResponseDTO.setToTime(DateUtils.asLocalTime(openShift.getEndDate()));
+            openShiftResponseDTO.setStartDate(DateUtils.asLocalDate(openShift.getStartDate()));
+            openShiftResponseDTO.setEndDate(DateUtils.asLocalDate(openShift.getEndDate()));
+            openShiftResponseDTOS.add(openShiftResponseDTO);
+        });
+        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS);
     }
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {

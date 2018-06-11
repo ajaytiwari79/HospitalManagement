@@ -6,15 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 
 @Document
 public class OpenShift extends MongoBaseEntity {
 
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private LocalTime fromTime;
-    private LocalTime toTime;
+    private Date startDate;
+    private Date endDate;
     private Integer noOfPersonRequired;
     private List<Long> interestedStaff;
     private List<Long> declinedBy;
@@ -48,31 +47,14 @@ public class OpenShift extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
-
-
-    public LocalDate getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public LocalTime getFromTime() {
-        return fromTime;
-    }
-
-    public void setFromTime(LocalTime fromTime) {
-        this.fromTime = fromTime;
-    }
-
-    public LocalTime getToTime() {
-        return toTime;
-    }
-
-    public void setToTime(LocalTime toTime) {
-        this.toTime = toTime;
-    }
 
     public Integer getNoOfPersonRequired() {
         return noOfPersonRequired;
@@ -99,13 +81,14 @@ public class OpenShift extends MongoBaseEntity {
     }
 
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+
     public BigInteger getParentOpenShiftId() {
         return parentOpenShiftId;
     }

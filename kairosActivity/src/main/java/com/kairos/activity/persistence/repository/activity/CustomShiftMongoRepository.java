@@ -25,6 +25,8 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftQueryResult> getShiftsByUnitBeforeDate(Long unitId, Date endDate);
 
-    public List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
+    List<ShiftQueryResult> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId);
+
+    List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
 
 }
