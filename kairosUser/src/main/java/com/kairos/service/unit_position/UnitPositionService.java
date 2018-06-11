@@ -668,7 +668,7 @@ public class UnitPositionService extends UserBaseService {
         }
         logger.info(updateDTO.getName());
         newWta = wtaService.copyWta(oldWta, updateDTO);
-        newWta.setExpertise(oldWta.getExpertise());
+        newWta.setExpertises(oldWta.getExpertise());
         newWta.setParentWTA(oldWta);
         newWta.setDisabled(false);
 */        //unitPosition.setWorkingTimeAgreement(newWta);
@@ -679,7 +679,7 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //newWta.setParentWTA(oldWta.basicDetails());
 
-        //newWta.setExpertise(newWta.getExpertise().retrieveBasicDetails());
+        //newWta.setExpertises(newWta.getExpertise().retrieveBasicDetails());
         //unitPositionQueryResult.setWorkingTimeAgreement(newWta);
         plannerSyncService.publishWTA(unitId, unitPositionId, wtaResponseDTO, IntegrationOperation.UPDATE);
         return unitPositionQueryResult;
