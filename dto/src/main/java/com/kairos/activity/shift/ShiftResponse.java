@@ -7,6 +7,7 @@ public class ShiftResponse {
     private BigInteger shiftId;
     private String shiftName;
     private List<String> messages;
+    private boolean success = false;
 
     public ShiftResponse() {
         //
@@ -36,9 +37,19 @@ public class ShiftResponse {
         this.shiftName = shiftName;
     }
 
-    public ShiftResponse(BigInteger shiftId, String shiftName, List<String> messages) {
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public ShiftResponse(BigInteger shiftId, String shiftName, List<String> messages,Boolean success) {
         this.shiftId = shiftId;
         this.shiftName = shiftName;
         this.messages = messages;
+        this.success=success;
     }
+
 }
