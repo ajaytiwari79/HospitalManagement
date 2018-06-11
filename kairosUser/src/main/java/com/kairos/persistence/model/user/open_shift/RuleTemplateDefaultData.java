@@ -17,18 +17,20 @@ public class RuleTemplateDefaultData {
     private List<OpenShiftIntervalDTO> intervals;
     private List<EmploymentTypeDTO> employmentTypes;
     private List<ExpertiseResponseDTO> expertises;
+    private Integer minOpenShiftHours;
 
     public RuleTemplateDefaultData() {
         //Default Constructor
     }
 
-    public RuleTemplateDefaultData(List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises) {
+    public RuleTemplateDefaultData(List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises,Integer minOpenShiftHours) {
         this.skills = skills;
         this.timeTypes = timeTypes;
         this.activities = activities;
         this.intervals = intervals;
         this.employmentTypes = employmentTypes;
         this.expertises = expertises;
+        this.minOpenShiftHours=minOpenShiftHours;
     }
 
     public RuleTemplateDefaultData(List<OrganizationTypeAndSubType> organizationTypeAndSubType, List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities, List<OpenShiftIntervalDTO> intervals, List<EmploymentTypeDTO> employmentTypes, List<ExpertiseResponseDTO> expertises) {
@@ -95,5 +97,13 @@ public class RuleTemplateDefaultData {
 
     public void setExpertises(List<ExpertiseResponseDTO> expertises) {
         this.expertises = expertises;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 }

@@ -470,7 +470,7 @@ public class OrganizationService extends UserBaseService {
     /*List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
         for (WTAAndExpertiseQueryResult allWtaExpertiseQueryResult : allWtaExpertiseQueryResults) {
-            allWtaExpertiseQueryResult.getWorkingTimeAgreement().setExpertise(allWtaExpertiseQueryResult.getExpertise());
+            allWtaExpertiseQueryResult.getWorkingTimeAgreement().setExpertises(allWtaExpertiseQueryResult.getExpertise());
             workingTimeAgreements.add(allWtaExpertiseQueryResult.getWorkingTimeAgreement());
         }
         return workingTimeAgreements;
@@ -1710,7 +1710,7 @@ public class OrganizationService extends UserBaseService {
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         OrderDefaultDataWrapper orderDefaultDataWrapper = new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(),
-                skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes);
+                skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes,orderAndActivityDTO.getMinOpenShiftHours());
         return orderDefaultDataWrapper;
     }
 
@@ -1766,9 +1766,9 @@ public class OrganizationService extends UserBaseService {
     public RuleTemplateDefaultData getDefaultDataForRuleTemplateByUnit(Long unitId) {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
-        PriorityGroupDefaultData priorityGroupDefaultData1 = employmentTypeService.getExpertiseAndEmployment(countryId, false);
-        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(), activityWithTimeTypeDTOS.getIntervals(), priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises());
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = priorityGroupIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId,countryId);
+        PriorityGroupDefaultData priorityGroupDefaultData1=employmentTypeService.getExpertiseAndEmployment(countryId,false);
+        RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData( skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises(),activityWithTimeTypeDTOS.getMinOpenShiftHours());
         return ruleTemplateDefaultData;
     }
 }

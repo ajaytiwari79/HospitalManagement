@@ -1,8 +1,8 @@
 package com.kairos.activity.controller.priority_group;
 
-import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -113,4 +113,12 @@ public class PriorityGroupController {
     public ResponseEntity<Map<String, Object>> getPriorityGroupsByOrderId(@PathVariable Long unitId,@PathVariable BigInteger orderId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupsByOrderIdForUnit(unitId,orderId));
     }
+    @ApiOperation("Get Staffs filtered by priorty group rules")
+    @GetMapping(value = UNIT_URL+"/priority_groups/{priorityGroupId}/filterPriorityGroup")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByPriorityGroups(@PathVariable Long unitId,@PathVariable BigInteger priorityGroupId) {
+        priorityGroupService.notifyStaffByPriorityGroup(priorityGroupId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
 }
