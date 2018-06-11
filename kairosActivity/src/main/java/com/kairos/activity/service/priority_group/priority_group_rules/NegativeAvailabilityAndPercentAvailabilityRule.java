@@ -30,10 +30,10 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
 
         for (Map.Entry<BigInteger, List<StaffUnitPositionQueryResult>> entry : openShiftStaffMap.entrySet()) {
             Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
-            Date filterEndDate = DateUtils.asDateEndOfDay(openShiftMap.get(entry.getKey()).getStartDate());
-            Date filterStartDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate());
-            Date flterStartDatePerAvailability = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(), openShiftMap.get(entry.getKey()).getFromTime());
-            Date filterEndDatePerAvailability = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(), openShiftMap.get(entry.getKey()).getToTime());
+            Date filterEndDate = DateUtils.getEndOfDay(openShiftMap.get(entry.getKey()).getStartDate());
+            Date filterStartDate = DateUtils.getStartOfDay(openShiftMap.get(entry.getKey()).getStartDate());
+            Date flterStartDatePerAvailability = openShiftMap.get(entry.getKey()).getStartDate();
+            Date filterEndDatePerAvailability = openShiftMap.get(entry.getKey()).getEndDate();
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(), filterEndDate.getTime());
             DateTimeInterval dateTimeIntervalPerAvailability = new DateTimeInterval(flterStartDatePerAvailability.getTime(), filterEndDatePerAvailability.getTime());
 

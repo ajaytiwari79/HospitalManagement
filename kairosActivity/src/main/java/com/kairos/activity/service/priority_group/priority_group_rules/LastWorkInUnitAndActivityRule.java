@@ -8,6 +8,7 @@ import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
@@ -28,8 +29,9 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
         BigInteger activityId = BigInteger.ZERO;
         for (Map.Entry<BigInteger, List<StaffUnitPositionQueryResult>> entry : openShiftStaffMap.entrySet()) {
             Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
-            Date filterStartDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate().minusDays(lastWorkingDaysWithUnit));
-            Date filterEndDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate());
+            LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
+            Date filterStartDate = DateUtils.asDate(openShiftDate.minusDays(lastWorkingDaysWithUnit));
+            Date filterEndDate = DateUtils.asDate(openShiftDate);
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
             if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit()).isPresent()) {
                 activityId = null;
