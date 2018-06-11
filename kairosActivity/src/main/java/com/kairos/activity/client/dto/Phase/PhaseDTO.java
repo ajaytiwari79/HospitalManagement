@@ -30,9 +30,6 @@ public class PhaseDTO {
     private Long organizationId;
     private Long countryId;
     private BigInteger parentCountryPhaseId;
-    private boolean allowFlipping;
-    private LocalTime flippingTime;
-    private DayOfWeek flippingDay;
     private int durationInDays;
     private PhaseType phaseType;
 
@@ -105,30 +102,6 @@ public class PhaseDTO {
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
-    }
-
-    public boolean isAllowFlipping() {
-        return allowFlipping;
-    }
-
-    public void setAllowFlipping(boolean allowFlipping) {
-        this.allowFlipping = allowFlipping;
-    }
-
-    public LocalTime getFlippingTime() {
-        return flippingTime;
-    }
-
-    public void setFlippingTime(LocalTime flippingTime) {
-        this.flippingTime = flippingTime;
-    }
-
-    public DayOfWeek getFlippingDay() {
-        return flippingDay;
-    }
-
-    public void setFlippingDay(DayOfWeek flippingDay) {
-        this.flippingDay = flippingDay;
     }
 
     public void setSequence(int sequence) {
