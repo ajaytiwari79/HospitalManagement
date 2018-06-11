@@ -66,7 +66,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -711,7 +710,7 @@ public class ActivityService extends MongoBaseService {
         // getting all phases by countryId as NO unit phase is configured
 
 //        List<PhaseDTO> phaseDTOs = phaseService.getPhasesByCountryId(countryId);
-        List<PhaseDTO> phaseDTOs = phaseService.getApplicablePhasesByOrganizationId(unitId);
+        List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
 
         // Set access Role of staff
         phaseActivityDTO.setStaffAccessRole(staffRestClient.getAccessOfCurrentLoggedInStaff());

@@ -3,6 +3,7 @@ package com.kairos.activity.client.dto.Phase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.persistence.model.enums.phase.PhaseType;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -33,6 +34,7 @@ public class PhaseDTO {
     private LocalTime flippingTime;
     private DayOfWeek flippingDay;
     private int durationInDays;
+    private PhaseType phaseType;
 
 
     public long getOrganizationId() {
@@ -145,6 +147,14 @@ public class PhaseDTO {
         this.parentCountryPhaseId = parentCountryPhaseId;
     }
 
+    public PhaseType getPhaseType() {
+        return phaseType;
+    }
+
+    public void setPhaseType(PhaseType phaseType) {
+        this.phaseType = phaseType;
+    }
+
     public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
         this.name = name;
         this.description = description;
@@ -160,7 +170,7 @@ public class PhaseDTO {
     }
 
     public Phase buildPhaseForCountry() {
-        Phase phase = new Phase(this.name, this.description, this.duration, this.durationType, this.sequence, this.countryId, this.allowFlipping, this.flippingTime, this.flippingDay, this.organizationId, this.parentCountryPhaseId);
+        Phase phase = new Phase(this.name, this.description, this.duration, this.durationType, this.sequence, this.countryId, this.organizationId, this.parentCountryPhaseId, this.phaseType);
         return phase;
     }
 

@@ -3,6 +3,7 @@ package com.kairos.activity.persistence.model.phase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.persistence.model.enums.phase.PhaseType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -29,9 +30,11 @@ public class Phase extends MongoBaseEntity {
     private Long organizationId;
     private Long countryId;
     private BigInteger parentCountryPhaseId;
-    private boolean allowFlipping;
+    private PhaseType phaseType;
+    // deferred
+    /*private boolean allowFlipping;
     private LocalTime flippingTime;
-    private DayOfWeek flippingDay;
+    private DayOfWeek flippingDay;*/
 
     public Phase() {
         //default constructor
@@ -93,7 +96,7 @@ public class Phase extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public boolean isAllowFlipping() {
+    /*public boolean isAllowFlipping() {
         return allowFlipping;
     }
 
@@ -115,7 +118,7 @@ public class Phase extends MongoBaseEntity {
 
     public void setFlippingDay(DayOfWeek flippingDay) {
         this.flippingDay = flippingDay;
-    }
+    }*/
 
     public BigInteger getParentCountryPhaseId() {
         return parentCountryPhaseId;
@@ -125,18 +128,24 @@ public class Phase extends MongoBaseEntity {
         this.parentCountryPhaseId = parentCountryPhaseId;
     }
 
-    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, boolean allowFlipping, LocalTime flippingTime, DayOfWeek flippingDay, Long organizationId, BigInteger parentCountryPhaseId) {
+    public PhaseType getPhaseType() {
+        return phaseType;
+    }
+
+    public void setPhaseType(PhaseType phaseType) {
+        this.phaseType = phaseType;
+    }
+
+    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType) {
         this.name = name;
         this.description = description;
         this.duration = duration;
         this.durationType = durationType;
         this.sequence = sequence;
         this.countryId = countryId;
-        this.allowFlipping = allowFlipping;
-        this.flippingDay = flippingDay;
-        this.flippingTime = flippingTime;
         this.organizationId = organizationId;
         this.parentCountryPhaseId = parentCountryPhaseId;
+        this.phaseType = phaseType;
     }
 
     @Override
