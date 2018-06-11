@@ -770,12 +770,11 @@ public class ShiftService extends MongoBaseService {
 
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
-
         List<ShiftResponse> successfullyCopiedShifts = new ArrayList<>();
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
 
         int counter = 0;
-        int firstshiftAdded = 0;
+        boolean firstShiftAdded = false;
         LocalDate previousShiftLocalDate = null;
         LocalDate shiftCreationFirstDate = copyShiftDTO.getStartDate();
         LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
@@ -787,8 +786,8 @@ public class ShiftService extends MongoBaseService {
             }
             Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(shift.getActivityId())).findAny().get();
             List<String> validationMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
-            if (firstshiftAdded == 0) {
-                firstshiftAdded = 1;
+            if (!firstShiftAdded) {
+                firstShiftAdded = true;
                 previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
             } else {
                 if (previousShiftLocalDate.equals(shift.getStartDate())) {
@@ -804,7 +803,6 @@ public class ShiftService extends MongoBaseService {
             } else {
                 errorInCopyingShifts.add(shiftResponse);
             }
-
         }
         statusMap.put("success", successfullyCopiedShifts);
         statusMap.put("error", errorInCopyingShifts);
