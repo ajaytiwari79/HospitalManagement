@@ -26,6 +26,14 @@ public class UnitPositionWithCtaDetailsDTO {
         this.unitPositionId = unitPositionId;
     }
 
+    public UnitPositionWithCtaDetailsDTO(Long unitPositionId,int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+        this.unitPositionId = unitPositionId;
+        this.contractedMinByWeek = contractedMinByWeek;
+        this.workingDaysPerWeek = workingDaysPerWeek;
+        this.unitPositionStartDate = unitPositionStartDate;
+        this.unitPositionEndDate = unitPositionEndDate;
+    }
+
     public UnitPositionWithCtaDetailsDTO() {
     }
 

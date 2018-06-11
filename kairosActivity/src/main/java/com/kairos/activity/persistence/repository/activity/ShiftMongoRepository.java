@@ -4,6 +4,7 @@ package com.kairos.activity.persistence.repository.activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.activity.shift.ShiftQueryResult;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +31,12 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{'deleted':false,'unitId':?2, 'isMainShift':true, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDuration(Date startDate, Date endDate,Long unitId);
 
-    List<Shift> findAllByIdInAndDeletedFalse(List<BigInteger> shiftIds);
+    List<Shift> findAllByIdInAndDeletedFalseOrderByStartDateAsc(List<BigInteger> shiftIds);
+
+    @Query("{'unitPositionId':{'$in':?0},'deleted':false,'isMainShift':true,'startDate':{$gte:?1},'parentOpenShiftId':{exists:true}}")
+    public List<Shift> findShiftBetweenDurationByUnitPositionIdsAfterDate(List<Long> unitPositionIds, Date startDate);
+
+    @Query("{'unitPositionId':{'$in':?0},'deleted':false,'isMainShift':true, '$or':[{'startDate':{$gte:?1,$lte:?2}},{'endDate':{$gte:?1,$lte:?2}}]}")
+    public List<Shift> findShiftBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
 }

@@ -1,4 +1,4 @@
-package com.kairos.response.dto.web.open_shift;
+package com.kairos.response.dto.web.open_shift.priority_group;
 
 public class DecisionCriteria {
     private boolean lowestTotalCost;
