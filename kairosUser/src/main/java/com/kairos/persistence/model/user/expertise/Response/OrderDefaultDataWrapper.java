@@ -15,30 +15,32 @@ public class OrderDefaultDataWrapper {
     private List<OrderResponseDTO> orders;
     private List<ActivityDTO> activities;
     private List<Skill> skills;
-    private List<Expertise> expertises;
+    private List<Expertise> expertise;
    // private List<TimeType> timeTypes;
     private List<StaffPersonalDetailDTO> staffList;
     private List<PresenceTypeDTO> plannedTime;
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
     private List<com.kairos.persistence.model.user.country.DayType> dayTypes;
+    private Integer minOpenShiftHours;
 
     public OrderDefaultDataWrapper() {
         //Default Constructor
     }
 
-    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertises, List<StaffPersonalDetailDTO> staffList,
-                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
+    public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
+                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes,Integer minOpenShiftHours) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
-        this.expertises = expertises;
+        this.expertise = expertise;
        // this.timeTypes = timeTypes;
         this.staffList = staffList;
         this.plannedTime = plannedTime;
         this.functions = functions;
         this.reasonCodes = reasonCodes;
         this.dayTypes = dayTypes;
+        this.minOpenShiftHours=minOpenShiftHours;
     }
 
     public List<OrderResponseDTO> getOrders() {
@@ -65,12 +67,12 @@ public class OrderDefaultDataWrapper {
         this.skills = skills;
     }
 
-    public List<Expertise> getExpertises() {
-        return expertises;
+    public List<Expertise> getExpertise() {
+        return expertise;
     }
 
-    public void setExpertises(List<Expertise> expertises) {
-        this.expertises = expertises;
+    public void setExpertise(List<Expertise> expertise) {
+        this.expertise = expertise;
     }
 
   /*  public List<TimeType> getTimeTypes() {
@@ -119,5 +121,13 @@ public class OrderDefaultDataWrapper {
 
     public void setDayTypes(List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
         this.dayTypes = dayTypes;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 }

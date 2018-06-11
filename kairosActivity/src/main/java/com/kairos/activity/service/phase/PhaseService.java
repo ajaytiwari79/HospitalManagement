@@ -48,22 +48,22 @@ public class PhaseService extends MongoBaseService {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
-            Phase phase = new Phase(phaseDTO.getName(),phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    phaseDTO.isAllowFlipping(), phaseDTO.getFlippingTime(), phaseDTO.getFlippingDay(), unitId, phaseDTO.getId() );
+            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
+                    phaseDTO.isAllowFlipping(), phaseDTO.getFlippingTime(), phaseDTO.getFlippingDay(), unitId, phaseDTO.getId());
             phases.add(phase);
         }
-        if(!phases.isEmpty()){
+        if (!phases.isEmpty()) {
             save(phases);
         }
     }
 
     /*
-    *@Author vipul
-    */
+     *@Author vipul
+     */
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
@@ -91,7 +91,7 @@ public class PhaseService extends MongoBaseService {
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
         OrganizationDTO unitOrganization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(unitOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
         List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.ASC);
         int weekCount = 0;
@@ -119,7 +119,7 @@ public class PhaseService extends MongoBaseService {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
             logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
-           exceptionService.dataNotFoundByIdException("message.country.phase.sequence",phaseDTO.getCountryId());
+            exceptionService.dataNotFoundByIdException("message.country.phase.sequence", phaseDTO.getCountryId());
         }
         Phase phase = phaseDTO.buildPhaseForCountry();
         phase.setCountryId(countryId);
@@ -141,7 +141,7 @@ public class PhaseService extends MongoBaseService {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
             logger.info("Phase not found in country " + phaseId);
-            exceptionService.dataNotFoundByIdException("message.country.phase.notfound",phaseId);
+            exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
         }
         phase.setDeleted(true);
         save(phase);
@@ -153,7 +153,7 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
         if (phases.isEmpty()) {
             logger.info("Phase not found in unit " + unitId);
-            exceptionService.dataNotFoundByIdException("message.organization.phase.notfound",unitId);
+            exceptionService.dataNotFoundByIdException("message.organization.phase.notfound", unitId);
         }
         return getCurrentPhaseInUnitByDate(phases, date);
     }
@@ -202,14 +202,14 @@ public class PhaseService extends MongoBaseService {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
             logger.info("Phase not found in country " + phaseId);
-            exceptionService.dataNotFoundByIdException("message.country.phase.notfound",phaseId);
+            exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
 
         }
         if (phase.getSequence() != phaseDTO.getSequence()) {
             long phaseInUse = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
             if (phaseInUse > 0) {
                 logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
-                exceptionService.duplicateDataException("message.country.phase.sequence",phaseDTO.getCountryId());
+                exceptionService.duplicateDataException("message.country.phase.sequence", phaseDTO.getCountryId());
             }
         }
         // Disable update of name
@@ -244,15 +244,15 @@ public class PhaseService extends MongoBaseService {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
 
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
         if (oldPhase == null) {
-            exceptionService.dataNotFoundByIdException("message.phase.id.notfound",phaseDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.phase.id.notfound", phaseDTO.getId());
         }
         Phase phase = phaseMongoRepository.findByNameAndDisabled(unitId, phaseDTO.getName(), false);
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
-            exceptionService.actionNotPermittedException("message.phase.name.alreadyexists",phaseDTO.getName());
+            exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
         preparePhase(oldPhase, phaseDTO);
         save(oldPhase);
@@ -341,5 +341,10 @@ public class PhaseService extends MongoBaseService {
         phase.setOrganizationId(unitOrganization.getId());
         return phase;
     }*/
+
+    public List<Phase> getAllPhasesOfUnit(Long unitId) {
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
+        return phases;
+    }
 
 }

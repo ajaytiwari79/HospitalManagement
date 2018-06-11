@@ -76,7 +76,7 @@ public class TimeBankCalculationService {
             dailyTimeBankEntry.setScheduledMin(0);
             dailyTimeBankEntry.setTimeBankMinWithoutCta(0);
             dailyTimeBankEntry.setTimeBankMinWithCta(0);
-            dailyTimeBankEntry.setStaffId(ctaDto.getStaffId());
+            dailyTimeBankEntry.setStaff(ctaDto.getStaff());
             dailyTimeBankEntry.setTimeBankCTADistributionList(getDistribution(ctaDto));
         }*/
         return dailyTimeBank;

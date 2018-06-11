@@ -2,9 +2,6 @@ package com.kairos.client.priority_group;
 
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
-import com.kairos.response.dto.web.UnitPositionWtaDTO;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

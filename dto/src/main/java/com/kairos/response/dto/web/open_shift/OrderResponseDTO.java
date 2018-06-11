@@ -19,7 +19,6 @@ public class OrderResponseDTO {
     private LocalDate endDate;
     private LocalTime fromTime;
     private LocalTime toTime;
-    private Integer MinOpenShiftHours;
     private WeekType weekType;
     private List<DayOfWeek> dayType = new ArrayList<DayOfWeek>();
     private Long reasonCodeId;
@@ -128,14 +127,6 @@ public class OrderResponseDTO {
 
     public void setToTime(LocalTime toTime) {
         this.toTime = toTime;
-    }
-
-    public Integer getMinOpenShiftHours() {
-        return MinOpenShiftHours;
-    }
-
-    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
-        MinOpenShiftHours = minOpenShiftHours;
     }
 
     public WeekType getWeekType() {

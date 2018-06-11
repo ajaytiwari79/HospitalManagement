@@ -35,12 +35,29 @@ public final class ApiConstant {
     public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/agreement_template";
     public static final String API_AGREEMENT_SECTION_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/agreement_section";
 
+    //filter
+    public static final String API_FILTER= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/filter";
+
+    //Master Questionnaire
+    public static final String API_MASTER_QUESTION= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/question";
+    public static final String API_MASTER_QUESTION_SECTION= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/question_section";
+    public static final String API_MASTER_QUESTIONNAIRE_TEMPLATE= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/questionnaire_template";
+
+
+
+    //Data category & element and data subject Mapping
+    public static final String API_DATA_CATEGORY_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_category";
+    public static final String API_DATA_ELEMENT_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/data_element";
+    public static final String API_DATA_SUBJECT_AND_MAPPING_URL= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/dataSubject_mapping";
+
+
+
+
     public static final String API_PROCESSING_ACTIVITY = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/processing_activity";
     public static final String API_ASSET_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/asset_type";
     public static final String API_HOSTING_LOCATION_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/hosting_location";
 
-    //filter
-    public static final String API_FILTER= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/filter";
+
 
     private ApiConstant() {
     }

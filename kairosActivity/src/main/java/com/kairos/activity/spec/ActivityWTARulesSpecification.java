@@ -1,26 +1,20 @@
 package com.kairos.activity.spec;
 
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DataNotFoundException;
-import com.kairos.activity.enums.RuleTemplates;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
 
 import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static com.kairos.activity.enums.RuleTemplates.getByTemplateType;
 /**
  * Created by vipul on 8/2/18.
  */
@@ -149,6 +143,11 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
             }
         }*/
         return true;
+    }
+
+    @Override
+    public List<String> isSatisfiedString(Activity activity) {
+        return Collections.emptyList();
     }
     private String getTemplateType(String templateType){
         if(!templateType.contains("_")){
