@@ -41,10 +41,10 @@ public class UnitSettingController {
     }
 
     @ApiOperation(value = "get unit open shift phase settings")
-    @GetMapping(value = "unit_setting/{unitSettingId}/open_shift_phase_setting")
+    @GetMapping(value = "unit_setting/open_shift_phase_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOpenShiftPhaseSettings(@PathVariable Long unitId,@PathVariable BigInteger unitSettingId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.getOpenShiftPhaseSettings(unitId,unitSettingId));
+    public ResponseEntity<Map<String, Object>> getOpenShiftPhaseSettings(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.getOpenShiftPhaseSettings(unitId));
     }
 
     @ApiOperation(value = "update unit open shift phase settings")
@@ -53,5 +53,12 @@ public class UnitSettingController {
     public ResponseEntity<Map<String, Object>> updateOpenShiftPhaseSettings(@PathVariable Long unitId,@PathVariable BigInteger unitSettingId,
                                                                      @RequestBody @Valid UnitSettingDTO unitSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.updateOpenShiftPhaseSettings(unitId,  unitSettingId,unitSettingDTO));
+    }
+
+    @ApiOperation(value = "add default open shift phase settings")
+    @PostMapping(value = "/unit_setting/open_shift_phase_setting")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addDefaultOpenShiftPhaseSettings(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.createDefaultOpenShiftPhaseSettings(unitId));
     }
 }

@@ -64,11 +64,8 @@ public class UnitSettingService extends MongoBaseService {
         return unitSettingsDTO;
     }
 
-    public List<UnitSettingDTO> getOpenShiftPhaseSettings(Long unitId, BigInteger unitSettingsId){
-//        List<PhaseDTO> phaseDTOS=phaseService.getPhasesByUnit(unitId);
-//        createDefaultPhaseSettings(unitId,phaseDTOS);
-//        return  null;
-        return unitSettingRepository.getOpenShiftPhaseSettings(unitId,unitSettingsId);
+    public List<UnitSettingDTO> getOpenShiftPhaseSettings(Long unitId){
+       return unitSettingRepository.getOpenShiftPhaseSettings(unitId);
     }
 
     public UnitSettingDTO updateOpenShiftPhaseSettings(Long unitId, BigInteger unitSettingsId, UnitSettingDTO unitSettingsDTO) {
@@ -82,15 +79,24 @@ public class UnitSettingService extends MongoBaseService {
         return unitSettingsDTO;
     }
 
-    public boolean createDefaultPhaseSettings(Long unitId, List<PhaseDTO> phases){
-        List<OpenShiftPhase> openShiftPhases=new ArrayList<>();
-        phases.forEach(phase -> {
-            OpenShiftPhase  openShiftPhase=new OpenShiftPhase(phase.getId(),phase.getName(),true);
-            openShiftPhases.add(openShiftPhase);
-        });
-        OpenShiftPhaseSetting openShiftPhaseSetting =new OpenShiftPhaseSetting(4,openShiftPhases);
-        UnitSetting unitSetting=new UnitSetting(openShiftPhaseSetting,unitId);
-        save(unitSetting);
-        return true;
+    public boolean createDefaultOpenShiftPhaseSettings(Long unitId){
+        List<UnitSettingDTO> openShiftPhaseSettings=unitSettingRepository.getOpenShiftPhaseSettings(unitId);
+        if(openShiftPhaseSettings.size()>0){
+            exceptionService.actionNotPermittedException("openShift.already.exist",unitId);
+        }
+        List<PhaseDTO> phases=phaseService.getPhasesByUnit(unitId);
+        if(Optional.ofNullable(phases).isPresent()) {
+            List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
+            phases.forEach(phase -> {
+                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), true);
+                openShiftPhases.add(openShiftPhase);
+            });
+            OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
+            UnitSetting unitSetting = new UnitSetting(openShiftPhaseSetting, unitId);
+            save(unitSetting);
+            return true;
+        }
+        return false;
+
     }
 }

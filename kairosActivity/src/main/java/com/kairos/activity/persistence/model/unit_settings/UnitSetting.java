@@ -1,9 +1,8 @@
 package com.kairos.activity.persistence.model.unit_settings;
 
+
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.response.dto.web.unit_settings.OpenShiftPhaseSetting;
-
-import java.util.List;
 
 public class UnitSetting extends MongoBaseEntity {
     private OpenShiftPhaseSetting openShiftPhaseSetting;
@@ -34,4 +33,3 @@ public class UnitSetting extends MongoBaseEntity {
         this.unitId = unitId;
     }
 }
-

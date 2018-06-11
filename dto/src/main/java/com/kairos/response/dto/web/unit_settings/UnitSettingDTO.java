@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web.unit_settings;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class UnitSettingDTO {
     private BigInteger id;
