@@ -302,7 +302,7 @@ public class UserService extends UserBaseService {
             return null;
         }
         currentUser = generateTokenToUser(currentUser);
-        Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
+        Organization org =  staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
@@ -390,7 +390,7 @@ public class UserService extends UserBaseService {
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
-        List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+            List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
