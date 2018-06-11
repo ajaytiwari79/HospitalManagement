@@ -1,14 +1,13 @@
 package com.kairos.persistance.model.filter;
 
 
-import com.kairos.dto.ModuleIdDto;
+import com.kairos.dto.master_data.ModuleIdDto;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.List;
 
 @Document(collection = "filterGroup")

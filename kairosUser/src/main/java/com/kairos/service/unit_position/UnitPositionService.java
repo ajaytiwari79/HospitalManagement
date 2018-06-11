@@ -175,6 +175,7 @@ public class UnitPositionService extends UserBaseService {
 
         }
         if (employment.getStartDateMillis() != null) {
+
             if (unitPositionDTO.getStartLocalDate().isBefore(DateUtil.getDateFromEpoch(employment.getStartDateMillis()))) {
                 exceptionService.actionNotPermittedException("message.staff.data.employmentdate.lessthan");
 
@@ -220,7 +221,7 @@ public class UnitPositionService extends UserBaseService {
         //      UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
-        plannerSyncService.publishUnitPosition(id, unitPosition, employmentType, IntegrationOperation.CREATE);
+        //plannerSyncService.publishUnitPosition(id, unitPosition, employmentType, IntegrationOperation.CREATE);
         return positionWrapper;
     }
 
@@ -234,7 +235,6 @@ public class UnitPositionService extends UserBaseService {
             if (unitPosition.getEndDateMillis() != null) {
                 if (newUPStartDate.isBefore(DateUtil.getDateFromEpoch(unitPosition.getEndDateMillis())) && newUPStartDate.isAfter(DateUtil.getDateFromEpoch(unitPosition.getStartDateMillis()))) {
                     exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", newUPEndDate, DateUtil.getDateFromEpoch(unitPosition.getStartDateMillis()));
-
                 }
                 if (newUPEndDate != null) {
                     Interval previousInterval = new Interval(unitPosition.getStartDateMillis(), unitPosition.getEndDateMillis());
@@ -242,8 +242,6 @@ public class UnitPositionService extends UserBaseService {
                     logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
                     if (previousInterval.overlaps(interval))
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
-
-
                 } else {
                     if (newUPStartDate.isBefore(DateUtil.getDateFromEpoch(unitPosition.getEndDateMillis()))) {
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", newUPEndDate, DateUtil.getDateFromEpoch(unitPosition.getEndDateMillis()));
@@ -254,7 +252,6 @@ public class UnitPositionService extends UserBaseService {
                 if (newUPEndDate != null) {
                     if (newUPEndDate.isAfter(DateUtil.getDateFromEpoch(unitPosition.getStartDateMillis()))) {
                         exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist.withvalue", newUPEndDate, DateUtil.getDateFromEpoch(unitPosition.getStartDateMillis()));
-
                     }
                 } else {
                     exceptionService.actionNotPermittedException("message.unitemployment.positioncode.alreadyexist");
@@ -311,7 +308,7 @@ public class UnitPositionService extends UserBaseService {
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
 
         // unitPositionDTO.getEndDate());
-        plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
+        //plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null, null), employmentQueryResult);
 
     }
@@ -328,7 +325,7 @@ public class UnitPositionService extends UserBaseService {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
         Employment employment = employmentService.updateEmploymentEndDate(unit, staffId);
-        plannerSyncService.publishUnitPosition(unitId, unitPosition, null, IntegrationOperation.DELETE);
+        //plannerSyncService.publishUnitPosition(unitId, unitPosition, null, IntegrationOperation.DELETE);
         return new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis());
     }
 
@@ -466,7 +463,6 @@ public class UnitPositionService extends UserBaseService {
 
             }
             oldUnitPosition.setUnion(union);
-
         }
 
 // If already present and still present but a different
@@ -939,7 +935,7 @@ public class UnitPositionService extends UserBaseService {
         return appliedSeniorityLevel;
     }
 
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId, Long accessGroupId){
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId, Long accessGroupId) {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtil.getIsoDateInLong(employmentEndDate);
@@ -981,8 +977,8 @@ public class UnitPositionService extends UserBaseService {
         return employmentUnitPositionDTO;
 
     }
-    public Long getUnitPositionIdByStaffAndExpertise(Long unitId,Long staffId,Long expertiseId){
-        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId,staffId,expertiseId,System.currentTimeMillis());
+    public Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId) {
+        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId, System.currentTimeMillis());
     }
 
     public Map<Long, Long> getUnitPositionExpertiseMap(Long unitId) {
@@ -1015,6 +1011,12 @@ public class UnitPositionService extends UserBaseService {
     public Boolean removeFunction(Long unitPositionId, Date appliedDate) throws ParseException {
         unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, appliedDate.getTime());
         return true;
+    }
+
+    public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData =
+                staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
+        return staffData;
     }
 
 }

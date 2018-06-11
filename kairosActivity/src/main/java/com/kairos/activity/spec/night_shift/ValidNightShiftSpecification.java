@@ -8,6 +8,7 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.common.TimeSlot;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.IntervalUnit;
+import com.kairos.response.dto.web.StaffDTO;
 import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.response.dto.web.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 
@@ -125,4 +126,10 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
         }
         return false;
     }
+
+    @Override
+    public List<String> isSatisfiedString(ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO) {
+        return Collections.EMPTY_LIST;
+    }
+
 }

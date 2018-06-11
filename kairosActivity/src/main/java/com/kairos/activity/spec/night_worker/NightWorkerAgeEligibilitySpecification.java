@@ -5,6 +5,8 @@ import com.kairos.response.dto.web.StaffDTO;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpecification<StaffDTO> {
@@ -25,6 +27,11 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
         } else {
             return false;
         }
-
     }
+
+    @Override
+    public List<String> isSatisfiedString(StaffDTO staffDTO) {
+        return Collections.emptyList();
+    }
+
 }
