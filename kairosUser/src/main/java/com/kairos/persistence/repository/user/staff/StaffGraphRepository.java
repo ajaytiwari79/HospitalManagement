@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -274,7 +275,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     Staff getStaffByUnitId(long unitId, long staffId);
 
 
-    @Query("MATCH (organization:Organization)-[:"+ HAS_EMPLOYMENTS +"]->(employment:Employment)-[:"+ BELONGS_TO +"]->(staff:Staff) where id(organization)={0} AND id(staff)={1}\n" +
+    @Query("MATCH (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(employment:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={0} AND id(staff)={1}\n" +
             " return staff, employment.startDateMillis as employmentStartDate")
     StaffEmploymentDTO getStaffAndEmploymentByUnitId(long unitId, long staffId);
 
@@ -370,7 +371,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
 
     /*@Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters\n" +
             "MATCH (staffFavouriteFilters)-[:" + HAS_FILTER_GROUP + "]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} return staffFavouriteFilters\n")*/
-    @Query("MATCH (staff:Staff)-[:"+HAS_FAVOURITE_FILTERS+"]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters \n" +
+    @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters \n" +
             "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} \n" +
             "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) with staffFavouriteFilters, collect({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) as filterDetails\n" +
             "return id(staffFavouriteFilters) as id, staffFavouriteFilters.name as name, filterDetails as filtersData")
@@ -410,22 +411,22 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     StaffEmploymentDTO findStaffAndEmploymentByStaffId(Long staffId);
 
 
-
-    @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)"+
+    @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)" +
             "where id(organization)={1}" +
-            "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} "+
-            "MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilter:StaffFavouriteFilter{deleted:false}) "+
+            "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} " +
+            "MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilter:StaffFavouriteFilter{deleted:false}) " +
             "WHERE id(staffFavouriteFilter) = {2} return staffFavouriteFilter")
-   StaffFavouriteFilter getStaffFavouriteFiltersOfStaffInOrganizationById(Long userId, Long organizationId, Long staffFavouriteFilterId);
+    StaffFavouriteFilter getStaffFavouriteFiltersOfStaffInOrganizationById(Long userId, Long organizationId, Long staffFavouriteFilterId);
 
-    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:"+FILTER_DETAIL+"]->(filterDetail:FilterSelection) WHERE id(staffFavouriteFilter)={0} \n"+
+    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:" + FILTER_DETAIL + "]->(filterDetail:FilterSelection) WHERE id(staffFavouriteFilter)={0} \n" +
             "DELETE r,filterDetail")
     void detachStaffFavouriteFilterDetails(Long staffFavouriteFilterId);
 
-    @Query("Match(organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(employments:Employment)-[:"+BELONGS_TO+"]->(staff:Staff{deleted:false}) where id(organization)={0} " +
-            "match(staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) return  id(staff) as id, staff.firstName as firstName, " +
+    @Query("Match(organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(employments:Employment)-[:" + BELONGS_TO + "]->(staff:Staff{deleted:false}) where id(organization)={0} " +
+            "match(staff)-[:" + HAS_CONTACT_DETAIL + "]->(contactDetail:ContactDetail) return  id(staff) as id, staff.firstName as firstName, " +
             " staff.lastName as lastName, contactDetail.privatePhone as privatePhone ")
     List<StaffPersonalDetailDTO> getAllStaffWithMobileNumber(long unitId);
+
 
     @Query("Match(o:Organization)-[:"+HAS_EMPLOYMENTS+"]->"+"(e:Employment)-[:"+BELONGS_TO+"]->(s:Staff) where id(o)={0} return s")
     List<Staff> getAllStaffByUnitId(long unitId);
@@ -453,10 +454,25 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "RETURN  id(o) as unitId, staffData as staffList")
     List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
 
-    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(employment:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return staff")
-    Staff findByUserId(Long userId,Long unitId);
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return staff")
+    Staff findByUserId(Long userId, Long unitId);
 
     @Query("Match(staff:Staff{deleted:false}) where id(staff)={0} " +
             "OPTIONAL MATCH(staff)-[:" + HAS_STAFF_SETTINGS + "]->(staffSettings:StaffSettings)-[:" + HAS_OPEN_SHIFT_SETTINGS + "]->(staffPreferences:StaffPreferences{deleted:false})  return id(staff) as id,staffSettings,staffPreferences")
     StaffSettingsQueryResult fetchStaffSettingDetails(Long staffId);
+
+
+    @Query("Match(staff:Staff{deleted:false}) where id(staff) IN {2}\n" +
+            "MATCH (expertise:Expertise) where id(expertise)={1}\n" +
+            "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
+            " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
+            "match (unitPosition)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+            " match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
+            "return staff as staff,expertise as expertise,cta as costTimeAgreement,unitPosition.workingTimeAgreementId as workingTimeAgreementId,et as employmentType,unit.unitTimeZone as unitTimeZone," +
+            "unitPosition.totalWeeklyHours as totalWeeklyHours, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis," +
+            "unitPosition.salary as salary,unitPosition.workingDaysInWeek as workingDaysInWeek," +
+            "unitPosition.hourlyWages as hourlyWages,id(unitPosition) as id,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
+            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
+    List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 }
