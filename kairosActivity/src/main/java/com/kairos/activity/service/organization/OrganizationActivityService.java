@@ -4,11 +4,13 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
+import com.kairos.activity.service.unit_settings.UnitSettingService;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.model.open_shift.OrderAndActivityDTO;
+import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
@@ -25,7 +27,9 @@ import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
+import com.kairos.activity.service.period.PeriodSettingsService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.service.unit_settings.PhaseSettingsService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 
@@ -74,7 +78,11 @@ public class OrganizationActivityService extends MongoBaseService {
     private OpenShiftIntervalRepository openShiftIntervalRepository;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
+    @Inject private PeriodSettingsService periodSettingsService;
+    @Inject private PhaseSettingsService phaseSettingsService;
     @Inject private UnitSettingRepository unitSettingRepository;
+    @Inject private UnitSettingService unitSettingService;
+
 
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -272,5 +280,13 @@ public class OrganizationActivityService extends MongoBaseService {
         ActivityWithTimeTypeDTO activityWithTimeTypeDTO=new ActivityWithTimeTypeDTO(activityDTOS,timeTypeDTOS,intervals,minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours());
         return activityWithTimeTypeDTO;
     }
+
+   public boolean createDefaultDataForOrganization(Long unitId,Long countryId){
+        List<Phase> phases= phaseService.createDefaultPhase(unitId,countryId);
+        periodSettingsService.createDefaultPeriodSettings(unitId);
+        phaseSettingsService.createDefaultPhaseSettings(unitId,phases);
+        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId);
+        return true;
+   }
 
 }

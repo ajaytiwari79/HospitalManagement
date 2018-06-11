@@ -456,6 +456,14 @@ public class DateUtils {
         return dates;
     }
 
+    public static ZonedDateTime getZoneDateTime(Date date){
+        return ZonedDateTime.ofInstant(date.toInstant(),ZoneId.systemDefault());
+    }
+
+    public static Date getDateByZoneDateTime(ZonedDateTime zonedDateTime){
+        return Date.from(zonedDateTime.toInstant());
+    }
+
     public static LocalDate addDurationInLocalDateExcludingLastDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
         LocalDate endDate = addDurationInLocalDate(localDate, duration, durationType, recurringNumber);
         return endDate.minusDays(1);

@@ -33,17 +33,12 @@ public class PeriodSettingsService extends MongoBaseService {
     @Inject
     ExceptionService exceptionService;
 
-    public PeriodSettings createDefaultPeriodSettings(Long unitId, Long parentOrgId) {
+    public PeriodSettings createDefaultPeriodSettings(Long unitId) {
 
         PeriodSettings periodSettingsOfParentOrg = null;
         // Set default values
         int presenceLimitInYear = AppConstants.PRESENCE_LIMIT_IN_YEAR;
         int absenceLimitInYear = AppConstants.ABSENCE_LIMIT_IN_YEAR;
-
-        // If parent exists, set settings as of parent
-        if(Optional.ofNullable(parentOrgId).isPresent()){
-            periodSettingsOfParentOrg = periodSettingsMongoRepository.findByUnit(parentOrgId);
-        }
 
         if(Optional.ofNullable(periodSettingsOfParentOrg).isPresent()){
             presenceLimitInYear = periodSettingsOfParentOrg.getPresenceLimitInYear();
@@ -58,7 +53,7 @@ public class PeriodSettingsService extends MongoBaseService {
     public PeriodSettings getPeriodSettings(Long unitId){
         PeriodSettings periodSettings = periodSettingsMongoRepository.findByUnit(unitId);
         if(!Optional.ofNullable(periodSettings).isPresent()){
-            periodSettings =  createDefaultPeriodSettings(unitId, null);
+            periodSettings =  createDefaultPeriodSettings(unitId);
         }
         return periodSettings;
     }

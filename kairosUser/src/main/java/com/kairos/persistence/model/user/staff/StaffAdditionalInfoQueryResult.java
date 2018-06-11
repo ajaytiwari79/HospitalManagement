@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.staff;
 
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
@@ -27,6 +28,7 @@ public class StaffAdditionalInfoQueryResult {
     private Date organizationNightEndTimeTo;
     private List<DayOfWeek> activityDayTypes;
     private ZoneId unitTimeZone;
+    private UserAccessRoleDTO userAccessRoleDTO;
 
 
     public ZoneId getUnitTimeZone() {
@@ -120,5 +122,13 @@ public class StaffAdditionalInfoQueryResult {
 
     public void setOrganizationNightEndTimeTo(Date organizationNightEndTimeTo) {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
+    }
+
+    public UserAccessRoleDTO getUserAccessRoleDTO() {
+        return userAccessRoleDTO;
+    }
+
+    public void setUserAccessRoleDTO(UserAccessRoleDTO userAccessRoleDTO) {
+        this.userAccessRoleDTO = userAccessRoleDTO;
     }
 }

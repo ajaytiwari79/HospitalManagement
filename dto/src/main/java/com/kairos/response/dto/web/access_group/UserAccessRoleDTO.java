@@ -5,6 +5,7 @@ public class UserAccessRoleDTO {
     private Long unitId;
     private Boolean staff;
     private Boolean management;
+    private Long staffId;
 
     public UserAccessRoleDTO(){
         // default constructor
@@ -15,6 +16,13 @@ public class UserAccessRoleDTO {
         this.unitId = unitId;
         this.staff = staff;
         this.management = management;
+    }
+
+    public UserAccessRoleDTO(Long unitId, Boolean staff, Boolean management, Long staffId) {
+        this.unitId = unitId;
+        this.staff = staff;
+        this.management = management;
+        this.staffId = staffId;
     }
 
     public Long getUserId() {
@@ -47,5 +55,13 @@ public class UserAccessRoleDTO {
 
     public void setManagement(Boolean management) {
         this.management = management;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }
