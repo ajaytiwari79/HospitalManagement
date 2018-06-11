@@ -43,7 +43,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     AccessGroup findAccessGroupByName(long organizationId, String name);
 
     @Query("Match (organization:Organization) where id(organization)={0}\n" +
-            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false,isEnabled:true}) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') return accessGroup")
+            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') return accessGroup")
     List<AccessGroup> getAccessGroups(long unitId);
 
     @Query("Match (organization:Organization) where id(organization)={0}\n" +
