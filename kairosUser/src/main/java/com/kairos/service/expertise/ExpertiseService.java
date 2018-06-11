@@ -115,6 +115,7 @@ public class ExpertiseService extends UserBaseService {
             }
             expertise = new Expertise();
             expertise.setCountry(country);
+
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
@@ -144,11 +145,11 @@ public class ExpertiseService extends UserBaseService {
             }
         }
 
-        TimeSlot timeSlot =  new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
+        /*TimeSlot timeSlot =  new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
                 null,null,null,null, countryId,expertise.getId() );
         priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
-                "/expertise/"+expertise.getId()+"/night_worker_setting",null);
+                "/expertise/"+expertise.getId()+"/night_worker_setting",null);*/
         return expertiseResponseDTO;
     }
 
@@ -276,6 +277,7 @@ public class ExpertiseService extends UserBaseService {
         expertise.setName(expertiseDTO.getName().trim());
         expertise.setDescription(expertiseDTO.getDescription());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
+        expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
         Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
