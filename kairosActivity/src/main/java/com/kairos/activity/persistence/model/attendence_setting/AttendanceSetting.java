@@ -13,7 +13,7 @@ public class AttendanceSetting extends MongoBaseEntity{
     private Long staffId;
     private Long unitId;
     private LocalDate currentDate;
-    private List<Duration> InOutDuration =new ArrayList<>();
+    private List<Duration> attendanceDuration =new ArrayList<>();
 
     public AttendanceSetting() {
     }
@@ -48,11 +48,11 @@ public class AttendanceSetting extends MongoBaseEntity{
         this.currentDate = currentDate;
     }
 
-    public List<Duration> getInOutDuration() {
-        return InOutDuration;
+    public List<Duration> getAttendanceDuration() {
+        return attendanceDuration;
     }
 
-    public void setInOutDuration(List<Duration> inOutDuration) {
-        this.InOutDuration = inOutDuration;
+    public void setAttendanceDuration(List<Duration> attendanceDuration) {
+        this.attendanceDuration = attendanceDuration;
     }
 }

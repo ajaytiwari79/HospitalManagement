@@ -28,8 +28,8 @@ public class AttendanceSettingController {
    }
 
    @PostMapping(value = "/{staffId}/attendance_setting")
-    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@PathVariable Long unitId, @PathVariable Long staffId, @RequestBody Duration InOutDuration){
-       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,staffId,InOutDuration));
+    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@PathVariable Long unitId, @PathVariable Long staffId, @RequestBody Duration attendanceDuration){
+       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,staffId,attendanceDuration));
    }
 
 }

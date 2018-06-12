@@ -23,28 +23,28 @@ public Duration getAttendanceSetting(Long unitId, Long staffId) {
     Duration attendanceDuration=new Duration();
     AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
     if(Optional.ofNullable(AttendanceSetting).isPresent()) {
-     attendanceDuration=AttendanceSetting.getInOutDuration().get(AttendanceSetting.getInOutDuration().size()-1);
+     attendanceDuration=AttendanceSetting.getAttendanceDuration().get(AttendanceSetting.getAttendanceDuration().size()-1);
     }
     return attendanceDuration;
 }
 
-public Duration updateAttendanceSetting(Long unitId, Long staffId, Duration InOutDuration) {
+public Duration updateAttendanceSetting(Long unitId, Long staffId, Duration attendanceDuration) {
     LocalDate currentDate= DateUtils.getCurrentLocalDate();
     AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
     if(Optional.ofNullable(attendanceSetting).isPresent()) {
-        if(InOutDuration.getTo()!=null){
-            Duration duration=attendanceSetting.getInOutDuration().get(attendanceSetting.getInOutDuration().size()-1);
+        if(attendanceDuration.getTo()!=null){
+            Duration duration=attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1);
             if (duration.getTo() == null) {
-                duration.setTo(InOutDuration.getTo());
+                duration.setTo(attendanceDuration.getTo());
             }
         }else{
-            attendanceSetting.getInOutDuration().add(InOutDuration);
+            attendanceSetting.getAttendanceDuration().add(attendanceDuration);
         }
     }else {
         attendanceSetting = new AttendanceSetting(unitId, staffId,currentDate);
-        attendanceSetting.getInOutDuration().add(InOutDuration);
+        attendanceSetting.getAttendanceDuration().add(attendanceDuration);
     }
     save(attendanceSetting);
-    return InOutDuration;
+    return attendanceDuration;
     }
 }
