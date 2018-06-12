@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
@@ -90,6 +91,9 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private List<EmploymentType> employmentTypeList;
+
+    @Relationship(type= HAS_SYSTEM_LANGUAGE)
+    private SystemLanguage systemLanguage;
 
     public Country() {
     }
