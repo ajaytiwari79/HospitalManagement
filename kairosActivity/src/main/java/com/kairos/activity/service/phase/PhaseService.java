@@ -46,7 +46,7 @@ public class PhaseService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public void createDefaultPhase(Long unitId, Long countryId) {
+    public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
@@ -58,6 +58,7 @@ public class PhaseService extends MongoBaseService {
         if (!phases.isEmpty()) {
             save(phases);
         }
+        return phases;
     }
 
     /*
@@ -214,7 +215,7 @@ public class PhaseService extends MongoBaseService {
         for (Phase phaseObject : phases) {
             if (phaseObject.getDurationType().equals(DurationType.WEEKS) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
                 for (int i = 0; i < phaseObject.getDuration(); i++) {
-                    logger.info(phaseObject.getName());
+                    //logger.info(phaseObject.getName());
                     if (weekDifference == weekCount) {
                         phase = phaseObject;
                         break outerLoop;
@@ -228,7 +229,7 @@ public class PhaseService extends MongoBaseService {
             phase = phases.get(phases.size() - 1);
             return phase;
         }
-        logger.info(phase.getName());
+        //logger.info(phase.getName());
         return phase;
     }
 

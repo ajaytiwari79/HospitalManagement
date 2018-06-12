@@ -4,9 +4,11 @@ import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithCompositeDTO;
+import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.activity.ActivityWithCTAWTASettingsDTO;
 import com.kairos.activity.response.dto.activity.OrganizationActivityDTO;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -18,6 +20,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.kairos.activity.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -266,10 +269,30 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Query query=new Query(Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^"+name+"$",Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date),Criteria.where("GeneralActivityTab.endDate").exists(false)));
         return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
-
-
     public Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId, Date date) {
         Query query=new Query(Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^"+name+"$",Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("unitId").is(unitId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date),Criteria.where("GeneralActivityTab.endDate").exists(false)));
         return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
+
+    public Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "balanceSettingsActivityTab.timeType"),
+                match(Criteria.where("deleted").is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
+               // match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
+               //group("unitId").addToSet("id").as("ids"),
+                project("id")
+
+        );
+        AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class);
+        List<Map> activityIdMap = result.getMappedResults();
+        //List<BigInteger> activityIds = activityIdMap.stream().map(Map:: get("_id")).collect(Collectors.toList());
+        Set<BigInteger> activityIds = new HashSet<>();
+        for(Map activityMap:activityIdMap) {
+            activityIds.add(new BigInteger(activityMap.get("_id").toString()));
+        }
+        //List<BigInteger> activityIds1 = activityIdMap.stream().map(Map::get("_id"))
+        return activityIds;//new HashSet<Long>(result.getMappedResults());
+    }
+
 }

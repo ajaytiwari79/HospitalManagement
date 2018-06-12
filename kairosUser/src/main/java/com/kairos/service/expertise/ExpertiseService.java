@@ -115,6 +115,7 @@ public class ExpertiseService extends UserBaseService {
             }
             expertise = new Expertise();
             expertise.setCountry(country);
+
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
@@ -276,6 +277,7 @@ public class ExpertiseService extends UserBaseService {
         expertise.setName(expertiseDTO.getName().trim());
         expertise.setDescription(expertiseDTO.getDescription());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
+        expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
         Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
         if (!Optional.ofNullable(level).isPresent()) {

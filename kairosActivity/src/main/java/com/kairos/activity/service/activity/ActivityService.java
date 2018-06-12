@@ -378,7 +378,13 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id",timeCalculationActivityDTO.getActivityId());
         }
+
         activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
+
+        if(!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)){
+            timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        }
+
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab);
         return activityTabsWrapper;
@@ -458,6 +464,11 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id",rulesActivityDTO.getActivityId());
         }
         activity.setRulesActivityTab(rulesActivityTab);
+
+        if(!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)){
+            activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        }
+
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab);
 
@@ -1027,6 +1038,9 @@ public class ActivityService extends MongoBaseService {
         }
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException("message.activity.published",activityId);
+        }
+        if (activity.getBalanceSettingsActivityTab().getTimeTypeId()==null || activity.getBalanceSettingsActivityTab().getPresenceTypeId()==null) {
+            exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null",activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);

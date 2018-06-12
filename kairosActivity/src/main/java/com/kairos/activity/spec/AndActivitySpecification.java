@@ -1,5 +1,7 @@
 package com.kairos.activity.spec;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,8 +28,10 @@ public class AndActivitySpecification<T> extends AbstractActivitySpecification<T
 
     @Override
     public List<String> isSatisfiedString(T t) {
-        return Collections.emptyList();
+        List<String> messages = new ArrayList<>();
+        messages.addAll(activitySpecification1.isSatisfiedString(t));
+        messages.addAll(activitySpecification2.isSatisfiedString(t));
+        return messages;
     }
-
 }
 
