@@ -8,6 +8,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.TemporalField;
 import java.util.List;
 //@PlanningEntity
 public class Shift extends TaskOrShift{
@@ -76,6 +77,34 @@ public class Shift extends TaskOrShift{
         return LocalTime.of(7,0);
     }
 
+
+
+    public int getNumberOfTasks(){
+        int i=0;
+        Task task=getNextTask();
+        while (task!=null){
+            i++;
+            task=task.getNextTask();
+        }
+        return i;
+    }
+
+    public double getTotalPlannedMinutes(){
+        double d=0d;
+        Task task=getNextTask();
+        while (task!=null){
+            d+=task.getPlannedDuration();
+            task=task.getNextTask();
+        }
+        return d;
+    }
+
+    public boolean isFriday(){
+        return localDate.getDayOfWeek().getValue()==5;
+    }
+
+
+
     @Override
     public String toString() {
         return "Shift{" +
@@ -85,4 +114,7 @@ public class Shift extends TaskOrShift{
                 "-" + end +
                 '}';
     }
+
+
+
 }
