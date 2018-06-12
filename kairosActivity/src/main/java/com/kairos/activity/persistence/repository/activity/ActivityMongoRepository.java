@@ -20,6 +20,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
 
     Activity findByNameIgnoreCaseAndDeletedFalseAndCountryId(String name, Long countryId);
+
     Activity findByNameIgnoreCaseAndDeletedFalseAndUnitId(String name, Long unitId);
 
     @Query("{'deleted' : false, 'unitId':?1, 'name':{$regex:?0, $options:'i'}}")
@@ -65,6 +66,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
 
     Activity findByNameIgnoreCaseAndUnitIdAndDeletedFalse(String unpaidBreak, Long unitId);
+
+    List<Activity> findAllByUnitIdAndNameInIgnoreCaseAndDeletedFalse( Long unitId,String... unpaidBreak);
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);

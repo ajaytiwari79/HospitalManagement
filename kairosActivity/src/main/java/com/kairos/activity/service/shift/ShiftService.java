@@ -166,7 +166,7 @@ public class ShiftService extends MongoBaseService {
         }
         Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(mainShift.getUnitId(), shiftDurationInMinute);
-        logger.info(breakSettings + "");
+
         Activity breakActivity = null;
         if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition().getExpertise().getBreakPaymentSetting()).isPresent() &&
                 staffAdditionalInfoDTO.getUnitPosition().getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID)) {
@@ -745,15 +745,20 @@ public class ShiftService extends MongoBaseService {
 
         List<WorkingTimeAgreement> workingTimeAgreements = wtaService.findAllByIdAndDeletedFalse(wtaIds);
         List<Phase> phases = phaseService.getAllPhasesOfUnit(unitId);
+        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByUnitIdAndDeletedFalseOrderByCreatedAtAsc(unitId);
+        activities.addAll(activityRepository.findAllByUnitIdAndNameInIgnoreCaseAndDeletedFalse(unitId, PAID_BREAK, UNPAID_BREAK));
 
         Integer unCopiedShiftCount = 0;
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
 
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
+
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
+
+            Activity breakActivity = activities.stream().filter(activity -> activity.getName().equalsIgnoreCase(staffUnitPosition.getExpertise().getBreakPaymentSetting().name())).findFirst().get();
             WorkingTimeAgreement workingTimeAgreement = workingTimeAgreements.stream().filter(wta -> wta.getId().equals(staffUnitPosition.getWorkingTimeAgreementId())).findAny().get();
 
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, workingTimeAgreement, phases, copyShiftDTO);
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, workingTimeAgreement, phases, copyShiftDTO, breakSettings, breakActivity);
 
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
@@ -766,7 +771,7 @@ public class ShiftService extends MongoBaseService {
         return copyShiftResponse;
     }
 
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition, List<Activity> activities, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<Shift> shifts, StaffUnitPositionDetails staffUnitPosition, List<Activity> activities, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO, List<BreakSettings> breakSettings, Activity breakActivity) {
 
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
@@ -779,22 +784,22 @@ public class ShiftService extends MongoBaseService {
         LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
         ShiftResponse shiftResponse = null;
 
-        Shift shift = shifts.get(0);
+        Shift sourceShift = shifts.get(0);
         while (shiftCreationLastDate.isAfter(shiftCreationDate) || shiftCreationLastDate.equals(shiftCreationDate)) {
 
-            BigInteger activityId = shift.getActivityId();
+            BigInteger activityId = sourceShift.getActivityId();
             Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(activityId)).findAny().get();
             List<String> validationMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
 
-            shiftResponse = addShift(validationMessages, shift, staffUnitPosition, shiftCreationDate, newShifts);
-            previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+            shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, shiftCreationDate, newShifts, breakActivity, breakSettings);
+            previousShiftLocalDate = DateUtils.asLocalDate(sourceShift.getStartDate());
 
             if (counter++ == shifts.size() - 1) {
                 counter = 0;
             }
             //getting the next shift from counter
-            shift = shifts.get(counter);
-            if (!previousShiftLocalDate.equals(DateUtils.asLocalDate(shift.getStartDate()))) {
+            sourceShift = shifts.get(counter);
+            if (!previousShiftLocalDate.equals(DateUtils.asLocalDate(sourceShift.getStartDate()))) {
                 shiftCreationDate = shiftCreationDate.plusDays(1L);
             }
 
@@ -811,20 +816,24 @@ public class ShiftService extends MongoBaseService {
         return statusMap;
     }
 
-    private ShiftResponse addShift(List<String> responseMessages, Shift shift, StaffUnitPositionDetails staffUnitPosition, LocalDate shiftCreationFirstDate, List<Shift> newShifts) {
+    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, LocalDate shiftCreationFirstDate, List<Shift> newShifts, Activity breakActivity, List<BreakSettings> breakSettings) {
         if (responseMessages.isEmpty()) {
-            Shift copiedShift = new Shift(shift.getName(), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(shift.getStartDate())), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(shift.getEndDate())),
-                    shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaff().getId(), shift.getPhase(), shift.getUnitId(),
-                    shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute(), shift.getId());
+            Long shiftDurationInMinute = (sourceShift.getEndDate().getTime() - sourceShift.getStartDate().getTime()) / ONE_MINUTE;
+
+            Shift copiedShift = new Shift(sourceShift.getName(), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getStartDate())), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getEndDate())),
+                    sourceShift.getRemarks(), sourceShift.getActivityId(), staffUnitPosition.getStaff().getId(), sourceShift.getPhase(), sourceShift.getUnitId(),
+                    sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.isMainShift(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getShiftState(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
+            Set<BigInteger> breakShiftIds = addBreakInCopiedShifts(copiedShift, breakActivity, breakSettings, shiftDurationInMinute);
+            copiedShift.setSubShifts(breakShiftIds);
             newShifts.add(copiedShift);
-            return new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList(NO_CONFLICTS), true, shiftCreationFirstDate);
+            return new ShiftResponse(sourceShift.getId(), sourceShift.getName(), Arrays.asList(NO_CONFLICTS), true, shiftCreationFirstDate);
 
         } else {
             List<String> errors = new ArrayList<>();
             responseMessages.forEach(responseMessage -> {
                 errors.add(localeService.getMessage(responseMessage));
             });
-            return new ShiftResponse(shift.getId(), shift.getName(), errors, false, shiftCreationFirstDate);
+            return new ShiftResponse(sourceShift.getId(), sourceShift.getName(), errors, false, shiftCreationFirstDate);
         }
     }
 
@@ -836,6 +845,96 @@ public class ShiftService extends MongoBaseService {
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(activity);
         return messages;
+
+    }
+
+    private Set<BigInteger> addBreakInCopiedShifts(Shift mainShift, Activity breakActivity, List<BreakSettings> breakSettings, Long shiftDurationInMinute) {
+        logger.info("ShiftDurationInMinute = {}", shiftDurationInMinute);
+        Long startDateMillis = mainShift.getStartDate().getTime();
+        Long endDateMillis = null;
+        Long breakAllowedAfterMinute = 0L;
+        Long allowedBreakDurationInMinute = 0L;
+        String lastItemAdded = null;
+        List<Shift> shifts = new ArrayList<>();
+        List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
+        for (int i = 0; i < breakSettings.size(); i++) {
+
+            /**
+             * The first eligible break hours after.It specifies you can take first break after this duration
+             **/
+            breakAllowedAfterMinute = (i == 0) ? breakSettings.get(i).getShiftDurationInMinute() : breakSettings.get(i).getShiftDurationInMinute() - breakSettings.get(i - 1).getShiftDurationInMinute();
+            endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
+            if (shiftDurationInMinute > breakAllowedAfterMinute) {
+                shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
+                // we have added a sub shift now adding the break for remaining period
+                shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
+                // if still after subtraction the shift is greater than
+                allowedBreakDurationInMinute = breakSettings.get(i).getBreakDurationInMinute();
+                startDateMillis = endDateMillis;
+                lastItemAdded = SHIFT;
+                if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
+                    endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
+                    shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
+
+                    shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
+                    startDateMillis = endDateMillis;
+                    lastItemAdded = BREAK;
+                } else {
+                    logger.info("Remaining shift duration {}  And we need to add break for {}", shiftDurationInMinute, breakSettings.get(i).getBreakDurationInMinute());
+                    // add break and increase main shift duration by remaining minute
+                }
+            } else {
+                break;
+            }
+        }
+        /**
+         * still shift is greater than break We need to repeat last break until shift duration is less
+         **/
+        while (shiftDurationInMinute > breakAllowedAfterMinute) {
+            // last end date is now start date
+            startDateMillis = endDateMillis;
+            endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
+            shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
+            shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+            lastItemAdded = SHIFT;
+            if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
+                startDateMillis = endDateMillis;
+                endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
+                shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
+                shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+                lastItemAdded = BREAK;
+            } else {
+                logger.info("Remaining shift duration " + shiftDurationInMinute + " And we need to add break for {} ", allowedBreakDurationInMinute);
+                // add break and increase main shift duration by remaining minute
+            }
+
+        }
+        // Sometimes the break is
+        if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == SHIFT) {
+            // handle later
+            startDateMillis = endDateMillis;
+            endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
+            shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
+
+
+        } else if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
+            startDateMillis = endDateMillis;
+            endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
+            shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
+
+        }
+        save(shifts);
+        shifts.stream().map(Shift::getId).collect(Collectors.toSet());
+        return shifts.stream().map(Shift::getId).collect(Collectors.toSet());
+    }
+
+    private Shift getShiftObject(Shift shift, String name, BigInteger activityId, Date startDate, Date endDate, Long allowedBreakDurationInMinute) {
+        Shift childShift = new Shift(null, name, startDate, endDate, shift.getBid(), shift.getpId(), shift.getBonusTimeBank()
+                , shift.getAmount(), shift.getProbability(), shift.getAccumulatedTimeBankInMinutes(), shift.getRemarks(), activityId, shift.getStaffId(), shift.getUnitId(), shift.getUnitPositionId());
+        childShift.setShiftState(ShiftState.UNPUBLISHED);
+        childShift.setMainShift(false);
+        childShift.setAllowedBreakDurationInMinute(allowedBreakDurationInMinute);
+        return childShift;
 
     }
 
