@@ -185,7 +185,7 @@ public class PhaseService extends MongoBaseService {
 
     public Phase getPhaseCurrentByUnit(Long unitId, Date date) {
 
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeDeletedFalseAndDurationGreaterThan(unitId, PhaseType.PLANNING.toString(), 0L);
         if (phases.isEmpty()) {
             logger.info("Phase not found in unit " + unitId);
             exceptionService.dataNotFoundByIdException("message.organization.phase.notfound", unitId);
@@ -371,7 +371,7 @@ public class PhaseService extends MongoBaseService {
     }*/
 
     public List<Phase> getAllPhasesOfUnit(Long unitId) {
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeDeletedFalseAndDurationGreaterThan(unitId, PhaseType.PLANNING.toString(), 0L);
         return phases;
     }
 
