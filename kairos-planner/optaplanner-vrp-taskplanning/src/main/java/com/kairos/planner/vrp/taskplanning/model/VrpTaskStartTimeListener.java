@@ -4,6 +4,7 @@ import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class VrpTaskStartTimeListener implements VariableListener<Task> {
     @Override
@@ -38,20 +39,41 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
     }
 
     private void updateStartTime(ScoreDirector scoreDirector, Task task) {
-        LocalDateTime plannedDateTime = null;
-        if(task.getPrevTaskOrShift() instanceof Shift){
-            scoreDirector.beforeVariableChanged(task,"plannedDateTime");
+        /*if(task.getPrevTaskOrShift() instanceof Shift){
             plannedDateTime=((Shift)task.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
-            task.setPlannedDateTime(plannedDateTime);
-            scoreDirector.afterVariableChanged(task,"plannedDateTime");
+            updatePlannedTime(task,plannedDateTime,scoreDirector);
             return;
         }
-
         while (task!=null){
 
-        }
-        scoreDirector.beforeVariableChanged(task,"plannedDateTime");
+        }*/
+        try{
 
+        if(task.getPrevTaskOrShift()==null || task.getShift()==null){
+            updatePlannedTime(task,null,scoreDirector);
+            return;
+        }
+        Task tempTask=task.getShift().getNextTask();
+        LocalDateTime plannedDateTime =((Shift)tempTask.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
+        updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
+        tempTask=tempTask.getNextTask();
+        while (tempTask!=null){
+            double duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
+            plannedDateTime=plannedDateTime.plusMinutes((long)duration);
+            updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
+            tempTask=tempTask.getNextTask();
+        }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+    private void updatePlannedTime(Task task, LocalDateTime plannedDateTime, ScoreDirector scoreDirector){
+        if(Objects.equals(task.getPlannedDateTime(),plannedDateTime)) return;
+        scoreDirector.beforeVariableChanged(task,"plannedDateTime");
+        task.setPlannedDateTime(plannedDateTime);
         scoreDirector.afterVariableChanged(task,"plannedDateTime");
     }
+
 }

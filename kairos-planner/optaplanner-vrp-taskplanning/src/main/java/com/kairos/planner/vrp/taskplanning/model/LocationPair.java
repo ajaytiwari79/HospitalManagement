@@ -2,6 +2,8 @@ package com.kairos.planner.vrp.taskplanning.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import java.util.Objects;
+
 @XStreamAlias("Locs")
 public class LocationPair {
     @XStreamAlias("lat1")
@@ -52,5 +54,22 @@ public class LocationPair {
 
     public void setToLongitude(double toLongitude) {
         this.toLongitude = toLongitude;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LocationPair that = (LocationPair) o;
+        return Double.compare(that.fromLatitute, fromLatitute) == 0 &&
+                Double.compare(that.fromLongitude, fromLongitude) == 0 &&
+                Double.compare(that.toLatitute, toLatitute) == 0 &&
+                Double.compare(that.toLongitude, toLongitude) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(fromLatitute, fromLongitude, toLatitute, toLongitude);
     }
 }

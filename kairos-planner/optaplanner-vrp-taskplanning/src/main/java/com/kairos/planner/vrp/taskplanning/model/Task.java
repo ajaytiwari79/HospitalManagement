@@ -174,24 +174,6 @@ public class Task extends TaskOrShift{
         this.longitude = longitude;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                 + intallationNo +
-                "-" + duration +
-                '}';
-    }
-    public double getPlannedDuration(){
-        if(shift==null) return duration;
-        return this.getDuration()/(this.getShift().getEmployee().getEfficiency()/100d);
-    }
-    public int getDrivingTime(){
-        if(prevTaskOrShift instanceof Shift) return 0;
-        return 0;
-
-
-    }
-
     public LocalDateTime getPlannedDateTime() {
         return plannedDateTime;
     }
@@ -206,5 +188,28 @@ public class Task extends TaskOrShift{
 
     public void setLocationsDistanceMatrix(LocationsDistanceMatrix locationsDistanceMatrix) {
         this.locationsDistanceMatrix = locationsDistanceMatrix;
+    }
+
+    public double getPlannedDuration(){
+        if(shift==null) return duration;
+        return this.getDuration()/(this.getShift().getEmployee().getEfficiency()/100d);
+    }
+    public int getDrivingTime(){
+        if(prevTaskOrShift ==null){
+            throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
+        }
+        if(prevTaskOrShift instanceof Shift) return 0;
+        Task prevTask=(Task)prevTaskOrShift;
+        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLattitude(),prevTask.getLongitude(),this.getLattitude(),this.getLongitude()));
+        return lpd.getTime()/60;
+
+
+    }
+    @Override
+    public String toString() {
+        return "Task{" +
+                + intallationNo +
+                "-" + duration +
+                '}';
     }
 }

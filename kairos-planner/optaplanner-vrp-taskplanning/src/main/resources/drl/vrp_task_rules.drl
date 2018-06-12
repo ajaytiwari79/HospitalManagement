@@ -13,3 +13,22 @@ salience 20
     then
         scoreHolder.addSoftConstraintMatch(kcontext,-1);
 end
+
+rule "Shift out of boundary half day"
+dialect "java"
+salience 20
+
+    when
+        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes, $minutes>390)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,-1);
+end
+
+rule "Shift out of boundary full day"
+dialect "java"
+salience 20
+    when
+        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes, $minutes>570)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,-1);
+end
