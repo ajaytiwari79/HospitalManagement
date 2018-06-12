@@ -3,6 +3,7 @@ package com.kairos.dto.master_data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -20,6 +21,7 @@ public class ClauseDto {
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
+    @Valid
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<ClauseTagDto> tags = new ArrayList<>();
 
