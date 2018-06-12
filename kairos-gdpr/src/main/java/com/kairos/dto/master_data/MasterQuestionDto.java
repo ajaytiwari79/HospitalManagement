@@ -6,13 +6,15 @@ import com.kairos.enums.QuestionType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionDto {
 
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
-    private String name;
+    private String question;
 
     @NotNullOrEmpty(message = "description.cannot.be.empty.or.null")
     private String description;
@@ -20,16 +22,35 @@ public class MasterQuestionDto {
     private Boolean isRequired;
 
     @NotNull
-    private QuestionType questionType;
+    private String questionType;
 
     private Boolean isNotSureAllowed;
 
-    public String getName() {
-        return name;
+    private Boolean isNotApplicableAllowed;
+
+
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
+    public Boolean getNotApplicableAllowed() {
+        return isNotApplicableAllowed;
+    }
+
+    public void setNotApplicableAllowed(Boolean notApplicableAllowed) {
+        isNotApplicableAllowed = notApplicableAllowed;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     public String getDescription() {
@@ -48,11 +69,11 @@ public class MasterQuestionDto {
         isRequired = required;
     }
 
-    public QuestionType getQuestionType() {
+    public String getQuestionType() {
         return questionType;
     }
 
-    public void setQuestionType(QuestionType questionType) {
+    public void setQuestionType(String questionType) {
         this.questionType = questionType;
     }
 

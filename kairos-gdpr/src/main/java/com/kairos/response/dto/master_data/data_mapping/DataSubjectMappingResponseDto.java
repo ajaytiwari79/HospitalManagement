@@ -1,10 +1,9 @@
-package com.kairos.response.dto.master_data;
+package com.kairos.response.dto.master_data.data_mapping;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 
-import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -23,10 +22,6 @@ public class DataSubjectMappingResponseDto {
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     private Set<DataCategoryResponseDto> dataCategories;
 
@@ -68,22 +63,6 @@ public class DataSubjectMappingResponseDto {
 
     public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
     }
 
     public Set<DataCategoryResponseDto> getDataCategories() {

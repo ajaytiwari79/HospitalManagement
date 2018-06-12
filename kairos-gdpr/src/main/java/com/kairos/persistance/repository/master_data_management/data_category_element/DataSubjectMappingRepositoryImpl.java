@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.master_data_management.data_category_e
 import com.kairos.persistance.model.master_data_management.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.DataSubjectMappingResponseDto;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDto;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -41,8 +41,6 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                 group("$id")
                         .first("organizationTypes").as("organizationTypes")
                         .first("organizationSubTypes").as("organizationSubTypes")
-                        .first("organizationServices").as("organizationServices")
-                        .first("organizationSubServices").as("organizationSubServices")
                         .first("name").as("name")
                         .first("description").as("description")
                         .first(COUNTRY_ID).as(COUNTRY_ID)
@@ -70,14 +68,11 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                 group("$id")
                         .first("organizationTypes").as("organizationTypes")
                         .first("organizationSubTypes").as("organizationSubTypes")
-                        .first("organizationServices").as("organizationServices")
-                        .first("organizationSubServices").as("organizationSubServices")
                         .first("name").as("name")
                         .first("description").as("description")
                         .first(COUNTRY_ID).as(COUNTRY_ID)
                         .addToSet("dataCategories").as("dataCategories")
         );
-
         AggregationResults<DataSubjectMappingResponseDto> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDto.class);
         return result.getMappedResults();
     }

@@ -78,9 +78,7 @@ public class DataElementService extends MongoBaseService {
 
         DataElement exist = dataElementMognoRepository.findByid(id);
         if (!Optional.ofNullable(exist).isPresent()) {
-
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
-
         }
         exist.setName(dataElement.getName());
         return save(exist);

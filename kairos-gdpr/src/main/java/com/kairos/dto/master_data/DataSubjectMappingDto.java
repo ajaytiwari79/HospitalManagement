@@ -30,11 +30,6 @@ public class DataSubjectMappingDto {
     @NotEmpty(message = "organization Sub Types list cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "organization Services list cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-
-    @NotEmpty(message = "organization  Sub Services list cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
     @NotEmpty(message = "dataCategories list cannot be empty")
     private Set<BigInteger> dataCategories;
 
@@ -68,22 +63,6 @@ public class DataSubjectMappingDto {
 
     public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
     }
 
     public Set<BigInteger> getDataCategories() {
