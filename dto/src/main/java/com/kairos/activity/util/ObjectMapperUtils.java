@@ -118,6 +118,7 @@ public class ObjectMapperUtils {
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         objectMapper.registerModule(javaTimeModule);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        //objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         try {
             return objectMapper.writeValueAsString(object);
         } catch (IOException e) {

@@ -17,9 +17,8 @@ public class VrpTaskPlanningSolverTest {
 
     @Test
     public void solve() throws IOException {
-        String problemJson=new String(Files.readAllBytes(Paths.get(new File("src/main/resources/problem.json").toURI())));
-        VrpTaskPlanningSolution problem=ObjectMapperUtils.JsonStringToObject(problemJson,VrpTaskPlanningSolution.class);
-        problem.setLocationsDistanceMatrix(new LocationsDistanceMatrix());
-        new VrpTaskPlanningSolver().solve(problem);
+       // String problemXML=new String(Files.readAllBytes(Paths.get(new File("src/main/resources/problem.xml").toURI())));
+        //VrpTaskPlanningSolution problem=ObjectMapperUtils.JsonStringToObject(problemJson,VrpTaskPlanningSolution.class);
+        new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml");
     }
 }

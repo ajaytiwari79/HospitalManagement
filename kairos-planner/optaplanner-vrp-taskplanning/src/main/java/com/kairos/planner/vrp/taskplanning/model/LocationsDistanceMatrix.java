@@ -20,4 +20,11 @@ public class LocationsDistanceMatrix {
         return table.get(new LocationPair(fromLatitute, fromLongitude, toLatitute, toLongitude));
     }
 
+    public Map<LocationPair, LocationPairDifference> getTable() {
+        return table;
+    }
+
+    public void setTable(Map<LocationPair, LocationPairDifference> table) {
+        this.table = table;
+    }
 }

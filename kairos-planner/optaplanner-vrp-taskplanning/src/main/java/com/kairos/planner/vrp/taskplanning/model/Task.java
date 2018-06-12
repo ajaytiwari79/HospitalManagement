@@ -36,7 +36,7 @@ public class Task extends TaskOrShift{
 
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
-
+    private LocationsDistanceMatrix locationsDistanceMatrix;
     public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
         this.intallationNo = intallationNo;
@@ -181,8 +181,8 @@ public class Task extends TaskOrShift{
                 "-" + duration +
                 '}';
     }
-
     public double getPlannedDuration(){
+        if(shift==null) return duration;
         return this.getDuration()/(this.getShift().getEmployee().getEfficiency()/100d);
     }
     public int getDrivingTime(){
@@ -190,5 +190,21 @@ public class Task extends TaskOrShift{
         return 0;
 
 
+    }
+
+    public LocalDateTime getPlannedDateTime() {
+        return plannedDateTime;
+    }
+
+    public void setPlannedDateTime(LocalDateTime plannedDateTime) {
+        this.plannedDateTime = plannedDateTime;
+    }
+
+    public LocationsDistanceMatrix getLocationsDistanceMatrix() {
+        return locationsDistanceMatrix;
+    }
+
+    public void setLocationsDistanceMatrix(LocationsDistanceMatrix locationsDistanceMatrix) {
+        this.locationsDistanceMatrix = locationsDistanceMatrix;
     }
 }

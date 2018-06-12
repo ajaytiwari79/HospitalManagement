@@ -2,7 +2,6 @@ package com.planner.service.tomtomService;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.ObjectUtils;
 import com.kairos.planner.vrp.taskplanning.model.Task;
@@ -13,7 +12,6 @@ import com.planner.repository.locationRepository.TomTomRepository;
 import com.planner.service.locationService.LocationService;
 import com.planner.service.taskService.TaskService;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -196,7 +194,7 @@ public class TomTomService {
     public List<Matrix> getMatrix(){
         List<Matrix> matrices = new ArrayList<>();
         tomTomRepository.findAll().forEach(t->{
-            matrices.addAll(t.getMatrix().stream().flatMap(m->m.stream().map(matrix -> matrix)).collect(Collectors.toList()));
+            matrices.addAll(t.getMatrix().stream().flatMap(m->m.stream()).collect(Collectors.toList()));
         });
         return matrices;
     }

@@ -2,6 +2,7 @@ package com.planner.service.taskService;
 
 import com.kairos.activity.util.ObjectUtils;
 import com.kairos.planner.vrp.taskplanning.model.LocationInfo;
+import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
 import com.planner.domain.task.Task;
 import com.planner.repository.taskRepository.TaskRepository;
 import com.planner.service.locationService.LocationService;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
@@ -32,7 +32,6 @@ public class TaskService {
     public List<com.kairos.planner.vrp.taskplanning.model.Task> getUniqueTask(){
         List<Task> taskList = taskRepository.findAll().stream().filter(ObjectUtils.distinctByKey(task -> task.getIntallationNo())).collect(toList());
         List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = new ArrayList<>();
-        Map<Integer,Map<Integer,LocationInfo>> locationInfoMap = locationService.getLocationMap();
         Map<Integer,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getIntallationNo,summingInt(Task::getDuration)));
         Map<Integer,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getIntallationNo,mapping(Task::getSkill,toSet())));
         Map<Integer,Task> taskMap= taskList.stream().collect(Collectors.toMap(t->t.getIntallationNo(), t->t));
