@@ -48,6 +48,14 @@ public class ShiftResponse {
         this.success = success;
     }
 
+    public LocalDate getShiftCreationDate() {
+        return shiftCreationDate;
+    }
+
+    public void setShiftCreationDate(LocalDate shiftCreationDate) {
+        this.shiftCreationDate = shiftCreationDate;
+    }
+
     public ShiftResponse(BigInteger shiftId, String shiftName, List<String> messages, Boolean success, LocalDate shiftCreationDate) {
         this.shiftId = shiftId;
         this.shiftName = shiftName;

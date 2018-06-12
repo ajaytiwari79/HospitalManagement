@@ -774,38 +774,28 @@ public class ShiftService extends MongoBaseService {
         List<ShiftResponse> errorInCopyingShifts = new ArrayList<>();
 
         int counter = 0;
-        boolean firstShiftAdded = false;
         LocalDate previousShiftLocalDate = null;
-        LocalDate shiftCreationFirstDate = copyShiftDTO.getStartDate();
+        LocalDate shiftCreationDate = copyShiftDTO.getStartDate();
         LocalDate shiftCreationLastDate = copyShiftDTO.getEndDate();
         ShiftResponse shiftResponse = null;
-        while (shiftCreationLastDate.isAfter(shiftCreationFirstDate) || shiftCreationLastDate.equals(shiftCreationFirstDate)) {
 
-            Shift shift = shifts.get(counter);
+        Shift shift = shifts.get(0);
+        while (shiftCreationLastDate.isAfter(shiftCreationDate) || shiftCreationLastDate.equals(shiftCreationDate)) {
+
+            BigInteger activityId = shift.getActivityId();
+            Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(activityId)).findAny().get();
+            List<String> validationMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
+
+            shiftResponse = addShift(validationMessages, shift, staffUnitPosition, shiftCreationDate, newShifts);
+            previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+
             if (counter++ == shifts.size() - 1) {
                 counter = 0;
             }
-            logger.info("Creation date -- shift date -- {} ,{}, shiftName ,{} ",shiftCreationFirstDate,shiftCreationLastDate,shift.getName());
-            Activity currentActivity = activities.parallelStream().filter(activity -> activity.getId().equals(shift.getActivityId())).findAny().get();
-            List<String> validationMessages = validateShiftWhileCopy(currentActivity, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
-
-            if (!firstShiftAdded) {
-                shiftResponse = addShift(validationMessages, shift, staffUnitPosition, shiftCreationFirstDate, newShifts);
-                firstShiftAdded = true;
-                previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-            } else {
-                if (previousShiftLocalDate.equals(DateUtils.asLocalDate(shift.getStartDate())) ){
-                    shiftResponse = addShift(validationMessages, shift, staffUnitPosition, shiftCreationFirstDate, newShifts);
-                    // both shifts are of same date so create shift on same start date
-                    previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-                    logger.info("if shifts are on same date  {} ,{} ",shiftCreationFirstDate,shift.getStartDate());
-                } else {
-                    shiftCreationFirstDate = shiftCreationFirstDate.plusDays(1L);
-                    logger.info(" if shifts are on different date  {} ,{} ,{}  ",shiftCreationFirstDate,shift.getStartDate(),shift.getName());
-                    shiftResponse = addShift(validationMessages, shift, staffUnitPosition, shiftCreationFirstDate, newShifts);
-                    previousShiftLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-
-                }
+            //getting the next shift from counter
+            shift = shifts.get(counter);
+            if (!previousShiftLocalDate.equals(DateUtils.asLocalDate(shift.getStartDate()))) {
+                shiftCreationDate = shiftCreationDate.plusDays(1L);
             }
 
             if (shiftResponse.isSuccess()) {
@@ -827,14 +817,14 @@ public class ShiftService extends MongoBaseService {
                     shift.getRemarks(), shift.getActivityId(), staffUnitPosition.getStaff().getId(), shift.getPhase(), shift.getUnitId(),
                     shift.getScheduledMinutes(), shift.getDurationMinutes(), shift.isMainShift(), shift.getExternalId(), staffUnitPosition.getId(), shift.getShiftState(), shift.getParentOpenShiftId(), shift.getAllowedBreakDurationInMinute(), shift.getId());
             newShifts.add(copiedShift);
-            return new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList(NO_CONFLICTS), true,shiftCreationFirstDate);
+            return new ShiftResponse(shift.getId(), shift.getName(), Arrays.asList(NO_CONFLICTS), true, shiftCreationFirstDate);
 
         } else {
             List<String> errors = new ArrayList<>();
             responseMessages.forEach(responseMessage -> {
                 errors.add(localeService.getMessage(responseMessage));
             });
-            return new ShiftResponse(shift.getId(), shift.getName(), errors, false,shiftCreationFirstDate);
+            return new ShiftResponse(shift.getId(), shift.getName(), errors, false, shiftCreationFirstDate);
         }
     }
 
