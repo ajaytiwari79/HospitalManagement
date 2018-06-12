@@ -1,0 +1,1 @@
+MATCH (ag:AccessGroup) set ag.enabled=true;
