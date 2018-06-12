@@ -125,7 +125,6 @@ public class ShiftService extends MongoBaseService {
     private LocaleService localeService;
 
 
-
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
 
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
@@ -418,13 +417,13 @@ public class ShiftService extends MongoBaseService {
             }
 
         }
-        List<ShiftQueryResult> activities = (Optional.ofNullable(unitPositionId).isPresent())?shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()):
+        List<ShiftQueryResult> activities = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()) :
                 shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
 
-        List<AppliedFunctionDTO> appliedFunctionDTOs=null;
-        if(Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()){
-             appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+        List<AppliedFunctionDTO> appliedFunctionDTOs = null;
+        if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+            appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
         }
 
         Map<LocalDate, FunctionDTO> funcitonDTOMap = new HashMap();
@@ -487,7 +486,7 @@ public class ShiftService extends MongoBaseService {
 
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification);
 
-          //TODO Pradeep will look into dayType/shift/staff/
+        //TODO Pradeep will look into dayType/shift/staff/
 
 
 //        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
@@ -816,13 +815,13 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate,Date endDate) {
+    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate) {
         List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
-        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
-        List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
+        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate);
+        List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {
-            OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();
-            BeanUtils.copyProperties(openShift,openShiftResponseDTO,openShift.getStartDate().toString(),openShift.getEndDate().toString());
+            OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
+            BeanUtils.copyProperties(openShift, openShiftResponseDTO, openShift.getStartDate().toString(), openShift.getEndDate().toString());
             openShiftResponseDTO.setFromTime(DateUtils.asLocalTime(openShift.getStartDate()));
             openShiftResponseDTO.setToTime(DateUtils.asLocalTime(openShift.getEndDate()));
             openShiftResponseDTO.setStartDate(DateUtils.asLocalDate(openShift.getStartDate()));
@@ -902,6 +901,9 @@ public class ShiftService extends MongoBaseService {
             if (!previousShiftLocalDate.equals(DateUtils.asLocalDate(sourceShift.getStartDate()))) {
                 shiftCreationDate = shiftCreationDate.plusDays(1L);
             }
+            if (shifts.size()==1){
+                shiftCreationDate = shiftCreationDate.plusDays(1L);
+            }
 
             if (shiftResponse.isSuccess()) {
                 successfullyCopiedShifts.add(shiftResponse);
@@ -912,7 +914,7 @@ public class ShiftService extends MongoBaseService {
         }
         statusMap.put("success", successfullyCopiedShifts);
         statusMap.put("error", errorInCopyingShifts);
-        save(newShifts);
+        if (!shifts.isEmpty()) save(newShifts);
         return statusMap;
     }
 
@@ -1023,7 +1025,8 @@ public class ShiftService extends MongoBaseService {
             shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
 
         }
-        save(shifts);
+        if (!shifts.isEmpty())
+            save(shifts);
         shifts.stream().map(Shift::getId).collect(Collectors.toSet());
         return shifts.stream().map(Shift::getId).collect(Collectors.toSet());
     }
