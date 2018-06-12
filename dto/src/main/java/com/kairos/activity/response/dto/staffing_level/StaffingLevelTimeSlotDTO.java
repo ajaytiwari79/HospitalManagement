@@ -1,7 +1,7 @@
 package com.kairos.activity.response.dto.staffing_level;
 
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
+import com.kairos.activity.persistence.model.staffing_level.Duration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSkill;
 
 import java.util.HashSet;
@@ -17,14 +17,14 @@ public class StaffingLevelTimeSlotDTO {
     private int availableNoOfStaff;
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
-    private StaffingLevelDuration staffingLevelDuration;
+    private Duration staffingLevelDuration;
 
     public StaffingLevelTimeSlotDTO() {
         //default constrictor
     }
 
     public StaffingLevelTimeSlotDTO(int sequence,int minNoOfStaff, int maxNoOfStaff,
-                                    StaffingLevelDuration staffingLevelDuration) {
+                                    Duration staffingLevelDuration) {
         this.sequence=sequence;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
@@ -79,11 +79,11 @@ public class StaffingLevelTimeSlotDTO {
         this.staffingLevelSkills = staffingLevelSkills;
     }
 
-    public StaffingLevelDuration getStaffingLevelDuration() {
+    public Duration getStaffingLevelDuration() {
         return staffingLevelDuration;
     }
 
-    public void setStaffingLevelDuration(StaffingLevelDuration staffingLevelDuration) {
+    public void setStaffingLevelDuration(Duration staffingLevelDuration) {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 }
