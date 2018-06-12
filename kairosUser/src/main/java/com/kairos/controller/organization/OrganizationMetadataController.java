@@ -2,6 +2,7 @@ package com.kairos.controller.organization;
 
 import com.kairos.persistence.model.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
+import com.kairos.response.dto.web.localAreaTag.DayTimeWindowDTO;
 import com.kairos.service.organizationMetadata.OrganizationMetadataService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -55,6 +57,13 @@ public class OrganizationMetadataController {
     public ResponseEntity<Map<String, Object>> updateLocalAreaTag(@Validated @RequestBody LocalAreaTag localAreaTag, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationMetadataService.updateTagData(localAreaTag, unitId));
     }
+
+   /* @ApiOperation(value = "Update Local Area Tag Busiest Time window")
+    @RequestMapping(value = localAreaTagUrl+"/busiest_time_window", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateLocalAreaTagBusiestTimeWindow(@RequestParam Long localAreaTagId, @RequestBody List<DayTimeWindowDTO> dayTimeWindowDTOS) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationMetadataService.updateBusiestTimeWindow(localAreaTagId, dayTimeWindowDTOS));
+    }*/
 
 
     @ApiOperation(value = "Delete Local Area Tag for a unit")

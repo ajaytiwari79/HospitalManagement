@@ -14,7 +14,7 @@ import java.util.List;
  * Created by prabjot on 22/2/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateTaskTypeDTO {
+public class TaskTypeDTO {
 
     @NotNull(message = "error.Tasktype.title.notnull") @NotEmpty(message = "error.Tasktype.title.notnull")
     private String title;
@@ -27,14 +27,41 @@ public class CreateTaskTypeDTO {
     private BigInteger id;
 
     private Boolean status;
+    private int duration;
+    private long serviceId;
+    private String parentTaskTypeId;
 
     private List<BigInteger> tags = new ArrayList<>();
 
-    public CreateTaskTypeDTO() {
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public TaskTypeDTO() {
         //default constructor
     }
 
-    public CreateTaskTypeDTO(String title, Date expiresOn, String description, BigInteger id,boolean status) {
+    public long getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(long serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getParentTaskTypeId() {
+        return parentTaskTypeId;
+    }
+
+    public void setParentTaskTypeId(String parentTaskTypeId) {
+        this.parentTaskTypeId = parentTaskTypeId;
+    }
+
+    public TaskTypeDTO(String title, Date expiresOn, String description, BigInteger id, boolean status) {
         this.title = title;
         this.expiresOn = expiresOn;
         this.description = description;
