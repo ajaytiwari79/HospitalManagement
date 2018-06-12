@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.planner.service.staffService.TaskStaffService;
+import com.planner.service.taskService.PlanningTaskService;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -45,7 +46,6 @@ import com.planner.service.locationService.GraphHopperService;
 import com.planner.service.locationService.LocationService;
 import com.planner.service.skillService.SkillService;
 import com.planner.service.staffService.ShiftService;
-import com.planner.service.taskService.TaskService;
 import com.planner.service.taskService.TaskTypeService;
 import com.planner.service.vehicleService.VehicleService;
 import com.thoughtworks.xstream.XStream;
@@ -55,7 +55,7 @@ public class TaskPlanningService {
 
 	private static final Logger log = LoggerFactory.getLogger(TaskPlanningService.class);
 
-	@Autowired private TaskService taskService;
+	@Autowired private PlanningTaskService planningTaskService;
 	@Autowired private TaskTypeService taskTypeService;
 	@Autowired private SkillService skillService;
 	@Autowired private TaskStaffService taskStaffService;
@@ -439,7 +439,7 @@ public class TaskPlanningService {
 		int i = 1;
 		for (EmployeePlanningFact emp : solution.getEmployees()) {
 			Map<String, Object> map = new HashMap<>();
-			makeEmployeeList(tasks, emp.getNextTask());
+			makeEmployeeList(tasks, emp.getPrevTaskOrShift());
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
 			map.put("employeeId", emp.getId());

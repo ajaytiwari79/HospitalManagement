@@ -84,12 +84,12 @@ public class TaskPlanningSolver {
 	}
 
 	private void printSolvedSolution(Object[] solution) {
-		log.info("-------Printing Solution:-------");
+		log.info("-------Printing solution:-------");
 		//List<Task> tasks= solution.getTaskList();
 		//log.info("-------Tasks:-------");
 		log.info(toDisplayString(solution));
 		//tasks.forEach(task->log.info(task.toString()));
-		log.info("-------Printing Solution Finished:-------");
+		log.info("-------Printing solution Finished:-------");
 	}
 
 	public Object[] getSolution() throws Exception{
