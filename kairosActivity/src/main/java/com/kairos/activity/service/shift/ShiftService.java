@@ -754,8 +754,8 @@ public class ShiftService extends MongoBaseService {
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
 
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
-
-            Activity breakActivity = activities.stream().filter(activity -> activity.getName().equalsIgnoreCase(staffUnitPosition.getExpertise().getBreakPaymentSetting().name())).findFirst().get();
+            String breakActivityForStaff = staffUnitPosition.getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID) ? PAID_BREAK : UNPAID_BREAK;
+            Activity breakActivity = activities.stream().filter(activity -> activity.getName().equalsIgnoreCase(breakActivityForStaff)).findFirst().get();
             WorkingTimeAgreement workingTimeAgreement = workingTimeAgreements.stream().filter(wta -> wta.getId().equals(staffUnitPosition.getWorkingTimeAgreementId())).findAny().get();
 
             Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, workingTimeAgreement, phases, copyShiftDTO, breakSettings, breakActivity);
