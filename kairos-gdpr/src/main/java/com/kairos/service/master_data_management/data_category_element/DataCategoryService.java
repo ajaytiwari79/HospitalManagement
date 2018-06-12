@@ -116,11 +116,9 @@ public class DataCategoryService extends MongoBaseService {
         Map<String, Object> dataElementList = new HashMap<>();
         try {
             dataElementList = dataElementService.createDataElements(countryId, dataCategoryDto.getDataElements());
-            DataCategory newDataCategory = new DataCategory();
-            newDataCategory.setCountryId(countryId);
-            newDataCategory.setName(dataCategoryDto.getName());
-            newDataCategory.setDataElements((List<BigInteger>) dataElementList.get("ids"));
-            dataCategory = save(newDataCategory);
+            dataCategory.setName(dataCategoryDto.getName());
+            dataCategory.setDataElements((List<BigInteger>) dataElementList.get("ids"));
+            dataCategory = save(dataCategory);
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());

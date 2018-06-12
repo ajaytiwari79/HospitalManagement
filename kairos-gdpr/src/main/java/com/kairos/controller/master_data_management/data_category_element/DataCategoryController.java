@@ -34,8 +34,6 @@ public class DataCategoryController {
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.addDataCategoryAndDataElement(countryId, dataCategoryDto));
-
-
     }
 
 
