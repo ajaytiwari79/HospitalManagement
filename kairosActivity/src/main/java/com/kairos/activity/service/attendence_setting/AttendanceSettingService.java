@@ -1,14 +1,12 @@
-package com.kairos.activity.service.clock_setting;
+package com.kairos.activity.service.attendence_setting;
 
-import com.kairos.activity.persistence.model.clock_setting.AttendanceSetting;
+import com.kairos.activity.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.activity.persistence.model.staffing_level.Duration;
-import com.kairos.activity.persistence.repository.clock_setting.AttendanceSettingRepository;
+import com.kairos.activity.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.activity.service.MongoBaseService;
-import com.kairos.response.dto.web.clock_setting.AttendanceSettingDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Optional;
 
 
@@ -20,12 +18,10 @@ private AttendanceSettingRepository attendanceSettingRepository;
 
 public Duration getAttendanceSetting(Long unitId, Long staffId) {
     LocalDate currentDate=LocalDate.now();
-    //AttendanceSettingDTO attendanceSettingDTO=new AttendanceSettingDTO(staffId,unitId,currentDate);
     Duration attendanceDuration=new Duration();
     AttendanceSetting getAttendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
     if(Optional.ofNullable(getAttendanceSetting).isPresent()) {
-        attendanceDuration=getAttendanceSetting.getClockInClockOutDuration();
-        //attendanceSettingDTO.setClockINclockOutDuration(getAttendanceSetting.getClockInClockOutDuration());
+     attendanceDuration=getAttendanceSetting.getClockInClockOutDuration().get(getAttendanceSetting.getClockInClockOutDuration().size()-1);
     }
     return attendanceDuration;
 }
@@ -34,9 +30,17 @@ public Duration updateAttendanceSetting(Long unitId, Long staffId, Duration cloc
     LocalDate currentDate=LocalDate.now();
     AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
     if(Optional.ofNullable(attendanceSetting).isPresent()) {
-    attendanceSetting.setClockInClockOutDuration(clockInClockOutDuration);
+        if(clockInClockOutDuration.getTo()!=null){
+            Duration duration=attendanceSetting.getClockInClockOutDuration().get(attendanceSetting.getClockInClockOutDuration().size()-1);
+            if (duration.getTo() == null) {
+                duration.setTo(clockInClockOutDuration.getTo());
+            }
+        }else{
+            attendanceSetting.getClockInClockOutDuration().add(clockInClockOutDuration);
+        }
     }else {
-        attendanceSetting = new AttendanceSetting(unitId, staffId,currentDate,clockInClockOutDuration);
+        attendanceSetting = new AttendanceSetting(unitId, staffId,currentDate);
+        attendanceSetting.getClockInClockOutDuration().add(clockInClockOutDuration);
     }
     save(attendanceSetting);
     return clockInClockOutDuration;

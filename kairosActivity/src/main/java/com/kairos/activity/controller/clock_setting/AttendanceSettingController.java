@@ -1,9 +1,8 @@
 package com.kairos.activity.controller.clock_setting;
 
 import com.kairos.activity.persistence.model.staffing_level.Duration;
-import com.kairos.activity.service.clock_setting.AttendanceSettingService;
+import com.kairos.activity.service.attendence_setting.AttendanceSettingService;
 import com.kairos.activity.util.response.ResponseHandler;
-import com.kairos.response.dto.web.clock_setting.AttendanceSettingDTO;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

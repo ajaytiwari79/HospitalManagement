@@ -1,28 +1,28 @@
-package com.kairos.activity.persistence.model.clock_setting;
+package com.kairos.activity.persistence.model.attendence_setting;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.staffing_level.Duration;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AttendanceSetting extends MongoBaseEntity{
     private Long staffId;
     private Long unitId;
     private LocalDate currentDate;
-    private Duration clockInClockOutDuration;
+    private List<Duration> clockInClockOutDuration=new ArrayList<>();
     public Long getStaffId() {
         return staffId;
     }
 
-    public AttendanceSetting(Long unitId, Long staffId,LocalDate currentDate,Duration clockInClockOutDuration) {
+    public AttendanceSetting(Long unitId, Long staffId,LocalDate currentDate) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.currentDate=currentDate;
-        this.clockInClockOutDuration=clockInClockOutDuration;
+
     }
 
     public void setStaffId(Long staffId) {
@@ -45,11 +45,11 @@ public class AttendanceSetting extends MongoBaseEntity{
         this.currentDate = currentDate;
     }
 
-    public Duration getClockInClockOutDuration() {
+    public List<Duration> getClockInClockOutDuration() {
         return clockInClockOutDuration;
     }
 
-    public void setClockInClockOutDuration(Duration clockInClockOutDuration) {
+    public void setClockInClockOutDuration(List<Duration> clockInClockOutDuration) {
         this.clockInClockOutDuration = clockInClockOutDuration;
     }
 }
