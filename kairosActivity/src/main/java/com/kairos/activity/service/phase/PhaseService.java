@@ -5,16 +5,13 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
-import com.kairos.persistence.model.enums.phase.PhaseType;
+import com.kairos.enums.phase.PhaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -27,8 +24,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.activity.constants.AppConstants.*;
 
 /**
  * Created by vipul on 25/9/17.
@@ -67,7 +62,7 @@ public class PhaseService extends MongoBaseService {
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
@@ -77,7 +72,7 @@ public class PhaseService extends MongoBaseService {
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
@@ -86,7 +81,7 @@ public class PhaseService extends MongoBaseService {
     public Map<String,List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
         }
         List<PhaseDTO> phases = getPhasesByUnit(unitId);
         Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
@@ -118,7 +113,7 @@ public class PhaseService extends MongoBaseService {
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
         OrganizationDTO unitOrganization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(unitOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.ASC);
         int weekCount = 0;
@@ -272,7 +267,7 @@ public class PhaseService extends MongoBaseService {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
 
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
         if (oldPhase == null) {

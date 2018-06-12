@@ -3,7 +3,7 @@ package com.kairos.activity.persistence.model.phase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.enums.DurationType;
-import com.kairos.persistence.model.enums.phase.PhaseType;
+import com.kairos.enums.phase.PhaseType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -11,8 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 
 /**
  * Created by vipul on 25/9/17.
@@ -31,10 +29,6 @@ public class Phase extends MongoBaseEntity {
     private Long countryId;
     private BigInteger parentCountryPhaseId;
     private PhaseType phaseType;
-    // deferred
-    /*private boolean allowFlipping;
-    private LocalTime flippingTime;
-    private DayOfWeek flippingDay;*/
 
     public Phase() {
         //default constructor
@@ -95,30 +89,6 @@ public class Phase extends MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
-
-    /*public boolean isAllowFlipping() {
-        return allowFlipping;
-    }
-
-    public void setAllowFlipping(boolean allowFlipping) {
-        this.allowFlipping = allowFlipping;
-    }
-
-    public LocalTime getFlippingTime() {
-        return flippingTime;
-    }
-
-    public void setFlippingTime(LocalTime flippingTime) {
-        this.flippingTime = flippingTime;
-    }
-
-    public DayOfWeek getFlippingDay() {
-        return flippingDay;
-    }
-
-    public void setFlippingDay(DayOfWeek flippingDay) {
-        this.flippingDay = flippingDay;
-    }*/
 
     public BigInteger getParentCountryPhaseId() {
         return parentCountryPhaseId;

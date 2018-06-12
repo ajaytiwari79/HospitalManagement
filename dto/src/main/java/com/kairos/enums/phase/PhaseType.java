@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.enums.phase;
+package com.kairos.enums.phase;
 
 public enum PhaseType {
     PLANNING("Planning"), ACTUAL("Actual");

@@ -3,14 +3,12 @@ package com.kairos.activity.client.dto.Phase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.persistence.model.enums.DurationType;
-import com.kairos.persistence.model.enums.phase.PhaseType;
+import com.kairos.enums.phase.PhaseType;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 
 /**
  * Created by vipul on 19/9/17.
