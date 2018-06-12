@@ -48,7 +48,7 @@ public class PhaseController {
     @GetMapping(value="")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPhasesByUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesByUnit(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getCategorisedPhasesByUnit(unitId));
     }
 
     @ApiOperation(value = "update phases by unit Id and PhaseId")
