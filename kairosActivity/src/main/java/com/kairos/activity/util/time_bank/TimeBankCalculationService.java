@@ -1,18 +1,24 @@
 package com.kairos.activity.util.time_bank;
 
 import com.google.common.collect.Lists;
+import com.kairos.activity.client.GenericIntegrationService;
+import com.kairos.activity.client.dto.TimeBankRestClient;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.TimeCalaculationType;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
+import com.kairos.activity.persistence.model.open_shift.OpenShift;
+import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.response.dto.time_bank.*;
+import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.Month;
 import java.util.*;
@@ -42,6 +49,12 @@ import static com.kairos.activity.constants.AppConstants.*;
 @Service
 public class TimeBankCalculationService {
 
+    @Inject
+    private OrderService orderService;
+    @Inject private OrderMongoRepository orderMongoRepository;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
+    @Inject private TimeBankRestClient timeBankRestClient;
 
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
 
@@ -783,6 +796,63 @@ public class TimeBankCalculationService {
         shifts.add(shiftQueryResultWithActivity);
         return shifts;
 
+    }
+
+    public DailyTimeBankEntry calculateDailyTimeBankForOpenShift(OpenShift shift,Long staffId,Long unitId) {
+        Optional<Order> order=orderMongoRepository.findById(shift.getOrderId());
+        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,order.get().getExpertiseId());
+        UnitPositionWithCtaDetailsDTO ctaDto = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
+        int totalDailyTimebank = 0;
+        int dailyScheduledMin = 0;
+        int timeBankMinWithoutCta = 0;
+        Interval interval = new Interval(shift.getStartDate(), shift.getEndDate());
+        int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? ctaDto.getContractedMinByWeek() / ctaDto.getWorkingDaysPerWeek() : 0;
+        for (CTARuleTemplateCalulatedTimeBankDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
+                    if (ruleTemplate.getAccountType() == null) continue;
+                    if (ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)) {
+                        int ctaTimeBankMin = 0;
+                        if ((ruleTemplate.getActivityIds().contains(shift.getActivityId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())))) {
+                            if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                                if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
+                                    dailyScheduledMin += shift.getScheduledMinutes();
+                                    totalDailyTimebank+=dailyScheduledMin;
+                                } if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)){
+                                    for (CTAIntervalDTO ctaIntervalDTO : ruleTemplate.getCtaIntervalDTOS()) {
+                                        Interval ctaInterval = getCTAInterval(ctaIntervalDTO, interval);
+                                        if (ctaInterval.overlaps(shiftInterval)) {
+                                            int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
+                                            if (ctaIntervalDTO.getCompensationType().equals(AppConstants.MINUTES)) {
+                                                ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity()) * ctaIntervalDTO.getCompensationValue();
+                                                totalDailyTimebank += ctaTimeBankMin;
+                                                break;
+                                            } else if (ctaIntervalDTO.getCompensationType().equals(AppConstants.PERCENT)) {
+                                                ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity()) / 100) * ctaIntervalDTO.getCompensationValue());
+                                                totalDailyTimebank += ctaTimeBankMin;
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(!ruleTemplate.isCalculateScheduledHours()) {
+                            ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.containsKey(ruleTemplate.getId()) ? ctaTimeBankMinMap.get(ruleTemplate.getId()) + ctaTimeBankMin : ctaTimeBankMin);
+                        }
+                    }
+                }
+
+
+        totalDailyTimebank = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? totalDailyTimebank - contractualMin : totalDailyTimebank;
+        timeBankMinWithoutCta = dailyScheduledMin-contractualMin;
+        dailyTimeBankEntry.setStaffId(ctaDto.getStaffId());
+        dailyTimeBankEntry.setTimeBankMinWithoutCta(timeBankMinWithoutCta);
+        dailyTimeBankEntry.setTimeBankMinWithCta(ctaTimeBankMinMap.entrySet().stream().mapToInt(c->c.getValue()).sum());
+        dailyTimeBankEntry.setContractualMin(contractualMin);
+        dailyTimeBankEntry.setScheduledMin(dailyScheduledMin);
+        dailyTimeBankEntry.setTotalTimeBankMin(totalDailyTimebank);
+        dailyTimeBankEntry.setTimeBankCTADistributionList(getBlankTimeBankDistribution(ctaDto.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        return dailyTimeBankEntry;
     }
 
 
