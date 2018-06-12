@@ -1,7 +1,11 @@
 package com.kairos.activity.service.event;
 
+import com.kairos.activity.constants.AppConstants;
+import com.kairos.activity.response.dto.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.activity.service.mail.MailService;
 import com.kairos.activity.service.staffing_level.StaffingLevelService;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
+import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +14,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class NotificationEventListener {
     Logger logger= LoggerFactory.getLogger(NotificationEventListener.class);
     @Autowired
     StaffingLevelService staffingLevelService;
+    @Autowired
+    MailService mailService;
 
     @Async
     @EventListener
@@ -23,5 +32,18 @@ public class NotificationEventListener {
          logger.info("shift created details {}",shiftNotificationEvent);
 
          staffingLevelService.updateStaffingLevelAvailableStaffCount(shiftNotificationEvent);
+    }
+    @Async
+    @EventListener
+    public void shiftNotificationEvent(PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) throws UnsupportedEncodingException {
+        logger.info("shift created details {send Emails}");
+
+        Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap = priorityGroupRuleDataDTO.getOpenShiftStaffMap();
+        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry:openShiftStaffMap.entrySet()) {
+
+            for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
+                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), AppConstants.OPENSHIFT_EMAIL_BODY,AppConstants.OPENSHIFT_SUBJECT);
+            }
+        }
     }
 }

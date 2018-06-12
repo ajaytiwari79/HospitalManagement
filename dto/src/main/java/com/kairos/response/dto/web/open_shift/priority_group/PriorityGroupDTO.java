@@ -1,7 +1,9 @@
-package com.kairos.response.dto.web.open_shift;
+package com.kairos.response.dto.web.open_shift.priority_group;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.PriorityGroupName;
+import com.kairos.response.dto.web.open_shift.priority_group.DecisionCriteria;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffExcludeFilter;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -29,8 +31,7 @@ public class PriorityGroupDTO {
         //Default Constructor
     }
 
-    public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean deActivated,
-                             RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
+    public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean deActivated,RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
                             StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
         this.id = id;
         this.deActivated = deActivated;

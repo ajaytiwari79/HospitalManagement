@@ -2,17 +2,14 @@ package com.kairos.activity.persistence.model.priority_group;
 
 import com.kairos.persistence.model.enums.PriorityGroupName;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.response.dto.web.open_shift.DecisionCriteria;
-import com.kairos.response.dto.web.open_shift.RoundRules;
-import com.kairos.response.dto.web.open_shift.StaffExcludeFilter;
-import com.kairos.response.dto.web.open_shift.StaffIncludeFilter;
+import com.kairos.response.dto.web.open_shift.priority_group.*;
+import com.kairos.response.dto.web.open_shift.priority_group.DecisionCriteria;
 
 import java.math.BigInteger;
 import java.util.List;
 
 public class PriorityGroup extends MongoBaseEntity {
     private boolean deActivated;
-    //private OpenShiftCancelProcess openShiftCancelProcess;
     private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;

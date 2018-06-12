@@ -693,4 +693,13 @@ public class AccessGroupService extends UserBaseService {
         );
         return userAccessRoleDTO;
     }
+
+    public UserAccessRoleDTO getStaffAccessRoles(Long unitId,Long staffId) {
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(unitId,
+                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),staffId),
+                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId),staffId
+        );
+        return userAccessRoleDTO;
+    }
 }

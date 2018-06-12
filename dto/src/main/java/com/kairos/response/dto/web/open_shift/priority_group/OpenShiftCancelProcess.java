@@ -1,4 +1,4 @@
-package com.kairos.activity.persistence.model.priority_group;
+package com.kairos.response.dto.web.open_shift.priority_group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
