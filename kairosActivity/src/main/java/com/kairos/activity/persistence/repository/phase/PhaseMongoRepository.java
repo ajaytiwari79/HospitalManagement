@@ -20,7 +20,7 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
 
     List<PhaseDTO> findByCountryIdAndDeletedFalse(Long countryId);
 
-    List<Phase> findByOrganizationIdAndPhaseTypeDeletedFalseAndDurationGreaterThan(Long unitId, String PhaseType, Long duration);
+    List<Phase> findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(Long unitId, String PhaseType, Long duration);
 
 
 
