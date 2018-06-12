@@ -13,16 +13,19 @@ public class AttendanceSetting extends MongoBaseEntity{
     private Long staffId;
     private Long unitId;
     private LocalDate currentDate;
-    private List<Duration> clockInClockOutDuration=new ArrayList<>();
-    public Long getStaffId() {
-        return staffId;
+    private List<Duration> InOutDuration =new ArrayList<>();
+
+    public AttendanceSetting() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId,LocalDate currentDate) {
+    public AttendanceSetting(Long unitId, Long staffId, LocalDate currentDate) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.currentDate=currentDate;
 
+    }
+    public Long getStaffId() {
+        return staffId;
     }
 
     public void setStaffId(Long staffId) {
@@ -45,11 +48,11 @@ public class AttendanceSetting extends MongoBaseEntity{
         this.currentDate = currentDate;
     }
 
-    public List<Duration> getClockInClockOutDuration() {
-        return clockInClockOutDuration;
+    public List<Duration> getInOutDuration() {
+        return InOutDuration;
     }
 
-    public void setClockInClockOutDuration(List<Duration> clockInClockOutDuration) {
-        this.clockInClockOutDuration = clockInClockOutDuration;
+    public void setInOutDuration(List<Duration> inOutDuration) {
+        this.InOutDuration = inOutDuration;
     }
 }

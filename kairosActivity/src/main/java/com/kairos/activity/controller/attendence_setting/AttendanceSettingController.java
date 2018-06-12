@@ -1,4 +1,4 @@
-package com.kairos.activity.controller.clock_setting;
+package com.kairos.activity.controller.attendence_setting;
 
 import com.kairos.activity.persistence.model.staffing_level.Duration;
 import com.kairos.activity.service.attendence_setting.AttendanceSettingService;
@@ -28,8 +28,8 @@ public class AttendanceSettingController {
    }
 
    @PostMapping(value = "/{staffId}/attendance_setting")
-    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@PathVariable Long unitId, @PathVariable Long staffId, @RequestBody Duration clockInclockOutDuration){
-       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,staffId,clockInclockOutDuration));
+    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@PathVariable Long unitId, @PathVariable Long staffId, @RequestBody Duration InOutDuration){
+       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,staffId,InOutDuration));
    }
 
 }
