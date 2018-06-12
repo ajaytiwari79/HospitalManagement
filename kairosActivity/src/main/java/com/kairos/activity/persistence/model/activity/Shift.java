@@ -212,10 +212,6 @@ public class Shift extends MongoBaseEntity {
         isMainShift = mainShift;
     }
 
-    public DateTimeInterval getInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
-    }
-
     @Override
     public String toString() {
         return "Shift{" +
