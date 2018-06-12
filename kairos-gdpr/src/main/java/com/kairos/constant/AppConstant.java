@@ -14,6 +14,11 @@ public class AppConstant {
     public static final String CLAUSE_MODULE_ID = "tab_209";
     public static final String MASTER_PROCESSING_ACTIVITY_MODULE_ID = "tab_224";
 
+//rollback
+    public static final String QUESTION_LIST = "question_list";
+    public static final String QUESTIONNIARE_SECTIONS = "questionnaire_sectionList";
+
+    public static final String IDS_LIST = "ids";
 
 
 }

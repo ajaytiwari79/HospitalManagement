@@ -19,7 +19,7 @@ public class MasterQuestionnaireSection extends MongoBaseEntity {
 
     @NotNull(message = "list.cannot.be.null")
     @NotEmpty(message = "list.cannot.be.empty")
-    private Set<BigInteger> questions;
+    private List<BigInteger> questions;
 
     private Long countryId;
 
@@ -39,11 +39,11 @@ public class MasterQuestionnaireSection extends MongoBaseEntity {
         this.title = title;
     }
 
-    public Set<BigInteger> getQuestions() {
+    public List<BigInteger> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(Set<BigInteger> questions) {
+    public void setQuestions(List<BigInteger> questions) {
         this.questions = questions;
     }
 

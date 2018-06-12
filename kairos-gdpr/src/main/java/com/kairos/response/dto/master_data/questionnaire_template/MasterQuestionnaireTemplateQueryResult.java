@@ -12,18 +12,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterQuestionnaireTemplateResponseDto {
-
+public class MasterQuestionnaireTemplateQueryResult {
 
     private BigInteger id;
 
     private String name;
     private String description;
+
+    @NotNullOrEmpty(message = "questionnaire type cannot be empty or null")
     private String templateType;
 
     private StorageType assetType;
 
-    private List<MasterQuestionnaireSectionResponseDto> sections=new ArrayList<>() ;
+    private List<MasterQuestionnaireSection> sections=new ArrayList<>() ;
+
+    private List<MasterQuestion> questions=new ArrayList<>();
+
+
+    public List<MasterQuestion> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<MasterQuestion> questions) {
+        this.questions = questions;
+    }
+
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    public List<MasterQuestionnaireSection> getSections() {
+        return sections;
+    }
+
+    public void setSections(List<MasterQuestionnaireSection> sections) {
+        this.sections = sections;
+    }
+
+    private Long countryId;
 
     public BigInteger getId() {
         return id;
@@ -49,13 +79,6 @@ public class MasterQuestionnaireTemplateResponseDto {
         this.description = description;
     }
 
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
 
     public StorageType getAssetType() {
         return assetType;
@@ -65,22 +88,11 @@ public class MasterQuestionnaireTemplateResponseDto {
         this.assetType = assetType;
     }
 
-    public List<MasterQuestionnaireSectionResponseDto> getSections() {
-        return sections;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setSections(List<MasterQuestionnaireSectionResponseDto> sections) {
-        this.sections = sections;
-    }
-
-    public MasterQuestionnaireTemplateResponseDto(BigInteger id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-
-    }
-
-    public MasterQuestionnaireTemplateResponseDto(BigInteger id) {
-        this.id = id;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }
