@@ -1,15 +1,10 @@
-package com.kairos.activity.persistence.model.open_shift;
-
-import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.kairos.response.dto.web.open_shift;
 
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
-@Document
-public class OpenShift extends MongoBaseEntity {
-
+public class OpenShiftDTO {
     private Date startDate;
     private Date endDate;
     private Integer noOfPersonRequired;
@@ -20,29 +15,21 @@ public class OpenShift extends MongoBaseEntity {
     private BigInteger activityId;
     private BigInteger parentOpenShiftId;
 
-
-    public Long getUnitId() {
-        return unitId;
+    public OpenShiftDTO() {
+        //Default Constructor
     }
 
-    public void setUnitId(Long unitId) {
+    public OpenShiftDTO(Date startDate, Date endDate, Integer noOfPersonRequired, List<Long> interestedStaff,
+                        List<Long> declinedBy, Long unitId, BigInteger orderId, BigInteger activityId, BigInteger parentOpenShiftId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.noOfPersonRequired = noOfPersonRequired;
+        this.interestedStaff = interestedStaff;
+        this.declinedBy = declinedBy;
         this.unitId = unitId;
-    }
-
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
-    public BigInteger getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(BigInteger orderId) {
         this.orderId = orderId;
+        this.activityId = activityId;
+        this.parentOpenShiftId = parentOpenShiftId;
     }
 
     public Date getStartDate() {
@@ -53,6 +40,13 @@ public class OpenShift extends MongoBaseEntity {
         this.startDate = startDate;
     }
 
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
     public Integer getNoOfPersonRequired() {
         return noOfPersonRequired;
@@ -78,13 +72,28 @@ public class OpenShift extends MongoBaseEntity {
         this.declinedBy = declinedBy;
     }
 
-
-    public Date getEndDate() {
-        return endDate;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public BigInteger getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(BigInteger orderId) {
+        this.orderId = orderId;
+    }
+
+    public BigInteger getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
     }
 
     public BigInteger getParentOpenShiftId() {

@@ -7,15 +7,19 @@ import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
+import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.service.shift.ShiftService;
+import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.activity.util.time_bank.TimeBankCalculationService;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftAndActivityWrapper;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
-import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
+import com.kairos.response.dto.web.open_shift.OpenShiftWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +50,9 @@ public class OpenShiftService extends MongoBaseService {
     private GenericIntegrationService genericIntegrationService;
     @Inject
     private ShiftService shiftService;
+    @Inject
+    private TimeBankService timeBankService;
+    @Inject private TimeBankCalculationService timeBankCalculationService;
 
     public OpenShiftResponseDTO createOpenShift(OpenShiftResponseDTO openShiftResponseDTO) {
 
@@ -178,6 +185,16 @@ public class OpenShiftService extends MongoBaseService {
             openShiftResponseDTOS.add(openShiftResponseDTO);
         });
         return openShiftResponseDTOS;
+    }
+
+   public OpenShiftWrapper fetchOpenShiftDataByStaff(Long unitId,  BigInteger openShiftId,  Long staffId){
+        OpenShiftAndActivityWrapper openShiftAndActivityWrapper=openShiftMongoRepository.getOpenShiftAndActivity(openShiftId,unitId);
+        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,openShiftAndActivityWrapper.getExpertiseId());
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+        timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShiftAndActivityWrapper.getOpenShift(),openShiftAndActivityWrapper.getActivity(),unitPositionWithCtaDetailsDTO);
+        OpenShiftWrapper openShiftWrapper=new OpenShiftWrapper();
+        return openShiftWrapper;
+
     }
 
 }

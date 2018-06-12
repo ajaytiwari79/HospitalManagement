@@ -63,4 +63,12 @@ public class OpenShiftController {
     public ResponseEntity<Map<String, Object>> pickOpenShiftByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId));
         }
+
+    @ApiOperation(value = "fetch details for open shift")
+    @RequestMapping(value = "open_shift/{openShiftId}/staff/{staffId}", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+
+    public ResponseEntity<Map<String, Object>> fetchOpenShiftDataByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.fetchOpenShiftDataByStaff(unitId,openShiftId,staffId));
+    }
 }
