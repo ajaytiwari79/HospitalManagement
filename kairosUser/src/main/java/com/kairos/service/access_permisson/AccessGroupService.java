@@ -558,6 +558,7 @@ public class AccessGroupService extends UserBaseService {
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
 
