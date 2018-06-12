@@ -3,7 +3,8 @@ package com.kairos.activity.controller.task;
 import com.kairos.activity.persistence.model.task_type.TaskType;
 import com.kairos.activity.persistence.model.task_type.MapPointer;
 import com.kairos.activity.persistence.model.task_type.TaskTypeDefination;
-import com.kairos.activity.response.dto.CreateTaskTypeDTO;
+import com.kairos.activity.response.dto.TaskTypeDTO;
+import com.kairos.activity.response.dto.TaskTypeSettingDTO;
 import com.kairos.activity.response.dto.task_type.TaskTypeCopyDTO;
 import com.kairos.activity.response.dto.task_type.TaskTypeResourceDTO;
 import com.kairos.activity.response.dto.task_type.TaskTypeSlaConfigDTO;
@@ -31,6 +32,7 @@ import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.activity.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.activity.constants.ApiConstants.UNIT_URL;
 
 
 /**
@@ -51,12 +53,11 @@ public class TaskTypeController {
     @RequestMapping(value = "/task_types", method = RequestMethod.POST)
     @ApiOperation("create task_type type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createTaskType(@RequestParam(value = "subServiceId") long subServiceId, @Validated @RequestBody CreateTaskTypeDTO createTaskTypeDTO) throws ParseException {
+    public ResponseEntity<Map<String, Object>> createTaskType(@RequestParam(value = "subServiceId") long subServiceId, @Validated @RequestBody TaskTypeDTO taskTypeDTO) throws ParseException {
         //todo require Implementation
         //String rehabTime = (String) data.get("rehabTime");
 
-        Map<String, Object> response = taskTypeService.createTaskType(createTaskTypeDTO.getTitle(), createTaskTypeDTO.getDescription(), createTaskTypeDTO.getExpiresOn(), subServiceId, createTaskTypeDTO.getTags());
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, taskTypeService.createTaskType(taskTypeDTO,subServiceId));
     }
 
     @RequestMapping(value = "/task_types", method = RequestMethod.GET)
@@ -737,5 +738,38 @@ public class TaskTypeController {
                 taskTypeService.createCopiesForTaskType(taskTypeId, taskTypeCopyDTO.getTaskTypeNames()));
     }
 
+
+    @ApiOperation(value = "Update taskType setting for Staff")
+    @PutMapping(value = UNIT_URL+"/staff/{staffId}/task_type_setting")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTaskTypeSettingForStaff(@PathVariable Long staffId,@RequestBody TaskTypeSettingDTO taskTypeSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                taskTypeService.updateOrCreateTaskTypeSetting(staffId,taskTypeSettingDTO));
+    }
+
+
+    /*@ApiOperation(value = "get taskType setting for Staff")
+    @GetMapping(value = UNIT_URL+"/staff/{staffId}/task_type_setting")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTaskTypeSettingForStaff(@PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                taskTypeService.getTaskTypeSettingByStaff(staffId));
+    }*/
+
+    @ApiOperation(value = "get taskType of organisation")
+    @GetMapping(value = UNIT_URL+"/staff/{staffId}/staff_task_type_setting")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTaskTypeOfOrganisationAndStaffSetting(@PathVariable Long unitId,@PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                taskTypeService.getTaskTypeByOrganisationAndStaffSetting(unitId,staffId));
+    }
+
+    @ApiOperation(value = "get taskType of organisation")
+    @GetMapping(value = UNIT_URL+"/client/{clientId}/client_task_type_setting")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTaskTypeOfOrganisationAndClientSetting(@PathVariable Long unitId,@PathVariable Long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                taskTypeService.getTaskTypeByOrganisationAndClientSetting(unitId,clientId));
+    }
 
 }

@@ -23,6 +23,7 @@ public class MasterQuestionService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+/*
 
     public List<MasterQuestion> addMasterQuestion(Long countryId, ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDtos) {
 
@@ -32,7 +33,7 @@ public class MasterQuestionService extends MongoBaseService {
 
         for (MasterQuestionDto masterQuestionDto : masterQuestionDtoList) {
 
-            MasterQuestion masterQuestion = new MasterQuestion(masterQuestionDto.getName(), masterQuestionDto.getDescription(), masterQuestionDto.getQuestionType().value, countryId);
+            MasterQuestion masterQuestion = new MasterQuestion(masterQuestionDto.getQuestion(), masterQuestionDto.getDescription(), masterQuestionDto.getQuestionType().value, countryId);
             masterQuestion.setRequired(masterQuestionDto.getRequired());
             masterQuestion.setNotSureAllowed(masterQuestionDto.getNotSureAllowed());
             masterQuestions.add(masterQuestion);
@@ -69,15 +70,15 @@ public class MasterQuestionService extends MongoBaseService {
 
         MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "question", questionDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "question", questionDto.getQuestion());
         }
-        if (questionMongoRepository.findByNameAndCountryId(countryId, questionDto.getName()) == null) {
-            exist.setName(questionDto.getName());
+        if (questionMongoRepository.findByNameAndCountryId(countryId, questionDto.getQuestion()) == null) {
+            exist.setQuestion(questionDto.getQuestion());
             exist.setCountryId(countryId);
             exist.setDescription(questionDto.getDescription());
             exist.setRequired(questionDto.getRequired());
             exist.setNotSureAllowed(questionDto.getNotSureAllowed());
-            exist.setQuestionType(questionDto.getQuestionType().value);
+            exist.setQuestionType(questionDto.getQuestionType());
             return save(exist);
 
         } else
@@ -106,6 +107,7 @@ public class MasterQuestionService extends MongoBaseService {
         return masterQuestions;
 
     }
+*/
 
 
 }

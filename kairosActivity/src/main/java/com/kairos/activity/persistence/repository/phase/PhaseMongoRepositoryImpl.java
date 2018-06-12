@@ -2,9 +2,9 @@ package com.kairos.activity.persistence.repository.phase;
 
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
-import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.query_result.PhaseWrapper;
+import com.kairos.enums.phase.PhaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -35,6 +35,7 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return result.getMappedResults();
 
     }
+
     public  List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction)
     {
         Query query = Query.query(Criteria.where("organizationId").is(unitId));
@@ -42,9 +43,17 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }
 
-    public  List<PhaseDTO> getApplicablePhasesByUnit(Long unitId)
+
+    public  List<PhaseDTO> getPlanningPhasesByUnit(Long unitId, Sort.Direction direction)
     {
-        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("duration").gt(0));
+        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("phaseType").is(PhaseType.PLANNING));
+        query.with(new Sort(direction,"sequence"));
+        return mongoTemplate.find(query,PhaseDTO.class,"phases");
+    }
+
+    public  List<PhaseDTO> getApplicablePlanningPhasesByUnit(Long unitId)
+    {
+        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("duration").gt(0).and("phaseType").is(PhaseType.PLANNING));
         query.with(new Sort(Sort.Direction.DESC,"sequence"));
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }

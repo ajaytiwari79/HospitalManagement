@@ -50,7 +50,6 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,
                                                                  @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
-
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
                                                                  @RequestParam(value = "startDate", required = false) String startDate,
@@ -123,8 +122,8 @@ public class ShiftController {
     @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
     @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, selectedDate));
+    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, startDate,endDate));
     }
 
     @ApiOperation("copy shifts from 1 employee to others")

@@ -41,7 +41,7 @@ public class AccountTypeController {
     @PostMapping("/add")
     public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (countryId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, false, accountTypeService.createAccountType(countryId, accountType));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
         }
         return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id can not be null");
     }

@@ -1,5 +1,13 @@
 package com.planner.util.wta;
 
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.planner.vrp.taskplanning.model.LocationPair;
+import com.kairos.planner.vrp.taskplanning.model.LocationPairDifference;
+import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
+import com.kairos.planning.domain.*;
+import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
@@ -17,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.time.LocalDate;
 
 public class FileIOUtil {
     private static Logger log= LoggerFactory.getLogger(PlannerService.class);
@@ -29,6 +38,27 @@ public class FileIOUtil {
             xstream.registerConverter(new JodaLocalTimeConverter());
             xstream.registerConverter(new JodaLocalDateConverter());
             // xstream.registerConverter(new JodaTimeConverterNoTZ());
+            xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
+            String xmlString = xstream.toXML(solution);
+            writeXml(xmlString, fileName);
+        }catch(Throwable e){
+            log.error("soe:",e);
+            throw e;
+        }
+    }
+    public static void writeVrpPlanningXMLToFile(VrpTaskPlanningSolution solution, String fileName) {
+        try {
+            XStream xstream = new XStream(new PureJavaReflectionProvider());
+            //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
+            xstream.setMode(XStream.ID_REFERENCES);
+            /*xstream.registerConverter(new JodaTimeConverter());
+            xstream.registerConverter(new JodaLocalTimeConverter());
+            xstream.registerConverter(new JodaLocalDateConverter());*/
+            // xstream.registerConverter(new JodaTimeConverterNoTZ());
+
+            xstream.processAnnotations(LocationPair.class);
+            xstream.processAnnotations(LocationPairDifference.class);
+
             xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
             String xmlString = xstream.toXML(solution);
             writeXml(xmlString, fileName);

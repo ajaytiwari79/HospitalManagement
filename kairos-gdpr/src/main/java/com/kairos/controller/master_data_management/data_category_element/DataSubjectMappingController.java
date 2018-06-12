@@ -33,7 +33,6 @@ public class DataSubjectMappingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.addDataSubjectAndMapping(countryId, dataSubjectMappingDto));
     }
 
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (countryId == null) {
@@ -61,7 +60,6 @@ public class DataSubjectMappingController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithData(countryId));
     }
-
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataSubjectMappingDto dataSubjectMappingDto) {

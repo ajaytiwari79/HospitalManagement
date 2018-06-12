@@ -19,7 +19,7 @@ import com.planner.service.locationService.LocationService;
 import com.planner.service.skillService.SkillService;
 import com.planner.service.staffService.ShiftService;
 import com.planner.service.staffService.TaskStaffService;
-import com.planner.service.taskService.TaskService;
+import com.planner.service.taskService.PlanningTaskService;
 import com.planner.service.taskService.TaskTypeService;
 import com.planner.service.vehicleService.VehicleService;
 import org.joda.time.DateTime;
@@ -36,7 +36,7 @@ public class TaskPlanningSolutionService {
 
     private static Logger logger = LoggerFactory.getLogger(TaskPlanningSolutionService.class);
 
-    @Autowired private TaskService taskService;
+    @Autowired private PlanningTaskService planningTaskService;
     @Autowired private TaskTypeService taskTypeService;
     @Autowired private SkillService skillService;
     @Autowired private TaskStaffService taskStaffService;
@@ -97,7 +97,7 @@ public class TaskPlanningSolutionService {
 
     private void getTaskList(TaskPlanningSolution taskPlanningSolution, long unitId,Date startDate,Date endDate,Map<String,Skill> skillMap) {
         Map<String,Location> locationsMap = getLocationsMap();
-        List<PlanningTask> planningTasks = taskService.getAllTasksForPLanning(unitId,startDate,endDate);
+        List<PlanningTask> planningTasks = planningTaskService.getAllTasksForPLanning(unitId,startDate,endDate);
         Map<String,Citizen> citizenMap = getCitizenMap(unitId);
         Map<String,TaskType> taskTypeMap = getTaskTypesMap(unitId,skillMap);
         List<Task> tasks = new ArrayList<>();

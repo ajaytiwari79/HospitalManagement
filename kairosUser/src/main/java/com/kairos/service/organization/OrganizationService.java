@@ -67,6 +67,7 @@ import com.kairos.response.dto.web.cta.DayTypeDTO;
 
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
+import com.kairos.response.dto.web.organization.OrganizationSettingDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
@@ -363,12 +364,16 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(),organization.getCountry().getId());
         // DO NOT CREATE PHASE for UNION
-        if (!orgDetails.getUnion()) {
-            phaseRestClient.createDefaultPhases(organization.getId());
-            periodRestClient.createDefaultPeriodSettings(organization.getId());
-        }
+
+//        if (!orgDetails.getUnion()) {
+//            phaseRestClient.createDefaultPhases(organization.getId());
+//            periodRestClient.createDefaultPeriodSettings(organization.getId());
+//        }
+
         //Copying Priority Groups to Unit from Country
+
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());
         //Copying OpenShift RuleTemplates to Unit from Country
         //OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOorganization.getCountry().getId());
@@ -456,10 +461,10 @@ public class OrganizationService extends UserBaseService {
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         // DO NOT CREATE PHASE for UNION
-        if (!orgDetails.getUnion()) {
-            phaseRestClient.createDefaultPhases(organization.getId());
-            periodRestClient.createDefaultPeriodSettings(organization.getId());
-        }
+//        if (!orgDetails.getUnion()) {
+//            phaseRestClient.createDefaultPhases(organization.getId());
+//            periodRestClient.createDefaultPeriodSettings(organization.getId());
+//        }
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
         organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
@@ -884,8 +889,9 @@ public class OrganizationService extends UserBaseService {
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
-        phaseRestClient.createDefaultPhases(unit.getId());
-        periodRestClient.createDefaultPeriodSettings(unit.getId());
+//        phaseRestClient.createDefaultPhases(unit.getId());
+//        periodRestClient.createDefaultPeriodSettings(unit.getId());
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),unit.getCountry().getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
@@ -1771,4 +1777,19 @@ public class OrganizationService extends UserBaseService {
         RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData( skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(),activityWithTimeTypeDTOS.getIntervals(),priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises(),activityWithTimeTypeDTOS.getMinOpenShiftHours());
         return ruleTemplateDefaultData;
     }
+
+    public OrganizationSettingDTO updateOrganizationSettings(OrganizationSettingDTO organizationSettingDTO,Long unitId){
+        OrganizationSetting organizationSetting = organizationGraphRepository.getOrganisationSettingByOrgId(unitId);
+        organizationSetting.setWalkingMeter(organizationSettingDTO.getWalkingMeter());
+        organizationSetting.setWalkingMinutes(organizationSettingDTO.getWalkingMinutes());
+        save(organizationSetting);
+        return organizationSettingDTO;
+    }
+
+    public OrganizationSettingDTO getOrganizationSettings(Long unitId){
+        OrganizationSetting organizationSetting = organizationGraphRepository.getOrganisationSettingByOrgId(unitId);
+        return new OrganizationSettingDTO(organizationSetting.getWalkingMeter(),organizationSetting.getWalkingMinutes());
+    }
+
+
 }

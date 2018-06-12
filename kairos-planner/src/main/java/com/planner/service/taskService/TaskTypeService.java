@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class TaskTypeService {
 
-    private static Logger logger = LoggerFactory.getLogger(TaskService.class);
+    private static Logger logger = LoggerFactory.getLogger(PlanningTaskService.class);
 
     @Autowired
     private TaskTypeRepository taskTypeRepository;

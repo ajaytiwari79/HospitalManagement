@@ -86,7 +86,7 @@ end
 rule "task timings in sla boundries"
 salience 5
     when
-        //$task: Task (previousTaskOrEmployee instanceof Task  && $prevTask:previousTaskOrEmployee && !$task.isPlannedInPossibleInterval())
+        //$task: Task (previousTaskOrEmployee instanceof Task  && $nextTask:previousTaskOrEmployee && !$task.isPlannedInPossibleInterval())
         Task (employee!=null && !isPlannedInPossibleInterval())
     then
         scoreHolder.addHardConstraintMatch(kcontext,5,-2);
@@ -115,7 +115,7 @@ end
 rule "task planned in extended interval"
 salience 20
     when
-        $task: Task (previousTaskOrEmployee instanceof Task  && $prevTask:previousTaskOrEmployee && $task.isPlannedInExtendedInterval())
+        $task: Task (previousTaskOrEmployee instanceof Task  && $nextTask:previousTaskOrEmployee && $task.isPlannedInExtendedInterval())
     then
         scoreHolder.addSoftConstraintMatch(kcontext,0,-10);
 end

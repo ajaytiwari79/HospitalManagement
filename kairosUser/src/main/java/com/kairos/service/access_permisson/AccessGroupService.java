@@ -558,6 +558,7 @@ public class AccessGroupService extends UserBaseService {
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
 
@@ -690,6 +691,15 @@ public class AccessGroupService extends UserBaseService {
         UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,
                 accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString()),
                 accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString())
+        );
+        return userAccessRoleDTO;
+    }
+
+    public UserAccessRoleDTO getStaffAccessRoles(Long unitId,Long staffId) {
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(unitId,
+                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),staffId),
+                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId),staffId
         );
         return userAccessRoleDTO;
     }

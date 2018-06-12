@@ -10,12 +10,13 @@ import javax.validation.constraints.NotNull;
 public class MasterQuestion extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
-    private String name;
+    private String question;
 
     @NotNullOrEmpty(message = "description.cannot.be.empty.or.null")
     private String description;
 
     private Boolean isRequired=false;
+
     @NotNull
     private String questionType;
 
@@ -31,12 +32,12 @@ public class MasterQuestion extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public String getName() {
-        return name;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     public String getDescription() {
@@ -71,8 +72,8 @@ public class MasterQuestion extends MongoBaseEntity {
         this.questionType = questionType;
     }
 
-    public MasterQuestion(String name, String description, @NotNull String questionType, Long countryId) {
-        this.name = name;
+    public MasterQuestion(String question, String description, String questionType, Long countryId) {
+        this.question = question;
         this.description = description;
         this.questionType = questionType;
         this.countryId = countryId;

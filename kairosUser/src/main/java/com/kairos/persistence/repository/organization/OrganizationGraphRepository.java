@@ -759,5 +759,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithName(String name);
 
+    @Query("MATCH (org:Organization)-[:"+HAS_SETTING+"]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
+    OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
 }

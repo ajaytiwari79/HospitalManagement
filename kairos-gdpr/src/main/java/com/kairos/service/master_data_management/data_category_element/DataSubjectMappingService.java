@@ -2,16 +2,13 @@ package com.kairos.service.master_data_management.data_category_element;
 
 
 import com.kairos.dto.master_data.DataSubjectMappingDto;
-import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataSubjectMappingRepository;
-import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSubjectMongoRepository;
-import com.kairos.response.dto.master_data.DataSubjectMappingResponseDto;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDto;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -49,12 +46,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         if (dataSubjectMappingDto.getOrganizationSubTypes().size() != 0) {
             dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
         }
-        if (dataSubjectMappingDto.getOrganizationServices().size() != 0) {
-            dataSubjectMapping.setOrganizationServices(dataSubjectMappingDto.getOrganizationServices());
-        }
-        if (dataSubjectMappingDto.getOrganizationSubServices().size() != 0) {
-            dataSubjectMapping.setOrganizationSubServices(dataSubjectMappingDto.getOrganizationTypes());
-        }
+
         dataSubjectMapping.setName(dataSubjectMappingDto.getName());
         dataSubjectMapping.setDescription(dataSubjectMappingDto.getDescription());
         dataSubjectMapping.setCountryId(countryId);
@@ -83,8 +75,6 @@ public class DataSubjectMappingService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
         return dataSubjectMapping;
-
-
     }
 
 
@@ -106,8 +96,6 @@ public class DataSubjectMappingService extends MongoBaseService {
         DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription());
         dataSubjectMapping.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
         dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
-        dataSubjectMapping.setOrganizationServices(dataSubjectMappingDto.getOrganizationServices());
-        dataSubjectMapping.setOrganizationSubServices(dataSubjectMappingDto.getOrganizationTypes());
         dataSubjectMapping.setCountryId(countryId);
         dataSubjectMapping.setDataCategories(dataSubjectMappingDto.getDataCategories());
         return save(dataSubjectMapping);

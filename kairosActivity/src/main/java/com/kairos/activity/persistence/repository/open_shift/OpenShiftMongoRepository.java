@@ -23,5 +23,5 @@ public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,
 
     OpenShift findByIdAndUnitIdAndDeletedFalse(BigInteger openShiftId,Long unitId);
 
-    List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId);
+    List<OpenShift> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId);
 }

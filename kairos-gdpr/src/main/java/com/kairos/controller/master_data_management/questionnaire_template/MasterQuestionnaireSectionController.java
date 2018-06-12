@@ -28,7 +28,7 @@ public class MasterQuestionnaireSectionController {
     private MasterQuestionnaireSectionService masterQuestionnaireSectionService;
 
 
-    @PostMapping("/add")
+   /* @PostMapping("/add")
     public ResponseEntity<Object> createMasterQuestionnaireSection(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "countryId cannot be null");
@@ -48,6 +48,6 @@ public class MasterQuestionnaireSectionController {
     }
 
 
-
+*/
 
 }
