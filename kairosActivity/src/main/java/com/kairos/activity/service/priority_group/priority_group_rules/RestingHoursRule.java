@@ -8,6 +8,8 @@ import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 public class RestingHoursRule implements PriorityGroupRuleFilter {
@@ -41,16 +43,19 @@ public class RestingHoursRule implements PriorityGroupRuleFilter {
         DateTimeInterval dateTimeIntervalAfterEnd = null;
         for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()) {
             Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+
             if(restingBeforeStart) {
-                Date filterEndDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(),openShiftMap.get(entry.getKey()).getFromTime());
-                Date filterStartDate = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(),openShiftMap.get(entry.getKey()).
-                        getFromTime().minusHours(restingHoursBeforeStart));
+                LocalTime openShiftStartTime = DateUtils.asLocalTime(openShiftMap.get(entry.getKey()).getStartDate());
+                LocalDate openshiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
+                Date filterEndDate = openShiftMap.get(entry.getKey()).getStartDate();
+                Date filterStartDate = DateUtils.asDate(openshiftDate,openShiftStartTime.minusHours(restingHoursBeforeStart));
                 dateTimeIntervalBeforeStart = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
             }
            if(restingAfterEnd) {
-               Date filterEndDateAfterEnd = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(),openShiftMap.get(entry.getKey()).getToTime().
-                       plusHours(restingHoursAfterEnd));
-               Date filterStartDateAfterEnd = DateUtils.asDate(openShiftMap.get(entry.getKey()).getStartDate(),openShiftMap.get(entry.getKey()).getToTime());
+               LocalTime openShiftEndTime = DateUtils.asLocalTime(openShiftMap.get(entry.getKey()).getEndDate());
+               LocalDate openshiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getEndDate());
+               Date filterEndDateAfterEnd = DateUtils.asDate(openshiftDate,openShiftEndTime.plusHours(restingHoursAfterEnd));
+               Date filterStartDateAfterEnd = openShiftMap.get(entry.getKey()).getEndDate();
                dateTimeIntervalAfterEnd = new DateTimeInterval(filterStartDateAfterEnd.getTime(),filterEndDateAfterEnd.getTime());
            }
 

@@ -58,8 +58,8 @@ public class PriorityGroupRulesDataGetterService {
 
         List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(priorityGroupDTO.getUnitId(),priorityGroupDTO.getOrderId());
         List<BigInteger> openShiftIds = openShifts.stream().map(OpenShift:: getId).collect(Collectors.toList());
-        LocalDate maxDate = openShifts.stream().map(OpenShift::getStartDate).max(LocalDate::compareTo).get();
-        LocalDate minDate = openShifts.stream().map(OpenShift::getStartDate).min(LocalDate::compareTo).get();
+        LocalDate maxDate = DateUtils.asLocalDate(openShifts.stream().map(OpenShift::getEndDate).max(Date::compareTo).get());
+        LocalDate minDate = DateUtils.asLocalDate(openShifts.stream().map(OpenShift::getStartDate).min(Date::compareTo).get());
         Long maxDateLong = DateUtils.getLongFromLocalDate(maxDate);
 
         List<StaffUnitPositionQueryResult> staffsUnitPositions = getStaffListByStaffIncludefilter(priorityGroupDTO,maxDateLong);
@@ -138,15 +138,16 @@ public class PriorityGroupRulesDataGetterService {
             while(staffUnitPositionIterator.hasNext()) {
 
                 StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
-                Long endDate = DateUtils.getLongFromLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
-                Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftMap.get(entry.getKey()).getStartDate()).getTime();
-                Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftMap.get(entry.getKey()).getStartDate());
+                LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
+                Long endDate = DateUtils.getLongFromLocalDate(openShiftDate);
+                Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftDate).getTime();
+                Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftDate);
                 UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
                         Optional.ofNullable(staffUnitPositionQueryResult.getContractedMinByWeek()).isPresent()?staffUnitPositionQueryResult.getContractedMinByWeek():0,
                         Optional.ofNullable(staffUnitPositionQueryResult.getWorkingDaysPerWeek()).isPresent()?staffUnitPositionQueryResult.getWorkingDaysPerWeek():0,
                         DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));
-                LocalDate startDatePlanned = DateUtils.getDateFromEpoch(DateUtils.getISOStartOfWeek(openShiftMap.get(entry.getKey()).getStartDate()));
-                LocalDate endDatePlanned = DateUtils.asLocalDate(DateUtils.getISOEndOfWeekDate(openShiftMap.get(entry.getKey()).getStartDate()));
+                LocalDate startDatePlanned = DateUtils.getDateFromEpoch(DateUtils.getISOStartOfWeek(openShiftDate));
+                LocalDate endDatePlanned = DateUtils.asLocalDate(DateUtils.getISOEndOfWeekDate(openShiftDate));
                 List<DailyTimeBankEntry> dailyTimeBankEntries = unitPositionDailyTimeBankEntryMap.get(staffUnitPositionQueryResult.getUnitPositionId());
 
                 dailyTimeBankEntries = Optional.ofNullable(dailyTimeBankEntries).orElse(new ArrayList<>());
