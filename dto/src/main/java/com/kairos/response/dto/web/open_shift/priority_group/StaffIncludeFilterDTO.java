@@ -1,28 +1,18 @@
-package com.kairos.response.dto.web.open_shift;
+package com.kairos.response.dto.web.open_shift.priority_group;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
-public class StaffIncludeFilter {
+public class StaffIncludeFilterDTO {
+
 
     private boolean allowForFlexPool;
     private List<Long> expertiseIds;
     private Float staffAvailability; // In Percentage
     private Integer distanceFromUnit; //In meter
-
-    public StaffIncludeFilter() {
-        //Default Constructor
-    }
-
-    public StaffIncludeFilter(boolean allowForFlexPool, List<Long> expertiseIds,  Float staffAvailability, Integer distanceFromUnit) {
-        this.allowForFlexPool = allowForFlexPool;
-        this.expertiseIds = expertiseIds;
-        this.staffAvailability=staffAvailability;
-        this.distanceFromUnit=distanceFromUnit;
-    }
+    private List<Long> employmentTypeIds;
+    private LocalDate openShiftDate;
+    private Long maxOpenShiftDate;
 
     public boolean isAllowForFlexPool() {
         return allowForFlexPool;
@@ -33,7 +23,7 @@ public class StaffIncludeFilter {
     }
 
     public List<Long> getExpertiseIds() {
-        return expertiseIds=Optional.ofNullable(expertiseIds).orElse(new ArrayList<>());
+        return expertiseIds;
     }
 
     public void setExpertiseIds(List<Long> expertiseIds) {
@@ -55,4 +45,28 @@ public class StaffIncludeFilter {
     public void setDistanceFromUnit(Integer distanceFromUnit) {
         this.distanceFromUnit = distanceFromUnit;
     }
+
+    public List<Long> getEmploymentTypeIds() {
+        return employmentTypeIds;
+    }
+
+    public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
+        this.employmentTypeIds = employmentTypeIds;
+    }
+
+    public LocalDate getOpenShiftDate() {
+        return openShiftDate;
+    }
+
+    public void setOpenShiftDate(LocalDate openShiftDate) {
+        this.openShiftDate = openShiftDate;
+    }
+    public Long getMaxOpenShiftDate() {
+        return maxOpenShiftDate;
+    }
+
+    public void setMaxOpenShiftDate(Long maxOpenShiftDate) {
+        this.maxOpenShiftDate = maxOpenShiftDate;
+    }
+
 }

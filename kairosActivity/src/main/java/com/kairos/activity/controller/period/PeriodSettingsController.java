@@ -32,7 +32,7 @@ public class PeriodSettingsController {
     @PostMapping(value="/period_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultPeriodSettings(@PathVariable Long unitId) {
-        periodSettingsService.createDefaultPeriodSettings(unitId, null);
+        periodSettingsService.createDefaultPeriodSettings(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

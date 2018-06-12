@@ -25,10 +25,10 @@ public class OpenShiftMongoRepositoryImpl implements CustomOpenShiftMongoReposit
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndSelectedDate(Long unitId, Date selectedDate) {
+    public List<OpenShift> getOpenShiftsByUnitIdAndDate(Long unitId, Date startDate,Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").is(selectedDate)));
-        AggregationResults<OpenShiftResponseDTO> result = mongoTemplate.aggregate(aggregation, OpenShift.class, OpenShiftResponseDTO.class);
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).and("endDate").lt(endDate)));
+        AggregationResults<OpenShift> result = mongoTemplate.aggregate(aggregation, OpenShift.class, OpenShift.class);
         return result.getMappedResults();
     }
 }

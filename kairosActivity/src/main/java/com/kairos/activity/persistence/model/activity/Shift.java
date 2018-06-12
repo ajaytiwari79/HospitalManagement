@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.enums.shift.ShiftState;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -299,6 +300,8 @@ public class Shift extends MongoBaseEntity {
         this.externalId = externalId;
 
     }
+
+
 
     public Long getUnitPositionId() {
         return unitPositionId;

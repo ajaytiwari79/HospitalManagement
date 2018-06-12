@@ -1,6 +1,8 @@
-package com.kairos.response.dto.web.open_shift;
+
+package com.kairos.response.dto.web.open_shift.priority_group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.response.dto.web.open_shift.DurationField;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundRules {
