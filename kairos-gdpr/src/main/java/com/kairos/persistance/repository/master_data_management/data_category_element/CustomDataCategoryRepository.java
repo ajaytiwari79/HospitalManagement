@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data_management.data_category_element;
 
-import com.kairos.response.dto.master_data.DataCategoryResponseDto;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDto;
 
 import java.math.BigInteger;
 import java.util.List;

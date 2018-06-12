@@ -2,14 +2,11 @@ package com.kairos.persistance.model.master_data_management.questionnaire_templa
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.enums.QuestionnaireType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.Set;
 
 @Document(collection = "questionnaire_template")
 public class MasterQuestionnaireTemplate extends MongoBaseEntity {
@@ -17,14 +14,33 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
     private String name;
 
-    @NotNull(message = "list.cannot.be.null")
-    @NotEmpty(message = "list.cannot.be.empty")
-    private List<BigInteger> sections;
+    private String description;
 
-    @NotNull
+    @NotNullOrEmpty(message = "questionnaire type cannot be empty or null")
+    private String templateType;
+
+    private BigInteger assetType;
+
     private Long countryId;
 
-    private String questionnaireType;
+    private Set<BigInteger> sections;
+
+
+    public BigInteger getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(BigInteger assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -34,20 +50,17 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.name = name;
     }
 
-    public String getQuestionnaireType() {
-        return questionnaireType;
-    }
 
-    public void setQuestionnaireType(String questionnaireType) {
-        this.questionnaireType = questionnaireType;
-    }
-
-    public List<BigInteger> getSections() {
-        return sections;
-    }
-
-    public void setSections(List<BigInteger> sections) {
+    public void setSections(Set<BigInteger> sections) {
         this.sections = sections;
+    }
+
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
     }
 
     public Long getCountryId() {
@@ -58,11 +71,10 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public MasterQuestionnaireTemplate(String name, List<BigInteger> sections, Long countryId, String questionnaireType) {
+    public MasterQuestionnaireTemplate(String name, Long countryId, String templateType) {
         this.name = name;
-        this.sections = sections;
         this.countryId = countryId;
-        this.questionnaireType = questionnaireType;
+        this.templateType = templateType;
     }
 
     public MasterQuestionnaireTemplate() {

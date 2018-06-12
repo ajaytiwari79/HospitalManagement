@@ -1,13 +1,11 @@
-package com.kairos.response.dto.master_data;
+package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.Set;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionnaireSectionResponseDto {
@@ -17,7 +15,7 @@ public class MasterQuestionnaireSectionResponseDto {
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
     private String title;
 
-    private Set<BigInteger> questions;
+    private List<MasterQuestionBasicResponse> questions;
 
     private Long countryId;
 
@@ -37,11 +35,11 @@ public class MasterQuestionnaireSectionResponseDto {
         this.title = title;
     }
 
-    public Set<BigInteger> getQuestions() {
+    public List<MasterQuestionBasicResponse> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(Set<BigInteger> questions) {
+    public void setQuestions(List<MasterQuestionBasicResponse> questions) {
         this.questions = questions;
     }
 

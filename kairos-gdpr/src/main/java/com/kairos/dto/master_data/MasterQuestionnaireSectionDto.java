@@ -4,6 +4,7 @@ package com.kairos.dto.master_data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -20,7 +21,8 @@ public class MasterQuestionnaireSectionDto {
 
     @NotNull(message = "list.cannot.be.null")
     @NotEmpty(message = "list.cannot.be.empty")
-    private Set<BigInteger> questions;
+    @Valid
+    private List<MasterQuestionDto> questions;
 
     private Long countryId;
 
@@ -40,11 +42,11 @@ public class MasterQuestionnaireSectionDto {
         this.title = title;
     }
 
-    public Set<BigInteger> getQuestions() {
+    public List<MasterQuestionDto> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(Set<BigInteger> questions) {
+    public void setQuestions(List<MasterQuestionDto> questions) {
         this.questions = questions;
     }
 }

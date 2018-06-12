@@ -1,20 +1,30 @@
-package com.kairos.response.dto.master_data;
+package com.kairos.response.dto.master_data.data_mapping;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataElementBasicResponseDto {
+public class DataCategoryResponseDto {
 
     private BigInteger id;
 
     private String name;
 
     private Long countryId;
+
+    private List<DataElementBasicResponseDto> dataElements=new ArrayList<>();
+
+    public List<DataElementBasicResponseDto> getDataElements() {
+        return dataElements;
+    }
+
+    public void setDataElements(List<DataElementBasicResponseDto> dataElements) {
+        this.dataElements = dataElements;
+    }
 
     public BigInteger getId() {
         return id;
@@ -40,6 +50,7 @@ public class DataElementBasicResponseDto {
         this.countryId = countryId;
     }
 
-    public DataElementBasicResponseDto() {
+    public DataCategoryResponseDto( ){
+
     }
 }

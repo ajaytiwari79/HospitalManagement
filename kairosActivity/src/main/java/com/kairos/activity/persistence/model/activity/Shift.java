@@ -302,9 +302,7 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public DateTimeInterval getInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
-    }
+
 
     public Long getUnitPositionId() {
         return unitPositionId;
