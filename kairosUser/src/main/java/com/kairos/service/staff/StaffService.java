@@ -1894,13 +1894,38 @@ public class StaffService extends UserBaseService {
     }
 
    public EmploymentDTO getMainEmployment(Long unitId,Long staffId) {
-       Employment  employment=staffGraphRepository.getMainEmployment(unitId,staffId);
+       Employment  employment=staffGraphRepository.getMainEmployment(staffId);
        return ObjectMapperUtils.copyPropertiesByMapper(employment,EmploymentDTO.class);
    }
 
   public List<Employment> updateMainEmployment(Long unitId,Long staffId,EmploymentDTO employmentDTO){
-        List<Employment>  employments= staffGraphRepository.getAllMainEmploymentByStaffId(unitId,staffId);
+        Date mainEmploymentStartDate=DateUtil.asDate(employmentDTO.getMainEmploymentStartDate());
+        Date mainEmploymentEndDate=DateUtil.asDate(employmentDTO.getMainEmploymentEndDate());
+        List<Employment>  employments= staffGraphRepository.getAllMainEmploymentByStaffId(unitId,staffId,mainEmploymentStartDate,mainEmploymentEndDate);
+        if(employments.size()!=0){
+            for(Employment employment:employments){
+                if(employment.getMainEmploymentEndDate().isAfter(employmentDTO.getMainEmploymentStartDate())&&employment.getMainEmploymentEndDate().isBefore(employmentDTO.getMainEmploymentEndDate())){
+                    employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
+                    //employment.setHasMainEmployment(false);
+                }
+                else if(employment.getMainEmploymentStartDate().isBefore(employmentDTO.getMainEmploymentEndDate())&&employment.getMainEmploymentEndDate().isAfter(employmentDTO.getMainEmploymentEndDate())){
+                    employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentEndDate().plusDays(1));
+                }
+            }
+            save(employments);
+            saveEmployment(staffId,employmentDTO);
+        }else{
+            saveEmployment(staffId,employmentDTO);
+        }
+
         return employments;
    }
-
+        public void saveEmployment(Long staffId,EmploymentDTO employmentDTO)
+        {
+            Employment employment=staffGraphRepository.getMainEmployment(staffId);
+            employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
+            employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
+            employment.setHasMainEmployment(employmentDTO.isHasMainEmployment());
+            save(employment);
+        }
 }

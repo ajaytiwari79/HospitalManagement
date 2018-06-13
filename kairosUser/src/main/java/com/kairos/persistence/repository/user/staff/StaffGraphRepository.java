@@ -15,10 +15,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -477,15 +474,15 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
-    @Query("MATCH (staff:Staff{deleted:false})-[:BELONGS_TO]-(e:Employment) WHERE id(staff)={1} \n"+
-    "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n" +
-      "return e")
-    Employment getMainEmployment(Long unitId,Long staffId);
+    @Query("MATCH (staff:Staff{deleted:false})-[:BELONGS_TO]-(e:Employment) WHERE id(staff)={0} return e")
+    Employment getMainEmployment(Long staffId);
 
 
     @Query("match (s:Staff)-[:BELONGS_TO]-(u:User)where id(s)={1} with s,u\n" +
-            "match (u)-[:BELONGS_TO]-(staff:Staff) with staff,u match (staff)-[:BELONGS_TO]-(e:Employment)\n" +
-            "with u,e,staff match (e)-[:HAS_EMPLOYMENTS]-(o:Organization) RETURN e")
-    List<Employment> getAllMainEmploymentByStaffId(Long unitId,Long StaffId);
+            "match (u)-[:BELONGS_TO]-(staff:Staff) with staff,u\n " +
+            "match (staff)-[:BELONGS_TO]-(e:Employment) with staff,u,e\n" +
+            "where id(staff)<>{1} AND e.mainEmploymentEndDate>{2} AND e.mainEmploymentStartDate<{3} with u,e,staff\n" +
+            "match (e)-[:HAS_EMPLOYMENTS]-(o:Organization) RETURN e")
+    List<Employment> getAllMainEmploymentByStaffId(Long unitId, Long StaffId, Date mainEmploymentStartDate, Date mainEmploymentEndDate );
 
 }
