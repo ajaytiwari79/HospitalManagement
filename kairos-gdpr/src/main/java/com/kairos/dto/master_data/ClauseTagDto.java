@@ -11,7 +11,7 @@ public class ClauseTagDto {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Tag cannot be Empty")
+    @NotNullOrEmpty(message = "Tag  can't be Empty")
     @Pattern(message = "numberic and Special character are not allowed in tag",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 

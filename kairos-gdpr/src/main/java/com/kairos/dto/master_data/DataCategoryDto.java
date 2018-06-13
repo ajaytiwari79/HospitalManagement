@@ -16,11 +16,11 @@ import java.util.Set;
 public class DataCategoryDto {
 
 
-    @NotNullOrEmpty(message = "Name cannot be Empty")
+    @NotNullOrEmpty(message = "Name  can't be  Empty")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNull(message = "Data Element cannot be Empty")
+    @NotNull(message = "Data Element can't be  Empty")
     @Valid
     List<DataElement> dataElements;
 

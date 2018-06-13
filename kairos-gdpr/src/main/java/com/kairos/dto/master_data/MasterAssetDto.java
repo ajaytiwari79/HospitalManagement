@@ -13,26 +13,26 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterAssetDto {
 
-    @NotNullOrEmpty(message = "Name cannot be Empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
+    @NotNullOrEmpty(message = "Name  can't be Empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
     private String name;
 
     @NotNullOrEmpty(message = "Description cannot be Empty")
     private String description;
-    @NotNull(message = "Organization Type cannot be null")
-    @NotEmpty(message = "Organization Type cannot be empty")
+    @NotNull(message = "Organization Type  can't be  null")
+    @NotEmpty(message = "Organization Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotNull(message = "Organization Sub Type cannot be null")
-    @NotEmpty(message = "Organization Sub Type cannot be empty")
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotNull(message = "Service Type cannot be null")
-    @NotEmpty(message = "Service Type cannot be empty")
+    @NotNull(message = "Service Type  can't be  null")
+    @NotEmpty(message = "Service Type  can't be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotNull(message = "Service Sub Type cannot be null")
-    @NotEmpty(message = "Service Sub Type cannot be empty")
+    @NotNull(message = "Service Sub Type  can't be  null")
+    @NotEmpty(message = "Service Sub Type  can't be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
 
