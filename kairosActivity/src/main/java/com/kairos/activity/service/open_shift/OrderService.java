@@ -52,7 +52,7 @@ public class OrderService extends MongoBaseService {
        orderOpenshiftResponseDTO.setPriorityGroups(priorityGroupDTOS);
        BigInteger id = null;
        for(PriorityGroupDTO priorityGroupDTO:priorityGroupDTOS) {
-           if(priorityGroupDTO.getName().toString().equals("PRIORITY_GROUP1")) {
+           if("PRIORITY_GROUP1".equals(priorityGroupDTO.getName())) {
                id = priorityGroupDTO.getId();
                break;
            }
