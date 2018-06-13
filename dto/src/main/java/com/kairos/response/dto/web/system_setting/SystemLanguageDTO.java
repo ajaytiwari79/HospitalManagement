@@ -12,6 +12,13 @@ public class SystemLanguageDTO {
         // default constructor
     }
 
+    public SystemLanguageDTO(String name, String code, boolean inactive, boolean defaultLanguage){
+        this.name = name;
+        this.code = code;
+        this.inactive = inactive;
+        this.defaultLanguage =defaultLanguage;
+    }
+
     public Long getId() {
         return id;
     }

@@ -109,4 +109,12 @@ public class SystemLanguageService extends UserBaseService {
         return true;
     }
 
+
+    // For test cases
+
+    public SystemLanguage getSystemLanguageByName(String name){
+        return systemLanguageGraphRepository.findSystemLanguageByName(name);
+    }
+
+
 }
