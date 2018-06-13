@@ -43,7 +43,6 @@ public class MasterAssetService extends MongoBaseService {
         if (masterAssetMongoRepository.findByNameAndCountry(countryId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         } else {
-
             if (masterAssetDto.getOrganizationTypes()!=null&&masterAssetDto.getOrganizationTypes().size()!=0) {
                 newAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
 

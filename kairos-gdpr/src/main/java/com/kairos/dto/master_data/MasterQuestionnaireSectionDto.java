@@ -16,7 +16,7 @@ import java.util.Set;
 public class MasterQuestionnaireSectionDto {
 
     @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
-    @Pattern(message = "special character or numberic data not excepted",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "special character or numberic data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @NotNull(message = "list.cannot.be.null")
