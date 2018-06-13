@@ -95,7 +95,7 @@ public class SystemLanguageService extends UserBaseService {
 
     public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId){
         Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
+        if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
 

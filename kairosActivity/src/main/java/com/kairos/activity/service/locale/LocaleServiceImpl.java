@@ -7,6 +7,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Created by vipul on 11/5/18.
@@ -19,13 +20,13 @@ public class LocaleServiceImpl implements LocaleService{
 
     @Override
     public String getMessage(String code) {
-        Locale locale = new Locale(UserContext.getUserDetails().getLanguage());
+        Locale locale = new Locale(Optional.ofNullable(UserContext.getUserDetails().getLanguage()).orElse(""));
         return this.messageSource.getMessage(code, null, locale);
     }
 
     @Override
     public String getMessage(String code, Object[] args) {
-        Locale locale = new Locale(UserContext.getUserDetails().getLanguage());
+        Locale locale = new Locale(Optional.ofNullable(UserContext.getUserDetails().getLanguage()).orElse(""));
         return this.messageSource.getMessage(code, args, locale);
     }
 

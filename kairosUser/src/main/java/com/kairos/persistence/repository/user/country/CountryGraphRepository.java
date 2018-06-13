@@ -224,6 +224,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("Match (u:User) WHERE id(u)={0}\n" +
             "MATCH (u)<-[:BELONGS_TO]-(s:Staff)<-[:BELONGS_TO]-(e:Employment)<-[:HAS_EMPLOYMENTS]-(o:Organization)-[:BELONGS_TO]-(c:Country) \n" +
-            "MATCH (c)-[:HAS_SYSTEM_LANGUAGE]-(sl:SystemLanguage) return DISTINCT sl.code")
+            "MATCH (c)-[:HAS_SYSTEM_LANGUAGE]-(sl:SystemLanguage) return sl.code LIMIT 1")
     String getSystemLanguageOfUser(long userId);
 }

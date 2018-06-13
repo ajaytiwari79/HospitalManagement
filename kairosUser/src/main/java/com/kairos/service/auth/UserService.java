@@ -601,6 +601,6 @@ public class UserService extends UserBaseService {
 
     public String getSystemLanguageOfUser(Long userId){
         String language =  countryGraphRepository.getSystemLanguageOfUser(userId);
-        return (Optional.ofNullable(language).isPresent() ? language : "");
+        return (Optional.ofNullable(language).orElse(""));
     }
 }

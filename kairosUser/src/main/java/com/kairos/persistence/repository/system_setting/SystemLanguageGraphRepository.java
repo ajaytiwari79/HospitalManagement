@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<SystemLanguage,Long> {
 
-    @Query("Match (language:SystemLanguage{deleted:false}) WHERE language.name={0}\n" +
+    @Query("Match (language:SystemLanguage{deleted:false}) WHERE lower(language.name)=lower({0})\n" +
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
     boolean isSystemLanguageExistsWithSameName(String name);
 
