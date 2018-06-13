@@ -1,5 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.*;
 
@@ -177,6 +179,11 @@ public class Task extends TaskOrShift{
     public LocalDateTime getPlannedDateTime() {
         return plannedDateTime;
     }
+    public LocalDateTime getPlannedEndTime() {
+        if(plannedDateTime==null) return null;
+        return plannedDateTime.plusMinutes((long)getPlannedDuration());
+
+    }
 
     public void setPlannedDateTime(LocalDateTime plannedDateTime) {
         this.plannedDateTime = plannedDateTime;
@@ -205,6 +212,27 @@ public class Task extends TaskOrShift{
 
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Task task = (Task) o;
+
+        return new EqualsBuilder()
+                .append(intallationNo, task.intallationNo)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(intallationNo)
+                .toHashCode();
+    }
+
     @Override
     public String toString() {
         return "Task{" +

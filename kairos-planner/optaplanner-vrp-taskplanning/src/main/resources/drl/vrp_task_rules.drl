@@ -6,7 +6,7 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 
 global HardMediumSoftLongScoreHolder scoreHolder;
 /********Task Rules*******/
-rule "Task"
+rule "Unassigned Task"
 salience 20
     when
         $task:Task(shift==null);
@@ -15,8 +15,7 @@ salience 20
 end
 
 rule "Shift out of boundary half day"
-dialect "java"
-salience 20
+salience 21
 
     when
         Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes, $minutes>390)
@@ -25,8 +24,7 @@ salience 20
 end
 
 rule "Shift out of boundary full day"
-dialect "java"
-salience 20
+salience 22
     when
         Shift(isFullWorkDay() && $minutes:totalPlannedMinutes, $minutes>570)
     then

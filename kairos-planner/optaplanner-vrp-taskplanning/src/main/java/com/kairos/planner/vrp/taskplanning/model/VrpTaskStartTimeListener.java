@@ -6,6 +6,9 @@ import org.optaplanner.core.impl.score.director.ScoreDirector;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+//variable listeners have order. make sure it's last or dont use properties that are in listners after its order.
+//Note that ASV is called after this listener not before so getShift() would be stale.
+//Order for prevTaskOrShift is IRSV > this > ASV
 public class VrpTaskStartTimeListener implements VariableListener<Task> {
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, Task task) {
@@ -28,6 +31,7 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
 
     }
 
+
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, Task task) {
 
@@ -37,16 +41,26 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
     public void afterEntityRemoved(ScoreDirector scoreDirector, Task task) {
 
     }
-
     private void updateStartTime(ScoreDirector scoreDirector, Task task) {
-        /*if(task.getPrevTaskOrShift() instanceof Shift){
-            plannedDateTime=((Shift)task.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
+        if(task.getPrevTaskOrShift()==null){
+            updatePlannedTime(task,null,scoreDirector);
+            return;
+        }
+        if(task.getPrevTaskOrShift() instanceof Shift){
+            LocalDateTime plannedDateTime=((Shift)task.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
             updatePlannedTime(task,plannedDateTime,scoreDirector);
             return;
         }
         while (task!=null){
+            LocalDateTime plannedDateTime =((Task)task.getPrevTaskOrShift()).getPlannedEndTime().plusMinutes(task.getDrivingTime());
+            updatePlannedTime(task,plannedDateTime,scoreDirector);
+            task=task.getNextTask();
+        }
+    }
 
-        }*/
+
+    private void updateStartTimeFromStart(ScoreDirector scoreDirector, Task task) {
+
         try{
 
         if(task.getPrevTaskOrShift()==null || task.getShift()==null){
@@ -70,6 +84,7 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
 
     }
     private void updatePlannedTime(Task task, LocalDateTime plannedDateTime, ScoreDirector scoreDirector){
+
         if(Objects.equals(task.getPlannedDateTime(),plannedDateTime)) return;
         scoreDirector.beforeVariableChanged(task,"plannedDateTime");
         task.setPlannedDateTime(plannedDateTime);
