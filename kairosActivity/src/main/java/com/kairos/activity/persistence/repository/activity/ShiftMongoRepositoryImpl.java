@@ -81,8 +81,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftQueryResult> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).and("endDate").lt(endDate)),
-
+                project("unitId", "startDate", "endDate", "activityId", "staffId", "unitPositionId", "shiftState", "allowedBreakDurationInMinute"),
                 sort(Sort.Direction.ASC, "staffId"));
+
+
+        //AggregationResults<Object> result1 = mongoTemplate.aggregate(aggregation, Shift.class, Object.class);
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
         return result.getMappedResults();
     }
@@ -114,21 +117,21 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
                         .and("startDate").gte(startDate).and("endDate").lte(endDate)),
                 graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts"),
-                sort(Sort.Direction.ASC,"startDate"));
+                sort(Sort.Direction.ASC, "startDate"));
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
         return result.getMappedResults();
     }
 
     public List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match( Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate).and("parentOpenShiftId").exists(true)),
-                       group("unitPositionId").count().as("count"),
+                match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate).and("parentOpenShiftId").exists(true)),
+                group("unitPositionId").count().as("count"),
                 project("count").and("_id").as("unitPositionId"),
                 sort(Sort.Direction.DESC, "count")
 
         );
 
-        AggregationResults<ShiftCountDTO> shiftCounts = mongoTemplate.aggregate(aggregation,Shift.class,ShiftCountDTO.class);
+        AggregationResults<ShiftCountDTO> shiftCounts = mongoTemplate.aggregate(aggregation, Shift.class, ShiftCountDTO.class);
 
         return shiftCounts.getMappedResults();
 
