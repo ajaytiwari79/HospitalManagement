@@ -178,7 +178,7 @@ public class DateTimeInterval {
     }
 
     public boolean containsInterval(DateTimeInterval interval){
-        return this.start>=interval.getStartMillis() && this.end>=interval.getEndMillis();
+        return this.start<=interval.getStartMillis() && this.end>=interval.getEndMillis();
     }
 
     public int getMinutes(){
