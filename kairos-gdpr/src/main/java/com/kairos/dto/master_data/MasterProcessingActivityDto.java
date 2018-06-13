@@ -4,6 +4,7 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -17,14 +18,18 @@ public class MasterProcessingActivityDto {
     private String description;
 
     @NotEmpty(message = "Organization Type cannot be Empty")
+    @NotNull(message = "Organization  Type cannot be null")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
+    @NotNull(message = "Organization Sub Type cannot be null")
     @NotEmpty(message = "Organization Sub Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
+    @NotNull(message = "Service Type cannot be null")
     @NotEmpty(message = "Service Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
+    @NotNull(message = "Service Sub Type cannot be null")
     @NotEmpty(message = "Service Sub Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 

@@ -19,20 +19,19 @@ public class MasterAssetDto {
 
     @NotNullOrEmpty(message = "Description cannot be Empty")
     private String description;
-
-    @NotNull
+    @NotNull(message = "Organization Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotNull
+    @NotNull(message = "Organization Sub Type cannot be null")
     @NotEmpty(message = "Organization Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotNull
+    @NotNull(message = "Service Type cannot be null")
     @NotEmpty(message = "Service Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotNull
+    @NotNull(message = "Service Sub Type cannot be null")
     @NotEmpty(message = "Service Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 

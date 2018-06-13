@@ -29,15 +29,19 @@ public class ClauseDto {
     @NotNullOrEmpty(message = "description cannot be Empty ")
     private String description;
 
+    @NotNull(message = "Organization  Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationTypes;
 
+    @NotNull(message = "Organization Sub Type cannot be null")
     @NotEmpty(message = "Organization Sub Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubTypes;
 
+    @NotNull(message = "Service Type cannot be null")
     @NotEmpty(message = "Service cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationServices;
 
+    @NotNull(message = "Service Sub Type cannot be null")
     @NotEmpty(message = "Service Sub Type cannot empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 

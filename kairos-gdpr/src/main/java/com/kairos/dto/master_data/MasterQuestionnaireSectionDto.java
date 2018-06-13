@@ -19,7 +19,8 @@ public class MasterQuestionnaireSectionDto {
     @Pattern(message = "special character or numberic data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
-    @NotNull(message = "Question cannot be empty")
+    @NotNull(message = "Question cannot be null")
+    @NotEmpty(message = "Question cannot be empty")
     @Valid
     private List<MasterQuestionDto> questions;
 
