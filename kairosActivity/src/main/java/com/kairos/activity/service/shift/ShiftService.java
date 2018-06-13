@@ -14,6 +14,7 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivit
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.activity.persistence.query_result.DateWiseShiftResponse;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -38,7 +39,7 @@ import com.kairos.activity.shift.ShiftWrapper;
 import com.kairos.activity.spec.*;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.ObjectMapperUtils;
+
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.enums.shift.BreakPaymentSetting;
@@ -64,6 +65,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.*;
 
@@ -834,10 +836,11 @@ public class ShiftService extends MongoBaseService {
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
 
 
-        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(copyShiftDTO.getShiftIds());
+        List<DateWiseShiftResponse> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
+        logger.info(shifts + "");
 
-        Set<BigInteger> activityIds = shifts.parallelStream().map(shift -> shift.getActivityId()).collect(Collectors.toSet());
-        List<Activity> activities = activityRepository.findAllActivitiesByIds(activityIds);
+        //  Set<BigInteger> activityIds = shifts.parallelStream().map(shift -> shift.getActivityId()).collect(Collectors.toSet());
+        List<Activity> activities = activityRepository.findAllActivitiesByIds(Collections.EMPTY_SET);
 
         List<StaffUnitPositionDetails> staffDataList = restClient.getStaffsUnitPosition(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
         Set<BigInteger> wtaIds = staffDataList.parallelStream().map(wta -> wta.getWorkingTimeAgreementId()).collect(Collectors.toSet());
@@ -849,7 +852,7 @@ public class ShiftService extends MongoBaseService {
 
         Integer unCopiedShiftCount = 0;
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
-
+/*
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
 
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
@@ -866,7 +869,7 @@ public class ShiftService extends MongoBaseService {
             copyShiftResponse.getFailure().add(errorInCopy);
         }
         copyShiftResponse.setUnCopiedShiftCount(unCopiedShiftCount);
-
+*/
         return copyShiftResponse;
     }
 
@@ -901,7 +904,7 @@ public class ShiftService extends MongoBaseService {
             if (!previousShiftLocalDate.equals(DateUtils.asLocalDate(sourceShift.getStartDate()))) {
                 shiftCreationDate = shiftCreationDate.plusDays(1L);
             }
-            if (shifts.size()==1){
+            if (shifts.size() == 1) {
                 shiftCreationDate = shiftCreationDate.plusDays(1L);
             }
 
