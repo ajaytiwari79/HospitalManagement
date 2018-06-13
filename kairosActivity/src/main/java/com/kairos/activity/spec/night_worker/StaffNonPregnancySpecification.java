@@ -7,6 +7,7 @@ import com.kairos.response.dto.web.StaffDTO;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 
 public class StaffNonPregnancySpecification extends AbstractActivitySpecification<StaffDTO> {
 
@@ -14,6 +15,10 @@ public class StaffNonPregnancySpecification extends AbstractActivitySpecificatio
     @Override
     public boolean isSatisfied(StaffDTO staffDTO) {
         return (staffDTO.getGender().equals(Gender.MALE) || (staffDTO.getGender().equals(Gender.FEMALE) && !staffDTO.isPregnant()) );
+    }
 
+    @Override
+    public List<String> isSatisfiedString(StaffDTO staffDTO) {
+        return null;
     }
 }

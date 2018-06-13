@@ -15,6 +15,26 @@ public class OrganizationSetting extends UserBaseEntity {
     private List<OpeningHours> openingHour;
     private String workingDays;
 
+    /*Walking Time setting*/
+    private int walkingMeter;
+    private int walkingMinutes;
+
+    public int getWalkingMeter() {
+        return walkingMeter;
+    }
+
+    public void setWalkingMeter(int walkingMeter) {
+        this.walkingMeter = walkingMeter;
+    }
+
+    public int getWalkingMinutes() {
+        return walkingMinutes;
+    }
+
+    public void setWalkingMinutes(int walkingMinutes) {
+        this.walkingMinutes = walkingMinutes;
+    }
+
     public List<OpeningHours> getOpeningHour() {
         return openingHour;
     }

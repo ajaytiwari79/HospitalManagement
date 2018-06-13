@@ -1,0 +1,15 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Task Rules*******/
+rule "Task"
+salience 20
+    when
+        $task:Task(shift==null);
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-1);
+end

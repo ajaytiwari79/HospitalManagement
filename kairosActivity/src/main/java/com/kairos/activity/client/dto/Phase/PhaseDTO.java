@@ -3,13 +3,12 @@ package com.kairos.activity.client.dto.Phase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.phase.PhaseType;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 
 /**
  * Created by vipul on 19/9/17.
@@ -29,17 +28,15 @@ public class PhaseDTO {
     private Long organizationId;
     private Long countryId;
     private BigInteger parentCountryPhaseId;
-    private boolean allowFlipping;
-    private LocalTime flippingTime;
-    private DayOfWeek flippingDay;
     private int durationInDays;
+    private PhaseType phaseType;
 
 
-    public long getOrganizationId() {
+    public Long getOrganizationId() {
         return organizationId;
     }
 
-    public void setOrganizationId(long organizationId) {
+    public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
     }
 
@@ -105,36 +102,8 @@ public class PhaseDTO {
         this.countryId = countryId;
     }
 
-    public boolean isAllowFlipping() {
-        return allowFlipping;
-    }
-
-    public void setAllowFlipping(boolean allowFlipping) {
-        this.allowFlipping = allowFlipping;
-    }
-
-    public LocalTime getFlippingTime() {
-        return flippingTime;
-    }
-
-    public void setFlippingTime(LocalTime flippingTime) {
-        this.flippingTime = flippingTime;
-    }
-
-    public DayOfWeek getFlippingDay() {
-        return flippingDay;
-    }
-
-    public void setFlippingDay(DayOfWeek flippingDay) {
-        this.flippingDay = flippingDay;
-    }
-
     public void setSequence(int sequence) {
         this.sequence = sequence;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
     }
 
     public BigInteger getParentCountryPhaseId() {
@@ -143,6 +112,14 @@ public class PhaseDTO {
 
     public void setParentCountryPhaseId(BigInteger parentCountryPhaseId) {
         this.parentCountryPhaseId = parentCountryPhaseId;
+    }
+
+    public PhaseType getPhaseType() {
+        return phaseType;
+    }
+
+    public void setPhaseType(PhaseType phaseType) {
+        this.phaseType = phaseType;
     }
 
     public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
@@ -160,7 +137,7 @@ public class PhaseDTO {
     }
 
     public Phase buildPhaseForCountry() {
-        Phase phase = new Phase(this.name, this.description, this.duration, this.durationType, this.sequence, this.countryId, this.allowFlipping, this.flippingTime, this.flippingDay, this.organizationId, this.parentCountryPhaseId);
+        Phase phase = new Phase(this.name, this.description, this.duration, this.durationType, this.sequence, this.countryId, this.organizationId, this.parentCountryPhaseId, this.phaseType);
         return phase;
     }
 

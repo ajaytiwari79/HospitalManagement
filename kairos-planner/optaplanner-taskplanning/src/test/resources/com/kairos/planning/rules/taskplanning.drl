@@ -15,20 +15,20 @@ end
 rule "tasksChain for time"
 salience 15
     when
-        $task: Task (previousTaskOrVehicle instanceof Task  && $prevTask:previousTaskOrVehicle && !$task.isAfter((Task)$prevTask))
-        //$task: Task( previousTaskOrVehicle==$prevTask && employee!=null)
-    //Boolean(booleanValue == true) from ($task.getEmployee().equals( ((Task)$prevTask).getEmployee())  || !((Task)$task).isAfter(((Task)$prevTask)))
+        $task: Task (previousTaskOrVehicle instanceof Task  && $nextTask:previousTaskOrVehicle && !$task.isAfter((Task)$nextTask))
+        //$task: Task( previousTaskOrVehicle==$nextTask && employee!=null)
+    //Boolean(booleanValue == true) from ($task.getEmployee().equals( ((Task)$nextTask).getEmployee())  || !((Task)$task).isAfter(((Task)$nextTask)))
     then
         scoreHolder.addHardConstraintMatch(kcontext,1,- 10);
 end
-//&& $prevTask:previousTaskOrVehicle && !$task.isAfter((Task)$prevTask)
+//&& $nextTask:previousTaskOrVehicle && !$task.isAfter((Task)$nextTask)
 // && vehicle!=null && $vehicle: vehicle
 rule "tasksChain for employee"
 salience 14
     when
-        $task: Task (employee!=null && $employee : employee && previousTaskOrVehicle instanceof Task && $prevTask:previousTaskOrVehicle && $task.getEmployee()!=((Task)$prevTask).getEmployee() )
-        //$task: Task( previousTaskOrVehicle==$prevTask && employee!=null)
-   // Boolean(booleanValue == true) from ($task.getEmployee().equals( ((Task)$prevTask).getEmployee()))
+        $task: Task (employee!=null && $employee : employee && previousTaskOrVehicle instanceof Task && $nextTask:previousTaskOrVehicle && $task.getEmployee()!=((Task)$nextTask).getEmployee() )
+        //$task: Task( previousTaskOrVehicle==$nextTask && employee!=null)
+   // Boolean(booleanValue == true) from ($task.getEmployee().equals( ((Task)$nextTask).getEmployee()))
     then
         scoreHolder.addHardConstraintMatch(kcontext,2,- 1);
 end
@@ -111,7 +111,7 @@ end
 rule "dummyTask"
 salience  10
     when
-        $task:Task(nextTask==null)
+        $task:Task(prevTaskOrShift==null)
     then
         $task.setNextTask(new Task(1000000+$task.getId(),$task,$task.getVehicle(),$task.getEmployee(),0,$task.getLocation(),"DUMMY",TaskType.getDummyTaskType()));
 end

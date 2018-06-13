@@ -12,11 +12,13 @@ import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.service.shift.ShiftService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,8 +74,10 @@ public class OpenShiftService extends MongoBaseService {
             } else {
                 openShift = new OpenShift();
             }
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
+            BeanUtils.copyProperties(openShiftResponseDTO,openShift,openShiftResponseDTO.getStartDate().toString());
             openShift.setOrderId(orderId);
+            openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getFromTime()):
+                    DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
             openShifts.add(openShift);
 
         }
@@ -81,7 +85,6 @@ public class OpenShiftService extends MongoBaseService {
         int currentElement = 0;
         OpenShift openShiftCurrent;
         for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
-
             openShiftCurrent = openShifts.get(currentElement);
             currentElement++;
             ObjectMapperUtils.copyProperties(openShiftCurrent, openShiftResponseDTO);
@@ -95,7 +98,10 @@ public class OpenShiftService extends MongoBaseService {
         for (OpenShiftResponseDTO openShiftResponseDTO : openShiftResponseDTOs) {
             openShiftResponseDTO.setOrderId(orderId);
             OpenShift openShift = new OpenShift();
-            ObjectMapperUtils.copyProperties(openShiftResponseDTO, openShift);
+            BeanUtils.copyProperties(openShiftResponseDTO,openShift,openShiftResponseDTO.getStartDate().toString());
+            openShift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
+            openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getFromTime()):
+                    DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
             openShifts.add(openShift);
 
         }
@@ -103,7 +109,6 @@ public class OpenShiftService extends MongoBaseService {
     }
 
     public void deleteOpenShift(BigInteger openShiftId) {
-
         OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         if(!Optional.ofNullable(openShift).isPresent()) {
             throw new DataNotFoundByIdException("OpenShift does not exist by id"+ openShiftId);
@@ -113,15 +118,25 @@ public class OpenShiftService extends MongoBaseService {
     }
 
 
-    public List<OpenShift> getOpenshiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
+    public List<OpenShiftResponseDTO> getOpenshiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId) {
 
-    List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+        List<OpenShift> openShifts = openShiftMongoRepository.findOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+        List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
+        openShifts.forEach(openShift -> {
+            OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();
+            BeanUtils.copyProperties(openShift,openShiftResponseDTO,openShift.getStartDate().toString(),openShift.getEndDate().toString());
+            openShiftResponseDTO.setFromTime(DateUtils.asLocalTime(openShift.getStartDate()));
+            openShiftResponseDTO.setToTime(DateUtils.asLocalTime(openShift.getEndDate()));
+            openShiftResponseDTO.setStartDate(DateUtils.asLocalDate(openShift.getStartDate()));
+            openShiftResponseDTO.setEndDate(DateUtils.asLocalDate(openShift.getEndDate()));
+            openShiftResponseDTOS.add(openShiftResponseDTO);
+        });
 
-        return openShifts;
+        return openShiftResponseDTOS;
     }
-    public List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndCurrentDate(Long unitId, Date selectedDate) {
+    public List<OpenShift> getOpenShiftsByUnitIdAndCurrentDate(Long unitId, Date startDate,Date endDate) {
 
-        List<OpenShiftResponseDTO> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndSelectedDate(unitId, selectedDate);
+        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
 
         return openShifts;
     }
@@ -134,8 +149,9 @@ public class OpenShiftService extends MongoBaseService {
         Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,order.get().getExpertiseId());
 
         if (order.get().getShiftAssignmentCriteria().equals(PICKABLE)) {
-            ShiftDTO shiftDTO=new ShiftDTO(openShift.getActivityId(),unitId,staffId,unitPositionId,openShift.getStartDate(),openShift.getEndDate(),openShift.getFromTime(),openShift.getToTime());
-            shiftDTO.setShiftDate(openShift.getStartDate());
+            ShiftDTO shiftDTO=new ShiftDTO(openShift.getActivityId(),unitId,staffId,unitPositionId,DateUtils.asLocalDate(openShift.getStartDate()),
+                    DateUtils.asLocalDate(openShift.getEndDate()),DateUtils.asLocalTime(openShift.getStartDate()),DateUtils.asLocalTime(openShift.getStartDate()));
+            shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
             shiftDTO.setParentOpenShiftId(openShiftId);
             shiftService.createShift(unitId,shiftDTO,"Organization",false);
             openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()-1);
@@ -150,7 +166,18 @@ public class OpenShiftService extends MongoBaseService {
     }
 
     List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndOrderId(Long unitId,BigInteger orderId){
-       return openShiftMongoRepository.getOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+       List<OpenShift> openShifts= openShiftMongoRepository.getOpenShiftsByUnitIdAndOrderId(unitId,orderId);
+        List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
+        openShifts.forEach(openShift -> {
+            OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();
+            BeanUtils.copyProperties(openShift,openShiftResponseDTO,openShift.getStartDate().toString(),openShift.getEndDate().toString());
+            openShiftResponseDTO.setFromTime(DateUtils.asLocalTime(openShift.getStartDate()));
+            openShiftResponseDTO.setToTime(DateUtils.asLocalTime(openShift.getEndDate()));
+            openShiftResponseDTO.setStartDate(DateUtils.asLocalDate(openShift.getStartDate()));
+            openShiftResponseDTO.setEndDate(DateUtils.asLocalDate(openShift.getEndDate()));
+            openShiftResponseDTOS.add(openShiftResponseDTO);
+        });
+        return openShiftResponseDTOS;
     }
 
 }

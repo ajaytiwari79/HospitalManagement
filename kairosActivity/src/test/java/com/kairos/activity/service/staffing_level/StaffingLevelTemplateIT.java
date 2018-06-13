@@ -1,7 +1,7 @@
 package com.kairos.activity.service.staffing_level;
 
 import com.kairos.activity.KairosActivityApplication;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
+import com.kairos.activity.persistence.model.staffing_level.Duration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
 import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
@@ -65,17 +65,17 @@ public class StaffingLevelTemplateIT {
 
     private PresenceStaffingLevelDto getStaffingLevelDTO(){
 
-        StaffingLevelDuration duration=new StaffingLevelDuration(LocalTime.now(),LocalTime.now());
+        Duration duration=new Duration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
         PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlots=new ArrayList<>();
-        StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(0,5,10,new StaffingLevelDuration(LocalTime.now(),
+        StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(0,5,10,new Duration(LocalTime.now(),
                 LocalTime.now()) );
-        StaffingLevelTimeSlotDTO timeSlotDTO2=new StaffingLevelTimeSlotDTO(1,5,10,new StaffingLevelDuration(LocalTime.now(),
+        StaffingLevelTimeSlotDTO timeSlotDTO2=new StaffingLevelTimeSlotDTO(1,5,10,new Duration(LocalTime.now(),
                 LocalTime.now()) );
-        StaffingLevelTimeSlotDTO timeSlotDTO3=new StaffingLevelTimeSlotDTO(2,5,10,new StaffingLevelDuration(LocalTime.now(),
+        StaffingLevelTimeSlotDTO timeSlotDTO3=new StaffingLevelTimeSlotDTO(2,5,10,new Duration(LocalTime.now(),
                 LocalTime.now()) );
-        StaffingLevelTimeSlotDTO timeSlotDTO4=new StaffingLevelTimeSlotDTO(3,5,10,new StaffingLevelDuration(LocalTime.now(),
+        StaffingLevelTimeSlotDTO timeSlotDTO4=new StaffingLevelTimeSlotDTO(3,5,10,new Duration(LocalTime.now(),
                 LocalTime.now()) );
         staffingLevelTimeSlots.add(timeSlotDTO1);staffingLevelTimeSlots.add(timeSlotDTO2);
         staffingLevelTimeSlots.add(timeSlotDTO3); staffingLevelTimeSlots.add(timeSlotDTO4);

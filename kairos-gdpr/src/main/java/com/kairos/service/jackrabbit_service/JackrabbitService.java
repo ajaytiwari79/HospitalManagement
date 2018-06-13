@@ -9,8 +9,7 @@ import com.kairos.persistance.repository.agreement_template.AgreementSectionMong
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDto;
 import com.kairos.response.dto.clause.ClauseBasicResponseDto;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;

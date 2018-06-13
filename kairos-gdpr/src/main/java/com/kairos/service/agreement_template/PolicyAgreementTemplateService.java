@@ -2,19 +2,16 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.dto.PolicyAgreementTemplateDto;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
-import com.kairos.response.dto.agreement_template.PolicyAgreementTemplateResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDto;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -73,7 +70,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections=new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
 
-            if (accountTypeService.getAccountTypeList(accountTypeIds).size()!=0) {
+            if (accountTypeService.getAccountTypeList(countryId,accountTypeIds).size()!=0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
 
                 if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
@@ -141,7 +138,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplate updatePolicyAgreementTemplate(BigInteger id, PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
+    public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId,BigInteger id, PolicyAgreementTemplateDto policyAgreementTemplateDto) throws RepositoryException {
 
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -153,7 +150,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
-            if (accountTypeService.getAccountTypeList(accountTypeIds).size()!=0) {
+            if (accountTypeService.getAccountTypeList(countryId,accountTypeIds).size()!=0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
                     policyAgreementTemplate.setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes());

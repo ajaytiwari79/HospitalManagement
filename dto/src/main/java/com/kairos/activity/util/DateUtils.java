@@ -32,17 +32,22 @@ public class DateUtils {
         return localDateTimeToDate(endOfDay);
     }
 
+    public static LocalDate getCurrentLocalDate()
+    {
+        return LocalDate.now();
+    }
+
     public static LocalDate getLocalDateFromDate(Date date) {
 
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate;
     }
-
     public static Date convertLocalDateToDate(LocalDate dateToConvert) {
         return Date.from(dateToConvert.atStartOfDay()
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
     }
+
 
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -297,7 +302,7 @@ public class DateUtils {
     }
 
     public static LocalTime asLocalTime(Date date) {
-        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalTime();
+        return   LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalTime();
     }
 
     public static Date asDate(LocalTime localTime) {
@@ -327,6 +332,10 @@ public class DateUtils {
 
     public static Date addDays(final Date date, final int amount) {
         return add(date, Calendar.DAY_OF_MONTH, amount);
+    }
+
+    public static Date addMonths(final Date date, final int amount) {
+        return add(date, Calendar.MONTH, amount);
     }
 
     private static Date add(final Date date, final int calendarField, final int amount) {
@@ -361,6 +370,10 @@ public class DateUtils {
 
     public static Date getDate() {
         return new Date();
+    }
+
+    public static Date parseStringDate(String dateString, SimpleDateFormat dateFormat) throws  ParseException{
+        return dateFormat.parse(dateString);
     }
 
     public static Date getDate(long millis) {
@@ -424,12 +437,21 @@ public class DateUtils {
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),localTime.getHour(),localTime.getMinute()).toDate();
     }
 
+    public static Date getDateByLocalDate(LocalDate localDate){
+        return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),0,0).toDate();
+    }
+
     public static String getDateStringWithFormat(Date date, String dateFormat) {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
     }
-
+    /**
+     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
+     */
+    public static DateTime getDateTime(Date date, LocalTime time){
+        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
+    }
 
     public static List<LocalDate> getDates(LocalDate start, LocalDate end){
         List<LocalDate> dates= new ArrayList<>();
@@ -437,6 +459,14 @@ public class DateUtils {
             dates.add(ld);
         }
         return dates;
+    }
+
+    public static ZonedDateTime getZoneDateTime(Date date){
+        return ZonedDateTime.ofInstant(date.toInstant(),ZoneId.systemDefault());
+    }
+
+    public static Date getDateByZoneDateTime(ZonedDateTime zonedDateTime){
+        return Date.from(zonedDateTime.toInstant());
     }
 
     public static LocalDate addDurationInLocalDateExcludingLastDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber){
@@ -484,6 +514,43 @@ public class DateUtils {
                 ( period.getDays() >= 7 ? period.getDays() / 7 + " WEEKS " : "")+
                 ( period.getDays()%7 > 0 ? period.getDays() % 7 + " DAYS " : "") ;
 
+    }
+
+
+    public static Date getISOEndOfWeekDate(LocalDate date) {
+
+       Date endOfWeek  = Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                ZoneId.systemDefault()).with(DayOfWeek.SUNDAY).toInstant());
+
+        return endOfWeek;
+    }
+
+    public static Long getISOStartOfWeek(LocalDate date) {
+
+        Date startOfWeek  = Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                ZoneId.systemDefault()).with(DayOfWeek.MONDAY).toInstant());
+        return startOfWeek.getTime();
+    }
+
+
+    public static Long getLongFromLocalDate(LocalDate date) {
+       return date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public static LocalDate getDateFromEpoch(Long dateLong) {
+        LocalDate date = null;
+        if(Optional.ofNullable(dateLong).isPresent()) {
+            date = Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return date;
+    }
+
+    public static Date asDateEndOfDay(LocalDate localDate) {
+        return Date.from(localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date asDate(LocalDate localDate, LocalTime localTime) {
+        return Date.from(localDate.atTime(localTime).atZone(ZoneId.systemDefault()).toInstant());
     }
 
 }

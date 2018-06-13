@@ -3,15 +3,8 @@ package com.kairos.activity.service.wta;
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
-import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.response.dto.WTADTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
-import com.kairos.activity.custom_exception.InvalidRequestException;
-import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.tag.Tag;
 import com.kairos.activity.persistence.model.wta.*;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -33,7 +26,6 @@ import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -42,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,7 +72,8 @@ public class WTAService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Inject private OrganizationRestClient organizationRestClient;
+    @Inject
+    private OrganizationRestClient organizationRestClient;
 
     @Autowired
     private ExceptionService exceptionService;
@@ -101,7 +93,7 @@ public class WTAService extends MongoBaseService {
         //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId());
         WorkingTimeAgreement wta = wtaRepository.getWtaByName(wtaDTO.getName(), countryId);
         if (Optional.ofNullable(wta).isPresent()) {
-            exceptionService.duplicateDataException("message.wta.name.duplicate",wtaDTO.getName());
+            exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
         }
         wta = new WorkingTimeAgreement();
         // Link tags to WTA
@@ -114,7 +106,7 @@ public class WTAService extends MongoBaseService {
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
         wta.setStartDate(startDate);
         if (wtaDTO.getTags().size() > 0) {
@@ -218,13 +210,13 @@ public class WTAService extends MongoBaseService {
 
     private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta, WTADTO wtaDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getExpertiseResponse()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id",wtaDTO.getExpertiseId());
+            exceptionService.dataNotFoundByIdException("message.expertise.id", wtaDTO.getExpertiseId());
         }
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationType()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.type",wtaDTO.getOrganizationType());
+            exceptionService.dataNotFoundByIdException("message.organization.type", wtaDTO.getOrganizationType());
         }
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.subtype",wtaDTO.getOrganizationSubType());
+            exceptionService.dataNotFoundByIdException("message.organization.subtype", wtaDTO.getOrganizationSubType());
         }
         wta.setDescription(wtaDTO.getDescription());
         wta.setName(wtaDTO.getName());
@@ -250,16 +242,16 @@ public class WTAService extends MongoBaseService {
     public WTAResponseDTO updateWtaOfCountry(Long countryId, BigInteger wtaId, WTADTO updateDTO) {
 
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            exceptionService.actionNotPermittedException("message.wta.start-current-date",wtaId);
+            exceptionService.actionNotPermittedException("message.wta.start-current-date", wtaId);
         }
         WorkingTimeAgreement workingTimeAgreement = wtaRepository.getWtaByNameExcludingCurrent(updateDTO.getName(), countryId, wtaId, updateDTO.getOrganizationType(), updateDTO.getOrganizationSubType());
         if (Optional.ofNullable(workingTimeAgreement).isPresent()) {
-            exceptionService.duplicateDataException("message.wta.name.duplicate",updateDTO.getName());
+            exceptionService.duplicateDataException("message.wta.name.duplicate", updateDTO.getName());
         }
         WorkingTimeAgreement oldWta = wtaRepository.getWTAByCountryId(countryId, wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
-            exceptionService.dataNotFoundByIdException("message.wta.id",wtaId);
+            exceptionService.dataNotFoundByIdException("message.wta.id", wtaId);
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(updateDTO.getExpertiseId(), updateDTO.getOrganizationSubType(), countryId, 0l, updateDTO.getOrganizationType());
         oldWta = prepareWtaWhileUpdate(oldWta, updateDTO, wtaBasicDetailsDTO);
@@ -293,10 +285,10 @@ public class WTAService extends MongoBaseService {
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
         if (!oldWta.getOrganizationType().getId().equals(updateDTO.getOrganizationType())) {
-            exceptionService.actionNotPermittedException("message.organization.type.update",updateDTO.getOrganizationType());
+            exceptionService.actionNotPermittedException("message.organization.type.update", updateDTO.getOrganizationType());
         }
         if (!oldWta.getOrganizationSubType().getId().equals(updateDTO.getOrganizationSubType())) {
-           exceptionService.actionNotPermittedException("message.organization.subtype.update",updateDTO.getOrganizationSubType());
+            exceptionService.actionNotPermittedException("message.organization.subtype.update", updateDTO.getOrganizationSubType());
         }
         WorkingTimeAgreement versionWTA = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
         versionWTA.setId(null);
@@ -314,7 +306,7 @@ public class WTAService extends MongoBaseService {
 
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
             if (!Optional.ofNullable(wtaBasicDetailsDTO.getExpertiseResponse()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.expertise.id",updateDTO.getExpertiseId());
+                exceptionService.dataNotFoundByIdException("message.expertise.id", updateDTO.getExpertiseId());
             }
             oldWta.setExpertise(new WTAExpertise(wtaBasicDetailsDTO.getExpertiseResponse().getId(), wtaBasicDetailsDTO.getExpertiseResponse().getName(), wtaBasicDetailsDTO.getExpertiseResponse().getDescription()));
         }
@@ -329,13 +321,13 @@ public class WTAService extends MongoBaseService {
 
     public WTAResponseDTO getWta(BigInteger wtaId) {
         WTAQueryResultDTO wtaQueryResult = wtaRepository.getOne(wtaId);
-        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult,WTAResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class);
     }
 
     public boolean removeWta(BigInteger wtaId) {
         WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         if (!Optional.ofNullable(wta).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.wta.id",wtaId);
+            exceptionService.dataNotFoundByIdException("message.wta.id", wtaId);
         }
         wta.setDeleted(true);
         save(wta);
@@ -345,8 +337,8 @@ public class WTAService extends MongoBaseService {
     public List<WTAResponseDTO> getAllWTAByOrganizationId(long organizationId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationTypeId(organizationId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        wtaQueryResultDTOS.forEach(wta -> {
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
         });
         return wtaResponseDTOS;
     }
@@ -354,8 +346,8 @@ public class WTAService extends MongoBaseService {
     public List<WTAResponseDTO> getAllWTAByCountryId(long countryId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        wtaQueryResultDTOS.forEach(wta -> {
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
         });
         wtaResponseDTOS.forEach(wtaResponseDTO -> {
             wtaResponseDTO.setStartDateMillis(wtaResponseDTO.getStartDate().getTime());
@@ -368,9 +360,9 @@ public class WTAService extends MongoBaseService {
 
     public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithOrganization(organizationSubTypeId);
-        List<WTAResponseDTO> wtaResponseDTOS =  new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
+        wtaQueryResultDTOS.forEach(wta -> {
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
         });
         return wtaResponseDTOS;
     }
@@ -382,9 +374,9 @@ public class WTAService extends MongoBaseService {
             objectList.add(result.get("result"));
         }*/
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithOrganization(countryId);
-        List<WTAResponseDTO> wtaResponseDTOS= new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
+        wtaQueryResultDTOS.forEach(wta -> {
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
         });
         return wtaResponseDTOS;
     }
@@ -396,9 +388,9 @@ public class WTAService extends MongoBaseService {
             objectList.add(result.get("result"));
         }*/
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithWTAId(countryId, wtaId);
-        List<WTAResponseDTO> wtaResponseDTOS= new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
+        wtaQueryResultDTOS.forEach(wta -> {
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
         });
         return wtaResponseDTOS;
     }
@@ -419,13 +411,13 @@ public class WTAService extends MongoBaseService {
         /*List<WTARuleTemplateDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTARuleTemplateDTO>();*/
         WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(null, organizationSubTypeId, countryId, null, null);
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.subtype.id",organizationSubTypeId);
+            exceptionService.dataNotFoundByIdException("message.organization.subtype.id", organizationSubTypeId);
         }
         WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         //TODO need to again activate check
         //checkUniquenessOfData(countryId, organizationSubTypeId, wta.getOrganizationType().getId(), wta.getExpertise().getId());
         if (!Optional.ofNullable(wta).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.wta.id",wtaId);
+            exceptionService.dataNotFoundByIdException("message.wta.id", wtaId);
         }
         if (checked) {
             WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
@@ -438,7 +430,7 @@ public class WTAService extends MongoBaseService {
             wtaBuilderService.copyRuleTemplateToNewWTA(wta, newWtaObject);
             save(newWtaObject);
             WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wta.getId());
-            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO,WTAResponseDTO.class);
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
             newWtaObject.setCountryId(null);
             map.put("wta", newWtaObject);
             map.put("ruleTemplate", wtaResponseDTO.getRuleTemplates());
@@ -509,7 +501,7 @@ public class WTAService extends MongoBaseService {
         WorkingTimeAgreement oldWta = wtaRepository.findOne(wtadto.getId());
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating unit Employment Position for staff %d");
-            exceptionService.dataNotFoundByIdException("message.wta.id",wtadto.getId());
+            exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
 
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
@@ -519,7 +511,7 @@ public class WTAService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.expertise.update");
         }
         BeanUtils.copyProperties(oldWta, newWta, "id");
-        if(wtadto.getEndDateMillis()!=null){
+        if (wtadto.getEndDateMillis() != null) {
             oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
         }
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
@@ -566,22 +558,22 @@ public class WTAService extends MongoBaseService {
         return wtaDefaultDataInfoDTO;
     }
 
-    public List<WTAResponseDTO> getWTAByIds(List<BigInteger> wtaIds){
+    public List<WTAResponseDTO> getWTAByIds(List<BigInteger> wtaIds) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByIds(wtaIds);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        wtaQueryResultDTOS.forEach(wta -> {
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
         });
         return wtaResponseDTOS;
     }
 
-    public WTAResponseDTO assignWTAToUnitPosition(BigInteger wtaId){
+    public WTAResponseDTO assignWTAToUnitPosition(BigInteger wtaId) {
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO,WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
         if (!Optional.ofNullable(wtaResponseDTO).isPresent()) {
             exceptionService.duplicateDataException("message.wta.id", wtaId);
         }
-        WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO,WorkingTimeAgreement.class);
+        WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (wtaResponseDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
@@ -594,18 +586,18 @@ public class WTAService extends MongoBaseService {
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());
         workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
         save(workingTimeAgreement);
-        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement,WTAResponseDTO.class);
+        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         return wtaResponseDTO;
 
     }
 
-    public Boolean assignWTAToNewOrganization(List<Long> subTypeIds, Long organisationId, Long countryId){
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTABySubType(subTypeIds,countryId);
+    public Boolean assignWTAToNewOrganization(List<Long> subTypeIds, Long organisationId, Long countryId) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTABySubType(subTypeIds, countryId);
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(w->{
-            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w,WTAResponseDTO.class);
-            WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO,WorkingTimeAgreement.class);
+        wtaQueryResultDTOS.forEach(w -> {
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w, WTAResponseDTO.class);
+            WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
             List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
             if (wtaResponseDTO.getRuleTemplates().size() > 0) {
                 ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
@@ -614,7 +606,7 @@ public class WTAService extends MongoBaseService {
                 workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
             }
             workingTimeAgreement.setId(null);
-            workingTimeAgreement.setOrganization(new WTAOrganization(organisationId,"",""));
+            workingTimeAgreement.setOrganization(new WTAOrganization(organisationId, "", ""));
             workingTimeAgreement.setCountryParentWTA(w.getId());
             workingTimeAgreement.setCountryId(null);
             workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
@@ -623,10 +615,14 @@ public class WTAService extends MongoBaseService {
             //wtaResponseDTO.setRuleTemplate(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
 
         });
-        if(!workingTimeAgreements.isEmpty()){
+        if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);
         }
         return true;
+    }
+
+    public List<WorkingTimeAgreement> findAllByIdAndDeletedFalse(Set<BigInteger> wtaIds) {
+        return wtaRepository.findAllByIdsInAndDeletedFalse(wtaIds);
     }
 
 

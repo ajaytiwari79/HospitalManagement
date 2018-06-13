@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.utils.userContext.UserContextInterceptor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,6 +23,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 @EnableEurekaClient
@@ -108,6 +110,8 @@ public class KairosGdprApplication {
                 .build();
         return template;
     }*/
+
+
 
 
 

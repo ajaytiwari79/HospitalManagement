@@ -76,7 +76,7 @@ public class TimeBankCalculationService {
             dailyTimeBankEntry.setScheduledMin(0);
             dailyTimeBankEntry.setTimeBankMinWithoutCta(0);
             dailyTimeBankEntry.setTimeBankMinWithCta(0);
-            dailyTimeBankEntry.setStaffId(ctaDto.getStaffId());
+            dailyTimeBankEntry.setStaff(ctaDto.getStaff());
             dailyTimeBankEntry.setTimeBankCTADistributionList(getDistribution(ctaDto));
         }*/
         return dailyTimeBank;
@@ -358,6 +358,41 @@ public class TimeBankCalculationService {
             }
         }
         return contractualMinutes;
+    }
+
+    public int calculateOnlyTimeBankForInterval(Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO,boolean isByOverView,List<DailyTimeBankEntry> dailyTimeBankEntries,boolean calculateContractual) {
+        List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
+        if(!calculateContractual){
+            dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d->DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toList());
+        }
+        if(isByOverView) {
+            interval = getIntervalByDateForOverview(unitPositionWithCtaDetailsDTO, interval);
+        }else {
+            interval = getIntervalByDateForAdvanceView(unitPositionWithCtaDetailsDTO, interval);
+        }
+        int contractualMinutes = 0;
+        int count = 0;
+        if(interval!=null) {
+            if (unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() == 7) {
+                while (interval.getStart().isBefore(interval.getEnd())) {
+                    if(calculateContractual || !dailyTimeBanksDates.contains(interval.getStart().toLocalDate())) {
+                        count++;
+                    }
+                    interval = interval.withStart(interval.getStart().plusDays(1));
+                }
+                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
+            } else {
+                DateTime startDate = interval.getStart();
+                while (startDate.isBefore(interval.getEnd())) {
+                    if ((calculateContractual || !dailyTimeBanksDates.contains(startDate.toLocalDate())) && startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY) {
+                        count++;
+                    }
+                    startDate = startDate.plusDays(1);
+                }
+                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek());
+            }
+        }
+        return !calculateContractual? -contractualMinutes : contractualMinutes;
     }
 
 

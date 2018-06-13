@@ -54,7 +54,6 @@ public class SpringMailConfig implements ApplicationContextAware, EnvironmentAwa
         final Properties javaMailProperties = new Properties();
         javaMailProperties.load(this.applicationContext.getResource(JAVA_MAIL_FILE).getInputStream());
         mailSender.setJavaMailProperties(javaMailProperties);
-
         return mailSender;
     }
 
