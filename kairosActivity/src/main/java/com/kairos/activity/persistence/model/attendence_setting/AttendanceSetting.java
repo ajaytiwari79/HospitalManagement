@@ -10,7 +10,7 @@ import java.util.List;
 
 
 public class AttendanceSetting extends MongoBaseEntity{
-    private Long staffId;
+    private Long userId;
     private Long unitId;
     private LocalDate currentDate;
     private List<Duration> attendanceDuration =new ArrayList<>();
@@ -18,18 +18,19 @@ public class AttendanceSetting extends MongoBaseEntity{
     public AttendanceSetting() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId, LocalDate currentDate) {
-        this.staffId = staffId;
+    public AttendanceSetting(Long unitId, Long userId, LocalDate currentDate) {
+        this.userId = userId;
         this.unitId = unitId;
         this.currentDate=currentDate;
 
     }
-    public Long getStaffId() {
-        return staffId;
+
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getUnitId() {

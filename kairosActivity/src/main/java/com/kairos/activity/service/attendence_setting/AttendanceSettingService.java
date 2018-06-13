@@ -18,19 +18,19 @@ public class AttendanceSettingService extends MongoBaseService{
 @Inject
 private AttendanceSettingRepository attendanceSettingRepository;
 
-public Duration getAttendanceSetting(Long unitId, Long staffId) {
+public Duration getAttendanceSetting(Long unitId, Long userId) {
     LocalDate currentDate= DateUtils.getCurrentLocalDate();
     Duration attendanceDuration=new Duration();
-    AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
+    AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUnitIdAndUserIdAndDate(unitId,userId,currentDate);
     if(Optional.ofNullable(AttendanceSetting).isPresent()) {
      attendanceDuration=AttendanceSetting.getAttendanceDuration().get(AttendanceSetting.getAttendanceDuration().size()-1);
     }
     return attendanceDuration;
 }
 
-public Duration updateAttendanceSetting(Long unitId, Long staffId, Duration attendanceDuration) {
+public Duration updateAttendanceSetting(Long unitId, Long userId, Duration attendanceDuration) {
     LocalDate currentDate= DateUtils.getCurrentLocalDate();
-    AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
+    AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUnitIdAndUserIdAndDate(unitId,userId,currentDate);
     if(Optional.ofNullable(attendanceSetting).isPresent()) {
         if(attendanceDuration.getTo()!=null){
             Duration duration=attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1);
@@ -41,7 +41,7 @@ public Duration updateAttendanceSetting(Long unitId, Long staffId, Duration atte
             attendanceSetting.getAttendanceDuration().add(attendanceDuration);
         }
     }else {
-        attendanceSetting = new AttendanceSetting(unitId, staffId,currentDate);
+        attendanceSetting = new AttendanceSetting(unitId, userId,currentDate);
         attendanceSetting.getAttendanceDuration().add(attendanceDuration);
     }
     save(attendanceSetting);
