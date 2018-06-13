@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 /**
  * Created by oodles on 1/2/17.
@@ -546,6 +547,11 @@ public class DateUtils {
 
     public static Date asDate(LocalDate localDate, LocalTime localTime) {
         return Date.from(localDate.atTime(localTime).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date getStartDateOfWeekFromDate(LocalDate date){
+        return asDate(date.with(previousOrSame(DayOfWeek.MONDAY)));
+
     }
 
 }

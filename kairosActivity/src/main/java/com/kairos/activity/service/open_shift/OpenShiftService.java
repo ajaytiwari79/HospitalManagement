@@ -3,13 +3,18 @@ package com.kairos.activity.service.open_shift;
 import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftAndActivityWrapper;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.activity.persistence.model.open_shift.Order;
+import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.service.mail.MailService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.service.shift.ShiftService;
@@ -17,9 +22,10 @@ import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
-import com.kairos.activity.persistence.model.open_shift.OpenShiftAndActivityWrapper;
+import com.kairos.response.dto.web.open_shift.OpenShiftDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftWrapper;
+import com.kairos.response.dto.web.staff.Staff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,8 +37,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.PICKABLE;
-import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.SHOW_INTEREST_APPROVAL_BY_PLANNER;
+import static com.kairos.activity.constants.AppConstants.*;
+import static com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria.*;
 
 @Service
 @Transactional
@@ -53,6 +59,9 @@ public class OpenShiftService extends MongoBaseService {
     @Inject
     private TimeBankService timeBankService;
     @Inject private TimeBankCalculationService timeBankCalculationService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private MailService mailService;
+    @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
 
     public OpenShiftResponseDTO createOpenShift(OpenShiftResponseDTO openShiftResponseDTO) {
 
@@ -153,19 +162,19 @@ public class OpenShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShift", openShiftId);
         }
         Optional<Order> order=orderMongoRepository.findById(openShift.getOrderId());
-        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,order.get().getExpertiseId());
 
         if (order.get().getShiftAssignmentCriteria().equals(PICKABLE)) {
-            ShiftDTO shiftDTO=new ShiftDTO(openShift.getActivityId(),unitId,staffId,unitPositionId,DateUtils.asLocalDate(openShift.getStartDate()),
-                    DateUtils.asLocalDate(openShift.getEndDate()),DateUtils.asLocalTime(openShift.getStartDate()),DateUtils.asLocalTime(openShift.getStartDate()));
-            shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
-            shiftDTO.setParentOpenShiftId(openShiftId);
-            shiftService.createShift(unitId,shiftDTO,"Organization",false);
-            openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired()-1);
-
+            assignShiftToStaff(openShift,unitId,staffId,order.get());
         } else if (order.get().getShiftAssignmentCriteria().equals(SHOW_INTEREST_APPROVAL_BY_PLANNER)) {
             openShift.getInterestedStaff().add(staffId);
         }
+        else if(order.get().getShiftAssignmentCriteria().equals(PICKABLE_APPROVAL_BY_PLANNER)){
+
+        }
+        else if(order.get().getShiftAssignmentCriteria().equals(SHOW_INTEREST_AUTO_SELECT)){
+
+        }
+
         save(openShift);
         OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
         ObjectMapperUtils.copyProperties(openShift, openShiftResponseDTO);
@@ -191,10 +200,49 @@ public class OpenShiftService extends MongoBaseService {
         OpenShiftAndActivityWrapper openShiftAndActivityWrapper=openShiftMongoRepository.getOpenShiftAndActivity(openShiftId,unitId);
         Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,openShiftAndActivityWrapper.getExpertiseId());
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
-        timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShiftAndActivityWrapper.getOpenShift(),openShiftAndActivityWrapper.getActivity(),unitPositionWithCtaDetailsDTO);
-        OpenShiftWrapper openShiftWrapper=new OpenShiftWrapper();
+        OpenShift openShift=openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
+        Date startDate=DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
+        Date endDate =DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));
+        List<OpenShiftDTO> similarShifts=openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftAndActivityWrapper.getActivity().getId(), startDate,endDate);
+        int [] data= timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift,openShiftAndActivityWrapper.getActivity(),unitPositionWithCtaDetailsDTO);
+        OpenShiftWrapper openShiftWrapper=new OpenShiftWrapper(data[0],data[1],0,similarShifts);
         return openShiftWrapper;
 
+    }
+
+    public boolean notifyStaff(Long unitId,BigInteger openShiftId,List<Long> staffIds,String action){
+        OpenShift openShift=openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
+        if (!Optional.ofNullable(openShift).isPresent()) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShift", openShiftId);
+        }
+        if(action.equals(ASSIGN)){
+            Optional<Order> order=orderMongoRepository.findById(openShift.getOrderId());
+            staffIds.forEach(staffId->{
+                assignShiftToStaff(openShift,unitId,staffId,order.get());
+            });
+            }
+        else if(action.equals(NOTIFY)){
+            List<String> emails=genericIntegrationService.getEmailsOfStaffByStaffIds(unitId,staffIds);
+            String [] recievers = emails.toArray(new String[emails.size()]);
+            mailService.sendMailWithAttachment(recievers,SHIFT_NOTIFICATION,SHIFT_NOTIFICATION_MESSAGE,null);
+            List<OpenShiftNotification> openShiftNotifications=new ArrayList<>();
+            staffIds.forEach(staffId->{
+                openShiftNotifications.add(new OpenShiftNotification(openShiftId,staffId));
+            });
+            save(openShiftNotifications);
+            }
+        return true;
+    }
+    private boolean assignShiftToStaff(OpenShift openShift,Long unitId,Long staffId,Order order) {
+        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,order.getExpertiseId());
+        ShiftDTO shiftDTO = new ShiftDTO(openShift.getActivityId(), unitId, staffId, unitPositionId, DateUtils.asLocalDate(openShift.getStartDate()),
+                DateUtils.asLocalDate(openShift.getEndDate()), DateUtils.asLocalTime(openShift.getStartDate()), DateUtils.asLocalTime(openShift.getStartDate()));
+        shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
+        shiftDTO.setParentOpenShiftId(openShift.getId());
+        shiftService.createShift(unitId, shiftDTO, "Organization", false);
+        openShift.setNoOfPersonRequired(openShift.getNoOfPersonRequired() - 1);
+        openShift.getAssignedStaff().add(staffId);
+        return true;
     }
 
 }

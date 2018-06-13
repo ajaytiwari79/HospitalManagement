@@ -1891,4 +1891,8 @@ public class StaffService extends UserBaseService {
         return staffsUnitPositions;
     }
 
+    public List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds) {
+        return staffGraphRepository.getEmailsOfStaffByStaffIds(staffIds);
+    }
+
 }

@@ -363,6 +363,7 @@ public class Shift extends MongoBaseEntity {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
     }
-
-
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+    }
 }

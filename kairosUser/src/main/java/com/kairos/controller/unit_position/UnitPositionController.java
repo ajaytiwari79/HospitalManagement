@@ -122,4 +122,6 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> getStaffsUnitPosition(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getStaffsUnitPosition(unitId,expertiseId, staffList));
     }
+
+
 }

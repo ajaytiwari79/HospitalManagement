@@ -475,4 +475,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
+
+    @Query("MATCH(staff:Staff) where id(staff) in {0} RETURN staff.email")
+    List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds);
 }

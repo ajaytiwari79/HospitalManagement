@@ -1018,5 +1018,4 @@ public class UnitPositionService extends UserBaseService {
                 staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffId);
         return staffData;
     }
-
 }

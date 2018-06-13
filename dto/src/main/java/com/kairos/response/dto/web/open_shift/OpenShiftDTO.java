@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 public class OpenShiftDTO {
+    private BigInteger id;
     private Date startDate;
     private Date endDate;
     private Integer noOfPersonRequired;
@@ -30,6 +31,14 @@ public class OpenShiftDTO {
         this.orderId = orderId;
         this.activityId = activityId;
         this.parentOpenShiftId = parentOpenShiftId;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public Date getStartDate() {

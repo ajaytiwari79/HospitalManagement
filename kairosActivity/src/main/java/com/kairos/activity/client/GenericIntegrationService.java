@@ -21,8 +21,8 @@ import java.util.Map;
 public class GenericIntegrationService {
     @Autowired
     GenericRestClient genericRestClient;
-    @Inject
-    private ExceptionService exceptionService;
+    @Autowired
+    ExceptionService exceptionService;
 
     public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId) {
         Integer value = genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/expertise/{expertiseId}/unitPositionId", null, staffId, expertiseId);
@@ -42,7 +42,12 @@ public class GenericIntegrationService {
 
     public List<StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, List<Long> staffIds, Long expertiseId) {
         List<StaffUnitPositionDetails> staffData = ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/expertise/{expertiseId}/unitPositions", null, expertiseId),StaffUnitPositionDetails.class);
-
         return  staffData;
     }
+
+    public List<String> getEmailsOfStaffByStaffIds(Long unitId,List<Long> staffIds) {
+        return genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/staff/emails", null);
+    }
+
+
 }
