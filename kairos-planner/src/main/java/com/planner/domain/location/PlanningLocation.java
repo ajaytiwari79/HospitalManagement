@@ -1,10 +1,11 @@
 package com.planner.domain.location;
 
+import com.planner.domain.MongoBaseEntity;
 import com.planner.domain.common.BaseEntity;
 //import org.springframework.data.cassandra.core.mapping.Table;
 
 ////@Table
-public class PlanningLocation extends BaseEntity {
+public class PlanningLocation extends MongoBaseEntity {
 
     private boolean isUnitAddress;
     private String country;

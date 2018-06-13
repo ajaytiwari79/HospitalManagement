@@ -1,7 +1,7 @@
 package com.kairos.activity.service.staffing_level;
 
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
+import com.kairos.activity.persistence.model.staffing_level.Duration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import org.junit.runner.RunWith;
@@ -57,7 +57,7 @@ public class StaffingLevelImportITTest {
         assertTrue(staffingLevels.size() == 7);
         StaffingLevel staffingLevel = staffingLevels.get(5);
         List<StaffingLevelInterval> staffingLevelIntervalList = staffingLevel.getPresenceStaffingLevelInterval();
-        StaffingLevelDuration duration = null;
+        Duration duration = null;
 
         LocalTime excelFrom = LocalTime.of(16, 0);
         for (StaffingLevelInterval interval : staffingLevelIntervalList) {

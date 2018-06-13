@@ -1,6 +1,6 @@
 package com.kairos.activity.response.dto.staffing_level;
 
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
+import com.kairos.activity.persistence.model.staffing_level.Duration;
 
 public class StaffingLevelActivityWithDuration {
 
@@ -10,7 +10,7 @@ public class StaffingLevelActivityWithDuration {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    private StaffingLevelDuration staffingLevelDuration;
+    private Duration staffingLevelDuration;
 
     public String getName() {
         return name;
@@ -52,15 +52,15 @@ public class StaffingLevelActivityWithDuration {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public StaffingLevelDuration getStaffingLevelDuration() {
+    public Duration getStaffingLevelDuration() {
         return staffingLevelDuration;
     }
 
-    public void setStaffingLevelDuration(StaffingLevelDuration staffingLevelDuration) {
+    public void setStaffingLevelDuration(Duration staffingLevelDuration) {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
-    public StaffingLevelActivityWithDuration(Long activityId, int minNoOfStaff, int maxNoOfStaff, StaffingLevelDuration staffingLevelDuration) {
+    public StaffingLevelActivityWithDuration(Long activityId, int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
         this.activityId = activityId;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;

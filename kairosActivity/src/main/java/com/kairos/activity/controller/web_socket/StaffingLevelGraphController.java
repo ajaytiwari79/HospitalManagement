@@ -2,7 +2,7 @@ package com.kairos.activity.controller.web_socket;
 
 import com.kairos.activity.constants.ApiConstants;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
+import com.kairos.activity.persistence.model.staffing_level.Duration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
 import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
@@ -34,14 +34,14 @@ public class StaffingLevelGraphController {
     @RequestMapping(value = API_ORGANIZATION_UNIT_URL+"/staffing_level/graph", method = RequestMethod.GET)
     public PresenceStaffingLevelDto dynamicStaffingLevelGraphSyncResponsetest(){
 
-        StaffingLevelDuration duration=new StaffingLevelDuration(LocalTime.now(),LocalTime.now());
+        Duration duration=new Duration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
         PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlots=new ArrayList<>();
 
         for(int i=0;i<=95;i++){
             int Random = (int)(Math.random()*12);
-            StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(i,5,10,new StaffingLevelDuration(LocalTime.of(0,0),
+            StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(i,5,10,new Duration(LocalTime.of(0,0),
                     LocalTime.of(0,15)) );
             timeSlotDTO1.setAvailableNoOfStaff(Random);
             StaffingLevelActivity activity=new StaffingLevelActivity(1L,6,6);
