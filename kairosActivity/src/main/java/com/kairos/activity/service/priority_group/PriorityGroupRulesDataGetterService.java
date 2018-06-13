@@ -155,7 +155,7 @@ public class PriorityGroupRulesDataGetterService {
                 plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMin() + d.getTimeBankMinWithCta()).sum();
-                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(new Interval(staffUnitPositionQueryResult.getStartDate(),endDate),
+                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(new Interval(DateUtils.asDate(DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate())).getTime(),endDate),
                         unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
 
                 deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(new Interval(startDateDeltaWeek,endDateDeltaWeek),
@@ -166,6 +166,7 @@ public class PriorityGroupRulesDataGetterService {
                 staffUnitPositionQueryResult.setPlannedHoursWeek(plannedHoursWeekly);
 
             }
+
         }
     }
 
