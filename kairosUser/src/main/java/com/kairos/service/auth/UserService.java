@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.SmsService;
@@ -62,6 +63,8 @@ public class UserService extends UserBaseService {
     private AccessGroupService accessGroupService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
 
 
     /**
@@ -594,5 +597,10 @@ public class UserService extends UserBaseService {
         });
         save(users);
         return true;
+    }
+
+    public String getSystemLanguageOfUser(Long userId){
+        String language =  countryGraphRepository.getSystemLanguageOfUser(userId);
+        return (Optional.ofNullable(language).orElse(""));
     }
 }

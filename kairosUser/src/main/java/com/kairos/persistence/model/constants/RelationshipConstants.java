@@ -253,8 +253,9 @@ public abstract class RelationshipConstants {
     public final static String HAS_STAFF_SETTINGS="HAS_STAFF_SETTINGS";
     public final static String HAS_OPEN_SHIFT_SETTINGS="HAS_OPEN_SHIFT_SETTINGS";
 
+// System Langugae
 
-
+    public final static String HAS_SYSTEM_LANGUAGE="HAS_SYSTEM_LANGUAGE";
 
 
     /**
