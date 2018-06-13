@@ -152,7 +152,7 @@ public class WTAService extends MongoBaseService {
         {
             if (!organization.isKairosHub()) {
                 WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
-                wtaBuilderService.copyWta(wta, workingTimeAgreement);
+                wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
                 workingTimeAgreement.setCountryParentWTA(wta.getId());
                 workingTimeAgreement.setDisabled(false);
                 if (wtadto.getRuleTemplates().size() > 0) {
