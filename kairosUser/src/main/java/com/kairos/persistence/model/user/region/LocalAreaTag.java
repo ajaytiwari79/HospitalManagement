@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TIME_WINDOW;
 import static com.kairos.persistence.model.constants.RelationshipConstants.LAT_LNG;
 
 /**
@@ -27,6 +28,12 @@ public class LocalAreaTag extends UserBaseEntity {
     @Relationship(type = LAT_LNG)
     private List<LatLng> paths = new ArrayList<>();
 
+
+    //It tells Us When this area is Busiest in these day Time Window
+    @Relationship(type = HAS_TIME_WINDOW)
+    private List<DayTimeWindow> dayTimeWindows;
+
+
     public boolean isDeleted() {
         return isDeleted;
     }
@@ -39,6 +46,14 @@ public class LocalAreaTag extends UserBaseEntity {
 
     public LocalAreaTag(){
 
+    }
+
+    public List<DayTimeWindow> getDayTimeWindows() {
+        return dayTimeWindows;
+    }
+
+    public void setDayTimeWindows(List<DayTimeWindow> dayTimeWindows) {
+        this.dayTimeWindows = dayTimeWindows;
     }
 
     public LocalAreaTag(String name, List<LatLng> paths) {

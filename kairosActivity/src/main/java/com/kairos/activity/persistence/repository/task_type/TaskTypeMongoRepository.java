@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.task_type;
 
 import com.kairos.activity.persistence.model.task_type.TaskType;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.activity.response.dto.TaskTypeDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -44,5 +45,8 @@ public interface TaskTypeMongoRepository extends MongoBaseRepository<TaskType,Bi
     List<TaskType> getTaskTypesForCopySettings(String id);
 
     TaskType findByOrganizationIdAndRootIdAndSubServiceId(long organizationId, BigInteger rootId, long subServiceId);
+
+    @Query(value = "{'organizationId':0,deleted:false,isEnabled:true}",fields = "{'title' : 1,'description':1}")
+    List<TaskTypeDTO> getTaskTypesOfOrganisation(Long organizationId);
 
 }

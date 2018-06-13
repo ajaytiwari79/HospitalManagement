@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.processing_activity_masterd
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingPurpose;
 import com.kairos.service.master_data_management.processing_activity_masterdata.ProcessingPurposeService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -39,11 +40,11 @@ public class ProcessingPurposeController {
 
     @ApiOperation("add processing purpose")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @RequestBody List<ProcessingPurpose> processingPurposes) {
+    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<ProcessingPurpose> processingPurposes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, processingPurposes));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, processingPurposes.getRequestBody()));
 
     }
 

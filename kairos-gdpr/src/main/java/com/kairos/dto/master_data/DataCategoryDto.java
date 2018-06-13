@@ -6,6 +6,7 @@ import com.kairos.persistance.model.master_data_management.data_category_element
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
@@ -15,10 +16,11 @@ import java.util.Set;
 public class DataCategoryDto {
 
 
-    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "Name  can't be  Empty")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
+    @NotNull(message = "Data Element can't be  Empty")
     @Valid
     List<DataElement> dataElements;
 

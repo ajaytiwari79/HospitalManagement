@@ -175,8 +175,8 @@ public class PriorityGroupService extends MongoBaseService {
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
 
-        ObjectMapperUtils.copyProperties(priorityGroups,priorityGroupDTOs);
-        return  priorityGroupDTOs;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroups,PriorityGroupDTO.class);
+        //return  priorityGroupDTOs;
     }
     public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
         List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyProperties(priorityGroupDTOs,PriorityGroup.class);

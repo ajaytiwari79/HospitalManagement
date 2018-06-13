@@ -17,19 +17,18 @@ import java.util.Set;
 @Document(collection = "agreement_template")
 public class PolicyAgreementTemplate extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Name cannot be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "error.agreement.description.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNull(message = "error.list.cannot.be.empty")
+    @NotNull(message = "Account types cannot be empty ")
     private Set<BigInteger> accountTypes;
 
-    @NotNull(message = "error.list.cannot.be.empty")
+    @NotNull(message = "Sections cannot be emoty")
     private Set<BigInteger> agreementSections;
 
-    @NotNull(message = "error.countryId.cannot.be.null")
     private Long countryId;
 
 

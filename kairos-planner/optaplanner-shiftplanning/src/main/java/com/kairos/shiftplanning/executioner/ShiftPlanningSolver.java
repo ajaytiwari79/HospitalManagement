@@ -256,7 +256,7 @@ public class ShiftPlanningSolver {
 
     private void printSolvedSolution(Object[] output) {
         ShiftRequestPhasePlanningSolution solution = (ShiftRequestPhasePlanningSolution) output[0];
-		log.info("-------Printing Solution:-------");
+		log.info("-------Printing solution:-------");
         log.info("total intervals:"+solution.getActivityLineIntervals().stream().count());
         log.info("total assigned intervals:"+solution.getActivityLineIntervals().stream().filter(i->i.getShift()!=null).count());
 		/*Map<ShiftRequestPhase,List<ActivityLineInterval>> shiftsAssignedToActivityIntervals= new HashMap<>();
@@ -294,7 +294,7 @@ public class ShiftPlanningSolver {
         /*shiftsAssignedToSkillIntervals.forEach((shift,v)->{
             log.info("Shift S--------"+shift.getId().toString()+":["+shift.getInterval()+"]:"+getMergedInterval(v.stream().map(i->i.getInterval()).sorted((i1,i2)->i1.getStart().compareTo(i2.getStart())).collect(Collectors.toList())) );
         });*/
-        log.info("-------Printing Solution Finished:-------");
+        log.info("-------Printing solution Finished:-------");
     }
 
 	private void printStaffingLines(List<ActivityLineInterval> activityLineIntervals) {

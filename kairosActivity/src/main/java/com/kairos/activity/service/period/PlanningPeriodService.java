@@ -3,8 +3,6 @@ package com.kairos.activity.service.period;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
@@ -17,8 +15,6 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.period.PeriodPhaseFlippingDateDTO;
 import com.kairos.response.dto.web.period.PlanningPeriodDTO;
-import org.apache.tomcat.jni.Local;
-import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,11 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -56,7 +48,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId){
-        List<PhaseDTO> phases = phaseService.getApplicablePhasesByOrganizationId(unitId);
+        List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
         phases.forEach(phase->{
             switch (phase.getDurationType()){
                 case DAYS:{
@@ -83,7 +75,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
     // To fetch list of planning periods
     public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, LocalDate startDate, LocalDate endDate){
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
+        List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
 
         // Prepare map for phases with id as key and sequence as value
         Map<BigInteger,Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
@@ -229,7 +221,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public PlanningPeriod updatePhaseFlippingDateOfPeriod(PlanningPeriod planningPeriod, PlanningPeriodDTO planningPeriodDTO, Long unitId){
         List<PeriodPhaseFlippingDate>  phaseFlippingDateList = planningPeriod.getPhaseFlippingDate();
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
+        List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
         Map<BigInteger,Integer> phasesMap = getMapOfPhasesIdAndSequence(phases);
 
         for(PeriodPhaseFlippingDate phaseFlippingDate : phaseFlippingDateList){
@@ -453,7 +445,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }*/
 
     /*public LinkedHashMap<Integer, Integer> getPhasesWithSuccessiveDurationInDays(Long unitId){
-        List<PhaseDTO> phases = phaseService.getApplicablePhasesByOrganizationId(unitId);
+        List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
         LinkedHashMap<Integer, Integer> phasesMap = new LinkedHashMap<Integer, Integer>(4);
         int duration = 0;
         for(PhaseDTO phase : phases){
@@ -544,7 +536,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }*/
 
     /*public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, Date startDate, Date endDate){
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
+        List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
 
         // Prepare map for phases with id as key and sequence as value
         Map<BigInteger,Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
@@ -608,7 +600,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
     /*public PlanningPeriod updatePhaseFlippingDateOfPeriod(PlanningPeriod planningPeriod, PlanningPeriodDTO planningPeriodDTO, Long unitId){
         List<PeriodPhaseFlippingDate>  phaseFlippingDateList = planningPeriod.getPhaseFlippingDate();
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
+        List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
         Map<BigInteger,Integer> phasesMap = getMapOfPhasesIdAndSequence(phases);
 
         for(PeriodPhaseFlippingDate phaseFlippingDate : phaseFlippingDateList){

@@ -29,7 +29,6 @@ public class MasterAsset extends MongoBaseEntity {
     @NotNull
     private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
     public Long getCountryId() {
