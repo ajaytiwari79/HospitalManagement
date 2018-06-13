@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @Controller
 @RequestMapping(API_ORGANIZATION_URL )
@@ -24,7 +25,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 public class SystemLanguageController {
 
     @Inject
-    SystemLanguageService systemLanguageService;
+    private SystemLanguageService systemLanguageService;
 
     @RequestMapping(value = "/system_language", method = RequestMethod.POST)
     @ApiOperation("To add System Language")
@@ -53,5 +54,13 @@ public class SystemLanguageController {
     public ResponseEntity<Map<String, Object>> deleteSystemLanguage(@PathVariable Long systemLanguageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.deleteSystemLanguage(systemLanguageId));
     }
+
+    @RequestMapping(value = COUNTRY_URL + "/system_language/{systemLanguageId}", method = RequestMethod.PUT)
+    @ApiOperation("To update System Language of Country")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateSystemLanguageOfCountry(@PathVariable Long countryId, @PathVariable Long systemLanguageId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateSystemLanguageOfCountry(countryId, systemLanguageId));
+    }
+
 
 }

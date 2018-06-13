@@ -2,7 +2,9 @@ package com.kairos.service.system_setting;
 
 
 import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.system_setting.SystemLanguageDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -22,9 +24,11 @@ public class SystemLanguageService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    ExceptionService exceptionService;
+    private ExceptionService exceptionService;
     @Inject
-    SystemLanguageGraphRepository systemLanguageGraphRepository;
+    private SystemLanguageGraphRepository systemLanguageGraphRepository;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
 
     public SystemLanguageDTO addSystemLanguage(SystemLanguageDTO systemLanguageDTO) {
 
@@ -48,7 +52,7 @@ public class SystemLanguageService extends UserBaseService {
         logger.info("featureDTO : "+systemLanguageDTO.getName());
         SystemLanguage  systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
         if(!Optional.ofNullable(systemLanguage).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.notFoundd",systemLanguageId);
+            exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
         }
 
         if( ! ( systemLanguage.getName().equalsIgnoreCase(systemLanguageDTO.getName()) ) && systemLanguageGraphRepository.isSystemLanguageExistsWithSameName(systemLanguageDTO.getName()) ){
@@ -56,11 +60,16 @@ public class SystemLanguageService extends UserBaseService {
         }
 
         // if defaultLanguage is false then ask to set default
-        if(!systemLanguageDTO.isDefaultLanguage() && !systemLanguageGraphRepository.isDefaultSystemLanguageExistsExceptId(systemLanguageId)){
+        if( !systemLanguageDTO.isDefaultLanguage() ||  ((systemLanguageDTO.isDefaultLanguage()
+                && systemLanguageDTO.isInactive()) && !systemLanguageGraphRepository.isDefaultSystemLanguageExistsExceptId(systemLanguageId)) ){
             exceptionService.invalidRequestException("message.system.language.must.default");
         }
 
-        // TODO to set inactive status, check if System Language is linked with Country
+        // To set inactive status, check if System Language is linked with Country
+        if(systemLanguageGraphRepository.isSystemLanguageSetInAnyCountry(systemLanguageId)){
+            exceptionService.invalidRequestException("message.system.language.cannot.set.inactive", systemLanguageId);
+        }
+
         systemLanguage.setCode(systemLanguageDTO.getCode());
         systemLanguage.setName(systemLanguageDTO.getName());
         save(systemLanguage);
@@ -72,7 +81,7 @@ public class SystemLanguageService extends UserBaseService {
 
         SystemLanguage  systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
         if(!Optional.ofNullable(systemLanguage).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.system.language.notFoundd",systemLanguageId);
+            exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
         }
 
         systemLanguage.setDeleted(true);
@@ -82,6 +91,22 @@ public class SystemLanguageService extends UserBaseService {
 
     public List<SystemLanguage> getListOfSystemLanguage(){
         return systemLanguageGraphRepository.getListOfSystemLanguage();
+    }
+
+    public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId){
+        Country country = countryGraphRepository.findOne(countryId);
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        }
+
+        SystemLanguage  systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
+        if(!Optional.ofNullable(systemLanguage).isPresent() || systemLanguage.isInactive()) {
+            exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
+        }
+
+        country.setSystemLanguage(systemLanguage);
+        save(country);
+        return true;
     }
 
 }

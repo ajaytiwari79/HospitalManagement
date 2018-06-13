@@ -287,4 +287,12 @@ public class Country extends UserBaseEntity {
     public void setEquipments(List<Equipment> equipments) {
         this.equipments = equipments;
     }
+
+    public SystemLanguage getSystemLanguage() {
+        return systemLanguage;
+    }
+
+    public void setSystemLanguage(SystemLanguage systemLanguage) {
+        this.systemLanguage = systemLanguage;
+    }
 }
