@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.processing_activity_masterd
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
 import com.kairos.service.master_data_management.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -37,11 +38,11 @@ public class AccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @RequestBody List<AccessorParty> accessorParties) {
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<AccessorParty> accessorParties) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(countryId, accessorParties));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(countryId, accessorParties.getRequestBody()));
 
     }
 
