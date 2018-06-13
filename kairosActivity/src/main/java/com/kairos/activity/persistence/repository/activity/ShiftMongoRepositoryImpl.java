@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.DateOperators;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -156,8 +157,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(Criteria.where("_id").in(shiftIds)),
                 project().and(DateOperators.dateOf("startDate").toString("%Y-%m-%d")).as("currentDate")
                         .and("$$ROOT").as("shift"),
-                group("currentDate").push("shift").as("shifts"), sort(Sort.Direction.ASC, "currentDate"));
-
+                group("currentDate").push("shift").as("shiftsList"),
+                project().and("_id").as("currentDate").and("shiftsList").as("shifts")
+                , sort(Sort.Direction.ASC, "currentDate")
+        );
         AggregationResults<DateWiseShiftResponse> shiftData = mongoTemplate.aggregate(aggregation, Shift.class, DateWiseShiftResponse.class);
         return shiftData.getMappedResults();
 
