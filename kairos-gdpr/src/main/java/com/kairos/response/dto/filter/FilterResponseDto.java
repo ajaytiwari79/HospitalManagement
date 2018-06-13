@@ -16,6 +16,15 @@ public class FilterResponseDto {
 
     private List<FilterAttributes> filterData;
 
+    private String displayName;
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
     public FilterType getName() {
         return name;
@@ -47,9 +56,10 @@ public class FilterResponseDto {
 
     }
 
-    public FilterResponseDto(FilterType name, String title,List<FilterAttributes> filterAttributes) {
+    public FilterResponseDto(FilterType name, String title,String displayName,List<FilterAttributes> filterAttributes) {
         this.name = name;
         this.title = title;
+        this.displayName=displayName;
         this.filterData = filterAttributes;
     }
 

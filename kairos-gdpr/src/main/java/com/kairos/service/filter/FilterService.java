@@ -96,15 +96,15 @@ public class FilterService {
     public FilterResponseDto buildFiltersCategoryResponse(FilterQueryResult filterQueryResult, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
-                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getAccountTypes());
+                return new FilterResponseDto(filterType, filterType.value,"Account Types", filterQueryResult.getAccountTypes());
             case ORGANIZATION_TYPES:
-                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationTypes());
+                return new FilterResponseDto(filterType, filterType.value, "Organization Types",filterQueryResult.getOrganizationTypes());
             case ORGANIZATION_SUB_TYPES:
-                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationSubTypes());
+                return new FilterResponseDto(filterType, filterType.value,"Organization Sub Types", filterQueryResult.getOrganizationSubTypes());
             case ORGANIZATION_SERVICES:
-                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationServices());
+                return new FilterResponseDto(filterType, filterType.value, "Service Types",filterQueryResult.getOrganizationServices());
             case ORGANIZATION_SUB_SERVICES:
-                return new FilterResponseDto(filterType, filterType.value, filterQueryResult.getOrganizationSubServices());
+                return new FilterResponseDto(filterType, filterType.value,"Service Sub Types", filterQueryResult.getOrganizationSubServices());
             default:
                 throw new InvalidRequestException("invalid request");
         }

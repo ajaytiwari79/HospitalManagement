@@ -4,6 +4,7 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -13,22 +14,26 @@ public class MasterProcessingActivityDto {
     @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
     private  String name;
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotEmpty(message = "Organization Type cannot be Empty")
+    @NotNull(message = "Organization  Type cannot be null")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Organization Sub Type cannot be null")
+    @NotEmpty(message = "Organization Sub Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Type cannot be null")
+    @NotEmpty(message = "Service Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Sub Type cannot be null")
+    @NotEmpty(message = "Service Sub Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private Boolean isSubProcess;
+    private Boolean isSubProcess=false;
 
     private List<MasterProcessingActivityDto> subProcessingActivities;
 

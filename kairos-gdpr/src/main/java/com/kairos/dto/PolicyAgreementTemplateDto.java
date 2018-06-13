@@ -24,20 +24,24 @@ public class PolicyAgreementTemplateDto {
     @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
 
-
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Organization Type cannot be null")
+    @NotEmpty(message = "Organization Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Organization Sub Type cannot be null")
+    @NotEmpty(message = "Organization Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Type cannot be null")
+    @NotEmpty(message = "Service Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Sub Type cannot be null")
+    @NotEmpty(message = "Service Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Account Type cannot be null")
+    @NotEmpty(message = "Account Type cannot be empty")
     private Set<BigInteger> accountTypes;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")

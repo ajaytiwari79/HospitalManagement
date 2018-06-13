@@ -2,6 +2,7 @@ package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -17,30 +18,34 @@ import java.util.Set;
 public class ClauseDto {
 
 
-    @NotEmpty(message = "error.clause.title.cannot.be.empty")
+    @NotNullOrEmpty(message = "Title cannot be empty ")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @Valid
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotEmpty(message = "Tags cannot be empty")
     private List<ClauseTagDto> tags = new ArrayList<>();
 
-    @NotNull(message = "error.clause.title.cannot.be.null")
+    @NotNullOrEmpty(message = "description cannot be Empty ")
     private String description;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Organization  Type cannot be null")
+    @NotEmpty(message = "Organization Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Organization Sub Type cannot be null")
+    @NotEmpty(message = "Organization Sub Type cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Type cannot be null")
+    @NotEmpty(message = "Service cannot be Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Sub Type cannot be null")
+    @NotEmpty(message = "Service Sub Type cannot empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotEmpty(message = "Account type cannot be Empty")
     private Set<BigInteger> accountType;
 
 

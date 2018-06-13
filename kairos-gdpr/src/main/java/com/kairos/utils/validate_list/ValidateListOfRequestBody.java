@@ -9,7 +9,6 @@ public class ValidateListOfRequestBody<T> {
     @Valid
     private List<T> requestBody;
 
-
     public List<T> getRequestBody() {
         return requestBody;
     }
