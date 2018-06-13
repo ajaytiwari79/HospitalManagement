@@ -17,6 +17,16 @@ public class StorageType extends MongoBaseEntity {
 
     private Long countryId;
 
+    private String nameInLowerCase;
+
+    public String getNameInLowerCase() {
+        return nameInLowerCase;
+    }
+
+    public void setNameInLowerCase(String nameInLowerCase) {
+        this.nameInLowerCase = nameInLowerCase;
+    }
+
     public Long getCountryId() {
         return countryId;
     }
