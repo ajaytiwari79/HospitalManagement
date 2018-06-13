@@ -10,27 +10,27 @@ import java.util.List;
 
 public class MasterProcessingActivityDto {
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
+    @NotNullOrEmpty(message = "Name  can't be Empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
     private  String name;
 
-    @NotNullOrEmpty(message = "Description cannot be empty")
+    @NotNullOrEmpty(message = "Description  can't be  Empty")
     private String description;
 
-    @NotEmpty(message = "Organization Type cannot be Empty")
-    @NotNull(message = "Organization  Type cannot be null")
+    @NotEmpty(message = "Organization Type  can't be  Empty")
+    @NotNull(message = "Organization  Type  can't be  null")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotNull(message = "Organization Sub Type cannot be null")
-    @NotEmpty(message = "Organization Sub Type cannot be Empty")
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type  can't be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotNull(message = "Service Type cannot be null")
-    @NotEmpty(message = "Service Type cannot be Empty")
+    @NotNull(message = "Service Type  can't be  null")
+    @NotEmpty(message = "Service Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotNull(message = "Service Sub Type cannot be null")
-    @NotEmpty(message = "Service Sub Type cannot be Empty")
+    @NotNull(message = "Service Sub Type  can't be  null")
+    @NotEmpty(message = "Service Sub Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     private Boolean isSubProcess=false;

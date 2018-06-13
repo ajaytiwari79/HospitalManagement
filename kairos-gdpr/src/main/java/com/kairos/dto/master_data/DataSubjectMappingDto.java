@@ -17,23 +17,23 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataSubjectMappingDto {
 
-    @NotNullOrEmpty(message = "name cannot be null or empty")
+    @NotNullOrEmpty(message = "name  can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "description cannotbe null or empty")
+    @NotNullOrEmpty(message = "description  can't be empty")
     private String description;
 
-    @NotNull(message = "Organization  Type cannot be null")
-    @NotEmpty(message = "Oraganization Type cannot be empty")
+    @NotNull(message = "Organization  Type  can't be  null")
+    @NotEmpty(message = "Oraganization Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotNull(message = "Organization Sub Type cannot be null")
-    @NotEmpty(message = "Organization Sub Type  cannot be empty")
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type   can't be  empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "DataCategorie cannot be empty")
-    @NotNull(message = "Data category cannot be null")
+    @NotEmpty(message = "DataCategorie  can't be  empty")
+    @NotNull(message = "Data category  can't be  null")
     private Set<BigInteger> dataCategories;
 
     public String getName() {

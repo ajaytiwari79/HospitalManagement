@@ -23,29 +23,29 @@ public class ClauseDto {
     private String title;
 
     @Valid
-    @NotEmpty(message = "Tags cannot be empty")
+    @NotEmpty(message = "Tags  can't be empty")
     private List<ClauseTagDto> tags = new ArrayList<>();
 
-    @NotNullOrEmpty(message = "description cannot be Empty ")
+    @NotNullOrEmpty(message = "description  can't be  Empty ")
     private String description;
 
-    @NotNull(message = "Organization  Type cannot be null")
-    @NotEmpty(message = "Organization Type cannot be Empty")
+    @NotNull(message = "Organization  Type  can't be  null")
+    @NotEmpty(message = "Organization Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationTypes;
 
-    @NotNull(message = "Organization Sub Type cannot be null")
-    @NotEmpty(message = "Organization Sub Type cannot be Empty")
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubTypes;
 
-    @NotNull(message = "Service Type cannot be null")
-    @NotEmpty(message = "Service cannot be Empty")
+    @NotNull(message = "Service Type  can't be  null")
+    @NotEmpty(message = "Service Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationServices;
 
-    @NotNull(message = "Service Sub Type cannot be null")
-    @NotEmpty(message = "Service Sub Type cannot empty")
+    @NotNull(message = "Service Sub Type  can't be  null")
+    @NotEmpty(message = "Service Sub Type  can't be empty")
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 
-    @NotEmpty(message = "Account type cannot be Empty")
+    @NotEmpty(message = "Account type  can't be  Empty")
     private Set<BigInteger> accountType;
 
 

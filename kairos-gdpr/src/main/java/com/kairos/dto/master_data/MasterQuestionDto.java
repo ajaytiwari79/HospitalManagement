@@ -13,11 +13,11 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionDto {
 
-    @NotNullOrEmpty(message = "Question title cannot be empty")
+    @NotNullOrEmpty(message = "Question title  can't be  empty")
     @Pattern(message = "numberic and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
     private String question;
 
-    @NotNullOrEmpty(message = "Description Cannot be Empty")
+    @NotNullOrEmpty(message = "Description  can't be  Empty")
     private String description;
 
     private Boolean isRequired=false;

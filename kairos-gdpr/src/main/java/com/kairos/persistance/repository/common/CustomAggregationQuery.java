@@ -55,9 +55,17 @@ public class CustomAggregationQuery {
                 "}}}} ";
     }
 
-
-
-
+    public static String dataCategoryWithDataElementProjectionData() {
+        return "{  '$project':" +
+                "{'dataElements':" +
+                "{'$filter' : { " +
+                "'input':'$dataElements'," +
+                "as: 'dataElement', " +
+                "cond:{$eq:['$$dataElement.deleted',false]}" +
+                "}}," +
+                "'countryId':1"+
+                ", 'name':1 }}";
+    }
 
 
 }

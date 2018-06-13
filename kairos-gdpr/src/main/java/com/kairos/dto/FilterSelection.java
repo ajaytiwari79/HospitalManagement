@@ -14,8 +14,8 @@ public class FilterSelection {
     @NotNullOrEmpty(message = "Filter Category name cannot be empty")
     private FilterType name;
 
-    @NotEmpty(message = "Value cannotbe Empty")
-    @NotNull(message = "Value cannot be Null")
+    @NotEmpty(message = "Value can't be Empty")
+    @NotNull(message = "Value can't be  Null")
     private List<Long> value;
 
     public FilterSelection() {
