@@ -634,4 +634,16 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
     }
+
+    @ApiOperation(value = "get main emloyment setting")
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getMainEmployment(@PathVariable Long unitId, @PathVariable long staffId){
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.getMainEmployment(unitId,staffId));
+    }
+
+    @ApiOperation(value = "update and set main emloyment setting")
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.POST)
+    public ResponseEntity<Map<String,Object>> updateMainEmployment(@PathVariable Long unitId, @PathVariable long staffId ,@RequestBody EmploymentDTO employmentDTO){
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(unitId,staffId,employmentDTO));
+    }
 }

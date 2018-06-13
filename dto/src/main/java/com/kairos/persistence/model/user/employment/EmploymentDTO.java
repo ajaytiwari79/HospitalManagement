@@ -1,18 +1,24 @@
 package com.kairos.persistence.model.user.employment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 /**
  * Created by yatharth on 19/4/18.
  */
+
 public class EmploymentDTO {
     @NotNull
     private String endDate;
     private Long reasonCodeId;
     private Long accessGroupIdOnEmploymentEnd;
-
+    private LocalDate mainEmploymentStartDate;
+    private LocalDate mainEmploymentEndDate;
+    private boolean hasMainEmployment;
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
     }
@@ -37,4 +43,27 @@ public class EmploymentDTO {
         this.endDate = endDate;
     }
 
+    public LocalDate getMainEmploymentStartDate() {
+        return mainEmploymentStartDate;
+    }
+
+    public void setMainEmploymentStartDate(LocalDate mainEmploymentStartDate) {
+        this.mainEmploymentStartDate = mainEmploymentStartDate;
+    }
+
+    public LocalDate getMainEmploymentEndDate() {
+        return mainEmploymentEndDate;
+    }
+
+    public void setMainEmploymentEndDate(LocalDate mainEmploymentEndDate) {
+        this.mainEmploymentEndDate = mainEmploymentEndDate;
+    }
+
+    public boolean isHasMainEmployment() {
+        return hasMainEmployment;
+    }
+
+    public void setHasMainEmployment(boolean hasMainEmployment) {
+        this.hasMainEmployment = hasMainEmployment;
+    }
 }

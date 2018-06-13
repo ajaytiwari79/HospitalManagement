@@ -6,6 +6,7 @@ import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
@@ -475,4 +476,16 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
+
+    @Query("MATCH (staff:Staff{deleted:false})-[:BELONGS_TO]-(e:Employment) WHERE id(staff)={1} \n"+
+    "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n" +
+      "return e")
+    Employment getMainEmployment(Long unitId,Long staffId);
+
+
+    @Query("match (s:Staff)-[:BELONGS_TO]-(u:User)where id(s)={1} with s,u\n" +
+            "match (u)-[:BELONGS_TO]-(staff:Staff) with staff,u match (staff)-[:BELONGS_TO]-(e:Employment)\n" +
+            "with u,e,staff match (e)-[:HAS_EMPLOYMENTS]-(o:Organization) RETURN e")
+    List<Employment> getAllMainEmploymentByStaffId(Long unitId,Long StaffId);
+
 }

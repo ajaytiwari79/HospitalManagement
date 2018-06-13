@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.organization;
+    package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

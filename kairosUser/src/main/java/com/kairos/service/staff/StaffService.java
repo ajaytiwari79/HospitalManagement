@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -19,6 +20,7 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
@@ -1890,5 +1892,15 @@ public class StaffService extends UserBaseService {
 
         return staffsUnitPositions;
     }
+
+   public EmploymentDTO getMainEmployment(Long unitId,Long staffId) {
+       Employment  employment=staffGraphRepository.getMainEmployment(unitId,staffId);
+       return ObjectMapperUtils.copyPropertiesByMapper(employment,EmploymentDTO.class);
+   }
+
+  public List<Employment> updateMainEmployment(Long unitId,Long staffId,EmploymentDTO employmentDTO){
+        List<Employment>  employments= staffGraphRepository.getAllMainEmploymentByStaffId(unitId,staffId);
+        return employments;
+   }
 
 }
