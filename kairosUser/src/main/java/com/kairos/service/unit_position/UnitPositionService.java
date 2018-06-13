@@ -371,7 +371,7 @@ public class UnitPositionService extends UserBaseService {
             unitPosition.setCta(cta);
         }
 
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 0);
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 1);
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", unitPositionDTO.getExpertiseId());
 

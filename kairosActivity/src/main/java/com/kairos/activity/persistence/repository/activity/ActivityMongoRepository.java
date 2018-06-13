@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +20,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
         CustomActivityMongoRepository {
 
 
-    Activity findByNameIgnoreCaseAndDeletedFalseAndCountryId(String name, Long countryId);
+
+
     Activity findByNameIgnoreCaseAndDeletedFalseAndUnitId(String name, Long unitId);
 
     @Query("{'deleted' : false, 'unitId':?1, 'name':{$regex:?0, $options:'i'}}")
