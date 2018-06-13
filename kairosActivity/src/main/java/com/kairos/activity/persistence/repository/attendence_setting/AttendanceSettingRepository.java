@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @Repository
 public interface AttendanceSettingRepository extends MongoBaseRepository<AttendanceSetting,BigInteger> {
 
-    @Query(value ="{unitId:?0,userId:?1,currentDate:?2,deleted:false}" )
-    AttendanceSetting findbyUnitIdAndUserIdAndDate(Long unitId, Long userId,LocalDate date);
+    @Query(value ="{userId:?0,currentDate:?1,deleted:false}" )
+    AttendanceSetting findbyUserIdAndDate(Long userId,LocalDate date);
 
 
 

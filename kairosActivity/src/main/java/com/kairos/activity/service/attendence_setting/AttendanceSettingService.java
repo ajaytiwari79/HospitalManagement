@@ -18,19 +18,19 @@ public class AttendanceSettingService extends MongoBaseService{
 @Inject
 private AttendanceSettingRepository attendanceSettingRepository;
 
-public Duration getAttendanceSetting(Long unitId, Long userId) {
+public Duration getAttendanceSetting(Long userId) {
     LocalDate currentDate= DateUtils.getCurrentLocalDate();
     Duration attendanceDuration=new Duration();
-    AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUnitIdAndUserIdAndDate(unitId,userId,currentDate);
+    AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUserIdAndDate(userId,currentDate);
     if(Optional.ofNullable(AttendanceSetting).isPresent()) {
      attendanceDuration=AttendanceSetting.getAttendanceDuration().get(AttendanceSetting.getAttendanceDuration().size()-1);
     }
     return attendanceDuration;
 }
 
-public Duration updateAttendanceSetting(Long unitId, Long userId, Duration attendanceDuration) {
+public Duration updateAttendanceSetting(Long userId, Duration attendanceDuration) {
     LocalDate currentDate= DateUtils.getCurrentLocalDate();
-    AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUnitIdAndUserIdAndDate(unitId,userId,currentDate);
+    AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUserIdAndDate(userId,currentDate);
     if(Optional.ofNullable(attendanceSetting).isPresent()) {
         if(attendanceDuration.getTo()!=null){
             Duration duration=attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1);
@@ -41,7 +41,7 @@ public Duration updateAttendanceSetting(Long unitId, Long userId, Duration atten
             attendanceSetting.getAttendanceDuration().add(attendanceDuration);
         }
     }else {
-        attendanceSetting = new AttendanceSetting(unitId, userId,currentDate);
+        attendanceSetting = new AttendanceSetting(userId,currentDate);
         attendanceSetting.getAttendanceDuration().add(attendanceDuration);
     }
     save(attendanceSetting);

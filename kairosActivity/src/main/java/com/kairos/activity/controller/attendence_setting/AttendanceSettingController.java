@@ -13,23 +13,24 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/userId")
-@Api(value = API_ORGANIZATION_UNIT_URL + "/userId")
+@RequestMapping(API_ORGANIZATION_URL + "/user")
+@Api(value = API_ORGANIZATION_URL + "/user")
 public class AttendanceSettingController {
 
    @Inject
    private AttendanceSettingService attendanceSettingService;
 
    @GetMapping(value ="/{userId}/attendance_setting")
-   public ResponseEntity<Map<String, Object>> getAttendanceSettings(@PathVariable Long unitId, @PathVariable Long userId) {
-       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.getAttendanceSetting(unitId,userId));
+   public ResponseEntity<Map<String, Object>> getAttendanceSettings(@PathVariable Long userId) {
+       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.getAttendanceSetting(userId));
    }
 
    @PostMapping(value = "/{userId}/attendance_setting")
-    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@PathVariable Long unitId, @PathVariable Long userId, @RequestBody Duration attendanceDuration){
-       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,userId,attendanceDuration));
+    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@PathVariable Long userId, @RequestBody Duration attendanceDuration){
+       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(userId,attendanceDuration));
    }
 
 }
