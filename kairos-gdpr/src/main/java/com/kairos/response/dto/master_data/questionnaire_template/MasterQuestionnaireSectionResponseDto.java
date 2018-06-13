@@ -2,6 +2,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
@@ -15,7 +16,7 @@ public class MasterQuestionnaireSectionResponseDto {
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
     private String title;
 
-    private List<MasterQuestionBasicResponse> questions;
+    private List<MasterQuestion> questions;
 
     private Long countryId;
 
@@ -35,11 +36,11 @@ public class MasterQuestionnaireSectionResponseDto {
         this.title = title;
     }
 
-    public List<MasterQuestionBasicResponse> getQuestions() {
+    public List<MasterQuestion> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<MasterQuestionBasicResponse> questions) {
+    public void setQuestions(List<MasterQuestion> questions) {
         this.questions = questions;
     }
 
