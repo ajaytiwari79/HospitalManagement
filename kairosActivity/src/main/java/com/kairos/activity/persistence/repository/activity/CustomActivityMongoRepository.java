@@ -55,4 +55,7 @@ public interface CustomActivityMongoRepository {
     Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,Date date);
 
     Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId);
+    Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate);
+    Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate);
+
 }
