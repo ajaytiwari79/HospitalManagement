@@ -33,6 +33,11 @@ public class DateUtils {
         return localDateTimeToDate(endOfDay);
     }
 
+    public static LocalDate getCurrentLocalDate()
+    {
+        return LocalDate.now();
+    }
+
     public static LocalDate getLocalDateFromDate(Date date) {
 
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();

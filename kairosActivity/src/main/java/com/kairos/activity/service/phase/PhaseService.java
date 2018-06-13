@@ -5,15 +5,13 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.phase.PhaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -25,8 +23,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-
-import static com.kairos.activity.constants.AppConstants.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by vipul on 25/9/17.
@@ -48,8 +45,9 @@ public class PhaseService extends MongoBaseService {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
-            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    phaseDTO.isAllowFlipping(), phaseDTO.getFlippingTime(), phaseDTO.getFlippingDay(), unitId, phaseDTO.getId());
+            Phase phase = new Phase(phaseDTO.getName(),phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType() );
+
             phases.add(phase);
         }
         if (!phases.isEmpty()) {
@@ -59,15 +57,37 @@ public class PhaseService extends MongoBaseService {
     }
 
     /*
-     *@Author vipul
-     */
+    *@Author vipul
+    */
+    public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
+        OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
+        if (unitOrganization == null) {
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+        }
+        List<PhaseDTO> phases = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
+        return phases;
+    }
+
+
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
+    }
+
+    public Map<String,List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
+        OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
+        if (unitOrganization == null) {
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+        }
+        List<PhaseDTO> phases = getPhasesByUnit(unitId);
+        Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
+        phasesData.put("planningPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.PLANNING)).collect(Collectors.toList()));
+        phasesData.put("actualPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.ACTUAL)).collect(Collectors.toList()));
+        return phasesData;
     }
 
     public boolean removePhase(BigInteger phaseId) {
@@ -81,6 +101,7 @@ public class PhaseService extends MongoBaseService {
         return true;
     }
 
+    //TODO
     public List<OrganizationPhaseDTO> getPhasesGroupByOrganization() {
         return phaseMongoRepository.getPhasesGroupByOrganization();
     }
@@ -92,9 +113,9 @@ public class PhaseService extends MongoBaseService {
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
         OrganizationDTO unitOrganization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(unitOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
-        List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.ASC);
+        List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.ASC);
         int weekCount = 0;
         if (weekDifference < 0) {    // Week has passed so FINAL will be the object returned
             phaseDTO = phaseDTOS.get(0);
@@ -133,8 +154,16 @@ public class PhaseService extends MongoBaseService {
         return phases;
     }
 
-    public List<PhaseDTO> getApplicablePhasesByOrganizationId(Long orgId) {
-        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePhasesByUnit(orgId);
+    public Map<String, List<PhaseDTO>> getPhasesWithCategoryByCountryId(Long countryId) {
+        List<PhaseDTO> phases = getPhasesByCountryId(countryId);
+        Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
+        phasesData.put("planningPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.PLANNING)).collect(Collectors.toList()));
+        phasesData.put("actualPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.ACTUAL)).collect(Collectors.toList()));
+        return phasesData;
+    }
+
+    public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId) {
+        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId);
         return phases;
     }
 
@@ -151,7 +180,7 @@ public class PhaseService extends MongoBaseService {
 
     public Phase getPhaseCurrentByUnit(Long unitId, Date date) {
 
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(unitId, PhaseType.PLANNING.toString(), 0L);
         if (phases.isEmpty()) {
             logger.info("Phase not found in unit " + unitId);
             exceptionService.dataNotFoundByIdException("message.organization.phase.notfound", unitId);
@@ -220,10 +249,6 @@ public class PhaseService extends MongoBaseService {
         phase.setDescription(phaseDTO.getDescription());
         phase.setDurationType(phaseDTO.getDurationType());
         phase.setDuration(phaseDTO.getDuration());
-
-        phase.setAllowFlipping(phaseDTO.isAllowFlipping());
-        phase.setFlippingDay(phaseDTO.getFlippingDay());
-        phase.setFlippingTime(phaseDTO.getFlippingTime());
         save(phase);
         return phase;
     }
@@ -235,9 +260,6 @@ public class PhaseService extends MongoBaseService {
         phase.setName(phase.getName());
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
-        phase.setFlippingTime(phaseDTO.getFlippingTime());
-        phase.setFlippingDay(phaseDTO.getFlippingDay());
-        phase.setAllowFlipping(phaseDTO.isAllowFlipping());
     }
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
@@ -245,7 +267,7 @@ public class PhaseService extends MongoBaseService {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
 
         if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
         if (oldPhase == null) {
@@ -344,7 +366,7 @@ public class PhaseService extends MongoBaseService {
     }*/
 
     public List<Phase> getAllPhasesOfUnit(Long unitId) {
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalseAndDurationGreaterThan(unitId, 0L);
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(unitId, PhaseType.PLANNING.toString(), 0L);
         return phases;
     }
 
