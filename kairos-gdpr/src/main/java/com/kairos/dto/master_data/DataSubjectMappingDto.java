@@ -24,13 +24,14 @@ public class DataSubjectMappingDto {
     @NotNullOrEmpty(message = "description cannotbe null or empty")
     private String description;
 
-    @NotEmpty(message = "oraganization type list cannot be empty")
+    @NotEmpty(message = "Oraganization Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotEmpty(message = "organization Sub Types list cannot be empty")
+    @NotEmpty(message = "Organization Sub Type  cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "dataCategories list cannot be empty")
+    @NotEmpty(message = "DataCategorie cannot be empty")
+    @NotNull(message = "Data category cannot be null")
     private Set<BigInteger> dataCategories;
 
     public String getName() {

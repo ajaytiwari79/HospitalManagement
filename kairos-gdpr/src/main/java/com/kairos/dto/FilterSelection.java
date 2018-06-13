@@ -11,11 +11,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilterSelection {
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "Filter Category name cannot be empty")
     private FilterType name;
 
-    @NotEmpty
-    @NotNull
+    @NotEmpty(message = "Value cannotbe Empty")
+    @NotNull(message = "Value cannot be Null")
     private List<Long> value;
 
     public FilterSelection() {

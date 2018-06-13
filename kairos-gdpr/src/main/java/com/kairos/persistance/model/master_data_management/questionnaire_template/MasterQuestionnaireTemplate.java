@@ -18,9 +18,10 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
     @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
+    @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNullOrEmpty(message = "questionnaire type cannot be empty or null")
+    @NotNullOrEmpty(message = "Template type cannot be empty ")
     private String templateType;
 
     private BigInteger assetType;
@@ -28,7 +29,6 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
     private Long countryId;
 
     private List<BigInteger> sections=new ArrayList<>();
-
 
     public BigInteger getAssetType() {
         return assetType;

@@ -13,27 +13,27 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterAssetDto {
 
-    @NotNullOrEmpty(message = "error.description.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "Name cannot be Empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
     private String name;
 
-    @NotNullOrEmpty(message = "error.description.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "Description cannot be Empty")
     private String description;
 
     @NotNull
-    @NotEmpty(message = "error.list.cannot.be.empty")
+    @NotEmpty(message = "Organization Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
     @NotNull
-    @NotEmpty(message = "error.list.cannot.be.empty")
+    @NotEmpty(message = "Organization Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
     @NotNull
-    @NotEmpty(message = "error.list.cannot.be.empty")
+    @NotEmpty(message = "Service Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
     @NotNull
-    @NotEmpty(message = "error.list.cannot.be.empty")
+    @NotEmpty(message = "Service Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
 

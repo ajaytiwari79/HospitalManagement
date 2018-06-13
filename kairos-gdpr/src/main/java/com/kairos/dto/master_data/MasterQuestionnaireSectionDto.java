@@ -15,12 +15,11 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionnaireSectionDto {
 
-    @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Title cannot be empty")
     @Pattern(message = "special character or numberic data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
-    @NotNull(message = "list.cannot.be.null")
-    @NotEmpty(message = "list.cannot.be.empty")
+    @NotNull(message = "Question cannot be empty")
     @Valid
     private List<MasterQuestionDto> questions;
 
