@@ -13,8 +13,7 @@
             <pattern>[VrpPlanner] %d %p [%t] %class{0}.%M\(%L\) | %m%n</pattern>
         </encoder>
     </appender>
-    <appender name="R" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <!--<appender name="R" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>example.log</File>
         <encoder>
             <pattern>%cyan([VrpPlanner]) %d %magenta(%p) [%t] %highlight(%class{0}.%M\(%L\)) | %m%n</pattern>
@@ -26,18 +25,18 @@
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <MaxFileSize>10000KB</MaxFileSize>
         </triggeringPolicy>
-    </appender>
+    </appender>-->
     <!--<logger name="org" level="INFO"/>-->
     <!--<logger name="org.drools.core.common.DefaultAgenda" level="INFO"/>-->
     <!--<logger name="com" level="INFO"/>-->
     <logger name="com.kairos.planner.vrp.taskplanning" level="DEBUG"/>
     <logger name="org.optaplanner" level="DEBUG"/>
-    <logger name="org.drools" level="INFO"/>
+    <logger name="org.drools" level="TRACE"/>
     <logger name="org.kie.api.internal.utils.ServiceDiscoveryImpl" level="ERROR"/>
     <logger name="io.netty.util" level="INFO"/>
     <logger name="com.thoughtworks.xstream" level="DEBUG"/>
     <root level="debug">
         <appender-ref ref="stdout"/>
-        <appender-ref ref="R"/>
+        <!--<appender-ref ref="R"/>-->
     </root>
 </configuration>
