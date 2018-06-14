@@ -57,10 +57,25 @@ public class OpenShiftController {
     }
 
     @ApiOperation(value = "Pick open Shift by staff")
-    @RequestMapping(value = "pick_open_shift/{openShiftId}/staff/{staffId}", method = RequestMethod.GET)
+    @RequestMapping(value = "open_shift/{openShiftId}/assign", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
-    public ResponseEntity<Map<String, Object>> pickOpenShiftByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId));
+    public ResponseEntity<Map<String, Object>> pickOpenShiftByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @RequestParam("staffId") Long staffId,@RequestParam("action") String action) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId,action));
         }
+
+    @ApiOperation(value = "fetch details for open shift")
+    @RequestMapping(value = "open_shift/{openShiftId}/staff/{staffId}", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+
+    public ResponseEntity<Map<String, Object>> fetchOpenShiftDataByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.fetchOpenShiftDataByStaff(unitId,openShiftId,staffId));
+    }
+
+    @ApiOperation(value = "notify staff for open shift")
+    @RequestMapping(value = "open_shift/{openShiftId}/notify", method = RequestMethod.POST)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> notifyStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @RequestBody List<Long> staffIds,@RequestParam("action") String action) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.notifyStaff(unitId,openShiftId,staffIds,action));
+    }
 }

@@ -122,4 +122,12 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> getStaffsUnitPosition(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getStaffsUnitPosition(unitId,expertiseId, staffList));
     }
+
+    @ApiOperation(value = "get unit positionsId based on expertise and staff list")
+    @RequestMapping(value = "/expertise/{expertiseId}/staff_and_unit_positions", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getStaffIdAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getStaffIdAndUnitPositionId(unitId,expertiseId, staffList));
+    }
+
+
 }

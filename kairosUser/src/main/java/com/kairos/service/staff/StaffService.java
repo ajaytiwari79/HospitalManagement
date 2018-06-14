@@ -1891,4 +1891,14 @@ public class StaffService extends UserBaseService {
         return staffsUnitPositions;
     }
 
+    public List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds) {
+        return staffGraphRepository.getEmailsOfStaffByStaffIds(staffIds);
+    }
+
+    public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId){
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        return accessGroupService.getStaffAccessRoles(unitId,staff.getId());
+    }
+
 }

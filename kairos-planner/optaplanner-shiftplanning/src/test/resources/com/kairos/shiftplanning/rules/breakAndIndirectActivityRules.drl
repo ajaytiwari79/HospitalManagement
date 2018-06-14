@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 /********Default StaffingLevel Activity Rules*******/
-rule "Empty activityPlannerEntity line 2"
+rule "Empty activity line 2"
 salience 20
     when
         //$alis:ArrayList(size>0) from collect (ActivityLineInterval(shift!=null));

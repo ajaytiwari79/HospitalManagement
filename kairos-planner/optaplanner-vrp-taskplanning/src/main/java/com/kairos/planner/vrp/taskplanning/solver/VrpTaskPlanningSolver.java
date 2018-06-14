@@ -43,12 +43,13 @@ public class VrpTaskPlanningSolver {
 
         for(Shift shift: solution.getShifts()){
             Task task=shift.getNextTask();
-            StringBuffer sb= new StringBuffer("Shift"+shift+":::");
+            StringBuffer sb= new StringBuffer("Shift"+shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>");
             while (task!=null){
                 sb.append(task+"->");
                 task=task.getNextTask();
 
             }
+            log.info(sb.toString());
         }
         log.info(solution.toString());
 

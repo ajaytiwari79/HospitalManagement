@@ -1019,4 +1019,9 @@ public class UnitPositionService extends UserBaseService {
         return staffData;
     }
 
+    public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData =
+                staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId,System.currentTimeMillis());
+        return staffData;
+    }
 }
