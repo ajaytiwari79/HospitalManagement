@@ -2,13 +2,11 @@ package com.kairos.activity.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.kairos.activity.client.CountryRestClient;
-import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.SkillRestClient;
-import com.kairos.activity.client.TimeSlotRestClient;
+import com.kairos.activity.client.*;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.activity.response.dto.TaskTypeSettingDTO;
 import com.kairos.activity.response.dto.staffTaskType.TaskTypeSettingWrapper;
@@ -79,6 +77,8 @@ public class TaskTypeService extends MongoBaseService {
 
     @Autowired
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
+
+    @Inject private OrganizationServiceRestClient organizationServiceRestClient;
 
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -1280,7 +1280,7 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }*/
 
-    public TaskTypeSettingDTO updateOrCreateTaskTypeSetting(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
         TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
             taskTypeSetting = new TaskTypeSetting(staffId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());
@@ -1293,6 +1293,18 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }
 
+
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForClient(Long clientId,TaskTypeSettingDTO taskTypeSettingDTO){
+        TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(clientId,taskTypeSettingDTO.getTaskTypeId());
+        if(taskTypeSetting ==null){
+            taskTypeSetting = new TaskTypeSetting(clientId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getDuration());
+        }
+        taskTypeSetting.setDuration(taskTypeSettingDTO.getEfficiency());
+        save(taskTypeSetting);
+        taskTypeSettingDTO.setId(taskTypeSetting.getId());
+        return taskTypeSettingDTO;
+    }
+
     /*public List<TaskTypeSettingDTO> getTaskTypeSettingByStaff(Long staffId){
         return taskTypeSettingMongoRepository.findByStaffId(staffId);
     }*/
@@ -1300,14 +1312,27 @@ public class TaskTypeService extends MongoBaseService {
 
     public TaskTypeSettingWrapper getTaskTypeByOrganisationAndStaffSetting(Long organisationId, Long staffId){
         List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByStaffId(staffId);
-        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId);
+        List<Long> serviceIds = getServiceIds(organisationId);
+        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId,serviceIds);
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);
     }
 
     public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long staffId){
         List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(staffId);
-        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId);
+        List<Long> serviceIds = getServiceIds(organisationId);
+        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId,serviceIds);
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);
+    }
+
+    public List<Long> getServiceIds(Long organisationId){
+        List<Long> serviceIds = new ArrayList<>();
+        Map<String, Object> services = organizationServiceRestClient.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
+        List<Map> service = (List<Map>)services.get("selectedServices");
+        service.get(0).get("children");
+        service.forEach(t->{
+            serviceIds.add((Long)((Map)t.get("children")).get("id"));
+        });
+        return serviceIds;
     }
 
 

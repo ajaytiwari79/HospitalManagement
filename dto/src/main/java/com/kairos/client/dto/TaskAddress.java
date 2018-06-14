@@ -16,7 +16,39 @@ public class TaskAddress {
     private String houseNumber;
     private String longitude;
     private String latitude;
+    private String block;
+    private int floorNo;
 
+
+    public TaskAddress(Integer zip, String city, String street, String houseNumber, String longitude, String latitude, String block, int floorNo) {
+        this.zip = zip;
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.block = block;
+        this.floorNo = floorNo;
+    }
+
+    public TaskAddress() {
+    }
+
+    public String getBlock() {
+        return block;
+    }
+
+    public void setBlock(String block) {
+        this.block = block;
+    }
+
+    public int getFloorNo() {
+        return floorNo;
+    }
+
+    public void setFloorNo(int floorNo) {
+        this.floorNo = floorNo;
+    }
 
     public String getCountry() {
         return country;
