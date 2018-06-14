@@ -1,26 +1,28 @@
 package com.kairos.response.dto.web.employment_dto;
 
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainEmploymentResultDTO {
 
-    private List<EmploymentOverlapDTO> employmentOverlapDTOList=new ArrayList<>();
-    private Boolean OverLapping;
+    private List<EmploymentOverlapDTO> employmentOverlapList =new ArrayList<>();
+    private EmploymentDTO updatedMainEmployment;
 
-    public List<EmploymentOverlapDTO> getEmploymentOverlapDTOList() {
-        return employmentOverlapDTOList;
+    public List<EmploymentOverlapDTO> getEmploymentOverlapList() {
+        return employmentOverlapList;
     }
 
-    public void setEmploymentOverlapDTOList(List<EmploymentOverlapDTO> employmentOverlapDTOList) {
-        this.employmentOverlapDTOList = employmentOverlapDTOList;
+    public void setEmploymentOverlapList(List<EmploymentOverlapDTO> employmentOverlapList) {
+        this.employmentOverlapList = employmentOverlapList;
     }
 
-    public Boolean getOverLapping() {
-        return OverLapping;
+    public EmploymentDTO getUpdatedMainEmployment() {
+        return updatedMainEmployment;
     }
 
-    public void setOverLapping(Boolean overLapping) {
-        OverLapping = overLapping;
+    public void setUpdatedMainEmployment(EmploymentDTO updatedMainEmployment) {
+        this.updatedMainEmployment = updatedMainEmployment;
     }
 }

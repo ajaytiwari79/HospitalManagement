@@ -2,7 +2,6 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.util.DateTimeInterval;
-import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -1905,14 +1904,17 @@ public class StaffService extends UserBaseService {
         return true;
     }
 
-    public Map<String,Object> updateMainEmployment(Long staffId, EmploymentDTO employmentDTO,Boolean confirm) {
+    public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO,Boolean confirm) {
         Map<String,Object> result=new HashMap<>();
         Date mainEmploymentStartDate = DateUtil.asDate(employmentDTO.getMainEmploymentStartDate());
         Date mainEmploymentEndDate = DateUtil.asDate(employmentDTO.getMainEmploymentEndDate());
+        if(mainEmploymentStartDate.after(mainEmploymentEndDate)){
+            exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
+        }
         List<Employment> employments = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
         DateTimeInterval newEmploymentInterval = new DateTimeInterval(mainEmploymentStartDate.getTime(), mainEmploymentEndDate.getTime());
+        MainEmploymentResultDTO mainEmploymentResultDTO=new MainEmploymentResultDTO();
         if (!employments.isEmpty()) {
-            MainEmploymentResultDTO mainEmploymentResultDTO=new MainEmploymentResultDTO();
             for (Employment employment : employments) {
                 EmploymentOverlapDTO employmentOverlapDTO=new EmploymentOverlapDTO();
                 DateTimeInterval employmentInterval = new DateTimeInterval(DateUtil.asDate(employment.getMainEmploymentStartDate()).getTime(), DateUtil.asDate(employment.getMainEmploymentEndDate()).getTime());
@@ -1934,12 +1936,11 @@ public class StaffService extends UserBaseService {
                         afterChangeMainEmployment(employmentOverlapDTO,employment);
                     }
                 }
-                mainEmploymentResultDTO.getEmploymentOverlapDTOList().add(employmentOverlapDTO);
+                mainEmploymentResultDTO.getEmploymentOverlapList().add(employmentOverlapDTO);
             }
-                mainEmploymentResultDTO.setOverLapping(true);
+
                 if(confirm==false){
-                    result.put("result",mainEmploymentResultDTO);
-                return result;
+                return mainEmploymentResultDTO;
                 }
         } else {
             saveEmployment(staffId, employmentDTO);
@@ -1948,15 +1949,18 @@ public class StaffService extends UserBaseService {
             save(employments);
             saveEmployment(staffId, employmentDTO);
             }
-        result.put("result",employmentDTO);
-        return result;
+        //result.put("result",employmentDTO);
+        mainEmploymentResultDTO.setEmploymentOverlapList(null);
+        mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
+        return mainEmploymentResultDTO;
     }
 
     public void saveEmployment(Long staffId, EmploymentDTO employmentDTO) {
         Employment employment = staffGraphRepository.getMainEmployment(staffId);
         employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
         employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
-        employment.setMainEmployment(employmentDTO.isMainEmployment());
+        employment.setMainEmployment(true);
+        employmentDTO.setMainEmployment(true);
         save(employment);
     }
     public void oldMainEmployment(EmploymentOverlapDTO employmentOverlapDTO,Employment employment){
