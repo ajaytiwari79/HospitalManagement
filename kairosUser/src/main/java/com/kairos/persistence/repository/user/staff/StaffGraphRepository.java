@@ -473,9 +473,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
-    @Query("MATCH(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
-            "MATCH(unitPosition)<-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) " +
-            "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={0} AND id(staff) IN {1} and id(expertise)={2} \n" +
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(expertise)={1} AND id(staff) IN {2}\n" +
+            "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={0}   \n" +
             "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
             "return id(unitPosition) as id , id(staff) as staffId")
     List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffIds,Long currentMillis);

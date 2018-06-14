@@ -3,7 +3,7 @@ package com.kairos.activity.service.open_shift;
 import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
-import com.kairos.activity.persistence.model.open_shift.OpenShiftAndActivityWrapper;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftActivityWrapper;
 import com.kairos.activity.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
@@ -23,11 +23,9 @@ import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
-import com.kairos.response.dto.web.open_shift.OpenShiftAction;
-import com.kairos.response.dto.web.open_shift.OpenShiftDTO;
+import com.kairos.enums.open_shift.OpenShiftAction;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftWrapper;
-import com.kairos.response.dto.web.staff.Staff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -207,14 +205,14 @@ public class OpenShiftService extends MongoBaseService {
     }
 
    public OpenShiftWrapper fetchOpenShiftDataByStaff(Long unitId,  BigInteger openShiftId,  Long staffId){
-        OpenShiftAndActivityWrapper openShiftAndActivityWrapper=openShiftMongoRepository.getOpenShiftAndActivity(openShiftId,unitId);
-        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId,openShiftAndActivityWrapper.getExpertiseId());
+        OpenShiftActivityWrapper openShiftActivityWrapper =openShiftMongoRepository.getOpenShiftAndActivity(openShiftId,unitId);
+        Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId, openShiftActivityWrapper.getExpertiseId());
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
         OpenShift openShift=openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         Date startDate=DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
         Date endDate =DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));
-        List<OpenShift> similarShifts=openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftAndActivityWrapper.getActivity().getId(), startDate,endDate);
-        int [] data= timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift,openShiftAndActivityWrapper.getActivity(),unitPositionWithCtaDetailsDTO);
+        List<OpenShift> similarShifts=openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate,endDate);
+        int [] data= timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(),unitPositionWithCtaDetailsDTO);
        List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
        similarShifts.forEach(openShift1 -> {
            OpenShiftResponseDTO openShiftResponseDTO=new OpenShiftResponseDTO();

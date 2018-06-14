@@ -3,7 +3,7 @@ package com.kairos.activity.persistence.repository.open_shift;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 
 
-import com.kairos.activity.persistence.model.open_shift.OpenShiftAndActivityWrapper;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftActivityWrapper;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 
@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -34,13 +33,13 @@ public class OpenShiftMongoRepositoryImpl implements CustomOpenShiftMongoReposit
         return result.getMappedResults();
     }
 
-   public OpenShiftAndActivityWrapper getOpenShiftAndActivity(BigInteger openShiftId,Long unitId){
+   public OpenShiftActivityWrapper getOpenShiftAndActivity(BigInteger openShiftId, Long unitId){
         Aggregation aggregation=Aggregation.newAggregation(
                 match(Criteria.where("_id").is(openShiftId).and("unitId").is(unitId).and("deleted").is(false)),
                         lookup("activities","activityId","_id","activity"),
                 lookup("order","orderId","_id","order"),
                 project().and("order.expertiseId").as("expertiseId").and("activity").as("activity"));
-        AggregationResults<OpenShiftAndActivityWrapper> result=mongoTemplate.aggregate(aggregation,OpenShift.class,OpenShiftAndActivityWrapper.class);
+        AggregationResults<OpenShiftActivityWrapper> result=mongoTemplate.aggregate(aggregation,OpenShift.class,OpenShiftActivityWrapper.class);
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
 
    }
