@@ -154,7 +154,7 @@ public class TaskPlanningService {
 		List<task> tasks = new ArrayList<>();
 		List<location> locations = new ArrayList<>();
 		List<LocationDistance> locationDistances = customRepository.selectAll(LocationDistance.class);
-		for (EmployeePlanningFact emp : taskPlanningSolution.getEmployees()) {
+		for (Employee emp : taskPlanningSolution.getEmployees()) {
 			location location = getLocationWithDistanceData(locationDistances, emp.getLocation());
 			emp.setLocation(location);
 			if (!locations.contains(location))
@@ -320,7 +320,7 @@ public class TaskPlanningService {
 		//solution.getAvailabilityList().forEach(ar->{
 		for(AvailabilityRequest ar : solution.getAvailabilityList()){
 //			solution.getEmployees().forEach(emp->{
-			for(EmployeePlanningFact emp:solution.getEmployees()){
+			for(Employee emp:solution.getEmployees()){
 				if(ar.getEmployee().getId().equals(emp.getId())){
 					List list = emp.getAvailabilityList()==null? new ArrayList(): emp.getAvailabilityList();
 					list.add(new AvailabilityRequest(ar.getId(), ar.getStartTime(), ar.getEndTime(), null));
@@ -329,7 +329,7 @@ public class TaskPlanningService {
 				}
 			}
 		}
-		for(EmployeePlanningFact emp:solution.getEmployees()){
+		for(Employee emp:solution.getEmployees()){
 			if(emp.getAvailabilityList()==null){
 				emp.setAvailabilityList(new ArrayList());
 			}
@@ -437,7 +437,7 @@ public class TaskPlanningService {
 		List<Map> updatedEmployees = new ArrayList<Map>();
 		List<Map> tasks = new ArrayList<>();
 		int i = 1;
-		for (EmployeePlanningFact emp : solution.getEmployees()) {
+		for (Employee emp : solution.getEmployees()) {
 			Map<String, Object> map = new HashMap<>();
 			makeEmployeeList(tasks, emp.getPrevTaskOrShift());
 			map.put("employeeName", emp.getName());
