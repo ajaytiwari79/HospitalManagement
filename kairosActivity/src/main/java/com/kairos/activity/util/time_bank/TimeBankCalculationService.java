@@ -840,13 +840,8 @@ public class TimeBankCalculationService {
 
     }
 
-
+    //Calculating Time Bank Against Open Shift
     public int[] calculateDailyTimeBankForOpenShift(OpenShift shift,Activity activity,UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
-        /*=activityMongoRepository.findById(shift.getActivityId()).get();
-        Optional<Order> order=orderMongoRepository.findById(shift.getOrderId());
-        *//*Long unitPositionId=genericIntegrationService.getUnitPositionId(shift.getUnitId(),staffId,order.getExpertiseId());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, ORGANIZATION, unitPositionId, activity.getTimeCalculationActivityTab().getDayTypes());
-         = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);*/
         int totalTimebank = 0;
         int plannedTimeMin = 0;
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
