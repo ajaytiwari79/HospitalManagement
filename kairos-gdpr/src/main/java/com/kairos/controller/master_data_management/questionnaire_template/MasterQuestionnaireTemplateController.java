@@ -89,7 +89,7 @@ public class MasterQuestionnaireTemplateController {
      * @param id
      * @param masterQuestionnaireSectionDto
      * @return
-     */
+     *//*
     @PostMapping("/{id}/add")
     @ApiOperation(value = "create and add questionniare section to  questionnaire template ")
     public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDto) {
@@ -101,5 +101,5 @@ public class MasterQuestionnaireTemplateController {
 
     }
 
-
+*/
 }

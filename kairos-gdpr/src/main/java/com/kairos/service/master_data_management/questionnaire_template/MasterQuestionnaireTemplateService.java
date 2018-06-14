@@ -2,7 +2,6 @@ package com.kairos.service.master_data_management.questionnaire_template;
 
 
 import com.kairos.custome_exception.InvalidRequestException;
-import com.kairos.dto.master_data.MasterQuestionnaireSectionDto;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireSection;
@@ -57,12 +56,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     @Inject
     private MasterQuestionMongoRepository masterQuestionMongoRepository;
 
-    /*
-     *creating basic questionniare template
-     *  QuestionnaireTemplateType is a enum if asset type is select then set asset type id in template else directly save questionniareType
-     * storage type reffered to asset type
-     *
-     */
+
     public MasterQuestionnaireTemplate addQuestionnaireTemplate(Long countryId, MasterQuestionnaireTemplate masterQuestionnaireTemplate) {
         MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, masterQuestionnaireTemplate.getName().trim());
         if (Optional.ofNullable(exisiting).isPresent()) {
@@ -91,13 +85,13 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         MasterQuestionnaireTemplateQueryResult queryResult = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId, id);
         List<MasterQuestionnaireTemplateQueryResult> queryResults = new ArrayList<>();
         queryResults.add(queryResult);
-        return createQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults).get(0);
+        return getQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults).get(0);
     }
 
 
     public List<MasterQuestionnaireTemplateResponseDto> getAllMasterQuestionniareTemplateWithSection(Long countryId) {
         List<MasterQuestionnaireTemplateQueryResult> queryResults = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId);
-        return createQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults);
+        return getQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults);
 
     }
 
@@ -117,7 +111,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
-    public List<MasterQuestionnaireTemplateResponseDto> createQuestionniareTemplateResponseWithSectionAndQuestionResponse(List<MasterQuestionnaireTemplateQueryResult> templateQueryResults) {
+    public List<MasterQuestionnaireTemplateResponseDto> getQuestionniareTemplateResponseWithSectionAndQuestionResponse(List<MasterQuestionnaireTemplateQueryResult> templateQueryResults) {
 
         Map<BigInteger, MasterQuestionnaireSection> sections = new HashMap<>();
         Map<BigInteger, MasterQuestion> questions = new HashMap<>();
@@ -185,25 +179,6 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * Map<String, Object> is used to get ids of section if any exception then delete section and delete question releated to sections
      */
 
-    public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, BigInteger id, List<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDto) {
-        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(existing).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
-        }
-        Map<String, Object> questionnaireSection = new HashMap<>();
-        questionnaireSection = masterQuestionnaireSectionService.addQuestionnaireSection(countryId, masterQuestionnaireSectionDto);
-        existing.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
-        try {
-            existing = save(existing);
-        } catch (Exception e) {
-            masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNIARE_SECTIONS));
-            masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
-            LOGGER.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return existing;
-
-    }
 
 
     public void addTemplateTypeToQuestionnaireTemplate(BigInteger id, MasterQuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateType templateType) {
