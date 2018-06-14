@@ -31,7 +31,10 @@ public class ShiftEndTimeListener implements VariableListener<Task> {
     }
 
     private void updateShiftTime(ScoreDirector scoreDirector, Task task) {
-        if(task.getPlannedStartTime()==null)return;
+        //this is to avoid multiple listener for same task chain
+        if(task.getNextTask()!=null)return;
+        //TODO when task is removed from chain or undomove(x-> null) then shift's time should be updated but task has all variables null so what shift to remove from????????????????????????????????????????
+        if(task.getPlannedStartTime()==null)return; //when task is removed from chain or undomove(x-> null) then shift's time should be updated
         Task firstTask=task;
         while (firstTask.getPrevTaskOrShift() instanceof Task){
             firstTask=(Task)firstTask.getPrevTaskOrShift();
