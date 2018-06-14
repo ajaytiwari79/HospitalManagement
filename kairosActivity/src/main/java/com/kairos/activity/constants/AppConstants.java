@@ -253,5 +253,7 @@ public class AppConstants {
     public static final String NOTIFY="NOTIFY";
     public static final String ASSIGN="ASSIGN";
     public static final String SHIFT_NOTIFICATION="SHIFT_NOTIFICATION";
-    public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAge";
+    public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
+    public static final String DECLINE="DECLINE";
+    public static final String ASSIGN_OR_NOTIFY="ASSIGN_OR_NOTIFY";
 }

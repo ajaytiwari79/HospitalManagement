@@ -64,4 +64,5 @@ public class UserAccessRoleDTO {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
+
 }

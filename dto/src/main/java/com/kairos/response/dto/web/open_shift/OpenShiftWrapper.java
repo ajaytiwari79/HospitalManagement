@@ -8,19 +8,28 @@ public class OpenShiftWrapper {
     private int timeBank;
     private int plannedTime;
     private int restingTime;
-    private List<OpenShiftDTO> similarShifts;
+    private List<OpenShiftResponseDTO> similarOpenShifts;
+    private OpenShiftResponseDTO openShift;
 
 
     public OpenShiftWrapper() {
         //Default Constructor
     }
 
-    public OpenShiftWrapper(int timeBank, int plannedTime, int restingTime, List<OpenShiftDTO> similarShifts) {
+    public OpenShiftWrapper(int timeBank, int plannedTime, int restingTime, List<OpenShiftResponseDTO> similarOpenShifts) {
         this.timeBank = timeBank;
         this.plannedTime = plannedTime;
         this.restingTime = restingTime;
-        this.similarShifts = similarShifts;
+        this.similarOpenShifts = similarOpenShifts;
 
+    }
+
+    public OpenShiftWrapper(int timeBank, int plannedTime, int restingTime, List<OpenShiftResponseDTO> similarOpenShifts, OpenShiftResponseDTO openShift) {
+        this.timeBank = timeBank;
+        this.plannedTime = plannedTime;
+        this.restingTime = restingTime;
+        this.similarOpenShifts = similarOpenShifts;
+        this.openShift = openShift;
     }
 
     public int getTimeBank() {
@@ -47,13 +56,19 @@ public class OpenShiftWrapper {
         this.restingTime = restingTime;
     }
 
-    public List<OpenShiftDTO> getSimilarShifts() {
-        return similarShifts;
+    public List<OpenShiftResponseDTO> getSimilarOpenShifts() {
+        return similarOpenShifts;
     }
 
-    public void setSimilarShifts(List<OpenShiftDTO> similarShifts) {
-        this.similarShifts = similarShifts;
+    public void setSimilarOpenShifts(List<OpenShiftResponseDTO> similarOpenShifts) {
+        this.similarOpenShifts = similarOpenShifts;
     }
 
+    public OpenShiftResponseDTO getOpenShift() {
+        return openShift;
+    }
 
+    public void setOpenShift(OpenShiftResponseDTO openShift) {
+        this.openShift = openShift;
+    }
 }

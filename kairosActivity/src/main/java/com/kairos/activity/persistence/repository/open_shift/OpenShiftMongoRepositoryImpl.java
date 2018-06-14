@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -26,9 +27,9 @@ public class OpenShiftMongoRepositoryImpl implements CustomOpenShiftMongoReposit
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public List<OpenShift> getOpenShiftsByUnitIdAndDate(Long unitId, Date startDate,Date endDate) {
+    public List<OpenShift> getOpenShiftsByUnitIdAndDate(Long unitId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).and("endDate").lt(endDate)));
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).and("endDate").lte(endDate)));
         AggregationResults<OpenShift> result = mongoTemplate.aggregate(aggregation, OpenShift.class, OpenShift.class);
         return result.getMappedResults();
     }

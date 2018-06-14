@@ -28,7 +28,7 @@ public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,
 
     List<OpenShift> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId);
 
-    @Query("{'deleted':false, 'isMainShift':true, 'activityId':?0, '$or':[{'startDate':{$gte:?1,$lte:?2}},{'endDate':{$gte:?1,$lte:?2}}]}")
-    List<OpenShiftDTO> findAllOpenShiftsByActivityIdAndBetweenDuration(BigInteger activityId, Date startDate, Date endDat);
+    @Query("{'deleted':false,  'activityId':?0, '$or':[{'startDate':{$gte:?1,$lte:?2}},{'endDate':{$gte:?1,$lte:?2}}]}")
+    List<OpenShift> findAllOpenShiftsByActivityIdAndBetweenDuration(BigInteger activityId, Date startDate, Date endDat);
 
 }

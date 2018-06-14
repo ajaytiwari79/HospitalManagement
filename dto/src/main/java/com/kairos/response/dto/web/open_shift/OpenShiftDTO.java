@@ -1,8 +1,10 @@
 package com.kairos.response.dto.web.open_shift;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class OpenShiftDTO {
     private BigInteger id;
@@ -15,6 +17,7 @@ public class OpenShiftDTO {
     private BigInteger orderId;
     private BigInteger activityId;
     private BigInteger parentOpenShiftId;
+    private List<Long> assignedStaff;
 
     public OpenShiftDTO() {
         //Default Constructor
@@ -66,7 +69,7 @@ public class OpenShiftDTO {
     }
 
     public List<Long> getInterestedStaff() {
-        return interestedStaff;
+        return interestedStaff=Optional.ofNullable(interestedStaff).orElse(new ArrayList<>());
     }
 
     public void setInterestedStaff(List<Long> interestedStaff) {
@@ -74,7 +77,7 @@ public class OpenShiftDTO {
     }
 
     public List<Long> getDeclinedBy() {
-        return declinedBy;
+        return declinedBy=Optional.ofNullable(declinedBy).orElse(new ArrayList<>());
     }
 
     public void setDeclinedBy(List<Long> declinedBy) {
@@ -111,5 +114,13 @@ public class OpenShiftDTO {
 
     public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
         this.parentOpenShiftId = parentOpenShiftId;
+    }
+
+    public List<Long> getAssignedStaff() {
+        return assignedStaff=Optional.ofNullable(assignedStaff).orElse(new ArrayList<>());
+    }
+
+    public void setAssignedStaff(List<Long> assignedStaff) {
+        this.assignedStaff = assignedStaff;
     }
 }

@@ -57,11 +57,11 @@ public class OpenShiftController {
     }
 
     @ApiOperation(value = "Pick open Shift by staff")
-    @RequestMapping(value = "pick_open_shift/{openShiftId}/staff/{staffId}", method = RequestMethod.GET)
+    @RequestMapping(value = "pick_open_shift/{openShiftId}/staff/{staffId}", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
-    public ResponseEntity<Map<String, Object>> pickOpenShiftByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId));
+    public ResponseEntity<Map<String, Object>> pickOpenShiftByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId,@RequestParam("action") String action) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.pickOpenShiftByStaff(unitId,openShiftId,staffId,action));
         }
 
     @ApiOperation(value = "fetch details for open shift")
@@ -72,7 +72,7 @@ public class OpenShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.fetchOpenShiftDataByStaff(unitId,openShiftId,staffId));
     }
 
-    @ApiOperation(value = "fetch details for open shift")
+    @ApiOperation(value = "notify staff for open shift")
     @RequestMapping(value = "notify_staff/open_shift/{openShiftId}", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> notifyStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @RequestBody List<Long> staffIds,@RequestParam("action") String action) {
