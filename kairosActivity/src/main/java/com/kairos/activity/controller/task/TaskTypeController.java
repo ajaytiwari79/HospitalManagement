@@ -744,7 +744,15 @@ public class TaskTypeController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTaskTypeSettingForStaff(@PathVariable Long staffId,@RequestBody TaskTypeSettingDTO taskTypeSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                taskTypeService.updateOrCreateTaskTypeSetting(staffId,taskTypeSettingDTO));
+                taskTypeService.updateOrCreateTaskTypeSettingForStaff(staffId,taskTypeSettingDTO));
+    }
+
+    @ApiOperation(value = "Update taskType setting for Staff")
+    @PutMapping(value = UNIT_URL+"/client/{clientId}/task_type_setting")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTaskTypeSettingForClient(@PathVariable Long clientId,@RequestBody TaskTypeSettingDTO taskTypeSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                taskTypeService.updateOrCreateTaskTypeSettingForClient(clientId,taskTypeSettingDTO));
     }
 
 

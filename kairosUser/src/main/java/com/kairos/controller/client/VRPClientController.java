@@ -1,29 +1,18 @@
 package com.kairos.controller.client;
 
-import com.google.common.collect.Lists;
-import com.kairos.persistence.model.user.client.VRPClient;
+import com.kairos.response.dto.web.client.VRPClientDTO;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * @author pradeep
@@ -36,22 +25,45 @@ public class VRPClientController {
     @Inject
     private VRPClientService vrpClientService;
 
-    @ApiOperation(value = "import Unit Client Excel File")
-    @PostMapping(value = "/importClient")
+   @ApiOperation(value = "import Unit Client Excel File")
+    @PostMapping(value = "/importClients")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> importVrpClient(@PathVariable Long unitId, @RequestParam("file") MultipartFile multipartFile) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                vrpClientService.importClient(unitId,multipartFile));
+                vrpClientService.importClients(unitId,multipartFile));
     }
 
-    @ApiOperation(value = "get VRPClient by Organization")
-    @GetMapping(value = "/getClient")
+     @ApiOperation(value = "get All VRPClient by Organization")
+    @GetMapping(value = "/vrpClient")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getClient(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getClients(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 vrpClientService.getAllClient(unitId));
     }
 
+    @ApiOperation(value = "get VRPClient by Id")
+    @GetMapping(value = "/vrpClient/{clientId}")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getClient(@PathVariable Long unitId,@PathVariable Long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                vrpClientService.getClient(clientId));
+    }
 
+    @ApiOperation(value = "delete VRPClient by Organization")
+    @DeleteMapping(value = "/vrpClient/{clientId}")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteClient(@PathVariable Long unitId,@PathVariable Long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                vrpClientService.deleteClient(clientId));
+    }
+
+
+    @ApiOperation(value = "update VRPClient by Organization")
+    @PutMapping(value = "/client")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateClient(@PathVariable Long unitId, @RequestBody VRPClientDTO vrpClientDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                vrpClientService.updateClient(unitId,vrpClientDTO));
+    }
 
 }

@@ -21,7 +21,7 @@ public class VRPClient extends User {
     private int houseNo;
     private String block;
     private int floorNo;
-    private int post;
+    private int postCode;
     private String city;
 
     @Relationship(type = BELONGS_TO)
@@ -100,12 +100,12 @@ public class VRPClient extends User {
         this.floorNo = floorNo;
     }
 
-    public int getPost() {
-        return post;
+    public int getPostCode() {
+        return postCode;
     }
 
-    public void setPost(int post) {
-        this.post = post;
+    public void setPostCode(int postCode) {
+        this.postCode = postCode;
     }
 
     public String getCity() {

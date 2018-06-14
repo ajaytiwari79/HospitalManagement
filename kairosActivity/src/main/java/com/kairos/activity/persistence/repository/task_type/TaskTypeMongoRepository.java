@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.repository.task_type;
 
+import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.persistence.model.task_type.TaskType;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.activity.response.dto.TaskTypeDTO;
@@ -46,7 +47,11 @@ public interface TaskTypeMongoRepository extends MongoBaseRepository<TaskType,Bi
 
     TaskType findByOrganizationIdAndRootIdAndSubServiceId(long organizationId, BigInteger rootId, long subServiceId);
 
-    @Query(value = "{'organizationId':0,deleted:false,isEnabled:true}",fields = "{'title' : 1,'description':1}")
-    List<TaskTypeDTO> getTaskTypesOfOrganisation(Long organizationId);
+    @Query(value = "{'organizationId':0,deleted:false,isEnabled:true,subServiceId:{$in:?1}}",fields = "{'title' : 1,'description':1}")
+    List<TaskTypeDTO> getTaskTypesOfOrganisation(Long organizationId,List<Long> serviceIds);
+
+    @Query("{unitId : ?0,isDeleted : false,title:{$in:?1}}")
+    List<TaskType> findByName(Long unitId,List<String> name);
+
 
 }

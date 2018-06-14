@@ -1,13 +1,21 @@
 package com.kairos.service.client;
 
+import com.google.common.collect.Lists;
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.activity.util.ObjectUtils;
+import com.kairos.client.TaskDemandRestClient;
+import com.kairos.client.TaskServiceRestClient;
+import com.kairos.client.TomTomRestClient;
+import com.kairos.client.dto.TaskAddress;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.client.VRPClient;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
 import com.kairos.response.dto.web.client.VRPClientDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.excel.ExcelService;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -17,10 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author pradeep
@@ -32,51 +38,81 @@ public class VRPClientService  extends UserBaseService {
 
     @Inject private VRPClientGraphRepository vrpClientGraphRepository;
     @Inject private OrganizationGraphRepository organizationGraphRepository;
+    @Inject private TomTomRestClient tomTomRestClient;
+    @Inject private ExcelService excelService;
+    @Inject private TaskServiceRestClient taskServiceRestClient;
 
-    public List<VRPClient> importDateFromXLSXFile(MultipartFile multipartFile,Organization organization) {
-        InputStream stream = null;
-        XSSFWorkbook workbook = null;
-        List<VRPClient> clients = null;
-        try {
-            stream = multipartFile.getInputStream();
-            //Get the workbook instance for XLS file
-            workbook = new XSSFWorkbook(stream);
 
-            //Get first sheet from the workbook
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rows = sheet.iterator();
-            clients = new ArrayList<>();
-            int i=0;
-            while (rows.hasNext()) {
-                Row row = rows.next();
-                VRPClient client = new VRPClient();
-                client.setFirstName("Client "+i);
-                client.setIntallationNo((int) row.getCell(5).getNumericCellValue());
-                client.setLattitude(row.getCell(14).getNumericCellValue());
-                client.setLongitude(row.getCell(15).getNumericCellValue());
-                client.setBlock(row.getCell(9).getStringCellValue());
-                client.setCity(row.getCell(13).getStringCellValue());
-                client.setDuration((int) row.getCell(0).getNumericCellValue());
-                client.setFloorNo((int) row.getCell(10).getNumericCellValue());
-                client.setHouseNo((int) row.getCell(8).getNumericCellValue());
-                client.setPost(new Integer(row.getCell(12).getStringCellValue()));
-                client.setStreetName(row.getCell(7).getStringCellValue());
-                client.setOrganization(organization);
-                clients.add(client);
-                i++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    private double getValue(Cell cell){
+        Double value = null;
+        if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
+            value =  cell.getNumericCellValue();
+        }else {
+            value = new Double(cell.getStringCellValue().replaceAll(",","."));
+
         }
-        return clients;
+        return value;
     }
 
+    private Object[] getVrpClientByRows(List<Row> rows,Organization organization){
+        List<VRPClient> vrpClients = new ArrayList<>();
+        List<VRPTaskDTO> vrpTasks = new ArrayList<>();
+        for (int i = 2;i<rows.size();i++){
+            Row row = rows.get(i);
+            VRPClient client = new VRPClient();
+            client.setFirstName("Client "+(i-1));
+            client.setIntallationNo((int) getValue(row.getCell(5)));
+            client.setLattitude(getValue(row.getCell(14)));
+            client.setLongitude(getValue(row.getCell(14)));
+            client.setBlock(row.getCell(9).getStringCellValue());
+            client.setCity(row.getCell(13).getStringCellValue());
+            client.setDuration((int) row.getCell(0).getNumericCellValue());
+            client.setFloorNo((int) row.getCell(10).getNumericCellValue());
+            client.setHouseNo((int) row.getCell(8).getNumericCellValue());
+            client.setPostCode(new Integer(row.getCell(12).getStringCellValue()));
+            client.setStreetName(row.getCell(7).getStringCellValue());
+            client.setOrganization(organization);
+            VRPTaskDTO vrpTaskDTO = new VRPTaskDTO();
+            vrpTaskDTO.setAddress(new TaskAddress(client.getPostCode(),client.getCity(),client.getStreetName(),""+client.getHouseNo(),client.getLattitude().toString(),client.getLattitude().toString(),client.getBlock(),client.getFloorNo()));
+            vrpTaskDTO.setIntallationNo(client.getIntallationNo());
+            vrpTaskDTO.setSkill(row.getCell(16).getStringCellValue());
+            vrpTasks.add(vrpTaskDTO);
+            vrpClients.add(client);
+        }
+        vrpClients = vrpClients.stream().filter(ObjectUtils.distinctByKey(vrpClient -> vrpClient.getIntallationNo())).collect(Collectors.toList());
+        return new Object[]{vrpClients,vrpTasks};
+    }
 
-    public List<VRPClientDTO> importClient(Long unitId,MultipartFile multipartFile){
+    public List<VRPClientDTO> importClients(Long unitId, MultipartFile multipartFile){
         Optional<Organization> organization = organizationGraphRepository.findById(unitId,0);
-        List<VRPClient> vrpClients = importDateFromXLSXFile(multipartFile,organization.get());
-        save(vrpClients);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(vrpClients, VRPClientDTO.class);
+        List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
+        Object objects[] = getVrpClientByRows(rows,organization.get());
+        List<VRPClient> vrpClients = (List<VRPClient>)objects[0];
+        List<VRPClient> vrpClientList = new ArrayList<>();
+        vrpClients.forEach(vrpClient -> {
+            Map<String,String> request = new HashMap<>();
+            request.put("streetName",vrpClient.getStreetName());
+            request.put("postalCode",""+vrpClient.getPostCode());
+            request.put("countryCode","DK");
+            /*Map response = tomTomRestClient.getfromTomtom(request);
+            if(response!=null){
+
+            }*/
+            vrpClientList.add(vrpClient);
+        });
+        save(vrpClientList);
+        createTask((List<VRPTaskDTO>)objects[1],vrpClientList);
+
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(vrpClientList, VRPClientDTO.class);
+    }
+
+    public void createTask(List<VRPTaskDTO> vrpTaskDTOS,List<VRPClient> vrpClients){
+        Map<Integer,Long> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getIntallationNo(),c->c.getId()));
+        for (VRPTaskDTO taskDTO : vrpTaskDTOS) {
+            taskDTO.setCitizenId(clientIdAndInstallationNo.get(taskDTO.getIntallationNo()));
+        }
+        taskServiceRestClient.createTaskBYExcel(vrpTaskDTOS);
     }
 
     public List<VRPClientDTO> getAllClient(Long unitId){
@@ -84,5 +120,30 @@ public class VRPClientService  extends UserBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(vrpClients, VRPClientDTO.class);
     }
 
+    public VRPClientDTO getClient(Long clientId){
+        VRPClient vrpClient = vrpClientGraphRepository.findOne(clientId);
+        return ObjectMapperUtils.copyPropertiesByMapper(vrpClient, VRPClientDTO.class);
+    }
+
+    public boolean deleteClient(Long clientId){
+        VRPClient vrpClient = vrpClientGraphRepository.findOne(clientId);
+        vrpClient.setDeleted(true);
+        save(vrpClient);
+        return true;
+    }
+
+
+
+    public boolean updateClient(Long clientId,VRPClientDTO vrpClientDTO){
+        VRPClient vrpClient = vrpClientGraphRepository.findOne(clientId,0);
+        vrpClient.setBlock(vrpClientDTO.getBlock());
+        vrpClient.setCity(vrpClientDTO.getCity());
+        vrpClient.setFloorNo(vrpClientDTO.getFloorNo());
+        vrpClient.setHouseNo(vrpClientDTO.getHouseNo());
+        vrpClient.setPostCode(vrpClientDTO.getPost());
+        vrpClient.setStreetName(vrpClientDTO.getStreetName());
+        save(vrpClient);
+        return true;
+    }
 
 }

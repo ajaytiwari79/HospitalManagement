@@ -28,7 +28,7 @@ public class TaskTypeDTO {
 
     private Boolean status;
     private int duration;
-    private long serviceId;
+    private Long serviceId;
     private String parentTaskTypeId;
 
     private List<BigInteger> tags = new ArrayList<>();
