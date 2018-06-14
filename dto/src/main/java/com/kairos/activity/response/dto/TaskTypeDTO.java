@@ -45,11 +45,11 @@ public class TaskTypeDTO {
         //default constructor
     }
 
-    public long getServiceId() {
+    public Long getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(long serviceId) {
+    public void setServiceId(Long serviceId) {
         this.serviceId = serviceId;
     }
 
