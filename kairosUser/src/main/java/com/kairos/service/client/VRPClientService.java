@@ -102,9 +102,11 @@ public class VRPClientService  extends UserBaseService {
     }
 
     public void createTask(List<VRPTaskDTO> vrpTaskDTOS,List<VRPClient> vrpClients){
-        Map<Integer,Long> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNo(), c->c.getId()));
+        Map<Integer,VRPClient> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNo(), c->c));
         for (VRPTaskDTO taskDTO : vrpTaskDTOS) {
-            taskDTO.setCitizenId(clientIdAndInstallationNo.get(taskDTO.getInstallationNo()));
+            VRPClient vrpClient = clientIdAndInstallationNo.get(taskDTO.getInstallationNo());
+            taskDTO.setCitizenId(vrpClient.getId());
+            taskDTO.setCitizenName(vrpClient.getFirstName());
         }
         taskServiceRestClient.createTaskBYExcel(vrpTaskDTOS);
     }

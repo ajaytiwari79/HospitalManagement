@@ -1,5 +1,6 @@
 package com.kairos.activity.response.dto.task;
 
+import com.kairos.activity.response.dto.TaskTypeDTO;
 import com.kairos.client.dto.TaskAddress;
 
 import java.math.BigInteger;
@@ -16,7 +17,25 @@ public class VRPTaskDTO {
     private Long citizenId;
     private String skill;
     private BigInteger taskTypeId;
+    private String citizenName;
+    private TaskTypeDTO taskType;
 
+
+    public TaskTypeDTO getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskTypeDTO taskType) {
+        this.taskType = taskType;
+    }
+
+    public String getCitizenName() {
+        return citizenName;
+    }
+
+    public void setCitizenName(String citizenName) {
+        this.citizenName = citizenName;
+    }
 
     public BigInteger getTaskTypeId() {
         return taskTypeId;
