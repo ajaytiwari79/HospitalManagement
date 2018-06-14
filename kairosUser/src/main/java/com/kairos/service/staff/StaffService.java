@@ -1896,11 +1896,6 @@ public class StaffService extends UserBaseService {
         return staffsUnitPositions;
     }
 
-    public EmploymentDTO getMainEmployment(Long staffId) {
-        Employment employment = staffGraphRepository.getMainEmployment(staffId);
-        return ObjectMapperUtils.copyPropertiesByMapper(employment, EmploymentDTO.class);
-    }
-
     public boolean deleteMainEmployment(Long staffId) {
         Employment employment = staffGraphRepository.getMainEmployment(staffId);
         employment.setMainEmploymentStartDate(null);

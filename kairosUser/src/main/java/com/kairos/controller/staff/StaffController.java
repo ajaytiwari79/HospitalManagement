@@ -636,12 +636,6 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
     }
 
-    @ApiOperation(value = "get main emloyment setting")
-    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getMainEmployment(@PathVariable Long unitId, @PathVariable long staffId){
-        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.getMainEmployment(staffId));
-    }
-
     @ApiOperation(value = "update and set main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
