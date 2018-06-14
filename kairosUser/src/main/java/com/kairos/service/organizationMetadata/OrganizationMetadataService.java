@@ -1,5 +1,6 @@
 package com.kairos.service.organizationMetadata;
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
@@ -8,12 +9,15 @@ import com.kairos.persistence.model.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.user.region.DayTimeWindow;
 import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
+import com.kairos.response.dto.web.localAreaTag.DayTimeWindowDTO;
+import com.kairos.response.dto.web.localAreaTag.LocalAreaTagDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -130,6 +134,16 @@ public class OrganizationMetadataService extends UserBaseService {
 
         return save(existingLocalAreaTag);
     }
+
+    /*public LocalAreaTagDTO updateBusiestTimeWindow(Long localAreaTagId, List<DayTimeWindowDTO> dayTimeWindowDTOS){
+        LocalAreaTag existingLocalAreaTag = organizationMetadataRepository.findOne(localAreaTagId);
+        List<DayTimeWindow> dayTimeWindows = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTimeWindowDTOS,DayTimeWindow.class);
+        save(dayTimeWindows);
+        existingLocalAreaTag.getDayTimeWindows().addAll(dayTimeWindows);
+        save(existingLocalAreaTag);
+        return ObjectMapperUtils.copyPropertiesByMapper(existingLocalAreaTag,LocalAreaTagDTO.class);
+    }*/
+
 
     public boolean deleteTagData(Long localAreaTagId) {
         LocalAreaTag localAreaTag = organizationMetadataRepository.findOne(localAreaTagId);

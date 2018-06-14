@@ -22,7 +22,7 @@ public class ShiftRequestPhasePlanningSolution {
 	private String id;
 	private Long unitId;
 	@ProblemFactCollectionProperty
-    private List<EmployeePlanningFact> employees;
+    private List<Employee> employees;
     @ProblemFactCollectionProperty
     private List<LocalDate> weekDates;
     @PlanningEntityCollectionProperty
@@ -30,7 +30,7 @@ public class ShiftRequestPhasePlanningSolution {
     private List<ShiftRequestPhase> shifts;
     //TODO it should have all activities per day
     @ProblemFactCollectionProperty
-    private List<ActivityPlannerEntity> activities;
+    private List<Activity> activities;
     @PlanningEntityCollectionProperty
     //@ValueRangeProvider(id = "activityLineIntervals")
     private List<ActivityLineInterval> activityLineIntervals;
@@ -38,7 +38,7 @@ public class ShiftRequestPhasePlanningSolution {
     private List<SkillLineInterval> skillLineIntervals;
     //@PlanningEntityCollectionProperty
     //private List<DateTime> possibleStartDateTimes;
-    private Map<LocalDate,List<ActivityPlannerEntity>> activitiesPerDay;
+    private Map<LocalDate,List<Activity>> activitiesPerDay;
 	@XStreamConverter(HardMediumSoftLongScoreXStreamConverter.class)
 	@PlanningScore
     private HardMediumSoftLongScore score;
@@ -64,11 +64,11 @@ public class ShiftRequestPhasePlanningSolution {
         this.shifts = shifts;
     }
 
-    public List<ActivityPlannerEntity> getActivities() {
+    public List<Activity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ActivityPlannerEntity> activities) {
+    public void setActivities(List<Activity> activities) {
         this.activities = activities;
     }
 
@@ -78,11 +78,11 @@ public class ShiftRequestPhasePlanningSolution {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public List<EmployeePlanningFact> getEmployees() {
+	public List<Employee> getEmployees() {
 		return employees;
 	}
 
-	public void setEmployees(List<EmployeePlanningFact> employees) {
+	public void setEmployees(List<Employee> employees) {
 		this.employees = employees;
 	}
 
@@ -120,11 +120,11 @@ public class ShiftRequestPhasePlanningSolution {
         this.weekDates = weekDates;
     }
 
-    public Map<LocalDate, List<ActivityPlannerEntity>> getActivitiesPerDay() {
+    public Map<LocalDate, List<Activity>> getActivitiesPerDay() {
         return activitiesPerDay;
     }
 
-    public void setActivitiesPerDay(Map<LocalDate, List<ActivityPlannerEntity>> activitiesPerDay) {
+    public void setActivitiesPerDay(Map<LocalDate, List<Activity>> activitiesPerDay) {
         this.activitiesPerDay = activitiesPerDay;
     }
 

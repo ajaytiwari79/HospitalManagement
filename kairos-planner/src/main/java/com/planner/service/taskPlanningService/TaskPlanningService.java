@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.planner.service.staffService.TaskStaffService;
+import com.planner.service.taskService.PlanningTaskService;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -45,7 +46,6 @@ import com.planner.service.locationService.GraphHopperService;
 import com.planner.service.locationService.LocationService;
 import com.planner.service.skillService.SkillService;
 import com.planner.service.staffService.ShiftService;
-import com.planner.service.taskService.TaskService;
 import com.planner.service.taskService.TaskTypeService;
 import com.planner.service.vehicleService.VehicleService;
 import com.thoughtworks.xstream.XStream;
@@ -55,7 +55,7 @@ public class TaskPlanningService {
 
 	private static final Logger log = LoggerFactory.getLogger(TaskPlanningService.class);
 
-	@Autowired private TaskService taskService;
+	@Autowired private PlanningTaskService planningTaskService;
 	@Autowired private TaskTypeService taskTypeService;
 	@Autowired private SkillService skillService;
 	@Autowired private TaskStaffService taskStaffService;
@@ -154,7 +154,7 @@ public class TaskPlanningService {
 		List<task> tasks = new ArrayList<>();
 		List<location> locations = new ArrayList<>();
 		List<LocationDistance> locationDistances = customRepository.selectAll(LocationDistance.class);
-		for (EmployeePlanningFact emp : taskPlanningSolution.getEmployees()) {
+		for (Employee emp : taskPlanningSolution.getEmployees()) {
 			location location = getLocationWithDistanceData(locationDistances, emp.getLocation());
 			emp.setLocation(location);
 			if (!locations.contains(location))
@@ -320,7 +320,7 @@ public class TaskPlanningService {
 		//solution.getAvailabilityList().forEach(ar->{
 		for(AvailabilityRequest ar : solution.getAvailabilityList()){
 //			solution.getEmployees().forEach(emp->{
-			for(EmployeePlanningFact emp:solution.getEmployees()){
+			for(Employee emp:solution.getEmployees()){
 				if(ar.getEmployee().getId().equals(emp.getId())){
 					List list = emp.getAvailabilityList()==null? new ArrayList(): emp.getAvailabilityList();
 					list.add(new AvailabilityRequest(ar.getId(), ar.getStartTime(), ar.getEndTime(), null));
@@ -329,7 +329,7 @@ public class TaskPlanningService {
 				}
 			}
 		}
-		for(EmployeePlanningFact emp:solution.getEmployees()){
+		for(Employee emp:solution.getEmployees()){
 			if(emp.getAvailabilityList()==null){
 				emp.setAvailabilityList(new ArrayList());
 			}
@@ -437,9 +437,9 @@ public class TaskPlanningService {
 		List<Map> updatedEmployees = new ArrayList<Map>();
 		List<Map> tasks = new ArrayList<>();
 		int i = 1;
-		for (EmployeePlanningFact emp : solution.getEmployees()) {
+		for (Employee emp : solution.getEmployees()) {
 			Map<String, Object> map = new HashMap<>();
-			makeEmployeeList(tasks, emp.getNextTask());
+			makeEmployeeList(tasks, emp.getPrevTaskOrShift());
 			map.put("employeeName", emp.getName());
 			map.put("employeeNumber", i);
 			map.put("employeeId", emp.getId());

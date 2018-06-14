@@ -53,7 +53,7 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id, @Valid @RequestBody MasterAssetDto asset) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id, @Validated @RequestBody MasterAssetDto asset) {
 
         if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(id, asset));

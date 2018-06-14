@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -104,6 +105,36 @@ public class ObjectMapperUtils {
         //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return objectMapper.readValue(objectMapper.writeValueAsString(object), valueType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static <T> String objectToJsonString(T object){
+        ObjectMapper objectMapper = new ObjectMapper();
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
+        objectMapper.registerModule(javaTimeModule);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        //objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static <T> T JsonStringToObject(String jsonString,Class<T> valueType){
+        ObjectMapper objectMapper = new ObjectMapper();
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
+        objectMapper.registerModule(javaTimeModule);
+        try {
+            return objectMapper.readValue(jsonString, valueType);
         } catch (IOException e) {
             e.printStackTrace();
         }

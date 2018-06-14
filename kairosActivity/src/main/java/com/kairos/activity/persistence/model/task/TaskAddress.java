@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskAddress extends MongoBaseEntity {
 
+    private String block;
+    private int floorNo;
     private String country;
     private Integer zip;
     private String city;
@@ -19,6 +21,22 @@ public class TaskAddress extends MongoBaseEntity {
     private String longitude;
     private String latitude;
 
+
+    public String getBlock() {
+        return block;
+    }
+
+    public void setBlock(String block) {
+        this.block = block;
+    }
+
+    public int getFloorNo() {
+        return floorNo;
+    }
+
+    public void setFloorNo(int floorNo) {
+        this.floorNo = floorNo;
+    }
 
     public String getCountry() {
         return country;

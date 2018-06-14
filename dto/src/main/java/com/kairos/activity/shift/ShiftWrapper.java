@@ -1,6 +1,7 @@
 package com.kairos.activity.shift;
 
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.kairos.response.dto.web.staff.StaffAccessRoleDTO;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 public class ShiftWrapper {
     private List<ShiftQueryResult> assignedShifts;
     private List<OpenShiftResponseDTO> openShifts;
+    private StaffAccessRoleDTO staffDetails;
 
     public ShiftWrapper() {
         //default case
@@ -18,6 +20,12 @@ public class ShiftWrapper {
     public ShiftWrapper(List<ShiftQueryResult> assignedShifts, List<OpenShiftResponseDTO> openShifts) {
         this.assignedShifts = assignedShifts;
         this.openShifts = openShifts;
+    }
+
+    public ShiftWrapper(List<ShiftQueryResult> assignedShifts, List<OpenShiftResponseDTO> openShifts, StaffAccessRoleDTO staffDetails) {
+        this.assignedShifts = assignedShifts;
+        this.openShifts = openShifts;
+        this.staffDetails = staffDetails;
     }
 
     public List<ShiftQueryResult> getAssignedShifts() {
@@ -34,5 +42,13 @@ public class ShiftWrapper {
 
     public void setOpenShifts(List<OpenShiftResponseDTO> openShifts) {
         this.openShifts = openShifts;
+    }
+
+    public StaffAccessRoleDTO getStaffDetails() {
+        return staffDetails;
+    }
+
+    public void setStaffDetails(StaffAccessRoleDTO staffDetails) {
+        this.staffDetails = staffDetails;
     }
 }

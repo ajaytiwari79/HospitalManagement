@@ -17,7 +17,7 @@ public class RequestedTaskService {
 		List<Skill> skills = new ArrayList<>();
 		List<location> locations = new ArrayList<>();
 		List<AvailabilityRequest> availabilityRequests = new ArrayList<>();
-		List<EmployeePlanningFact> employees = new ArrayList<>();
+		List<Employee> employees = new ArrayList<>();
 	
 	 private void makeListFromDbData(){
 			locationsList();
@@ -155,7 +155,7 @@ public class RequestedTaskService {
 				Set<Skill> skillSet = new HashSet<>();
 				skillSet.add(skills.get(0));
 				long employeeId = (long)staffmap.get("id");
-				EmployeePlanningFact employee = new EmployeePlanningFact(employeeId,(String)staffmap.get("firstName")+" "+staffmap.get("lastName"));
+				Employee employee = new Employee(employeeId,(String)staffmap.get("firstName")+" "+staffmap.get("lastName"));
 				//Long availblerequestId = 0l;
 				List<AvailabilityRequest> availabilityList = new ArrayList<>();
 				AvailabilityRequest availabilityRequest;

@@ -9,7 +9,7 @@ import java.util.List;
 public class FilterSelectionDto {
 
 
-    @NotEmpty
+    @NotEmpty(message = "Selection List cannot Empty")
     private List<FilterSelection> filtersData;
 
 

@@ -1,7 +1,10 @@
 package com.kairos.persistance.repository.master_data_management.data_category_element;
 
 import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
-import com.kairos.response.dto.master_data.DataCategoryResponseDto;
+import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
+import com.kairos.persistance.repository.common.CustomAggregationQuery;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDto;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -25,35 +28,37 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
     @Override
     public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, BigInteger id) {
+
+
+
+
+        String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
+        Document projectionOperation = Document.parse(projection);
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
-                unwind("dataElements"),
-                match(Criteria.where("dataElements.deleted").is(false)),
-                group("$id")
-                        .first("name").as("name")
-                        .first(COUNTRY_ID).as(COUNTRY_ID)
-                        .addToSet("dataElements").as("dataElements")
-
-
+                new CustomAggregationOperation(projectionOperation)
         );
+
+
+
         AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
         return result.getUniqueMappedResult();
     }
 
     @Override
     public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId) {
+
+        String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
+        Document projectionOperation = Document.parse(projection);
+
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
-                unwind("dataElements"),
-                match(Criteria.where("dataElements.deleted").is(false)),
-                group("$id")
-                        .first("name").as("name")
-                        .first(COUNTRY_ID).as(COUNTRY_ID)
-                        .addToSet("dataElements").as("dataElements")
+                new CustomAggregationOperation(projectionOperation)
         );
+
         AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
         return result.getMappedResults();
     }

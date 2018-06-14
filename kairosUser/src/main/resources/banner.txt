@@ -1,0 +1,25 @@
+
+
+
+
+
+
+
+                            KKKKKKKKK    KKKKKKK                    iiii
+                            K:::::::K    K:::::K                   i::::i
+                            K:::::::K    K:::::K                    iiii
+                            K:::::::K   K::::::K
+                            KK::::::K  K:::::KKK  aaaaaaaaaaaaa   iiiiiii rrrrr   rrrrrrrrr      ooooooooooo       ssssssssss
+                              K:::::K K:::::K     a::::::::::::a  i:::::i r::::rrr:::::::::r   oo:::::::::::oo   ss::::::::::s
+                              K::::::K:::::K      aaaaaaaaa:::::a  i::::i r:::::::::::::::::r o:::::::::::::::os s:::::::::::::s
+                              K:::::::::::K                a::::a  i::::i rr::::::rrrrr:::::: ro:::::ooooo:::::o s::::::ssss:::::s
+                              K:::::::::::K         aaaaaaa:::::a  i::::i  r:::::r     r::::: ro::::o     o::::o s:::::s  ssssss
+                              K::::::K:::::K      aa::::::::::::a  i::::i  r:::::r     rrrrrr ro::::o     o::::o   s::::::s
+                              K:::::K K:::::K    a::::aaaa::::::a  i::::i  r:::::r            o::::o     o:::::o      s::::::s
+                            KK::::::K  K:::::KKK a::::a    a:::::a i::::i  r:::::r            o:::::o     o::::o osssss   s::::s
+                            K:::::::K   K::::::K a::::a    a:::::a i::::i  r::::r             o:::::ooooo:::::o  s:::::ssss:::::s
+                            K:::::::K    K:::::K a:::::aaaa::::::a i::::i  r::::r              o::::::::::::::o  s:::::::::::::s
+                            K:::::::K    K:::::K a::::::::::aa:::a i::::i  r::::r              o:::::::::::oo    s:::::::::::ss
+                            KKKKKKKKK    KKKKKKK  aaaaaaaaaa  aaaa iiiiii  rrrrrr                ooooooooooo       sssssssssss
+
+                                            ${Ansi.RED} :: Spring Boot${spring-boot.formatted-version} :: ${Ansi.DEFAULT}

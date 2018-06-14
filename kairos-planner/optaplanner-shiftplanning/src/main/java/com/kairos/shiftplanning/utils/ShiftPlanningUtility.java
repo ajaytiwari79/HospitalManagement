@@ -75,7 +75,7 @@ public class ShiftPlanningUtility {
         i++;
         /*
 		Interval interval =(Interval) objs[2];
-		EmployeePlanningFact employee= (EmployeePlanningFact)objs[1];*/
+		Employee employee= (Employee)objs[1];*/
        // DefaultKnowledgeHelper helper = (DefaultKnowledgeHelper) objs[0];
         List<AvailabilityRequest> requests = new ArrayList<>();
 		/*for (Object object : helper.getWorkingMemory().getObjects()) {
@@ -91,7 +91,7 @@ public class ShiftPlanningUtility {
 
     }
 
-    public static boolean checkEmployeeCanWorkThisIntervalUsingDroolsMemory(EmployeePlanningFact employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
+    public static boolean checkEmployeeCanWorkThisIntervalUsingDroolsMemory(Employee employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
         StatefulKnowledgeSessionImpl kieSession = ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
@@ -118,7 +118,7 @@ public class ShiftPlanningUtility {
         return false;
     }
 
-    public static boolean checkEmployeeAttemptedToPlanThisInterval(EmployeePlanningFact employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
+    public static boolean checkEmployeeAttemptedToPlanThisInterval(Employee employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
         StatefulKnowledgeSessionImpl kieSession = ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
@@ -131,7 +131,7 @@ public class ShiftPlanningUtility {
         return false;
     }
 
-    public static boolean checkEmployeeAttemptedToPlanThisIntervals(EmployeePlanningFact employee, List<Interval> intervals, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
+    public static boolean checkEmployeeAttemptedToPlanThisIntervals(Employee employee, List<Interval> intervals, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         @SuppressWarnings("all")
         boolean canBeAttempted = false;
         for (Interval taskTime : intervals) {
@@ -144,7 +144,7 @@ public class ShiftPlanningUtility {
         return canBeAttempted;
     }
 
-    /*public static AvailabilityRequest getEmployeeAvailabilityForDay(EmployeePlanningFact employee,ScoreDirector<ShiftPlanningSolution> director){
+    /*public static AvailabilityRequest getEmployeeAvailabilityForDay(Employee employee,ScoreDirector<ShiftPlanningSolution> director){
     	AvailabilityRequest req=null;
     	for (AvailabilityRequest availabilityRequest : director.getWorkingSolution().getAvailabilityList()) {
 			if(availabilityRequest.getEmployee().getId().equals(employee.getId())){
@@ -224,7 +224,7 @@ public class ShiftPlanningUtility {
         return invalidShiftIntervals[0];
     }
 
-    public static boolean canEmployeeWorkForActivityType(List<StaffingLevelActivityType> staffingLevelActivityTypes, EmployeePlanningFact employee) {
+    public static boolean canEmployeeWorkForActivityType(List<StaffingLevelActivityType> staffingLevelActivityTypes, Employee employee) {
         boolean canWork = false;
         if (staffingLevelActivityTypes == null || staffingLevelActivityTypes.isEmpty())
             //TODO return true later and modify
@@ -441,7 +441,7 @@ public class ShiftPlanningUtility {
    /* public static BigDecimal calculateCostOfEmployee(ShiftRequestPhase shift){
         BigDecimal totalCostOfShift = new BigDecimal(0);
         for (ActivityLineInterval ali:shift.getActivityLineIntervalsList()) {
-            totalCostOfShift.add(new BigDecimal(ali.getActivityPlannerEntity().getActivityCost() * shift.getCostForThisInterval(ali.getInterval())));
+            totalCostOfShift.add(new BigDecimal(ali.getActivity().getActivityCost() * shift.getCostForThisInterval(ali.getInterval())));
         }
         return totalCostOfShift;
     }*/
@@ -459,10 +459,10 @@ public class ShiftPlanningUtility {
         };*/
         return Comparator.comparing(ActivityLineInterval::getStart);
     }
-    public static List<ActivityLineInterval> filterActivityLineIntervals(List<ActivityLineInterval> intervals, ActivityPlannerEntity activityPlannerEntity){
+    public static List<ActivityLineInterval> filterActivityLineIntervals(List<ActivityLineInterval> intervals, Activity activity){
         List<ActivityLineInterval> filteredActivityLineIntervals= new ArrayList<>();
         for (ActivityLineInterval ali:intervals) {
-            if(ali.getActivityPlannerEntity().getId().equals(activityPlannerEntity.getId()))
+            if(ali.getActivity().getId().equals(activity.getId()))
                 filteredActivityLineIntervals.add(ali);
         }
         return filteredActivityLineIntervals;
@@ -735,27 +735,27 @@ public class ShiftPlanningUtility {
         intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
         //log.info("before:"+intervals);
         Interval mergedInterval=intervals.get(0).getInterval();
-        String id=intervals.get(0).getActivityPlannerEntity().getId();
+        String id=intervals.get(0).getActivity().getId();
         List<Interval> mergedIntervals= new ArrayList<>();
         List<String> namesList= new ArrayList<>();
         for (ActivityLineInterval ali:intervals) {
-            if (mergedInterval.getEnd().equals(ali.getStart()) && id.equals(ali.getActivityPlannerEntity().getId())) {
+            if (mergedInterval.getEnd().equals(ali.getStart()) && id.equals(ali.getActivity().getId())) {
                 mergedInterval = mergedInterval.withEnd(ali.getEnd());
-            }else if (mergedInterval.getEnd().equals(ali.getStart()) && !id.equals(ali.getActivityPlannerEntity().getId())) {
+            }else if (mergedInterval.getEnd().equals(ali.getStart()) && !id.equals(ali.getActivity().getId())) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
-                namesList.add(ali.getActivityPlannerEntity().getName());
+                namesList.add(ali.getActivity().getName());
             } else if (mergedInterval.getEnd().isBefore(ali.getStart())) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
-                namesList.add(ali.getActivityPlannerEntity().getName());
+                namesList.add(ali.getActivity().getName());
             }
         }
         //to add last one
         mergedIntervals.add(mergedInterval);
         StringBuilder sb = new StringBuilder("\n");
         intervals.forEach(i->{
-            sb.append(ShiftPlanningUtility.getIntervalAsString(i.getInterval())+":"+i.getActivityPlannerEntity().getName()+"\n");
+            sb.append(ShiftPlanningUtility.getIntervalAsString(i.getInterval())+":"+i.getActivity().getName()+"\n");
         });
         return sb.toString();
     }
@@ -765,19 +765,19 @@ public class ShiftPlanningUtility {
         }
         intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
         Interval mergedInterval=intervals.get(0).getInterval();
-        String id=intervals.get(0).getActivityPlannerEntity().getId();
+        String id=intervals.get(0).getActivity().getId();
         List<Interval> mergedIntervals= new ArrayList<>();
         for (ActivityLineInterval ali:intervals) {
-            if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities ||id.equals(ali.getActivityPlannerEntity().getId()))) {
+            if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities ||id.equals(ali.getActivity().getId()))) {
                 mergedInterval = mergedInterval.withEnd(ali.getEnd());
-            }else if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities ||!id.equals(ali.getActivityPlannerEntity().getId()))) {
+            }else if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities ||!id.equals(ali.getActivity().getId()))) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
-                id=ali.getActivityPlannerEntity().getId();
+                id=ali.getActivity().getId();
             } else if (mergedInterval.getEnd().isBefore(ali.getStart())) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
-                id=ali.getActivityPlannerEntity().getId();
+                id=ali.getActivity().getId();
             }
         }
         //to add last one
@@ -810,14 +810,14 @@ public class ShiftPlanningUtility {
      * @param activities
      * @return
      */
-    public static Map<LocalDate, Object[]> createStaffingLevelMatrix(List<LocalDate> dates, List<ActivityLineInterval> alis,int  granularity,List<ActivityPlannerEntity> activities){
+    public static Map<LocalDate, Object[]> createStaffingLevelMatrix(List<LocalDate> dates, List<ActivityLineInterval> alis,int  granularity,List<Activity> activities){
         Map<LocalDate, Object[]> slMatrix=new HashMap<>();
         for(LocalDate localDate:dates){
             slMatrix.put(localDate,new int[1440/granularity][activities.size()*2]);
         }
         for(ActivityLineInterval ali:alis){
-            if(ali.getActivityPlannerEntity().isBlankActivity())continue;
-            if(ali.getActivityPlannerEntity().isTypeAbsence()){
+            if(ali.getActivity().isBlankActivity())continue;
+            if(ali.getActivity().isTypeAbsence()){
                 IntStream.rangeClosed(0,1440/granularity-1).forEach(i->{
                     ((int[][])slMatrix.get(ali.getStart().toLocalDate()))[i][getActivityIndex(ali)]++;
                 });
@@ -898,7 +898,7 @@ public class ShiftPlanningUtility {
         return slMatrix;
     }
     @Deprecated
-    private static boolean intervalOverlapsIndirectActivities(List<IndirectActivity> indirectActivities, Interval interval,EmployeePlanningFact employee) {
+    private static boolean intervalOverlapsIndirectActivities(List<IndirectActivity> indirectActivities, Interval interval,Employee employee) {
         for(IndirectActivity ic:indirectActivities){
             if(ic.getInterval()!=null && ic.getInterval().overlaps(interval) && ic.getEmployees().contains(employee)) return true;
         }
@@ -912,7 +912,7 @@ public class ShiftPlanningUtility {
             log.debug("1 reduceStaffingLevelMatrix() took"+(System.currentTimeMillis()-start)/1000.0);
         boolean b=slMatrix.get(new LocalDate("2017-12-11"))[0]==slMatrixOriginal.get(new LocalDate("2017-12-11"))[0];
         for(ActivityLineInterval ali:alis){
-            if(ali.getActivityPlannerEntity().isTypeAbsence()){
+            if(ali.getActivity().isTypeAbsence()){
                     IntStream.rangeClosed(0,1440/granularity-1).forEach(i->{
                         int[] perIntervalStaffingLevel=((int[][])slMatrix.get(ali.getStart().toLocalDate()))[i];
                         if(perIntervalStaffingLevel[getActivityMinIndex(ali)]>0){
@@ -984,13 +984,13 @@ public class ShiftPlanningUtility {
     }
     //activity with order 1 can return 0 if min and 1 if max
     public static int getActivityIndex(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivityPlannerEntity().getOrder()*2-(activityLineInterval.isRequired()?2:1);
+        return activityLineInterval.getActivity().getOrder()*2-(activityLineInterval.isRequired()?2:1);
     }
     public static int getActivityMinIndex(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivityPlannerEntity().getOrder()*2-2;
+        return activityLineInterval.getActivity().getOrder()*2-2;
     }
     public static int getActivityMaxIndex(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivityPlannerEntity().getOrder()*2-1;
+        return activityLineInterval.getActivity().getOrder()*2-1;
     }
     public static void breakConstraints(RuleContext kContext,HardMediumSoftLongScoreHolder scoreHolder, List<ShiftRequestPhase> shifts){
         kContext=kContext;
@@ -1000,8 +1000,8 @@ public class ShiftPlanningUtility {
         return;
     }
 
-    public static boolean checkEmployeesAvailability(List<ShiftRequestPhase> shifts, List<EmployeePlanningFact> employeeList, DateTime startTime) {
-        for(EmployeePlanningFact emp:employeeList){
+    public static boolean checkEmployeesAvailability(List<ShiftRequestPhase> shifts, List<Employee> employeeList, DateTime startTime) {
+        for(Employee emp:employeeList){
             boolean employeeAvailable=false;
             //for()
         }

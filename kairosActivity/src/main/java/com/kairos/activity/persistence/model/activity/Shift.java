@@ -212,9 +212,6 @@ public class Shift extends MongoBaseEntity {
         isMainShift = mainShift;
     }
 
-    public DateTimeInterval getInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
-    }
 
     @Override
     public String toString() {
@@ -366,6 +363,7 @@ public class Shift extends MongoBaseEntity {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
     }
-
-
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+    }
 }

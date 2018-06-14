@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Document(collection = "clause_tag")
 public class ClauseTag extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "error.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Name cannot be  empty")
     private String name;
 
     @NotNull

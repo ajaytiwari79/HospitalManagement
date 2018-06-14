@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain.activityConstraint;
 
-import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
+import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
@@ -45,9 +45,9 @@ public class MaxDiffrentActivity implements ConstraintHandler {
     }
 
     public int checkConstraints(ShiftRequestPhase shift){
-        Set<ActivityPlannerEntity> activities = new HashSet<>();
+        Set<Activity> activities = new HashSet<>();
         for (ActivityLineInterval ali:shift.getActivityLineIntervals()) {
-             activities.add(ali.getActivityPlannerEntity());
+             activities.add(ali.getActivity());
         }
         return activities.size()>maxDiffrentActivity?activities.size()-maxDiffrentActivity:0;
     }

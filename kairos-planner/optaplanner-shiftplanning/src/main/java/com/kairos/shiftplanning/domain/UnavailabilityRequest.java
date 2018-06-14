@@ -12,20 +12,20 @@ public class UnavailabilityRequest {
     //@XStreamConverter(JodaTimeConverter.class)
     private DateTime endTime;
     private int weight;
-    private EmployeePlanningFact employee;
+    private Employee employee;
 
-    public EmployeePlanningFact getEmployee() {
+    public Employee getEmployee() {
 		return employee;
 	}
 
-	public void setEmployee(EmployeePlanningFact employee) {
+	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
 
 	public UnavailabilityRequest() {
     }
 
-    public UnavailabilityRequest(Long id, int weight, DateTime startTime, DateTime endTime,EmployeePlanningFact employee) {
+    public UnavailabilityRequest(Long id, int weight, DateTime startTime, DateTime endTime,Employee employee) {
         this.weight = weight;
         this.endTime = endTime;
         this.startTime = startTime;

@@ -6,7 +6,9 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -16,19 +18,22 @@ public class DataSubjectMapping extends MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "name cannotbe null or empty")
+    @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "description cannotbe null or empty")
+    @NotNullOrEmpty(message = "Description Cannot be empty")
     private String description;
 
+    @NotEmpty(message = "Organization Type cannot be empty")
+    @NotNull(message = "Organization Type cannot null")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
+    @NotEmpty(message = "Organization Type cannot be empty")
+    @NotNull(message = "Organization Sub Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
-
+    @NotNull(message = "Data category cannot null")
+    @NotEmpty(message = "Data Category cannot be empty")
     private Set<BigInteger> dataCategories;
 
     private Long countryId;
@@ -79,22 +84,6 @@ public class DataSubjectMapping extends MongoBaseEntity {
 
     public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
     }
 
     public DataSubjectMapping(String name, String description) {

@@ -19,6 +19,7 @@ public class CountryAccessGroupDTO {
     private String description;
     private OrganizationCategory organizationCategory;
     private AccessGroupRole role;
+    private boolean enabled = true;
 
     public CountryAccessGroupDTO(){
         // default constructor
@@ -61,6 +62,14 @@ public class CountryAccessGroupDTO {
 
     public void setOrganizationCategory(OrganizationCategory organizationCategory) {
         this.organizationCategory = organizationCategory;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public AccessGroupRole getRole() {

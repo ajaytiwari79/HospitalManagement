@@ -61,10 +61,9 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAllAccountType()
+    public List<AccountType> getAllAccountType(Long countryId)
     {
-   return accountTypeRepository.getAllAccountType(UserContext.getCountryId());
-
+   return accountTypeRepository.getAllAccountType(countryId);
     }
 
 
@@ -94,7 +93,6 @@ public class AccountTypeService extends MongoBaseService {
 
 
     public Boolean deleteAccountType(BigInteger id) {
-
         AccountType exists = accountTypeRepository.findByid(id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw  new DataNotFoundByIdException("Account type exist for id "+id);

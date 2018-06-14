@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.constant.AppConstant.COUNTRY_ID;
@@ -29,7 +31,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false));
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
 
-            if (filterSelection.getValue().size()!=0) {
+            if (filterSelection.getValue().size() != 0) {
                 query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));
             }
         });
@@ -44,7 +46,11 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
         switch (filterType) {
             case ACCOUNT_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                List<BigInteger> ids = new ArrayList<>();
+                for (Long id : filterSelection.getValue()) {
+                    ids.add(BigInteger.valueOf(id));
+                }
+                return Criteria.where(filterType.value + ID).in(ids);
             case ORGANIZATION_TYPES:
                 return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
 
@@ -57,7 +63,6 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
             default:
                 throw new InvalidRequestException("data not found for Filtertype " + filterType);
-
 
         }
 
