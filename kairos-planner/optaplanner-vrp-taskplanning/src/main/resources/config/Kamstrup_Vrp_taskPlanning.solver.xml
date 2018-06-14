@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-    <!--<environmentMode>FULL_ASSERT</environmentMode>-->
+    <environmentMode>FULL_ASSERT</environmentMode>
     <!--<environmentMode>FAST_ASSERT</environmentMode>-->
     <solutionClass>com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution</solutionClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.TaskOrShift</entityClass>
-    <!--<entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>-->
+    <entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>
     <scoreDirectorFactory>
         <scoreDrl>drl/vrp_task_rules.drl</scoreDrl>
         <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>

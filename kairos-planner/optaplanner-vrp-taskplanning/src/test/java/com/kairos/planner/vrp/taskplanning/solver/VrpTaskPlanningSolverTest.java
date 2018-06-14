@@ -17,8 +17,6 @@ public class VrpTaskPlanningSolverTest {
 
     @Test
     public void solve() throws IOException {
-       // String problemXML=new String(Files.readAllBytes(Paths.get(new File("src/main/resources/problem.xml").toURI())));
-        //VrpTaskPlanningSolution problem=ObjectMapperUtils.JsonStringToObject(problemJson,VrpTaskPlanningSolution.class);
         new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml");
     }
 }

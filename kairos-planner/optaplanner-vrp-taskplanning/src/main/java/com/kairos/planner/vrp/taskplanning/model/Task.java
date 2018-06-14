@@ -6,7 +6,6 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.*;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,7 +32,7 @@ public class Task extends TaskOrShift{
     private TaskOrShift prevTaskOrShift;
 
     @CustomShadowVariable(sources = @PlanningVariableReference(variableName = "prevTaskOrShift"),variableListenerClass = VrpTaskStartTimeListener.class)
-    private LocalDateTime plannedDateTime;
+    private LocalDateTime plannedStartTime;
 
 
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
@@ -176,17 +175,17 @@ public class Task extends TaskOrShift{
         this.longitude = longitude;
     }
 
-    public LocalDateTime getPlannedDateTime() {
-        return plannedDateTime;
+    public LocalDateTime getPlannedStartTime() {
+        return plannedStartTime;
     }
     public LocalDateTime getPlannedEndTime() {
-        if(plannedDateTime==null) return null;
-        return plannedDateTime.plusMinutes((long)getPlannedDuration());
+        if(plannedStartTime ==null) return null;
+        return plannedStartTime.plusMinutes((long)getPlannedDuration());
 
     }
 
-    public void setPlannedDateTime(LocalDateTime plannedDateTime) {
-        this.plannedDateTime = plannedDateTime;
+    public void setPlannedStartTime(LocalDateTime plannedStartTime) {
+        this.plannedStartTime = plannedStartTime;
     }
 
     public LocationsDistanceMatrix getLocationsDistanceMatrix() {
