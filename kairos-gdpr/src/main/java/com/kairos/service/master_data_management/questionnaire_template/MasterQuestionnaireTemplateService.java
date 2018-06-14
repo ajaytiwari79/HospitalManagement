@@ -1,13 +1,14 @@
 package com.kairos.service.master_data_management.questionnaire_template;
 
 
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
-import com.kairos.dto.master_data.MasterQuestionnaireSectionDto;
+import com.kairos.dto.master_data.MasterQuestionnaireTemplateDto;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireSection;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireTemplate;
-import com.kairos.persistance.repository.master_data_management.asset_management.StorageTypeMongoRepository;
+import com.kairos.persistance.repository.master_data_management.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionMongoRepository;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireSectionRepository;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
@@ -25,11 +26,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.kairos.constant.AppConstant.IDS_LIST;
-import static com.kairos.constant.AppConstant.QUESTION_LIST;
-import static com.kairos.constant.AppConstant.QUESTIONNIARE_SECTIONS;
 
 
 @Service
@@ -46,7 +42,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private StorageTypeMongoRepository storageTypeMongoRepository;
+    private AssetTypeMongoRepository storageTypeMongoRepository;
 
     @Inject
     private MasterQuestionnaireSectionService masterQuestionnaireSectionService;
@@ -57,67 +53,121 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     @Inject
     private MasterQuestionMongoRepository masterQuestionMongoRepository;
 
-    /*
-     *creating basic questionniare template
-     *  QuestionnaireTemplateType is a enum if asset type is select then set asset type id in template else directly save questionniareType
-     * storage type reffered to asset type
-     *
-     */
-    public MasterQuestionnaireTemplate addQuestionnaireTemplate(Long countryId, MasterQuestionnaireTemplate masterQuestionnaireTemplate) {
-        MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, masterQuestionnaireTemplate.getName().trim());
-        if (Optional.ofNullable(exisiting).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "quetionnaire template", masterQuestionnaireTemplate.getName());
-        }
-        MasterQuestionnaireTemplate newQuestionnaireTemplate = new MasterQuestionnaireTemplate();
-        if (QuestionnaireTemplateType.valueOf(masterQuestionnaireTemplate.getTemplateType()) == null) {
-            throw new InvalidRequestException("template type not found for " + masterQuestionnaireTemplate.getTemplateType());
-        } else {
-            addTemplateTypeToQuestionnaireTemplate(masterQuestionnaireTemplate.getAssetType(), newQuestionnaireTemplate, QuestionnaireTemplateType.valueOf(masterQuestionnaireTemplate.getTemplateType().trim()));
-            try {
-                newQuestionnaireTemplate.setCountryId(countryId);
-                newQuestionnaireTemplate.setName(masterQuestionnaireTemplate.getName());
-                newQuestionnaireTemplate.setDescription(masterQuestionnaireTemplate.getDescription());
-                newQuestionnaireTemplate = save(newQuestionnaireTemplate);
 
-            } catch (MongoException e) {
-                LOGGER.info(e.getMessage());
-                throw new MongoException(e.getMessage());
-            }
+    public MasterQuestionnaireTemplate addQuestionnaireTemplate(Long countryId, MasterQuestionnaireTemplateDto templateDto) {
+        MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, templateDto.getName().trim());
+        if (Optional.ofNullable(exisiting).isPresent()) {
+           throw new DuplicateDataException("Template Exists with same name");
         }
-        return newQuestionnaireTemplate;
+        MasterQuestionnaireTemplate questionnaireTemplate = new MasterQuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
+        questionnaireTemplate = buildQuestionniareTemplate(templateDto, questionnaireTemplate);
+        try {
+            questionnaireTemplate = save(questionnaireTemplate);
+        } catch (MongoException e) {
+            LOGGER.info(e.getMessage());
+            throw new MongoException(e.getMessage());
+        }
+        return questionnaireTemplate;
     }
+
+
+    public MasterQuestionnaireTemplate buildQuestionniareTemplate(MasterQuestionnaireTemplateDto templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
+        if (QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()) == null) {
+            throw new InvalidRequestException("template type not found for" + templateDto.getTemplateType());
+        }
+        addTemplateTypeToQuestionnaireTemplate(templateDto.getAssetType(), questionnaireTemplate, QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()));
+        return questionnaireTemplate;
+    }
+
+    public void addTemplateTypeToQuestionnaireTemplate(BigInteger assetTypeId, MasterQuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateType templateType) {
+
+        switch (templateType) {
+            case VENDOR:
+                questionnaireTemplate.setTemplateType(templateType.value);
+                break;
+            case GENERAL:
+                questionnaireTemplate.setTemplateType(templateType.value);
+                break;
+            case ASSET_TYPE:
+                if (assetTypeId == null) {
+                    exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
+                } else {
+                    if (storageTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
+                        questionnaireTemplate.setTemplateType(templateType.value);
+                        questionnaireTemplate.setAssetType(assetTypeId);
+                    } else {
+                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "asset type", questionnaireTemplate.getAssetType());
+                    }
+                }
+                break;
+            case PROCESSING_ACTIVITY:
+                questionnaireTemplate.setTemplateType(templateType.value);
+                break;
+            default:
+                throw new InvalidRequestException("invalid request template type not found for " + templateType.value);
+        }
+    }
+
+
+    public Boolean deleteMasterQuestionnaireTemplate(Long countryId, BigInteger id) {
+        MasterQuestionnaireTemplate exist = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(exist).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
+        }
+        exist.setDeleted(true);
+        save(exist);
+        return true;
+    }
+
+    public MasterQuestionnaireTemplate updateQuestionniareTemplate(Long countryId, BigInteger id, MasterQuestionnaireTemplateDto templateDto) {
+        MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, templateDto.getName().trim());
+        if (Optional.ofNullable(exisiting).isPresent()) {
+            throw new DuplicateDataException("Template Exists with same name");
+        }
+        exisiting = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(exisiting).isPresent()) {
+            exceptionService.duplicateDataException("message.dataNotFound", "quetionnaire template", id);
+        }
+        exisiting.setName(templateDto.getName());
+        exisiting.setDescription(templateDto.getDescription());
+        exisiting = buildQuestionniareTemplate(templateDto, exisiting);
+        try {
+            exisiting = save(exisiting);
+        } catch (MongoException e) {
+            LOGGER.info(e.getMessage());
+            throw new MongoException(e.getMessage());
+        }
+        return exisiting;
+    }
+
 
     public MasterQuestionnaireTemplateResponseDto getMasterQuestionniareTemplateWithSectionById(Long countryId, BigInteger id) {
         MasterQuestionnaireTemplateQueryResult queryResult = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId, id);
         List<MasterQuestionnaireTemplateQueryResult> queryResults = new ArrayList<>();
         queryResults.add(queryResult);
-        return createQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults).get(0);
+        return getQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults).get(0);
     }
 
 
     public List<MasterQuestionnaireTemplateResponseDto> getAllMasterQuestionniareTemplateWithSection(Long countryId) {
         List<MasterQuestionnaireTemplateQueryResult> queryResults = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId);
-        return createQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults);
+        return getQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults);
 
     }
 
     public Map<BigInteger, MasterQuestion> filterNonDeletedQuestion(List<MasterQuestion> masterQuestions) {
-
         Map<BigInteger, MasterQuestion> nonDeletedQuestions = new HashMap<>();
-
         masterQuestions.forEach(masterQuestion -> {
 
             if (!masterQuestion.isDeleted()) {
                 nonDeletedQuestions.put(masterQuestion.getId(), masterQuestion);
             }
         });
-
         return nonDeletedQuestions;
 
     }
 
-
-    public List<MasterQuestionnaireTemplateResponseDto> createQuestionniareTemplateResponseWithSectionAndQuestionResponse(List<MasterQuestionnaireTemplateQueryResult> templateQueryResults) {
+    public List<MasterQuestionnaireTemplateResponseDto> getQuestionniareTemplateResponseWithSectionAndQuestionResponse(List<MasterQuestionnaireTemplateQueryResult> templateQueryResults) {
 
         Map<BigInteger, MasterQuestionnaireSection> sections = new HashMap<>();
         Map<BigInteger, MasterQuestion> questions = new HashMap<>();
@@ -162,80 +212,6 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
 
         return responseListQuestionniareResult;
-
-
-    }
-
-
-    public Boolean deleteMasterQuestionnaireTemplate(Long countryId, BigInteger id) {
-        MasterQuestionnaireTemplate exist = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
-        }
-        exist.setDeleted(true);
-        save(exist);
-        return true;
-
-    }
-
-    /**
-     * add questionnaire section list to questionnaire template
-     * duplicate sections are allowed for different questionniare template
-     * sections contain list of question
-     * Map<String, Object> is used to get ids of section if any exception then delete section and delete question releated to sections
-     */
-
-    public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, BigInteger id, List<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDto) {
-        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(existing).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
-        }
-        Map<String, Object> questionnaireSection = new HashMap<>();
-        questionnaireSection = masterQuestionnaireSectionService.addQuestionnaireSection(countryId, masterQuestionnaireSectionDto);
-        existing.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
-        try {
-            existing = save(existing);
-        } catch (Exception e) {
-            masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNIARE_SECTIONS));
-            masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
-            LOGGER.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return existing;
-
-    }
-
-
-    public void addTemplateTypeToQuestionnaireTemplate(BigInteger id, MasterQuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateType templateType) {
-
-        switch (templateType) {
-            case VENDOR:
-                questionnaireTemplate.setTemplateType(templateType.value);
-                break;
-            case GENERAL:
-                questionnaireTemplate.setTemplateType(templateType.value);
-                break;
-            case ASSET_TYPE:
-                if (id == null) {
-                    exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
-                } else {
-                    if (storageTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), id) != null) {
-                        questionnaireTemplate.setTemplateType(templateType.value);
-                        questionnaireTemplate.setAssetType(id);
-                    } else {
-                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "asset type", questionnaireTemplate.getAssetType());
-                    }
-                }
-                break;
-            case PROCESSING_ACTIVITY:
-                questionnaireTemplate.setTemplateType(templateType.value);
-                break;
-
-            default:
-                throw new InvalidRequestException("invalid request template type not found for " + templateType.value);
-
-
-        }
 
 
     }

@@ -56,7 +56,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
             }
             if (masterProcessingActivityDto.getOrganizationSubServices() != null && masterProcessingActivityDto.getOrganizationSubServices().size() != 0) {
-                masterProcessingActivity.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationTypes());
+                masterProcessingActivity.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationSubServices());
 
             }
             if (masterProcessingActivityDto.getSubProcessingActivities() != null && masterProcessingActivityDto.getSubProcessingActivities().size() != 0) {
@@ -142,7 +142,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
                     exists.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
                 }
                 if (masterProcessingActivityDto.getOrganizationSubServices() != null && masterProcessingActivityDto.getOrganizationSubServices().size() != 0) {
-                    exists.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationTypes());
+                    exists.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationSubServices());
 
                 }
                 if (masterProcessingActivityDto.getSubProcessingActivities() != null && masterProcessingActivityDto.getSubProcessingActivities().size() != 0) {

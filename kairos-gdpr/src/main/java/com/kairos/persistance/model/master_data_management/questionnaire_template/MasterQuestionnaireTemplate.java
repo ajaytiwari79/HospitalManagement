@@ -78,10 +78,10 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public MasterQuestionnaireTemplate(String name, Long countryId, String templateType) {
+    public MasterQuestionnaireTemplate(String name, Long countryId, String description) {
         this.name = name;
         this.countryId = countryId;
-        this.templateType = templateType;
+        this.description = description;
     }
 
     public MasterQuestionnaireTemplate() {

@@ -8,8 +8,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 
-@Document(collection = "storage_type")
-public class StorageType extends MongoBaseEntity {
+@Document(collection = "asset_type")
+public class AssetType extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")

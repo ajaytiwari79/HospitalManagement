@@ -75,19 +75,15 @@ public class ClauseService extends MongoBaseService {
             Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
             if (clauseDto.getOrganizationTypes() != null && clauseDto.getOrganizationTypes().size() != 0) {
                 newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
-
             }
             if (clauseDto.getOrganizationSubTypes() != null && clauseDto.getOrganizationSubTypes().size() != 0) {
                 newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
-
             }
             if (clauseDto.getOrganizationServices() != null && clauseDto.getOrganizationServices().size() != 0) {
                 newclause.setOrganizationServices(clauseDto.getOrganizationServices());
-
             }
             if (clauseDto.getOrganizationSubServices() != null && clauseDto.getOrganizationSubServices().size() != 0) {
-                newclause.setOrganizationSubServices(clauseDto.getOrganizationTypes());
-
+                newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
             newclause.setAccountTypes(accountTypes);
             newclause.setTags(tagList);
@@ -131,19 +127,15 @@ public class ClauseService extends MongoBaseService {
 
             if (clauseDto.getOrganizationTypes() != null && clauseDto.getOrganizationTypes().size() != 0) {
                 exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
-
             }
             if (clauseDto.getOrganizationSubTypes() != null && clauseDto.getOrganizationSubTypes().size() != 0) {
                 exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
-
             }
             if (clauseDto.getOrganizationServices() != null && clauseDto.getOrganizationServices().size() != 0) {
                 exists.setOrganizationServices(clauseDto.getOrganizationServices());
-
             }
             if (clauseDto.getOrganizationSubServices() != null && clauseDto.getOrganizationSubServices().size() != 0) {
-                exists.setOrganizationSubServices(clauseDto.getOrganizationTypes());
-
+                exists.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
             List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountType());
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());

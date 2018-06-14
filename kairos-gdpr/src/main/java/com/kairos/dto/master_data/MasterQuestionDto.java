@@ -13,6 +13,8 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionDto {
 
+    private BigInteger id;
+
     @NotNullOrEmpty(message = "Question title  can't be  empty")
     @Pattern(message = "numberic and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
     private String question;
@@ -28,6 +30,14 @@ public class MasterQuestionDto {
     private Boolean isNotSureAllowed=false;
 
     private Boolean isNotApplicableAllowed=false;
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public Boolean getNotApplicableAllowed() {
         return isNotApplicableAllowed;

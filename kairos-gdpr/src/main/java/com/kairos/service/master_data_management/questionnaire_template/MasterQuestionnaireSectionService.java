@@ -4,8 +4,10 @@ package com.kairos.service.master_data_management.questionnaire_template;
 import com.kairos.dto.master_data.MasterQuestionnaireSectionDto;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireSection;
+import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionMongoRepository;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireSectionRepository;
+import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -42,6 +44,10 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     private MongoTemplate mongoTemplate;
 
 
+    @Inject
+    private MasterQuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
+
+
     //add questionnaire section in questionnaire template
     //masterQuestionnaireSectionDtos is list or questionnaire section ,each section contain questions list
     public Map<String, Object> addQuestionnaireSection(Long countryId, List<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDtos) {
@@ -67,7 +73,6 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             masterQuestionMongoRepository.deleteAll(questionList);
-
         }
         result.put(IDS_LIST, questionSectionIds);
         result.put(QUESTIONNIARE_SECTIONS, masterQuestionnaireSections);
@@ -86,6 +91,33 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             titles.add(questionnaireSectionDto.getTitle());
         }
     }
+
+
+
+
+
+    public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, BigInteger id, List<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDto) {
+        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(existing).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
+        }
+        Map<String, Object> questionnaireSection = new HashMap<>();
+        questionnaireSection = addQuestionnaireSection(countryId, masterQuestionnaireSectionDto);
+        existing.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
+        try {
+            existing = save(existing);
+        } catch (Exception e) {
+            masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNIARE_SECTIONS));
+            masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
+            LOGGER.info(e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return existing;
+
+    }
+
+
+
 
 
 }

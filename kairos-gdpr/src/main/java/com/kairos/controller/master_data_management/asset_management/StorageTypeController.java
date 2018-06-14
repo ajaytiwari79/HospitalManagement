@@ -1,8 +1,8 @@
 package com.kairos.controller.master_data_management.asset_management;
 
 
-import com.kairos.persistance.model.master_data_management.asset_management.StorageType;
-import com.kairos.service.master_data_management.asset_management.StorageTypeService;
+import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
+import com.kairos.service.master_data_management.asset_management.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
 import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
 /*
@@ -33,21 +32,21 @@ public class StorageTypeController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageTypeController.class);
 
     @Inject
-    private StorageTypeService storageTypeService;
+    private AssetTypeService storageTypeService;
 
 
-    @ApiOperation("add StorageType")
+    @ApiOperation("add AssetType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<StorageType> storageTypes) {
+    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> storageTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createStorageType(countryId, storageTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetType(countryId, storageTypes.getRequestBody()));
 
     }
 
 
-    @ApiOperation("get StorageType by id")
+    @ApiOperation("get AssetType by id")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getStorageType(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
@@ -56,46 +55,46 @@ public class StorageTypeController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageType(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAssetType(countryId, id));
 
     }
 
 
-    @ApiOperation("get all StorageType ")
+    @ApiOperation("get all AssetType ")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllStorageType() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAllStorageType());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAllAssetType());
 
     }
 
 
-    @ApiOperation("get StorageType by name")
+    @ApiOperation("get AssetType by name")
     @GetMapping("/name")
     public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getStorageTypeByName(countryId, name));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAssetTypeByName(countryId, name));
 
     }
 
 
-    @ApiOperation("delete StorageType  by id")
+    @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteStorageType(@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.deleteStorageType(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.deleteAssetType(id));
 
     }
 
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateStorageType(@PathVariable BigInteger id,  @Valid @RequestBody StorageType storageType) {
+    public ResponseEntity<Object> updateStorageType(@PathVariable BigInteger id,  @Valid @RequestBody AssetType storageType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.updateStorageType(id, storageType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.updateAssetType(id, storageType));
 
     }
 
