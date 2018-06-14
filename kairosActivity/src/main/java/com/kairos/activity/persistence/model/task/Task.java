@@ -104,14 +104,14 @@ public class Task extends TaskDemand {
     private boolean locationChanged;
 
     //Vrp settings
-    private Integer intallationNo;
+    private Integer installationNo;
 
-    public Integer getIntallationNo() {
-        return intallationNo;
+    public Integer getInstallationNo() {
+        return installationNo;
     }
 
-    public void setIntallationNo(Integer intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setInstallationNo(Integer installationNo) {
+        this.installationNo = installationNo;
     }
 
     public Integer getExtraPenalty() {

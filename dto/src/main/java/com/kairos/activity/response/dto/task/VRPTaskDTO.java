@@ -12,7 +12,7 @@ import java.math.BigInteger;
 public class VRPTaskDTO {
     private TaskAddress address;
     //Vrp settings
-    private Integer intallationNo;
+    private Integer installationNo;
     private Long citizenId;
     private String skill;
     private BigInteger taskTypeId;
@@ -50,11 +50,11 @@ public class VRPTaskDTO {
         this.address = address;
     }
 
-    public Integer getIntallationNo() {
-        return intallationNo;
+    public Integer getInstallationNo() {
+        return installationNo;
     }
 
-    public void setIntallationNo(Integer intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setInstallationNo(Integer installationNo) {
+        this.installationNo = installationNo;
     }
 }

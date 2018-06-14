@@ -9,7 +9,7 @@ public class VRPClientDTO {
 
     private String firstName;
     private Long id;
-    private int intallationNo;
+    private int installationNo;
     private Double lattitude;
     private Double longitude;
     private String streetName;
@@ -36,12 +36,12 @@ public class VRPClientDTO {
         this.id = id;
     }
 
-    public int getIntallationNo() {
-        return intallationNo;
+    public int getInstallationNo() {
+        return installationNo;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setInstallationNo(int installationNo) {
+        this.installationNo = installationNo;
     }
 
     public Double getLattitude() {

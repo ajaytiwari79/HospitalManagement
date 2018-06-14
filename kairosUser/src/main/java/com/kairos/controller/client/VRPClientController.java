@@ -37,7 +37,7 @@ public class VRPClientController {
     @GetMapping(value = "/vrpClient")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getClients(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 vrpClientService.getAllClient(unitId));
     }
 
@@ -45,7 +45,7 @@ public class VRPClientController {
     @GetMapping(value = "/vrpClient/{clientId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getClient(@PathVariable Long unitId,@PathVariable Long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 vrpClientService.getClient(clientId));
     }
 
@@ -53,7 +53,7 @@ public class VRPClientController {
     @DeleteMapping(value = "/vrpClient/{clientId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteClient(@PathVariable Long unitId,@PathVariable Long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 vrpClientService.deleteClient(clientId));
     }
 
@@ -62,7 +62,7 @@ public class VRPClientController {
     @PutMapping(value = "/client")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateClient(@PathVariable Long unitId, @RequestBody VRPClientDTO vrpClientDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 vrpClientService.updateClient(unitId,vrpClientDTO));
     }
 

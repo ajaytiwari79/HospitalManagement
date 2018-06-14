@@ -13,7 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 
 public class VRPClient extends User {
 
-    private int intallationNo;
+    private int installationNo;
     private Double lattitude;
     private Double longitude;
     private int duration;
@@ -35,12 +35,12 @@ public class VRPClient extends User {
         this.organization = organization;
     }
 
-    public int getIntallationNo() {
-        return intallationNo;
+    public int getInstallationNo() {
+        return installationNo;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setInstallationNo(int installationNo) {
+        this.installationNo = installationNo;
     }
 
     public Double getLattitude() {

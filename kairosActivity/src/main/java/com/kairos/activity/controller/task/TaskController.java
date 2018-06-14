@@ -254,7 +254,7 @@ public class TaskController {
     @GetMapping(value = "/vrpTask")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTasks(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 taskService.getAllTask(unitId));
     }
 
@@ -262,7 +262,7 @@ public class TaskController {
     @GetMapping(value = "/vrpTask/{taskId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable Long unitId,@PathVariable BigInteger taskId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 taskService.getTask(taskId));
     }
 

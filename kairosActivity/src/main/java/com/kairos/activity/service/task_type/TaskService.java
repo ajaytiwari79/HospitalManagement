@@ -7,7 +7,6 @@ import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.client.Client;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.staff.*;
-import com.kairos.activity.client.vrpRestClient.VRPRestClient;
 import com.kairos.activity.config.env.EnvConfig;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.messaging.ReceivedTask;
@@ -174,7 +173,6 @@ public class TaskService extends MongoBaseService {
     private PayOutCalculationService payOutCalculationService;
     @Autowired
     private ExceptionService exceptionService;
-    @Inject private VRPRestClient vrpRestClient;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -1587,9 +1585,9 @@ public class TaskService extends MongoBaseService {
         return value;
     }
 
-    private List<Task> getVrpTasksByRows(List<Row> rows, Long unitId){
+    /*private List<Task> getVrpTasksByRows(List<Row> rows, Long unitId){
         List<VRPClientDTO> vrpClientDTOS = vrpRestClient.getAllVRPClient();
-        Map<Integer,Long> installationAndCitizenId = vrpClientDTOS.stream().collect(Collectors.toMap(c->c.getIntallationNo(),c->c.getId()));
+        Map<Integer,Long> installationAndCitizenId = vrpClientDTOS.stream().collect(Collectors.toMap(c->c.getInstallationNo(),c->c.getId()));
         List<Task> tasks = new ArrayList<>();
         for (int i = 2;i<rows.size();i++){
             Row row = rows.get(i);
@@ -1604,14 +1602,14 @@ public class TaskService extends MongoBaseService {
             taskAddress.setStreet(row.getCell(7).getStringCellValue());
             taskAddress.setBlock(row.getCell(9).getStringCellValue());
             task.setAddress(taskAddress);
-            task.setIntallationNo(getValue(row.getCell(5)).intValue());
+            task.setInstallationNo(getValue(row.getCell(5)).intValue());
             task.setDuration((int) row.getCell(0).getNumericCellValue());
-            task.setCitizenId(installationAndCitizenId.get(task.getIntallationNo()));
+            task.setCitizenId(installationAndCitizenId.get(task.getInstallationNo()));
             task.setUnitId(unitId);
             tasks.add(task);
         }
         return tasks;
-    }
+    }*/
 
     public List<TaskDTO> importTask(Long unitId, List<VRPTaskDTO> taskDTOS){
        // List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);

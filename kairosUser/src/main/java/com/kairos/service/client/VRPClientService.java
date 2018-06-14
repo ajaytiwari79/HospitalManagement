@@ -1,10 +1,8 @@
 package com.kairos.service.client;
 
-import com.google.common.collect.Lists;
 import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.ObjectUtils;
-import com.kairos.client.TaskDemandRestClient;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.client.TomTomRestClient;
 import com.kairos.client.dto.TaskAddress;
@@ -17,14 +15,10 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.excel.ExcelService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +56,7 @@ public class VRPClientService  extends UserBaseService {
             Row row = rows.get(i);
             VRPClient client = new VRPClient();
             client.setFirstName("Client "+(i-1));
-            client.setIntallationNo((int) getValue(row.getCell(5)));
+            client.setInstallationNo((int) getValue(row.getCell(5)));
             client.setLattitude(getValue(row.getCell(14)));
             client.setLongitude(getValue(row.getCell(14)));
             client.setBlock(row.getCell(9).getStringCellValue());
@@ -75,12 +69,12 @@ public class VRPClientService  extends UserBaseService {
             client.setOrganization(organization);
             VRPTaskDTO vrpTaskDTO = new VRPTaskDTO();
             vrpTaskDTO.setAddress(new TaskAddress(client.getPostCode(),client.getCity(),client.getStreetName(),""+client.getHouseNo(),client.getLattitude().toString(),client.getLattitude().toString(),client.getBlock(),client.getFloorNo()));
-            vrpTaskDTO.setIntallationNo(client.getIntallationNo());
+            vrpTaskDTO.setInstallationNo(client.getInstallationNo());
             vrpTaskDTO.setSkill(row.getCell(16).getStringCellValue());
             vrpTasks.add(vrpTaskDTO);
             vrpClients.add(client);
         }
-        vrpClients = vrpClients.stream().filter(ObjectUtils.distinctByKey(vrpClient -> vrpClient.getIntallationNo())).collect(Collectors.toList());
+        vrpClients = vrpClients.stream().filter(ObjectUtils.distinctByKey(vrpClient -> vrpClient.getInstallationNo())).collect(Collectors.toList());
         return new Object[]{vrpClients,vrpTasks};
     }
 
@@ -108,9 +102,9 @@ public class VRPClientService  extends UserBaseService {
     }
 
     public void createTask(List<VRPTaskDTO> vrpTaskDTOS,List<VRPClient> vrpClients){
-        Map<Integer,Long> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getIntallationNo(),c->c.getId()));
+        Map<Integer,Long> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNo(), c->c.getId()));
         for (VRPTaskDTO taskDTO : vrpTaskDTOS) {
-            taskDTO.setCitizenId(clientIdAndInstallationNo.get(taskDTO.getIntallationNo()));
+            taskDTO.setCitizenId(clientIdAndInstallationNo.get(taskDTO.getInstallationNo()));
         }
         taskServiceRestClient.createTaskBYExcel(vrpTaskDTOS);
     }
