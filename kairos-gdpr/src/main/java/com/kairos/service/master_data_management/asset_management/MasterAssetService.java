@@ -56,7 +56,7 @@ public class MasterAssetService extends MongoBaseService {
 
             }
             if (masterAssetDto.getOrganizationSubServices()!=null&&masterAssetDto.getOrganizationSubServices().size()!=0) {
-                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
 
@@ -96,7 +96,7 @@ public class MasterAssetService extends MongoBaseService {
 
             }
             if (masterAssetDto.getOrganizationSubServices() != null && masterAssetDto.getOrganizationSubServices().size() != 0) {
-                exists.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+                exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
             exists.setName(masterAssetDto.getName());
