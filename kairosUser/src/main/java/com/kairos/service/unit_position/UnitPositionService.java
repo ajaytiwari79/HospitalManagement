@@ -371,7 +371,7 @@ public class UnitPositionService extends UserBaseService {
             unitPosition.setCta(cta);
         }
 
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 0);
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 1);
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", unitPositionDTO.getExpertiseId());
 
@@ -1019,4 +1019,9 @@ public class UnitPositionService extends UserBaseService {
         return staffData;
     }
 
+    public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData =
+                staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId,System.currentTimeMillis());
+        return staffData;
+    }
 }

@@ -38,4 +38,12 @@ public class PhaseSettingsController {
                                                                      @RequestBody @Valid List<PhaseSettingsDTO> phaseSettingsDTOS) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseSettingsService.updatePhaseSettings(unitId,  phaseSettingsDTOS));
     }
+
+    @ApiOperation(value = "get unit phase settings")
+    @PostMapping(value = "/default_phase_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createDefaultPhaseSettings(@PathVariable Long unitId) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseSettingsService.createDefaultPhaseSettings(unitId,null));
+    }
 }

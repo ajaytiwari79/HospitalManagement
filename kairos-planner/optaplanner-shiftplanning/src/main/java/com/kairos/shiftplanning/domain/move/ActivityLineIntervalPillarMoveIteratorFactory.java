@@ -47,9 +47,9 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
         List<ShiftRequestPhase> shifts= solution.getShifts().stream().filter(s->s.getDate().equals(date)).collect(Collectors.toList());
         Map<String,List<ActivityLineInterval>> groupedAlis= solution.getActivitiesIntervalsGroupedPerDay();
         List<List<ActivityLineInterval>> activityLineIntervalsPerDay= new ArrayList<>();
-        for(ActivityPlannerEntity activityPlannerEntity :solution.getActivitiesPerDay().get(date)){
+        for(Activity activity :solution.getActivitiesPerDay().get(date)){
             for(Map.Entry<String,List<ActivityLineInterval>> entry:groupedAlis.entrySet()){
-                if(!entry.getKey().startsWith(date.toString("MM/dd/yyyy")+"_"+ activityPlannerEntity.getId())) continue;
+                if(!entry.getKey().startsWith(date.toString("MM/dd/yyyy")+"_"+ activity.getId())) continue;
                 List<ActivityLineInterval> alis=entry.getValue();
                 //int[] randomRange= ShiftPlanningUtility.getRandomRange(alis.size(),workingRandom);
                 //activityLineIntervalsPerDayPerAct.add(alis.subList(randomRange[0],randomRange[1]));
@@ -79,14 +79,14 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
     private void mergeMultipleActivityLinesForSingleShift(List<List<ActivityLineInterval>> activityLineIntervalsPerDay,Random workingRandom) {
         List<List<ActivityLineInterval>> mergedActivityLines=new ArrayList<>();
         for(List<ActivityLineInterval> activityLineIntervalsOuter:activityLineIntervalsPerDay){
-            if(activityLineIntervalsOuter.get(0).getActivityPlannerEntity().isTypeAbsence())continue;
+            if(activityLineIntervalsOuter.get(0).getActivity().isTypeAbsence())continue;
             int outerPartitionIndex=workingRandom.nextInt(activityLineIntervalsOuter.size());
             DateTime outersPartitionTime=activityLineIntervalsOuter.get(outerPartitionIndex).getStart();
             for(List<ActivityLineInterval> activityLineIntervalsInner:activityLineIntervalsPerDay){
-                if(activityLineIntervalsInner.get(0).getActivityPlannerEntity().isTypeAbsence())continue;
+                if(activityLineIntervalsInner.get(0).getActivity().isTypeAbsence())continue;
                 if(activityLineIntervalsInner==activityLineIntervalsOuter ||
                         //activityLineIntervalsInner.get(0).getStart().isAfter(activityLineIntervalsOuter.get(0).getStart())||
-                        activityLineIntervalsInner.get(0).getActivityPlannerEntity().getId().equals(activityLineIntervalsOuter.get(0).getActivityPlannerEntity().getId()))continue;
+                        activityLineIntervalsInner.get(0).getActivity().getId().equals(activityLineIntervalsOuter.get(0).getActivity().getId()))continue;
                 if(overlaps(activityLineIntervalsOuter,activityLineIntervalsInner)){
                     List<ActivityLineInterval> mergedAlis=new ArrayList<>();
                     boolean innerStartsFirst=activityLineIntervalsOuter.get(0).getStart().isAfter(activityLineIntervalsInner.get(0).getStart());

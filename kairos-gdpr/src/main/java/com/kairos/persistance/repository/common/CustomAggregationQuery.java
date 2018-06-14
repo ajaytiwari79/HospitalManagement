@@ -32,10 +32,40 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String questionnnaireTemplateAddNonDeletedQuestions()
+    {
+        return "{  '$addFields':" +
+                "{'questions':" +
+                "{$filter : { "+
+                "'input': '$questions',"+
+                "as: 'questions', "+
+                "cond: {$eq: ['$$questions.deleted',"+false+"]}" +
+                "}}}} ";
+    }
 
 
+    public static String questionnnaireTemplateAddNonDeletedAssetType()
+    {
+        return "{  '$addFields':" +
+                "{'assetType':" +
+                "{$filter : { "+
+                "'input': '$assetType',"+
+                "as: 'assetType', "+
+                "cond: {$eq: ['$$assetType.deleted',"+false+"]}" +
+                "}}}} ";
+    }
 
-
+    public static String dataCategoryWithDataElementProjectionData() {
+        return "{  '$project':" +
+                "{'dataElements':" +
+                "{'$filter' : { " +
+                "'input':'$dataElements'," +
+                "as: 'dataElement', " +
+                "cond:{$eq:['$$dataElement.deleted',false]}" +
+                "}}," +
+                "'countryId':1"+
+                ", 'name':1 }}";
+    }
 
 
 }

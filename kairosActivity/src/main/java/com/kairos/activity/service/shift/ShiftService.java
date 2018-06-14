@@ -44,9 +44,12 @@ import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftState;
+import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.response.dto.web.AppliedFunctionDTO;
 import com.kairos.response.dto.web.FunctionDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.kairos.response.dto.web.staff.StaffAccessRoleDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -125,6 +128,7 @@ public class ShiftService extends MongoBaseService {
     private GenericIntegrationService restClient;
     @Inject
     private LocaleService localeService;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
@@ -506,6 +510,9 @@ public class ShiftService extends MongoBaseService {
     private void validateStaffingLevel(Shift shift, Activity activity, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        if(Optional.ofNullable(phaseSettings).isPresent()){
+            exceptionService.dataNotFoundException("message.phaseSettings.absent");
+        }
         if (phaseSettings.isManagementEligibleForOverStaffing() || phaseSettings.isManagementEligibleForUnderStaffing() || phaseSettings.isStaffEligibleForOverStaffing() || phaseSettings.isStaffEligibleForUnderStaffing()) {
             Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS));
             Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS));
@@ -819,8 +826,10 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate) {
         List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
-        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate);
-        List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
+
+        List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
+        UserAccessRoleDTO userAccessRoleDTO=genericIntegrationService.getAccessRolesOfStaff(unitId);
+        List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
         openShifts.forEach(openShift -> {
             OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();
             BeanUtils.copyProperties(openShift, openShiftResponseDTO, openShift.getStartDate().toString(), openShift.getEndDate().toString());
@@ -830,7 +839,15 @@ public class ShiftService extends MongoBaseService {
             openShiftResponseDTO.setEndDate(DateUtils.asLocalDate(openShift.getEndDate()));
             openShiftResponseDTOS.add(openShiftResponseDTO);
         });
-        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS);
+        List<AccessGroupRole> roles=new ArrayList<>();
+        if(userAccessRoleDTO.getManagement()){
+            roles.add(AccessGroupRole.MANAGEMENT);
+        }
+        if(userAccessRoleDTO.getStaff()){
+            roles.add(AccessGroupRole.STAFF);
+        }
+        StaffAccessRoleDTO staffAccessRoleDTO=new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(),roles);
+        return new ShiftWrapper(assignedShifts, openShiftResponseDTOS,staffAccessRoleDTO);
     }
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {

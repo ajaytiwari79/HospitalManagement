@@ -14,7 +14,7 @@ import java.util.*;
 @XStreamAlias("ShiftConstrutionPhase")
 public class ShiftConstrutionPhase implements Shift{
     private UUID id;
-    private EmployeePlanningFact employee;
+    private Employee employee;
     @PlanningVariable(valueRangeProviderRefs = "possibleStartTimes")
     private DateTime start;
     @PlanningVariable(valueRangeProviderRefs = "possibleEndTimes")
@@ -98,11 +98,11 @@ public class ShiftConstrutionPhase implements Shift{
         return getMinutes() == 0 ? 0 : getMinutes() - getBreakMinutes();
     }*/
 
-    public EmployeePlanningFact getEmployee() {
+    public Employee getEmployee() {
         return employee;
     }
 
-    public void setEmployee(EmployeePlanningFact employee) {
+    public void setEmployee(Employee employee) {
         this.employee = employee;
     }
 

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@XStreamAlias("ActivityPlannerEntity")
-public class ActivityPlannerEntity {
+@XStreamAlias("Activity")
+public class Activity {
     private static Logger log= LoggerFactory.getLogger(WorkingTimeConstraints.class);
     private String id;
     private List<Skill> skills;
@@ -25,7 +25,7 @@ public class ActivityPlannerEntity {
     private int order;
     private int rank;
     private List<Long> expertises;
-    public ActivityPlannerEntity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
+    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
         this.id = id;
         this.skills = skills;
         this.priority = priority;
@@ -35,7 +35,7 @@ public class ActivityPlannerEntity {
         this.rank=rank;
         this.expertises = expertises;
     }
-    public ActivityPlannerEntity() {
+    public Activity() {
     }
 
 
@@ -129,7 +129,7 @@ public class ActivityPlannerEntity {
 
 
     public void breakActivityContraints(ShiftRequestPhase shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, int index) {
-        log.debug("breaking ActivityPlannerEntity constraint: {}",index);
+        log.debug("breaking Activity constraint: {}",index);
         switch (index) {
             /*case 1:
                 activityConstraints.getLongestDuration().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
@@ -181,8 +181,8 @@ public class ActivityPlannerEntity {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        //ActivityPlannerEntity activity = (ActivityPlannerEntity) o;
-        return id.equals(((ActivityPlannerEntity) o).getId());
+        //Activity activity = (Activity) o;
+        return id.equals(((Activity) o).getId());
 
         /*return new EqualsBuilder()
                 .append(priority, activity.priority)

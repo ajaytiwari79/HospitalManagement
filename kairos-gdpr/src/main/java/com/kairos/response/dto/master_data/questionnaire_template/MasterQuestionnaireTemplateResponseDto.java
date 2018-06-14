@@ -2,35 +2,28 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistance.model.master_data_management.asset_management.StorageType;
+import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
+import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireSection;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionnaireTemplateResponseDto {
 
+
     private BigInteger id;
 
     private String name;
     private String description;
+    private String templateType;
 
-    @NotNullOrEmpty(message = "questionnaire type cannot be empty or null")
-    private String questionnaireType;
+    private StorageType assetType;
 
-    private BigInteger assetType;
-
-    private List<MasterQuestionnaireSectionResponseDto> questionSections;
-
-    public List<MasterQuestionnaireSectionResponseDto> getQuestionSections() {
-        return questionSections;
-    }
-
-    public void setQuestionSections(List<MasterQuestionnaireSectionResponseDto> questionSections) {
-        this.questionSections = questionSections;
-    }
-
-    private Long countryId;
+    private List<MasterQuestionnaireSectionResponseDto> sections=new ArrayList<>() ;
 
     public BigInteger getId() {
         return id;
@@ -56,27 +49,38 @@ public class MasterQuestionnaireTemplateResponseDto {
         this.description = description;
     }
 
-    public String getQuestionnaireType() {
-        return questionnaireType;
+    public String getTemplateType() {
+        return templateType;
     }
 
-    public void setQuestionnaireType(String questionnaireType) {
-        this.questionnaireType = questionnaireType;
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
     }
 
-    public BigInteger getAssetType() {
+    public StorageType getAssetType() {
         return assetType;
     }
 
-    public void setAssetType(BigInteger assetType) {
+    public void setAssetType(StorageType assetType) {
         this.assetType = assetType;
     }
 
-    public Long getCountryId() {
-        return countryId;
+    public List<MasterQuestionnaireSectionResponseDto> getSections() {
+        return sections;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setSections(List<MasterQuestionnaireSectionResponseDto> sections) {
+        this.sections = sections;
+    }
+
+    public MasterQuestionnaireTemplateResponseDto(BigInteger id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+
+    }
+
+    public MasterQuestionnaireTemplateResponseDto(BigInteger id) {
+        this.id = id;
     }
 }

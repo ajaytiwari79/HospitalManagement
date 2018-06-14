@@ -4,31 +4,36 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
 public class MasterProcessingActivityDto {
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title cannot contain number or special character")
+    @NotNullOrEmpty(message = "Name  can't be Empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
     private  String name;
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "Description  can't be  Empty")
     private String description;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotEmpty(message = "Organization Type  can't be  Empty")
+    @NotNull(message = "Organization  Type  can't be  null")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type  can't be Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Type  can't be  null")
+    @NotEmpty(message = "Service Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
+    @NotNull(message = "Service Sub Type  can't be  null")
+    @NotEmpty(message = "Service Sub Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private Boolean isSubProcess;
+    private Boolean isSubProcess=false;
 
     private List<MasterProcessingActivityDto> subProcessingActivities;
 

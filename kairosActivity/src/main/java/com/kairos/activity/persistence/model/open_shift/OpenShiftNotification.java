@@ -1,11 +1,22 @@
 package com.kairos.activity.persistence.model.open_shift;
 
+import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+
 import java.math.BigInteger;
 
-public class OpenShiftNotification {
+public class OpenShiftNotification extends MongoBaseEntity {
     private BigInteger openShiftId;
     private Long staffId;
     private boolean response;
+
+    public OpenShiftNotification() {
+        //Default Constructor
+    }
+
+    public OpenShiftNotification(BigInteger openShiftId, Long staffId) {
+        this.openShiftId = openShiftId;
+        this.staffId = staffId;
+    }
 
     public BigInteger getOpenShiftId() {
         return openShiftId;

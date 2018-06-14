@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface StorageTypeMongoRepository extends MongoRepository<StorageType,BigInteger> {
+public interface StorageTypeMongoRepository extends MongoRepository<StorageType,BigInteger>,CustomStorageTypeRepository {
 
 
 
@@ -19,7 +19,7 @@ public interface StorageTypeMongoRepository extends MongoRepository<StorageType,
     @Query("{'countryId':?0,_id:?1,deleted:false}")
     StorageType findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
+    @Query("{countryId:?0,nameInLowerCase:?1,deleted:false}")
     StorageType findByName(Long countryId,String name);
 
     StorageType findByid(BigInteger id);
@@ -28,6 +28,6 @@ public interface StorageTypeMongoRepository extends MongoRepository<StorageType,
     List<StorageType> findAllStorageTypes(Long countryId);
 
 
-    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    @Query("{countryId:?0,nameInLowerCase:{$in:?1},deleted:false}")
     List<StorageType>  findByCountryAndNameList(Long countryId,Set<String> name);
 }
