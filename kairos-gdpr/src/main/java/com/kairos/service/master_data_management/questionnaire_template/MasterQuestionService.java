@@ -42,7 +42,7 @@ public class MasterQuestionService extends MongoBaseService {
         checkForDuplicacyInQuestion(masterQuestionDtos);
         for (MasterQuestionDto masterQuestion : masterQuestionDtos) {
 
-            if (QuestionType.valueOf(masterQuestion.getQuestionType())!=null) {
+            if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
                 MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
                 masterQuestion.setNotApplicableAllowed(masterQuestion.getNotApplicableAllowed());
                 masterQuestion.setNotSureAllowed(masterQuestion.getNotSureAllowed());
@@ -81,6 +81,34 @@ public class MasterQuestionService extends MongoBaseService {
 
 
     }
+
+    public Boolean deleteMasterQuestion(Long countryId, BigInteger id) {
+
+        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (exist == null) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " question ", id);
+        }
+        exist.setDeleted(true);
+        save(exist);
+        return true;
+
+    }
+
+
+    public Boolean deleteQuestionsListByIds(Long countryId, List<BigInteger> ids) {
+        List<MasterQuestion> masterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, ids);
+        masterQuestions.forEach(masterQuestion -> {
+            masterQuestion.setDeleted(true);
+        });
+        save(masterQuestions);
+        return true;
+    }
+
+
+
+
+
+
 
 
 

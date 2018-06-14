@@ -28,8 +28,9 @@ public class MasterQuestionController {
     @Inject
     private MasterQuestionService masterQuestionService;
 
+/*
 
-   /* @PostMapping("/add")
+    @PostMapping("/add")
     public ResponseEntity<Object> addMasterQuestion(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
@@ -65,6 +66,7 @@ public class MasterQuestionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestionListByIds(countryId, ids));
     }
 
+*/
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id) {
@@ -73,10 +75,10 @@ public class MasterQuestionController {
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(countryId,id));
     }
 
-
+/*
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody MasterQuestionDto masterQuestionDto) {
         if (countryId == null) {
@@ -85,7 +87,6 @@ public class MasterQuestionController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.updateMasterQuestion(countryId, id, masterQuestionDto));
-    }
+    }*/
 
-*/
 }

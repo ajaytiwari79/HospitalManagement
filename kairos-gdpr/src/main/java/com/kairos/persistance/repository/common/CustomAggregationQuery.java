@@ -64,7 +64,8 @@ public class CustomAggregationQuery {
                 "cond:{$eq:['$$dataElement.deleted',false]}" +
                 "}}," +
                 "'countryId':1"+
-                ", 'name':1 }}";
+                ", 'name':1" +
+                ",'deleted':1 }}";
     }
 
 

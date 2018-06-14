@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface MasterQuestionnaireSectionRepository extends MongoRepository<MasterQuestionnaireSection, BigInteger> ,CustomMasterQuestionSectionRepository {
@@ -17,6 +19,10 @@ public interface MasterQuestionnaireSectionRepository extends MongoRepository<Ma
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
     MasterQuestionnaireSection findByIdAndNonDeleted(Long countryId, BigInteger id);
+
+
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<MasterQuestionnaireSection> getQuestionnniareSectionListByIds(Long countryId, List<BigInteger> id);
 
     MasterQuestionnaireSection findByid(BigInteger id);
 

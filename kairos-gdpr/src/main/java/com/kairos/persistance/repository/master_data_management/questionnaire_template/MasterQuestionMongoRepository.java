@@ -24,7 +24,7 @@ public interface MasterQuestionMongoRepository extends MongoRepository<MasterQue
     List<MasterQuestion> getAllMasterQuestion(Long countryId);
 
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<MasterQuestion> getMasterQuestionListByIds(Long countryId, Set<BigInteger> ids);
+    List<MasterQuestion> getMasterQuestionListByIds(Long countryId, List<BigInteger> ids);
 
 
 

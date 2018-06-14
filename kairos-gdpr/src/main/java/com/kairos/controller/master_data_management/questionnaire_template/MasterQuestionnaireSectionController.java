@@ -9,10 +9,13 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import java.math.BigInteger;
+
 import static com.kairos.constant.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
 
 @RestController
@@ -28,32 +31,47 @@ public class MasterQuestionnaireSectionController {
     /**
      * @param countryId
      * @param id
-     * @param masterQuestionnaireSectionDto
+     * @param questionniareSectionsDto
      * @return
      */
-    @PostMapping("/{id}/add")
+    @PostMapping("/{id}/section")
     @ApiOperation(value = "create and add questionniare section to questionnaire template ")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> masterQuestionnaireSectionDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+        } else if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, id, masterQuestionnaireSectionDto.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, id, questionniareSectionsDto.getRequestBody()));
 
 
     }
 
 
+   /* @PutMapping("/{id}/section/update")
+    @ApiOperation(value = "update list of Questionniare section and deleted section if deleted property is true")
+    public ResponseEntity updateAndDeletedQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> questionniareSectionsDto) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+        } else if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, id, questionniareSectionsDto.getRequestBody()));
 
-  /*  @DeleteMapping("/delete/{id}")
+
+    }*/
+
+
+
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.deleteMasterQuestionnaireSection(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.deletedQuestionniareSection(countryId,id));
     }
 
-*/
 
 }

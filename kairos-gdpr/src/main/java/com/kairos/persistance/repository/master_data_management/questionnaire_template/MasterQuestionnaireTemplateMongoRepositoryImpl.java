@@ -51,6 +51,7 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
                         .first("templateType").as("templateType")
                         .first("assetType").as("assetType")
                         .first("countryId").as("countryId")
+                        .first("deleted").as("deleted")
                 .addToSet("sections").as("sections")
                 .addToSet("questions").as("questions")
 
@@ -87,10 +88,9 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
                         .first("templateType").as("templateType")
                         .first("assetType").as("assetType")
                         .first("countryId").as("countryId")
+                        .first("deleted").as("deleted")
                         .addToSet("sections").as("sections")
                         .addToSet("questions").as("questions")
-
-
 
 
         );
