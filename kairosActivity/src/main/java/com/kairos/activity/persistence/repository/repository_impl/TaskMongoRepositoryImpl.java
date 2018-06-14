@@ -8,6 +8,8 @@ import com.kairos.activity.persistence.query_result.TaskWrapper;
 import com.kairos.activity.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.activity.persistence.repository.task_type.CustomTaskMongoRepository;
 
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
+import com.kairos.client.dto.TaskAddress;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -177,5 +179,15 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
         mongoTemplate.updateMulti(query,update,Task.class);
     }
 
+
+    @Override
+    public List<VRPTaskDTO> getAllTasksByUnitId(Long unitId){
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("unitId").is(unitId).and("isDeleted").is(false)),
+        lookup("task_types","taskTypeId","_id","taskType"),
+                project("unitId","address","installationNo","citizenId","skill","citizenName","citizenId","taskType.title","taskType._id")
+        );
+        AggregationResults<VRPTaskDTO> results = mongoTemplate.aggregate(aggregation,Task.class, VRPTaskDTO.class);
+        return results.getMappedResults();
+    }
 
 }

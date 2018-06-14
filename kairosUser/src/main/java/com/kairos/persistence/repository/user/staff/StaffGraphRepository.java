@@ -474,7 +474,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
-    @Query("MATCH (staff:Staff{deleted:false})-[:BELONGS_TO]-(e:Employment) WHERE id(staff)={0} return e")
+    @Query("MATCH (staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(e:Employment) WHERE id(staff)={0} return e")
     Employment getMainEmployment(Long staffId);
 
 
@@ -485,4 +485,12 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "match (employment)-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization) RETURN employment")
     List<Employment> getAllMainEmploymentByStaffId(Long StaffId, Date mainEmploymentStartDate, Date mainEmploymentEndDate );
 
+    @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(expertise)={1} AND id(staff) IN {2}\n" +
+            "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={0}   \n" +
+            "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
+            "return id(unitPosition) as id , id(staff) as staffId")
+    List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffIds,Long currentMillis);
+
+    @Query("MATCH(staff:Staff) where id(staff) in {0} RETURN staff.email")
+    List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds);
 }

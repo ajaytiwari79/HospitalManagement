@@ -1905,7 +1905,6 @@ public class StaffService extends UserBaseService {
     }
 
     public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO,Boolean confirm) {
-        Map<String,Object> result=new HashMap<>();
         Date mainEmploymentStartDate = DateUtil.asDate(employmentDTO.getMainEmploymentStartDate());
         Date mainEmploymentEndDate = DateUtil.asDate(employmentDTO.getMainEmploymentEndDate());
         if(mainEmploymentStartDate.after(mainEmploymentEndDate)){
@@ -1967,9 +1966,18 @@ public class StaffService extends UserBaseService {
         employmentOverlapDTO.setMainEmploymentStartDate(employment.getMainEmploymentStartDate());
         employmentOverlapDTO.setMainEmploymentEndDate(employment.getMainEmploymentEndDate());
     }
-    public void afterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO,Employment employment){
+    public void afterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO,Employment employment) {
         employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
         employmentOverlapDTO.setAfterChangeEndDate(employment.getMainEmploymentEndDate());
+    }
+    public List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds) {
+        return staffGraphRepository.getEmailsOfStaffByStaffIds(staffIds);
+    }
+
+    public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId){
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        return accessGroupService.getStaffAccessRoles(unitId,staff.getId());
     }
 
 }

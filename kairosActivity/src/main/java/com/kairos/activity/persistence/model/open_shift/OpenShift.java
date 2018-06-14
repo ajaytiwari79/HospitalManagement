@@ -4,10 +4,10 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Document
 public class OpenShift extends MongoBaseEntity {
@@ -21,7 +21,22 @@ public class OpenShift extends MongoBaseEntity {
     private BigInteger orderId;
     private BigInteger activityId;
     private BigInteger parentOpenShiftId;
+    private List<Long> assignedStaff;
 
+    public OpenShift() {
+        //Default Constructor
+    }
+
+    public OpenShift(BigInteger id, Date startDate, Date endDate, Integer noOfPersonRequired, List<Long> interestedStaff, List<Long> declinedBy, Long unitId, BigInteger parentOpenShiftId) {
+        this.id=id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.noOfPersonRequired = noOfPersonRequired;
+        this.interestedStaff = interestedStaff;
+        this.declinedBy = declinedBy;
+        this.unitId = unitId;
+        this.parentOpenShiftId = parentOpenShiftId;
+    }
 
     public Long getUnitId() {
         return unitId;
@@ -65,7 +80,7 @@ public class OpenShift extends MongoBaseEntity {
     }
 
     public List<Long> getInterestedStaff() {
-        return interestedStaff;
+        return interestedStaff=Optional.ofNullable(interestedStaff).orElse(new ArrayList<>());
     }
 
     public void setInterestedStaff(List<Long> interestedStaff) {
@@ -73,7 +88,7 @@ public class OpenShift extends MongoBaseEntity {
     }
 
     public List<Long> getDeclinedBy() {
-        return declinedBy;
+        return declinedBy=Optional.ofNullable(declinedBy).orElse(new ArrayList<>());
     }
 
     public void setDeclinedBy(List<Long> declinedBy) {
@@ -95,5 +110,13 @@ public class OpenShift extends MongoBaseEntity {
 
     public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
         this.parentOpenShiftId = parentOpenShiftId;
+    }
+
+    public List<Long> getAssignedStaff() {
+        return assignedStaff=Optional.ofNullable(assignedStaff).orElse(new ArrayList<>());
+    }
+
+    public void setAssignedStaff(List<Long> assignedStaff) {
+        this.assignedStaff = assignedStaff;
     }
 }

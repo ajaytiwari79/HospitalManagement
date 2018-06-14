@@ -1,5 +1,6 @@
 package com.kairos.config.security;
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.user.auth.UserPrincipal;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
@@ -36,7 +37,9 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         log.info("adding user details information into oauth2 token");
         UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> userDetails = new HashMap<>();
-         userDetails.put("details", user.getDetails());
+        Map<String,Object> userDetailsMap = ObjectMapperUtils.copyPropertiesByMapper(user.getDetails(), Map.class);
+        userDetailsMap.put("language", userService.getSystemLanguageOfUser(user.getUser().getId()));
+         userDetails.put("details", userDetailsMap);
          authentication.setDetails(userDetails);
         return super.createAccessToken(authentication);
 

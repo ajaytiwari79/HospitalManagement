@@ -1,13 +1,5 @@
 package com.kairos.service.processing_activity;
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.dto.ProcessingActivityDto;
-import com.kairos.persistance.model.processing_activity.AssetType;
-import com.kairos.persistance.model.master_data_management.asset_management.OrganizationalSecurityMeasure;
-import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
-import com.kairos.persistance.model.processing_activity.ProcessingActivity;
-import com.kairos.persistance.repository.processing_activity.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.processing_activity.ProcessingActivityMongoRepository;
@@ -18,9 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProcessingActivityService extends MongoBaseService {
@@ -36,8 +25,6 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private ProcessingPurposeService processingPurposeService;
 
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
 
     @Inject
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.QuestionType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -13,21 +15,21 @@ public class MasterQuestionDto {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Question title  can't be  empty")
+    @Pattern(message = "numberic and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
     private String question;
 
-    @NotNullOrEmpty(message = "description.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Description  can't be  Empty")
     private String description;
 
-    private Boolean isRequired;
+    private Boolean isRequired=false;
 
-    @NotNull
+    @NotNullOrEmpty(message = "Question type Must be Text ,Yes no May")
     private String questionType;
 
-    private Boolean isNotSureAllowed;
+    private Boolean isNotSureAllowed=false;
 
-    private Boolean isNotApplicableAllowed;
-
+    private Boolean isNotApplicableAllowed=false;
 
     public BigInteger getId() {
         return id;

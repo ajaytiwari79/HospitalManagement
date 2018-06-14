@@ -18,6 +18,7 @@ public class OpenShiftResponseDTO {
     private BigInteger orderId;
     private BigInteger activityId;
     private  LocalDate endDate;
+    private List<Long> assignedStaff;
 
     public BigInteger getActivityId() {
         return activityId;
@@ -117,5 +118,13 @@ public class OpenShiftResponseDTO {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public List<Long> getAssignedStaff() {
+        return assignedStaff;
+    }
+
+    public void setAssignedStaff(List<Long> assignedStaff) {
+        this.assignedStaff = assignedStaff;
     }
 }

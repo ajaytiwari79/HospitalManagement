@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
-import com.kairos.activity.util.DateUtils;
 import com.kairos.planning.utils.JodaTimeConverter;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
@@ -12,7 +11,6 @@ import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.JodaTimeUtil;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.planner.commonUtil.StaticField;
-import com.planner.domain.activity.Activity;
 import com.planner.domain.staff.Staff;
 import com.planner.domain.staff.UnitPosition;
 import com.planner.domain.staffinglevel.StaffingLevel;
@@ -32,16 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -213,7 +202,7 @@ public class ShiftPlanningService {
 
     public ShiftRequestPhasePlanningSolution getShiftPlanningSolutionByXml(String xml) {
         XStream xstream = new XStream();
-        xstream.processAnnotations(EmployeePlanningFact.class);
+        xstream.processAnnotations(Employee.class);
         xstream.processAnnotations(ShiftConstrutionPhase.class);
         xstream.processAnnotations(StaffingLevelPlannerEntity.class);
         xstream.setMode(XStream.ID_REFERENCES);
@@ -229,30 +218,30 @@ public class ShiftPlanningService {
     public ShiftRequestPhasePlanningSolution createShiftPlanningProblem(Long unitId,List<LocalDate> dates){
         ShiftRequestPhasePlanningSolution problem= new ShiftRequestPhasePlanningSolution();
         List<StaffingLevel> staffingLevels= staffingLevelRepository.getStaffingLevelsByUnitIdAndBetweenDate(unitId,dates);
-        List<Activity> activities= activityRepository.getActivitiesByUnitId(unitId);
+        List<com.planner.domain.activity.Activity> activities= activityRepository.getActivitiesByUnitId(unitId);
         List<UnitPosition> unitPositions=unitPositionRepository.getAllUnitPositionsByUnitId(unitId);
         List<String> staffIds=unitPositions.stream().map(up->up.getStaffId()).collect(Collectors.toList());
         Iterable<Staff> staff= staffRepository.findAllById(staffIds);
         Map<String, Staff> staffMap=new HashMap<>();
         staff.forEach(st->staffMap.put(st.getId(),st));
-        List<EmployeePlanningFact> employees= new ArrayList<>();
+        List<Employee> employees= new ArrayList<>();
         for(UnitPosition unitPosition:unitPositions){
             Staff stf=staffMap.get(unitPosition.getStaffId());
-            EmployeePlanningFact employee= new EmployeePlanningFact(stf.getId(),stf.getFirstName(),null, unitPosition.getExpertiseId(),unitPosition.getTotalWeeklyMinutes(),unitPosition.getWorkingDaysInWeek(),unitPosition.getPaidOutFrequencyEnum(), unitPosition.getEmploymentTypeId());
+            Employee employee= new Employee(stf.getId(),stf.getFirstName(),null, unitPosition.getExpertiseId(),unitPosition.getTotalWeeklyMinutes(),unitPosition.getWorkingDaysInWeek(),unitPosition.getPaidOutFrequencyEnum(), unitPosition.getEmploymentTypeId());
             employees.add(employee);
         }
-        List<ActivityPlannerEntity> acts= new ArrayList<>();
-        Map<Long, ActivityPlannerEntity> activityKariosIdMap=new HashMap<>();
-        for (Activity activity:activities){
+        List<Activity> acts= new ArrayList<>();
+        Map<Long, Activity> activityKariosIdMap=new HashMap<>();
+        for (com.planner.domain.activity.Activity activity:activities){
             //TODO gotta consider timetupes presence ot absence
-            ActivityPlannerEntity act= new ActivityPlannerEntity(activity.getId(),null,0,activity.getName(),null,0,0,activity.getExpertises());
+            Activity act= new Activity(activity.getId(),null,0,activity.getName(),null,0,0,activity.getExpertises());
             activityKariosIdMap.put(activity.getKairosId().longValue(),act);
             acts.add(act);
         }
-        /*Map<String, ActivityPlannerEntity> activityMap=new HashMap<>();
+        /*Map<String, Activity> activityMap=new HashMap<>();
         acts.forEach(a->activityMap.put(a.getId(),a));*/
         List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
-        Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities= new HashMap<>();
+        Map<org.joda.time.LocalDate, List<Activity>> perDayActivities= new HashMap<>();
         for (StaffingLevel staffingLevel:staffingLevels){
             activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,true));
             activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,false));
@@ -270,7 +259,7 @@ public class ShiftPlanningService {
         return problem;
     }
 
-    private List<ActivityLineInterval> getActivityLineIntervals(Map<Long, ActivityPlannerEntity> kairosIdActivities, Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities, StaffingLevel staffingLevel,boolean presence) {
+    private List<ActivityLineInterval> getActivityLineIntervals(Map<Long, Activity> kairosIdActivities, Map<org.joda.time.LocalDate, List<Activity>> perDayActivities, StaffingLevel staffingLevel, boolean presence) {
         List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
         //org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getDate());
         org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getDate());
@@ -279,7 +268,7 @@ public class ShiftPlanningService {
         for(StaffingLevelInterval sli: psli){
             for(StaffingLevelActivity sla:sli.getStaffingLevelActivities()){
                 if(!perDayActivities.containsKey(date)){
-                    List<ActivityPlannerEntity> slActs= new ArrayList<>();
+                    List<Activity> slActs= new ArrayList<>();
                     slActs.add(kairosIdActivities.get(sla.getActivityId()));
                     perDayActivities.put(date,slActs);
                 }else if(!perDayActivities.get(date).contains(kairosIdActivities.get(sla.getActivityId()))){
@@ -294,9 +283,9 @@ public class ShiftPlanningService {
         return activityLineIntervals;
     }
 
-    public List<ShiftRequestPhase> createEmptyShiftsForEmployees(List<EmployeePlanningFact> employees, List<org.joda.time.LocalDate> dates){
+    public List<ShiftRequestPhase> createEmptyShiftsForEmployees(List<Employee> employees, List<org.joda.time.LocalDate> dates){
         List<ShiftRequestPhase> shifts= new ArrayList<>();
-        for(EmployeePlanningFact employee:employees){
+        for(Employee employee:employees){
             for(org.joda.time.LocalDate date: dates){
                 ShiftRequestPhase shift = new ShiftRequestPhase(employee,date);
                 shifts.add(shift);
@@ -308,7 +297,7 @@ public class ShiftPlanningService {
     public Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
         for(ActivityLineInterval ali:activityLineIntervals){
-            String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivityPlannerEntity().getId()+"_"+ali.getStaffNo();
+            String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivity().getId()+"_"+ali.getStaffNo();
             if(groupedAlis.containsKey(key)){
                 groupedAlis.get(key).add(ali);
             }else{

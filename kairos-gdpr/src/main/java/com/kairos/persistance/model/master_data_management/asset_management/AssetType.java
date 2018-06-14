@@ -5,15 +5,27 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 
-@Document(collection = "storage_type")
-public class StorageType extends MongoBaseEntity {
+@Document(collection = "asset_type")
+public class AssetType extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
+    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
+
+    private String nameInLowerCase;
+
+    public String getNameInLowerCase() {
+        return nameInLowerCase;
+    }
+
+    public void setNameInLowerCase(String nameInLowerCase) {
+        this.nameInLowerCase = nameInLowerCase;
+    }
 
     public Long getCountryId() {
         return countryId;

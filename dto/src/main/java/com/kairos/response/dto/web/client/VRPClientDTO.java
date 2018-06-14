@@ -7,10 +7,11 @@ package com.kairos.response.dto.web.client;
 
 public class VRPClientDTO {
 
-    private int intallationNo;
+    private String firstName;
+    private Long id;
+    private int installationNo;
     private Double lattitude;
     private Double longitude;
-    private int duration;
     private String streetName;
     private int houseNo;
     private String block;
@@ -18,12 +19,29 @@ public class VRPClientDTO {
     private int post;
     private String city;
 
-    public int getIntallationNo() {
-        return intallationNo;
+
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public int getInstallationNo() {
+        return installationNo;
+    }
+
+    public void setInstallationNo(int installationNo) {
+        this.installationNo = installationNo;
     }
 
     public Double getLattitude() {
@@ -42,13 +60,6 @@ public class VRPClientDTO {
         this.longitude = longitude;
     }
 
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
 
     public String getStreetName() {
         return streetName;

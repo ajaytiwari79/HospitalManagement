@@ -5,26 +5,30 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Document(collection = "questionnaire_template")
 public class MasterQuestionnaireTemplate extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
+    @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNullOrEmpty(message = "questionnaire type cannot be empty or null")
+    @NotNullOrEmpty(message = "Template type cannot be empty ")
     private String templateType;
 
     private BigInteger assetType;
 
     private Long countryId;
 
-    private Set<BigInteger> sections;
-
+    private List<BigInteger> sections=new ArrayList<>();
 
     public BigInteger getAssetType() {
         return assetType;
@@ -50,8 +54,11 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.name = name;
     }
 
+    public List<BigInteger> getSections() {
+        return sections;
+    }
 
-    public void setSections(Set<BigInteger> sections) {
+    public void setSections(List<BigInteger> sections) {
         this.sections = sections;
     }
 
@@ -71,10 +78,10 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public MasterQuestionnaireTemplate(String name, Long countryId, String templateType) {
+    public MasterQuestionnaireTemplate(String name, Long countryId, String description) {
         this.name = name;
         this.countryId = countryId;
-        this.templateType = templateType;
+        this.description = description;
     }
 
     public MasterQuestionnaireTemplate() {

@@ -43,7 +43,6 @@ public class MasterAssetService extends MongoBaseService {
         if (masterAssetMongoRepository.findByNameAndCountry(countryId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         } else {
-
             if (masterAssetDto.getOrganizationTypes()!=null&&masterAssetDto.getOrganizationTypes().size()!=0) {
                 newAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
 
@@ -57,7 +56,7 @@ public class MasterAssetService extends MongoBaseService {
 
             }
             if (masterAssetDto.getOrganizationSubServices()!=null&&masterAssetDto.getOrganizationSubServices().size()!=0) {
-                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
 
@@ -97,7 +96,7 @@ public class MasterAssetService extends MongoBaseService {
 
             }
             if (masterAssetDto.getOrganizationSubServices() != null && masterAssetDto.getOrganizationSubServices().size() != 0) {
-                exists.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+                exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
             exists.setName(masterAssetDto.getName());

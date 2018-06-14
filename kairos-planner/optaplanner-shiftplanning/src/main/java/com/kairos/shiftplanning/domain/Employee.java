@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 
-@XStreamAlias("EmployeePlanningFact")
-public class EmployeePlanningFact {
-    private static Logger log= LoggerFactory.getLogger(EmployeePlanningFact.class);
+@XStreamAlias("Employee")
+public class Employee {
+    private static Logger log= LoggerFactory.getLogger(Employee.class);
     private String id;
     private BigDecimal baseCost;
     transient private WorkingTimeConstraints workingTimeConstraints;
@@ -39,7 +39,7 @@ public class EmployeePlanningFact {
     private Long employmentTypeId;
 
 
-    public EmployeePlanningFact(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
+    public Employee(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
         super();
         this.id = id;
         this.name = name;
@@ -197,7 +197,7 @@ public class EmployeePlanningFact {
     public String toString() {
         return "E:" + id;//+"-"+getAvailabilityList();//+skillSet+"-
     }
-    public EmployeePlanningFact() {
+    public Employee() {
     }
 
 
@@ -208,7 +208,7 @@ public class EmployeePlanningFact {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        EmployeePlanningFact employee = (EmployeePlanningFact) o;
+        Employee employee = (Employee) o;
 
         return new EqualsBuilder()
                 .append(id, employee.id)
@@ -227,7 +227,7 @@ public class EmployeePlanningFact {
                 .append(id)
                 .toHashCode();*/
         int hashcode=id.hashCode();
-        //log.info("EmployeePlanningFact hashcode:"+id+":"+hashcode);
+        //log.info("Employee hashcode:"+id+":"+hashcode);
         return hashcode;
     }
     public int checkConstraints(List<Shift> shifts, int index){
