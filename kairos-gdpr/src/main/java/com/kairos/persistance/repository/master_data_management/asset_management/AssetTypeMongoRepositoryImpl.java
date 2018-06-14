@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data_management.asset_management;
 
-import com.kairos.persistance.model.master_data_management.asset_management.StorageType;
+import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Collation;
@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class StorageTypeMongoRepositoryImpl implements CustomStorageTypeRepository {
+public class AssetTypeMongoRepositoryImpl implements CustomStorageTypeRepository {
 
 
     @Inject
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<StorageType> getAllStorageListByNamesAndCountryList(Long countryId, Set<String> names) {
+    public List<AssetType> getAllStorageListByNamesAndCountryList(Long countryId, Set<String> names) {
 
         Locale locale=LocaleContextHolder.getLocale();
         Collation collation=Collation.of("en");
@@ -29,7 +29,7 @@ public class StorageTypeMongoRepositoryImpl implements CustomStorageTypeReposito
         query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").in(names))
                 ;
         query.collation(collation);
-        return mongoTemplate.find(query,StorageType.class);
+        return mongoTemplate.find(query,AssetType.class);
 
 
 

@@ -2,6 +2,7 @@ package com.kairos.controller.master_data_management.questionnaire_template;
 
 
 import com.kairos.dto.master_data.MasterQuestionnaireSectionDto;
+import com.kairos.dto.master_data.MasterQuestionnaireTemplateDto;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.service.master_data_management.questionnaire_template.MasterQuestionnaireTemplateService;
 import com.kairos.utils.ResponseHandler;
@@ -33,16 +34,16 @@ public class MasterQuestionnaireTemplateController {
     /**
      *
      * @param countryId
-     * @param masterQuestionnaireTemplate
+     * @param templateDto
      * @return masterQuestionnaireTemplate basic response
      */
     @PostMapping("/add")
     @ApiOperation(value = "add questionnaire template basic data ")
-    public ResponseEntity<Object> addMasterQuestionnaireTemplate(@PathVariable Long countryId, @Valid @RequestBody MasterQuestionnaireTemplate masterQuestionnaireTemplate) {
+    public ResponseEntity<Object> addMasterQuestionnaireTemplate(@PathVariable Long countryId, @Valid @RequestBody MasterQuestionnaireTemplateDto templateDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.addQuestionnaireTemplate(countryId, masterQuestionnaireTemplate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.addQuestionnaireTemplate(countryId,templateDto ));
 
 
     }
@@ -83,6 +84,22 @@ public class MasterQuestionnaireTemplateController {
 
 
     }
+
+    @PutMapping("/update/{id}")
+    @ApiOperation(value = "update basic detail of Questionniare template ")
+    public ResponseEntity<Object> updateQuestionniareTemplate(@PathVariable  Long countryId,@PathVariable  BigInteger id,@Valid @RequestBody MasterQuestionnaireTemplateDto templateDto)
+    {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+        } else if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, " id cannot be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.updateQuestionniareTemplate(countryId, id,templateDto));
+
+    }
+
+
+
 
     /**
      * @param countryId
