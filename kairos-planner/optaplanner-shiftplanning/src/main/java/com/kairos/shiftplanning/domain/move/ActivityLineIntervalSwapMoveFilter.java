@@ -18,7 +18,7 @@ public class ActivityLineIntervalSwapMoveFilter implements SelectionFilter<Shift
     public boolean accept(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, SwapMove selection) {
         ActivityLineInterval activityLineInterval1 = (ActivityLineInterval) selection.getLeftEntity();
         ActivityLineInterval activityLineInterval2 = (ActivityLineInterval) selection.getRightEntity();
-        if(activityLineInterval1.getActivityPlannerEntity().isTypeAbsence()!=activityLineInterval2.getActivityPlannerEntity().isTypeAbsence()){
+        if(activityLineInterval1.getActivity().isTypeAbsence()!=activityLineInterval2.getActivity().isTypeAbsence()){
             return false;
         }
         ShiftRequestPhase shiftRequestPhase1= activityLineInterval2.getShift();
@@ -26,7 +26,7 @@ public class ActivityLineIntervalSwapMoveFilter implements SelectionFilter<Shift
         if(Objects.equals(shiftRequestPhase1,shiftRequestPhase2)){
             return false;
         }
-        if(activityLineInterval1.getActivityPlannerEntity().isTypeAbsence()!=activityLineInterval2.getActivityPlannerEntity().isTypeAbsence()){
+        if(activityLineInterval1.getActivity().isTypeAbsence()!=activityLineInterval2.getActivity().isTypeAbsence()){
             return false;
         }
         if(!activityLineInterval2.getStart().toLocalDate().equals(activityLineInterval1.getStart().toLocalDate())){

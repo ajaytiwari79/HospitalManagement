@@ -26,27 +26,27 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private ActivityLineInterval next;
     private DateTime start;
     private boolean required;
-    private ActivityPlannerEntity activityPlannerEntity;
+    private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
     private ShiftRequestPhase shift;
     public ActivityLineInterval() {
     }
     private int duration;
     private int staffNo;
-    public ActivityLineInterval(String id, DateTime start, int duration, boolean required, ActivityPlannerEntity activityPlannerEntity, int staffNo) {
+    public ActivityLineInterval(String id, DateTime start, int duration, boolean required, Activity activity, int staffNo) {
         this.id=id;
         this.start = start;
         this.duration = duration;
         this.required = required;
-        this.activityPlannerEntity = activityPlannerEntity;
+        this.activity = activity;
         this.staffNo = staffNo;
     }
-    public ActivityPlannerEntity getActivityPlannerEntity() {
-        return activityPlannerEntity;
+    public Activity getActivity() {
+        return activity;
     }
 
-    public void setActivityPlannerEntity(ActivityPlannerEntity activityPlannerEntity) {
-        this.activityPlannerEntity = activityPlannerEntity;
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 
     public DateTime getStart() {
@@ -77,7 +77,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     @Deprecated
     public boolean overlaps(StaffingLineInterval staffingLineInterval){
         return Objects.equals(this.getInterval(), staffingLineInterval.getInterval()) &&
-                this.getClass().isInstance(staffingLineInterval) || this.getActivityPlannerEntity().getSkills().contains(((SkillLineInterval) staffingLineInterval).getSkill());
+                this.getClass().isInstance(staffingLineInterval) || this.getActivity().getSkills().contains(((SkillLineInterval) staffingLineInterval).getSkill());
     }
 
     public ShiftRequestPhase getShift() {
@@ -90,7 +90,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
 
     @Override
     public String toString() {
-        return id+"-"+staffNo+"-"+ activityPlannerEntity.getName()+"-"+getIntervalAsString();
+        return id+"-"+staffNo+"-"+ activity.getName()+"-"+getIntervalAsString();
     }
     public String getLabel() {
         return id+"---"+getIntervalAsString();
