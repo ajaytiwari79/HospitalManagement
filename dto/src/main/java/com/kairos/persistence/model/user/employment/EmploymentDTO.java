@@ -18,7 +18,7 @@ public class EmploymentDTO {
     private Long accessGroupIdOnEmploymentEnd;
     private LocalDate mainEmploymentStartDate;
     private LocalDate mainEmploymentEndDate;
-    private boolean hasMainEmployment;
+    private boolean mainEmployment;
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
     }
@@ -59,11 +59,12 @@ public class EmploymentDTO {
         this.mainEmploymentEndDate = mainEmploymentEndDate;
     }
 
-    public boolean isHasMainEmployment() {
-        return hasMainEmployment;
+
+    public boolean isMainEmployment() {
+        return mainEmployment;
     }
 
-    public void setHasMainEmployment(boolean hasMainEmployment) {
-        this.hasMainEmployment = hasMainEmployment;
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
     }
 }

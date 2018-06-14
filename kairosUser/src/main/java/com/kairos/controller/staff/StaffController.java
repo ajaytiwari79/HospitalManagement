@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.QueryParam;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -638,12 +639,18 @@ public class StaffController {
     @ApiOperation(value = "get main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getMainEmployment(@PathVariable Long unitId, @PathVariable long staffId){
-        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.getMainEmployment(unitId,staffId));
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.getMainEmployment(staffId));
     }
 
     @ApiOperation(value = "update and set main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> updateMainEmployment(@PathVariable Long unitId, @PathVariable long staffId ,@RequestBody EmploymentDTO employmentDTO){
-        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(unitId,staffId,employmentDTO));
+    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(staffId,employmentDTO,confirm));
     }
-}
+
+    @ApiOperation(value ="remove main employment")
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.DELETE)
+    public ResponseEntity<Map<String ,Object>> deleteMainEmployment(@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.deleteMainEmployment(staffId));
+    }
+ }

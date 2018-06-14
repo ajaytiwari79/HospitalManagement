@@ -36,7 +36,7 @@ public class Employment extends UserBaseEntity {
     private LocalDate mainEmploymentStartDate;
     @Convert(LocalDateConverter.class)
     private LocalDate mainEmploymentEndDate;
-    private boolean hasMainEmployment;
+    private boolean mainEmployment;
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
     }
@@ -130,11 +130,11 @@ public class Employment extends UserBaseEntity {
         this.mainEmploymentEndDate = mainEmploymentEndDate;
     }
 
-    public boolean isHasMainEmployment() {
-        return hasMainEmployment;
+    public boolean isMainEmployment() {
+        return mainEmployment;
     }
 
-    public void setHasMainEmployment(boolean hasMainEmployment) {
-        this.hasMainEmployment = hasMainEmployment;
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
     }
 }

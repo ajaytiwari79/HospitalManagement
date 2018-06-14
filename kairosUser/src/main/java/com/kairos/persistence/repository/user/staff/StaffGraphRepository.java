@@ -478,11 +478,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Employment getMainEmployment(Long staffId);
 
 
-    @Query("match (s:Staff)-[:BELONGS_TO]-(u:User)where id(s)={1} with s,u\n" +
-            "match (u)-[:BELONGS_TO]-(staff:Staff) with staff,u\n " +
-            "match (staff)-[:BELONGS_TO]-(e:Employment) with staff,u,e\n" +
-            "where id(staff)<>{1} AND e.mainEmploymentEndDate>{2} AND e.mainEmploymentStartDate<{3} with u,e,staff\n" +
-            "match (e)-[:HAS_EMPLOYMENTS]-(o:Organization) RETURN e")
-    List<Employment> getAllMainEmploymentByStaffId(Long unitId, Long StaffId, Date mainEmploymentStartDate, Date mainEmploymentEndDate );
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(user:User)where id(staff)={0} with staff,user\n" +
+            "match (user)-[:"+BELONGS_TO+"]-(staffs:Staff)where id(staffs)<>{0} with staffs,user\n " +
+            "match (staffs)-[:"+BELONGS_TO+"]-(employment:Employment) with staffs,user,employment\n" +
+            "where  employment.mainEmploymentEndDate>={1} AND employment.mainEmploymentStartDate<={2} with user,employment,staffs\n" +
+            "match (employment)-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization) RETURN employment")
+    List<Employment> getAllMainEmploymentByStaffId(Long StaffId, Date mainEmploymentStartDate, Date mainEmploymentEndDate );
 
 }
