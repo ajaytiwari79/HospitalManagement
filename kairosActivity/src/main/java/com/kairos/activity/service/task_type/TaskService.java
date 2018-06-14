@@ -1623,9 +1623,11 @@ public class TaskService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(tasks, TaskDTO.class);
     }
 
+    //FIXME To be modified by Pradeep
     public List<TaskDTO> getAllTask(Long unitId){
-        List<Task> tasks = taskMongoRepository.getAllTasksByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(tasks,TaskDTO.class);
+//        List<Task> tasks = taskMongoRepository.getAllTasksByUnitId(unitId);
+//        return ObjectMapperUtils.copyPropertiesOfListByMapper(tasks,TaskDTO.class);
+        return new ArrayList<>();
 
     }
 
