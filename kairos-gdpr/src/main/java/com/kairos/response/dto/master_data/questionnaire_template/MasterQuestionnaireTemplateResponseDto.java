@@ -1,9 +1,12 @@
 package com.kairos.response.dto.master_data.questionnaire_template;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +23,7 @@ public class MasterQuestionnaireTemplateResponseDto {
 
     private AssetType assetType;
 
-    private List<MasterQuestionnaireSectionResponseDto> sections=new ArrayList<>() ;
+    private List<MasterQuestionnaireSectionResponseDto> sections;
 
     public BigInteger getId() {
         return id;
@@ -79,5 +82,8 @@ public class MasterQuestionnaireTemplateResponseDto {
 
     public MasterQuestionnaireTemplateResponseDto(BigInteger id) {
         this.id = id;
+    }
+
+    public MasterQuestionnaireTemplateResponseDto() {
     }
 }

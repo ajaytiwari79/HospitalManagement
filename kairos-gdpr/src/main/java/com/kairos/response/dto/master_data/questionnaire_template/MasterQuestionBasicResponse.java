@@ -1,6 +1,7 @@
 package com.kairos.response.dto.master_data.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -12,7 +13,7 @@ public class MasterQuestionBasicResponse {
     private BigInteger id;
 
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
-    private String name;
+    private String question;
 
     private String description;
 
@@ -26,12 +27,12 @@ public class MasterQuestionBasicResponse {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     public String getDescription() {
@@ -48,5 +49,8 @@ public class MasterQuestionBasicResponse {
 
     public void setQuestionType(String questionType) {
         this.questionType = questionType;
+    }
+
+    public MasterQuestionBasicResponse() {
     }
 }

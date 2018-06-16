@@ -63,7 +63,7 @@ public class MasterQuestionnaireSectionController {
 
 
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}/section/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");

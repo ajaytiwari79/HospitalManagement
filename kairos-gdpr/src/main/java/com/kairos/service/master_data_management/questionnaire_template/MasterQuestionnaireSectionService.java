@@ -10,7 +10,6 @@ import com.kairos.persistance.repository.master_data_management.questionnaire_te
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -224,7 +223,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         });
 
 
-        //TODO  working on it
+        //  working on it
         return null;
 
     }
