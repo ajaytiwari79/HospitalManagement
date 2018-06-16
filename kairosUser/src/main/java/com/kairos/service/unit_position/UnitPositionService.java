@@ -10,7 +10,6 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.persistence.model.user.country.DayType;
 
-import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
@@ -70,7 +69,6 @@ import com.kairos.util.DateUtil;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,8 +79,6 @@ import java.time.DayOfWeek;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +87,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.kairos.UserServiceApplication.FORMATTER;
 import static com.kairos.activity.util.DateUtils.ONLY_DATE;
 
 /**
@@ -1028,8 +1023,8 @@ public class UnitPositionService extends UserBaseService {
         return staffData;
     }
 
-    public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
-        List<StaffUnitPositionDetails> staffData =
+    public List<com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails> staffData =
                 staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId,System.currentTimeMillis());
         return staffData;
     }

@@ -29,8 +29,8 @@ public class AndActivitySpecification<T> extends AbstractSpecification<T> {
     @Override
     public List<String> isSatisfiedString(T t) {
         List<String> messages = new ArrayList<>();
-        messages.addAll(activitySpecification1.isSatisfiedString(t));
-        messages.addAll(activitySpecification2.isSatisfiedString(t));
+        messages.addAll(specification1.isSatisfiedString(t));
+        messages.addAll(specification2.isSatisfiedString(t));
         return messages;
     }
 }

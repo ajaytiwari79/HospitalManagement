@@ -88,7 +88,6 @@ public class StaffUnitPositionDetails {
     private ZoneId unitTimeZone;
     private Staff staff;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private Long staffId;
 
     public StaffUnitPositionDetails() {
     }
@@ -261,13 +260,5 @@ public class StaffUnitPositionDetails {
 
     public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
         this.appliedFunctions = appliedFunctions;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
     }
 }
