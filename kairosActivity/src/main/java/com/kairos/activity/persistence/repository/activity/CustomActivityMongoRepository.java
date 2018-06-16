@@ -3,6 +3,7 @@ package com.kairos.activity.persistence.repository.activity;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithCompositeDTO;
+import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.activity.ActivityWithCTAWTASettingsDTO;
 import com.kairos.activity.response.dto.activity.OrganizationActivityDTO;
@@ -52,4 +53,9 @@ public interface CustomActivityMongoRepository {
     Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId,Date date);
 
     Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,Date date);
+
+    Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId);
+    Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate);
+    Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate);
+
 }

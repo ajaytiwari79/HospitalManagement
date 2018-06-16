@@ -66,6 +66,6 @@ public class SkillLineInterval implements StaffingLineInterval {
         this.shift = shift;
     }
     public boolean isPossibleAlongActivity(ActivityLineInterval activityLineInterval){
-        return activityLineInterval.getActivityPlannerEntity().getSkills().contains(this.getSkill());
+        return activityLineInterval.getActivity().getSkills().contains(this.getSkill());
     }
 }

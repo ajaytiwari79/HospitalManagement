@@ -6,6 +6,7 @@ import com.kairos.response.dto.web.UserDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.joda.time.DateTimeZone;
 
 import java.time.DayOfWeek;
@@ -50,6 +51,7 @@ public class StaffAdditionalInfoDTO {
     public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
         this.timeSlotSets = timeSlotSets;
     }
+    private UserAccessRoleDTO userAccessRoleDTO;
 
 
     public DateTimeZone getUnitTimeZone() {
@@ -148,4 +150,12 @@ public class StaffAdditionalInfoDTO {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
     }
 
+
+    public UserAccessRoleDTO getUserAccessRoleDTO() {
+        return userAccessRoleDTO;
+    }
+
+    public void setUserAccessRoleDTO(UserAccessRoleDTO userAccessRoleDTO) {
+        this.userAccessRoleDTO = userAccessRoleDTO;
+    }
 }

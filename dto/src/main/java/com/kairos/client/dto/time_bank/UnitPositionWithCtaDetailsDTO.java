@@ -19,6 +19,7 @@ public class UnitPositionWithCtaDetailsDTO {
     private Long countryId;
     private int minutesFromCta;
     private ZoneId unitTimeZone;
+    private int fullTimeWeeklyMinutes;
 
 
     public UnitPositionWithCtaDetailsDTO(Long id) {
@@ -34,6 +35,15 @@ public class UnitPositionWithCtaDetailsDTO {
         this.workingDaysInWeek = workingDaysInWeek;
         this.unitPositionStartDate = unitPositionStartDate;
         this.unitPositionEndDate = unitPositionEndDate;
+    }
+
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
     public ZoneId getUnitTimeZone() {

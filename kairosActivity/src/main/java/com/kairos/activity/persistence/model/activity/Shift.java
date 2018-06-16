@@ -6,7 +6,6 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.shift.ShiftQueryResult;
-
 import com.kairos.enums.shift.ShiftState;
 import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -225,13 +224,14 @@ public class Shift extends MongoBaseEntity {
         return isMainShift;
     }
 
-    public DateTimeInterval getInterval(){
+    public DateTimeInterval getDateTimeInterval(){
         return new DateTimeInterval(this.startDate.getTime(),this.getEndDate().getTime());
     }
 
     public void setMainShift(boolean mainShift) {
         isMainShift = mainShift;
     }
+
 
     @Override
     public String toString() {
@@ -322,6 +322,8 @@ public class Shift extends MongoBaseEntity {
 
     }
 
+
+
     public Long getUnitPositionId() {
         return unitPositionId;
     }
@@ -381,6 +383,7 @@ public class Shift extends MongoBaseEntity {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
     }
-
-
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+    }
 }

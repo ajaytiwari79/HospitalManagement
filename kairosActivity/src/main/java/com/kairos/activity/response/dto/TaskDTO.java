@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.persistence.model.task_type.AbsencePlanningStatus;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -14,6 +15,7 @@ import java.util.List;
  * This
  * Created by oodles on 8/2/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskDTO {
 
     private String id;

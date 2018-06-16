@@ -2,27 +2,29 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.QuestionnaireType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionnaireTemplateDto {
 
+
     @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    @NotNull(message = "list.cannot.be.null")
-    @NotEmpty(message = "list.cannot.be.empty")
-    private List<BigInteger> sections;
+    @NotNullOrEmpty(message = "Description cannot be empty")
+    private String description;
+
+    @NotNullOrEmpty(message = "Template type cannot be empty ")
+    private String templateType;
+
+    private BigInteger assetType;
 
     private Long countryId;
 
-    private QuestionnaireType questionnaireType;
 
     public String getName() {
         return name;
@@ -32,20 +34,28 @@ public class MasterQuestionnaireTemplateDto {
         this.name = name;
     }
 
-    public QuestionnaireType getQuestionnaireType() {
-        return questionnaireType;
+    public String getDescription() {
+        return description;
     }
 
-    public void setQuestionnaireType(QuestionnaireType questionnaireType) {
-        this.questionnaireType = questionnaireType;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public List<BigInteger> getSections() {
-        return sections;
+    public String getTemplateType() {
+        return templateType;
     }
 
-    public void setSections(List<BigInteger> sections) {
-        this.sections = sections;
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    public BigInteger getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(BigInteger assetType) {
+        this.assetType = assetType;
     }
 
     public Long getCountryId() {
@@ -56,5 +66,6 @@ public class MasterQuestionnaireTemplateDto {
         this.countryId = countryId;
     }
 
-
+    public MasterQuestionnaireTemplateDto() {
+    }
 }

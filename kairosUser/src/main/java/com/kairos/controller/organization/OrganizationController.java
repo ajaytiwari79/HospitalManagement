@@ -14,6 +14,7 @@ import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
+import com.kairos.response.dto.web.organization.OrganizationSettingDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
@@ -1385,4 +1386,19 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplateByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplateByUnit(unitId));
     }
+
+    @ApiOperation(value = "Update Unit settings")
+    @PutMapping(value = "/unit/{unitId}/updateOrganizationSettings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateOrganizationSettings(@PathVariable Long unitId,@RequestBody OrganizationSettingDTO organizationSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateOrganizationSettings(organizationSettingDTO,unitId));
+    }
+
+    @ApiOperation(value = "get Unit settings")
+    @GetMapping(value = "/unit/{unitId}/getOrganizationSettings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationSettings(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationSettings(unitId));
+    }
+
 }

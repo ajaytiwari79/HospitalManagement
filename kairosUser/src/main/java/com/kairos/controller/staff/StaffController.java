@@ -5,7 +5,10 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+
 import com.kairos.response.dto.web.PasswordUpdateDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.organization.OrganizationServiceService;
@@ -618,11 +621,33 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getUnitWiseStaff() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitWiseStaffList());
     }
+    @RequestMapping(value = "/priority_group", method = RequestMethod.POST)
+    @ApiOperation("get Staff by StaffId ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByPriorityGroup(@PathVariable long unitId, @RequestBody StaffIncludeFilterDTO staffIncludeFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByStaffIncludeFilterForPriorityGroups(staffIncludeFilterDTO,unitId));
+    }
 
     @ApiOperation(value = "Staff personalized view in daily view")
-    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.PUT)
+    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
     }
+
+    @RequestMapping(value = "/emails", method = RequestMethod.POST)
+    @ApiOperation("get email addresses of staffs")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEmailsOfStaffByStaffIds(@RequestBody List<Long> staffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getEmailsOfStaffByStaffIds(staffIds));
+    }
+
+    @RequestMapping(value = "/access_roles", method = RequestMethod.GET)
+    @ApiOperation("get access roles of staffs")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessRolesOfStaffByUserId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessRolesOfStaffByUserId(unitId));
+    }
+
+
 }

@@ -1,29 +1,52 @@
 package com.kairos.activity.util.time_bank;
 
 import com.google.common.collect.Lists;
+import com.kairos.activity.client.GenericIntegrationService;
+import com.kairos.activity.client.StaffRestClient;
+import com.kairos.activity.client.dto.TimeBankRestClient;
+import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
+import com.kairos.activity.client.dto.staff.UnitPositionDTO;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.TimeCalaculationType;
 import com.kairos.activity.enums.TimeTypes;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
+import com.kairos.activity.persistence.model.open_shift.OpenShift;
+import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
+import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
+import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.activity.response.dto.time_bank.*;
+import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.client.dto.time_bank.*;
+import com.kairos.client.dto.time_bank.CTAIntervalDTO;
+import com.kairos.client.dto.time_bank.CalculatedTimeBankByDateDTO;
+import com.kairos.client.dto.time_bank.ScheduleTimeByTimeTypeDTO;
+import com.kairos.client.dto.time_bank.TimeBankCTADistributionDTO;
+import com.kairos.client.dto.time_bank.TimeBankDTO;
+import com.kairos.client.dto.time_bank.TimeBankIntervalDTO;
+import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import static java.time.temporal.ChronoUnit.MINUTES;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.Month;
 import java.util.*;
@@ -42,6 +65,14 @@ import static com.kairos.activity.constants.AppConstants.*;
 @Service
 public class TimeBankCalculationService {
 
+    @Inject
+    private OrderService orderService;
+    @Inject private OrderMongoRepository orderMongoRepository;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
+    @Inject private TimeBankRestClient timeBankRestClient;
+    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private StaffRestClient staffRestClient;
 
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
 
@@ -172,7 +203,7 @@ public class TimeBankCalculationService {
                                     totalDailyTimebank+=dailyScheduledMin;
                                 } if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)){
                                     for (CTAIntervalDTO ctaIntervalDTO : ruleTemplate.getCtaIntervalDTOS()) {
-                                        Interval ctaInterval = getCTAInterval(ctaIntervalDTO, interval);
+                                        Interval ctaInterval = getCTAInterval(ctaIntervalDTO, interval.getStart());
                                         if (ctaInterval.overlaps(shiftInterval)) {
                                             int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
                                             if (ctaIntervalDTO.getCompensationType().equals(AppConstants.MINUTES)) {
@@ -209,10 +240,10 @@ public class TimeBankCalculationService {
         return dailyTimeBankEntry;
     }
 
-    public Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO,Interval interval){
+    public Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO,DateTime startDate){
         int ctaStart = ctaIntervalDTO.getStartTime();
         int ctaEnd = ctaIntervalDTO.getStartTime()>=ctaIntervalDTO.getEndTime()? 1440+ctaIntervalDTO.getEndTime() : ctaIntervalDTO.getEndTime();
-        return new Interval(interval.getStart().withTimeAtStartOfDay().plusMinutes(ctaStart), interval.getStart().plusMinutes(ctaEnd));
+        return new Interval(startDate.withTimeAtStartOfDay().plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
     }
 
     private List<TimeBankCTADistribution> getBlankTimeBankDistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalulatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
@@ -358,6 +389,41 @@ public class TimeBankCalculationService {
             }
         }
         return contractualMinutes;
+    }
+
+    public int calculateOnlyTimeBankForInterval(Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO,boolean isByOverView,List<DailyTimeBankEntry> dailyTimeBankEntries,boolean calculateContractual) {
+        List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
+        if(!calculateContractual){
+            dailyTimeBanksDates = dailyTimeBankEntries.stream().map(d->DateUtils.toJodaDateTime(d.getDate()).toLocalDate()).collect(Collectors.toList());
+        }
+        if(isByOverView) {
+            interval = getIntervalByDateForOverview(unitPositionWithCtaDetailsDTO, interval);
+        }else {
+            interval = getIntervalByDateForAdvanceView(unitPositionWithCtaDetailsDTO, interval);
+        }
+        int contractualMinutes = 0;
+        int count = 0;
+        if(interval!=null) {
+            if (unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) {
+                while (interval.getStart().isBefore(interval.getEnd())) {
+                    if(calculateContractual || !dailyTimeBanksDates.contains(interval.getStart().toLocalDate())) {
+                        count++;
+                    }
+                    interval = interval.withStart(interval.getStart().plusDays(1));
+                }
+                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
+            } else {
+                DateTime startDate = interval.getStart();
+                while (startDate.isBefore(interval.getEnd())) {
+                    if ((calculateContractual || !dailyTimeBanksDates.contains(startDate.toLocalDate())) && startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY) {
+                        count++;
+                    }
+                    startDate = startDate.plusDays(1);
+                }
+                contractualMinutes = count * (unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek());
+            }
+        }
+        return !calculateContractual? -contractualMinutes : contractualMinutes;
     }
 
 
@@ -784,6 +850,93 @@ public class TimeBankCalculationService {
         return shifts;
 
     }
+
+    //Calculating Time Bank Against Open Shift
+    public int[] calculateDailyTimeBankForOpenShift(OpenShift shift,Activity activity,UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+        int totalTimebank = 0;
+        int plannedTimeMin = 0;
+        DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
+        Interval shiftInterval = new Interval(shift.getStartDate().getTime(),shift.getEndDate().getTime());
+        int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() ? unitPositionWithCtaDetailsDTO.getTotalWeeklyMinutes() / unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() : 0;
+        for (CTARuleTemplateDTO ruleTemplate : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
+                    if (ruleTemplate.getAccountType() == null) continue;
+                    if (ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)) {
+                        int ctaTimeBankMin = 0;
+                        if ((ruleTemplate.getActivityIds().contains(shift.getActivityId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(activity.getBalanceSettingsActivityTab().getTimeTypeId())))) {
+                            if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                                if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
+                                    plannedTimeMin += calculateScheduleAndDurationHourForOpenShift(shift, activity, unitPositionWithCtaDetailsDTO);
+                                    totalTimebank += plannedTimeMin;
+                                }
+                                if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)) {
+                                    for (CTAIntervalDTO ctaIntervalDTO : ruleTemplate.getCtaIntervalDTOS()) {
+                                        Interval ctaInterval = getCTAInterval(ctaIntervalDTO, startDate);
+                                        if (ctaInterval.overlaps(shiftInterval)) {
+                                            int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
+                                            if (ctaIntervalDTO.getCompensationType().equals(AppConstants.MINUTES)) {
+                                                ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity()) * ctaIntervalDTO.getCompensationValue();
+                                                totalTimebank += ctaTimeBankMin;
+                                                plannedTimeMin += ctaTimeBankMin;
+                                                break;
+                                            } else if (ctaIntervalDTO.getCompensationType().equals(AppConstants.PERCENT)) {
+                                                ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity()) / 100) * ctaIntervalDTO.getCompensationValue());
+                                                totalTimebank += ctaTimeBankMin;
+                                                plannedTimeMin += ctaTimeBankMin;
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    }
+
+
+
+        totalTimebank = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysInWeek() ? totalTimebank - contractualMin : totalTimebank;
+        return new int[]{plannedTimeMin,totalTimebank};
+    }
+
+    //Calculating schedule Minutes for Open Shift
+    private int calculateScheduleAndDurationHourForOpenShift(OpenShift openShift, Activity activity, UnitPositionWithCtaDetailsDTO unitPosition){
+        int scheduledMinutes = 0;
+        int duration = 0;
+        int weeklyMinutes = 0;
+
+        switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
+            case ENTERED_MANUALLY:
+                duration =(int) MINUTES.between(DateUtils.asLocalTime(openShift.getStartDate()),DateUtils.asLocalTime(openShift.getStartDate()));
+                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                break;
+            case FIXED_TIME:
+                duration = activity.getTimeCalculationActivityTab().getFixedTimeValue().intValue();
+                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                break;
+            case ENTERED_TIMES:
+                duration = (int) new Interval(openShift.getStartDate().getTime(), openShift.getEndDate().getTime()).toDuration().getStandardMinutes();
+                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                break;
+
+            case AppConstants.FULL_DAY_CALCULATION:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType()))?unitPosition.getFullTimeWeeklyMinutes():unitPosition.getTotalWeeklyMinutes();
+                duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case AppConstants.WEEKLY_HOURS:
+                duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case AppConstants.FULL_WEEK:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType()))?unitPosition.getFullTimeWeeklyMinutes():unitPosition.getTotalWeeklyMinutes();
+                duration = new Double(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+        }
+        return scheduledMinutes;
+    }
+
 
 
 }

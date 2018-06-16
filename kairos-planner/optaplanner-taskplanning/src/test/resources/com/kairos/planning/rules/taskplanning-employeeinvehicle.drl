@@ -15,7 +15,7 @@ end
 rule "tasksChain for time"
 salience 15
     when
-        $task: Task (previousTaskOrVehicle instanceof Task  && $prevTask:previousTaskOrVehicle && !$task.isAfter((Task)$prevTask))
+        $task: Task (previousTaskOrVehicle instanceof Task  && $nextTask:previousTaskOrVehicle && !$task.isAfter((Task)$nextTask))
     then
         scoreHolder.addHardConstraintMatch(kcontext,1,- 10);
 end

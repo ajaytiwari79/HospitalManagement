@@ -20,6 +20,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskPackageMongoRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.activity.response.dto.TaskDemandDTO;
+import com.kairos.activity.response.dto.TaskTypeDTO;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.planner.PlannerService;
 import com.kairos.activity.service.planner.TasksMergingService;
@@ -115,9 +116,9 @@ public class VisitatorService{
         List<TaskDemand> taskDemandIdList = new ArrayList<>();
         List<Client> clientList = new ArrayList<>();
 
-        List<Map<String, Object>> mapList = taskTypeService.getTaskTypes(serviceId);
-        for (Map<String, Object> map : mapList) {
-            taskTypeIdList.add(map.get("id").toString());
+        List<TaskTypeDTO> taskTypeDTOS = taskTypeService.getTaskTypes(serviceId);
+        for (TaskTypeDTO taskTypeDTO : taskTypeDTOS) {
+            taskTypeIdList.add(taskTypeDTO.getId().toString());
         }
         /*for (String id : taskTypeIdList) {
             taskDemandIdList = taskDemandService.getbyTaskTypeId(id);

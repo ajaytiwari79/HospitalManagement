@@ -2,21 +2,30 @@ package com.kairos.service.master_data_management.questionnaire_template;
 
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.dto.master_data.MasterQuestionDto;
+import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.mongodb.MongoClientException;
 import jdk.nashorn.internal.runtime.options.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.constant.AppConstant.IDS_LIST;
+import static com.kairos.constant.AppConstant.QUESTION_LIST;
+
+
 @Service
 public class MasterQuestionService extends MongoBaseService {
 
+    private Logger logger = LoggerFactory.getLogger(MasterQuestionService.class);
 
     @Inject
     private MasterQuestionMongoRepository questionMongoRepository;
@@ -24,25 +33,58 @@ public class MasterQuestionService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public List<MasterQuestion> addMasterQuestion(Long countryId, ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDtos) {
 
+    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, List<MasterQuestionDto> masterQuestionDtos) {
 
-        List<MasterQuestionDto> masterQuestionDtoList = masterQuestionDtos.getRequestBody();
+        List<BigInteger> questionSectionIds = new ArrayList<>();
+        Map<String, Object> result = new HashMap<>();
         List<MasterQuestion> masterQuestions = new ArrayList<>();
+        checkForDuplicacyInQuestion(masterQuestionDtos);
+        for (MasterQuestionDto masterQuestion : masterQuestionDtos) {
 
-        for (MasterQuestionDto masterQuestionDto : masterQuestionDtoList) {
-
-            MasterQuestion masterQuestion = new MasterQuestion(masterQuestionDto.getName(), masterQuestionDto.getDescription(), masterQuestionDto.getQuestionType().value, countryId);
-            masterQuestion.setRequired(masterQuestionDto.getRequired());
-            masterQuestion.setNotSureAllowed(masterQuestionDto.getNotSureAllowed());
-            masterQuestions.add(masterQuestion);
-
+            if (QuestionType.valueOf(masterQuestion.getQuestionType())!=null) {
+                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
+                masterQuestion.setNotApplicableAllowed(masterQuestion.getNotApplicableAllowed());
+                masterQuestion.setNotSureAllowed(masterQuestion.getNotSureAllowed());
+                masterQuestion.setRequired(masterQuestion.getRequired());
+                masterQuestions.add(question);
+            } else {
+                exceptionService.invalidRequestException("message.invalid.request", masterQuestion.getQuestion() + " not exist");
+            }
         }
-        masterQuestions = save(masterQuestions);
-        return masterQuestions;
+        try {
+            masterQuestions = save(masterQuestions);
+            masterQuestions.forEach(masterQuestion -> questionSectionIds.add(masterQuestion.getId()));
+        } catch (MongoClientException e) {
+            logger.info(e.getMessage());
+            throw new MongoClientException(e.getMessage());
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+        result.put(IDS_LIST, questionSectionIds);
+        result.put(QUESTION_LIST, masterQuestions);
+        return result;
 
     }
 
+
+    public void checkForDuplicacyInQuestion(List<MasterQuestionDto> masterQuestionDtos) {
+
+        List<String> titles = new ArrayList<>();
+        for (MasterQuestionDto masterQuestionDto : masterQuestionDtos) {
+            if (titles.contains(masterQuestionDto.getQuestion())) {
+                exceptionService.duplicateDataException("message.duplicate", " question ", masterQuestionDto.getQuestion());
+            }
+            titles.add(masterQuestionDto.getQuestion());
+        }
+
+
+    }
+
+
+
+/*
     public MasterQuestion getMasterQuestion(Long countryId, BigInteger id) {
 
         MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
@@ -69,15 +111,15 @@ public class MasterQuestionService extends MongoBaseService {
 
         MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "question", questionDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", "question", questionDto.getQuestion());
         }
-        if (questionMongoRepository.findByNameAndCountryId(countryId, questionDto.getName()) == null) {
-            exist.setName(questionDto.getName());
+        if (questionMongoRepository.findByNameAndCountryId(countryId, questionDto.getQuestion()) == null) {
+            exist.setQuestion(questionDto.getQuestion());
             exist.setCountryId(countryId);
             exist.setDescription(questionDto.getDescription());
             exist.setRequired(questionDto.getRequired());
             exist.setNotSureAllowed(questionDto.getNotSureAllowed());
-            exist.setQuestionType(questionDto.getQuestionType().value);
+            exist.setQuestionType(questionDto.getQuestionType());
             return save(exist);
 
         } else
@@ -106,6 +148,7 @@ public class MasterQuestionService extends MongoBaseService {
         return masterQuestions;
 
     }
+*/
 
 
 }

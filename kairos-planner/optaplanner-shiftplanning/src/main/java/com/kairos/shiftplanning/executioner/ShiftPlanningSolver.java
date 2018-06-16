@@ -213,7 +213,7 @@ public class ShiftPlanningSolver {
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
-            }else if(entity instanceof ActivityPlannerEntity) {
+            }else if(entity instanceof Activity) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n------------------------\n");
 
@@ -228,7 +228,7 @@ public class ShiftPlanningSolver {
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
-            }else if(entity instanceof EmployeePlanningFact) {
+            }else if(entity instanceof Employee) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n------------------------\n");
                 sb.append(entity.toString()+"---\n");
@@ -256,7 +256,7 @@ public class ShiftPlanningSolver {
 
     private void printSolvedSolution(Object[] output) {
         ShiftRequestPhasePlanningSolution solution = (ShiftRequestPhasePlanningSolution) output[0];
-		log.info("-------Printing Solution:-------");
+		log.info("-------Printing solution:-------");
         log.info("total intervals:"+solution.getActivityLineIntervals().stream().count());
         log.info("total assigned intervals:"+solution.getActivityLineIntervals().stream().filter(i->i.getShift()!=null).count());
 		/*Map<ShiftRequestPhase,List<ActivityLineInterval>> shiftsAssignedToActivityIntervals= new HashMap<>();
@@ -294,16 +294,16 @@ public class ShiftPlanningSolver {
         /*shiftsAssignedToSkillIntervals.forEach((shift,v)->{
             log.info("Shift S--------"+shift.getId().toString()+":["+shift.getInterval()+"]:"+getMergedInterval(v.stream().map(i->i.getInterval()).sorted((i1,i2)->i1.getStart().compareTo(i2.getStart())).collect(Collectors.toList())) );
         });*/
-        log.info("-------Printing Solution Finished:-------");
+        log.info("-------Printing solution Finished:-------");
     }
 
 	private void printStaffingLines(List<ActivityLineInterval> activityLineIntervals) {
         ///activityLineIntervals.sort(Comparator.comparing(a -> a.getStart()).thenComparing(ActivityLineInterval::getStart));
         activityLineIntervals.sort(Comparator.comparing(( ActivityLineInterval a) -> a.getStart().toLocalDate())
-                .thenComparing(a -> a.getActivityPlannerEntity().getName())
+                .thenComparing(a -> a.getActivity().getName())
                 .thenComparingInt(a -> a.getStaffNo())
                 .thenComparing(a -> a.getStart().toLocalTime()));//This doesnt
-        activityLineIntervals.sort(Comparator.comparing(a -> a.getActivityPlannerEntity().getName())); //This does
+        activityLineIntervals.sort(Comparator.comparing(a -> a.getActivity().getName())); //This does
         for(ActivityLineInterval activityLineInterval:activityLineIntervals){
             log.info(activityLineInterval.toString()+"-------"+activityLineInterval.getShift());
         }
@@ -317,7 +317,7 @@ public class ShiftPlanningSolver {
         }
         return unsolvedSolution;
     }
-    private void assignEmployeeToAvaiability(List<EmployeePlanningFact> employeeList, boolean assign) {
+    private void assignEmployeeToAvaiability(List<Employee> employeeList, boolean assign) {
 		/*employeeList.forEach(employee->{
 			employee.getAvailabilityList().forEach(avail->{
 				avail.setEmployee(assign?employee:null);
@@ -336,7 +336,7 @@ public class ShiftPlanningSolver {
     private List<ShiftDTO> getShift(List<ShiftRequestPhase> shiftRequestPhase){
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shiftRequestPhase.size());
         shiftRequestPhase.forEach(s->{
-            //s.getActivityLineIntervals().get(0).getActivityPlannerEntity().getId()
+            //s.getActivityLineIntervals().get(0).getActivity().getId()
             ShiftDTO shiftDTO = new ShiftDTO(s.getStart().toDate(),s.getEnd().toDate(),new BigInteger("320"),95l,1005l);//Long.valueOf(s.getEmployee().getId()));
             shiftDTO.setUnitEmploymentPositionId(12431l);
             if(s.getActivityLineIntervals().size()>1) {
@@ -355,7 +355,7 @@ public class ShiftPlanningSolver {
         List<ActivityLineInterval> alis = getMergedALIs(shift.getActivityLineIntervals());
         if(alis.size()==1) return null;
         alis.forEach(a->{
-            //a.getActivityPlannerEntity().getId()
+            //a.getActivity().getId()
             ShiftDTO shiftDTO = new ShiftDTO(a.getStart().minusHours(5).minusMinutes(30).toDate(),a.getEnd().minusHours(5).minusMinutes(30).toDate(),new BigInteger("375"),95l,1005l);//Long.valueOf(shift.getEmployee().getId()));
             //shiftDTO.setSubShifts(getSubShift(shift,95l));
             shiftDTOS.add(shiftDTO);
@@ -364,19 +364,19 @@ public class ShiftPlanningSolver {
     }
 
     private int getActivityCount(List<ActivityLineInterval> intervals){
-        Set<ActivityPlannerEntity> activities = new HashSet<>();
+        Set<Activity> activities = new HashSet<>();
         intervals.forEach(activityLineInterval -> {
-            activities.add(activityLineInterval.getActivityPlannerEntity());
+            activities.add(activityLineInterval.getActivity());
         });
         return activities.size();
     }
 
     private List<ActivityLineInterval> getMergedALIs(List<ActivityLineInterval> intervals){
-        //String activityId = intervals.get(0).getActivityPlannerEntity().getId();
+        //String activityId = intervals.get(0).getActivity().getId();
         List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
         ActivityLineInterval activityLineInterval = intervals.get(0);
         for (ActivityLineInterval ali:intervals.subList(1,intervals.size()-1)) {
-            if (activityLineInterval.getEnd().equals(ali.getStart()) && activityLineInterval.getActivityPlannerEntity().getId().equals(ali.getActivityPlannerEntity().getId())) {
+            if (activityLineInterval.getEnd().equals(ali.getStart()) && activityLineInterval.getActivity().getId().equals(ali.getActivity().getId())) {
                 activityLineInterval.setDuration(activityLineInterval.getDuration()+ali.getDuration());
             }else{
                 activityLineIntervals.add(activityLineInterval);

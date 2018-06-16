@@ -17,6 +17,8 @@ public class UnitPositionWithCtaDetailsDTO {
     private Long staffId;
     private LocalDate unitPositionStartDate;
     private LocalDate unitPositionEndDate;
+    private int totalWeeklyMinutes;
+    private int fullTimeWeeklyMinutes;
     private Long countryId;
     private int minutesFromCta;
     private ZoneId unitTimeZone;
@@ -34,6 +36,14 @@ public class UnitPositionWithCtaDetailsDTO {
         this.unitPositionId = unitPositionId;
     }
 
+    public UnitPositionWithCtaDetailsDTO(Long unitPositionId,int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate, LocalDate unitPositionEndDate) {
+        this.unitPositionId = unitPositionId;
+        this.contractedMinByWeek = contractedMinByWeek;
+        this.workingDaysPerWeek = workingDaysPerWeek;
+        this.unitPositionStartDate = unitPositionStartDate;
+        this.unitPositionEndDate = unitPositionEndDate;
+    }
+
     public UnitPositionWithCtaDetailsDTO() {
     }
 
@@ -41,6 +51,21 @@ public class UnitPositionWithCtaDetailsDTO {
         return unitTimeZone!=null?DateTimeZone.forID(unitTimeZone.getId()):null;
     }
 
+    public int getTotalWeeklyMinutes() {
+        return totalWeeklyMinutes;
+    }
+
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
 
     public ZoneId getUnitTimeZone() {
         return unitTimeZone;

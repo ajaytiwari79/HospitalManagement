@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ public class MasterQuestionnaireSection extends MongoBaseEntity {
 
     @NotNull(message = "list.cannot.be.null")
     @NotEmpty(message = "list.cannot.be.empty")
-    private Set<BigInteger> questions;
+    private List<BigInteger> questions=new ArrayList<>();
 
     private Long countryId;
 
@@ -39,11 +40,11 @@ public class MasterQuestionnaireSection extends MongoBaseEntity {
         this.title = title;
     }
 
-    public Set<BigInteger> getQuestions() {
+    public List<BigInteger> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(Set<BigInteger> questions) {
+    public void setQuestions(List<BigInteger> questions) {
         this.questions = questions;
     }
 

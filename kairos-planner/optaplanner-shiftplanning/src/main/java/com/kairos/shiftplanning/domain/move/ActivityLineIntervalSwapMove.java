@@ -60,7 +60,7 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
 
     @Override
     public boolean isMoveDoable(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
-        boolean isDoable=leftActivityLineInterval.getActivityPlannerEntity().isTypeAbsence()==rightActivityLineInterval.getActivityPlannerEntity().isTypeAbsence() &&
+        boolean isDoable=leftActivityLineInterval.getActivity().isTypeAbsence()==rightActivityLineInterval.getActivity().isTypeAbsence() &&
                 !Objects.equals(leftActivityLineInterval,rightActivityLineInterval) &&
                 !Objects.equals(leftActivityLineInterval.getShift(),rightActivityLineInterval.getShift());
         return isDoable;

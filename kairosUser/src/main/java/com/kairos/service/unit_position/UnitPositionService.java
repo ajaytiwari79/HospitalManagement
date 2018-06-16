@@ -375,7 +375,7 @@ public class UnitPositionService extends UserBaseService {
             unitPosition.setCta(cta);
         }
 
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 0);
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 1);
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", unitPositionDTO.getExpertiseId());
 
@@ -672,7 +672,7 @@ public class UnitPositionService extends UserBaseService {
         }
         logger.info(updateDTO.getName());
         newWta = wtaService.copyWta(oldWta, updateDTO);
-        newWta.setExpertise(oldWta.getExpertise());
+        newWta.setExpertises(oldWta.getExpertise());
         newWta.setParentWTA(oldWta);
         newWta.setDisabled(false);
 */        //unitPosition.setWorkingTimeAgreement(newWta);
@@ -683,7 +683,7 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //newWta.setParentWTA(oldWta.basicDetails());
 
-        //newWta.setExpertise(newWta.getExpertise().retrieveBasicDetails());
+        //newWta.setExpertises(newWta.getExpertise().retrieveBasicDetails());
         //unitPositionQueryResult.setWorkingTimeAgreement(newWta);
         plannerSyncService.publishWTA(unitId, unitPositionId, wtaResponseDTO, IntegrationOperation.UPDATE);
         return unitPositionQueryResult;
@@ -1028,4 +1028,9 @@ public class UnitPositionService extends UserBaseService {
         return staffData;
     }
 
+    public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, Long expertiseId, List<Long> staffId) {
+        List<StaffUnitPositionDetails> staffData =
+                staffGraphRepository.getStaffIdAndUnitPositionId(unitId, expertiseId, staffId,System.currentTimeMillis());
+        return staffData;
+    }
 }

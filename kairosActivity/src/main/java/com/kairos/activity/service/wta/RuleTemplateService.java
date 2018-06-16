@@ -42,9 +42,6 @@ import java.util.*;
 @Transactional
 @Service
 public class RuleTemplateService extends MongoBaseService {
-
-
-
     @Inject
     private CountryRestClient countryRestClient;
     @Inject
@@ -66,8 +63,6 @@ public class RuleTemplateService extends MongoBaseService {
         if (countryDTO == null) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
-
-
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
@@ -159,7 +154,6 @@ public class RuleTemplateService extends MongoBaseService {
         dailyRestingTimeWTATemplate.setWtaTemplateType(WTATemplateType.DAILY_RESTING_TIME);
         wtaBaseRuleTemplates1.add(dailyRestingTimeWTATemplate);
 
-
         DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplate("Minimum duration between shifts",false,"Minimum duration between shifts");
         durationBetweenShiftsWTATemplate.setCountryId(countryDTO.getId());
         durationBetweenShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
@@ -172,6 +166,7 @@ public class RuleTemplateService extends MongoBaseService {
         restPeriodInAnIntervalWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         restPeriodInAnIntervalWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(restPeriodInAnIntervalWTATemplate);
+
 
         ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest",false,"Shortest and Average daily Rest",1, week);
         shortestAndAverageDailyRestWTATemplate.setCountryId(countryDTO.getId());
@@ -205,7 +200,6 @@ public class RuleTemplateService extends MongoBaseService {
 
         ChildCareDaysCheckWTATemplate careDaysCheck=new ChildCareDaysCheckWTATemplate("Child Care Days Check",false,"Child Care Days Check",Arrays.asList(range),new ArrayList<>(),5,localDate,12);
         careDaysCheck.setCountryId(countryDTO.getId());
-        //careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
 
@@ -289,7 +283,6 @@ public class RuleTemplateService extends MongoBaseService {
                     RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
                     BeanUtils.copyProperties(ruleTemplateCategoryTagDTO,ruleTemplateCategoryDTO);
                     ruleTemplateResponseDTO.setRuleTemplateCategory(ruleTemplateCategoryDTO);
-                    //ruleTemplateResponseDTO.setTemplateType("MAXIMUM_SHIFT_LENGTH");
                 }
             }
         }
@@ -305,99 +298,19 @@ public class RuleTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.wta-base-rule-template.id",templateDTO.getId());
         }
-       /* String templateType=getTemplateType(templateDTO.getTemplateType());
-        WTATemplateType ruleTemplateType = getByTemplateType(templateType);*/
         oldTemplate = WTABuilderService.copyRuleTemplate(templateDTO,false);
-        //BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
-        //List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        //BeanUtils.copyProperties(phaseTemplateValues,templateDTO.getPhaseTemplateValues());
-        //oldTemplate.setPhaseTemplateValues(phaseTemplateValues);
-        //oldTemplate.setDisabled(templateDTO.isDisabled());
-        //oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
-
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
         oldTemplate.setRuleTemplateCategoryId(templateDTO.getRuleTemplateCategory().getId());
         oldTemplate.setCountryId(countryId);
         save(oldTemplate);
         return templateDTO;
     }
-
-    /*protected BigInteger checkAndAssignRuleTemplateCategory(WTABaseRuleTemplate oldTemplate, WTARuleTemplateDTO templateDTO) {
-        RuleTemplateCategory ruleTemplateCategory = null;
-        if (!oldTemplate.getName().equalsIgnoreCase(templateDTO.getRuleTemplateCategory().getName())) {
-            ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(templateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
-            if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid ruleTemplateCategory name " + templateDTO.getRuleTemplateCategory().getName());
-            }
-            wtaBaseRuleTemplateMongoRepository.deleteCategoryFromTemplate(oldTemplate.getId(), oldTemplate.getId(), templateDTO.getRuleTemplateCategory().getName());
-        }
-        return oldTemplate.getId();
-    }
-*/
-    /*
-    *
-    * This method will change the category of rule Template when we change the rule template all existing rule templates wil set to none
-     * and new rule temp wll be setted to  this new rule template category
-    * */
-    /*public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO wtaRuleTemplateDTO, long countryId) {
-        // This Method will get all the previous
-        Map<String, Object> response = new HashMap();
-        List<RuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWtaBaseRuleTemplateByIds(wtaRuleTemplateDTO.getRuleTemplateIds());
-        RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "(?i)" + wtaRuleTemplateDTO.getCategoryName(), RuleTemplateCategoryType.WTA);
-        if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
-            previousRuleTemplateCategory = new RuleTemplateCategory(wtaRuleTemplateDTO.getCategoryName());
-            CountryDTO country = countryRestClient.getCountryById(countryId);
-            List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-            ruleTemplateCategories.add(previousRuleTemplateCategory);
-            country.setRuleTemplateCategories(ruleTemplateCategories);
-            countryGraphRepository.save(country);
-            // Break Previous Relation
-            wtaBaseRuleTemplateMongoRepository.deleteOldCategories(wtaRuleTemplateDTO.getRuleTemplateIds());
-            previousRuleTemplateCategory.setRuleTemplateIds(wtaBaseRuleTemplates);
-            // Save Tags in Rule Template Category
-            previousRuleTemplateCategory.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTags(), MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
-            save(previousRuleTemplateCategory);
-            response.put("category", previousRuleTemplateCategory);
-            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
-
-        } else {
-            List<Long> previousBaseRuleTemplates = ruleTemplateCategoryMongoRepository.findAllExistingRuleTemplateAddedToThiscategory(wtaRuleTemplateDTO.getCategoryName(), countryId);
-            List<Long> newRuleTemplates = wtaRuleTemplateDTO.getRuleTemplateIds();
-            List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(previousBaseRuleTemplates, newRuleTemplates);
-            List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(newRuleTemplates, previousBaseRuleTemplates);
-            ruleTemplateCategoryMongoRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToAddInCategory, wtaRuleTemplateDTO.getCategoryName());
-            ruleTemplateCategoryMongoRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
-            // Save Tags in Rule Template Category
-            previousRuleTemplateCategory.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTags(), MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
-            save(previousRuleTemplateCategory);
-            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
-        }
-        return response;
-    }*/
-
-   /* private List<RuleTemplateDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<RuleTemplateDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());
-        wtaBaseRuleTemplates.forEach(wtaBaseRuleTemplate -> {
-            RuleTemplateDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(wtaBaseRuleTemplate, RuleTemplateDTO.class);
-            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCategory);
-
-            wtaBaseRuleTemplateDTOS.add(wtaBaseRuleTemplateDTO);
-        });
-
-        return wtaBaseRuleTemplateDTOS;
-    }*/
-
     public WTABaseRuleTemplateDTO copyRuleTemplate(Long countryId, WTABaseRuleTemplateDTO wtaRuleTemplateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
-       /* if(!Optional.ofNullable(wtaRuleTemplateDTO.getTemplateType()).isPresent()){
-            throw new DataNotFoundByIdException("No templateType found");
-        }*/
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, wtaRuleTemplateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.category.not-matched");
@@ -412,50 +325,8 @@ public class RuleTemplateService extends MongoBaseService {
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
-       // RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
-        //BeanUtils.copyProperties(ruleTemplateCategory,ruleTemplateCategoryDTO);
         wtaRuleTemplateDTO.setRuleTemplateCategory(wtaRuleTemplateDTO.getRuleTemplateCategory());
-        /*int number=getNumberFromlastInsertedTemplateType(lastInsertedTemplateType);
-
-        String templateTypeToBeSet=originalTemplateType+"_";*/
         return wtaRuleTemplateDTO;
 
-
     }
-    /*private String getTemplateType(String templateType){
-        if(!templateType.contains("_")){
-            return templateType;
-        }
-        int lastCharIndex = templateType.lastIndexOf("_");
-        if(lastCharIndex > 0){
-            char nextCharacter = templateType.charAt(lastCharIndex + 1);
-            if(!Character.isDigit(templateType.charAt(lastCharIndex + 1))){
-                return templateType;
-            }
-            else{
-                return templateType.substring(0, lastCharIndex);
-            }
-        }
-        return null;
-    }*/
-
-
-  /*  int getNumberFromlastInsertedTemplateType(String templateType) {
-        if (!templateType.contains("_")) {
-            return 0;
-        }
-        int lastCharIndex = templateType.lastIndexOf("_");
-        if (lastCharIndex > 0) {
-            char nextCharacter = templateType.charAt(lastCharIndex + 1);
-            if(!Character.isDigit(templateType.charAt(lastCharIndex + 1))){
-                return 0;
-            }
-            else{
-                return (int) Integer.parseInt(templateType.substring(++lastCharIndex,templateType.length()));
-            }
-        }
-
-        return 0;
-    }*/
-
 }

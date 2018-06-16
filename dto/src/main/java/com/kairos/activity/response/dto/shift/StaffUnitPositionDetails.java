@@ -99,14 +99,6 @@ public class StaffUnitPositionDetails {
     }
 
 
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
     }
@@ -233,5 +225,13 @@ public class StaffUnitPositionDetails {
 
     public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
         this.appliedFunctions = appliedFunctions;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }

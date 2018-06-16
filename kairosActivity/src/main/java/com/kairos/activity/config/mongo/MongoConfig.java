@@ -48,6 +48,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements Environme
         List<Converter<?, ?>> converterList = new ArrayList<Converter<?, ?>>();
         converterList.add(new LocalDateReadConverter());
         converterList.add(new LocalDateWriteConverter());
+        converterList.add(new LocalDateToStringReadConverter());
         converterList.add(new LocalTimeReadConverter());
         converterList.add(new LocalTimeWriteConverter());
         converterList.add(new LocalDateTimeWriteConverter());

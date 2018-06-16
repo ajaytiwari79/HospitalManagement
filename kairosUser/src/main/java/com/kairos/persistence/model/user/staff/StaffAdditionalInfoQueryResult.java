@@ -1,12 +1,8 @@
 package com.kairos.persistence.model.user.staff;
 
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
-import com.kairos.response.dto.web.UserDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
-import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
-import com.kairos.response.dto.web.skill.SkillDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
@@ -28,13 +24,14 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffUnitPositionDetails unitPosition;
+    private com.kairos.activity.response.dto.shift.StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
-    private List<TimeSlotWrapper> timeSlotSets;
+    private List<com.kairos.activity.client.dto.TimeSlotWrapper> timeSlotSets;
     private UserAccessRoleDTO user;
+    private UserAccessRoleDTO userAccessRoleDTO;
 
 
     public UserAccessRoleDTO getUser() {
@@ -45,11 +42,11 @@ public class StaffAdditionalInfoQueryResult {
         this.user = user;
     }
 
-    public List<TimeSlotWrapper> getTimeSlotSets() {
+    public List<com.kairos.activity.client.dto.TimeSlotWrapper> getTimeSlotSets() {
         return timeSlotSets;
     }
 
-    public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
+    public void setTimeSlotSets(List<com.kairos.activity.client.dto.TimeSlotWrapper> timeSlotSets) {
         this.timeSlotSets = timeSlotSets;
     }
 
@@ -144,5 +141,13 @@ public class StaffAdditionalInfoQueryResult {
 
     public void setOrganizationNightEndTimeTo(Date organizationNightEndTimeTo) {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
+    }
+
+    public UserAccessRoleDTO getUserAccessRoleDTO() {
+        return userAccessRoleDTO;
+    }
+
+    public void setUserAccessRoleDTO(UserAccessRoleDTO userAccessRoleDTO) {
+        this.userAccessRoleDTO = userAccessRoleDTO;
     }
 }

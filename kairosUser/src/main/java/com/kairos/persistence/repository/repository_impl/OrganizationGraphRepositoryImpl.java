@@ -115,7 +115,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             query+= " MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) where id(organization)={parentOrganizationId} "+
                     " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User)  "+ getMatchQueryForPropertiesOfStaffByFilters(filters, searchText)+
                     " with user, staff OPTIONAL MATCH (staff)-[:"+BELONGS_TO_STAFF+"]-(unitPos:UnitPosition{deleted:false})-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos "+
-                    " match (emp:EmploymentType)<-[relation:"+HAS_EMPLOYMENT_TYPE+"]-(unitPos)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
+                    " optional match (emp:EmploymentType)<-[relation:"+HAS_EMPLOYMENT_TYPE+"]-(unitPos)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
                     " with user ,staff, collect({id:id(expertise),name:expertise.name}) as expertiseList ,collect({id:id(emp),name:emp.name,employmentTypeCategory:relation.employmentTypeCategory}) as employmentList \n";
         }
 

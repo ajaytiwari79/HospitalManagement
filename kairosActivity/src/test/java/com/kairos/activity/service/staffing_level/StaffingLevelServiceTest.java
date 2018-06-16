@@ -4,7 +4,7 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.config.env.EnvConfig;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
+import com.kairos.activity.persistence.model.staffing_level.Duration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
@@ -49,7 +49,7 @@ public class StaffingLevelServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        StaffingLevelDuration duration=new StaffingLevelDuration(LocalTime.MIN,LocalTime.MAX);
+        Duration duration=new Duration(LocalTime.MIN,LocalTime.MAX);
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
         LocalDate date = LocalDate.now();
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
@@ -59,7 +59,7 @@ public class StaffingLevelServiceTest {
         int startTimeCounter=0;
         LocalTime startTime=LocalTime.MIN;
         for(int i=0;i<=95;i++){
-            StaffingLevelInterval staffingLevelInterval=new StaffingLevelInterval(i,0,0,new StaffingLevelDuration(startTime.plusMinutes(startTimeCounter),
+            StaffingLevelInterval staffingLevelInterval=new StaffingLevelInterval(i,0,0,new Duration(startTime.plusMinutes(startTimeCounter),
                     startTime.plusMinutes(startTimeCounter+=15)));
 
             staffingLevelInterval.setAvailableNoOfStaff(0);

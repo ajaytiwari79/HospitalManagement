@@ -17,25 +17,23 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataSubjectMappingDto {
 
-    @NotNullOrEmpty(message = "name cannot be null or empty")
+    @NotNullOrEmpty(message = "name  can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "description cannotbe null or empty")
+    @NotNullOrEmpty(message = "description  can't be empty")
     private String description;
 
-    @NotEmpty(message = "oraganization type list cannot be empty")
+    @NotNull(message = "Organization  Type  can't be  null")
+    @NotEmpty(message = "Oraganization Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
-    @NotEmpty(message = "organization Sub Types list cannot be empty")
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type   can't be  empty")
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
-    @NotEmpty(message = "organization Services list cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-
-    @NotEmpty(message = "organization  Sub Services list cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
-    @NotEmpty(message = "dataCategories list cannot be empty")
+    @NotEmpty(message = "DataCategorie  can't be  empty")
+    @NotNull(message = "Data category  can't be  null")
     private Set<BigInteger> dataCategories;
 
     public String getName() {
@@ -68,22 +66,6 @@ public class DataSubjectMappingDto {
 
     public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
     }
 
     public Set<BigInteger> getDataCategories() {
