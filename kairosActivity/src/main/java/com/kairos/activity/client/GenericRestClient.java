@@ -27,7 +27,7 @@ public class GenericRestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
+    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit);
 
         try {

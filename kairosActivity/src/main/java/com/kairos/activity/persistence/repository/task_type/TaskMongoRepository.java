@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.repository.task_type;
 
+import com.google.inject.Inject;
 import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import org.joda.time.DateTime;
@@ -90,4 +91,8 @@ public interface TaskMongoRepository extends MongoBaseRepository<Task,BigInteger
 
     @Query(value = "{ 'taskDemandId' : ?0 , 'taskDemandVisitId' : ?1, dateFrom:{$gte:?2,$lte:?3}, 'isDeleted' : false}")
     Task getTaskByDemandIdAndVisitIdAndBetweenDates(String taskDemandId, BigInteger taskDemandVisitId, Date dateFrom, Date dateTo);
+
+
+
+
 }
