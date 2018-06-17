@@ -48,7 +48,7 @@ public class MasterQuestionnaireSectionController {
     }
 
 
-   /* @PutMapping("/{id}/section/update")
+    @PutMapping("/{id}/section/update")
     @ApiOperation(value = "update list of Questionniare section and deleted section if deleted property is true")
     public ResponseEntity updateAndDeletedQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> questionniareSectionsDto) {
         if (countryId == null) {
@@ -56,14 +56,14 @@ public class MasterQuestionnaireSectionController {
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, id, questionniareSectionsDto.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.updateExistingQuestionniareSectionsAndCreateNewSectionsWithQuestions(countryId, id, questionniareSectionsDto.getRequestBody()));
 
 
-    }*/
+    }
 
 
 
-    @DeleteMapping("/{id}/section/{id}")
+    @DeleteMapping("/section/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
