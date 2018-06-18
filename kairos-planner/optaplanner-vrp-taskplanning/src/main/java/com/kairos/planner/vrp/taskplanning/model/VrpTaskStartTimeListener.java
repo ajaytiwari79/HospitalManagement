@@ -47,9 +47,10 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
             return;
         }
         if(task.getPrevTaskOrShift() instanceof Shift){
-            LocalDateTime plannedDateTime=((Shift)task.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
+            LocalDateTime plannedDateTime=((Shift)task.getPrevTaskOrShift()).getStartTime();
             updatePlannedTime(task,plannedDateTime,scoreDirector);
-            return;
+            task=task.getNextTask();
+            //return;
         }
         while (task!=null){
             LocalDateTime plannedDateTime =((Task)task.getPrevTaskOrShift()).getPlannedEndTime().plusMinutes(task.getDrivingTime());

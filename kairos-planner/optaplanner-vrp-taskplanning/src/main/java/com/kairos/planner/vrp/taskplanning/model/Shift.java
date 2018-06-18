@@ -19,7 +19,7 @@ public class Shift extends TaskOrShift{
 
     private LocalDateTime startTime;
     @CustomShadowVariable(variableListenerClass = ShiftEndTimeListener.class,
-            sources = @PlanningVariableReference(entityClass = Task.class,variableName = "plannedStartTime"))
+            sources = @PlanningVariableReference(entityClass = Task.class,variableName = "nextTask"))
     private LocalDateTime endTime;
 
 
@@ -59,7 +59,7 @@ public class Shift extends TaskOrShift{
     }
 
     public LocalDateTime getStartTime() {
-        return startTime;
+        return localDate.atStartOfDay().with(getDefaultShiftStart());
     }
 
     public void setStartTime(LocalDateTime startTime) {
