@@ -1,6 +1,6 @@
 package com.kairos.activity.response.dto.counter;
 
-import com.kairos.activity.persistence.enums.counter.CounterType;
+import com.kairos.activity.enums.counter.CounterType;
 
 import java.math.BigInteger;
 

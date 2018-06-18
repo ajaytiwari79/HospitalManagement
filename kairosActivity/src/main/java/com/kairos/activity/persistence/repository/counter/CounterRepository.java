@@ -1,16 +1,16 @@
 package com.kairos.activity.persistence.repository.counter;
 
-import com.kairos.activity.persistence.enums.counter.CounterType;
+import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.counter.*;
 import com.kairos.activity.response.dto.counter.*;
-import io.jsonwebtoken.lang.Assert;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-import sun.security.pkcs11.Secmod;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -158,6 +158,12 @@ public class CounterRepository {
                 Aggregation.match(Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and("moduleId").is(moduleId))
         );
         AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UserWiseCounterOrder.class, CounterOrderDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List getMappedValues(List<AggregationOperation> operations, Class fromClassType, Class toClassType ){
+        Aggregation aggregation = Aggregation.newAggregation(operations);
+        AggregationResults<Activity> results = mongoTemplate.aggregate(aggregation, fromClassType, toClassType);
         return results.getMappedResults();
     }
 

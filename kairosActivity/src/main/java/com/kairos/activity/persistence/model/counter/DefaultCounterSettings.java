@@ -1,6 +1,6 @@
 package com.kairos.activity.persistence.model.counter;
 
-import com.kairos.activity.persistence.enums.counter.CounterType;
+import com.kairos.activity.enums.counter.CounterType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;

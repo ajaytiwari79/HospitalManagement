@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.counter;
+package com.kairos.activity.client.dto.counter;
 
 public class CounterTypeDefDTO {
     private String name;

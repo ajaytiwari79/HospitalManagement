@@ -1,15 +1,12 @@
-package com.kairos.activity.persistence.enums.counter;
+package com.kairos.activity.enums.counter;
 
-import com.kairos.activity.constants.CounterStore;
-import com.kairos.activity.response.dto.counter.CounterTypeDefDTO;
-import com.kairos.activity.service.counter.XCounterService;
+import com.kairos.activity.client.dto.counter.CounterTypeDefDTO;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
 public enum CounterType {
-    RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"), COUNTER_2("Counter 2"), COUNTER_3("Counter 3");
+    RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"), SCHEDULED_HOURS_NET("Scheduled Hours-Net");
     private String name;
 
     private CounterType(String name){
@@ -30,5 +27,4 @@ public enum CounterType {
         }
         return counterTypes;
     }
-
 }

@@ -1,6 +1,6 @@
 package com.kairos.activity.constants;
 
-import com.kairos.activity.persistence.enums.counter.CounterType;
+import com.kairos.activity.enums.counter.CounterType;
 import com.kairos.activity.service.counter.CounterService;
 import com.kairos.activity.service.counter.XCounterService;
 import org.slf4j.Logger;

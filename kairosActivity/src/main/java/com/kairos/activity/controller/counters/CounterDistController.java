@@ -1,6 +1,6 @@
 package com.kairos.activity.controller.counters;
 
-import com.kairos.activity.persistence.enums.counter.CounterType;
+import com.kairos.activity.enums.counter.CounterType;
 import com.kairos.activity.persistence.model.counter.Counter;
 import com.kairos.activity.response.dto.counter.ModulewiseCounterGroupingDTO;
 import com.kairos.activity.response.dto.counter.RolewiseCounterDTO;
@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -19,17 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.activity.constants.ApiConstants.COUNTER_URL;
+import static com.kairos.activity.constants.ApiConstants.COUNTER_COUNTRY_DIST_URL;
 
 @RestController
-@RequestMapping(COUNTER_URL)
-@Api(COUNTER_URL)
-public class CounterController {
+@RequestMapping(COUNTER_COUNTRY_DIST_URL)
+@Api(COUNTER_COUNTRY_DIST_URL)
+public class CounterDistController {
 
     @Inject
     CounterManagementService counterManagementService;
 
-    private final static Logger logger = LoggerFactory.getLogger(CounterController.class);
+    private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
     public ResponseEntity<Map<String, Object>> getModulewiseCounterDistributionForCountry(@RequestParam BigInteger countryId){
         Map<String, Object> data = new HashMap();

@@ -126,7 +126,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		return template;
 	}
 
-    @Profile({"development"})
+    @Profile({"development", "test"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
@@ -137,7 +137,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
         return template;
     }
 
-	@Profile({"development"})
+	@Profile({"development", "test"})
     @Bean(name ="schedulerRestTemplate")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
