@@ -1,0 +1,3 @@
+// set isEnabled property as true
+Match (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN"
+Match (ag)-[r:HAS_ACCESS_OF_TABS]-(ap:AccessPage) SET r.isEnabled=true,r.read=true,r.write=true;

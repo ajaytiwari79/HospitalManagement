@@ -173,6 +173,12 @@ public class AuthController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
 
+    @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/{userId}/permission", method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getPermission(@PathVariable long organizationId, @PathVariable long userId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(organizationId, userId));
+    }
+
+
     @PreAuthorize("hasPermission()")
     @RequestMapping(value = { "/user/{unitId}" }, produces = "application/json")
     public Map<String, Object> user(OAuth2Authentication user) {

@@ -1,8 +1,10 @@
 package com.kairos.persistence.repository.user.access_permission;
 
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.user.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -337,6 +339,39 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WHERE customRel.accessGroupId={0} AND id(accessPages) IN {1} DELETE customRel")
     void removeCustomPermissionsForAccessGroup(Long accessGroupId, List<Long> accessPageIds);
 
+
+    @Query("Match (emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} with emp\n" +
+            "Match (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization{isKairosHub:true}) return org ORDER BY id(org) LIMIT 1 \n" )
+    Organization fetchParentHub(Long userId);
+
+
+
+    // fetch Permission of Hub Users
+
+    @Query("MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with emp \n" +
+            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org:Organization) WHERE id(org)={1}  with unitPermission,org \n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission \n" +
+            "Match (module:AccessPage)<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,modulePermission,unitPermission,accessGroup\n" +
+            "optional match (unitPermission)-[moduleCustomRel:HAS_CUSTOMIZED_PERMISSION]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
+            "with module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
+            "return module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as isModule")
+    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId);
+
+    @Query("Match (u:User) WHERE id(u)={0} \n" +
+            "Match (org:Organization)-[:HAS_EMPLOYMENTS]-(e:Employment)-[:BELONGS_TO]-(s:Staff)-[:BELONGS_TO]-(u) \n" +
+            "match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization) with e,org+[unit] as coll\n" +
+            "unwind coll as units with  distinct units,e \n" +
+            "match  (o:Organization)-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
+            "WHERE o.isParentOrganization=true AND o.organizationLevel=\"CITY\" \n" +
+            "with o,e, [o]+units as units  unwind units as org  WITH distinct org,o,e\n" +
+            "Match (e)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WITH org,accessGroup,unitPermission\n" +
+            "Match (accessPage:AccessPage)\n" +
+            "Optional Match (accessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
+            "WITH org,collect( distinct {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,isModule:accessPage.isModule}) as permissions\n" +
+            "return id(org) as unitId, permissions as permission")
+    List<UserPermissionQueryResult> fetchStaffPermission(Long userId);
 }
 
 
