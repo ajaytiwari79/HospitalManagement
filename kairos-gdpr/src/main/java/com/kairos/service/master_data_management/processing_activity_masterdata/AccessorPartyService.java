@@ -99,7 +99,7 @@ public class AccessorPartyService extends MongoBaseService {
 
 
         AccessorParty exist = accessorPartyMongoRepository.findByName(UserContext.getCountryId(), accessorParty.getName());
-        if (Optional.ofNullable(exist).isPresent()&& !id.equals(exist.getId())) {
+        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
             throw new DuplicateDataException("Name Already Exist");
         } else {
             exist=accessorPartyMongoRepository.findByid(id);

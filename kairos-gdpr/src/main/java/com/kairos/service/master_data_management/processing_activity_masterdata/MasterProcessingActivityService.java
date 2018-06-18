@@ -125,7 +125,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     public MasterProcessingActivity updateMasterProcessingActivity(Long countryId, BigInteger id, MasterProcessingActivityDto masterProcessingActivityDto) {
 
         MasterProcessingActivity exists = masterProcessingActivityRepository.findByNameAndCountryId(countryId, masterProcessingActivityDto.getName());
-        if (Optional.ofNullable(exists).isPresent()&& !id.equals(exists.getId())) {
+        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
             throw new DuplicateDataException("processing Activity with name Already Exist" + exists.getName());
         }
         exists = masterProcessingActivityRepository.findByid(id);

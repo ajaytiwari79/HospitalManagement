@@ -66,8 +66,6 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
-
-
     public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
         return organizationTypes;
     }

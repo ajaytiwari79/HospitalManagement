@@ -100,7 +100,7 @@ public class DataSourceService extends MongoBaseService {
     public DataSource updateDataSource(BigInteger id, DataSource dataSource) {
 
         DataSource exist = dataSourceMongoRepository.findByName(UserContext.getCountryId(),dataSource.getName());
-        if (Optional.ofNullable(exist).isPresent()&& !id.equals(exist.getId())) {
+        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
             throw new DuplicateDataException("data  exist for  "+dataSource.getName());
         } else {
             exist=dataSourceMongoRepository.findByid(id);

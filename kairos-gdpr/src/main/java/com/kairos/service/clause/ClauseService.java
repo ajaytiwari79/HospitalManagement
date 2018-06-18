@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import java.math.BigInteger;
@@ -72,7 +73,6 @@ public class ClauseService extends MongoBaseService {
         }
         tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
         try {
-
             Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
             if (clauseDto.getOrganizationTypes() != null && clauseDto.getOrganizationTypes().size() != 0) {
                 newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
@@ -87,29 +87,19 @@ public class ClauseService extends MongoBaseService {
                 newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
             if (clauseDto.getAccountType().size() != 0) {
-                Set<BigInteger> accountTypeIds = new HashSet<>();
-                clauseDto.getAccountType().forEach(accountTypeDto -> {
-                    accountTypeIds.add(accountTypeDto.getId());
-                });
-                List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, accountTypeIds);
-                newclause.setAccountTypes(accountTypes);
+                newclause.setAccountTypes(getAccountTypeList(countryId, clauseDto.getAccountType()));
             }
             newclause.setTags(tagList);
             newclause = save(newclause);
             jackrabbitService.addClauseNodeToJackrabbit(newclause.getId(), newclause);
             return newclause;
-        } catch (NullPointerException e) {
-            clauseTagMongoRepository.deleteAll(tagList);
-            LOGGER.warn(e.getMessage());
-            e.printStackTrace();
-
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
 
         }
-        return null;
+
     }
 
     public Clause getClause(Long countryId, BigInteger id) {
@@ -148,12 +138,8 @@ public class ClauseService extends MongoBaseService {
                 exists.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
             if (clauseDto.getAccountType().size() != 0) {
-                Set<BigInteger> accountTypeIds = new HashSet<>();
-                clauseDto.getAccountType().forEach(accountTypeDto -> {
-                    accountTypeIds.add(accountTypeDto.getId());
-                });
-                List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, accountTypeIds);
-                exists.setAccountTypes(accountTypes);
+
+                exists.setAccountTypes(getAccountTypeList(countryId, clauseDto.getAccountType()));
             }
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
             exists.setTitle(clauseDto.getTitle());
@@ -162,14 +148,10 @@ public class ClauseService extends MongoBaseService {
             exists.setTitle(clauseDto.getTitle());
             jackrabbitService.clauseVersioning(clauseId, exists);
             exists = save(exists);
-        } catch (NullPointerException e) {
-            clauseTagMongoRepository.deleteAll(tagList);
-            LOGGER.warn(e.getMessage());
-            e.printStackTrace();
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
 
         }
         return exists;
@@ -218,6 +200,14 @@ public class ClauseService extends MongoBaseService {
     }
 
 
+    public List<AccountType> getAccountTypeList(Long countryId, Set<AccountTypeDto> accountTypeDtos) {
+        Set<BigInteger> accountTypeIds = new HashSet<>();
+        accountTypeDtos.forEach(accountTypeDto -> {
+            accountTypeIds.add(accountTypeDto.getId());
+        });
+        List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, accountTypeIds);
+        return accountTypes;
+    }
 
 /*  public List<Clause> getClauseByAccountType(String accountType) {
         List<Clause> clauses = clauseRepository.getClauseByAccountType(accountType);
