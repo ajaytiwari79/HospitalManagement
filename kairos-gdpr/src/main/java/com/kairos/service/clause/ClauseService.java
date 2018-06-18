@@ -71,7 +71,7 @@ public class ClauseService extends MongoBaseService {
         }
         tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
         try {
-            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountType());
+
             Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
             if (clauseDto.getOrganizationTypes() != null && clauseDto.getOrganizationTypes().size() != 0) {
                 newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
@@ -85,7 +85,14 @@ public class ClauseService extends MongoBaseService {
             if (clauseDto.getOrganizationSubServices() != null && clauseDto.getOrganizationSubServices().size() != 0) {
                 newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
-            newclause.setAccountTypes(accountTypes);
+            if (clauseDto.getAccountType().size() != 0) {
+                Set<BigInteger> accountTypeIds = new HashSet<>();
+                clauseDto.getAccountType().forEach(accountTypeDto -> {
+                    accountTypeIds.add(accountTypeDto.getId());
+                });
+                List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, accountTypeIds);
+                newclause.setAccountTypes(accountTypes);
+            }
             newclause.setTags(tagList);
             newclause = save(newclause);
             jackrabbitService.addClauseNodeToJackrabbit(newclause.getId(), newclause);
@@ -117,11 +124,13 @@ public class ClauseService extends MongoBaseService {
     public Clause updateClause(Long countryId, BigInteger clauseId, ClauseDto clauseDto) throws RepositoryException {
 
         List<ClauseTag> tagList = new ArrayList<>();
-        Clause exists = clauseRepository.findByIdAndNonDeleted(countryId, clauseId);
+        Clause exists = clauseRepository.findClauseByNameAndCountryId(countryId, clauseDto.getTitle());
+        if (Optional.ofNullable(exists).isPresent() && !clauseId.equals(exists.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
+        }
+        exists = clauseRepository.findByIdAndNonDeleted(countryId, clauseId);
         if (!Optional.ofNullable(exists).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
-        } else if (clauseRepository.findClauseByNameAndCountryId(countryId, clauseDto.getTitle()) != null) {
-            exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
         try {
 
@@ -137,9 +146,15 @@ public class ClauseService extends MongoBaseService {
             if (clauseDto.getOrganizationSubServices() != null && clauseDto.getOrganizationSubServices().size() != 0) {
                 exists.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
-            List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountType());
+            if (clauseDto.getAccountType().size() != 0) {
+                Set<BigInteger> accountTypeIds = new HashSet<>();
+                clauseDto.getAccountType().forEach(accountTypeDto -> {
+                    accountTypeIds.add(accountTypeDto.getId());
+                });
+                List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, accountTypeIds);
+                exists.setAccountTypes(accountTypes);
+            }
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
-            exists.setAccountTypes(accountTypes);
             exists.setTitle(clauseDto.getTitle());
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);

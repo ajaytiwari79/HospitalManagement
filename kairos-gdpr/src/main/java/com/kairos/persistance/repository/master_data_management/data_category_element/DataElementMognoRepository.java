@@ -23,7 +23,7 @@ public interface DataElementMognoRepository extends MongoRepository<DataElement,
     @Query("{deleted:false,countryId:?0}")
     List<DataElement> getAllDataElement(Long countryId);
 
-    @Query("{deleted:false,countryId:?0._id:{$in:?1}}")
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<DataElement> getAllDataElementListByIds(Long countryId,List<BigInteger> ids);
 
 }

@@ -1,11 +1,11 @@
 package com.kairos.service.master_data_management.data_category_element;
 
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.dto.master_data.DataElementDto;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataElementMognoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,19 +26,21 @@ public class DataElementService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
     @Inject
     private DataElementMognoRepository dataElementMognoRepository;
 
-    public Map<String, Object> createDataElements(Long countryId, List<DataElementDto> dataElements) {
+    public Map<String, Object> createDataElements(Long countryId, List<DataElementDto> dataElementsDto) {
 
         Set<String> dataElementNames = new HashSet<>();
-        dataElements.forEach(dataElement -> {
+        dataElementsDto.forEach(dataElement -> {
             dataElementNames.add(dataElement.getName().trim());
         });
         List<DataElement> existingDataElement = dataElementMognoRepository.findByCountryIdAndNames(countryId, dataElementNames);
         if (existingDataElement.size() != 0) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
+        checkForDuplicacyInName(dataElementsDto);
         List<DataElement> dataElementList = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> dataElementids = new ArrayList<>();
@@ -101,6 +103,7 @@ public class DataElementService extends MongoBaseService {
 
     public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, List<DataElementDto> dataElementsDto) {
 
+        checkForDuplicacyInName(dataElementsDto);
         List<DataElementDto> upadateDataElementsDto = new ArrayList<>();
         List<DataElementDto> createNewDataElementsDto = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
@@ -161,5 +164,19 @@ public class DataElementService extends MongoBaseService {
         result.put(DATA_EMELENTS_LIST, dataElementList);
         return result;
     }
+
+
+    public void checkForDuplicacyInName(List<DataElementDto> dataElementDtos) {
+        List<String> names = new ArrayList<>();
+        dataElementDtos.forEach(dataElementDto -> {
+            if (names.contains(dataElementDto.getName())) {
+                throw new DuplicateDataException("Duplicate Entry with name "+dataElementDto.getName());
+            }
+            names.add(dataElementDto.getName());
+        });
+
+
+    }
+
 
 }

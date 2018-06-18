@@ -102,7 +102,7 @@ public class AssetTypeService extends MongoBaseService {
     public AssetType updateAssetType(BigInteger id, AssetType AssetType) {
 
         AssetType exist = assetTypeMongoRepository.findByName(UserContext.getCountryId(), AssetType.getName().toLowerCase());
-        if (Optional.ofNullable(exist).isPresent()) {
+        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
             throw new DuplicateDataException("data  exist for  " + AssetType.getName());
         } else {
             exist = assetTypeMongoRepository.findByid(id);
