@@ -1895,8 +1895,8 @@ public class StaffService extends UserBaseService {
         return staffsUnitPositions;
     }
 
-    public boolean deleteMainEmployment(Long staffId) {
-        Employment employment = staffGraphRepository.getMainEmployment(staffId);
+    public boolean removeMainEmployment(Long staffId) {
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setMainEmploymentStartDate(null);
         employment.setMainEmploymentEndDate(null);
         employment.setMainEmployment(false);
@@ -1938,16 +1938,18 @@ public class StaffService extends UserBaseService {
                 mainEmploymentResultDTO.getEmploymentOverlapList().add(employmentOverlapDTO);
             }
 
-                if(confirm==false){
+                if(!confirm){
                 return mainEmploymentResultDTO;
+                }else{
+                    save(employments);
                 }
         } else {
             saveEmployment(staffId, employmentDTO);
-        }
-            if(confirm==true){
-            save(employments);
-            saveEmployment(staffId, employmentDTO);
-            }
+       }
+//            if(confirm==true){
+//
+//            saveEmployment(staffId, employmentDTO);
+//            }
         //result.put("result",employmentDTO);
         mainEmploymentResultDTO.setEmploymentOverlapList(null);
         mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
@@ -1955,7 +1957,7 @@ public class StaffService extends UserBaseService {
     }
 
     public void saveEmployment(Long staffId, EmploymentDTO employmentDTO) {
-        Employment employment = staffGraphRepository.getMainEmployment(staffId);
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
         employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
         employment.setMainEmployment(true);

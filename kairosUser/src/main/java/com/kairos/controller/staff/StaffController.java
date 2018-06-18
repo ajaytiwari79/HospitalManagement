@@ -637,15 +637,15 @@ public class StaffController {
     }
 
     @ApiOperation(value = "update and set main emloyment setting")
-    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @RequestParam("confirm") Boolean confirm){
         return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(staffId,employmentDTO,confirm));
     }
 
     @ApiOperation(value ="remove main employment")
-    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.DELETE)
-    public ResponseEntity<Map<String ,Object>> deleteMainEmployment(@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.deleteMainEmployment(staffId));
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String ,Object>> removeMainEmployment(@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.removeMainEmployment(staffId));
     }
 
 
