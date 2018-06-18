@@ -24,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import java.math.BigInteger;
@@ -185,31 +184,7 @@ public class ClauseService extends MongoBaseService {
 
 
     public List<ClauseResponseDto> getAllClauses() {
-        List<Clause> clauses = clauseRepository.findAllClause(UserContext.getCountryId());
-        List<ClauseResponseDto> clauseResponse = new ArrayList<>();
-        clauses.forEach(clause ->
-                {
-                    ClauseResponseDto clauseresponse = new ClauseResponseDto();
-                    clauseresponse.setDescription(clause.getDescription());
-                    clauseresponse.setTitle(clause.getTitle());
-                    clauseresponse.setId(clause.getId());
-                    clauseresponse.setOrganizationTypes(clause.getOrganizationTypes());
-                    clauseresponse.setOrganizationSubTypes(clause.getOrganizationSubTypes());
-                    clauseresponse.setOrganizationServices(clause.getOrganizationServices());
-                    clauseresponse.setOrganizationSubServices(clause.getOrganizationSubServices());
-                    clauseresponse.setTags(clause.getTags());
-                    List<AccountTypeDto> accountTypes = new ArrayList<>();
-                    clause.getAccountTypes().forEach(accountType -> {
-                        AccountTypeDto accountTypeDto = new AccountTypeDto();
-                        accountTypeDto.setName(accountType.getName());
-                        accountTypeDto.setId(accountType.getId());
-                        accountTypes.add(accountTypeDto);
-                    });
-                    clauseresponse.setAccountTypes(accountTypes);
-                    clauseResponse.add(clauseresponse);
-                }
-        );
-        return clauseResponse;
+        return clauseRepository.findAllClause(UserContext.getCountryId());
     }
 
 
