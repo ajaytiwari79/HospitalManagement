@@ -28,8 +28,6 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     @Query("{deleted:false,countryId:?0,title:?1}")
     Clause findClauseByNameAndCountryId(Long countryId,String title);
 
-
-
     @Query("{deleted:false,countryId:?0}")
     List<Clause>  findAllClause(Long countryId);
 

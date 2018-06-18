@@ -2,12 +2,14 @@ package com.kairos.service.clause;
 
 import com.kairos.client.OrganizationTypeRestClient;
 import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.dto.master_data.AccountTypeDto;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.master_data.ClauseDto;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.response.dto.clause.ClauseResponseDto;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
@@ -182,10 +184,32 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public List<Clause> getAllClauses() {
-
-        return clauseRepository.findAllClause(UserContext.getCountryId());
-
+    public List<ClauseResponseDto> getAllClauses() {
+        List<Clause> clauses = clauseRepository.findAllClause(UserContext.getCountryId());
+        List<ClauseResponseDto> clauseResponse = new ArrayList<>();
+        clauses.forEach(clause ->
+                {
+                    ClauseResponseDto clauseresponse = new ClauseResponseDto();
+                    clauseresponse.setDescription(clause.getDescription());
+                    clauseresponse.setTitle(clause.getTitle());
+                    clauseresponse.setId(clause.getId());
+                    clauseresponse.setOrganizationTypes(clause.getOrganizationTypes());
+                    clauseresponse.setOrganizationSubTypes(clause.getOrganizationSubTypes());
+                    clauseresponse.setOrganizationServices(clause.getOrganizationServices());
+                    clauseresponse.setOrganizationSubServices(clause.getOrganizationSubServices());
+                    clauseresponse.setTags(clause.getTags());
+                    List<AccountTypeDto> accountTypes = new ArrayList<>();
+                    clause.getAccountTypes().forEach(accountType -> {
+                        AccountTypeDto accountTypeDto = new AccountTypeDto();
+                        accountTypeDto.setName(accountType.getName());
+                        accountTypeDto.setId(accountType.getId());
+                        accountTypes.add(accountTypeDto);
+                    });
+                    clauseresponse.setAccountTypes(accountTypes);
+                    clauseResponse.add(clauseresponse);
+                }
+        );
+        return clauseResponse;
     }
 
 
