@@ -48,6 +48,13 @@ public class CountryPhaseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesWithCategoryByCountryId(countryId));
     }
 
+    @ApiOperation(value = "get All  Phases in country")
+    @GetMapping(value = COUNTRY_URL+"/phase/all")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPhases(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesByCountryId(countryId));
+    }
+
     @ApiOperation(value = "remove a  Phase in country")
     @DeleteMapping(value = COUNTRY_URL+"/phase/{phaseId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
