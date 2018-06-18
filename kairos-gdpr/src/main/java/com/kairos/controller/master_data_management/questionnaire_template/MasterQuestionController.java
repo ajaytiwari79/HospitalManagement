@@ -15,13 +15,14 @@ import javax.validation.Valid;
 import javax.ws.rs.POST;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 
-import static com.kairos.constant.ApiConstant.API_MASTER_QUESTION;
+import static com.kairos.constant.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
 
 @RestController
-@RequestMapping(API_MASTER_QUESTION)
-@Api(API_MASTER_QUESTION)
+@RequestMapping(API_MASTER_QUESTIONNAIRE_TEMPLATE)
+@Api(API_MASTER_QUESTIONNAIRE_TEMPLATE)
 public class MasterQuestionController {
 
 
@@ -29,16 +30,10 @@ public class MasterQuestionController {
     private MasterQuestionService masterQuestionService;
 
 
-   /* @PostMapping("/add")
-    public ResponseEntity<Object> addMasterQuestion(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDto) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.addMasterQuestion(countryId, masterQuestionDto));
-    }
 
 
-    @GetMapping("/{id}")
+
+    @GetMapping("/question/{id}")
     public ResponseEntity<Object> getMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
@@ -49,7 +44,7 @@ public class MasterQuestionController {
     }
 
 
-    @GetMapping("/all")
+    @GetMapping("/question/all")
     public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
@@ -57,35 +52,27 @@ public class MasterQuestionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getAllMasterQuestion(countryId));
     }
 
-    @GetMapping("/ids")
-    public ResponseEntity<Object> getMasterQuestionListByIds(@PathVariable Long countryId, @RequestBody Set<BigInteger> ids) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestionListByIds(countryId, ids));
-    }
 
 
-    @DeleteMapping("/delete/{id}")
+
+    @DeleteMapping("/question/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(countryId,id));
     }
 
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody MasterQuestionDto masterQuestionDto) {
+  /*  @PutMapping("/section/{id}/question")
+    public ResponseEntity<Object> updateMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.updateMasterQuestion(countryId, id, masterQuestionDto));
-    }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.updateExistingQuestionAndCreateNewQuestions(countryId, id, masterQuestionDto.getRequestBody()));
+    }*/
 
-*/
 }

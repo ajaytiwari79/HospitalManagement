@@ -1,6 +1,7 @@
 package com.kairos.service.master_data_management.questionnaire_template;
 
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.dto.master_data.MasterQuestionnaireTemplateDto;
@@ -42,7 +43,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private AssetTypeMongoRepository storageTypeMongoRepository;
+    private AssetTypeMongoRepository assetTypeMongoRepository;
 
     @Inject
     private MasterQuestionnaireSectionService masterQuestionnaireSectionService;
@@ -53,11 +54,10 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     @Inject
     private MasterQuestionMongoRepository masterQuestionMongoRepository;
 
-
     public MasterQuestionnaireTemplate addQuestionnaireTemplate(Long countryId, MasterQuestionnaireTemplateDto templateDto) {
         MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, templateDto.getName().trim());
         if (Optional.ofNullable(exisiting).isPresent()) {
-           throw new DuplicateDataException("Template Exists with same name");
+            throw new DuplicateDataException("Template Exists with same name");
         }
         MasterQuestionnaireTemplate questionnaireTemplate = new MasterQuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
         questionnaireTemplate = buildQuestionniareTemplate(templateDto, questionnaireTemplate);
@@ -71,6 +71,11 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
+    /**
+     * @param templateDto           contain data to create basic questionniare Template
+     * @param questionnaireTemplate is template in which we add properties of Template Type and Asset Type if present
+     * @return
+     */
     public MasterQuestionnaireTemplate buildQuestionniareTemplate(MasterQuestionnaireTemplateDto templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
         if (QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()) == null) {
             throw new InvalidRequestException("template type not found for" + templateDto.getTemplateType());
@@ -91,13 +96,11 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
+                } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
+                    questionnaireTemplate.setTemplateType(templateType.value);
+                    questionnaireTemplate.setAssetType(assetTypeId);
                 } else {
-                    if (storageTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
-                        questionnaireTemplate.setTemplateType(templateType.value);
-                        questionnaireTemplate.setAssetType(assetTypeId);
-                    } else {
-                        exceptionService.dataNotFoundByIdException("message.dataNotFound", "asset type", questionnaireTemplate.getAssetType());
-                    }
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "asset type", assetTypeId);
                 }
                 break;
             case PROCESSING_ACTIVITY:
@@ -140,79 +143,34 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         return exisiting;
     }
 
-
+    /**
+     * we get section[ {} ] as query response from mongo we are not using JsonInclude non empty so we can filter data
+     * we are not using JsonInclude.NON_EMPTY so that we  get object with {id=null,name=null,description=null} for section
+     * and send section as empty array after filtering data
+     *
+     * @param countryId
+     * @param id
+     * @return
+     */
     public MasterQuestionnaireTemplateResponseDto getMasterQuestionniareTemplateWithSectionById(Long countryId, BigInteger id) {
-        MasterQuestionnaireTemplateQueryResult queryResult = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId, id);
-        List<MasterQuestionnaireTemplateQueryResult> queryResults = new ArrayList<>();
-        queryResults.add(queryResult);
-        return getQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults).get(0);
+        MasterQuestionnaireTemplateResponseDto templateResponseDto = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId, id);
+        if (templateResponseDto.getSections().get(0).getId() == null) {
+            templateResponseDto.setSections(new ArrayList<>());
+        }
+        return templateResponseDto;
     }
 
 
     public List<MasterQuestionnaireTemplateResponseDto> getAllMasterQuestionniareTemplateWithSection(Long countryId) {
-        List<MasterQuestionnaireTemplateQueryResult> queryResults = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId);
-        return getQuestionniareTemplateResponseWithSectionAndQuestionResponse(queryResults);
 
-    }
-
-    public Map<BigInteger, MasterQuestion> filterNonDeletedQuestion(List<MasterQuestion> masterQuestions) {
-        Map<BigInteger, MasterQuestion> nonDeletedQuestions = new HashMap<>();
-        masterQuestions.forEach(masterQuestion -> {
-
-            if (!masterQuestion.isDeleted()) {
-                nonDeletedQuestions.put(masterQuestion.getId(), masterQuestion);
+        List<MasterQuestionnaireTemplateResponseDto> templateResponseDtos = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId);
+        templateResponseDtos.forEach(template -> {
+            if (template.getSections().get(0).getId() == null) {
+                template.setSections(new ArrayList<>());
             }
         });
-        return nonDeletedQuestions;
 
-    }
-
-    public List<MasterQuestionnaireTemplateResponseDto> getQuestionniareTemplateResponseWithSectionAndQuestionResponse(List<MasterQuestionnaireTemplateQueryResult> templateQueryResults) {
-
-        Map<BigInteger, MasterQuestionnaireSection> sections = new HashMap<>();
-        Map<BigInteger, MasterQuestion> questions = new HashMap<>();
-
-        templateQueryResults.forEach(masterQuestionnaireTemplateQueryResult -> {
-            if (masterQuestionnaireTemplateQueryResult.getQuestions().size() != 0) {
-                questions.putAll(filterNonDeletedQuestion(masterQuestionnaireTemplateQueryResult.getQuestions()));
-            }
-
-        });
-        List<MasterQuestionnaireTemplateResponseDto> responseListQuestionniareResult = new ArrayList<>();
-        templateQueryResults.forEach(questionnaireResult -> {
-
-            MasterQuestionnaireTemplateResponseDto questionnaireTemplateResponseDto =
-                    new MasterQuestionnaireTemplateResponseDto(questionnaireResult.getId(), questionnaireResult.getName(), questionnaireResult.getDescription());
-            questionnaireTemplateResponseDto.setAssetType(questionnaireResult.getAssetType());
-            questionnaireTemplateResponseDto.setTemplateType(questionnaireResult.getTemplateType());
-
-            if (questionnaireResult.getSections().size() != 0) {
-
-                List<MasterQuestionnaireSectionResponseDto> sectionResponseDtos = new ArrayList<>();
-                for (MasterQuestionnaireSection questionnaireSection : questionnaireResult.getSections()) {
-                    if (!questionnaireSection.isDeleted()) {
-                        MasterQuestionnaireSectionResponseDto sectionResponseDto = new MasterQuestionnaireSectionResponseDto();
-                        sectionResponseDto.setId(questionnaireSection.getId());
-                        sectionResponseDto.setTitle(questionnaireSection.getTitle());
-                        sectionResponseDto.setCountryId(questionnaireSection.getCountryId());
-                        List<MasterQuestion> questionList = new ArrayList<>();
-                        for (BigInteger id : questionnaireSection.getQuestions()) {
-                            questionList.add(questions.get(id));
-                        }
-                        sectionResponseDto.setQuestions(questionList);
-                        sectionResponseDtos.add(sectionResponseDto);
-                    }
-                    questionnaireTemplateResponseDto.setSections(sectionResponseDtos);
-                }
-
-            }
-            responseListQuestionniareResult.add(questionnaireTemplateResponseDto);
-
-        });
-
-
-        return responseListQuestionniareResult;
-
+        return templateResponseDtos;
 
     }
 
