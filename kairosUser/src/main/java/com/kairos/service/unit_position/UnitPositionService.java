@@ -214,7 +214,7 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
 
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(), wtaResponseDTO);
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(),parentOrganization.getName(), wtaResponseDTO);
         PositionWrapper positionWrapper = new PositionWrapper(unitPositionQueryResult, new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd()));
 //        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), organization.getId()));
 
@@ -262,8 +262,9 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId) {
+    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId,String type) {
 
+        Organization organization = organizationService.getOrganizationDetail(unitId, type);
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(unitPositionDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
             return new PositionWrapper(clientMinimumDTO);
@@ -309,7 +310,7 @@ public class UnitPositionService extends UserBaseService {
 
         // unitPositionDTO.getEndDate());
         //plannerSyncService.publishUnitPosition(unitId, oldUnitPosition, unitPositionEmploymentTypeRelationShip.getEmploymentType(), IntegrationOperation.UPDATE);
-        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null, null), employmentQueryResult);
+        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip,organization.getId(), organization.getName(), null), employmentQueryResult);
 
     }
 
@@ -685,7 +686,7 @@ public class UnitPositionService extends UserBaseService {
         return unitPositionQueryResult;
     }
 
-    private UnitPositionQueryResult getBasicDetails(UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, UnitPositionEmploymentTypeRelationShip relationShip, Long parentOrganizationId, WTAResponseDTO wtaResponseDTO) {
+    private UnitPositionQueryResult getBasicDetails(UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, UnitPositionEmploymentTypeRelationShip relationShip, Long parentOrganizationId,String parentOrganizationName, WTAResponseDTO wtaResponseDTO) {
 
 
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
@@ -696,7 +697,10 @@ public class UnitPositionService extends UserBaseService {
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setParentUnitId(parentOrganizationId);
         // TODO Setting for compatibility
-
+        Map<String,Object > unitInfo=new HashMap<>();
+        unitInfo.put("id",parentOrganizationId);
+        unitInfo.put("name",parentOrganizationName);
+        result.setUnitInfo(unitInfo);
         Map<String, Object> employmentTypes = new HashMap();
         employmentTypes.put("name", relationShip.getEmploymentType().getName());
         employmentTypes.put("id", relationShip.getEmploymentType().getId());
