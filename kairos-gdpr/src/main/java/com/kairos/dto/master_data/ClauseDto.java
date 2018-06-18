@@ -46,7 +46,8 @@ public class ClauseDto {
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 
     @NotEmpty(message = "Account type  can't be  Empty")
-    private Set<BigInteger> accountType;
+    @NotNull(message = "Account Type cannot be null")
+    private Set<AccountTypeDto> accountType;
 
 
     public String getTitle() {
@@ -105,11 +106,11 @@ public class ClauseDto {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountType() {
+    public Set<AccountTypeDto> getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(Set<BigInteger> accountType) {
+    public void setAccountType(Set<AccountTypeDto> accountType) {
         this.accountType = accountType;
     }
 }

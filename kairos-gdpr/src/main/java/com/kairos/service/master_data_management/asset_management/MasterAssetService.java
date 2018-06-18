@@ -43,19 +43,19 @@ public class MasterAssetService extends MongoBaseService {
         if (masterAssetMongoRepository.findByNameAndCountry(countryId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         } else {
-            if (masterAssetDto.getOrganizationTypes()!=null&&masterAssetDto.getOrganizationTypes().size()!=0) {
+            if (masterAssetDto.getOrganizationTypes() != null && masterAssetDto.getOrganizationTypes().size() != 0) {
                 newAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
 
             }
-            if (masterAssetDto.getOrganizationSubTypes()!=null&&masterAssetDto.getOrganizationSubTypes().size()!=0) {
+            if (masterAssetDto.getOrganizationSubTypes() != null && masterAssetDto.getOrganizationSubTypes().size() != 0) {
                 newAsset.setOrganizationSubTypes(masterAssetDto.getOrganizationSubTypes());
 
             }
-            if (masterAssetDto.getOrganizationServices()!=null&&masterAssetDto.getOrganizationServices().size()!=0) {
+            if (masterAssetDto.getOrganizationServices() != null && masterAssetDto.getOrganizationServices().size() != 0) {
                 newAsset.setOrganizationServices(masterAssetDto.getOrganizationServices());
 
             }
-            if (masterAssetDto.getOrganizationSubServices()!=null&&masterAssetDto.getOrganizationSubServices().size()!=0) {
+            if (masterAssetDto.getOrganizationSubServices() != null && masterAssetDto.getOrganizationSubServices().size() != 0) {
                 newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
@@ -78,10 +78,13 @@ public class MasterAssetService extends MongoBaseService {
     public MasterAsset updateMasterAsset(BigInteger id, MasterAssetDto masterAssetDto) {
 
 
-        MasterAsset exists = masterAssetMongoRepository.findByid(id);
-
+        MasterAsset exists = masterAssetMongoRepository.findByNameAndCountry(UserContext.getCountryId(), masterAssetDto.getName());
+        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
+            throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
+        }
+        exists = masterAssetMongoRepository.findByid(id);
         if (!Optional.of(exists).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","master.asset",id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "master.asset", id);
         } else {
             if (masterAssetDto.getOrganizationTypes() != null && masterAssetDto.getOrganizationTypes().size() != 0) {
                 exists.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
@@ -105,8 +108,6 @@ public class MasterAssetService extends MongoBaseService {
         }
         return save(exists);
     }
-
-
 
 
     public Boolean deleteMasterAsset(BigInteger id) {

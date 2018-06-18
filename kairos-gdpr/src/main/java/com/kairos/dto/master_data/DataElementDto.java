@@ -1,16 +1,17 @@
-package com.kairos.persistance.model.master_data_management.data_category_element;
+package com.kairos.dto.master_data;
 
 
-import com.kairos.persistance.model.common.MongoBaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
-@Document(collection = "data_element")
-public class DataElement extends MongoBaseEntity {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class DataElementDto {
 
+
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
     @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$")
@@ -18,12 +19,13 @@ public class DataElement extends MongoBaseEntity {
 
     private Long countryId;
 
-    public Long getCountryId() {
-        return countryId;
+
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -32,5 +34,13 @@ public class DataElement extends MongoBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }

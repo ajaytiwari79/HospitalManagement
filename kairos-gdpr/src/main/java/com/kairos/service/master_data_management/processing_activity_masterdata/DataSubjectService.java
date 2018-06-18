@@ -99,7 +99,7 @@ public class DataSubjectService extends MongoBaseService {
 
 
         DataSubject exist = dataSubjectMongoRepository.findByName(UserContext.getCountryId(),dataSubject.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
             throw new DuplicateDataException("data  exist for  "+dataSubject.getName());
         } else {
             exist=dataSubjectMongoRepository.findByid(id);

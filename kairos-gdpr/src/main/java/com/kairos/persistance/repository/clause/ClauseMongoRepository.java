@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.clause;
 
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.clause.ClauseResponseDto;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -28,10 +29,8 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     @Query("{deleted:false,countryId:?0,title:?1}")
     Clause findClauseByNameAndCountryId(Long countryId,String title);
 
-
-
     @Query("{deleted:false,countryId:?0}")
-    List<Clause>  findAllClause(Long countryId);
+    List<ClauseResponseDto>  findAllClause(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<Clause>  getClauseListByIds(Long countryId, Set<BigInteger> ids);
