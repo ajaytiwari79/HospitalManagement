@@ -39,7 +39,6 @@ public final class ApiConstant {
     public static final String API_FILTER= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/filter";
 
     //Master Questionnaire
-    public static final String API_MASTER_QUESTION= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/question";
     public static final String API_MASTER_QUESTION_SECTION= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/question_section";
     public static final String API_MASTER_QUESTIONNAIRE_TEMPLATE= API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/questionnaire_template";
 
