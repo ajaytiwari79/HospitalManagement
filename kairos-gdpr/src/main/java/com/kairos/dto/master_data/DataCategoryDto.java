@@ -22,7 +22,7 @@ public class DataCategoryDto {
 
     @NotNull(message = "Data Element can't be  Empty")
     @Valid
-    List<DataElement> dataElements;
+    List<DataElementDto> dataElements;
 
     private Long countryId;
 
@@ -34,11 +34,11 @@ public class DataCategoryDto {
         this.name = name;
     }
 
-    public List<DataElement> getDataElements() {
+    public List<DataElementDto> getDataElements() {
         return dataElements;
     }
 
-    public void setDataElements(List<DataElement> dataElements) {
+    public void setDataElements(List<DataElementDto> dataElements) {
         this.dataElements = dataElements;
     }
 

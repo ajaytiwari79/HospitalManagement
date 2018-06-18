@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data_management.data_category_element;
 
 
+import com.kairos.dto.master_data.DataElementDto;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataElement;
 import com.kairos.service.master_data_management.data_category_element.DataElementService;
 import com.kairos.utils.ResponseHandler;
@@ -28,7 +29,7 @@ public class DataElementController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<DataElement> dataElements) {
+    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDto> dataElements) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id Cannotbe null");
         }
