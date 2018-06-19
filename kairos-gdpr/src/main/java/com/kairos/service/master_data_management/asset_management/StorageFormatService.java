@@ -9,6 +9,7 @@ import com.kairos.persistance.model.master_data_management.asset_management.Stor
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
+import jdk.nashorn.internal.runtime.options.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,11 +97,11 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(),storageFormat.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data  exist for  "+storageFormat.getName());
+        StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(), storageFormat.getName());
+        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+            throw new DuplicateDataException("data  exist for  " + storageFormat.getName());
         } else {
-            exist=storageFormatMongoRepository.findByid(id);
+            exist = storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
             return save(exist);
 

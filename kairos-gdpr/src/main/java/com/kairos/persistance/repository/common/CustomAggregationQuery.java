@@ -32,7 +32,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateAddNonDeletedQuestions()
+   /* public static String questionnnaireTemplateAddNonDeletedQuestions()
     {
         return "{  '$addFields':" +
                 "{'questions':" +
@@ -41,7 +41,31 @@ public class CustomAggregationQuery {
                 "as: 'questions', "+
                 "cond: {$eq: ['$$questions.deleted',"+false+"]}" +
                 "}}}} ";
+    }*/
+
+    public static String questionnnaireTemplateAddNonDeletedQuestions()
+    {
+        return "{  '$addFields':" +
+                "{'sections.questions':" +
+                "{$filter : { "+
+                "'input': '$questions',"+
+                "as: 'questions', "+
+                "cond: {$eq: ['$$questions.deleted',"+false+"]}" +
+                "}}}} ";
     }
+
+
+    public static String questionnnaireTemplateAddNonDeletedSections()
+    {
+        return "{  '$addFields':" +
+                "{'sections':" +
+                "{$filter : { "+
+                "'input': '$sections',"+
+                "as: 'sections', "+
+                "cond: {$eq: ['$$sections.deleted',"+false+"]}" +
+                "}}}} ";
+    }
+
 
 
     public static String questionnnaireTemplateAddNonDeletedAssetType()
@@ -55,6 +79,34 @@ public class CustomAggregationQuery {
                 "}}}} ";
     }
 
+
+
+
+    public static String questionnnaireTemplateGroupOperation()
+    {
+        return "{'$group':{" +
+                "'_id':'$_id','sections':{'$push':{ '$cond': [ { '$eq': [ '$sections.deleted',false ] }, '$sections', {} ] }}," +
+                "'name':{$first:'$name'}," +
+                "'description':{$first:'$description'}," +
+                "'assetType':{$first:'$assetType'}," +
+                "'templateType':{$first:'$templateType'}," +
+                "}}";
+    }
+    public static String questionnnaireTemplateProjectionBeforeGroupOperationForAssetType()
+    {
+        return " {" +
+                "'$project':{"+
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'name':1," +
+                "        'sections':1," +
+                "      'description':1," +
+                "     'templateType':1," +
+                "      'countryId':1," +
+                "            }}";
+    }
+
+
+
     public static String dataCategoryWithDataElementProjectionData() {
         return "{  '$project':" +
                 "{'dataElements':" +
@@ -64,7 +116,8 @@ public class CustomAggregationQuery {
                 "cond:{$eq:['$$dataElement.deleted',false]}" +
                 "}}," +
                 "'countryId':1"+
-                ", 'name':1 }}";
+                ", 'name':1" +
+                ",'deleted':1 }}";
     }
 
 

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.constant.AppConstant.ID;
 import static com.kairos.constant.AppConstant.IDS_LIST;
 import static com.kairos.constant.AppConstant.QUESTION_LIST;
 
@@ -42,7 +43,7 @@ public class MasterQuestionService extends MongoBaseService {
         checkForDuplicacyInQuestion(masterQuestionDtos);
         for (MasterQuestionDto masterQuestion : masterQuestionDtos) {
 
-            if (QuestionType.valueOf(masterQuestion.getQuestionType())!=null) {
+            if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
                 MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
                 masterQuestion.setNotApplicableAllowed(masterQuestion.getNotApplicableAllowed());
                 masterQuestion.setNotSureAllowed(masterQuestion.getNotSureAllowed());
@@ -58,9 +59,6 @@ public class MasterQuestionService extends MongoBaseService {
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
             throw new MongoClientException(e.getMessage());
-        } catch (Exception e) {
-            logger.info(e.getMessage());
-            throw new RuntimeException(e.getMessage());
         }
         result.put(IDS_LIST, questionSectionIds);
         result.put(QUESTION_LIST, masterQuestions);
@@ -73,18 +71,35 @@ public class MasterQuestionService extends MongoBaseService {
 
         List<String> titles = new ArrayList<>();
         for (MasterQuestionDto masterQuestionDto : masterQuestionDtos) {
-            if (titles.contains(masterQuestionDto.getQuestion())) {
+            if (titles.contains(masterQuestionDto.getQuestion().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", " question ", masterQuestionDto.getQuestion());
             }
-            titles.add(masterQuestionDto.getQuestion());
+            titles.add(masterQuestionDto.getQuestion().toLowerCase());
         }
 
 
     }
 
+    public Boolean deleteMasterQuestion(Long countryId, BigInteger id) {
+
+        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (exist == null) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " question ", id);
+        }
+        exist.setDeleted(true);
+        save(exist);
+        return true;
+
+    }
 
 
-/*
+    public List<MasterQuestion> getAllMasterQuestion(Long countryId) {
+
+        return questionMongoRepository.getAllMasterQuestion(countryId);
+
+    }
+
+
     public MasterQuestion getMasterQuestion(Long countryId, BigInteger id) {
 
         MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
@@ -95,60 +110,84 @@ public class MasterQuestionService extends MongoBaseService {
 
     }
 
-    public MasterQuestion deleteMasterQuestion(BigInteger id) {
 
-        MasterQuestion exist = questionMongoRepository.findByid(id);
-        if (exist == null) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.master.question", id);
+    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, List<MasterQuestionDto> questionDtos) {
+
+        checkForDuplicacyInQuestion(questionDtos);
+        List<MasterQuestionDto> updateExistingQuestions = new ArrayList<>();
+        List<MasterQuestionDto> createNewQuestions = new ArrayList<>();
+
+        questionDtos.forEach(sectionDto -> {
+                    if (Optional.ofNullable(sectionDto.getId()).isPresent()) {
+                        updateExistingQuestions.add(sectionDto);
+                    } else {
+                        createNewQuestions.add(sectionDto);
+                    }
+                }
+        );
+        Map<String, Object> updatedQuestions = new HashMap<>(), newQuestions = new HashMap<>();
+        List<BigInteger> questionIds = new ArrayList<>();
+        List<MasterQuestion> masterQuestions = new ArrayList<>();
+
+        if (createNewQuestions.size() != 0) {
+            newQuestions = addQuestionsToQuestionSection(countryId, createNewQuestions);
+            questionIds.addAll((List<BigInteger>) newQuestions.get(IDS_LIST));
+            masterQuestions.addAll((List<MasterQuestion>) newQuestions.get(QUESTION_LIST));
         }
-        exist.setDeleted(true);
-        save(exist);
-        return exist;
+        if (updateExistingQuestions.size() != 0) {
 
-    }
-
-    public MasterQuestion updateMasterQuestion(Long countryId, BigInteger id, MasterQuestionDto questionDto) {
-
-        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "question", questionDto.getQuestion());
+            updatedQuestions = updateQuestionsList(countryId, updateExistingQuestions);
+            questionIds.addAll((List<BigInteger>) updatedQuestions.get(IDS_LIST));
+            masterQuestions.addAll((List<MasterQuestion>) updatedQuestions.get(QUESTION_LIST));
         }
-        if (questionMongoRepository.findByNameAndCountryId(countryId, questionDto.getQuestion()) == null) {
-            exist.setQuestion(questionDto.getQuestion());
-            exist.setCountryId(countryId);
-            exist.setDescription(questionDto.getDescription());
-            exist.setRequired(questionDto.getRequired());
-            exist.setNotSureAllowed(questionDto.getNotSureAllowed());
-            exist.setQuestionType(questionDto.getQuestionType());
-            return save(exist);
 
-        } else
-            throw new DuplicateDataException("question with same name Exist");
+
+        Map<String, Object> result = new HashMap<>();
+        result.put(IDS_LIST, questionIds);
+        result.put(QUESTION_LIST, masterQuestions);
+        return result;
+
+
     }
 
 
-    public List<MasterQuestion> getAllMasterQuestion(Long countryId) {
+    public Map<String, Object> updateQuestionsList(Long countryId, List<MasterQuestionDto> masterQuestionDtos) {
 
-        return questionMongoRepository.getAllMasterQuestion(countryId);
+        List<BigInteger> questionids = new ArrayList<>();
+        masterQuestionDtos.forEach(question -> questionids.add(question.getId()));
+        List<MasterQuestion> ExisitingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, questionids);
 
-    }
-
-    //get master Question by Ids and check if data not exist for id then throw exception
-    public List<MasterQuestion> getMasterQuestionListByIds(Long countryId, Set<BigInteger> ids) {
-        List<MasterQuestion> masterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, ids);
-        Set<BigInteger> questionIds = new HashSet<>();
-        masterQuestions.forEach(masterQuestion -> {
-            questionIds.add(masterQuestion.getId());
+        Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
+        masterQuestionDtos.forEach(masterQuestionDto -> {
+            masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto);
         });
-        if (questionIds.size() != ids.size()) {
-            ids.removeAll(questionIds);
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.master.question", ids.iterator().next());
+        List<MasterQuestion> updatedQuestionsList = new ArrayList<>();
+        for (MasterQuestion masterQuestion : ExisitingMasterQuestions) {
 
+            MasterQuestionDto questionDto = (MasterQuestionDto) masterQuestionDtoCorrespondingToId.get(masterQuestion.getId());
+            if (QuestionType.valueOf(questionDto.getQuestionType()) != null) {
+                masterQuestion.setQuestion(questionDto.getQuestion());
+                masterQuestion.setNotSureAllowed(questionDto.getNotSureAllowed());
+                masterQuestion.setRequired(questionDto.getRequired());
+                masterQuestion.setQuestionType(questionDto.getQuestionType());
+                masterQuestion.setDescription(questionDto.getDescription());
+                updatedQuestionsList.add(masterQuestion);
+            } else {
+                exceptionService.invalidRequestException("message.invalid.request", masterQuestion.getQuestion() + " not exist");
+            }
         }
-        return masterQuestions;
+        try {
+            updatedQuestionsList = save(updatedQuestionsList);
+        } catch (MongoClientException e) {
+            logger.info(e.getMessage());
+            throw new MongoClientException(e.getMessage());
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put(IDS_LIST, questionids);
+        result.put(QUESTION_LIST, updatedQuestionsList);
+        return result;
 
     }
-*/
 
 
 }

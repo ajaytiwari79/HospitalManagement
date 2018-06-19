@@ -85,7 +85,7 @@ public class DataSubjectMappingService extends MongoBaseService {
 
     public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, BigInteger id, DataSubjectMappingDto dataSubjectMappingDto) {
         DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
-        if (Optional.ofNullable(existing).isPresent()) {
+        if (Optional.ofNullable(existing).isPresent()&&id!=existing.getId()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }
         existing = dataSubjectMappingRepository.findByIdAndNonDeleted(countryId, id);
