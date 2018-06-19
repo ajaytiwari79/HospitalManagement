@@ -63,16 +63,13 @@ public class BreakSettingsService extends MongoBaseService {
                 // current break settings
                 if (breakSettings.getId().equals(breakSettingsList.get(i).getId())) {
                     // validate previous
-                    if (i != 0) {
-                        if (breakSettingsList.get(i - 1).getShiftDurationInMinute() >= breakSettingsDTO.getShiftDurationInMinute())
-                            exceptionService.actionNotPermittedException("error.breakSettings.greaterThan", DateUtils.getTimeFromMinuteLong(breakSettingsList.get(i - 1).getShiftDurationInMinute()));
+                    if (i != 0 && (breakSettingsList.get(i - 1).getShiftDurationInMinute() >= breakSettingsDTO.getShiftDurationInMinute())) {
+                        exceptionService.actionNotPermittedException("error.breakSettings.greaterThan", DateUtils.getTimeFromMinuteLong(breakSettingsList.get(i - 1).getShiftDurationInMinute()));
+                    }
+                    if (i != breakSettingsList.size() - 1 && breakSettingsList.get(i + 1).getShiftDurationInMinute() <= breakSettingsDTO.getShiftDurationInMinute()) {
+                        exceptionService.actionNotPermittedException("error.breakSettings.lessThan", DateUtils.getTimeFromMinuteLong(breakSettingsList.get(i + 1).getShiftDurationInMinute()));
                     }
 
-                    if (i != breakSettingsList.size() - 1) {
-                        if (breakSettingsList.get(i + 1).getShiftDurationInMinute() <= breakSettingsDTO.getShiftDurationInMinute())
-                            exceptionService.actionNotPermittedException("error.breakSettings.lessThan", DateUtils.getTimeFromMinuteLong(breakSettingsList.get(i + 1).getShiftDurationInMinute()));
-
-                    }
 
                 }
             }
