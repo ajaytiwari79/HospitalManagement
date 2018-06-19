@@ -12,7 +12,7 @@ import java.util.Set;
 @Repository
 public interface MasterQuestionMongoRepository extends MongoRepository<MasterQuestion, BigInteger> {
 
-    @Query("{countryId:?0,name:{$regex:?1,$options:'i'},deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     MasterQuestion findByNameAndCountryId(Long countryId, String name);
 
     @Query("{countryId:?0,_id:?1,deleted:false}")

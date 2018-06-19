@@ -14,7 +14,7 @@ import java.util.Set;
 public interface MasterQuestionnaireSectionRepository extends MongoRepository<MasterQuestionnaireSection, BigInteger> ,CustomMasterQuestionSectionRepository {
 
 
-    @Query("{deleted:false,countryId:?0,title:{$regex:?1,$options:'i'}}")
+    @Query("{deleted:false,countryId:?0,title:?1}")
     MasterQuestionnaireSection findMasterQuestionByTitleAndCountryId(Long countryId, String name);
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
