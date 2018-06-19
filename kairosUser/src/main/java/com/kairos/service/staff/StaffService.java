@@ -1905,11 +1905,14 @@ public class StaffService extends UserBaseService {
     }
 
     public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO,Boolean confirm) {
+        if(employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())){
+            exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
+        }
         Long mainEmploymentStartDate=DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentStartDate());
         Long mainEmploymentEndDate=null;
         if(employmentDTO.getMainEmploymentEndDate()!=null) {
              mainEmploymentEndDate = DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentEndDate());
-            if (employmentDTO.getMainEmploymentStartDate() != null && employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
+            if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
                 exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
             }
         }
@@ -1924,11 +1927,7 @@ public class StaffService extends UserBaseService {
                     if(employment.getMainEmploymentEndDate()!=null&&employmentDTO.getMainEmploymentEndDate()!=null){
                     DateTimeInterval employmentInterval = new DateTimeInterval(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()), DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate()));
                     if (newEmploymentInterval.containsInterval(employmentInterval)) {
-                        getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
-                        employment.setMainEmploymentStartDate(null);
-                        employment.setMainEmploymentEndDate(null);
-                        employment.setMainEmployment(false);
-                        getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            exceptionService.invalidRequestException("message.employment.alreadyexist",employment.getName());
                     } else {
                         if (employmentInterval.contains(newEmploymentInterval.getStartDate())) {
                             getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
@@ -1964,8 +1963,11 @@ public class StaffService extends UserBaseService {
                                 getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                                 employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
                             }
+                            if(employment.getMainEmploymentStartDate().isEqual(employmentDTO.getMainEmploymentStartDate())){
+                                exceptionService.invalidRequestException("message.employment.alreadyexist",employment.getName());
+                            }
                         }
-                    else if(employment.getMainEmploymentEndDate()!=null&&employmentDTO.getMainEmploymentEndDate()==null){
+                    else {
                             if(employment.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentStartDate())){
                                 getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                                 employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
@@ -1978,7 +1980,6 @@ public class StaffService extends UserBaseService {
                         }
                     }
                     if(employment.getMainEmploymentEndDate().isBefore(employment.getMainEmploymentStartDate())){
-                        getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                         employment.setMainEmploymentStartDate(null);
                         employment.setMainEmploymentEndDate(null);
                         employment.setMainEmployment(false);
