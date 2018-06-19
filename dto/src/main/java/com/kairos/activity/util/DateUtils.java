@@ -561,9 +561,13 @@ public class DateUtils {
         return Date.from(localDate.atTime(localTime).atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static Date getStartDateOfWeekFromDate(LocalDate date){
+    public static Date getStartDateOfWeekFromDate(LocalDate date) {
         return asDate(date.with(previousOrSame(DayOfWeek.MONDAY)));
 
+    }
+
+    public static LocalTime getTimeFromMinuteLong(Long durationInMinute) {
+        return LocalTime.MIN.plus(Duration.ofMinutes(durationInMinute));
     }
 
 }
