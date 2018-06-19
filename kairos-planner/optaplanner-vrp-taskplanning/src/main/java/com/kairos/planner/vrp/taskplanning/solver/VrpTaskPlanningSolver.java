@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class VrpTaskPlanningSolver {
@@ -27,24 +29,29 @@ public class VrpTaskPlanningSolver {
         solver = solverFactory.buildSolver();
     }
 
-    public void solve(String problemXML){
+    public void solve(String problemXML) throws IOException {
+        XStream xstream = getxStream();
+        VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));
+        solve(problem);
+    }
+
+    private XStream getxStream() {
         XStream xstream= new XStream();
         xstream.setMode(XStream.ID_REFERENCES);
         xstream.processAnnotations(LocationPair.class);
         xstream.processAnnotations(LocationPairDifference.class);
         xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
-        VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));
-        solve(problem);
+        return xstream;
     }
 
-    public void solve(VrpTaskPlanningSolution problem){
+    public void solve(VrpTaskPlanningSolution problem) throws IOException {
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             at.addAndGet(t.getDuration());
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
         });
         //TODO ease efficiency for debugging
-        problem.getEmployees().forEach(e->e.setEfficiency(100));
+        //problem.getEmployees().forEach(e->e.setEfficiency(100));
         VrpTaskPlanningSolution solution=null;
         try {
             solution = solver.solve(problem);
@@ -53,8 +60,9 @@ public class VrpTaskPlanningSolver {
             //e.printStackTrace();
             throw  e;
         }
+        getxStream().toXML(solution,new FileWriter("src/main/resources/problem.xml"));
         for(Shift shift: solution.getShifts()){
-            StringBuffer sb= new StringBuffer("Shift"+shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString());
+            StringBuffer sb= new StringBuffer("Shift"+shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
             log.info(sb.toString());
         }
         log.info(solution.toString());

@@ -30,3 +30,11 @@ salience 22
     then
         scoreHolder.addHardConstraintMatch(kcontext,-1);
 end
+
+rule "Driving Time"
+salience 22
+    when
+        Task(prevTaskOrShift!=null ,$minutes:drivingTime, $minutes>0)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-$minutes);
+end

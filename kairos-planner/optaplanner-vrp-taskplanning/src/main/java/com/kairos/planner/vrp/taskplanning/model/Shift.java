@@ -147,11 +147,23 @@ public class Shift extends TaskOrShift{
         }
         return "("+duration+"):("+startTime+":"+endTime+")"+sb.toString();
     }
+
+    public String getLocationsString(){
+        StringBuilder sb = new StringBuilder();
+        Task temp=getNextTask();
+        while (temp!=null){
+            sb.append(temp.getLatLongString()+" -> ");
+            temp=temp.getNextTask();
+        }
+        return sb.toString();
+    }
+
+
     public int getChainDuration() {
         int duration=0;
         Task temp=getNextTask();
         while (temp!=null){
-            duration+=temp.getDrivingTime()+temp.getDuration();
+            duration+=temp.getDrivingTime()+temp.getPlannedDuration();
             temp=temp.getNextTask();
         }
         return duration;

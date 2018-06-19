@@ -114,13 +114,24 @@ app.controller('shiftPlanningCtrl',['$scope','$http',function($scope,$http) {
         var map;
         var directionsDisplay;
         var directionsService = new google.maps.DirectionsService();
-        var locations = [
+        /*var locations = [
             ['Noida', 28.5355, 77.3910, 2],
             ['gurgaon', 28.4595, 77.0266, 4],
             ['Delhi',28.7041, 77.1025, 5],
             ['Rohtak', 28.8955, 76.6066, 1],
             ['Plawal', 28.1487, 77.3320, 3]
+        ];*/
+        var locations = [
+            ['NoidaA',56.63576484,9.79802229,9],
+            ['NoidaB',56.636099,9.79815781,8],
+            ['NoidaC',56.6356396,9.79824642,7],
+            ['NoidaD',56.63614757,9.79673164,6],
+            ['NoidaE',56.63619445,9.7964408,5],
+            ['NoidaF',56.63627518,9.7960116,4],
+            ['NoidaG',56.63687887,9.79517636,3],
+            ['NoidaH',56.63834967,9.79337845,2]
         ];
+
 
         directionsDisplay = new google.maps.DirectionsRenderer();
 

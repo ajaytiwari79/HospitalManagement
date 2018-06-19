@@ -197,8 +197,7 @@ public class Task extends TaskOrShift{
     }
 
     public double getPlannedDuration(){
-        if(shift==null) return duration;
-        return this.getDuration()/(this.getShift().getEmployee().getEfficiency()/100d);
+        return this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
     }
     public int getDrivingTime(){
         if(prevTaskOrShift ==null){
@@ -238,5 +237,17 @@ public class Task extends TaskOrShift{
                 + intallationNo +
                 "-" + duration +
                 '}';
+    }
+
+    public Shift getShiftFromAnchor(){
+        Task temp=this;
+        while(temp.getPrevTaskOrShift() instanceof Task){
+            temp= (Task) temp.getPrevTaskOrShift();
+        }
+        return (Shift) temp.getPrevTaskOrShift();
+    }
+
+    public String getLatLongString(){
+        return lattitude+":"+longitude;
     }
 }
