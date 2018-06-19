@@ -891,7 +891,7 @@ public class OrganizationService extends UserBaseService {
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
 //        phaseRestClient.createDefaultPhases(unit.getId());
 //        periodRestClient.createDefaultPeriodSettings(unit.getId());
-        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),unit.getCountry().getId());
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),parent.getCountry().getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
