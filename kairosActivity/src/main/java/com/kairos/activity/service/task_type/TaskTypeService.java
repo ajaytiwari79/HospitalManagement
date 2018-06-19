@@ -1330,7 +1330,10 @@ public class TaskTypeService extends MongoBaseService {
         List<Map> service = (List<Map>)services.get("selectedServices");
         service.get(0).get("children");
         service.forEach(t->{
-            serviceIds.add((Long)((Map)t.get("children")).get("id"));
+            List<Map> children = (List<Map>)t.get("children");
+            children.forEach(c->{
+                serviceIds.add(((Integer)c.get("id")).longValue());
+            });
         });
         return serviceIds;
     }
