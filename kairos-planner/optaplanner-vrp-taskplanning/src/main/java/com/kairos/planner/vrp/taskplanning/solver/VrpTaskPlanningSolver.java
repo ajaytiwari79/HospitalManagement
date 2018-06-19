@@ -1,9 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
-import com.kairos.planner.vrp.taskplanning.model.LocationPair;
-import com.kairos.planner.vrp.taskplanning.model.LocationPairDifference;
-import com.kairos.planner.vrp.taskplanning.model.Shift;
-import com.kairos.planner.vrp.taskplanning.model.Task;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.thoughtworks.xstream.XStream;
 import org.optaplanner.core.api.solver.Solver;
@@ -15,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class VrpTaskPlanningSolver {
@@ -61,11 +61,28 @@ public class VrpTaskPlanningSolver {
             throw  e;
         }
         getxStream().toXML(solution,new FileWriter("src/main/resources/problem.xml"));
+        int totalDrivingTime=0;
         for(Shift shift: solution.getShifts()){
-            StringBuffer sb= new StringBuffer("Shift"+shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
+            StringBuffer sb= new StringBuffer(shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
             log.info(sb.toString());
+            log.info(getLocationList(shift).toString());
+            totalDrivingTime+=shift.getChainDrivingTime();
         }
-        log.info(solution.toString());
+        log.info("total driving time:"+totalDrivingTime);
 
+    }
+
+    public List<Location> getLocationList(Shift shift){
+        List<Location> list= new ArrayList<>();
+        Task temp=shift.getNextTask();
+        int i=0;
+        while(temp!=null){
+            Location location = new Location(temp.getLattitude(), temp.getLongitude(), ++i, temp.getIntallationNo());
+            if(!list.contains(location)){
+                list.add(location);
+            }
+            temp=temp.getNextTask();
+        }
+        return list;
     }
 }
