@@ -12,6 +12,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -453,10 +454,22 @@ public class DateUtils {
         return dateTime.toString(formatter);
     }
 
+    public static ZonedDateTime getZoneDateTime(Date date){
+         return ZonedDateTime.ofInstant(date.toInstant(),
+                 ZoneId.systemDefault());
+    }
+
+    public static Date getDateByZonedDateTime(ZonedDateTime dateTime){
+        return Date.from(dateTime.toInstant());
+    }
+
+    public static org.joda.time.LocalDate asJodaLocalDate(Date date) {
+        return new DateTime(date).toLocalDate();
+    }
     /**
      * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
      */
-    public static DateTime getDateTime(Date date, LocalTime time) {
+    public static DateTime getDateTime(Date date, LocalTime time){
         return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
     }
 
@@ -468,9 +481,6 @@ public class DateUtils {
         return dates;
     }
 
-    public static ZonedDateTime getZoneDateTime(Date date) {
-        return ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
 
     public static Date getDateByZoneDateTime(ZonedDateTime zonedDateTime) {
         return Date.from(zonedDateTime.toInstant());

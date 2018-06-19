@@ -23,7 +23,7 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
 
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
@@ -37,11 +37,11 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 

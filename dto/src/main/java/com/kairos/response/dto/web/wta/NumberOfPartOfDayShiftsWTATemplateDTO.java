@@ -22,12 +22,9 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
     private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
-    private long validationStartDateMillis;
-
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
@@ -65,19 +62,11 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -114,13 +103,6 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
         this.intervalLength = intervalLength;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
 
     public NumberOfPartOfDayShiftsWTATemplateDTO(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
         this.noOfPartOfDayWorked = noOfPartOfDayWorked;

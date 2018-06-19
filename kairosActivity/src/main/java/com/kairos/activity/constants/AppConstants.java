@@ -238,6 +238,14 @@ public class AppConstants {
     public static final int MAX_ONE_ACTIVITY_PER_SHIFT = 10;
 
 
+
+    //RuleTemplate
+    public static final String MONTHS = "MONTHS";
+    public static final String WEEKS = "WEEKS";
+    public static final String DAYS = "DAYS";
+    public static final String YEARS = "YEARS";
+
+
     // Default Unit Age Settings
     public static final int YOUNGER_AGE = 18;
     public static final int OLDER_AGE = 62;

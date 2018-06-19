@@ -3,16 +3,28 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.util.DateUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.activity.constants.AppConstants.*;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -24,14 +36,27 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     private long intervalLength;//
     private String intervalUnit;
-    private LocalDate validationStartDate;
-    private long continuousDayRestHours;
-    private long averageRest;//(hours number)
-    private String shiftAffiliation;//(List checkbox)
-    private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
+
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -41,13 +66,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -82,54 +100,75 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.intervalUnit = intervalUnit;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
-
-    public long getContinuousDayRestHours() {
-        return continuousDayRestHours;
-    }
-
-    public void setContinuousDayRestHours(long continuousDayRestHours) {
-        this.continuousDayRestHours = continuousDayRestHours;
-    }
-
-    public long getAverageRest() {
-        return averageRest;
-    }
-
-    public void setAverageRest(long averageRest) {
-        this.averageRest = averageRest;
-    }
-
-    public String getShiftAffiliation() {
-        return shiftAffiliation;
-    }
-
-    public void setShiftAffiliation(String shiftAffiliation) {
-        this.shiftAffiliation = shiftAffiliation;
-    }
-
     public ShortestAndAverageDailyRestWTATemplate(String name,  boolean disabled,
-                                                  String description, long intervalLength, String intervalUnit, LocalDate validationStartDate,
-                                                  long continuousDayRestHours, long averageRest, String shiftAffiliation) {
+                                                  String description, long intervalLength, String intervalUnit) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
-        this.validationStartDate =validationStartDate;
-        this.continuousDayRestHours=continuousDayRestHours;
-        this.averageRest=averageRest;
-        this.shiftAffiliation=shiftAffiliation;
         wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
     public ShortestAndAverageDailyRestWTATemplate() {
         wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
+            DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
+            List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);
+            shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
+            shifts.add(infoWrapper.getShift());
+            List<DateTimeInterval> intervals = getIntervals(interval);
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+            for (DateTimeInterval dateTimeInterval : intervals) {
+                int totalMin = dateTimeInterval.getMinutes();
+                for (ShiftWithActivityDTO shift : shifts) {
+                    if(dateTimeInterval.overlaps(shift.getDateTimeInterval())){
+                        totalMin -=dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
+                    }
+                }
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*dateTimeInterval.getDays()));
+                if (!isValid) {
+                    if(limitAndCounter[1]!=null) {
+                        int counterValue =  limitAndCounter[1] - 1;
+                        if(counterValue<0){
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        }else {
+                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        }
+                    }else {
+                        throw new InvalidRequestException(getName() + " is Broken");
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){
+        ZonedDateTime zonedDateTime = null;
+        switch (intervalUnit){
+            case DAYS:dateTime.plusDays(intervalLength);
+                break;
+            case WEEKS:dateTime.plusWeeks(intervalLength);
+                break;
+            case MONTHS:dateTime.plusMonths(intervalLength);
+                break;
+            case YEARS:dateTime.plusYears(intervalLength);
+                break;
+        }
+        return zonedDateTime;
+    }
+
+    private List<DateTimeInterval> getIntervals(DateTimeInterval interval){
+        List<DateTimeInterval> intervals = new ArrayList<>();
+        ZonedDateTime nextEnd = getNextDateOfInterval(interval.getStart());
+        intervals.add(new DateTimeInterval(interval.getStart(),nextEnd));
+        intervals.add(new DateTimeInterval(nextEnd,getNextDateOfInterval(nextEnd)));
+        return intervals;
     }
 
 }

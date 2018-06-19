@@ -3,7 +3,9 @@ package com.kairos.activity.response.dto.shift;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.enums.shift.ShiftState;
 import org.hibernate.validator.constraints.Range;
@@ -304,12 +306,22 @@ public class ShiftDTO {
 
 
     public Shift buildShift() {
+
         Shift shift = new Shift(this.id, this.name, DateUtils.getDateByLocalDateAndLocalTime(this.startLocalDate, this.startTime), DateUtils.getDateByLocalDateAndLocalTime(this.endLocalDate, this.endTime), this.bid, this.pId, this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shift.setDurationMinutes(this.durationMinutes);
         shift.setScheduledMinutes(this.scheduledMinutes);
         shift.setShiftState(ShiftState.UNPUBLISHED);
         shift.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         return shift;
+    }
+
+
+    public ShiftWithActivityDTO buildResponse(Activity activity) {
+        ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO(this.id, activity.getName(), getStartDate(), getEndDate(), this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId,  this.unitPositionId,this.unitId,activity);
+        shiftWithActivityDTO.setDurationMinutes(this.durationMinutes);
+        shiftWithActivityDTO.setScheduledMinutes(this.scheduledMinutes);
+        shiftWithActivityDTO.setShiftState(ShiftState.UNPUBLISHED);
+        return shiftWithActivityDTO;
     }
 
     public BigInteger getParentOpenShiftId() {

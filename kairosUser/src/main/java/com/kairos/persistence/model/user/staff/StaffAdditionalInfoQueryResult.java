@@ -1,7 +1,8 @@
 package com.kairos.persistence.model.user.staff;
 
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
@@ -23,13 +24,31 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffUnitPositionDetails unitPosition;
+    private com.kairos.activity.response.dto.shift.StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    private List<DayOfWeek> activityDayTypes;
+    private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
+    private List<com.kairos.activity.client.dto.TimeSlotWrapper> timeSlotSets;
+    private UserAccessRoleDTO user;
     private UserAccessRoleDTO userAccessRoleDTO;
 
+
+    public UserAccessRoleDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserAccessRoleDTO user) {
+        this.user = user;
+    }
+
+    public List<com.kairos.activity.client.dto.TimeSlotWrapper> getTimeSlotSets() {
+        return timeSlotSets;
+    }
+
+    public void setTimeSlotSets(List<com.kairos.activity.client.dto.TimeSlotWrapper> timeSlotSets) {
+        this.timeSlotSets = timeSlotSets;
+    }
 
     public ZoneId getUnitTimeZone() {
         return unitTimeZone;
@@ -39,12 +58,12 @@ public class StaffAdditionalInfoQueryResult {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public List<DayOfWeek> getActivityDayTypes() {
-        return activityDayTypes;
+    public List<DayTypeDTO> getDayTypes() {
+        return dayTypes;
     }
 
-    public void setActivityDayTypes(List<DayOfWeek> activityDayTypes) {
-        this.activityDayTypes = activityDayTypes;
+    public void setDayTypes(List<DayTypeDTO> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 
     public StaffAdditionalInfoQueryResult() {

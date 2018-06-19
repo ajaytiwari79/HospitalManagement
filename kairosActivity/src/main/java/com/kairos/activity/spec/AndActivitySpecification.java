@@ -8,29 +8,29 @@ import java.util.List;
 /**
  * Created by vipul on 7/2/18.
  */
-public class AndActivitySpecification<T> extends AbstractActivitySpecification<T> {
+public class AndActivitySpecification<T> extends AbstractSpecification<T> {
 
-    private ActivitySpecification<T> activitySpecification1;
-    private ActivitySpecification<T> activitySpecification2;
+    private Specification<T> specification1;
+    private Specification<T> specification2;
 
 
-    public AndActivitySpecification(ActivitySpecification<T> activitySpecification1, ActivitySpecification<T> activitySpecification2) {
-        this.activitySpecification1 = activitySpecification1;
-        this.activitySpecification2 = activitySpecification2;
+    public AndActivitySpecification(Specification<T> specification1, Specification<T> specification2) {
+        this.specification1 = specification1;
+        this.specification2 = specification2;
 
     }
 
 
     @Override
     public boolean isSatisfied(T t) {
-        return activitySpecification1.isSatisfied(t) && activitySpecification2.isSatisfied(t);
+        return specification1.isSatisfied(t) && specification2.isSatisfied(t);
     }
 
     @Override
     public List<String> isSatisfiedString(T t) {
         List<String> messages = new ArrayList<>();
-        messages.addAll(activitySpecification1.isSatisfiedString(t));
-        messages.addAll(activitySpecification2.isSatisfiedString(t));
+        messages.addAll(specification1.isSatisfiedString(t));
+        messages.addAll(specification2.isSatisfiedString(t));
         return messages;
     }
 }
