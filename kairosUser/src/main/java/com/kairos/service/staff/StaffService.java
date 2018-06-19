@@ -189,6 +189,7 @@ public class StaffService extends UserBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -1066,6 +1067,7 @@ public class StaffService extends UserBaseService {
         staff.setClient(client);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
+        resgisterUser(staff);
         staff.setUser(null); // removing user to send in FE
 //        staff.setGender(user.getGender());
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
