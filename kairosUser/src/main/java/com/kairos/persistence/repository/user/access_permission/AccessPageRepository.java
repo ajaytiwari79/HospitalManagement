@@ -366,8 +366,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "with o,e, [o]+units as units  unwind units as org  WITH distinct org,o,e\n" +
             "Match (e)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission\n" +
             "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WITH org,accessGroup,unitPermission\n" +
-            "Match (accessPage:AccessPage)\n" +
-            "Optional Match (accessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
+            //"Match (accessPage:AccessPage)\n" +
+            "Match (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( distinct {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,isModule:accessPage.isModule}) as permissions\n" +
             "return id(org) as unitId, permissions as permission")
