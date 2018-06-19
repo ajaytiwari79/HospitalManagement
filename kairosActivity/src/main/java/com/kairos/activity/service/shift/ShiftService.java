@@ -510,7 +510,7 @@ public class ShiftService extends MongoBaseService {
     private void validateStaffingLevel(Shift shift, Activity activity, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        if(Optional.ofNullable(phaseSettings).isPresent()){
+        if(!Optional.ofNullable(phaseSettings).isPresent()){
             exceptionService.dataNotFoundException("message.phaseSettings.absent");
         }
         if (phaseSettings.isManagementEligibleForOverStaffing() || phaseSettings.isManagementEligibleForUnderStaffing() || phaseSettings.isStaffEligibleForOverStaffing() || phaseSettings.isStaffEligibleForUnderStaffing()) {
