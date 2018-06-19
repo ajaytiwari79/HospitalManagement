@@ -10,14 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class ComparisonUtils<T> {
+public class ComparisonUtils {
 
-
-    private T object;
-
-    public ComparisonUtils(T object) {
-        this.object = object;
-    }
 
     public void checkOrgTypeAndService(Set<Long> ids, List<OrganizationTypeAndServiceBasicDto> orgTypesAndServices) {
 
@@ -33,25 +27,11 @@ public class ComparisonUtils<T> {
 
     }
 
+
+
     public Set<Long> difference(final Set<Long> set1, final Set<Long> set2) {
         final Set<Long> larger = set1.size() > set2.size() ? set1 : set2;
         final Set<Long> smaller = larger.equals(set1) ? set2 : set1;
         return larger.stream().filter(n -> !smaller.contains(n)).collect(Collectors.toSet());
     }
-
-
-   /* public void CheckForDuplicacyInTitlesAndNames(List<T> list)
-    {
-        list.forEach(t -> {
-
-
-
-
-
-        });
-
-
-    }*/
-
-
 }

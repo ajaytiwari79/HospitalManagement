@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.POST;
 import java.math.BigInteger;
 
 import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
@@ -29,9 +28,9 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
 @RestController
 @RequestMapping(API_STORAGE_TYPE_URL)
 @Api(API_STORAGE_TYPE_URL)
-public class StorageTypeController {
+public class AssetTypeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StorageTypeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeController.class);
 
     @Inject
     private AssetTypeService storageTypeService;
@@ -110,8 +109,7 @@ public class StorageTypeController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createSubAssetTypeAndAddToAssetType(countryId, subAssetTypes.getRequestBody()));
-
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.buildSubAssetTypeAndAddToAssetType(countryId, subAssetTypes.getRequestBody()));
     }
 
 

@@ -1,6 +1,5 @@
 package com.kairos.service.master_data_management.asset_management;
 
-
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
@@ -36,7 +35,7 @@ public class AssetTypeService extends MongoBaseService {
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
-    //Todo add sub asset Types to asset types during creation of asset types
+    //Todo  if requirement is to create single asset with multiple sub asset then remove this method
     public Map<String, List<AssetType>> createAssetType(Long countryId, List<AssetType> assetTypes) {
         Map<String, List<AssetType>> result = new HashMap<>();
         List<AssetType> existing = new ArrayList<>();
@@ -57,7 +56,6 @@ public class AssetTypeService extends MongoBaseService {
 
                 }
         }
-
         List<AssetType> assetTypeList = new ArrayList<>();
         if (newAssetTypes.size() != 0) {
             for (AssetType AssetType : newAssetTypes) {
@@ -75,6 +73,34 @@ public class AssetTypeService extends MongoBaseService {
         result.put("new", assetTypeList);
         return result;
 
+    }
+
+
+    //Todo if requiremenet is to create single Asset type with multiple Sub asset use this
+    public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDto assetTypeDto) {
+
+
+        AssetType exist = assetTypeMongoRepository.findByName(countryId, assetTypeDto.getName().toLowerCase());
+        if (Optional.ofNullable(exist).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
+        }
+
+        Map<String, Object> subAssetTypes = new HashMap<>();
+        AssetType assetType = new AssetType();
+        if (assetTypeDto.getSubAssetTypes().size() != 0) {
+            subAssetTypes = buildSubAssetTypeAndAddToAssetType(countryId, assetTypeDto.getSubAssetTypes());
+            assetType.setSubAssetTypes((List<BigInteger>) subAssetTypes.get(IDS_LIST));
+        }
+        assetType.setName(assetTypeDto.getName());
+        assetType.setCountryId(countryId);
+        assetType.setNameInLowerCase(assetTypeDto.getName().toLowerCase());
+        try {
+            assetType = save(assetType);
+        } catch (Exception e) {
+            LOGGER.info(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+        return assetType;
     }
 
 
@@ -127,7 +153,6 @@ public class AssetTypeService extends MongoBaseService {
 
 
     public AssetType getAssetTypeByName(Long countryId, String name) {
-
         if (!StringUtils.isBlank(name)) {
             AssetType exist = assetTypeMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
@@ -140,12 +165,11 @@ public class AssetTypeService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
      * @param subAssetTypesDto contains list of Sub Asset Types
      * @return
      */
-    public Map<String, Object> createSubAssetTypeAndAddToAssetType(Long countryId, List<AssetTypeDto> subAssetTypesDto) {
+    public Map<String, Object> buildSubAssetTypeAndAddToAssetType(Long countryId, List<AssetTypeDto> subAssetTypesDto) {
 
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
@@ -174,7 +198,6 @@ public class AssetTypeService extends MongoBaseService {
     }
 
     /**
-     *
      * @param assetTypeDtos check for duplicacy in name of Asset types
      */
     public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDto> assetTypeDtos) {

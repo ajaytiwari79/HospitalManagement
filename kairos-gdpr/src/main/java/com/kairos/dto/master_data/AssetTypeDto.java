@@ -6,11 +6,14 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetTypeDto {
 
+
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "Title cannot be empty ")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
@@ -19,6 +22,13 @@ public class AssetTypeDto {
     @Valid
     private List<AssetTypeDto> subAssetTypes;
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name.trim();
