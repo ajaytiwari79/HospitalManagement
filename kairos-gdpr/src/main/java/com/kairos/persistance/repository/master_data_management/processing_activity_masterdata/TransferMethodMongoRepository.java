@@ -17,7 +17,7 @@ public interface TransferMethodMongoRepository extends MongoRepository<TransferM
     TransferMethod findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     TransferMethod findByid(BigInteger id);
-    @Query("{countryId:?0,name:{$regex:?1,$options:'i'},deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     TransferMethod findByName(Long countryId,String name);
 
     @Query("{countryId:?0,deleted:false}")

@@ -29,9 +29,6 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     @Override
     public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, BigInteger id) {
 
-
-
-
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
         Aggregation aggregation = Aggregation.newAggregation(
