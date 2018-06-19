@@ -1,24 +1,25 @@
 package com.kairos.activity.spec;
 
+import com.kairos.activity.service.exception.ExceptionService;
 import java.util.Collections;
 import java.util.List;
 
 public class OrActivitySpecification<T> extends AbstractActivitySpecification<T> {
 
-    private ActivitySpecification<T> activitySpecification1;
-    private ActivitySpecification<T> activitySpecification2;
+    private Specification<T> specification1;
+    private Specification<T> specification2;
 
 
-    public OrActivitySpecification(ActivitySpecification<T> activitySpecification1, ActivitySpecification<T> activitySpecification2) {
-        this.activitySpecification1 = activitySpecification1;
-        this.activitySpecification2 = activitySpecification2;
+    public OrActivitySpecification(Specification<T> activitySpecification1, Specification<T> activitySpecification2) {
+        this.specification1 = activitySpecification1;
+        this.specification2 = activitySpecification2;
 
     }
 
 
     @Override
     public boolean isSatisfied(T t) {
-        return activitySpecification1.isSatisfied(t) || activitySpecification2.isSatisfied(t);
+        return specification1.isSatisfied(t) || specification2.isSatisfied(t);
     }
 
     @Override

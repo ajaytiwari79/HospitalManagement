@@ -1,11 +1,12 @@
 package com.kairos.activity.spec;
 
+import com.kairos.activity.service.exception.ExceptionService;
 import java.util.List;
 
 /**
  * Created by vipul on 30/1/18.
  */
-public interface ActivitySpecification<T> {
+public interface Specification<T> {
     /**
      * Check if {@code t} is satisfied by the specification.
      *
@@ -16,11 +17,10 @@ public interface ActivitySpecification<T> {
 
     /**
      * Create a new specification that is the AND operation of {@code this} specification and another specification.
-     *
-     * @param activitySpecification Specification to AND.
+     * @param specification Specification to AND.
      * @return A new specification.
      */
-    ActivitySpecification<T> and(ActivitySpecification<T> activitySpecification);
+    Specification<T> and(Specification<T> specification);
 
     /**
      * Create a new specification that is the OR operation of {@code this} specification and another specification.
@@ -28,7 +28,7 @@ public interface ActivitySpecification<T> {
      * @param activitySpecification Specification to OR.
      * @return A new specification.
      */
-    ActivitySpecification<T> or(ActivitySpecification<T> activitySpecification);
+    Specification<T> or(Specification<T> activitySpecification);
 
     List<String> isSatisfiedString(T t);
 }

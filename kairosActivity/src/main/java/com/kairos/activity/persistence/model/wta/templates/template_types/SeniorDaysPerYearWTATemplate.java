@@ -3,6 +3,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -48,6 +49,11 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     public SeniorDaysPerYearWTATemplate() {
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
         //Default Constructor
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,

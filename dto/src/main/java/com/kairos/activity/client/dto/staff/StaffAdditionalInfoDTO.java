@@ -1,6 +1,11 @@
 package com.kairos.activity.client.dto.staff;
 
+import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.UserDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import org.joda.time.DateTimeZone;
 
@@ -23,13 +28,34 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    private List<DayOfWeek> activityDayTypes;
+    //These are the all day type of country
+    private List<DayTypeDTO> dayTypes;
+    private UserAccessRoleDTO user;
+    //This is unit TimeZone
     private ZoneId unitTimeZone;
+    //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
+    private List<TimeSlotWrapper> timeSlotSets;
+
+    public UserAccessRoleDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserAccessRoleDTO user) {
+        this.user = user;
+    }
+
+    public List<TimeSlotWrapper> getTimeSlotSets() {
+        return timeSlotSets;
+    }
+
+    public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
+        this.timeSlotSets = timeSlotSets;
+    }
     private UserAccessRoleDTO userAccessRoleDTO;
 
 
     public DateTimeZone getUnitTimeZone() {
-        return DateTimeZone.forID(unitTimeZone.getId());
+        return unitTimeZone!=null ? DateTimeZone.forID(unitTimeZone.getId()) : null;
     }
 
     public ZoneId getUnitZoneId() {
@@ -40,12 +66,13 @@ public class StaffAdditionalInfoDTO {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public List<DayOfWeek> getActivityDayTypes() {
-        return activityDayTypes;
+
+    public List<DayTypeDTO> getDayTypes() {
+        return dayTypes;
     }
 
-    public void setActivityDayTypes(List<DayOfWeek> activityDayTypes) {
-        this.activityDayTypes = activityDayTypes;
+    public void setDayTypes(List<DayTypeDTO> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 
     public StaffAdditionalInfoDTO() {

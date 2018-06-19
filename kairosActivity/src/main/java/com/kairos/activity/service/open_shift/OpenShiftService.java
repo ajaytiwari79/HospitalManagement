@@ -207,7 +207,7 @@ public class OpenShiftService extends MongoBaseService {
    public OpenShiftWrapper fetchOpenShiftDataByStaff(Long unitId,  BigInteger openShiftId,  Long staffId){
         OpenShiftActivityWrapper openShiftActivityWrapper =openShiftMongoRepository.getOpenShiftAndActivity(openShiftId,unitId);
         Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId, openShiftActivityWrapper.getExpertiseId());
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+       com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
         OpenShift openShift=openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         Date startDate=DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
         Date endDate =DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));

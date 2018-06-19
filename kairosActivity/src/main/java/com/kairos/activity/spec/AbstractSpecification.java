@@ -1,12 +1,11 @@
 package com.kairos.activity.spec;
 
 import com.kairos.activity.service.exception.ExceptionService;
-import java.util.List;
 
 /**
  * Created by vipul on 30/1/18.
  */
-public abstract class AbstractActivitySpecification<T> implements Specification<T> {
+public abstract class AbstractSpecification<T> implements Specification<T> {
     /**
      * {@inheritDoc}
      */
@@ -19,5 +18,5 @@ public abstract class AbstractActivitySpecification<T> implements Specification<
     public Specification<T> or(final Specification<T> specification) {
         return new OrActivitySpecification<T>(this, specification);
     }
-    public abstract List<String> isSatisfiedString(T t);
+
 }
