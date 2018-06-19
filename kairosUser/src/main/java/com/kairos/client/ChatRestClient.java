@@ -47,13 +47,13 @@ public class ChatRestClient {
 //                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
 //                    };
             HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
-            ResponseEntity<Object> restExchange =
+            ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
                             "http://xyz.example.com:8008/_matrix/client/r0/register?kind=user",
                             HttpMethod.POST,
-                            requestEntity, Object.class);
+                            requestEntity, StaffChatDetails.class);
 
-            Object response = restExchange.getBody();
+            StaffChatDetails response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 BeanUtils.copyProperties(response,staffChatDetails1);
                 return staffChatDetails1;

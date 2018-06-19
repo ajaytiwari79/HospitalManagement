@@ -1923,6 +1923,17 @@ public class StaffService extends UserBaseService {
         return accessGroupService.getStaffAccessRoles(unitId, staff.getId());
     }
 
+    public boolean registerAllStaffsToChatServer() {
+        List<Staff> staffList=staffGraphRepository.findAll();
+        staffList.forEach(staff -> {
+            addStaffInChatServer(staff);
+            save(staff);
+        });
+        return true;
+    }
+
+
+
     private void addStaffInChatServer(Staff staff){
         Map<String,String> auth=new HashMap<>();
         auth.put("type","m.login.dummy");
