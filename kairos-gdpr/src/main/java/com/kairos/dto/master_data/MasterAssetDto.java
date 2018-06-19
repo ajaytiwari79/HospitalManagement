@@ -1,9 +1,11 @@
 package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MasterAssetDto {
 
     @NotNullOrEmpty(message = "Name  can't be Empty")
@@ -19,20 +22,21 @@ public class MasterAssetDto {
 
     @NotNullOrEmpty(message = "Description cannot be Empty")
     private String description;
+
     @NotNull(message = "Organization Type  can't be  null")
-    @NotEmpty(message = "Organization Type  can't be  empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
     @NotNull(message = "Organization Sub Type  can't be  null")
-    @NotEmpty(message = "Organization Sub Type  can't be  empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
     @NotNull(message = "Service Type  can't be  null")
-    @NotEmpty(message = "Service Type  can't be empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
     @NotNull(message = "Service Sub Type  can't be  null")
-    @NotEmpty(message = "Service Sub Type  can't be empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
 

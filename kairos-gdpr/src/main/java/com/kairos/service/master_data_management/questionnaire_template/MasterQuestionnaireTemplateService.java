@@ -124,7 +124,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
     public MasterQuestionnaireTemplate updateQuestionniareTemplate(Long countryId, BigInteger id, MasterQuestionnaireTemplateDto templateDto) {
         MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, templateDto.getName().trim());
-        if (Optional.ofNullable(exisiting).isPresent()) {
+        if (Optional.ofNullable(exisiting).isPresent() && !id.equals(exisiting.getId())) {
             throw new DuplicateDataException("Template Exists with same name");
         }
         exisiting = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);

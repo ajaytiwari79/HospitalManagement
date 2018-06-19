@@ -100,7 +100,10 @@ public class DestinationService extends MongoBaseService {
 
 
         Destination exist = destinationMongoRepository.findByName(UserContext.getCountryId(),destination.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+destination.getName());
         } else {
             exist=destinationMongoRepository.findByid(id);

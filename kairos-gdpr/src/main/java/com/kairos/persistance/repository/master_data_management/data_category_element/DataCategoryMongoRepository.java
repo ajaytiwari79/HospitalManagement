@@ -18,7 +18,7 @@ public interface DataCategoryMongoRepository extends MongoRepository<DataCategor
     @Query("{deleted:false,countryId:?0,_id:?1}")
     DataCategory findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,name:?1}")
+    @Query("{deleted:false,countryId:?0,name:{$regex:?1,$options:'i'}}")
     DataCategory findByCountryIdAndName(Long countryId,String name);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")

@@ -95,7 +95,10 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     public OrganizationalSecurityMeasure updateOrganizationalSecurityMeasure(BigInteger id, OrganizationalSecurityMeasure orgSecurityMeasure) {
 
         OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(UserContext.getCountryId(),orgSecurityMeasure.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data exist of "+orgSecurityMeasure.getName());
         } else {
             exist=organizationalSecurityMeasureMongoRepository.findByid(id);

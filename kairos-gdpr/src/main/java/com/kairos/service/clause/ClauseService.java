@@ -2,7 +2,7 @@ package com.kairos.service.clause;
 
 import com.kairos.client.OrganizationTypeRestClient;
 import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.dto.master_data.AccountTypeDto;
+import com.kairos.response.dto.master_data.AccountTypeRequestAndResponseDto;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.master_data.ClauseDto;
@@ -200,7 +200,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountTypeList(Long countryId, Set<AccountTypeDto> accountTypeDtos) {
+    public List<AccountType> getAccountTypeList(Long countryId, Set<AccountTypeRequestAndResponseDto> accountTypeDtos) {
         Set<BigInteger> accountTypeIds = new HashSet<>();
         accountTypeDtos.forEach(accountTypeDto -> {
             accountTypeIds.add(accountTypeDto.getId());

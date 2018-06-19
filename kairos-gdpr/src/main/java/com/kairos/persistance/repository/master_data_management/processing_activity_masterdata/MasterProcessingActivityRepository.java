@@ -23,7 +23,7 @@ public interface MasterProcessingActivityRepository extends MongoRepository<Mast
 
     MasterProcessingActivity findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,name:?1}")
+    @Query("{deleted:false,countryId:?0,name:{$regex:?1,$options:'i'}}")
     MasterProcessingActivity findByNameAndCountryId(Long countryId,String name);
 
 

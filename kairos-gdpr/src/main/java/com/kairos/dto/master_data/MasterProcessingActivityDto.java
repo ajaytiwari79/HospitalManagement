@@ -1,13 +1,16 @@
 package com.kairos.dto.master_data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityDto {
 
     @NotNullOrEmpty(message = "Name  can't be Empty")
@@ -19,18 +22,22 @@ public class MasterProcessingActivityDto {
 
     @NotEmpty(message = "Organization Type  can't be  Empty")
     @NotNull(message = "Organization  Type  can't be  null")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
 
     @NotNull(message = "Organization Sub Type  can't be  null")
     @NotEmpty(message = "Organization Sub Type  can't be Empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
 
     @NotNull(message = "Service Type  can't be  null")
     @NotEmpty(message = "Service Type  can't be  Empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
 
     @NotNull(message = "Service Sub Type  can't be  null")
     @NotEmpty(message = "Service Sub Type  can't be  Empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
     private Boolean isSubProcess=false;

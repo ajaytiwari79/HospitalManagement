@@ -19,7 +19,7 @@ public class PolicyAgreementTemplateResponseDto {
     @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
     private String description;
 
-    private List<AccountTypeBasicResponseDto> accountTypes;
+    private List<AccountTypeRequestAndResponseDto> accountTypes;
 
     private List<AgreementSectionResponseDto> agreementSections;
 
@@ -54,11 +54,11 @@ public class PolicyAgreementTemplateResponseDto {
         this.description = description;
     }
 
-    public List<AccountTypeBasicResponseDto> getAccountTypes() {
+    public List<AccountTypeRequestAndResponseDto> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(List<AccountTypeBasicResponseDto> accountTypes) {
+    public void setAccountTypes(List<AccountTypeRequestAndResponseDto> accountTypes) {
         this.accountTypes = accountTypes;
     }
 

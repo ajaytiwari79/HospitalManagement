@@ -19,7 +19,7 @@ public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,
     @Query("{deleted:false,countryId:?0}")
     List<MasterAsset> findAllMasterAssets( Long countryId);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
+    @Query("{countryId:?0,name:{$regex:?1,$options:'i'},deleted:false}")
     MasterAsset findByNameAndCountry(Long countryId,String name);
 
     MasterAsset findByid(BigInteger id);
