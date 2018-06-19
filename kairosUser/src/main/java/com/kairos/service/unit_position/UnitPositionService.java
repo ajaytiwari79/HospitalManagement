@@ -546,7 +546,7 @@ public class UnitPositionService extends UserBaseService {
 
             }
         }
-        if (unitPositionDTO.getStartLocalDate().isAfter(LocalDate.now())) {
+        if (unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())||unitPositionDTO.getStartLocalDate().isEqual(LocalDate.now())) {
             exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
 
         }
