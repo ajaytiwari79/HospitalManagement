@@ -48,7 +48,6 @@ public class TransferMethodService extends MongoBaseService {
                     newTransferMethod.setName(name);
                     newTransferMethod.setCountryId(countryId);
                     newTransferMethods.add(newTransferMethod);
-
                 }
 
                 newTransferMethods = save(newTransferMethods);
@@ -73,7 +72,6 @@ public class TransferMethodService extends MongoBaseService {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
             return exist;
-
         }
     }
 
@@ -87,13 +85,11 @@ public class TransferMethodService extends MongoBaseService {
             exist.setDeleted(true);
             save(exist);
             return true;
-
         }
     }
 
 
     public TransferMethod updateTransferMethod(BigInteger id, TransferMethod transferMethod) {
-
 
         TransferMethod exist = transferMethodDestinationRepository.findByName(UserContext.getCountryId(),transferMethod.getName());
         if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
@@ -108,8 +104,6 @@ public class TransferMethodService extends MongoBaseService {
 
 
     public TransferMethod getTransferMethodByName(Long countryId, String name) {
-
-
         if (!StringUtils.isBlank(name)) {
             TransferMethod exist = transferMethodDestinationRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {

@@ -3,8 +3,7 @@ package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.dto.master_data.AccountTypeDto;
-import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.response.dto.master_data.AccountTypeRequestAndResponseDto;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
@@ -41,13 +40,13 @@ public class ClauseResponseDto {
 
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
 
-    private List<AccountTypeDto> accountTypes;
+    private List<AccountTypeRequestAndResponseDto> accountTypes;
 
-    public List<AccountTypeDto> getAccountTypes() {
+    public List<AccountTypeRequestAndResponseDto> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(List<AccountTypeDto> accountTypes) {
+    public void setAccountTypes(List<AccountTypeRequestAndResponseDto> accountTypes) {
         this.accountTypes = accountTypes;
     }
 
