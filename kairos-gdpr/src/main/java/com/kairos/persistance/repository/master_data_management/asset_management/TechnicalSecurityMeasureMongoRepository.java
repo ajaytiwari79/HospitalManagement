@@ -17,7 +17,7 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository
     TechnicalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
-    TechnicalSecurityMeasure findByName(Long countryId,String name);
+    TechnicalSecurityMeasure findByNameAndCountryId(Long countryId,String name);
 
 
     TechnicalSecurityMeasure findByid(BigInteger id);

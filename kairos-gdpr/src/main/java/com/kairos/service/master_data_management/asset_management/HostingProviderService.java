@@ -97,7 +97,10 @@ public class HostingProviderService extends MongoBaseService {
     public HostingProvider updateHostingProvider(BigInteger id, HostingProvider hostingProvider) {
 
         HostingProvider exist = hostingProviderMongoRepository.findByName(UserContext.getCountryId(),hostingProvider.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+hostingProvider.getName());
         } else {
             exist=hostingProviderMongoRepository.findByid(id);

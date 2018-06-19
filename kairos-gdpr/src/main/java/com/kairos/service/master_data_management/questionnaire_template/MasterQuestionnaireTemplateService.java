@@ -124,7 +124,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
     public MasterQuestionnaireTemplate updateQuestionniareTemplate(Long countryId, BigInteger id, MasterQuestionnaireTemplateDto templateDto) {
         MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, templateDto.getName().trim());
-        if (Optional.ofNullable(exisiting).isPresent()) {
+        if (Optional.ofNullable(exisiting).isPresent() && !id.equals(exisiting.getId())) {
             throw new DuplicateDataException("Template Exists with same name");
         }
         exisiting = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, id);
@@ -147,7 +147,6 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * we get section[ {} ] as query response from mongo we are not using JsonInclude non empty so we can filter data
      * we are not using JsonInclude.NON_EMPTY so that we  get object with {id=null,name=null,description=null} for section
      * and send section as empty array after filtering data
-     *
      * @param countryId
      * @param id
      * @return
@@ -162,14 +161,12 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
 
     public List<MasterQuestionnaireTemplateResponseDto> getAllMasterQuestionniareTemplateWithSection(Long countryId) {
-
         List<MasterQuestionnaireTemplateResponseDto> templateResponseDtos = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId);
         templateResponseDtos.forEach(template -> {
             if (template.getSections().get(0).getId() == null) {
                 template.setSections(new ArrayList<>());
             }
         });
-
         return templateResponseDtos;
 
     }
