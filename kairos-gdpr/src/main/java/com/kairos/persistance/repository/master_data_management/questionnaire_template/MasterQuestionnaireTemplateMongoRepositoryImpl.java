@@ -25,20 +25,22 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
     @Inject
     private MongoTemplate mongoTemplate;
 
+
+    final String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
+    final String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
+    final String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
+    final String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
+    final String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
+
+    Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
+    Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
+    Document sectionsAddFieldOperation = Document.parse(addFieldSections);
+    Document projectionOperation = Document.parse(projection);
+    Document groupDataOperation = Document.parse(groupData);
+
+
     @Override
     public List<MasterQuestionnaireTemplateResponseDto> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId) {
-
-        String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
-        String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-        String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-        String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
-        String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
-
-        Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
-        Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
-        Document sectionsAddFieldOperation = Document.parse(addFieldSections);
-        Document projectionOperation = Document.parse(projection);
-        Document groupDataOperation = Document.parse(groupData);
 
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -62,21 +64,6 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
 
     @Override
     public MasterQuestionnaireTemplateResponseDto getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId, BigInteger id) {
-
-
-
-        String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
-        String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-        String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-        String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
-        String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
-
-        Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
-        Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
-        Document sectionsAddFieldOperation = Document.parse(addFieldSections);
-        Document projectionOperation = Document.parse(projection);
-        Document groupDataOperation = Document.parse(groupData);
-
 
         Aggregation aggregation = Aggregation.newAggregation(
 
