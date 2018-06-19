@@ -231,6 +231,7 @@ public class ShiftService extends MongoBaseService {
         Long endDateMillis = null;
         Long breakAllowedAfterMinute = 0L;
         Long allowedBreakDurationInMinute = 0L;
+        Long totalBreakAllotedInMinute = 0L;
         String lastItemAdded = null;
         List<Shift> shifts = new ArrayList<>();
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
@@ -256,6 +257,7 @@ public class ShiftService extends MongoBaseService {
 
                     shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                     startDateMillis = endDateMillis;
+                    totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                     logger.info("Remaining shift length after break = {}", shiftDurationInMinute);
                     lastItemAdded = BREAK;
                 } else {
@@ -281,6 +283,7 @@ public class ShiftService extends MongoBaseService {
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
                 shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+                totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                 lastItemAdded = BREAK;
             } else {
                 logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for {} ", allowedBreakDurationInMinute);
@@ -293,6 +296,7 @@ public class ShiftService extends MongoBaseService {
             // handle later
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
+            totalBreakAllotedInMinute += allowedBreakDurationInMinute;
             shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
 
 
@@ -303,6 +307,9 @@ public class ShiftService extends MongoBaseService {
 
         }
         save(shifts);
+        if (breakActivity.getName().equalsIgnoreCase(UNPAID_BREAK)) {
+            mainShift.setScheduledMinutes(mainShift.getScheduledMinutes() - totalBreakAllotedInMinute.intValue());
+        }
         mainShift.setSubShifts(shifts.stream().map(Shift::getId).collect(Collectors.toSet()));
         shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;

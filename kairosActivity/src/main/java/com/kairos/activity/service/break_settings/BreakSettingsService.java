@@ -66,7 +66,6 @@ public class BreakSettingsService extends MongoBaseService {
                     if (i != 0) {
                         if (breakSettingsList.get(i - 1).getShiftDurationInMinute() >= breakSettingsDTO.getShiftDurationInMinute())
                             exceptionService.actionNotPermittedException("error.breakSettings.greaterThan", DateUtils.getTimeFromMinuteLong(breakSettingsList.get(i - 1).getShiftDurationInMinute()));
-
                     }
 
                     if (i != breakSettingsList.size() - 1) {
@@ -77,11 +76,6 @@ public class BreakSettingsService extends MongoBaseService {
 
                 }
             }
-            BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(unitId, breakSettingsDTO.getShiftDurationInMinute());
-            if (Optional.ofNullable(breakSettingsFromDB).isPresent()) {
-                exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
-            }
-
         }
         breakSettings.setShiftDurationInMinute(breakSettingsDTO.getShiftDurationInMinute());
         breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
