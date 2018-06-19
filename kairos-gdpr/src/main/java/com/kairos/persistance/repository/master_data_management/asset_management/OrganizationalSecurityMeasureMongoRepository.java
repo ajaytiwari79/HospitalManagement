@@ -17,7 +17,7 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepos
     @Query("{countryId:?0,_id:?1,deleted:false}")
     OrganizationalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
+    @Query("{countryId:?0,name:{$regex:?1,$options:'i'},deleted:false}")
     OrganizationalSecurityMeasure findByName(Long countryId,String name);
 
     OrganizationalSecurityMeasure findByid(BigInteger id);

@@ -18,7 +18,7 @@ public interface DataSubjectMappingRepository extends MongoRepository<DataSubjec
     DataSubjectMapping findByIdAndNonDeleted(Long countryId, BigInteger id);
 
 
-    @Query("{deleted:false,countryId:?0,name:?1}")
+    @Query("{deleted:false,countryId:?0,name:{$regex:?1,$options:'i'}}")
     DataSubjectMapping findByCountryIdAndName(Long countryId,String name);
 
 

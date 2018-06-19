@@ -92,7 +92,10 @@ public class TransferMethodService extends MongoBaseService {
     public TransferMethod updateTransferMethod(BigInteger id, TransferMethod transferMethod) {
 
         TransferMethod exist = transferMethodDestinationRepository.findByName(UserContext.getCountryId(),transferMethod.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        if (Optional.ofNullable(exist).isPresent()) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+transferMethod.getName());
         } else {
             exist=transferMethodDestinationRepository.findByid(id);

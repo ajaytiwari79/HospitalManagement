@@ -16,7 +16,7 @@ public interface ResponsibilityTypeMongoRepository extends MongoRepository<Respo
     @Query("{countryId:?0,_id:?1,deleted:false}")
     ResponsibilityType findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
+    @Query("{countryId:?0,name:{$regex:?1,$options:'i'},deleted:false}")
     ResponsibilityType findByName(Long countryId,String name);
 
     ResponsibilityType findByid(BigInteger id);

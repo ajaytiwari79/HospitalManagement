@@ -17,7 +17,7 @@ public interface DataDisposalMongoRepository extends MongoRepository<DataDisposa
     @Query("{deleted:false,countryId:?0,_id:?1}")
     DataDisposal findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
+    @Query("{countryId:?0,name:{$regex:?1,$options:'i'},deleted:false}")
     DataDisposal findByName(Long countryId,String name);
 
     DataDisposal findByid(BigInteger id);

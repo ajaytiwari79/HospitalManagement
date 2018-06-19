@@ -97,8 +97,11 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(), storageFormat.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(UserContext.getCountryId(), storageFormat.getName());
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  " + storageFormat.getName());
         } else {
             exist = storageFormatMongoRepository.findByid(id);
@@ -113,7 +116,7 @@ public class StorageFormatService extends MongoBaseService {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByName(countryId, name);
+            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
