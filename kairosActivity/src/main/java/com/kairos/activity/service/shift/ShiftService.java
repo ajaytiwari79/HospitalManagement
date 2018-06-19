@@ -508,64 +508,66 @@ public class ShiftService extends MongoBaseService {
     }
 
     private void validateStaffingLevel(Shift shift, Activity activity, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
-        PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        if(!Optional.ofNullable(phaseSettings).isPresent()){
-            exceptionService.dataNotFoundException("message.phaseSettings.absent");
-        }
-        if (phaseSettings.isManagementEligibleForOverStaffing() || phaseSettings.isManagementEligibleForUnderStaffing() || phaseSettings.isStaffEligibleForOverStaffing() || phaseSettings.isStaffEligibleForUnderStaffing()) {
-            Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS));
-            Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS));
-            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(shift.getUnitId(), startDate1, endDate1);
-            if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
-                exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+        if(activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
+            Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
+            PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+            if (!Optional.ofNullable(phaseSettings).isPresent()) {
+                exceptionService.dataNotFoundException("message.phaseSettings.absent");
             }
-            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shift.getStartDate(), shift.getEndDate(), shift.getUnitId());
-            boolean isUpdated = !checkOverStaffing ? shifts.removeIf(s -> s.getId().equals(shift.getId())) : shifts.add(shift);
-            for (StaffingLevel staffingLevel : staffingLevels) {
-                List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
-                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
-                for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
-                    int shiftsCount = 0;
-                    boolean checkForUnderStaffing = false;
-                    Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> new BigInteger(sa.getActivityId().toString()).equals(activity.getId())).findFirst();
-                    if (staffingLevelActivity.isPresent()) {
-                        ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getFrom());
-                        ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getTo());
-                        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-                        for (Shift shift1 : shifts) {
-                            if (shift1.getActivityId().equals(activity.getId()) && interval.overlaps(shift1.getInterval())) {
-                                if (!checkOverStaffing) {
-                                    checkForUnderStaffing = true;
+            if (phaseSettings.isManagementEligibleForOverStaffing() || phaseSettings.isManagementEligibleForUnderStaffing() || phaseSettings.isStaffEligibleForOverStaffing() || phaseSettings.isStaffEligibleForUnderStaffing()) {
+                Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS));
+                Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS));
+                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(shift.getUnitId(), startDate1, endDate1);
+                if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
+                    exceptionService.actionNotPermittedException("message.staffingLevel.absent");
+                }
+                List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shift.getStartDate(), shift.getEndDate(), shift.getUnitId());
+                boolean isUpdated = !checkOverStaffing ? shifts.removeIf(s -> s.getId().equals(shift.getId())) : shifts.add(shift);
+                for (StaffingLevel staffingLevel : staffingLevels) {
+                    List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
+                            activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
+                    for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
+                        int shiftsCount = 0;
+                        boolean checkForUnderStaffing = false;
+                        Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> new BigInteger(sa.getActivityId().toString()).equals(activity.getId())).findFirst();
+                        if (staffingLevelActivity.isPresent()) {
+                            ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getFrom());
+                            ZonedDateTime endDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelInterval.getStaffingLevelDuration().getTo());
+                            DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+                            for (Shift shift1 : shifts) {
+                                if (shift1.getActivityId().equals(activity.getId()) && interval.overlaps(shift1.getInterval())) {
+                                    if (!checkOverStaffing) {
+                                        checkForUnderStaffing = true;
+                                    }
+                                    shiftsCount++;
                                 }
-                                shiftsCount++;
                             }
-                        }
-                        int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
-                        boolean checkForStaff = staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff();
-                        boolean checkForManagement = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-                        if ((checkOverStaffing && totalCount > 0)) {
-                            if (checkForStaff && checkForManagement) {
-                                if (phaseSettings.isManagementEligibleForOverStaffing() && phaseSettings.isStaffEligibleForOverStaffing()) {
+                            int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
+                            boolean checkForStaff = staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff();
+                            boolean checkForManagement = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
+                            if ((checkOverStaffing && totalCount > 0)) {
+                                if (checkForStaff && checkForManagement) {
+                                    if (phaseSettings.isManagementEligibleForOverStaffing() && phaseSettings.isStaffEligibleForOverStaffing()) {
+                                        exceptionService.actionNotPermittedException("message.shift.overStaffing");
+                                    }
+                                } else if (checkForStaff ? phaseSettings.isStaffEligibleForOverStaffing() : phaseSettings.isManagementEligibleForOverStaffing()) {
                                     exceptionService.actionNotPermittedException("message.shift.overStaffing");
                                 }
-                            } else if (checkForStaff ? phaseSettings.isStaffEligibleForOverStaffing() : phaseSettings.isManagementEligibleForOverStaffing()) {
-                                exceptionService.actionNotPermittedException("message.shift.overStaffing");
                             }
-                        }
-                        if (!checkOverStaffing && checkForUnderStaffing && totalCount < 0) {
-                            if (checkForStaff && checkForManagement) {
-                                if (phaseSettings.isStaffEligibleForUnderStaffing() && phaseSettings.isManagementEligibleForUnderStaffing()) {
+                            if (!checkOverStaffing && checkForUnderStaffing && totalCount < 0) {
+                                if (checkForStaff && checkForManagement) {
+                                    if (phaseSettings.isStaffEligibleForUnderStaffing() && phaseSettings.isManagementEligibleForUnderStaffing()) {
+                                        exceptionService.actionNotPermittedException("message.shift.underStaffing");
+                                    }
+                                } else if (checkForStaff ? phaseSettings.isStaffEligibleForUnderStaffing() : phaseSettings.isManagementEligibleForUnderStaffing()) {
                                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                                 }
-                            } else if (checkForStaff ? phaseSettings.isStaffEligibleForUnderStaffing() : phaseSettings.isManagementEligibleForUnderStaffing()) {
-                                exceptionService.actionNotPermittedException("message.shift.underStaffing");
                             }
+                        } else {
+                            exceptionService.actionNotPermittedException("message.staffingLevel.activity");
                         }
-                    } else {
-                        exceptionService.actionNotPermittedException("message.staffingLevel.activity");
-                    }
 
+                    }
                 }
             }
         }
