@@ -18,7 +18,7 @@ rule "Shift out of boundary half day"
 salience 21
 
     when
-        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes, $minutes>390)
+        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes, $minutes>330)
     then
         scoreHolder.addHardConstraintMatch(kcontext,-1);
 end
@@ -26,7 +26,7 @@ end
 rule "Shift out of boundary full day"
 salience 22
     when
-        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes, $minutes>570)
+        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes, $minutes>510)
     then
         scoreHolder.addHardConstraintMatch(kcontext,-1);
 end

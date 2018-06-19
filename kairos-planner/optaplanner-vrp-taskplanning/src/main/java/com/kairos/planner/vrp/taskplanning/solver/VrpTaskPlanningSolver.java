@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class VrpTaskPlanningSolver {
     public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
@@ -25,6 +26,7 @@ public class VrpTaskPlanningSolver {
         solverFactory = SolverFactory.createFromXmlFile(new File(config));
         solver = solverFactory.buildSolver();
     }
+
     public void solve(String problemXML){
         XStream xstream= new XStream();
         xstream.setMode(XStream.ID_REFERENCES);
@@ -33,22 +35,26 @@ public class VrpTaskPlanningSolver {
         xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
         VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));
         solve(problem);
-
     }
+
     public void solve(VrpTaskPlanningSolution problem){
+        AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
+            at.addAndGet(t.getDuration());
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
         });
-        VrpTaskPlanningSolution solution=solver.solve(problem);
+        //TODO ease efficiency for debugging
+        problem.getEmployees().forEach(e->e.setEfficiency(100));
+        VrpTaskPlanningSolution solution=null;
+        try {
+            solution = solver.solve(problem);
 
+        }catch (Exception e){
+            //e.printStackTrace();
+            throw  e;
+        }
         for(Shift shift: solution.getShifts()){
-            Task task=shift.getNextTask();
-            StringBuffer sb= new StringBuffer("Shift"+shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>");
-            while (task!=null){
-                sb.append(task+"->");
-                task=task.getNextTask();
-
-            }
+            StringBuffer sb= new StringBuffer("Shift"+shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString());
             log.info(sb.toString());
         }
         log.info(solution.toString());

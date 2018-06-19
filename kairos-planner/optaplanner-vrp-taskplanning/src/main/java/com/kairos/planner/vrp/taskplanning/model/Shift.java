@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @PlanningEntity
 public class Shift extends TaskOrShift{
@@ -98,7 +99,7 @@ public class Shift extends TaskOrShift{
     }
     public int getTotalPlannedMinutes(){
         if(endTime==null)return 0;
-        return (int)Duration.between(getDefaultShiftStart(), endTime).toMinutes();
+        return (int)ChronoUnit.MINUTES.between(getStartTime(), endTime);
     }
 
     public boolean isHalfWorkDay(){
@@ -109,8 +110,8 @@ public class Shift extends TaskOrShift{
     }
     @Override
     public String toString() {
-        return "Shift{" +
-                "" + employee.getName() +
+        return "Shift{" +id+
+                ":" + employee.getName() +
                 ":" + localDate +
                 '}';
     }
@@ -133,5 +134,26 @@ public class Shift extends TaskOrShift{
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .toHashCode();
+    }
+
+    public String getTaskChainString(){
+        StringBuilder sb = new StringBuilder();
+        Task temp=getNextTask();
+        int duration=0;
+        while (temp!=null){
+            sb.append("[("+temp.getDrivingTime()+")"+temp.toString()+"]->");
+            duration+= temp.getDrivingTime()+temp.getPlannedDuration();
+            temp=temp.getNextTask();
+        }
+        return "("+duration+"):("+startTime+":"+endTime+")"+sb.toString();
+    }
+    public int getChainDuration() {
+        int duration=0;
+        Task temp=getNextTask();
+        while (temp!=null){
+            duration+=temp.getDrivingTime()+temp.getDuration();
+            temp=temp.getNextTask();
+        }
+        return duration;
     }
 }

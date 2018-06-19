@@ -22,7 +22,7 @@
             <changeMoveSelector>
 
                 <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
-                <selectedCountLimit>100</selectedCountLimit>
+                <!--<selectedCountLimit>100</selectedCountLimit>-->
                 <valueSelector>
                     <!--<cacheType>PHASE</cacheType>-->
                     <!--<selectionOrder>SORTED</selectionOrder>
@@ -34,6 +34,6 @@
     </constructionHeuristic>
     <localSearch/>
     <termination>
-        <secondsSpentLimit>3000</secondsSpentLimit>
+        <secondsSpentLimit>60</secondsSpentLimit>
     </termination>
 </solver>
