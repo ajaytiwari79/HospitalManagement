@@ -3,11 +3,12 @@ package com.kairos.response.dto.web.employment_dto;
 import java.time.LocalDate;
 
 public class EmploymentOverlapDTO {
+    private String organizationName;
     private LocalDate mainEmploymentStartDate;
     private LocalDate mainEmploymentEndDate;
     private LocalDate afterChangeStartDate;
     private LocalDate afterChangeEndDate;
-    //private boolean hasMainEmployment;
+
 
     public LocalDate getMainEmploymentStartDate() {
         return mainEmploymentStartDate;
@@ -41,11 +42,13 @@ public class EmploymentOverlapDTO {
         this.afterChangeEndDate = afterChangeEndDate;
     }
 
-//    public boolean isHasMainEmployment() {
-//        return hasMainEmployment;
-//    }
-//
-//    public void setHasMainEmployment(boolean hasMainEmployment) {
-//        this.hasMainEmployment = hasMainEmployment;
-//    }
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+
 }

@@ -638,12 +638,12 @@ public class StaffController {
 
     @ApiOperation(value = "update and set main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
-    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @RequestParam("confirm") Boolean confirm){
+    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
         return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(staffId,employmentDTO,confirm));
     }
 
     @ApiOperation(value ="remove main employment")
-    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{staffId}/remove_main_employment",method = RequestMethod.PUT)
     public ResponseEntity<Map<String ,Object>> removeMainEmployment(@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.removeMainEmployment(staffId));
     }
