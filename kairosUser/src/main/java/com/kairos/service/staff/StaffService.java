@@ -1077,7 +1077,6 @@ public class StaffService extends UserBaseService {
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
         return staff;
     }
-
     public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
@@ -1928,8 +1927,10 @@ public class StaffService extends UserBaseService {
         Map<String,String> auth=new HashMap<>();
         auth.put("type","m.login.dummy");
         auth.put("session",staff.getCprNumber());
-        StaffChatDetails staffChatDetails=new StaffChatDetails(auth,staff.getId().toString(),staff.getFirstName()+"@kairos");
-        chatRestClient.registerUser(staffChatDetails);
-    }
+        StaffChatDetails staffChatDetails=new StaffChatDetails(auth,staff.getEmail(),staff.getFirstName()+"@kairos");
+        StaffChatDetails chatDetails=chatRestClient.registerUser(staffChatDetails);
+        staff.setAccess_token(chatDetails.getAccess_token());
+        staff.setUser_id(chatDetails.getUser_id());
+        }
 
 }
