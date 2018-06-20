@@ -89,7 +89,7 @@ public class AssetTypeController {
 
     }
 
-    @ApiOperation("update StorageFormat by id")
+    @ApiOperation("update subAsset by id")
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateStorageType(@PathVariable BigInteger id,  @Valid @RequestBody AssetType assetType) {
         if (id == null) {
@@ -102,14 +102,14 @@ public class AssetTypeController {
 
 
 
-    @ApiOperation("update StorageFormat by id")
-    @PostMapping("/subAsset")
-    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,  @Valid @RequestBody ValidateListOfRequestBody<AssetTypeDto> subAssetTypes) {
+    @ApiOperation("update subAsset by id")
+    @PostMapping("/subAsset/add")
+    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,  @Valid @RequestBody AssetTypeDto assetTypeDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.buildSubAssetTypeAndAddToAssetType(countryId, subAssetTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetTypeAndAddSubAssetTypes(countryId,assetTypeDto));
     }
 
 

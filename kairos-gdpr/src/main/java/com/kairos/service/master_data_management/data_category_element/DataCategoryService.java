@@ -116,16 +116,16 @@ public class DataCategoryService extends MongoBaseService {
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
-        Map<String, Object> dataElementList = new HashMap<>();
+        Map<String, Object> dataElementListMap = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
         try {
-            dataElementList = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
             dataCategory.setName(dataCategoryDto.getName());
-            dataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
+            dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
             dataCategory = save(dataCategory);
+            throw new RuntimeException();
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_EMELENTS_LIST));
         }
 
         return dataCategory;
