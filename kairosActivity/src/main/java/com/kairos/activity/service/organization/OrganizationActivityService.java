@@ -286,7 +286,8 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityWithTimeTypeDTO;
     }
 
-    public boolean createDefaultDataForOrganization(Long unitId, Long countryId) {
+    public boolean createDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId) {
+        // TODO add parentOrganization and country id
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);

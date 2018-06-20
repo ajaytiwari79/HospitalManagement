@@ -364,7 +364,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(),organization.getCountry().getId());
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
         // DO NOT CREATE PHASE for UNION
 
 //        if (!orgDetails.getUnion()) {
@@ -891,7 +891,7 @@ public class OrganizationService extends UserBaseService {
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
 //        phaseRestClient.createDefaultPhases(unit.getId());
 //        periodRestClient.createDefaultPeriodSettings(unit.getId());
-        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),unit.getCountry().getId());
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),unitId, unit.getCountry().getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
