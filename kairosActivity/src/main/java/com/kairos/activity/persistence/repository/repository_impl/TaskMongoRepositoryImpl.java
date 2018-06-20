@@ -198,7 +198,9 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
                 new CustomAggregationOperation(Document.parse("{ \"$project\" : { \"installationIdandtaskType\" : { \"$concat\" : [{$substr: [\"$installationNumber\",0,64]},\"$taskTypeId\"] } } }"))
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,Task.class, Map.class);
-        return results.getMappedResults().isEmpty() ? null :results.getMappedResults().get(0);
+        Map<Integer,BigInteger> installationNoAndTaskTypeId = new HashMap<>();
+        results.getMappedResults().forEach(t->installationNoAndTaskTypeId.put(new Integer((String) t.get("installationIdandtaskType")),new BigInteger((String)t.get("_id"))));
+        return installationNoAndTaskTypeId;
     }
 
 }

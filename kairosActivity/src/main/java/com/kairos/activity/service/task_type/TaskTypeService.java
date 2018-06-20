@@ -1295,11 +1295,11 @@ public class TaskTypeService extends MongoBaseService {
 
 
     public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForClient(Long clientId,TaskTypeSettingDTO taskTypeSettingDTO){
-        TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(clientId,taskTypeSettingDTO.getTaskTypeId());
+        TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByClientIdAndTaskType(clientId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
-            taskTypeSetting = new TaskTypeSetting(clientId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getDuration());
+            taskTypeSetting = new TaskTypeSetting(taskTypeSettingDTO.getTaskTypeId(),clientId);
         }
-        taskTypeSetting.setDuration(taskTypeSettingDTO.getEfficiency());
+        taskTypeSetting.setDuration(taskTypeSettingDTO.getDuration());
         save(taskTypeSetting);
         taskTypeSettingDTO.setId(taskTypeSetting.getId());
         return taskTypeSettingDTO;
@@ -1317,8 +1317,8 @@ public class TaskTypeService extends MongoBaseService {
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);
     }
 
-    public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long staffId){
-        List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(staffId);
+    public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long clientId){
+        List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(clientId);
         List<Long> serviceIds = getServiceIds(organisationId);
         List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId,serviceIds);
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);

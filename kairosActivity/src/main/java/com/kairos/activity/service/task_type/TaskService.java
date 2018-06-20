@@ -1623,7 +1623,7 @@ public class TaskService extends MongoBaseService {
             if(!taskTypeIds.containsKey(task.getSkill())){
                 exceptionService.dataNotFoundException("message.taskType.enddate.required",task.getSkill());
             }
-            if(!installationNoAndTaskTypeId.containsValue(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill()))) {
+            if(!installationNoAndTaskTypeId.containsKey(new Integer(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
                 task.setUnitId(unitId);
                 task.setTaskTypeId(taskTypeIds.get(task.getSkill()));
                 newTasks.add(task);
