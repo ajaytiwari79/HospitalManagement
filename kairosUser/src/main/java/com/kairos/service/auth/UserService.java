@@ -399,8 +399,8 @@ public class UserService extends UserBaseService {
         return unitPermissionMap;
     }
 
-    public Map<String, Object> getPermission(Long organizationId, Long userId){
-        long currentUserId = userId;//UserContext.getUserDetails().getId();
+    public Map<String, Object> getPermission(Long organizationId){
+        long currentUserId = UserContext.getUserDetails().getId();
         Map<String, Object> permissionData = new HashMap<>();
         if(accessPageService.isHubMember(currentUserId)){
             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
