@@ -87,7 +87,7 @@ public class PlanningController {
 	}
 
 	@RequestMapping(value = "/saveSolverConfig", method = RequestMethod.POST)
-	Map<String, Object> getAllSolverConfig(@RequestBody SolverConfigDTO solverConfigDTO) {
+	Map<String, Object> getAllSolverConfig(@RequestBody SolverConfigWTADTO solverConfigDTO) {
 		return ResponseHandler.generateResponse(StaticField.SAVE_SUCCESS, HttpStatus.ACCEPTED, false,solverConfigService.saveSolverConfig(solverConfigDTO));
 	}
 
@@ -107,7 +107,7 @@ public class PlanningController {
 	}
 
 	@RequestMapping(value = "/saveDefaultSolverConfigByJson", method = RequestMethod.POST)
-	Map<String, Object> saveDefaultSolverConfig(@RequestBody SolverConfigDTO solverConfigDTO) {
+	Map<String, Object> saveDefaultSolverConfig(@RequestBody SolverConfigWTADTO solverConfigDTO) {
 		return ResponseHandler.generateResponse(StaticField.SAVE_SUCCESS, HttpStatus.ACCEPTED, false,solverConfigService.saveDefaultSolverConfig(solverConfigDTO));
 	}
 

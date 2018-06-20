@@ -14,6 +14,7 @@ import java.math.BigInteger;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VRPTaskDTO {
+    private BigInteger id;
     private TaskAddress address;
     //Vrp settings
     private Integer installationNumber;
@@ -23,6 +24,14 @@ public class VRPTaskDTO {
     private String citizenName;
     private TaskTypeDTO taskType;
     private Long unitId;
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public Long getUnitId() {
         return unitId;

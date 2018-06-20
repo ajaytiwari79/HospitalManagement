@@ -185,7 +185,7 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
     public List<VRPTaskDTO> getAllTasksByUnitId(Long unitId){
         Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("unitId").is(unitId).and("isDeleted").is(false)),
         lookup("task_types","taskTypeId","_id","taskType"),
-                project("unitId","address","installationNumber","citizenId","skill","citizenName","citizenId","taskType.title","taskType._id")
+                project("unitId","address","installationNumber","citizenId","citizenName","taskType.title","taskType._id")
         );
         AggregationResults<VRPTaskDTO> results = mongoTemplate.aggregate(aggregation,Task.class, VRPTaskDTO.class);
         return results.getMappedResults();

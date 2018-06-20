@@ -1,10 +1,8 @@
 package com.planner.controller;
 
-import com.kairos.dto.solverconfig.SolverConfigDTO;
-import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
+import com.kairos.dto.solverconfig.SolverConfigWTADTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.config.SolverConfigService;
-import com.planner.service.staff.StaffService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +24,9 @@ public class SolverConfigController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("Create solver config")
-    public ResponseEntity<Map<String, Object>> addSolverConfig(@RequestBody SolverConfigDTO solverConfigDTO,
+    public ResponseEntity<Map<String, Object>> addSolverConfig(@RequestBody SolverConfigWTADTO solverConfigWTADTO,
                                                                 @PathVariable Long unitId) {
-        solverConfigService.addSolverConfig(unitId, solverConfigDTO);
+        solverConfigService.addSolverConfig(unitId, solverConfigWTADTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
     }
 

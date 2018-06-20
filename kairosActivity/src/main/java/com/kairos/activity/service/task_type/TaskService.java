@@ -58,9 +58,7 @@ import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResp
 import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.activity.util.userContext.UserContext;
-import com.kairos.response.dto.web.client.VRPClientDTO;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.bson.Document;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -1621,7 +1619,7 @@ public class TaskService extends MongoBaseService {
         List<VRPTaskDTO> newTasks = new ArrayList<>();
         for (VRPTaskDTO task : taskDTOS) {
             if(!taskTypeIds.containsKey(task.getSkill())){
-                exceptionService.dataNotFoundException("message.taskType.enddate.required",task.getSkill());
+                exceptionService.dataNotFoundException("message.taskType.notExists",task.getSkill());
             }
             if(!installationNoAndTaskTypeId.containsKey(new Integer(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
                 task.setUnitId(unitId);

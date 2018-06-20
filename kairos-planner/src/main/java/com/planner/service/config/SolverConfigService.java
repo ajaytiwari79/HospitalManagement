@@ -1,7 +1,7 @@
 package com.planner.service.config;
 
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.dto.solverconfig.SolverConfigDTO;
+import com.kairos.dto.solverconfig.SolverConfigWTADTO;
 import com.planner.commonUtil.StaticField;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
@@ -27,8 +27,8 @@ public class SolverConfigService {
     @Autowired private XmlConfigService xmlConfigService;
     @Autowired private PathProvider pathProvider;
 
-    public void addSolverConfig(Long unitId, SolverConfigDTO solverConfigDTO){
-        SolverConfig solverConfig= new SolverConfig(solverConfigDTO.getTemplateTypes(),120,unitId);
+    public void addSolverConfig(Long unitId, SolverConfigWTADTO solverConfigWTADTO){
+        SolverConfig solverConfig= new SolverConfig(solverConfigWTADTO.getTemplateTypes(),120,unitId);
         solverConfigRepository.save(solverConfig);
     }
 
@@ -122,12 +122,12 @@ public class SolverConfigService {
         }
     }
 
-    /*public List<SolverConfigDTO> getAllSolverConfig(Long unitId){
-        List<SolverConfigDTO> solverConfigDTOS = null;
+    /*public List<SolverConfigWTADTO> getAllSolverConfig(Long unitId){
+        List<SolverConfigWTADTO> solverConfigDTOS = null;
         if(unitId!=null){
             List<SolverConfig> solverConfigs = solverConfigRepository.getAllByUnitId(unitId,SolverConfig.class);
             for (SolverConfig solverConfig:solverConfigs) {
-                SolverConfigDTO solverConfigDTO = getSolverConfigDTO(solverConfig);
+                SolverConfigWTADTO solverConfigDTO = getSolverConfigDTO(solverConfig);
                 solverConfigDTO.setConstraintDTOList(getContraintDTOs(solverConfig.getId()));
                 solverConfigDTOS.add(solverConfigDTO);
             }
@@ -135,17 +135,17 @@ public class SolverConfigService {
         return solverConfigDTOS;
     }
 
-    public SolverConfigDTO getOne(String solverConfigId){
+    public SolverConfigWTADTO getOne(String solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findById(solverConfigId,SolverConfig.class);
-        SolverConfigDTO solverConfigDTO = getSolverConfigDTO(solverConfig);
+        SolverConfigWTADTO solverConfigDTO = getSolverConfigDTO(solverConfig);
         List<CategoryDTO> categoryDTOS = solverConfigRepository.findAll(Category.class);
         //solverConfigDTO.setConstraintDTOList(getContraintDTOs(constraints));
         solverConfigDTO.setCategoryDTOS(categoryDTOS);
         return solverConfigDTO;
     }
 
-    private SolverConfigDTO getSolverConfigDTO(SolverConfig solverConfig){
-        SolverConfigDTO solverConfigDTO = new SolverConfigDTO();
+    private SolverConfigWTADTO getSolverConfigDTO(SolverConfig solverConfig){
+        SolverConfigWTADTO solverConfigDTO = new SolverConfigWTADTO();
         solverConfigDTO.setOptaPlannerId(solverConfig.getId());
         solverConfigDTO.setTemplate(solverConfig.isTemplate());
         solverConfigDTO.setHardLevel(solverConfig.getHard());
@@ -156,8 +156,8 @@ public class SolverConfigService {
         return solverConfigDTO;
     }
 
-    public SolverConfigDTO getOneForPlanning(String solverConfigId){
-        SolverConfigDTO solverConfigDTO = getOne(solverConfigId);
+    public SolverConfigWTADTO getOneForPlanning(String solverConfigId){
+        SolverConfigWTADTO solverConfigDTO = getOne(solverConfigId);
         if(solverConfigDTO!=null){
             solverConfigDTO.setOptaPlannerId(solverConfigId);
             solverConfigDTO.setConstraintDTOList(getContraintDTOs(solverConfigId));
@@ -182,13 +182,13 @@ public class SolverConfigService {
         return constraintDTOS;
     }
 
-    public boolean saveSolverConfig(SolverConfigDTO solverConfigDTO){
+    public boolean saveSolverConfig(SolverConfigWTADTO solverConfigDTO){
         SolverConfig solverConfig = new SolverConfig();
         solverConfig.setHard(solverConfigDTO.getHardLevel());
         solverConfig.setMedium(solverConfigDTO.getMediumLevel());
         solverConfig.setSoft(solverConfigDTO.getSoftLevel());
         solverConfig.setUnitId(solverConfigDTO.getUnitId());
-        solverConfig.setPhase(SolverConfigPhase.valueOf(solverConfigDTO.getPhase()));
+        solverConfig.setPhase(PlanningType.valueOf(solverConfigDTO.getPhase()));
         solverConfig.setParentSolverConfigId(solverConfigDTO.getOptaPlannerId());
         solverConfig.setTemplate(solverConfigDTO.isTemplate());
         solverConfig = solverConfigRepository.save(solverConfig);
@@ -279,11 +279,11 @@ public class SolverConfigService {
         }
     }
 
-    public boolean saveDefaultSolverConfig(SolverConfigDTO solverConfigDTO){
+    public boolean saveDefaultSolverConfig(SolverConfigWTADTO solverConfigDTO){
         SolverConfig solverConfig = new SolverConfig();
         solverConfig.setTemplate(solverConfigDTO.isTemplate());
         solverConfig.setUnitId(solverConfigDTO.getUnitId());
-        solverConfig.setPhase(SolverConfigPhase.getEnumByString(solverConfigDTO.getPhase()));
+        solverConfig.setPhase(PlanningType.getEnumByString(solverConfigDTO.getPhase()));
         solverConfig.setHard(solverConfigDTO.getHardLevel());
         solverConfig.setMedium(solverConfigDTO.getMediumLevel());
         solverConfig.setSoft(solverConfigDTO.getSoftLevel());
@@ -318,7 +318,7 @@ public class SolverConfigService {
         try {
             TypeFactory typeFactory = mapper.getTypeFactory();
             CollectionType collectionType = typeFactory.constructCollectionType(
-                    List.class, SolverConfigDTO.class);
+                    List.class, SolverConfigWTADTO.class);
             rules = mapper.readValue( mapper.writeValueAsString(map), collectionType);
         } catch (IOException e) {
             e.printStackTrace();

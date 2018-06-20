@@ -10,6 +10,7 @@ import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
@@ -66,6 +67,7 @@ public class StaffController {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject private VRPClientService vrpClientService;
 
 
 
@@ -400,6 +402,7 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId,
                                                                 @RequestParam("file") MultipartFile multipartFile,
                                                                 @RequestParam("accessGroupId") Long accessGroupId) {
+        vrpClientService.importClients(unitId,multipartFile);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffService.batchAddStaffToDatabase(unitId, multipartFile, accessGroupId));
     }
