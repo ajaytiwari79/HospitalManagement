@@ -238,13 +238,13 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>();
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
         for (int i = 0; i < breakSettings.size(); i++) {
-
             /**
              * The first eligible break hours after.It specifies you can take first break after this duration
              **/
             breakAllowedAfterMinute = breakSettings.get(i).getShiftDurationInMinute();
-            endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
+
             if (shiftDurationInMinute > breakAllowedAfterMinute) {
+                endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(shiftDTO, mainShift.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
                 // we have added a sub shift now adding the break for remaining period
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
@@ -305,7 +305,7 @@ public class ShiftService extends MongoBaseService {
         } else if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
-            shifts.add(getShiftObject(shiftDTO, shiftDTO.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
+            shifts.add(getShiftObject(shiftDTO, mainShift.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
 
         }
         save(shifts);
