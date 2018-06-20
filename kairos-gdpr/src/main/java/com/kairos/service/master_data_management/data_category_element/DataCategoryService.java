@@ -109,7 +109,7 @@ public class DataCategoryService extends MongoBaseService {
     public DataCategory updateDataCategoryAndElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
-        if (Optional.ofNullable(dataCategory).isPresent() && id.equals(dataCategory.getId())) {
+        if (Optional.ofNullable(dataCategory).isPresent() && !id.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
         dataCategory = dataCategoryMongoRepository.findByid(id);

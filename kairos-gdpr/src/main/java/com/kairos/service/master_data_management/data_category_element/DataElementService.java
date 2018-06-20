@@ -6,6 +6,7 @@ import com.kairos.persistance.model.master_data_management.data_category_element
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataElementMognoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class DataElementService extends MongoBaseService {
     public Map<String, Object> createDataElements(Long countryId, List<DataElementDto> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
-        Set<String> dataElementNames = new HashSet<>();
+        List<String> dataElementNames = new ArrayList<>();
         dataElementsDto.forEach(dataElement -> {
             dataElementNames.add(dataElement.getName().trim());
         });
@@ -140,11 +141,13 @@ public class DataElementService extends MongoBaseService {
 
         Map<BigInteger, DataElementDto> dataElementsDtoList = new HashMap<>();
         List<BigInteger> dataElementsIds = new ArrayList<>();
+        List<String> dataElementsNames = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
             dataElementsDtoList.put(dataElementDto.getId(), dataElementDto);
             dataElementsIds.add(dataElementDto.getId());
+            dataElementsNames.add(dataElementDto.getName());
         });
-
+        checkDuplicateInsertionOnUpdatingDataElements(countryId,dataElementsDtoList,dataElementsNames);
         List<DataElement> dataElementList = dataElementMognoRepository.getAllDataElementListByIds(countryId, dataElementsIds);
         dataElementList.forEach(dataElement -> {
             DataElementDto darElementDto = dataElementsDtoList.get(dataElement.getId());
@@ -178,20 +181,22 @@ public class DataElementService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
-     * @param dataElementDto map contain dataElemenet corresponding to id
-     * @param dataElementsIds list of data elemenets id
+     * @param dataElementDtoMap map contain dataElemenet corresponding to id
+     * @param dataElementNames  list of data elemenets names which we need to check if duplicate data present then throw exception
      */
-    public void checkDuplicateInsertionOnupdatingDataElements(Long countryId, Map<BigInteger, DataElementDto> dataElementDto, List<BigInteger> dataElementsIds) {
+    public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Map<BigInteger, DataElementDto> dataElementDtoMap, List<String> dataElementNames) {
 
-        List<DataElement> dataElementList = dataElementMognoRepository.getAllDataElementListByIds(countryId, dataElementsIds);
+        List<DataElement> dataElementList = dataElementMognoRepository.findByCountryIdAndNames(countryId, dataElementNames);
         dataElementList.forEach(dataElement -> {
-            if (!dataElement.getName().equals(dataElementDto.get(dataElement.getId()).getName())) {
+            if (!dataElementDtoMap.containsKey(dataElement.getId())) {
                 exceptionService.duplicateDataException("message.duplicate", "data element", dataElement.getName());
+            } else {
+                if (!dataElementDtoMap.get(dataElement.getId()).getName().equals(dataElement.getName())) {
+                    exceptionService.duplicateDataException("message.duplicate", "data element", dataElement.getName());
+                }
             }
         });
-
     }
 
 
