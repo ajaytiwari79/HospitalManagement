@@ -89,25 +89,24 @@ public class OrganizationActivityService extends MongoBaseService {
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
-        logger.info("activityId,{}", activityId);
         ActivityDTO activityDetail = null;
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
-        }
-        Activity isActivityAlreadyExist = activityMongoRepository.findByNameIgnoreCaseAndUnitIdAndByDate(activity.getName().trim(), unitId,activity.getGeneralActivityTab().getStartDate(),activity.getGeneralActivityTab().getEndDate());
-        if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
-            exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
-        }
-        List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
-        List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        for (PhaseDTO phaseDTO : phaseDTOList) {
-            PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), false, false);
-            phaseTemplateValues.add(phaseTemplateValue);
-        }
-        activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
         Activity activityCopied;
         if (checked) {
+            Activity activity = activityMongoRepository.findOne(activityId);
+            if (!Optional.ofNullable(activity).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+            }
+            Activity isActivityAlreadyExist = activityMongoRepository.findByNameIgnoreCaseAndUnitIdAndByDate(activity.getName().trim(), unitId,activity.getGeneralActivityTab().getStartDate(),activity.getGeneralActivityTab().getEndDate());
+            if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
+                exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+            }
+            List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+            for (PhaseDTO phaseDTO : phaseDTOList) {
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), false, false);
+                phaseTemplateValues.add(phaseTemplateValue);
+            }
+            activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             if (!activity.getState().equals(ActivityStateEnum.LIVE)) {
                 activity.setState(ActivityStateEnum.LIVE);
