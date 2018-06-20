@@ -5,7 +5,7 @@
     <solutionClass>com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution</solutionClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.TaskOrShift</entityClass>
-    <!--<entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>-->
+    <entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>
     <scoreDirectorFactory>
         <scoreDrl>drl/vrp_task_rules.drl</scoreDrl>
         <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
@@ -22,7 +22,7 @@
             <changeMoveSelector>
 
                 <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
-                <selectedCountLimit>100</selectedCountLimit>
+                <!--<selectedCountLimit>100</selectedCountLimit>-->
                 <valueSelector>
                     <!--<cacheType>PHASE</cacheType>-->
                     <!--<selectionOrder>SORTED</selectionOrder>
@@ -32,8 +32,21 @@
             </changeMoveSelector>
         </queuedEntityPlacer>
     </constructionHeuristic>
-    <localSearch/>
+    <localSearch>
+    <unionMoveSelector>
+        <changeMoveSelector></changeMoveSelector>
+             <!--<selectedCountLimit>1000</selectedCountLimit>-->
+        <swapMoveSelector></swapMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        <subChainChangeMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        </subChainChangeMoveSelector>
+        <subChainSwapMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        </subChainSwapMoveSelector>
+    </unionMoveSelector>
+    </localSearch>
     <termination>
-        <secondsSpentLimit>3000</secondsSpentLimit>
+        <secondsSpentLimit>60000</secondsSpentLimit>
     </termination>
 </solver>

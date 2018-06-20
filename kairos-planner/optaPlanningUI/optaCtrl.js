@@ -123,14 +123,15 @@ app.controller('namesCtrl',['$scope','$http',function($scope,$http) {
         var map;
         var directionsDisplay;
         var directionsService = new google.maps.DirectionsService();
-        var locations = [
+        /*var locations = [
             ['Noida', 28.5355, 77.3910, 2],
             ['gurgaon', 28.4595, 77.0266, 4],
             ['Delhi',28.7041, 77.1025, 5],
             ['Rohtak', 28.8955, 76.6066, 1],
             ['Plawal', 28.1487, 77.3320, 3]
-        ];
+        ];*/
 
+        var locations= [['Task1',56.64051688,9.79363265,10006065], ['Task2',56.64051688,9.79363265,6061], ['Task3',56.63910757,9.79357958,714], ['Task4',56.63928466,9.79353536,718], ['Task5',56.63988443,9.79311734,6661], ['Task6',56.63910757,9.79357958,4715], ['Task7',56.6391797,9.7934534,2102], ['Task8',56.63912616,9.79334062,425], ['Task9',56.63928466,9.79353536,1976], ['Task10',56.63877388,9.79366551,705]];
         directionsDisplay = new google.maps.DirectionsRenderer();
 
 

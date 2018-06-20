@@ -13,9 +13,6 @@ public class LocationsDistanceMatrix {
         table.put(locationPair, locationPairDifference);
     }
     public LocationPairDifference getLocationsDifference(LocationPair locationPair){
-        if(table.get(locationPair)==null){
-            table=table;
-        }
         return table.get(locationPair);
     }
 
