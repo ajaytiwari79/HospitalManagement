@@ -1,11 +1,16 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
+import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -14,6 +19,7 @@ import java.util.Set;
  */
 @PlanningEntity
 public class Task extends TaskOrShift{
+    private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     //TODO consider break in  sub tasks or dont consider merged tasks at all
     private String id;
     private int intallationNo;
@@ -199,16 +205,23 @@ public class Task extends TaskOrShift{
     public double getPlannedDuration(){
         return this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
     }
-    public int getDrivingTime(){
+    //for rules only
+    public int getDrivingTimeSeconds(){
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
         }
         if(prevTaskOrShift instanceof Shift) return 0;
         Task prevTask=(Task)prevTaskOrShift;
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLattitude(),prevTask.getLongitude(),this.getLattitude(),this.getLongitude()));
-        return lpd.getTime()/60;
+        return lpd.getTime();
 
 
+    }
+
+
+    public int getDrivingTime(){
+        int mins=(int)Math.ceil(getDrivingTimeSeconds()/60d);
+        return mins;
     }
 
     @Override
@@ -250,4 +263,17 @@ public class Task extends TaskOrShift{
     public String getLatLongString(){
         return lattitude+":"+longitude;
     }
+    public boolean isConsecutive(Task task){
+        //If chain(shift) is different.. dont even consider this constraint
+        boolean consecutive = !VrpPlanningUtil.hasSameChain(this, task) || VrpPlanningUtil.isConsecutive(this, task);
+        return consecutive;
+    }
+    public boolean isEmployeeEligible(){
+        return shift==null || shift.getEmployee().getSkills().containsAll(this.skills);
+    }
+    public boolean hasSameLocation(Task task){
+        return VrpPlanningUtil.hasSameLocation(this,task);
+    }
+
+
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-    <environmentMode>FULL_ASSERT</environmentMode>
+    <!--<environmentMode>FULL_ASSERT</environmentMode>-->
     <!--<environmentMode>FAST_ASSERT</environmentMode>-->
     <solutionClass>com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution</solutionClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
@@ -32,8 +32,21 @@
             </changeMoveSelector>
         </queuedEntityPlacer>
     </constructionHeuristic>
-    <localSearch/>
+    <localSearch>
+    <unionMoveSelector>
+        <changeMoveSelector></changeMoveSelector>
+             <!--<selectedCountLimit>1000</selectedCountLimit>-->
+        <swapMoveSelector></swapMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        <subChainChangeMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        </subChainChangeMoveSelector>
+        <subChainSwapMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        </subChainSwapMoveSelector>
+    </unionMoveSelector>
+    </localSearch>
     <termination>
-        <secondsSpentLimit>60</secondsSpentLimit>
+        <secondsSpentLimit>60000</secondsSpentLimit>
     </termination>
 </solver>

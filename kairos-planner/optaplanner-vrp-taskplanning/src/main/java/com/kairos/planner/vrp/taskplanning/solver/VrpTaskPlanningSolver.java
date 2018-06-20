@@ -52,6 +52,7 @@ public class VrpTaskPlanningSolver {
         });
         //TODO ease efficiency for debugging
         //problem.getEmployees().forEach(e->e.setEfficiency(100));
+        log.info("Number of tasks:"+problem.getTasks().size());
         VrpTaskPlanningSolution solution=null;
         try {
             solution = solver.solve(problem);
@@ -60,7 +61,7 @@ public class VrpTaskPlanningSolver {
             //e.printStackTrace();
             throw  e;
         }
-        getxStream().toXML(solution,new FileWriter("src/main/resources/problem.xml"));
+        getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
         int totalDrivingTime=0;
         for(Shift shift: solution.getShifts()){
             StringBuffer sb= new StringBuffer(shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
