@@ -16,6 +16,7 @@ public class EmploymentDTO {
     private String endDate;
     private Long reasonCodeId;
     private Long accessGroupIdOnEmploymentEnd;
+    @NotNull(message = "Main employment start date can't be null")
     private LocalDate mainEmploymentStartDate;
     private LocalDate mainEmploymentEndDate;
     private boolean mainEmployment;
