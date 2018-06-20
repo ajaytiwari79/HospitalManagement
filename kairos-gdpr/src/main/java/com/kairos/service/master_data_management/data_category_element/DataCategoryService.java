@@ -121,7 +121,6 @@ public class DataCategoryService extends MongoBaseService {
             dataCategory.setName(dataCategoryDto.getName());
             dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
             dataCategory = save(dataCategory);
-            throw new RuntimeException();
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());

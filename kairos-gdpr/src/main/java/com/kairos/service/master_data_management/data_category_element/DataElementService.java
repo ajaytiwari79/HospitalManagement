@@ -183,7 +183,7 @@ public class DataElementService extends MongoBaseService {
     /**
      * @param countryId
      * @param dataElementDtoMap map contain dataElemenet corresponding to id
-     * @param dataElementNames  list of data elemenets names which we need to check if duplicate data present then throw exception
+     * @param dataElementNames  list of data elemenets names which we need to check if duplicate data present on updating existing Data elements
      */
     public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Map<BigInteger, DataElementDto> dataElementDtoMap, List<String> dataElementNames) {
 
