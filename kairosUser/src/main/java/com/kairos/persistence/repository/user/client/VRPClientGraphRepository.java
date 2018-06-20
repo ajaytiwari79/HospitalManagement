@@ -18,4 +18,8 @@ public interface VRPClientGraphRepository extends Neo4jBaseRepository<VRPClient,
 
     @Query("MATCH (vc:VRPClient{deleted:false})-[:"+BELONGS_TO+"]-(o:Organization) where id(o)={0} return vc")
     List<VRPClient> getAllClient(Long unitId);
+
+    @Query("MATCH (vc:VRPClient{deleted:false})-[:"+BELONGS_TO+"]-(o:Organization) where id(o)={0} return vc.installationNumber")
+    List<Integer> getAllClientInstalltionNo(Long unitId);
+
 }
