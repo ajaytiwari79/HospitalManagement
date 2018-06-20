@@ -1958,7 +1958,7 @@ public class StaffService extends UserBaseService {
                     }
                     }else{
                         if(employment.getMainEmploymentEndDate()==null&&employmentDTO.getMainEmploymentEndDate()!=null){
-                            if(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())>mainEmploymentStartDate&&DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())<mainEmploymentEndDate){
+                            if(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())>mainEmploymentStartDate&&DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())<=mainEmploymentEndDate){
                                 getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                                 employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
                                 getAfterChangeMainEmployment(employmentOverlapDTO, employment);
@@ -1987,11 +1987,11 @@ public class StaffService extends UserBaseService {
                                 getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                                 employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
                                 getAfterChangeMainEmployment(employmentOverlapDTO, employment);
-                            } else if(mainEmploymentStartDate>DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())&&mainEmploymentStartDate<DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate())){
+                            } else if(mainEmploymentStartDate>DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())&&mainEmploymentStartDate<=DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate())){
                                 getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
                                     employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
                                 getAfterChangeMainEmployment(employmentOverlapDTO, employment);
-                            } else{
+                            } else if(employment.getMainEmploymentStartDate().isEqual(employmentDTO.getMainEmploymentStartDate())){
                                 exceptionService.invalidRequestException("message.employment.alreadyexist",mainEmploymentQueryResult.getOrganizationName());
                             }
                         }
