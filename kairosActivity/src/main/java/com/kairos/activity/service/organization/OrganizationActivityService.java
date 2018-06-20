@@ -94,7 +94,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         for (PhaseDTO phaseDTO : phaseDTOList) {
-            PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), false, false);
+            PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), new HashSet<>(), false);
             phaseTemplateValues.add(phaseTemplateValue);
         }
         activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);

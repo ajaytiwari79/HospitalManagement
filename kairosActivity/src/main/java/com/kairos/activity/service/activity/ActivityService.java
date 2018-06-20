@@ -1011,7 +1011,7 @@ public class ActivityService extends MongoBaseService {
             phaseTemplateValue.setName(phaseDTO.getName());
             phaseTemplateValue.setDescription(phaseDTO.getDescription());
             phaseTemplateValue.setEligibleForManagement(false);
-            phaseTemplateValue.setEligibleForStaff(false);
+            phaseTemplateValue.setStaffEmployments(new HashSet<>());
             phaseTemplateValues.add(phaseTemplateValue);
         }
         return phaseTemplateValues;
