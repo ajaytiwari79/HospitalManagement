@@ -551,20 +551,16 @@ public class ShiftService extends MongoBaseService {
                             boolean checkForStaff = staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff();
                             boolean checkForManagement = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
                             if ((checkOverStaffing && totalCount > 0)) {
-                                if (checkForStaff && checkForManagement) {
-                                    if (phaseSettings.isManagementEligibleForOverStaffing() && phaseSettings.isStaffEligibleForOverStaffing()) {
-                                        exceptionService.actionNotPermittedException("message.shift.overStaffing");
-                                    }
-                                } else if (checkForStaff ? phaseSettings.isStaffEligibleForOverStaffing() : phaseSettings.isManagementEligibleForOverStaffing()) {
+                                if ((checkForStaff && checkForManagement) && (!phaseSettings.isManagementEligibleForOverStaffing() && !phaseSettings.isStaffEligibleForOverStaffing())) {
+                                    exceptionService.actionNotPermittedException("message.shift.overStaffing");
+                                } else if (checkForStaff ? !phaseSettings.isStaffEligibleForOverStaffing() : !phaseSettings.isManagementEligibleForOverStaffing()) {
                                     exceptionService.actionNotPermittedException("message.shift.overStaffing");
                                 }
                             }
                             if (!checkOverStaffing && checkForUnderStaffing && totalCount < 0) {
-                                if (checkForStaff && checkForManagement) {
-                                    if (phaseSettings.isStaffEligibleForUnderStaffing() && phaseSettings.isManagementEligibleForUnderStaffing()) {
+                                if ((checkForStaff && checkForManagement) && (!phaseSettings.isStaffEligibleForUnderStaffing() && !phaseSettings.isManagementEligibleForUnderStaffing())) {
                                         exceptionService.actionNotPermittedException("message.shift.underStaffing");
-                                    }
-                                } else if (checkForStaff ? phaseSettings.isStaffEligibleForUnderStaffing() : phaseSettings.isManagementEligibleForUnderStaffing()) {
+                                } else if (checkForStaff ? !phaseSettings.isStaffEligibleForUnderStaffing() : !phaseSettings.isManagementEligibleForUnderStaffing()) {
                                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                                 }
                             }
