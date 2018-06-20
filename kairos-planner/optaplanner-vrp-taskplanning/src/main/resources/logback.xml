@@ -31,7 +31,7 @@
     <!--<logger name="com" level="INFO"/>-->
     <logger name="com.kairos.planner.vrp.taskplanning" level="DEBUG"/>
     <logger name="org.optaplanner" level="DEBUG"/>
-    <logger name="org.drools" level="TRACE"/>
+    <logger name="org.drools" level="INFO"/>
     <logger name="org.kie.api.internal.utils.ServiceDiscoveryImpl" level="ERROR"/>
     <logger name="io.netty.util" level="INFO"/>
     <logger name="com.thoughtworks.xstream" level="DEBUG"/>

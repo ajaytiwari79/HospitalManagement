@@ -67,7 +67,7 @@ public class VRPGeneratorService {
         List<Shift> shifts = new ArrayList<>();
         employeeList.forEach(e->{
             for (int i=4;i<=8;i++) {
-                shifts.add(new Shift(e.getId(), e, LocalDate.of(2018, 6, i), null, null));
+                shifts.add(new Shift(e.getId()+i, e, LocalDate.of(2018, 6, i), null, null));
             }
         });
         return shifts;

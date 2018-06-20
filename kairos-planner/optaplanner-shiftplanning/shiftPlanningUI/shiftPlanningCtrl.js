@@ -122,6 +122,8 @@ app.controller('shiftPlanningCtrl',['$scope','$http',function($scope,$http) {
             ['Plawal', 28.1487, 77.3320, 3]
         ];
 
+
+
         directionsDisplay = new google.maps.DirectionsRenderer();
 
 

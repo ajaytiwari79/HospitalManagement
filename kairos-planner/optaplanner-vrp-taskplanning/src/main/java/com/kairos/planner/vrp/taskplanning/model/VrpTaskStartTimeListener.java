@@ -47,9 +47,10 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
             return;
         }
         if(task.getPrevTaskOrShift() instanceof Shift){
-            LocalDateTime plannedDateTime=((Shift)task.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
+            LocalDateTime plannedDateTime=((Shift)task.getPrevTaskOrShift()).getStartTime();
             updatePlannedTime(task,plannedDateTime,scoreDirector);
-            return;
+            task=task.getNextTask();
+            //return;
         }
         while (task!=null){
             LocalDateTime plannedDateTime =((Task)task.getPrevTaskOrShift()).getPlannedEndTime().plusMinutes(task.getDrivingTime());
@@ -58,37 +59,39 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
         }
     }
 
+    private void updatePlannedTime(Task task, LocalDateTime plannedDateTime, ScoreDirector scoreDirector){
+
+        if(Objects.equals(task.getPlannedStartTime(),plannedDateTime)) return;
+        scoreDirector.beforeVariableChanged(task,"plannedStartTime");
+        task.setPlannedStartTime(plannedDateTime);
+        scoreDirector.afterVariableChanged(task,"plannedStartTime");
+    }
+
+
 
     private void updateStartTimeFromStart(ScoreDirector scoreDirector, Task task) {
 
         try{
 
-        if(task.getPrevTaskOrShift()==null || task.getShift()==null){
-            updatePlannedTime(task,null,scoreDirector);
-            return;
-        }
-        Task tempTask=task.getShift().getNextTask();
-        LocalDateTime plannedDateTime =((Shift)tempTask.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
-        updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
-        tempTask=tempTask.getNextTask();
-        while (tempTask!=null){
-            double duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
-            plannedDateTime=plannedDateTime.plusMinutes((long)duration);
+            if(task.getPrevTaskOrShift()==null || task.getShift()==null){
+                updatePlannedTime(task,null,scoreDirector);
+                return;
+            }
+            Task tempTask=task.getShift().getNextTask();
+            LocalDateTime plannedDateTime =((Shift)tempTask.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
             updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
             tempTask=tempTask.getNextTask();
-        }
+            while (tempTask!=null){
+                double duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
+                plannedDateTime=plannedDateTime.plusMinutes((long)duration);
+                updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
+                tempTask=tempTask.getNextTask();
+            }
 
         }catch(Exception e){
             e.printStackTrace();
         }
 
-    }
-    private void updatePlannedTime(Task task, LocalDateTime plannedDateTime, ScoreDirector scoreDirector){
-
-        if(Objects.equals(task.getPlannedDateTime(),plannedDateTime)) return;
-        scoreDirector.beforeVariableChanged(task,"plannedDateTime");
-        task.setPlannedDateTime(plannedDateTime);
-        scoreDirector.afterVariableChanged(task,"plannedDateTime");
     }
 
 }
