@@ -6,6 +6,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +21,8 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
 
     private long intervalLength;//
     private String intervalUnit;
-    private LocalDate validationStartDate;
-    private long continuousDayRestHours;
-    private long averageRest;//(hours number)
-    private String shiftAffiliation;//(List checkbox)
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
@@ -37,12 +35,20 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
     }
 
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
     public float getRecommendedValue() {
@@ -79,37 +85,6 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
         this.intervalUnit = intervalUnit;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
-
-    public long getContinuousDayRestHours() {
-        return continuousDayRestHours;
-    }
-
-    public void setContinuousDayRestHours(long continuousDayRestHours) {
-        this.continuousDayRestHours = continuousDayRestHours;
-    }
-
-    public long getAverageRest() {
-        return averageRest;
-    }
-
-    public void setAverageRest(long averageRest) {
-        this.averageRest = averageRest;
-    }
-
-    public String getShiftAffiliation() {
-        return shiftAffiliation;
-    }
-
-    public void setShiftAffiliation(String shiftAffiliation) {
-        this.shiftAffiliation = shiftAffiliation;
-    }
 
     public ShortestAndAverageDailyRestWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;

@@ -82,7 +82,7 @@ public class AccountTypeService extends MongoBaseService {
     public AccountType updateAccountName(Long countryId,BigInteger id,AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByNameAndNonDeleted(countryId,accountType.getName());
-        if (Optional.ofNullable(exists).isPresent()) {
+        if (Optional.ofNullable(exists).isPresent()&&!id.equals(exists.getId())) {
             throw  new DuplicateDataException("Account type exist for "+accountType.getName());
         }
         exists=accountTypeRepository.findByIdAndNonDeleted(countryId,id);

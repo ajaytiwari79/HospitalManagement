@@ -31,8 +31,8 @@ public class PlannerRestClient {
 
     public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation, Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
-
-        try {
+        return null;
+        /*        try {
             String url = baseUrl + unitId + "/" + getURI(t, integrationOperation, pathParams);
             logger.info("calling url:{} with http method:{}", url, integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
@@ -51,7 +51,7 @@ public class PlannerRestClient {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
+        }*/
 
     }
 

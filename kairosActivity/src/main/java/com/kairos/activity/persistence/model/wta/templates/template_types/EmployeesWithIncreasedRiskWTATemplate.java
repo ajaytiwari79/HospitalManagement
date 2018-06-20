@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
 
@@ -60,6 +61,11 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
 
     public EmployeesWithIncreasedRiskWTATemplate() {
         wtaTemplateType=WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public EmployeesWithIncreasedRiskWTATemplate(String name, boolean disabled, String description, int belowYear, int aboveYear, boolean pregnant) {

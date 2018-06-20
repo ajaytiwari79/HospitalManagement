@@ -42,7 +42,6 @@ public class MasterQuestionService extends MongoBaseService {
         List<MasterQuestion> masterQuestions = new ArrayList<>();
         checkForDuplicacyInQuestion(masterQuestionDtos);
         for (MasterQuestionDto masterQuestion : masterQuestionDtos) {
-
             if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
                 MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
                 masterQuestion.setNotApplicableAllowed(masterQuestion.getNotApplicableAllowed());
@@ -125,7 +124,7 @@ public class MasterQuestionService extends MongoBaseService {
                     }
                 }
         );
-        Map<String, Object> updatedQuestions = new HashMap<>(), newQuestions = new HashMap<>();
+        Map<String, Object> updatedQuestions,newQuestions ;
         List<BigInteger> questionIds = new ArrayList<>();
         List<MasterQuestion> masterQuestions = new ArrayList<>();
 
@@ -140,8 +139,6 @@ public class MasterQuestionService extends MongoBaseService {
             questionIds.addAll((List<BigInteger>) updatedQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) updatedQuestions.get(QUESTION_LIST));
         }
-
-
         Map<String, Object> result = new HashMap<>();
         result.put(IDS_LIST, questionIds);
         result.put(QUESTION_LIST, masterQuestions);

@@ -58,7 +58,7 @@ public class FilterService {
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
-//get fields with distinct values on which fiter is apply
+//get fields with distinct values on which fiter is applicable
     public FilterAndFavouriteFilterDto getFilterCategories(Long countryId, String moduleId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();

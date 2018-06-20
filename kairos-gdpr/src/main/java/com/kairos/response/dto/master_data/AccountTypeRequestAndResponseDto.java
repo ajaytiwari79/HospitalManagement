@@ -4,16 +4,18 @@ package com.kairos.response.dto.master_data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccountTypeBasicResponseDto {
+public class AccountTypeRequestAndResponseDto {
 
+    @NotNull(message ="Account id can't be null" )
     private BigInteger id;
 
-    @NotNullOrEmpty
-    private String typeOfAccount;
-
+    @NotNullOrEmpty(message ="name can't be null" )
+    private String name;
+    
     public BigInteger getId() {
         return id;
     }
@@ -22,11 +24,11 @@ public class AccountTypeBasicResponseDto {
         this.id = id;
     }
 
-    public String getTypeOfAccount() {
-        return typeOfAccount;
+    public String getName() {
+        return name;
     }
 
-    public void setTypeOfAccount(String typeOfAccount) {
-        this.typeOfAccount = typeOfAccount;
+    public void setName(String name) {
+        this.name = name;
     }
 }

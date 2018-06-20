@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.phase.Phase;
 
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.enums.shift.ShiftState;
 import org.joda.time.Interval;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 /*
@@ -17,7 +21,7 @@ import java.util.Date;
 *
 * */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ShiftQueryResultWithActivity {
+public class ShiftWithActivityDTO {
 
     private BigInteger id;
     private String name;
@@ -32,7 +36,7 @@ public class ShiftQueryResultWithActivity {
     private long accumulatedTimeBankInMinutes;
     private String remarks;
     private BigInteger activityId;
-    private Long unitEmploymentPositionId;
+    private Long unitPositionId;
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
@@ -41,23 +45,65 @@ public class ShiftQueryResultWithActivity {
     private Activity activity;
     private int scheduledMinutes;
     private int durationMinutes;
-    private ShiftQueryResultWithActivity subShift;
+    private ShiftWithActivityDTO subShift;
+    private ShiftState shiftState;
+    private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
 
-    public Long getUnitEmploymentPositionId() {
-        return unitEmploymentPositionId;
+
+    public ShiftState getShiftState() {
+        return shiftState;
     }
 
-    public ShiftQueryResultWithActivity() {
+    public void setShiftState(ShiftState shiftState) {
+        this.shiftState = shiftState;
     }
 
-    public ShiftQueryResultWithActivity(Date startDate, Date endDate, Activity activity) {
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public ShiftWithActivityDTO() {
+    }
+
+
+    public List<BigInteger> getBrokenRuleTemplateIds() {
+        return brokenRuleTemplateIds;
+    }
+
+    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
+        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
+    }
+
+
+    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitPositionId, Long unitId, Activity activity) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bonusTimeBank = bonusTimeBank;
+        this.amount = amount;
+        this.probability = probability;
+        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+        this.remarks = remarks;
+        this.activityId = activityId;
+        this.unitPositionId = unitPositionId;
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.activity = activity;
+    }
+
+    public ShiftWithActivityDTO(Date startDate, Date endDate, Activity activity) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activity = activity;
     }
 
-    public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
-        this.unitEmploymentPositionId = unitEmploymentPositionId;
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
+
+    public int getMinutes(){
+        return ((int)(this.endDate.getTime() - this.startDate.getTime())/60000);
     }
 
     public int getScheduledMinutes() {
@@ -76,11 +122,11 @@ public class ShiftQueryResultWithActivity {
         this.durationMinutes = durationMinutes;
     }
 
-    public ShiftQueryResultWithActivity getSubShift() {
+    public ShiftWithActivityDTO getSubShift() {
         return subShift;
     }
 
-    public void setSubShift(ShiftQueryResultWithActivity subShift) {
+    public void setSubShift(ShiftWithActivityDTO subShift) {
         this.subShift = subShift;
     }
 
@@ -194,7 +240,7 @@ public class ShiftQueryResultWithActivity {
     }
 
     public static void setOverrideWeekCount(boolean overrideWeekCount) {
-        ShiftQueryResultWithActivity.overrideWeekCount = overrideWeekCount;
+        ShiftWithActivityDTO.overrideWeekCount = overrideWeekCount;
     }
 
     public Long getUnitId() {
@@ -213,8 +259,12 @@ public class ShiftQueryResultWithActivity {
         this.activity = activity;
     }
 
+    public DateTimeInterval getDateTimeInterval(){
+       return new DateTimeInterval(startDate.getTime(),endDate.getTime());
+    }
+
     public Interval getInterval(){
-       return new Interval(startDate.getTime(),endDate.getTime());
+        return new Interval(startDate.getTime(),endDate.getTime());
     }
 
 }

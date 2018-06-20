@@ -99,7 +99,10 @@ public class HostingTypeService extends MongoBaseService {
 
 
         HostingType exist = hostingTypeMongoRepository.findByName(UserContext.getCountryId(),hostingType.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+hostingType.getName());
         } else {
             exist=hostingTypeMongoRepository.findByid(id);

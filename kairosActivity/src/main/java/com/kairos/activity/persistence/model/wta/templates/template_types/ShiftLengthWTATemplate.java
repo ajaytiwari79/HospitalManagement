@@ -2,15 +2,20 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.util.TimeInterval;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -21,7 +26,6 @@ import java.util.List;
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
-    private boolean checkAgainstTimeRules;
     private List<Long> dayTypeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
@@ -75,22 +79,41 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.timeLimit = timeLimit;
     }
 
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
 
     public ShiftLengthWTATemplate() {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
-    public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
+            if (timeInterval != null) {
+                if (isValidForDay(dayTypeIds, infoWrapper)) {
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0] * 60, infoWrapper.getShift().getMinutes());
+                    if (!isValid) {
+                        if (limitAndCounter[1] != null) {
+                            int counterValue = limitAndCounter[1] - 1;
+                            if (counterValue < 0) {
+                                throw new InvalidRequestException(getName() + " is Broken");
+                            } else {
+                                infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                                infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            }
+                        } else {
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        }
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    public ShiftLengthWTATemplate(String name, String description, long timeLimit) {
         super(name, description);
         this.timeLimit = timeLimit;
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 }

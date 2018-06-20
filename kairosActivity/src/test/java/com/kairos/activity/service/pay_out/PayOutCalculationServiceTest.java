@@ -5,7 +5,7 @@ import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivi
 import com.kairos.activity.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.util.DateUtils;
 import org.joda.time.DateTime;
@@ -45,7 +45,7 @@ public class PayOutCalculationServiceTest {
     @Mock
     ActivityMongoRepository activityMongoRepository;
 
-    List<ShiftQueryResultWithActivity> shifts = new ArrayList<>(3);
+    List<ShiftWithActivityDTO> shifts = new ArrayList<>(3);
     Interval interval = null;
     Activity activity = null;
 
@@ -56,11 +56,11 @@ public class PayOutCalculationServiceTest {
         DateTime startDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("22/02/2018 00:00:00");
         DateTime endDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("23/02/2018 00:00:00");
         interval = new Interval(startDate,endDate);
-        ShiftQueryResultWithActivity shift = new ShiftQueryResultWithActivity(interval.getStart().minusHours(2).toDate(),interval.getStart().plusMinutes(120).toDate(),activity);
+        ShiftWithActivityDTO shift = new ShiftWithActivityDTO(interval.getStart().minusHours(2).toDate(),interval.getStart().plusMinutes(120).toDate(),activity);
         shifts.add(shift);
-        shift = new ShiftQueryResultWithActivity(interval.getStart().plusMinutes(240).toDate(),interval.getStart().plusMinutes(720).toDate(),activity);
+        shift = new ShiftWithActivityDTO(interval.getStart().plusMinutes(240).toDate(),interval.getStart().plusMinutes(720).toDate(),activity);
         shifts.add(shift);
-        shift = new ShiftQueryResultWithActivity(interval.getStart().plusMinutes(1020).toDate(),interval.getStart().plusMinutes(1560).toDate(),activity);
+        shift = new ShiftWithActivityDTO(interval.getStart().plusMinutes(1020).toDate(),interval.getStart().plusMinutes(1560).toDate(),activity);
         shifts.add(shift);
     }
 

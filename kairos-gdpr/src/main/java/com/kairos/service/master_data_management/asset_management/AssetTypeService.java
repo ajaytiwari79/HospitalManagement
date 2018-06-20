@@ -48,7 +48,7 @@ public class AssetTypeService extends MongoBaseService {
                 }
         }
 
-        List<AssetType> sotrageList=new ArrayList<>();
+        List<AssetType> sotrageList = new ArrayList<>();
         if (newAssetTypes.size() != 0) {
             for (AssetType AssetType : newAssetTypes) {
 
@@ -66,7 +66,7 @@ public class AssetTypeService extends MongoBaseService {
         result.put("new", sotrageList);
         return result;
 
-}
+    }
 
 
     public List<AssetType> getAllAssetType() {
@@ -103,6 +103,9 @@ public class AssetTypeService extends MongoBaseService {
 
         AssetType exist = assetTypeMongoRepository.findByName(UserContext.getCountryId(), AssetType.getName().toLowerCase());
         if (Optional.ofNullable(exist).isPresent()) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  " + AssetType.getName());
         } else {
             exist = assetTypeMongoRepository.findByid(id);
@@ -114,7 +117,6 @@ public class AssetTypeService extends MongoBaseService {
 
 
     public AssetType getAssetTypeByName(Long countryId, String name) {
-
 
         if (!StringUtils.isBlank(name)) {
             AssetType exist = assetTypeMongoRepository.findByName(countryId, name);

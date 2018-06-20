@@ -11,10 +11,14 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constant.AppConstant.IDS_LIST;
+import static com.kairos.constant.AppConstant.DATA_EMELENTS_LIST;
+
+
+
 
 @Service
 public class DataCategoryService extends MongoBaseService {
@@ -48,11 +52,11 @@ public class DataCategoryService extends MongoBaseService {
             DataCategory newDataCategory = new DataCategory();
             newDataCategory.setCountryId(countryId);
             newDataCategory.setName(dataCategoryDto.getName());
-            newDataCategory.setDataElements((List<BigInteger>) dataElementList.get("ids"));
+            newDataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
             dataCategory = save(newDataCategory);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get("elements"));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
         }
         return dataCategory;
     }
@@ -105,24 +109,23 @@ public class DataCategoryService extends MongoBaseService {
     public DataCategory updateDataCategoryAndElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
-        if (Optional.ofNullable(dataCategory).isPresent()) {
+        if (Optional.ofNullable(dataCategory).isPresent() && id.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
         dataCategory = dataCategoryMongoRepository.findByid(id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
-
         }
         Map<String, Object> dataElementList = new HashMap<>();
         try {
-            dataElementList = dataElementService.createDataElements(countryId, dataCategoryDto.getDataElements());
+            dataElementList = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
             dataCategory.setName(dataCategoryDto.getName());
-            dataCategory.setDataElements((List<BigInteger>) dataElementList.get("ids"));
+            dataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
             dataCategory = save(dataCategory);
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get("elements"));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
         }
 
         return dataCategory;

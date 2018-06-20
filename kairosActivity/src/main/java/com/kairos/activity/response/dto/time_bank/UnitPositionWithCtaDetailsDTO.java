@@ -24,6 +24,8 @@ public class UnitPositionWithCtaDetailsDTO {
     private ZoneId unitTimeZone;
 
 
+
+
     public UnitPositionWithCtaDetailsDTO(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
@@ -143,6 +145,8 @@ public class UnitPositionWithCtaDetailsDTO {
     public void setCtaRuleTemplates(List<CTARuleTemplateCalulatedTimeBankDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
+
+
 
 
 }

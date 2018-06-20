@@ -99,8 +99,11 @@ public class DataSourceService extends MongoBaseService {
 
     public DataSource updateDataSource(BigInteger id, DataSource dataSource) {
 
-        DataSource exist = dataSourceMongoRepository.findByName(UserContext.getCountryId(),dataSource.getName());
+        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(UserContext.getCountryId(),dataSource.getName());
         if (Optional.ofNullable(exist).isPresent()) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+dataSource.getName());
         } else {
             exist=dataSourceMongoRepository.findByid(id);
@@ -115,7 +118,7 @@ public class DataSourceService extends MongoBaseService {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByName(countryId, name);
+            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

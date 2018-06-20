@@ -1,20 +1,22 @@
 package com.kairos.dto.master_data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.response.dto.master_data.AccountTypeRequestAndResponseDto;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseDto {
 
 
@@ -30,23 +32,24 @@ public class ClauseDto {
     private String description;
 
     @NotNull(message = "Organization  Type  can't be  null")
-    @NotEmpty(message = "Organization Type  can't be  Empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto>  organizationTypes;
 
     @NotNull(message = "Organization Sub Type  can't be  null")
-    @NotEmpty(message = "Organization Sub Type  can't be  Empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubTypes;
 
     @NotNull(message = "Service Type  can't be  null")
-    @NotEmpty(message = "Service Type  can't be  Empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto>  organizationServices;
 
     @NotNull(message = "Service Sub Type  can't be  null")
-    @NotEmpty(message = "Service Sub Type  can't be empty")
+    @Valid
     private List<OrganizationTypeAndServiceBasicDto>  organizationSubServices;
 
-    @NotEmpty(message = "Account type  can't be  Empty")
-    private Set<BigInteger> accountType;
+    @NotNull(message = "Account Type cannot be null")
+    @Valid
+    private Set<AccountTypeRequestAndResponseDto> accountType;
 
 
     public String getTitle() {
@@ -105,11 +108,11 @@ public class ClauseDto {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountType() {
+    public Set<AccountTypeRequestAndResponseDto> getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(Set<BigInteger> accountType) {
+    public void setAccountType(Set<AccountTypeRequestAndResponseDto> accountType) {
         this.accountType = accountType;
     }
 }

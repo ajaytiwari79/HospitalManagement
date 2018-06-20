@@ -99,7 +99,10 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
 
         ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(UserContext.getCountryId(),responsibilityType.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+responsibilityType.getName());
         } else {
             exist=responsibilityTypeMongoRepository.findByid(id);

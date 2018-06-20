@@ -45,7 +45,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
-        return result.getMappedResults().get(0);
+        return result.getMappedResults().size()>0 ? result.getMappedResults().get(0) : null;
     }
 
     @Override
@@ -125,7 +125,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
-        return result.getMappedResults().get(0);
+        return result.getMappedResults().size()>0 ? result.getMappedResults().get(0) : null;
     }
 
     @Override

@@ -6,12 +6,14 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 
 @Document(collection = "data_element")
 public class DataElement extends MongoBaseEntity {
 
+
     @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
-    @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
