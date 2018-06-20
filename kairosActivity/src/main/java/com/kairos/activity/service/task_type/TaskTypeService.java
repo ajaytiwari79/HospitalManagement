@@ -3,7 +3,7 @@ package com.kairos.activity.service.task_type;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.kairos.activity.client.*;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.constants.AppConstants;

@@ -1,10 +1,13 @@
 package com.kairos.activity.service.organization;
 
+import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.activity.service.unit_settings.UnitSettingService;
+import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
@@ -86,23 +89,25 @@ public class OrganizationActivityService extends MongoBaseService {
     private UnitSettingRepository unitSettingRepository;
     @Inject
     private UnitSettingService unitSettingService;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
         Activity activity = activityMongoRepository.findOne(activityId);
-        List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
-        List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        for (PhaseDTO phaseDTO : phaseDTOList) {
-            PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), new HashSet<>(), false);
-            phaseTemplateValues.add(phaseTemplateValue);
-        }
-        activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
 
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
         if (checked) {
+            List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+            for (int i=0;i<phaseDTOList.size();i++) {
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement());
+                phaseTemplateValues.add(phaseTemplateValue);
+            }
+            activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
             Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
 
@@ -235,10 +240,11 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= genericIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
+        List<DayType> dayTypes =ObjectMapperUtils.copyProperties(dayTypeEmploymentTypeWrapper.getDayTypes(),DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
-        List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes,dayTypeEmploymentTypeWrapper.getEmploymentTypes());
 
         return activityTabsWrapper;
     }

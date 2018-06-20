@@ -2,7 +2,7 @@ package com.kairos.activity.service.staffing_level;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.config.env.EnvConfig;

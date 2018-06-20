@@ -28,19 +28,6 @@ public class DayTypesDTO {
         //Default Constructor
     }
 
-    public DayTypesDTO(@NotEmpty(message = "error.DayType.name.notEmpty") @NotNull(message = "error.DayType.name.notnull") String name,
-                       @NotNull int code, String description, @NotEmpty(message = "error.DayType.colorCode.notEmpty") @NotNull(message = "error.DayType.colorCode.notnull")
-                               String colorCode, List<Day> validDays, boolean holidayType, boolean isEnabled, boolean allowTimeSettings) {
-        this.name = name;
-        this.code = code;
-        this.description = description;
-        this.colorCode = colorCode;
-        this.validDays = validDays;
-        this.holidayType = holidayType;
-        this.isEnabled = isEnabled;
-        this.allowTimeSettings = allowTimeSettings;
-    }
-
     public String getName() {
         return name;
     }

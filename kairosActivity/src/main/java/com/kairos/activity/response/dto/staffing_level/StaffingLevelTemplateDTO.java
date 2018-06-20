@@ -3,6 +3,7 @@ package com.kairos.activity.response.dto.staffing_level;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.staffing_level.*;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelTemplatePeriod;
+import com.kairos.enums.Day;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 

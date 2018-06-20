@@ -13,7 +13,7 @@ public class PhaseTemplateValue implements Serializable {
     private BigInteger phaseId;
     private String name;
     private String description;
-    private Set<Long> staffEmployments;
+    private List<Long> eligibleEmploymentTypes;
     private boolean eligibleForManagement;
 
     public BigInteger getPhaseId() {
@@ -40,12 +40,12 @@ public class PhaseTemplateValue implements Serializable {
         this.description = description;
     }
 
-    public Set<Long> getStaffEmployments() {
-        return staffEmployments=Optional.ofNullable(staffEmployments).orElse(new HashSet<>());
+    public List<Long> getEligibleEmploymentTypes() {
+        return eligibleEmploymentTypes =Optional.ofNullable(eligibleEmploymentTypes).orElse(new ArrayList<>());
     }
 
-    public void setStaffEmployments(Set<Long> staffEmployments) {
-        this.staffEmployments = staffEmployments;
+    public void setEligibleEmploymentTypes(List<Long> eligibleEmploymentTypes) {
+        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
     }
 
     public boolean isEligibleForManagement() {
@@ -60,11 +60,11 @@ public class PhaseTemplateValue implements Serializable {
 
     }
 
-    public PhaseTemplateValue(BigInteger phaseId, String name, String description, Set<Long> staffEmployments, boolean eligibleForManagement) {
+    public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement) {
         this.phaseId = phaseId;
         this.name = name;
         this.description = description;
-        this.staffEmployments = staffEmployments;
+        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
         this.eligibleForManagement = eligibleForManagement;
     }
 }

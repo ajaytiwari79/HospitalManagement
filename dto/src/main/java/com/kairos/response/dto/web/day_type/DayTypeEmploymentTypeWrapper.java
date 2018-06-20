@@ -4,24 +4,24 @@ import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 
 import java.util.List;
 
-public class DayTypeEmploymentWrapper {
-    private List<DayTypesDTO> dayTypes;
+public class DayTypeEmploymentTypeWrapper {
+    private List<DayType> dayTypes;
     private List<EmploymentTypeDTO> employmentTypes;
 
-    public DayTypeEmploymentWrapper() {
+    public DayTypeEmploymentTypeWrapper() {
         //Default Constructor
     }
 
-    public DayTypeEmploymentWrapper(List<DayTypesDTO> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
+    public DayTypeEmploymentTypeWrapper(List<DayType> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
         this.dayTypes = dayTypes;
         this.employmentTypes = employmentTypes;
     }
 
-    public List<DayTypesDTO> getDayTypes() {
+    public List<DayType> getDayTypes() {
         return dayTypes;
     }
 
-    public void setDayTypes(List<DayTypesDTO> dayTypes) {
+    public void setDayTypes(List<DayType> dayTypes) {
         this.dayTypes = dayTypes;
     }
 

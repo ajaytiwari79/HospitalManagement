@@ -1,12 +1,15 @@
 package com.kairos.activity.service.activity;
 
 
+import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.SkillRestClient;
 import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
+import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
@@ -114,6 +117,7 @@ public class ActivityService extends MongoBaseService {
     private StaffRestClient staffRestClient;
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -477,12 +481,14 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
-        List<DayType> dayTypes = organizationRestClient.getDayTypesByCountryId(countryId);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= genericIntegrationService.getDayTypesAndEmploymentTypes(countryId);
+        List<DayType> dayTypes1 =dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<EmploymentTypeDTO> employmentTypeDTOS=dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
 
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
 
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes1,employmentTypeDTOS);
         return activityTabsWrapper;
     }
 
@@ -1011,7 +1017,7 @@ public class ActivityService extends MongoBaseService {
             phaseTemplateValue.setName(phaseDTO.getName());
             phaseTemplateValue.setDescription(phaseDTO.getDescription());
             phaseTemplateValue.setEligibleForManagement(false);
-            phaseTemplateValue.setStaffEmployments(new HashSet<>());
+            phaseTemplateValue.setEligibleEmploymentTypes(new ArrayList<>());
             phaseTemplateValues.add(phaseTemplateValue);
         }
         return phaseTemplateValues;
@@ -1040,9 +1046,9 @@ public class ActivityService extends MongoBaseService {
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException("message.activity.published", activityId);
         }
-        if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null || activity.getBalanceSettingsActivityTab().getPresenceTypeId() == null) {
-            exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null", activity.getName());
-        }
+//        if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null || activity.getBalanceSettingsActivityTab().getPresenceTypeId() == null) {
+//            exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null", activity.getName());
+//        }
         activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);
         return true;
