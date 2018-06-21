@@ -105,15 +105,12 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private WTAService wtaService;
     @Inject
-
     private ExceptionService exceptionService;
     @Inject
     private OpenShiftMongoRepository openShiftMongoRepository;
-
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
     @Inject
-
     private PhaseSettingsService phaseSettingsService;
     @Inject
     private PhaseSettingsRepository phaseSettingsRepository;
@@ -251,7 +248,6 @@ public class ShiftService extends MongoBaseService {
                 // if still after subtraction the shift is greater than
                 allowedBreakDurationInMinute = breakSettings.get(i).getBreakDurationInMinute();
                 startDateMillis = endDateMillis;
-                logger.info("Remaining for ShiftDurationInMinute = {}", shiftDurationInMinute);
                 lastItemAdded = SHIFT;
                 if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                     endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
@@ -284,7 +280,7 @@ public class ShiftService extends MongoBaseService {
                 startDateMillis = endDateMillis;
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
-                shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+                shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                 lastItemAdded = BREAK;
             } else {
@@ -294,7 +290,7 @@ public class ShiftService extends MongoBaseService {
 
         }
         // Sometimes the break is
-        if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == SHIFT) {
+        if (shiftDurationInMinute > 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == SHIFT) {
             // handle later
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
@@ -302,7 +298,7 @@ public class ShiftService extends MongoBaseService {
             shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
 
 
-        } else if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
+        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(shiftDTO, mainShift.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
@@ -559,7 +555,7 @@ public class ShiftService extends MongoBaseService {
                             }
                             if (!checkOverStaffing && checkForUnderStaffing && totalCount < 0) {
                                 if ((checkForStaff && checkForManagement) && (!phaseSettings.isStaffEligibleForUnderStaffing() && !phaseSettings.isManagementEligibleForUnderStaffing())) {
-                                        exceptionService.actionNotPermittedException("message.shift.underStaffing");
+                                    exceptionService.actionNotPermittedException("message.shift.underStaffing");
                                 } else if (checkForStaff ? !phaseSettings.isStaffEligibleForUnderStaffing() : !phaseSettings.isManagementEligibleForUnderStaffing()) {
                                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                                 }
@@ -855,6 +851,9 @@ public class ShiftService extends MongoBaseService {
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<DateWiseShiftResponse> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
+        if (!Optional.ofNullable(shifts).isPresent() || shifts.isEmpty()) {
+            exceptionService.invalidOperationException("message.shift.notBlank");
+        }
         Set<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getShifts().stream().map(ss -> ss.getActivityId())).collect(Collectors.toSet());
 
         List<Activity> activities = activityRepository.findAllActivitiesByIds(activityIds);
@@ -976,8 +975,8 @@ public class ShiftService extends MongoBaseService {
              * The first eligible break hours after.It specifies you can take first break after this duration
              **/
             breakAllowedAfterMinute = breakSettings.get(i).getShiftDurationInMinute();
-            endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
             if (shiftDurationInMinute > breakAllowedAfterMinute) {
+                endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
                 // we have added a sub shift now adding the break for remaining period
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
@@ -1015,7 +1014,8 @@ public class ShiftService extends MongoBaseService {
                 startDateMillis = endDateMillis;
                 endDateMillis = endDateMillis + (allowedBreakDurationInMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
-                shiftDurationInMinute = shiftDurationInMinute - breakAllowedAfterMinute;
+                // reduce the shift
+                shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                 lastItemAdded = BREAK;
             } else {
@@ -1025,14 +1025,14 @@ public class ShiftService extends MongoBaseService {
 
         }
         // Sometimes the break is
-        if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == SHIFT) {
+        if (shiftDurationInMinute > 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == SHIFT) {
             // handle later
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
             totalBreakAllotedInMinute += allowedBreakDurationInMinute;
 
-        } else if (shiftDurationInMinute >= 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
+        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute < breakAllowedAfterMinute && lastItemAdded == BREAK) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
