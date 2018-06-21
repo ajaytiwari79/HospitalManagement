@@ -84,4 +84,10 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         Query query = Query.query(Criteria.where("sequence").is(sequence).and("id").is(phaseId));
         return mongoTemplate.exists(query, Phase.class);
     }
+    public  List<Phase> getPlanningPhasesByUnit(Long unitId)
+    {
+        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("duration").gt(0).and("phaseType").is(PhaseType.PLANNING));
+        query.with(new Sort(Sort.Direction.DESC,"sequence"));
+        return mongoTemplate.find(query,Phase.class,"phases");
+    }
 }

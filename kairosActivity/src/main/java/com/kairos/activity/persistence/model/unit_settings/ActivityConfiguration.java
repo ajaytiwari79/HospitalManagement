@@ -1,17 +1,13 @@
 package com.kairos.activity.persistence.model.unit_settings;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.enums.unit_settings.TimeTypeEnum;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.PhasePlannedTime;
-
-import java.math.BigInteger;
-import java.util.List;
+import com.kairos.response.dto.web.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.response.dto.web.unit_settings.activity_configuration.PresencePlannedTime;
 
 public class ActivityConfiguration extends MongoBaseEntity {
     private Long unitId;
-    private BigInteger timeTypeId;
-    private TimeTypeEnum timeType;   // if this will
-    private List<PhasePlannedTime> phasePlannedTimes;
+    private PresencePlannedTime presencePlannedTime;
+    private AbsencePlannedTime absencePlannedTime;
 
     public ActivityConfiguration() {
         // dc
@@ -25,27 +21,31 @@ public class ActivityConfiguration extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
+    public PresencePlannedTime getPresencePlannedTime() {
+        return presencePlannedTime;
     }
 
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
+    public void setPresencePlannedTime(PresencePlannedTime presencePlannedTime) {
+        this.presencePlannedTime = presencePlannedTime;
     }
 
-    public List<PhasePlannedTime> getPhasePlannedTimes() {
-        return phasePlannedTimes;
+    public AbsencePlannedTime getAbsencePlannedTime() {
+        return absencePlannedTime;
     }
 
-    public void setPhasePlannedTimes(List<PhasePlannedTime> phasePlannedTimes) {
-        this.phasePlannedTimes = phasePlannedTimes;
+
+    public void setAbsencePlannedTime(AbsencePlannedTime absencePlannedTime) {
+
+        this.absencePlannedTime = absencePlannedTime;
     }
 
-    public TimeTypeEnum getTimeType() {
-        return timeType;
+    public ActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
+        this.unitId = unitId;
+        this.presencePlannedTime = presencePlannedTime;
+    }
+    public ActivityConfiguration(Long unitId, AbsencePlannedTime absencePlannedTime) {
+        this.unitId = unitId;
+        this.absencePlannedTime = absencePlannedTime;
     }
 
-    public void setTimeType(TimeTypeEnum timeType) {
-        this.timeType = timeType;
-    }
 }

@@ -3,13 +3,13 @@ package com.kairos.response.dto.web.unit_settings.activity_configuration;
 import com.kairos.enums.unit_settings.TimeTypeEnum;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class ActivityConfigurationDTO {
     private BigInteger id;
-    private TimeTypeEnum timeType;
-    private BigInteger timeTypeId;
-    private List<PhasePlannedTime> phasePlannedTimes;
+    private TimeTypeEnum timeType;  // presence absence
+    private PresencePlannedTime presencePlannedTime;   // this is applicable for presence
+    private AbsencePlannedTime absencePlannedTime; // this is only for absence
+
 
     public ActivityConfigurationDTO() {
         //DC
@@ -31,19 +31,19 @@ public class ActivityConfigurationDTO {
         this.timeType = timeType;
     }
 
-    public List<PhasePlannedTime> getPhasePlannedTimes() {
-        return phasePlannedTimes;
+    public PresencePlannedTime getPresencePlannedTime() {
+        return presencePlannedTime;
     }
 
-    public void setPhasePlannedTimes(List<PhasePlannedTime> phasePlannedTimes) {
-        this.phasePlannedTimes = phasePlannedTimes;
+    public void setPresencePlannedTime(PresencePlannedTime presencePlannedTime) {
+        this.presencePlannedTime = presencePlannedTime;
     }
 
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
+    public AbsencePlannedTime getAbsencePlannedTime() {
+        return absencePlannedTime;
     }
 
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
+    public void setAbsencePlannedTime(AbsencePlannedTime absencePlannedTime) {
+        this.absencePlannedTime = absencePlannedTime;
     }
 }

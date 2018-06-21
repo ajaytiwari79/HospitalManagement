@@ -2,10 +2,6 @@ package com.kairos.activity.service.organization;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
-import com.kairos.activity.service.unit_settings.UnitSettingService;
-import com.kairos.response.dto.web.phase.PhaseDTO;
-import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
@@ -15,10 +11,9 @@ import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepos
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
-
+import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithUnitIdDTO;
-
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
@@ -29,13 +24,16 @@ import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.service.period.PeriodSettingsService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.service.unit_settings.ActivityConfigurationService;
 import com.kairos.activity.service.unit_settings.PhaseSettingsService;
+import com.kairos.activity.service.unit_settings.UnitSettingService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
-
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.response.dto.web.unit_settings.UnitSettingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +84,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private UnitSettingRepository unitSettingRepository;
     @Inject
     private UnitSettingService unitSettingService;
+    private @Inject
+    ActivityConfigurationService activityConfigurationService;
 
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -290,6 +290,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
+        activityConfigurationService.createDefaultPhaseSettings(countryId,unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId);
         return true;
     }

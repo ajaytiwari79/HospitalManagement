@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.phase;
 
 
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
+import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import org.springframework.data.domain.Sort;
 
@@ -20,4 +21,5 @@ public interface CustomPhaseMongoRepository {
      Boolean checkPhaseByName(BigInteger phaseId, String name);
      Boolean checkPhaseBySequence(BigInteger phaseId, int sequence);
      List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence);
+     List<Phase> getPlanningPhasesByUnit(Long unitId);
 }
