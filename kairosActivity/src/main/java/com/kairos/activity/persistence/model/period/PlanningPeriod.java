@@ -1,16 +1,13 @@
 package com.kairos.activity.persistence.model.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by prerna on 6/4/18.

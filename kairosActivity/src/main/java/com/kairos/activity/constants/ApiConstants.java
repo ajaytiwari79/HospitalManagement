@@ -28,6 +28,7 @@ public final class ApiConstants {
     public static final String ORDER_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/orders";
     public static final String OPENSHIFT_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/order/{orderId}/openshifts";
     public static final String OPEN_SHIFT_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/open_shift";
+    public static final String ACTIVITY_CONFIGURATION = API_ORGANIZATION_UNIT_URL + "/activity_configuration";
 
 
 

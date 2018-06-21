@@ -2,9 +2,9 @@ package com.kairos.activity.service.organization;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.activity.service.unit_settings.UnitSettingService;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;

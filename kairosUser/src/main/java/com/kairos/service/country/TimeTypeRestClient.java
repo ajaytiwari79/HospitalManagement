@@ -1,8 +1,10 @@
 package com.kairos.service.country;
 
 
+
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
+
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

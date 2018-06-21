@@ -1,10 +1,7 @@
 package com.kairos.response.dto.web.cta;
-
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +10,7 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     private List<DayTypeDTO> dayTypes=new ArrayList<>();
     private List<PhaseDTO> phases=new ArrayList<>();
-    private List<TimeTypeDTO> timeTypes=new ArrayList<>();
+    private List<com.kairos.activity.response.dto.activity.TimeTypeDTO> timeTypes=new ArrayList<>();
     private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
     private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
     private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
@@ -57,11 +54,11 @@ public class CTARuleTemplateDefaultDataWrapper {
         this.phases = phases;
     }
 
-    public List<TimeTypeDTO> getTimeTypes() {
+    public List<com.kairos.activity.response.dto.activity.TimeTypeDTO> getTimeTypes() {
         return timeTypes;
     }
 
-    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
+    public void setTimeTypes(List<com.kairos.activity.response.dto.activity.TimeTypeDTO> timeTypes) {
         this.timeTypes = timeTypes;
     }
 

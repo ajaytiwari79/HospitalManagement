@@ -1,9 +1,9 @@
 package com.kairos.activity.persistence.repository.activity;
 
 
-import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.activity.TimeType;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -20,14 +20,23 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     List<TimeType> findAllLowerLevelTimeType(Long countryId);
 
     @Query("{countryId:?1,label:?0,deleted : false}")
-    TimeType exists(String name,Long countryId);
+    TimeType exists(String name, Long countryId);
 
     @Query("{upperLevelTimeTypeId:?0,deleted : false,countryId:?1}")
-    List<TimeType> findAllChildByParentId(BigInteger id,Long countryId);
+    List<TimeType> findAllChildByParentId(BigInteger id, Long countryId);
 
     @Query("{countryId:?0,deleted : false}")
     List<TimeType> findAllByCountryId(Long countryId);
 
     @Query("{id:?0,countryId:?1,deleted : false}")
-    TimeType findOneById(BigInteger TimeTypeId,Long countryId);
+    TimeType findOneById(BigInteger TimeTypeId, Long countryId);
+
+    @Query("{id:?0, deleted : false}")
+    TimeType findOneById(BigInteger TimeTypeId);
+
+    @Query(value = "{'upperLevelTimeTypeId':{'$exists':false},'deleted' : false,'countryId':?0}")
+    List<TimeTypeDTO> getTopLevelTimeTypeIds(Long countryId);
+
+    @Query("{upperLevelTimeTypeId:{$in:?0},deleted : false}")
+    List<TimeTypeDTO> findAllChildByParentId(List<BigInteger> id);
 }

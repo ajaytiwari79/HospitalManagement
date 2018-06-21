@@ -8,6 +8,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.activity.enums.TimeTypes;
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
@@ -15,7 +16,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
+
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;

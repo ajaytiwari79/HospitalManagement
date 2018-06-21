@@ -1,10 +1,8 @@
 package com.kairos.activity.service.unit_settings;
 
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
+
 import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.activity.persistence.model.unit_settings.UnitSetting;
 import com.kairos.activity.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
@@ -13,6 +11,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.unit_settings.OpenShiftPhase;
 import com.kairos.response.dto.web.unit_settings.OpenShiftPhaseSetting;
 import com.kairos.response.dto.web.unit_settings.UnitAgeSettingDTO;

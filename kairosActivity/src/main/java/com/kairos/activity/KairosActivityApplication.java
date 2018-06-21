@@ -8,7 +8,7 @@ import com.kairos.activity.config.LocalDateDeserializer;
 import com.kairos.activity.config.LocalDateSerializer;
 import com.kairos.activity.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
-import com.kairos.activity.schedular.PhaseChangeScheduler;
+
 import com.kairos.activity.util.userContext.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -145,13 +145,6 @@ public class KairosActivityApplication implements WebMvcConfigurer {
                 .build();
         return template;
     }
-
-
-
-	@Bean
-	public PhaseChangeScheduler getPhaseChangeScheduler() {
-		return new PhaseChangeScheduler();
-	}
 
 /*
 	private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";
