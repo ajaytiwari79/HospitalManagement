@@ -20,7 +20,6 @@ public class TimeCalculationActivityTab implements Serializable {
     private TimeCalaculationType fullWeekCalculationType;
     private Boolean allowBreakReduction;
     private Long fixedTimeValue;
-    private Long monthsToCalculate;
     private String methodForCalculatingTimeInMonths;
     private List<String> balanceType;
     private Boolean multiplyWith;
@@ -79,14 +78,6 @@ public class TimeCalculationActivityTab implements Serializable {
 
     public void setFixedTimeValue(Long fixedTimeValue) {
         this.fixedTimeValue = fixedTimeValue;
-    }
-
-    public Long getMonthsToCalculate() {
-        return monthsToCalculate;
-    }
-
-    public void setMonthsToCalculate(Long monthsToCalculate) {
-        this.monthsToCalculate = monthsToCalculate;
     }
 
     public String getMethodForCalculatingTimeInMonths() {
@@ -179,14 +170,13 @@ public class TimeCalculationActivityTab implements Serializable {
         this.multiplyWithValue = multiplyWithValue;
     }
 
-    public TimeCalculationActivityTab(String methodForCalculatingTime, TimeCalaculationType fullDayCalculationType, TimeCalaculationType fullWeekCalculationType, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
+    public TimeCalculationActivityTab(String methodForCalculatingTime, TimeCalaculationType fullDayCalculationType, TimeCalaculationType fullWeekCalculationType, Boolean allowBreakReduction, Long fixedTimeValue, String methodForCalculatingTimeInMonths, List<String> balanceType,
                                       Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd, int historyDuration, LocalTime defaultStartTime) {
         this.methodForCalculatingTime = methodForCalculatingTime;
         this.fullDayCalculationType = fullDayCalculationType;
         this.fullWeekCalculationType = fullWeekCalculationType;
         this.allowBreakReduction = allowBreakReduction;
         this.fixedTimeValue = fixedTimeValue;
-        this.monthsToCalculate = monthsToCalculate;
         this.methodForCalculatingTimeInMonths = methodForCalculatingTimeInMonths;
         this.balanceType = balanceType;
         this.multiplyWith = multiplyWith;

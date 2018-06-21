@@ -193,7 +193,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
+        //validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         Shift shift = buildShift(shiftWithActivityDTO);
         validateActivityWithStaffEmployment(shift,activity,staffAdditionalInfoDTO);
         shift.setMainShift(true);

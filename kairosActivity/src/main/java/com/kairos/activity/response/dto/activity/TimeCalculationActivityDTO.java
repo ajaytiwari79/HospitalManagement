@@ -20,7 +20,6 @@ public class TimeCalculationActivityDTO {
     private TimeCalaculationType fullWeekCalculationType;
     private Boolean allowBreakReduction;
     private Long fixedTimeValue;
-    private Long monthsToCalculate;
     private String methodForCalculatingTimeInMonths;
     private List<String> balanceType;
     private Boolean multiplyWith;
@@ -69,7 +68,7 @@ public class TimeCalculationActivityDTO {
 
     public TimeCalculationActivityTab buildTimeCalculationActivityTab(){
         TimeCalculationActivityTab timeCalculationActivityTab =new TimeCalculationActivityTab(methodForCalculatingTime, fullDayCalculationType, fullWeekCalculationType, allowBreakReduction,
-                fixedTimeValue,monthsToCalculate,methodForCalculatingTimeInMonths,balanceType,multiplyWith,multiplyWithValue,multiplyByVacationFactor,multiplyByFinalSchedule, breakTemplates,
+                fixedTimeValue,methodForCalculatingTimeInMonths,balanceType,multiplyWith,multiplyWithValue,multiplyByVacationFactor,multiplyByFinalSchedule, breakTemplates,
                 dayTypes,fullWeekStart,fullWeekEnd,historyDuration,defaultStartTime);
         return timeCalculationActivityTab;
     }
@@ -95,14 +94,6 @@ public class TimeCalculationActivityDTO {
 
     public void setFixedTimeValue(Long fixedTimeValue) {
         this.fixedTimeValue = fixedTimeValue;
-    }
-
-    public Long getMonthsToCalculate() {
-        return monthsToCalculate;
-    }
-
-    public void setMonthsToCalculate(Long monthsToCalculate) {
-        this.monthsToCalculate = monthsToCalculate;
     }
 
     public String getMethodForCalculatingTimeInMonths() {

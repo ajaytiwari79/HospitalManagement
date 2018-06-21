@@ -28,8 +28,6 @@ public class GeneralActivityTabDTO {
     private  String shortName;
     private boolean eligibleForUse=true;
     private String ultraShortName;
-
-    private boolean overRuleCtaWta;
     private LocalDate startDate;
     private LocalDate endDate;
 
@@ -70,7 +68,7 @@ public class GeneralActivityTabDTO {
     public GeneralActivityTab buildGeneralActivityTab() {
         GeneralActivityTab generalActivityTab =
                 new GeneralActivityTab(name, code, printoutSymbol,categoryId, colorPresent, backgroundColor, textColor, description,this.isActive,
-                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta, this.startDate,this.endDate);
+                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName, this.startDate,this.endDate);
         return generalActivityTab;
     }
 
@@ -204,15 +202,6 @@ public class GeneralActivityTabDTO {
 
     public void setModifiedIconName(String modifiedIconName) {
         this.modifiedIconName = modifiedIconName;
-    }
-
-
-    public boolean isOverRuleCtaWta() {
-        return overRuleCtaWta;
-    }
-
-    public void setOverRuleCtaWta(boolean overRuleCtaWta) {
-        this.overRuleCtaWta = overRuleCtaWta;
     }
 
     public LocalDate getStartDate() {

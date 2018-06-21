@@ -903,7 +903,6 @@ public class ActivityService extends MongoBaseService {
                     new BalanceSettingsActivityTab();
             balanceSettingsActivityTab.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence() ? presenceTimeTypeId : absenceTimeTypeId);
             balanceSettingsActivityTab.setNegativeDayBalancePresent(timeCareActivity.getNegativeDayBalance());
-            balanceSettingsActivityTab.setAddDayTo(timeCareActivity.getBalanceDayType().replace(" ", "_"));
             activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
 
             //rules activity tab
