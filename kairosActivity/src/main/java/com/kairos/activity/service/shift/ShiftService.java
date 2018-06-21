@@ -194,8 +194,8 @@ public class ShiftService extends MongoBaseService {
         ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
         validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
-        validateActivityWithStaffEmployment();
         Shift shift = buildShift(shiftWithActivityDTO);
+        validateActivityWithStaffEmployment(shift,activity,staffAdditionalInfoDTO);
         shift.setMainShift(true);
         List<Integer> activityDayTypes = new ArrayList<>();
         if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
@@ -1119,7 +1119,7 @@ public class ShiftService extends MongoBaseService {
         }
         if(Optional.ofNullable(phaseTemplateValue1).isPresent()){
             if(!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())){
-                exceptionService.actionNotPermittedException("message.employmentType");
+                exceptionService.actionNotPermittedException("message.staff.employmentType.absent");
             }
         }
 
