@@ -209,6 +209,9 @@ public class Task extends TaskOrShift{
     }
     //for rules only
     public int getDrivingTimeSeconds(){
+        if(!false){
+            return 0;
+        }
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
         }
@@ -216,11 +219,7 @@ public class Task extends TaskOrShift{
         Task prevTask=(Task)prevTaskOrShift;
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLattitude(),prevTask.getLongitude(),this.getLattitude(),this.getLongitude()));
         return lpd.getTime();
-
-
     }
-
-
     public int getDrivingTime(){
         int mins=(int)Math.ceil(getDrivingTimeSeconds()/60d);
         return mins;
@@ -279,6 +278,9 @@ public class Task extends TaskOrShift{
     }
     public boolean hasSameSkillset(Task task){
         return VrpPlanningUtil.hasSameSkillset(this,task);
+    }
+    public int getMissingSkills(){
+            return VrpPlanningUtil.getMissingSkills(this,this.getShift().getEmployee());
     }
 
 

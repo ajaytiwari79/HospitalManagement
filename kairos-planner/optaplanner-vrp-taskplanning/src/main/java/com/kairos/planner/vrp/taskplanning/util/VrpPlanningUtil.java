@@ -1,11 +1,14 @@
 package com.kairos.planner.vrp.taskplanning.util;
 
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class VrpPlanningUtil {
@@ -45,5 +48,19 @@ public class VrpPlanningUtil {
 
     public static boolean hasSameSkillset(Task task, Task task1) {
         return Objects.equals(task.getSkills(),task1.getSkills());
+    }
+
+    public static int getMissingSkills(Task task, Employee employee) {
+        if(Objects.equals(employee.getSkills(),task.getSkills())){
+            return 0;
+        }else if(employee.getSkills().containsAll(task.getSkills())){
+            //we intent to return -ve
+            return task.getSkills().size()-employee.getSkills().size();
+        }
+        else {
+            List<String> list= new ArrayList<>(task.getSkills());
+            list.removeAll(employee.getSkills());
+            return list.size();
+        }
     }
 }

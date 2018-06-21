@@ -5,8 +5,11 @@ import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
 import com.thoughtworks.xstream.XStream;
+import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
+import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.impl.score.director.drools.DroolsScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,6 +82,12 @@ public class VrpTaskPlanningSolver {
         log.info(sbs.toString());
         log.info(shiftChainInfo.toString());
         log.info("total driving time:"+totalDrivingTime);
+        DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
+
+        director.setWorkingSolution(solution);
+        Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+
+        toDisplayString(new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()});
 
     }
 
@@ -119,4 +129,23 @@ public class VrpTaskPlanningSolver {
         }
         return list;
     }
+    public String toDisplayString(Object[] array) {
+
+        VrpTaskPlanningSolution solution = (VrpTaskPlanningSolution) array[0];
+        //unassignTaskFromUnavailableEmployees(solution);
+        Map<Task, Indictment> indictmentMap = (Map<Task, Indictment>) array[1];
+        Collection<ConstraintMatchTotal> constraintMatchTotals = (Collection<ConstraintMatchTotal>) array[2];
+        constraintMatchTotals.forEach(constraintMatchTotal -> {
+            log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
+            constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
+                constraintMatch.getJustificationList().forEach(o -> {
+                    log.info("---" + o+"---------"+((Task)o).getShift());
+                });
+            });
+
+        });
+        return "";
+    }
+
+
 }

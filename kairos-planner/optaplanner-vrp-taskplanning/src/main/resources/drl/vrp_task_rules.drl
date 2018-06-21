@@ -9,9 +9,13 @@ global HardMediumSoftLongScoreHolder scoreHolder;
 rule "Task eligibility"
 salience 20
     when
-        $task:Task(!isEmployeeEligible());
+        $task:Task(prevTaskOrShift!=null, $m:missingSkills , $m!=0);
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-1);
+        if($m>0)
+            scoreHolder.addHardConstraintMatch(kcontext,-$m);
+        else
+            scoreHolder.addSoftConstraintMatch(kcontext,$m);
+
 end
 
 
