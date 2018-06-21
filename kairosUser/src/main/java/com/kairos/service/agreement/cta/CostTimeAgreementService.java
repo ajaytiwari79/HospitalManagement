@@ -607,7 +607,7 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setCountry(countryGraphRepository.findOne(countryId,0));
         this.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
-        publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
+        //publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
 
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         /*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
