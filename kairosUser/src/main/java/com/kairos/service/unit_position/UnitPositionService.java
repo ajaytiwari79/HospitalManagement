@@ -509,13 +509,18 @@ public class UnitPositionService extends UserBaseService {
 
         }
         Set<Long> olderFunctionsAddedInUnitPosition = oldUnitPosition.getFunctions() != null ? oldUnitPosition.getFunctions().stream().map(Function::getId).collect(Collectors.toSet()) : Collections.emptySet();
-        if (olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
-            if (!olderFunctionsAddedInUnitPosition.isEmpty())
-                unitPositionGraphRepository.removeOlderFunctionsFromUnitPosition(oldUnitPosition.getId());
-            List<Function> functions = functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctionIds());
-            if (functions.size() != unitPositionDTO.getFunctionIds().size()) {
-                exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
+        if (!olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
 
+            /*if (!olderFunctionsAddedInUnitPosition.isEmpty())
+                unitPositionGraphRepository.removeOlderFunctionsFromUnitPosition(oldUnitPosition.getId());*/
+
+            List<Function> functions = new ArrayList<>();
+            if(!unitPositionDTO.getFunctionIds().isEmpty()){
+                functions = functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctionIds());
+                if (functions.size() != unitPositionDTO.getFunctionIds().size()) {
+                    exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
+
+                }
             }
             oldUnitPosition.setFunctions(functions);
         }
@@ -545,7 +550,7 @@ public class UnitPositionService extends UserBaseService {
 
             }
         }
-        if (unitPositionDTO.getStartLocalDate().isAfter(LocalDate.now())) {
+        if (unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())) {
             exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
 
         }
