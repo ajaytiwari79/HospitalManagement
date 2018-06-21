@@ -193,7 +193,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        //validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
+        validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         Shift shift = buildShift(shiftWithActivityDTO);
         validateActivityWithStaffEmployment(shift,activity,staffAdditionalInfoDTO);
         shift.setMainShift(true);
@@ -865,7 +865,6 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date startDate, Date endDate) {
         List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
-
         List<OpenShift> openShifts = openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate,endDate);
         UserAccessRoleDTO userAccessRoleDTO=genericIntegrationService.getAccessRolesOfStaff(unitId);
         List<OpenShiftResponseDTO> openShiftResponseDTOS=new ArrayList<>();
