@@ -921,7 +921,7 @@ public class ShiftService extends MongoBaseService {
         }
         statusMap.put("success", successfullyCopiedShifts);
         statusMap.put("error", errorInCopyingShifts);
-        if (!shifts.isEmpty()) save(newShifts);
+        if (!newShifts.isEmpty()) save(newShifts);
         return statusMap;
     }
 
