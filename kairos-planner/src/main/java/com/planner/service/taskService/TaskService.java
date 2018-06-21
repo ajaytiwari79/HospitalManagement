@@ -41,8 +41,6 @@ public class TaskService {
             Task task = taskMap.get(t.getKey());
             tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(task.getId(),task.getIntallationNo(),task.getLattitude(),task.getLongitude(),intallationandSkill.get(task.getIntallationNo()),t.getValue(),task.getStreetName(),task.getHouseNo(),task.getBlock(),task.getFloorNo(),task.getPost(),task.getCity()));
         });
-        AtomicInteger a = new AtomicInteger(0);
-        tasks.forEach(t->a.addAndGet(t.getDuration()));
         return tasks;
     }
 

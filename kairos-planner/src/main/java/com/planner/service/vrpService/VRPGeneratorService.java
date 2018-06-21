@@ -4,6 +4,7 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 
+import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;
@@ -71,6 +72,25 @@ public class VRPGeneratorService {
             }
         });
         return shifts;
+    }
+
+    public VrpTaskPlanningSolution getVRPProblemSolution(VrpTaskPlanningDTO vrpTaskPlanningDTO){
+        VrpTaskPlanningSolution solution = new VrpTaskPlanningSolution();
+        List<Employee> employees = ObjectMapperUtils.copyPropertiesOfListByMapper(vrpTaskPlanningDTO.getEmployees(),Employee.class);
+        List<Matrix> matrix=tomTomService.getMatrix();
+        LocationsDistanceMatrix locationsDistanceMatrix= new LocationsDistanceMatrix();
+        matrix.forEach(m->{
+            locationsDistanceMatrix.addLocationDistance(new LocationPair(m.getFirstLatitude(),m.getFirstLongitude(),m.getSecondLattitude(),m.getSecondLongitude()),
+                    new LocationPairDifference(m.getResponse().getRouteSummary().getLengthInMeters(),m.getResponse().getRouteSummary().getTravelTimeInSeconds(),m.getResponse().getRouteSummary().getTrafficDelayInSeconds()));
+        });
+        List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = ObjectMapperUtils.copyPropertiesOfListByMapper(vrpTaskPlanningDTO.getTasks(),com.kairos.planner.vrp.taskplanning.model.Task.class);
+        List<Shift> shifts = ObjectMapperUtils.copyPropertiesOfListByMapper(vrpTaskPlanningDTO.getTasks(),Shift.class);
+        solution.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
+        solution.setTasks(tasks);
+        solution.setShifts(shifts);
+        solution.setEmployees(employees);
+        solution.setLocationsDistanceMatrix(locationsDistanceMatrix);
+        return solution;
     }
 
 

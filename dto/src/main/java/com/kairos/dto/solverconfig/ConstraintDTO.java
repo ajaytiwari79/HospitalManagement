@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.solver_config.ConstraintCategory;
 
+import java.math.BigInteger;
+
 /**
  * @author pradeep
  * @date - 20/6/18
@@ -12,9 +14,18 @@ import com.kairos.enums.solver_config.ConstraintCategory;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConstraintDTO {
 
+    private BigInteger id;
     private String name;
     private String description;
     private ConstraintCategory category;
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

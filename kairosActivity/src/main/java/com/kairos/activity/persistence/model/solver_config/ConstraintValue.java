@@ -16,7 +16,8 @@ import java.util.List;
 public class ConstraintValue {
 
 
-    private BigInteger constraintId;
+    //constraint id
+    private BigInteger id;
 
      //it is used for current constraint belongs to which level like (Hard,Medium,soft).
     private ContraintLevel level;
@@ -26,22 +27,32 @@ public class ConstraintValue {
     private Integer levelValue;
     //it is used for making rule conditions like (waiting time not more then 8 hours) It is used when planner doesnt' give
     private List<Integer> staticRuleValues;
-    //it is same as static value but it is used when planner give the value for this contraint.
+    //it is same as static constraintValue but it is used when planner give the constraintValue for this contraint.
     private List<Integer> dynamicRuleValue;
+
+    private Integer constraintValue;
+
+    public Integer getConstraintValue() {
+        return constraintValue;
+    }
+
+    public void setConstraintValue(Integer constraintValue) {
+        this.constraintValue = constraintValue;
+    }
 
     public ConstraintValue() {
     }
 
-    public ConstraintValue(BigInteger constraintId) {
-        this.constraintId = constraintId;
+    public ConstraintValue(BigInteger id) {
+        this.id = id;
     }
 
-    public BigInteger getConstraintId() {
-        return constraintId;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setConstraintId(BigInteger constraintId) {
-        this.constraintId = constraintId;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public ContraintLevel getLevel() {

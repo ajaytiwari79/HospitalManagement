@@ -1592,8 +1592,8 @@ public class TaskService extends MongoBaseService {
             Row row = rows.get(i);
             Task task = new Task();
             TaskAddress taskAddress = new TaskAddress();
-            taskAddress.setLatitude(getValue(row.getCell(14)).toString());
-            taskAddress.setLongitude(getValue(row.getCell(14)).toString());
+            taskAddress.setLatitude(getConstraintValue(row.getCell(14)).toString());
+            taskAddress.setLongitude(getConstraintValue(row.getCell(14)).toString());
             taskAddress.setCity(row.getCell(13).getStringCellValue());
             taskAddress.setFloorNumber((int) row.getCell(10).getNumericCellValue());
             taskAddress.setHouseNumber( ""+row.getCell(8).getNumericCellValue());
@@ -1601,7 +1601,7 @@ public class TaskService extends MongoBaseService {
             taskAddress.setStreet(row.getCell(7).getStringCellValue());
             taskAddress.setBlock(row.getCell(9).getStringCellValue());
             task.setAddress(taskAddress);
-            task.setInstallationNumber(getValue(row.getCell(5)).intValue());
+            task.setInstallationNumber(getConstraintValue(row.getCell(5)).intValue());
             task.setDuration((int) row.getCell(0).getNumericCellValue());
             task.setCitizenId(installationAndCitizenId.get(task.getInstallationNumber()));
             task.setUnitId(unitId);

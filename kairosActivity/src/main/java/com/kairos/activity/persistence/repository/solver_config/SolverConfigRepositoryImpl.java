@@ -32,8 +32,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
     public List<SolverConfigDTO> getAllByUnitId(Long unitId) {
         Aggregation agg = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                lookup("constraint","constraints.constraintId","_id","constraints"),
-                project().and("constraints._id").as("constraints.constraintId")
+                lookup("constraint","constraints.constraintId","_id","constraints")
         );
         AggregationResults< SolverConfigDTO > result =mongoTemplate.aggregate(agg,SolverConfig.class,SolverConfigDTO.class);
         return result.getMappedResults();

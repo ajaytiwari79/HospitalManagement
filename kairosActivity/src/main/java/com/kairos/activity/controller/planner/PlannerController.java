@@ -10,6 +10,7 @@ import com.kairos.activity.service.CustomTimeScaleService;
 import com.kairos.activity.service.planner.PlannerService;
 import com.kairos.activity.service.planner.TaskExceptionService;
 import com.kairos.activity.service.planner.TasksMergingService;
+import com.kairos.activity.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.service.visitator.VisitatorService;
 import com.kairos.activity.util.response.ResponseHandler;
@@ -55,6 +56,7 @@ public class PlannerController {
     VisitatorService visitatorService;
     @Autowired
     TaskService taskService;
+    @Inject private VRPPlanningService vrpPlanningService;
 
     @ApiOperation("Get Citizen planner data")
     @RequestMapping(value = "/citizen/{citizenId}", method = RequestMethod.GET)
@@ -301,6 +303,12 @@ public class PlannerController {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, plannerService.getCitizenListByTimeSlotIds(timeSlotIds, unitId));
 
+    }
+
+    @PostMapping(value = "/{solverConfigId}")
+    @ApiOperation("create default solver config")
+    public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
     }
 
 }

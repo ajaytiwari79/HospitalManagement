@@ -3,6 +3,7 @@ package com.kairos.dto.solverconfig;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.solver_config.PlanningType;
+import com.kairos.enums.solver_config.SolverConfigStatus;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -22,7 +23,16 @@ public class SolverConfigDTO {
     private BigInteger parentSolverConfigId;
     private Integer terminationTime;
     private List<ConstraintValueDTO> constraints;
+    private SolverConfigStatus status;
     private boolean isDefault;
+
+    public SolverConfigStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SolverConfigStatus status) {
+        this.status = status;
+    }
 
     public List<ConstraintValueDTO> getConstraints() {
         return constraints;

@@ -16,7 +16,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConstraintValueDTO {
 
-    private BigInteger constraintId;
+    //constraint id
+    private BigInteger id;
     private String name;
     private String description;
     private ConstraintCategory category;
@@ -28,16 +29,25 @@ public class ConstraintValueDTO {
     private Integer levelValue;
     //it is used for making rule conditions like (waiting time not more then 8 hours) It is used when planner doesnt' give
     private List<Integer> staticRuleValues;
-    //it is same as static value but it is used when planner give the value for this contraint.
+    //it is same as static constraintValue but it is used when planner give the constraintValue for this contraint.
     private List<Integer> dynamicRuleValue;
 
+    private Integer constraintValue;
 
-    public BigInteger getConstraintId() {
-        return constraintId;
+    public Integer getConstraintValue() {
+        return constraintValue;
     }
 
-    public void setConstraintId(BigInteger constraintId) {
-        this.constraintId = constraintId;
+    public void setConstraintValue(Integer constraintValue) {
+        this.constraintValue = constraintValue;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public ContraintLevel getLevel() {

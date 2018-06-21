@@ -1,6 +1,7 @@
 package com.planner.controller;
 
 import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
+import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.commonUtil.OptaNotFoundException;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.commonUtil.StaticField;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
@@ -119,6 +121,18 @@ public class PlanningController {
 
 
 */
+
+	@PostMapping(value = "/submitVRPPlanning")
+	ResponseEntity<Map<String, Object>> submitVRPPlanning(@RequestBody VrpTaskPlanningDTO vrpTaskPlanningDTO) {
+		 plannerService.submitVRPPlanning(vrpTaskPlanningDTO);
+		return ResponseHandler.generateResponse(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED);
+	}
+
+	@GetMapping(value = "/vrp/{solverConfigId}")
+	ResponseEntity<Map<String, Object>> getSolutionBySolverConfigId(@PathVariable BigInteger solverConfigId) {
+		return ResponseHandler.generateResponseWithData(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED,plannerService.getSolutionBySolverConfigId(solverConfigId));
+	}
+
 
 
 

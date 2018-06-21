@@ -4,6 +4,7 @@ import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
+import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import static com.kairos.activity.util.RestClientUrlUtil.getPlannerBaseUrl;
 public class PlannerRestClient {
     private Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation,Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
@@ -78,6 +79,9 @@ public class PlannerRestClient {
         }
         else if(t instanceof WTAResponseDTO){
             uri= String.format("staff/%s/unitposition/%s/wta",pathParams);
+        }
+        else if (t instanceof VrpTaskPlanningDTO){
+            uri = "planner/submitVRPPlanning";
         }
         return uri;
     }

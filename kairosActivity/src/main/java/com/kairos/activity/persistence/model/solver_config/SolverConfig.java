@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.solver_config.PlanningType;
+import com.kairos.enums.solver_config.SolverConfigStatus;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -21,6 +22,7 @@ public class SolverConfig extends MongoBaseEntity{
     private boolean isTemplate;
     private PlanningType phase;
     private BigInteger parentSolverConfigId;
+    private SolverConfigStatus status;
     private Integer terminationTime;//In minutes
     private List<ConstraintValue> constraints;
     private boolean isDefault;
@@ -29,7 +31,7 @@ public class SolverConfig extends MongoBaseEntity{
     public SolverConfig() {
     }
 
-    public SolverConfig(Long unitId, String name, boolean isTemplate, PlanningType phase, BigInteger parentSolverConfigId, Integer terminationTime, List<ConstraintValue> constraints, boolean isDefault) {
+    public SolverConfig(Long unitId, String name, boolean isTemplate, PlanningType phase, BigInteger parentSolverConfigId, Integer terminationTime, List<ConstraintValue> constraints, boolean isDefault,SolverConfigStatus status) {
         this.unitId = unitId;
         this.name = name;
         this.isTemplate = isTemplate;
@@ -38,6 +40,15 @@ public class SolverConfig extends MongoBaseEntity{
         this.terminationTime = terminationTime;
         this.constraints = constraints;
         this.isDefault = isDefault;
+        this.status = status;
+    }
+
+    public SolverConfigStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SolverConfigStatus status) {
+        this.status = status;
     }
 
     public Long getUnitId() {

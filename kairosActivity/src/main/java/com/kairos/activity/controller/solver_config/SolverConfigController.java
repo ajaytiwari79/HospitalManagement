@@ -1,6 +1,7 @@
 package com.kairos.activity.controller.solver_config;
 
 import com.kairos.activity.constants.ApiConstants;
+import com.kairos.activity.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.activity.service.solver_config.SolverConfigService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Map;
 
 /**
@@ -23,8 +26,9 @@ import java.util.Map;
 @RequestMapping(ApiConstants.API_ORGANIZATION_UNIT_URL + "/solverConfig")
 public class SolverConfigController {
     private static Logger logger= LoggerFactory.getLogger(SolverConfigController.class);
-    @Autowired
+    @Inject
     private SolverConfigService solverConfigService;
+    @Inject private VRPPlanningService vrpPlanningService;
 
     @PostMapping(value = "/")
     @ApiOperation("Create solver config")
@@ -39,10 +43,10 @@ public class SolverConfigController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, solverConfigService.getAllVRPSolverConfig(unitId));
     }
 
-    @PutMapping(value = "")
+    @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("update solver config")
-    public ResponseEntity<Map<String, Object>> updateSolverConfig(@PathVariable Long unitId,@RequestBody SolverConfigDTO solverConfigDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, solverConfigService.updateSolverConfig(unitId,solverConfigDTO));
+    public ResponseEntity<Map<String, Object>> updateSolverConfig(@PathVariable BigInteger solverConfigId, @PathVariable Long unitId, @RequestBody SolverConfigDTO solverConfigDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED, true, solverConfigService.updateSolverConfig(solverConfigId,solverConfigDTO));
     }
 
     @PostMapping(value = "/defaultConfig")
@@ -50,6 +54,20 @@ public class SolverConfigController {
     public ResponseEntity<Map<String, Object>> createDefaultConfig(@PathVariable Long unitId) {
         solverConfigService.createDefaultConfig(unitId);
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,null);
+    }
+
+    @PostMapping(value = "/{solverConfigId}/stop")
+    @ApiOperation("create default solver config")
+    public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.stopToPlannerBySolverConfig(unitId,solverConfigId));
+    }
+
+
+
+    @PostMapping(value = "/{solverConfigId}")
+    @ApiOperation("create default solver config")
+    public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
     }
 
 }

@@ -73,6 +73,21 @@ public class VrpTaskPlanningSolver {
 
     }
 
+    public VrpTaskPlanningSolution solveProblemOnRequest(VrpTaskPlanningSolution problem) {
+        AtomicInteger at=new AtomicInteger(0);
+        problem.getTasks().forEach(t->{
+            t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
+        });
+        VrpTaskPlanningSolution solution=null;
+        try {
+            solution = solver.solve(problem);
+        }catch (Exception e){
+            //e.printStackTrace();
+            throw  e;
+        }
+        return solution;
+    }
+
     public List<Location> getLocationList(Shift shift){
         List<Location> list= new ArrayList<>();
         Task temp=shift.getNextTask();
