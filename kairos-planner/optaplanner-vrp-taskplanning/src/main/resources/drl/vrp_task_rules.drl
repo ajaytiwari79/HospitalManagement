@@ -53,7 +53,16 @@ rule "Consecutive tasks"
 salience 22
     when
         $t1:Task(prevTaskOrShift!=null)
-        $t2:Task(prevTaskOrShift!=null && hasSameLocation($t1) && !isConsecutive($t1))
+        $t2:Task(prevTaskOrShift!=null && hasSameChain($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
+    then
+        scoreHolder.addMediumConstraintMatch(kcontext,-1);
+end
+
+rule "Consecutive tasks if same skillSet"
+salience 22
+    when
+        $t1:Task(prevTaskOrShift!=null)
+        $t2:Task(prevTaskOrShift!=null && !id.equals($t1.id) && hasSameSkillset($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end

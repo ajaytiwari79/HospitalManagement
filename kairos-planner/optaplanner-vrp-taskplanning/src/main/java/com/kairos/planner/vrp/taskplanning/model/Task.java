@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author pradeep
@@ -152,6 +153,7 @@ public class Task extends TaskOrShift{
     }
 
     public Task(int intallationNo, Double lattitude, Double longitude) {
+        this.id= UUID.randomUUID().toString();
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
         this.longitude = longitude;
@@ -264,15 +266,19 @@ public class Task extends TaskOrShift{
         return lattitude+":"+longitude;
     }
     public boolean isConsecutive(Task task){
-        //If chain(shift) is different.. dont even consider this constraint
-        boolean consecutive = !VrpPlanningUtil.hasSameChain(this, task) || VrpPlanningUtil.isConsecutive(this, task);
-        return consecutive;
+        return VrpPlanningUtil.isConsecutive(this, task);
     }
     public boolean isEmployeeEligible(){
         return shift==null || shift.getEmployee().getSkills().containsAll(this.skills);
     }
     public boolean hasSameLocation(Task task){
         return VrpPlanningUtil.hasSameLocation(this,task);
+    }
+    public boolean hasSameChain(Task task){
+        return VrpPlanningUtil.hasSameChain(this,task);
+    }
+    public boolean hasSameSkillset(Task task){
+        return VrpPlanningUtil.hasSameSkillset(this,task);
     }
 
 

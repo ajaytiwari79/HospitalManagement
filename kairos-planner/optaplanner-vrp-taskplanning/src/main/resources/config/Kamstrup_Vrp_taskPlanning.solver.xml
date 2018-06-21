@@ -41,9 +41,8 @@
         <subChainChangeMoveSelector>
             <!-- <selectedCountLimit>100</selectedCountLimit>-->
         </subChainChangeMoveSelector>
-        <subChainSwapMoveSelector>
-            <!-- <selectedCountLimit>100</selectedCountLimit>-->
-        </subChainSwapMoveSelector>
+        <!--<subChainSwapMoveSelector>
+        </subChainSwapMoveSelector>-->
     </unionMoveSelector>
     </localSearch>
     <termination>

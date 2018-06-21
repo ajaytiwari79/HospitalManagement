@@ -3,6 +3,7 @@ package com.kairos.planner.vrp.taskplanning.solver;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
+import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
 import com.thoughtworks.xstream.XStream;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -15,7 +16,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class VrpTaskPlanningSolver {
     public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
@@ -63,15 +66,45 @@ public class VrpTaskPlanningSolver {
         }
         getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
         int totalDrivingTime=0;
+        StringBuilder sbs= new StringBuilder("Locs data:\n");
+        StringBuilder shiftChainInfo= new StringBuilder("Shift chain data:\n");
         for(Shift shift: solution.getShifts()){
-            StringBuffer sb= new StringBuffer(shift+":::"+shift.getTotalPlannedMinutes()+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
+            StringBuffer sb= new StringBuffer(shift+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
             log.info(sb.toString());
-            log.info(getLocationList(shift).toString());
+            sbs.append(shift.getId()+":"+getLocationList(shift).toString()+"\n");
+            shiftChainInfo.append(shift.getId()+":"+getShiftChainInfo(shift)+"\n");
             totalDrivingTime+=shift.getChainDrivingTime();
         }
+        log.info(sbs.toString());
+        log.info(shiftChainInfo.toString());
         log.info("total driving time:"+totalDrivingTime);
 
     }
+
+    private String getShiftChainInfo(Shift shift) {
+        StringBuilder sb = new StringBuilder();
+        int tasks=shift.getNumberOfTasks();
+        int uniqueTasks=shift.getTaskList().stream().map(t->t.getLattitude()+"_"+t.getLongitude()).collect(Collectors.toSet()).size();
+        if(tasks==uniqueTasks) return " all fine ";
+        Map<String,List<Task>> groupedTasks= shift.getTaskList().stream().collect(Collectors.groupingBy(t->t.getLattitude()+"_"+t.getLongitude()));
+        groupedTasks.entrySet().forEach(e->{
+            if(e.getValue().size()<2){
+                return;
+            }
+            for (int i = 0; i < e.getValue().size(); i++) {
+                for (int j = 1; j < e.getValue().size(); j++) {
+                    Task t1=e.getValue().get(i);
+                    Task t2=e.getValue().get(j);
+                    if(!VrpPlanningUtil.isConsecutive(t1,t2)){
+                        sb.append("Not consecutive{"+t1+t2+"},");
+                    }
+                }
+            }
+        });
+
+        return sb.toString();
+    }
+
 
     public List<Location> getLocationList(Shift shift){
         List<Location> list= new ArrayList<>();
