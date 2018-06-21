@@ -18,7 +18,7 @@ public interface DataElementMognoRepository extends MongoRepository<DataElement,
     DataElement findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     @Query("{deleted:false,countryId:?0,name:{$in:?1}}")
-    List<DataElement> findByCountryIdAndNames(Long countryId, Set<String> names);
+    List<DataElement> findByCountryIdAndNames(Long countryId, List<String> names);
 
     @Query("{deleted:false,countryId:?0}")
     List<DataElement> getAllDataElement(Long countryId);

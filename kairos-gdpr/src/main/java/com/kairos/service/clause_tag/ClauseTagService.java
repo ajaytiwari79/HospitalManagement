@@ -101,7 +101,7 @@ public class ClauseTagService extends MongoBaseService {
         }
     }
 
-    //add tags in clause
+    //add tags in clause if tag exist then simply add and create new tag and add
     public List<ClauseTag> addClauseTagAndGetClauseTagList(List<ClauseTagDto> tagList) {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
@@ -132,7 +132,6 @@ public class ClauseTagService extends MongoBaseService {
         if (clauseTagList.size() != 0) {
             clauseTagList = save(clauseTagList);
         }
-
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(UserContext.getCountryId(), existClauseTagIds));
         return clauseTagList;
     }

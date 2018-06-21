@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data_management.asset_management;
 
 
+import com.kairos.dto.master_data.AssetTypeDto;
 import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 import com.kairos.service.master_data_management.asset_management.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -27,9 +28,9 @@ import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
 @RestController
 @RequestMapping(API_STORAGE_TYPE_URL)
 @Api(API_STORAGE_TYPE_URL)
-public class StorageTypeController {
+public class AssetTypeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StorageTypeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeController.class);
 
     @Inject
     private AssetTypeService storageTypeService;
@@ -37,11 +38,11 @@ public class StorageTypeController {
 
     @ApiOperation("add AssetType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> storageTypes) {
+    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> assetTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetType(countryId, storageTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetType(countryId, assetTypes.getRequestBody()));
 
     }
 
@@ -78,24 +79,37 @@ public class StorageTypeController {
 
     @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteStorageType(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteStorageType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        } else if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.deleteAssetType(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.deleteAssetType(countryId,id));
 
     }
 
-    @ApiOperation("update StorageFormat by id")
+    @ApiOperation("update subAsset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateStorageType(@PathVariable BigInteger id,  @Valid @RequestBody AssetType storageType) {
+    public ResponseEntity<Object> updateStorageType(@PathVariable BigInteger id,  @Valid @RequestBody AssetType assetType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.updateAssetType(id, storageType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.updateAssetType(id, assetType));
 
+    }
+
+
+
+    @ApiOperation("update subAsset by id")
+    @PostMapping("/subAsset/add")
+    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,  @Valid @RequestBody AssetTypeDto assetTypeDto) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+        }
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetTypeAndAddSubAssetTypes(countryId,assetTypeDto));
     }
 
 
