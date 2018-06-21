@@ -6,6 +6,7 @@ import com.kairos.persistance.model.master_data_management.data_category_element
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
@@ -21,6 +22,7 @@ public class DataCategoryDto {
     private String name;
 
     @NotNull(message = "Data Element can't be  Empty")
+    @NotEmpty(message = "Data Element can't be empty")
     @Valid
     List<DataElementDto> dataElements;
 

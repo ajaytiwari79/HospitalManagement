@@ -6,6 +6,15 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 
 global HardMediumSoftLongScoreHolder scoreHolder;
 /********Task Rules*******/
+rule "Task eligibility"
+salience 20
+    when
+        $task:Task(!isEmployeeEligible());
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,-1);
+end
+
+
 rule "Unassigned Task"
 salience 20
     when
@@ -18,15 +27,33 @@ rule "Shift out of boundary half day"
 salience 21
 
     when
-        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes, $minutes>390)
+        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes)
+        $ot: Integer(intValue>0) from ($minutes-330)
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-1);
+        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
 end
 
 rule "Shift out of boundary full day"
 salience 22
     when
-        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes, $minutes>570)
+        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes)
+        $ot: Integer(intValue>0) from ($minutes-510)
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-1);
+        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
+end
+
+rule "Driving Time"
+salience 22
+    when
+        Task(prevTaskOrShift!=null ,$minutes:drivingTimeSeconds, $minutes>0)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-$minutes);
+end
+rule "Consecutive tasks"
+salience 22
+    when
+        $t1:Task(prevTaskOrShift!=null)
+        $t2:Task(prevTaskOrShift!=null && hasSameLocation($t1) && !isConsecutive($t1))
+    then
+        scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end

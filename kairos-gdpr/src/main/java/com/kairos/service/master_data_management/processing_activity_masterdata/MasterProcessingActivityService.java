@@ -108,7 +108,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     public void checkForDuplicacyByName(Long countryId, List<String> subProcessingAcitivityNames) {
-
         List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(countryId, subProcessingAcitivityNames);
         if (processingActivities.size() != 0) {
             throw new DuplicateDataException(" sub processing acitvity " + processingActivities.get(0).getName() + " exist");

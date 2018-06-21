@@ -18,7 +18,7 @@ import java.util.Set;
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 
-    @Query("{deleted:false,countryId:?0,title:{$regex:?1,$options:'i'}}")
+    @Query("{deleted:false,countryId:?0,title:?1}")
     Clause findByTitleAndCountry(Long countryId,String title);
 
     Clause findByid(BigInteger id);

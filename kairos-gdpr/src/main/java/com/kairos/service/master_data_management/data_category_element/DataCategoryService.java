@@ -11,13 +11,13 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constant.AppConstant.IDS_LIST;
 import static com.kairos.constant.AppConstant.DATA_EMELENTS_LIST;
-
-
 
 
 @Service
@@ -106,26 +106,25 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public DataCategory updateDataCategoryAndElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
+    public DataCategory updateDataCategoryAndDataElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
-        if (Optional.ofNullable(dataCategory).isPresent() && id.equals(dataCategory.getId())) {
+        if (Optional.ofNullable(dataCategory).isPresent() && !id.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
         dataCategory = dataCategoryMongoRepository.findByid(id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
-        Map<String, Object> dataElementList = new HashMap<>();
+        Map<String, Object> dataElementListMap = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
         try {
-            dataElementList = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
             dataCategory.setName(dataCategoryDto.getName());
-            dataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
+            dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
             dataCategory = save(dataCategory);
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_EMELENTS_LIST));
         }
 
         return dataCategory;

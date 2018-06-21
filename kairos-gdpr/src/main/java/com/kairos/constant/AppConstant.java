@@ -20,6 +20,8 @@ public class AppConstant {
     public static final String PROCESSING_ACTIVITIES = "processing_activities";
     public static final String IDS_LIST = "ids";
     public static final String DATA_EMELENTS_LIST = "data_elements";
+    public static final String ASSET_TYPES_LIST = "asset_types";
+
 
 
 }

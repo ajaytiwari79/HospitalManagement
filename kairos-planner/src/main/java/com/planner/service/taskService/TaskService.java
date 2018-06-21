@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
@@ -30,15 +31,18 @@ public class TaskService {
     }
 
     public List<com.kairos.planner.vrp.taskplanning.model.Task> getUniqueTask(){
-        List<Task> taskList = taskRepository.findAll().stream().filter(ObjectUtils.distinctByKey(task -> task.getIntallationNo())).collect(toList());
+        List<Task> taskList = taskRepository.findAll();
+        List<Task> uniqueTaskList = taskList.stream().filter(ObjectUtils.distinctByKey(task -> task.getIntallationNo())).collect(toList());
         List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = new ArrayList<>();
         Map<Integer,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getIntallationNo,summingInt(Task::getDuration)));
         Map<Integer,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getIntallationNo,mapping(Task::getSkill,toSet())));
-        Map<Integer,Task> taskMap= taskList.stream().collect(Collectors.toMap(t->t.getIntallationNo(), t->t));
+        Map<Integer,Task> taskMap= uniqueTaskList.stream().collect(Collectors.toMap(t->t.getIntallationNo(), t->t));
         intallationandDuration.entrySet().forEach(t->{
             Task task = taskMap.get(t.getKey());
             tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(task.getId(),task.getIntallationNo(),task.getLattitude(),task.getLongitude(),intallationandSkill.get(task.getIntallationNo()),t.getValue(),task.getStreetName(),task.getHouseNo(),task.getBlock(),task.getFloorNo(),task.getPost(),task.getCity()));
         });
+        AtomicInteger a = new AtomicInteger(0);
+        tasks.forEach(t->a.addAndGet(t.getDuration()));
         return tasks;
     }
 
