@@ -283,7 +283,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDurationInMinute = shiftDurationInMinute - ((endDateMillis - startDateMillis) / ONE_MINUTE);
                 totalBreakAllotedInMinute += allowedBreakDurationInMinute;
                 lastItemAdded = BREAK;
-              } else {
+            } else {
                 logger.info("Remaing shift duration " + shiftDurationInMinute + " And we need to add break for {} ", allowedBreakDurationInMinute);
                 // add break and increase main shift duration by remaining minute
             }
@@ -852,7 +852,7 @@ public class ShiftService extends MongoBaseService {
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<DateWiseShiftResponse> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
         if (!Optional.ofNullable(shifts).isPresent() || shifts.isEmpty()) {
-
+            exceptionService.invalidOperationException("message.shift.notBlank");
         }
         Set<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getShifts().stream().map(ss -> ss.getActivityId())).collect(Collectors.toSet());
 
