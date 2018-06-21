@@ -45,6 +45,7 @@ public class Task extends TaskOrShift{
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
     private LocationsDistanceMatrix locationsDistanceMatrix;
+    private boolean shiftBreak;
     public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
         this.intallationNo = intallationNo;
@@ -209,9 +210,9 @@ public class Task extends TaskOrShift{
     }
     //for rules only
     public int getDrivingTimeSeconds(){
-        if(!false){
+        /*if(!false){
             return 0;
-        }
+        }*/
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
         }
@@ -283,5 +284,12 @@ public class Task extends TaskOrShift{
             return VrpPlanningUtil.getMissingSkills(this,this.getShift().getEmployee());
     }
 
+    public boolean isShiftBreak() {
+        return shiftBreak;
+    }
+
+    public void setShiftBreak(boolean shiftBreak) {
+        this.shiftBreak = shiftBreak;
+    }
 
 }

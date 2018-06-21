@@ -17,10 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -52,6 +49,8 @@ public class VrpTaskPlanningSolver {
     }
 
     public void solve(VrpTaskPlanningSolution problem) throws IOException {
+        printProblemInfo(problem);
+        addBreaks(problem);
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             at.addAndGet(t.getDuration());
@@ -88,6 +87,24 @@ public class VrpTaskPlanningSolver {
         Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
 
         toDisplayString(new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()});
+
+    }
+
+    private void addBreaks(VrpTaskPlanningSolution problem) {
+        List<Task> breaks=new ArrayList<>();
+
+    }
+
+    private void printProblemInfo(VrpTaskPlanningSolution problem) {
+        log.info("Tasks details:");
+        problem.getTasks().forEach(t->{
+            log.info(t+"-----"+t.getSkills());
+        });
+        Map<Set<String>,List<Task>> map=problem.getTasks().stream().collect(Collectors.groupingBy(t->t.getSkills()));
+        for(Map.Entry<Set<String>,List<Task>> e:map.entrySet()){
+            log.info(e.getKey()+"----------"+e.getValue().stream().mapToInt(t->t.getDuration()).sum());
+        }
+        log.info("Tasks details Done.");
 
     }
 
