@@ -17,6 +17,12 @@ public class VrpTaskPlanningSolverTest {
 
     @Test
     public void solve() throws IOException {
-        new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml");
+        boolean readFromSolution=true;
+        if(readFromSolution){
+            new VrpTaskPlanningSolver().solve("src/main/resources/solution.xml");
+        }else{
+            new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml");
+        }
+
     }
 }

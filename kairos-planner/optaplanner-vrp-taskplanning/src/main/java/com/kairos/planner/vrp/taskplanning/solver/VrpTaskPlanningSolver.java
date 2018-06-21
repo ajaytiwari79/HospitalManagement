@@ -97,22 +97,22 @@ public class VrpTaskPlanningSolver {
         int uniqueTasks=shift.getTaskList().stream().map(t->t.getLattitude()+"_"+t.getLongitude()).collect(Collectors.toSet()).size();
         if(tasks==uniqueTasks) return " all fine ";
         Map<String,List<Task>> groupedTasks= shift.getTaskList().stream().collect(Collectors.groupingBy(t->t.getLattitude()+"_"+t.getLongitude()));
-        groupedTasks.entrySet().forEach(e->{
-            if(e.getValue().size()<2){
-                return;
-            }
-            for (int i = 0; i < e.getValue().size(); i++) {
-                for (int j = 1; j < e.getValue().size(); j++) {
-                    Task t1=e.getValue().get(i);
-                    Task t2=e.getValue().get(j);
-                    if(!VrpPlanningUtil.isConsecutive(t1,t2)){
-                        sb.append("Not consecutive{"+t1+t2+"},");
-                    }
+        for(Map.Entry<String,List<Task>> e:groupedTasks.entrySet()){
+                if(e.getValue().size()<2){
+                    continue;
                 }
+                for (int i = 0; i < e.getValue().size(); i++) {
+                    for (int j = i+1; j < e.getValue().size(); j++) {
+                        Task t1=e.getValue().get(i);
+                        Task t2=e.getValue().get(j);
+                        if(!VrpPlanningUtil.isConsecutive(t1,t2)){
+                            sb.append("Not consecutive{"+t1+t2+"},");
+                        }
+                    }
             }
-        });
+        }
 
-        return sb.toString();
+        return sb.toString().isEmpty()?" all fine ":sb.toString();
     }
 
 
@@ -139,7 +139,7 @@ public class VrpTaskPlanningSolver {
             log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
             constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
                 constraintMatch.getJustificationList().forEach(o -> {
-                    log.info("---" + o+"---------"+((Task)o).getShift());
+                    log.info(constraintMatch.getScore()+"---" + o+"---------"+((Task)o).getShift());
                 });
             });
 
