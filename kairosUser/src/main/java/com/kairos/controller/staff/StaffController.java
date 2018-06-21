@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.QueryParam;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -634,6 +635,19 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
     }
+
+    @ApiOperation(value = "update and set main emloyment setting")
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(staffId,employmentDTO,confirm));
+    }
+
+    @ApiOperation(value ="remove main employment")
+    @RequestMapping(value = "/{staffId}/remove_main_employment",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String ,Object>> removeMainEmployment(@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.removeMainEmployment(staffId));
+    }
+
 
     @RequestMapping(value = "/emails", method = RequestMethod.POST)
     @ApiOperation("get email addresses of staffs")
