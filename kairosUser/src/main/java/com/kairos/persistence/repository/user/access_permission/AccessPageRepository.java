@@ -349,7 +349,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     // fetch Permission of Hub Users
 
     @Query("MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with emp \n" +
-            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org:Organization) WHERE id(org)={1}  with unitPermission,org \n" +
+            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org:Organization{isEnable:true}) WHERE id(org)={1}  with unitPermission,org \n" +
             "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission \n" +
             "Match (module:AccessPage)<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,modulePermission,unitPermission,accessGroup\n" +
             "optional match (unitPermission)-[moduleCustomRel:HAS_CUSTOMIZED_PERMISSION]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
@@ -358,10 +358,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId);
 
     @Query("Match (u:User) WHERE id(u)={0} \n" +
-            "Match (org:Organization)-[:HAS_EMPLOYMENTS]-(e:Employment)-[:BELONGS_TO]-(s:Staff)-[:BELONGS_TO]-(u) \n" +
-            "match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization) with e,org+[unit] as coll\n" +
+            "Match (org:Organization{isEnable:true})-[:HAS_EMPLOYMENTS]-(e:Employment)-[:BELONGS_TO]-(s:Staff)-[:BELONGS_TO]-(u) \n" +
+            "match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with e,org+[unit] as coll\n" +
             "unwind coll as units with  distinct units,e \n" +
-            "match  (o:Organization)-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
+            "match  (o:Organization{isEnable:true})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
             "WHERE o.isParentOrganization=true AND o.organizationLevel=\"CITY\" \n" +
             "with o,e, [o]+units as units  unwind units as org  WITH distinct org,o,e\n" +
             "Match (e)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission\n" +

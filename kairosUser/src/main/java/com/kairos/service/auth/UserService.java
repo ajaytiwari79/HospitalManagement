@@ -20,6 +20,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
@@ -399,30 +400,30 @@ public class UserService extends UserBaseService {
         return unitPermissionMap;
     }
 
-    public Map<String, Object> getPermission(Long organizationId){
+    public UnitWiseStaffPermissionsDTO getPermission(Long organizationId){
         long currentUserId = UserContext.getUserDetails().getId();
-        Map<String, Object> permissionData = new HashMap<>();
+        UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         if(accessPageService.isHubMember(currentUserId)){
             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
-            Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
+            HashMap<String, Object> unitPermissionMap = new HashMap<>();
             for (AccessPageQueryResult permission : permissions) {
                 permission.setActive(permission.isRead() || permission.isWrite());
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
-            permissionData.put("hub", true);
-            permissionData.put("hubPermissions", unitPermissionMap);
-
+            permissionData.setHub(true);
+            permissionData.setHubPermissions(unitPermissionMap);
+            
         } else {
 
             List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId);
-            Map<Long, Object> unitPermission = new HashMap<>();
+            HashMap<Long, Object> unitPermission = new HashMap<>();
             for (UserPermissionQueryResult userPermissionQueryResult: unitWisePermissions){
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class)));
             }
-            permissionData.put("hub", false);
-            permissionData.put("organizationPermissions", unitPermission);
+            permissionData.setHub(true);
+            permissionData.setOrganizationPermissions(unitPermission);
         }
         return permissionData;
     }
