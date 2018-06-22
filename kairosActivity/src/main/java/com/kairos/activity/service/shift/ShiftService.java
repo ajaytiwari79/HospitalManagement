@@ -294,7 +294,7 @@ public class ShiftService extends MongoBaseService {
             // handle later
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
-            totalBreakAllotedInMinute += allowedBreakDurationInMinute;
+            totalBreakAllotedInMinute += ((endDateMillis - startDateMillis) / ONE_MINUTE);
             shifts.add(getShiftObject(shiftDTO, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
 
 
@@ -304,7 +304,8 @@ public class ShiftService extends MongoBaseService {
             shifts.add(getShiftObject(shiftDTO, mainShift.getName(), shiftDTO.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
 
         }
-        save(shifts);
+        if (!shifts.isEmpty())
+            save(shifts);
         if (breakActivity.getName().equalsIgnoreCase(UNPAID_BREAK)) {
             mainShift.setScheduledMinutes(mainShift.getScheduledMinutes() - totalBreakAllotedInMinute.intValue());
         }
@@ -1030,7 +1031,7 @@ public class ShiftService extends MongoBaseService {
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
-            totalBreakAllotedInMinute += allowedBreakDurationInMinute;
+            totalBreakAllotedInMinute += ((endDateMillis - startDateMillis) / ONE_MINUTE);
 
         } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && lastItemAdded == BREAK) {
             startDateMillis = endDateMillis;
@@ -1068,9 +1069,8 @@ public class ShiftService extends MongoBaseService {
             startDateInISO = new DateTime(startDate).toDate();
             if (endDateAsString != null) {
                 Date endDate = dateISOFormat.parse(endDateAsString);
-                endDateInISO = new DateTime(endDate).toDate();
+                endDateInISO = new DateTime(endDate).plusDays(1).toDate();
             }
-
         }
         List<ShiftQueryResult> activities = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, unitId);
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
