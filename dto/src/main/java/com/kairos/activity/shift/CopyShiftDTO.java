@@ -124,13 +124,10 @@ public class CopyShiftDTO {
 
     @AssertTrue(message = "'start date' must be less than 'end date'.")
     public boolean isValid() {
-        if (!Optional.ofNullable(this.startDate).isPresent()) {
+        if (!Optional.ofNullable(this.startDate).isPresent() || !Optional.ofNullable(this.endDate).isPresent()) {
             return false;
         }
-        if (Optional.ofNullable(this.startDate).isPresent()) {
-            boolean dateValue = (startDate.isBefore(endDate)) ? true : false;
-            return dateValue;
-        }
-        return true;
+        return startDate.isBefore(endDate);
+
     }
 }

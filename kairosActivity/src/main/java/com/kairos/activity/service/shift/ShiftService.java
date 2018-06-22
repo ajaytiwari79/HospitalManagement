@@ -1069,7 +1069,7 @@ public class ShiftService extends MongoBaseService {
             startDateInISO = new DateTime(startDate).toDate();
             if (endDateAsString != null) {
                 Date endDate = dateISOFormat.parse(endDateAsString);
-                endDateInISO = new DateTime(endDate).toDate();
+                endDateInISO = new DateTime(endDate).plusDays(1).toDate();
             }
         }
         List<ShiftQueryResult> activities = shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, unitId);
