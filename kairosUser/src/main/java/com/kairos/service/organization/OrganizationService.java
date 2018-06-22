@@ -1793,7 +1793,8 @@ public class OrganizationService extends UserBaseService {
     }
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit(){
-        return organizationGraphRepository.getUnitAndParentOrganizationAndCountyIds();
+        List<Map<String, Object>> parentOrganizationAndCountryData = organizationGraphRepository.getUnitAndParentOrganizationAndCountryIds();
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
 
 }

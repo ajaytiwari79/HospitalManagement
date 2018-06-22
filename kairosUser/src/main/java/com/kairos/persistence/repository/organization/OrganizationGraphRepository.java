@@ -764,9 +764,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
     @Query("Match (child:Organization) \n" +
-            "OPTIONAL MATCH (child)-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization) with child,parent\n" +
-            "MATCH (child)-[:"+HAS_SUB_ORGANIZATION+"*]-(superParent:Organization{organizationLevel:'COUNTRY'}) \n" +
-            "MATCH (superParent)-[:"+BELONGS_TO+"]-(country:Country)\n" +
-            "return id(child) as unitId, id(parent) as parentOrganizationId,id(country) as countryId")
-    List<UnitAndParentOrganizationAndCountryDTO> getUnitAndParentOrganizationAndCountyIds();
+            "OPTIONAL MATCH (child)<-[:HAS_SUB_ORGANIZATION]-(parent:Organization) with child,parent\n" +
+            "MATCH (child)<-[:HAS_SUB_ORGANIZATION]-(superParent:Organization) with child,parent,superParent\n" +
+            "MATCH (superParent)-[:BELONGS_TO]-(country:Country)\n" +
+            "return id(child) as unitId, CASE WHEN parent IS NULL THEN id(child) ELSE id(parent) END as parentOrganizationId, id(country) as countryId")
+    List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
 }
