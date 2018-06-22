@@ -65,11 +65,11 @@ public class ClauseService extends MongoBaseService {
 
 
     public Clause createClause(Long countryId, ClauseDTO clauseDto) throws RepositoryException {
-        List<ClauseTag> tagList = new ArrayList<>();
+
         if (clauseRepository.findByTitleAndCountry(countryId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle());
         }
-        tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
+        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
         try {
             Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
             if (clauseDto.getOrganizationTypes() != null && clauseDto.getOrganizationTypes().size() != 0) {

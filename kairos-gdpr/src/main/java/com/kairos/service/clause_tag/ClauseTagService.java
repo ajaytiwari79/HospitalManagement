@@ -36,7 +36,6 @@ public class ClauseTagService extends MongoBaseService {
     public ClauseTag createClauseTag(Long countryId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
-
         }
         ClauseTag exist = clauseTagMongoRepository.findByNameAndCountryId(countryId, clauseTag);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -51,12 +50,7 @@ public class ClauseTagService extends MongoBaseService {
 
 
     public List<ClauseTag> getAllClauseTag() {
-        List<ClauseTag> result = clauseTagMongoRepository.findAllClauseTag(UserContext.getCountryId());
-        if (result.size() != 0) {
-            return result;
-
-        } else
-            throw new DataNotExists("ClauseTag not exist please create purpose ");
+      return clauseTagMongoRepository.findAllClauseTag(UserContext.getCountryId());
     }
 
 
@@ -111,7 +105,6 @@ public class ClauseTagService extends MongoBaseService {
 
             if (tagDto.getId() == null) {
                 if (clauseTagsName.contains(tagDto.getName())) {
-
                     throw new DuplicateDataException("tags with duplicate name");
                 }
                 clauseTagsName.add(tagDto.getName());
@@ -126,8 +119,7 @@ public class ClauseTagService extends MongoBaseService {
         }
         List<ClauseTag> exists = clauseTagMongoRepository.findTagByNames(UserContext.getCountryId(), clauseTagsName);
         if (exists.size() != 0) {
-
-            throw new DuplicateDataException("tag is already with name " + exists.get(0).getName());
+            throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
             clauseTagList = save(clauseTagList);
