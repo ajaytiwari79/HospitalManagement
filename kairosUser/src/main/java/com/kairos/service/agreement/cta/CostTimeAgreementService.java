@@ -607,7 +607,7 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setCountry(countryGraphRepository.findOne(countryId,0));
         this.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
-        //publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
+        publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
 
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         /*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
@@ -711,7 +711,8 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public Boolean publishNewCountryCTAToOrganizationByOrgSubType(Long countryId,CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Long organizationSubTypeId) throws ExecutionException, InterruptedException{
-        List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        //List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        List<Organization> organizations = organizationGraphRepository.findOrganizationsByIdsIn(Collections.singletonList(2567L));
         List<Long> organizationIds = new ArrayList<>();
         List<Long> activityIds = new ArrayList<>();
         organizations.stream().forEach(organization -> organizationIds.add(organization.getId()));
