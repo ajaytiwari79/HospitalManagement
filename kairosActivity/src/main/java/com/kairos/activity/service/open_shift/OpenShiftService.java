@@ -116,8 +116,8 @@ public class OpenShiftService extends MongoBaseService {
             OpenShift openShift = new OpenShift();
             BeanUtils.copyProperties(openShiftResponseDTO,openShift,openShiftResponseDTO.getStartDate().toString());
             openShift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
-            openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getFromTime()):
-                    DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
+            openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getToTime()):
+                    DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getToTime()));
             openShifts.add(openShift);
 
         }
