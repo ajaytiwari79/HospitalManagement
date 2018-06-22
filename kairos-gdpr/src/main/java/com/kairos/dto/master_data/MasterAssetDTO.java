@@ -6,6 +6,7 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -21,19 +22,23 @@ public class MasterAssetDTO {
     @NotNullOrEmpty(message = "Description cannot be Empty")
     private String description;
 
-    @NotNull(message = "Organization Type  can't be  null")
     @Valid
+    @NotNull(message = "Organization  Type  can't be  null")
+    @NotEmpty(message = "Organization Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
 
-    @NotNull(message = "Organization Sub Type  can't be  null")
     @Valid
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
 
-    @NotNull(message = "Service Type  can't be  null")
     @Valid
+    @NotNull(message = "Service  Type  can't be  null")
+    @NotEmpty(message = "Service  Type  can't be  Empty")
     private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
 
     @NotNull(message = "Service Sub Type  can't be  null")
+    @NotEmpty(message = "Service Sub Type  can't be  Empty")
     @Valid
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
 
@@ -77,7 +82,6 @@ public class MasterAssetDTO {
     public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
-
     public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseDTO {
 
@@ -31,20 +30,24 @@ public class ClauseDTO {
     @NotNullOrEmpty(message = "description  can't be  Empty ")
     private String description;
 
-    @NotNull(message = "Organization  Type  can't be  null")
     @Valid
+    @NotNull(message = "Organization  Type  can't be  null")
+    @NotEmpty(message = "Organization  Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDTO>  organizationTypes;
 
-    @NotNull(message = "Organization Sub Type  can't be  null")
     @Valid
+    @NotNull(message = "Organization Sub Type  can't be  null")
+    @NotEmpty(message = "Organization Sub Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDTO>  organizationSubTypes;
 
-    @NotNull(message = "Service Type  can't be  null")
     @Valid
+    @NotNull(message = "Service Type  can't be  null")
+    @NotEmpty(message = "Service  Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDTO>  organizationServices;
 
-    @NotNull(message = "Service Sub Type  can't be  null")
     @Valid
+    @NotNull(message = "Service Sub Type  can't be  null")
+    @NotEmpty(message = "Service Sub Type  can't be  empty")
     private List<OrganizationTypeAndServiceBasicDTO>  organizationSubServices;
 
     @NotNull(message = "Account Type cannot be null")
