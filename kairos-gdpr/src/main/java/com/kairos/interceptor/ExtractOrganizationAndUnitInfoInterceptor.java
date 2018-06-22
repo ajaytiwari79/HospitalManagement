@@ -1,7 +1,7 @@
 package com.kairos.interceptor;
 
 
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

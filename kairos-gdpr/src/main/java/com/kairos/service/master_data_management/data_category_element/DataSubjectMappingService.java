@@ -1,7 +1,7 @@
 package com.kairos.service.master_data_management.data_category_element;
 
 
-import com.kairos.dto.master_data.DataSubjectMappingDto;
+import com.kairos.dto.master_data.DataSubjectMappingDTO;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataSubjectMappingRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDto;
@@ -32,7 +32,7 @@ public class DataSubjectMappingService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    public DataSubjectMapping addDataSubjectAndMapping(Long countryId, DataSubjectMappingDto dataSubjectMappingDto) {
+    public DataSubjectMapping addDataSubjectAndMapping(Long countryId, DataSubjectMappingDTO dataSubjectMappingDto) {
 
         DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
         if (Optional.ofNullable(existing).isPresent()) {
@@ -83,7 +83,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         }
 
 
-    public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, BigInteger id, DataSubjectMappingDto dataSubjectMappingDto) {
+    public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, BigInteger id, DataSubjectMappingDTO dataSubjectMappingDto) {
         DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
         if (Optional.ofNullable(existing).isPresent()&&id!=existing.getId()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());

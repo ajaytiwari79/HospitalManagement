@@ -3,7 +3,6 @@ package com.kairos.controller.clause_tag;
 
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -11,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import static  com.kairos.constant.ApiConstant.API_CLAUSE_TAG_URL;
+import static  com.kairos.constants.ApiConstant.API_CLAUSE_TAG_URL;
 import javax.inject.Inject;
 import java.math.BigInteger;
 /*

@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data_management.processing_activity_masterdata;
 
 
-import com.kairos.dto.master_data.MasterProcessingActivityDto;
+import com.kairos.dto.master_data.MasterProcessingActivityDTO;
 import com.kairos.service.master_data_management.processing_activity_masterdata.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constant.ApiConstant.API_MASTER_PROCESSING_ACTIVITY;
+import static com.kairos.constants.ApiConstant.API_MASTER_PROCESSING_ACTIVITY;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -31,7 +31,7 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "add MasterProcessingActivity asset")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<Object> createMasterProcessingActivity(@PathVariable Long countryId, @RequestBody @Valid MasterProcessingActivityDto processingActivityDto) {
+    public ResponseEntity<Object> createMasterProcessingActivity(@PathVariable Long countryId, @RequestBody @Valid MasterProcessingActivityDTO processingActivityDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
@@ -46,7 +46,7 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody  MasterProcessingActivityDto processingActivityDto) {
+    public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody MasterProcessingActivityDTO processingActivityDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

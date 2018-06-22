@@ -1,15 +1,13 @@
 package com.kairos.service.clause;
 
-import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.response.dto.master_data.AccountTypeRequestAndResponseDto;
-import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.dto.master_data.ClauseDto;
+import com.kairos.dto.master_data.ClauseDTO;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.response.dto.clause.ClauseResponseDto;
+import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
@@ -48,9 +46,9 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private JackrabbitService jackrabbitService;
 
-
     @Inject
-    private OrganizationTypeRestClient organizationTypeAndServiceRestClient;
+    private AccountTypeMongoRepository accountTypeMongoRepository;
+
 
     @Inject
     private ComparisonUtils comparisonUtils;
@@ -66,7 +64,7 @@ public class ClauseService extends MongoBaseService {
     private ClauseTagMongoRepository clauseTagMongoRepository;
 
 
-    public Clause createClause(Long countryId, ClauseDto clauseDto) throws RepositoryException {
+    public Clause createClause(Long countryId, ClauseDTO clauseDto) throws RepositoryException {
         List<ClauseTag> tagList = new ArrayList<>();
         if (clauseRepository.findByTitleAndCountry(countryId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle());
@@ -86,8 +84,8 @@ public class ClauseService extends MongoBaseService {
             if (clauseDto.getOrganizationSubServices() != null && clauseDto.getOrganizationSubServices().size() != 0) {
                 newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
-            if (clauseDto.getAccountType().size() != 0) {
-                newclause.setAccountTypes(getAccountTypeList(countryId, clauseDto.getAccountType()));
+            if (clauseDto.getAccountTypes().size() != 0) {
+                newclause.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
             }
             newclause.setTags(tagList);
             newclause = save(newclause);
@@ -112,7 +110,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(Long countryId, BigInteger clauseId, ClauseDto clauseDto) throws RepositoryException {
+    public Clause updateClause(Long countryId, BigInteger clauseId, ClauseDTO clauseDto) throws RepositoryException {
 
         List<ClauseTag> tagList = new ArrayList<>();
         Clause exists = clauseRepository.findClauseByNameAndCountryId(countryId, clauseDto.getTitle());
@@ -137,9 +135,8 @@ public class ClauseService extends MongoBaseService {
             if (clauseDto.getOrganizationSubServices() != null && clauseDto.getOrganizationSubServices().size() != 0) {
                 exists.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
             }
-            if (clauseDto.getAccountType().size() != 0) {
-
-                exists.setAccountTypes(getAccountTypeList(countryId, clauseDto.getAccountType()));
+            if (clauseDto.getAccountTypes().size() != 0) {
+                exists.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
             }
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(clauseDto.getTags());
             exists.setTitle(clauseDto.getTitle());
@@ -152,7 +149,6 @@ public class ClauseService extends MongoBaseService {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
             throw new RuntimeException(e.getMessage());
-
         }
         return exists;
 
@@ -165,7 +161,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public List<ClauseResponseDto> getAllClauses() {
+    public List<ClauseResponseDTO> getAllClauses() {
         return clauseRepository.findAllClause(UserContext.getCountryId());
     }
 
@@ -198,80 +194,6 @@ public class ClauseService extends MongoBaseService {
         return jackrabbitService.getClauseVersions(id);
 
     }
-
-
-    public List<AccountType> getAccountTypeList(Long countryId, Set<AccountTypeRequestAndResponseDto> accountTypeDtos) {
-        Set<BigInteger> accountTypeIds = new HashSet<>();
-        accountTypeDtos.forEach(accountTypeDto -> {
-            accountTypeIds.add(accountTypeDto.getId());
-        });
-        List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, accountTypeIds);
-        return accountTypes;
-    }
-
-/*  public List<Clause> getClauseByAccountType(String accountType) {
-        List<Clause> clauses = clauseRepository.getClauseByAccountType(accountType);
-        if (clauses != null)
-            return clauses;
-        else
-            throw new DataNotExists("Clauses for AccountTYpe : " + accountType + "  Not Exists");
-    }*/
-
-
-
-
-
-
-/*
-
-    public List<Clause> getClause(ClauseGetQueryDto clauseQueryDto) {
-        Query query = new Query();
-        String whereQuery = null;
-        List<Clause> clauses;
-        List<Long> organizationTypes, organizationSubTypes, organizationServices, organizationSubServices;
-        organizationTypes = clauseQueryDto.getOrganizationTypes();
-        organizationSubTypes = clauseQueryDto.getOrganizationSubTypes();
-        organizationServices = clauseQueryDto.getOrganizationServices();
-        organizationSubServices = clauseQueryDto.getOrganizationSubServices();
-        Criteria criteria = new Criteria();
-        if (!Optional.ofNullable(clauseQueryDto).isPresent()) {
-            return null;
-        } else {
-
-            if (clauseQueryDto.getAccountTypes() != null) {
-                whereQuery = "accountTypes._id";
-                query.addCriteria((Criteria.where(whereQuery).in(clauseQueryDto.getAccountTypes())));
-            }
-            if (organizationServices != null) {
-                whereQuery = "organizationServices";
-                query.addCriteria((Criteria.where(whereQuery).in(organizationServices)));
-
-            }
-            if (organizationTypes != null) {
-                whereQuery = "organizationTypes";
-                query.addCriteria((Criteria.where(whereQuery).in(organizationTypes)));
-
-            }
- if (organizationSubServices!=null) {
-                whereQuery = "organizationServices";
-                query.addCriteria(Criteria.where(whereQuery).in(organizationSubServices));
-
-            }
-
-            if (clauseQueryDto.getTags() != null) {
-                whereQuery = "tags";
-                query.addCriteria(Criteria.where(whereQuery).in(clauseQueryDto.getTags()));
-            }
-            clauses = mongoTemplate.find(query, Clause.class);
-            if (clauses.size() != 0) {
-                return clauses;
-            }
-            throw new DataNotExists("clause not exists");
-
-        }
-
-    }
-*/
 
 
 }

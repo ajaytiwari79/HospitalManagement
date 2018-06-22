@@ -1,7 +1,7 @@
 package com.kairos.utils;
 
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 public class ComparisonUtils {
 
 
-    public void checkOrgTypeAndService(Set<Long> ids, List<OrganizationTypeAndServiceBasicDto> orgTypesAndServices) {
+    public void checkOrgTypeAndService(Set<Long> ids, List<OrganizationTypeAndServiceBasicDTO> orgTypesAndServices) {
 
         Set<Long> orgTypeAndServiceIds = new HashSet<>();
         if (ids.size() != orgTypesAndServices.size()) {
-            for (OrganizationTypeAndServiceBasicDto result : orgTypesAndServices) {
+            for (OrganizationTypeAndServiceBasicDTO result : orgTypesAndServices) {
                 orgTypeAndServiceIds.add(result.getId());
             }
             Set<Long> differences = difference(ids, orgTypeAndServiceIds);

@@ -1,8 +1,8 @@
 package com.kairos.service.exception;
 
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.service.locale.LocaleService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

@@ -1,11 +1,11 @@
 package com.kairos.service.clause_tag;
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.dto.master_data.ClauseTagDto;
+import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
@@ -102,12 +102,12 @@ public class ClauseTagService extends MongoBaseService {
     }
 
     //add tags in clause if tag exist then simply add and create new tag and add
-    public List<ClauseTag> addClauseTagAndGetClauseTagList(List<ClauseTagDto> tagList) {
+    public List<ClauseTag> addClauseTagAndGetClauseTagList(List<ClauseTagDTO> tagList) {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
         List<BigInteger> existClauseTagIds = new ArrayList<>();
         List<String> clauseTagsName = new ArrayList<>();
-        for (ClauseTagDto tagDto : tagList) {
+        for (ClauseTagDTO tagDto : tagList) {
 
             if (tagDto.getId() == null) {
                 if (clauseTagsName.contains(tagDto.getName())) {

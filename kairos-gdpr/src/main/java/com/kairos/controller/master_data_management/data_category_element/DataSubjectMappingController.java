@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data_management.data_category_element;
 
 
-import com.kairos.dto.master_data.DataSubjectMappingDto;
+import com.kairos.dto.master_data.DataSubjectMappingDTO;
 import com.kairos.service.master_data_management.data_category_element.DataSubjectMappingService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constant.ApiConstant.API_DATA_SUBJECT_AND_MAPPING_URL;
+import static com.kairos.constants.ApiConstant.API_DATA_SUBJECT_AND_MAPPING_URL;
 
 @RestController
 @RequestMapping(API_DATA_SUBJECT_AND_MAPPING_URL)
@@ -26,7 +26,7 @@ public class DataSubjectMappingController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId, @Valid @RequestBody DataSubjectMappingDto dataSubjectMappingDto) {
+    public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         }
@@ -62,7 +62,7 @@ public class DataSubjectMappingController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataSubjectMappingDto dataSubjectMappingDto) {
+    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
