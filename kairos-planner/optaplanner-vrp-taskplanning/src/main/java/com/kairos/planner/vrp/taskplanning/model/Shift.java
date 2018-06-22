@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @PlanningEntity
 public class Shift extends TaskOrShift{
@@ -141,7 +143,7 @@ public class Shift extends TaskOrShift{
         Task temp=getNextTask();
         int duration=0;
         while (temp!=null){
-            sb.append("[("+temp.getDrivingTime()+")"+temp.toString()+"]->");
+            sb.append("[("+temp.isEmployeeEligible()+":"+temp.getDrivingTime()+")"+temp.toString()+"]->");
             duration+= temp.getDrivingTime()+temp.getPlannedDuration();
             temp=temp.getNextTask();
         }
@@ -176,5 +178,14 @@ public class Shift extends TaskOrShift{
             temp=temp.getNextTask();
         }
         return duration;
+    }
+    public List<Task> getTaskList(){
+        List<Task> tasks= new ArrayList<>();
+        Task temp=getNextTask();
+        while (temp!=null){
+            tasks.add(temp);
+            temp=temp.getNextTask();
+        }
+        return tasks;
     }
 }
