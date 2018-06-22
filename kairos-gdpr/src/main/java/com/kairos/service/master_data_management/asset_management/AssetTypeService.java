@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.asset_management;
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
-import com.kairos.dto.master_data.AssetTypeDto;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 import com.kairos.persistance.repository.master_data_management.asset_management.AssetTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -19,8 +19,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.constant.AppConstant.IDS_LIST;
-import static com.kairos.constant.AppConstant.ASSET_TYPES_LIST;
+import static com.kairos.constants.AppConstant.IDS_LIST;
+import static com.kairos.constants.AppConstant.ASSET_TYPES_LIST;
 
 
 @Service
@@ -77,7 +77,7 @@ public class AssetTypeService extends MongoBaseService {
 
 
     //Todo if requiremenet is to create single Asset type with multiple Sub asset use this
-    public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDto assetTypeDto) {
+    public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDTO assetTypeDto) {
 
 
         AssetType exist = assetTypeMongoRepository.findByName(countryId, assetTypeDto.getName().toLowerCase());
@@ -108,11 +108,11 @@ public class AssetTypeService extends MongoBaseService {
      * @param subAssetTypesDto list of sub asset types needed to create new Sub asset types
      * @return
      */
-    public Map<String, Object> createNewSubAssetTypesList(Long countryId, List<AssetTypeDto> subAssetTypesDto) {
+    public Map<String, Object> createNewSubAssetTypesList(Long countryId, List<AssetTypeDTO> subAssetTypesDto) {
 
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
-        for (AssetTypeDto subAssetTypeDto : subAssetTypesDto) {
+        for (AssetTypeDTO subAssetTypeDto : subAssetTypesDto) {
             AssetType assetType = new AssetType();
             assetType.setCountryId(countryId);
             assetType.setName(subAssetTypeDto.getName());
@@ -142,10 +142,10 @@ public class AssetTypeService extends MongoBaseService {
      * @param subAssetTypesDto contain list of Existing Sub Asset type which need to we update
      * @return
      */
-    public Map<String, Object> updateSubAssetTypes(Long countryId, List<AssetTypeDto> subAssetTypesDto) {
+    public Map<String, Object> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDto) {
 
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
-        Map<BigInteger, AssetTypeDto> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
+        Map<BigInteger, AssetTypeDTO> subAssetTypeDtoCorrespondingToIds = new HashMap<>();
         subAssetTypesDto.forEach(subAssetTypeDto -> {
             subAssetTypesIds.add(subAssetTypeDto.getId());
             subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
@@ -153,7 +153,7 @@ public class AssetTypeService extends MongoBaseService {
         List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
 
-            AssetTypeDto subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
+            AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
             subAssetType.setNameInLowerCase(subAssetTypeDto.getName());
             subAssetType.setSubAsset(true);
             subAssetType.setNameInLowerCase(subAssetTypeDto.getName().toLowerCase());
@@ -220,7 +220,7 @@ public class AssetTypeService extends MongoBaseService {
 
 
     //Todo add this method if requirement is to update Sub Asset and create new Sub Assets and Add to Asset
-    public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, BigInteger id, AssetTypeDto assetTypeDto) {
+    public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, BigInteger id, AssetTypeDTO assetTypeDto) {
         AssetType exist = assetTypeMongoRepository.findByName(UserContext.getCountryId(), assetTypeDto.getName().toLowerCase());
         if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
 
@@ -229,8 +229,8 @@ public class AssetTypeService extends MongoBaseService {
 
         exist = assetTypeMongoRepository.findByid(id);
         exist.setName(assetTypeDto.getName());
-        List<AssetTypeDto> newSubAssetTypesList = new ArrayList<>();
-        List<AssetTypeDto> updateExistingSubAssetTypes = new ArrayList<>();
+        List<AssetTypeDTO> newSubAssetTypesList = new ArrayList<>();
+        List<AssetTypeDTO> updateExistingSubAssetTypes = new ArrayList<>();
         assetTypeDto.getSubAssetTypes().forEach(subAssetTypeDto -> {
             if (Optional.ofNullable(subAssetTypeDto.getId()).isPresent()) {
                 updateExistingSubAssetTypes.add(subAssetTypeDto);
@@ -288,9 +288,9 @@ public class AssetTypeService extends MongoBaseService {
     /**
      * @param assetTypeDtos check for duplicacy in name of Asset types
      */
-    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDto> assetTypeDtos) {
+    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDtos) {
         List<String> names = new ArrayList<>();
-        for (AssetTypeDto assetTypeDto : assetTypeDtos) {
+        for (AssetTypeDTO assetTypeDto : assetTypeDtos) {
             if (names.contains(assetTypeDto.getName().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
             }
