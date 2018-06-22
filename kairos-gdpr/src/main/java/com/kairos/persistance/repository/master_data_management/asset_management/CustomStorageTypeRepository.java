@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface CustomStorageTypeRepository {
 
-    List<AssetType> getAllStorageListByNamesAndCountryList(Long countryId, Set<String> names);
+    List<AssetType> getAllStorageListByNamesAndCountryList(Long countryId,String name);
 
 
 }

@@ -595,7 +595,7 @@ public class UnitPositionService extends UserBaseService {
         Employment employment = employmentReasonCode.getEmployment();
 
         Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent() ? employmentReasonCode.getReasonCode().getId() : null;
-        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd(),employment.getMainEmploymentStartDate(),employment.getMainEmploymentEndDate(),employment.isMainEmployment());
         List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization) ? unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) : unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId);
         List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementRestClient.getWTAByIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
         Map<BigInteger, WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w -> w.getId(), w -> w));
@@ -695,6 +695,7 @@ public class UnitPositionService extends UserBaseService {
         result.setUnitId(unitPosition.getUnit().getId());
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setParentUnitId(parentOrganizationId);
+
         // TODO Setting for compatibility
         Map<String,Object > unitInfo=new HashMap<>();
         unitInfo.put("id",parentOrganizationId);
@@ -965,14 +966,20 @@ public class UnitPositionService extends UserBaseService {
                 unitPosition.setReasonCode(reasonCode);
             }
         }
-        unitPositionGraphRepository.saveAll(unitPositions);
+
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        if(employment.getMainEmploymentEndDate()!=null){
+        Long mainEmploymentEndDate=DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate());
+        if(endDateMillis>mainEmploymentEndDate){
+            exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
+        }
+        }
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
 
         employment.setReasonCode(reasonCode);
         employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
-
+        unitPositionGraphRepository.saveAll(unitPositions);
         employmentGraphRepository.save(employment);
         if (Optional.ofNullable(employmentEndDate).isPresent() && (DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString())) == 0)) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);

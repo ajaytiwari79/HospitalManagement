@@ -6,6 +6,7 @@ import com.kairos.persistance.model.master_data_management.data_category_element
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataElementMognoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,8 @@ public class DataElementService extends MongoBaseService {
 
     public Map<String, Object> createDataElements(Long countryId, List<DataElementDto> dataElementsDto) {
 
-        Set<String> dataElementNames = new HashSet<>();
+        checkForDuplicacyInName(dataElementsDto);
+        List<String> dataElementNames = new ArrayList<>();
         dataElementsDto.forEach(dataElement -> {
             dataElementNames.add(dataElement.getName().trim());
         });
@@ -40,7 +42,6 @@ public class DataElementService extends MongoBaseService {
         if (existingDataElement.size() != 0) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
-        checkForDuplicacyInName(dataElementsDto);
         List<DataElement> dataElementList = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> dataElementids = new ArrayList<>();
@@ -134,22 +135,23 @@ public class DataElementService extends MongoBaseService {
 
     }
 
+
+    //Fixme add Check for duplicate name in data Elemenets dusing update and also check if id is same or not
     public Map<String, Object> updateDataElementsList(Long countryId, List<DataElementDto> dataElementsDto) {
 
         Map<BigInteger, DataElementDto> dataElementsDtoList = new HashMap<>();
         List<BigInteger> dataElementsIds = new ArrayList<>();
+        List<String> dataElementsNames = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
             dataElementsDtoList.put(dataElementDto.getId(), dataElementDto);
             dataElementsIds.add(dataElementDto.getId());
-
+            dataElementsNames.add(dataElementDto.getName());
         });
-
+        checkDuplicateInsertionOnUpdatingDataElements(countryId,dataElementsDtoList,dataElementsNames);
         List<DataElement> dataElementList = dataElementMognoRepository.getAllDataElementListByIds(countryId, dataElementsIds);
         dataElementList.forEach(dataElement -> {
-
             DataElementDto darElementDto = dataElementsDtoList.get(dataElement.getId());
             dataElement.setName(darElementDto.getName());
-
         });
         Map<String, Object> result = new HashMap<>();
         try {
@@ -170,12 +172,31 @@ public class DataElementService extends MongoBaseService {
         List<String> names = new ArrayList<>();
         dataElementDtos.forEach(dataElementDto -> {
             if (names.contains(dataElementDto.getName())) {
-                throw new DuplicateDataException("Duplicate Entry with name "+dataElementDto.getName());
+                throw new DuplicateDataException("Duplicate Entry with name " + dataElementDto.getName());
             }
             names.add(dataElementDto.getName());
         });
 
 
+    }
+
+    /**
+     * @param countryId
+     * @param dataElementDtoMap map contain dataElemenet corresponding to id
+     * @param dataElementNames  list of data elemenets names which we need to check if duplicate data present on updating existing Data elements
+     */
+    public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Map<BigInteger, DataElementDto> dataElementDtoMap, List<String> dataElementNames) {
+
+        List<DataElement> dataElementList = dataElementMognoRepository.findByCountryIdAndNames(countryId, dataElementNames);
+        dataElementList.forEach(dataElement -> {
+            if (!dataElementDtoMap.containsKey(dataElement.getId())) {
+                exceptionService.duplicateDataException("message.duplicate", "data element", dataElement.getName());
+            } else {
+                if (!dataElementDtoMap.get(dataElement.getId()).getName().equals(dataElement.getName())) {
+                    exceptionService.duplicateDataException("message.duplicate", "data element", dataElement.getName());
+                }
+            }
+        });
     }
 
 

@@ -188,8 +188,6 @@ public class OrganizationTypeService extends UserBaseService {
     }
 
 
-
-
     public List<OrganizationTypeAndSubTypeDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId) {
         List<Map> organizationType = organizationTypeGraphRepository.getAllOrganizationTypeAndServiceAndSubServices(countryId);
         List<OrganizationTypeAndSubTypeDto> list = new ArrayList<>();
