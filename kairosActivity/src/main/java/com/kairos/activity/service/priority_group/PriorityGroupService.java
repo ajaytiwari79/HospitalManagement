@@ -184,11 +184,8 @@ public class PriorityGroupService extends MongoBaseService {
         return priorityGroupDTOs;
     }
 
-    public List<PriorityGroupDTO> getPriorityGroupsByRuleTemplate(long unitId,BigInteger ruleTemplateId) {
-        return priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(unitId,ruleTemplateId);
-    }
     public PriorityGroupWrapper getPriorityGroupsByRuleTemplateForUnit(Long unitId,BigInteger ruleTemplateId){
-        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(unitId,ruleTemplateId);
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndOrderIdIsNullAndDeletedFalse(unitId,ruleTemplateId);
         PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
         PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);

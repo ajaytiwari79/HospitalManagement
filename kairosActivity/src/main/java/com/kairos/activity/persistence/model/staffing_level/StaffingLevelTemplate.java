@@ -17,7 +17,7 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
     private List<Long> dayType=new ArrayList<Long>();
     private List<Day> validDays =new ArrayList<Day>();
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelInterval> staffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
 
     public StaffingLevelTemplate() {
@@ -71,12 +71,12 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public List<StaffingLevelInterval> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelInterval> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
     public Long getUnitId() {
         return unitId;
@@ -98,7 +98,7 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
         if (staffingLevelTimeSlot == null)
             throw new NullPointerException("Can't add null staffLevelActivity");
 
-        this.getStaffingLevelInterval().add(staffingLevelTimeSlot);
+        this.getPresenceStaffingLevelInterval().add(staffingLevelTimeSlot);
 
     }
 
@@ -106,7 +106,7 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
         if (staffingLevelTimeSlots == null)
             throw new NullPointerException("Can't add null staffLevelActivity");
 
-        this.getStaffingLevelInterval().addAll(staffingLevelTimeSlots);
+        this.getPresenceStaffingLevelInterval().addAll(staffingLevelTimeSlots);
 
     }
 
