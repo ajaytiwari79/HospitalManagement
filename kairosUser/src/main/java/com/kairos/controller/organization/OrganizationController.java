@@ -1401,4 +1401,10 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationSettings(unitId));
     }
 
+    @ApiOperation(value = "get Unit and Parent Organization and Country Id")
+    @GetMapping(value = "/unit/parent_org_and_country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getParentOrganizationAndCountryIdsOfUnit() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganizationAndCountryIdsOfUnit());
+    }
 }

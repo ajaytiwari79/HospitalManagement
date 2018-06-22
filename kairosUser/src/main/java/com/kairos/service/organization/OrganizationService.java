@@ -68,6 +68,7 @@ import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.organization.OrganizationSettingDTO;
+import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
@@ -1791,5 +1792,8 @@ public class OrganizationService extends UserBaseService {
         return new OrganizationSettingDTO(organizationSetting.getWalkingMeter(),organizationSetting.getWalkingMinutes());
     }
 
+    public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit(){
+        return organizationGraphRepository.getUnitAndParentOrganizationAndCountyIds();
+    }
 
 }

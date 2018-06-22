@@ -13,6 +13,7 @@ import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -762,4 +763,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization)-[:"+HAS_SETTING+"]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
+    @Query("Match (child:Organization) \n" +
+            "OPTIONAL MATCH (child)-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization) with child,parent\n" +
+            "MATCH (child)-[:"+HAS_SUB_ORGANIZATION+"*]-(superParent:Organization{organizationLevel:'COUNTRY'}) \n" +
+            "MATCH (superParent)-[:"+BELONGS_TO+"]-(country:Country)\n" +
+            "return id(child) as unitId, id(parent) as parentOrganizationId,id(country) as countryId")
+    List<UnitAndParentOrganizationAndCountryDTO> getUnitAndParentOrganizationAndCountyIds();
 }
