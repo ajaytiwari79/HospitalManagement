@@ -2,9 +2,11 @@ package com.kairos.activity.shift;
 
 import com.kairos.persistence.model.user.country.Day;
 
+import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class CopyShiftDTO {
     List<BigInteger> shiftIds;
@@ -118,5 +120,17 @@ public class CopyShiftDTO {
 
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
+    }
+
+    @AssertTrue(message = "'start date' must be less than 'end date'.")
+    public boolean isValid() {
+        if (!Optional.ofNullable(this.startDate).isPresent()) {
+            return false;
+        }
+        if (Optional.ofNullable(this.startDate).isPresent()) {
+            boolean dateValue = (startDate.isBefore(endDate)) ? true : false;
+            return dateValue;
+        }
+        return true;
     }
 }
