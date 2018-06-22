@@ -1,7 +1,6 @@
 package com.planner.domain.location;
 
 import com.planner.domain.MongoBaseEntity;
-import com.planner.domain.common.BaseEntity;
 
 //import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -19,32 +18,32 @@ public class LocationDistance extends MongoBaseEntity {
 	private Double timeByBike;
 	private Double distanceByTruck;
 	private Double timeBytruck;
-	private int firstInstallationNo;
-	private int secondInstallationNo;
+	private long firstInstallationNo;
+	private long secondInstallationNo;
 
 	public LocationDistance() {
 	}
 
-	public LocationDistance(int firstInstallationNo, int secondInstallationNo, Double distanceByCar, Double timeByCar) {
+	public LocationDistance(long firstInstallationNo, long secondInstallationNo, Double distanceByCar, Double timeByCar) {
 		this.distanceByCar = distanceByCar;
 		this.timeByCar = timeByCar;
 		this.firstInstallationNo = firstInstallationNo;
 		this.secondInstallationNo = secondInstallationNo;
 	}
 
-	public int getFirstInstallationNo() {
+	public long getFirstInstallationNo() {
 		return firstInstallationNo;
 	}
 
-	public void setFirstInstallationNo(int firstInstallationNo) {
+	public void setFirstInstallationNo(long firstInstallationNo) {
 		this.firstInstallationNo = firstInstallationNo;
 	}
 
-	public int getSecondInstallationNo() {
+	public long getSecondInstallationNo() {
 		return secondInstallationNo;
 	}
 
-	public void setSecondInstallationNo(int secondInstallationNo) {
+	public void setSecondInstallationNo(long secondInstallationNo) {
 		this.secondInstallationNo = secondInstallationNo;
 	}
 

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,8 +22,8 @@ public class Task extends TaskOrShift{
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     //TODO consider break in  sub tasks or dont consider merged tasks at all
     private String id;
-    private int intallationNo;
-    private Double lattitude;
+    private long installationNo;
+    private Double latitude;
     private Double longitude;
     private Set<String> skills;
     private int duration;
@@ -46,10 +45,10 @@ public class Task extends TaskOrShift{
     private Shift shift;
     private LocationsDistanceMatrix locationsDistanceMatrix;
     private boolean shiftBreak;
-    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public Task(String id, int installationNo, Double latitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
-        this.intallationNo = intallationNo;
-        this.lattitude = lattitude;
+        this.installationNo = installationNo;
+        this.latitude = latitude;
         this.longitude = longitude;
         this.skills = skills;
         this.duration = duration;
@@ -153,27 +152,27 @@ public class Task extends TaskOrShift{
     public Task() {
     }
 
-    public Task(int intallationNo, Double lattitude, Double longitude) {
+    public Task(int installationNo, Double latitude, Double longitude) {
         this.id= UUID.randomUUID().toString();
-        this.intallationNo = intallationNo;
-        this.lattitude = lattitude;
+        this.installationNo = installationNo;
+        this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public int getIntallationNo() {
-        return intallationNo;
+    public long getInstallationNo() {
+        return installationNo;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setInstallationNo(long installationNo) {
+        this.installationNo = installationNo;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {
@@ -218,7 +217,7 @@ public class Task extends TaskOrShift{
         }
         if(prevTaskOrShift instanceof Shift) return 0;
         Task prevTask=(Task)prevTaskOrShift;
-        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLattitude(),prevTask.getLongitude(),this.getLattitude(),this.getLongitude()));
+        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
         return lpd.getTime();
     }
     public int getDrivingTime(){
@@ -235,21 +234,21 @@ public class Task extends TaskOrShift{
         Task task = (Task) o;
 
         return new EqualsBuilder()
-                .append(intallationNo, task.intallationNo)
+                .append(installationNo, task.installationNo)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(intallationNo)
+                .append(installationNo)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                + intallationNo +
+                +installationNo +
                 "-" + duration +
                 '}';
     }
@@ -263,7 +262,7 @@ public class Task extends TaskOrShift{
     }
 
     public String getLatLongString(){
-        return lattitude+":"+longitude;
+        return latitude +":"+longitude;
     }
     public boolean isConsecutive(Task task){
         return VrpPlanningUtil.isConsecutive(this, task);

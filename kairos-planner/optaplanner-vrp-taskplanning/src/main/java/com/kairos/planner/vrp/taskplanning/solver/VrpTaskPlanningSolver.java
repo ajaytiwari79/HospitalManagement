@@ -1,6 +1,5 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
@@ -111,9 +110,9 @@ public class VrpTaskPlanningSolver {
     private String getShiftChainInfo(Shift shift) {
         StringBuilder sb = new StringBuilder();
         int tasks=shift.getNumberOfTasks();
-        int uniqueTasks=shift.getTaskList().stream().map(t->t.getLattitude()+"_"+t.getLongitude()).collect(Collectors.toSet()).size();
+        int uniqueTasks=shift.getTaskList().stream().map(t->t.getLatitude()+"_"+t.getLongitude()).collect(Collectors.toSet()).size();
         if(tasks==uniqueTasks) return " all fine ";
-        Map<String,List<Task>> groupedTasks= shift.getTaskList().stream().collect(Collectors.groupingBy(t->t.getLattitude()+"_"+t.getLongitude()));
+        Map<String,List<Task>> groupedTasks= shift.getTaskList().stream().collect(Collectors.groupingBy(t->t.getLatitude()+"_"+t.getLongitude()));
         for(Map.Entry<String,List<Task>> e:groupedTasks.entrySet()){
                 if(e.getValue().size()<2){
                     continue;
@@ -138,7 +137,7 @@ public class VrpTaskPlanningSolver {
         Task temp=shift.getNextTask();
         int i=0;
         while(temp!=null){
-            Location location = new Location(temp.getLattitude(), temp.getLongitude(), ++i, temp.getIntallationNo());
+            Location location = new Location(temp.getLatitude(), temp.getLongitude(), ++i, temp.getInstallationNo());
             if(!list.contains(location)){
                 list.add(location);
             }

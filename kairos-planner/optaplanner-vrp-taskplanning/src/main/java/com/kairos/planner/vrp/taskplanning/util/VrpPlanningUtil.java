@@ -1,6 +1,5 @@
 package com.kairos.planner.vrp.taskplanning.util;
 
-import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
@@ -43,7 +42,7 @@ public class VrpPlanningUtil {
         return !task1.getId().equals(task2.getId()) && task1.getShift().getId().equals(task2.getShift().getId());
     }
     public static boolean hasSameLocation(Task task1,Task task2){
-        return Objects.equals(task1.getLattitude(),task2.getLattitude()) &&Objects.equals(task1.getLongitude(),task2.getLongitude());
+        return Objects.equals(task1.getLatitude(),task2.getLatitude()) &&Objects.equals(task1.getLongitude(),task2.getLongitude());
     }
 
     public static boolean hasSameSkillset(Task task, Task task1) {
