@@ -45,7 +45,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
-    public void createDefaultPhaseSettings(Long countryId, Long unitId, List<Phase> phases) {
+    public void createDefaultPhaseSettings(Long unitId, Long countryId, List<Phase> phases) {
         // TODO REMOVE
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty())
@@ -112,9 +112,9 @@ public class ActivityConfigurationService extends MongoBaseService {
     public List<ActivityConfigurationDTO> getActivityConfiguration(Long unitId, TimeTypeEnum timeTypeEnum) {
         List<ActivityConfigurationDTO> activityConfigurations = new ArrayList<>();
         if (timeTypeEnum.equals(TimeTypeEnum.ABSENCE)) {
-            activityConfigurations = activityConfigurationRepository.findByUnitIdAndDeletedFalse(unitId);
+            activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId);
         } else {
-            activityConfigurations = activityConfigurationRepository.findByUnitIdAndDeletedFalse(unitId);
+            activityConfigurations = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId);
         }
         return activityConfigurations;
     }
