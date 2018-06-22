@@ -72,6 +72,7 @@ public class VRPClientService  extends UserBaseService {
             vrpTaskDTO.setAddress(new TaskAddress(client.getZipCode(),client.getCity(),client.getStreetName(),""+client.getHouseNumber(),client.getLatitude().toString(),client.getLatitude().toString(),client.getBlock(),client.getFloorNumber()));
             vrpTaskDTO.setInstallationNumber(client.getInstallationNumber());
             vrpTaskDTO.setSkill(row.getCell(16).getStringCellValue());
+            vrpTaskDTO.setDuration((int) row.getCell(0).getNumericCellValue());
             vrpTasks.add(vrpTaskDTO);
             vrpClients.add(client);
         }

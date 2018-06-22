@@ -311,4 +311,16 @@ public class PlannerController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
     }
 
+    @DeleteMapping(value = "/{solverConfigId}")
+    @ApiOperation("stop solver config")
+    public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.stopToPlannerBySolverConfig(unitId,solverConfigId));
+    }
+
+    @DeleteMapping(value = "/{solverConfigId}")
+    @ApiOperation("get solution of solver config")
+    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId));
+    }
+
 }

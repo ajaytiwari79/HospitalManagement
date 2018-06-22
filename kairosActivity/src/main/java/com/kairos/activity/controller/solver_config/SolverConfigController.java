@@ -30,7 +30,7 @@ public class SolverConfigController {
     private SolverConfigService solverConfigService;
     @Inject private VRPPlanningService vrpPlanningService;
 
-    @PostMapping(value = "/")
+    @PostMapping(value = "")
     @ApiOperation("Create solver config")
     public ResponseEntity<Map<String, Object>> addSolverConfig(@RequestBody SolverConfigDTO solverConfigDTO,
                                                                @PathVariable Long unitId) {
@@ -56,7 +56,7 @@ public class SolverConfigController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,null);
     }
 
-    @PostMapping(value = "/{solverConfigId}/stop")
+   /* @PostMapping(value = "/{solverConfigId}/stop")
     @ApiOperation("create default solver config")
     public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.stopToPlannerBySolverConfig(unitId,solverConfigId));
@@ -68,7 +68,7 @@ public class SolverConfigController {
     @ApiOperation("create default solver config")
     public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
-    }
+    }*/
 
 }
 

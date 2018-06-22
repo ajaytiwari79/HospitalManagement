@@ -43,8 +43,9 @@ public class ConstraintValue {
     public ConstraintValue() {
     }
 
-    public ConstraintValue(BigInteger id) {
+    public ConstraintValue(BigInteger id,Integer constraintValue) {
         this.id = id;
+        this.constraintValue = null;
     }
 
     public BigInteger getId() {

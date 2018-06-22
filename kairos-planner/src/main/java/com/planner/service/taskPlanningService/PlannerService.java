@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -59,6 +60,7 @@ public class PlannerService {
     @Autowired private TomTomService tomTomService;
     @Autowired private VRPGeneratorService vrpGeneratorService;
     @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
+   // @Autowired private
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
         PlanningProblem planningProblem = (PlanningProblem) planningRepository.findById(id,PlanningProblem.class);
@@ -136,15 +138,36 @@ public class PlannerService {
     @Async
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO){
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
-        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver();
+        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(true);
         solution = solver.solveProblemOnRequest(solution);
-        VRPPlanningSolution vrpPlanningSolution = ObjectMapperUtils.copyPropertiesByMapper(solution,VRPPlanningSolution.class);
+        Object[] objects = getSolvedTasks(solution.getShifts());
+        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<Shift>) objects[0],solution.getEmployees(),(List<Task>) objects[1]);
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
+
     }
 
     public VrpTaskPlanningDTO getSolutionBySolverConfigId(BigInteger solverConfigId){
         VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(solverConfigId);
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = new VrpTaskPlanningDTO();
         return ObjectMapperUtils.copyPropertiesByMapper(solution,VrpTaskPlanningDTO.class);
+    }
+
+    private Object[] getSolvedTasks(List<Shift> shifts){
+        List<Task> tasks1 = new ArrayList<>();
+        for (Shift shift:shifts){
+            Task task = shift.getNextTask();
+            while (true){
+                tasks1.add(task);
+                if(task.getNextTask()!=null){
+                    task = task.getNextTask();
+                    tasks1.add(task);
+                }else {
+                    break;
+                }
+            }
+            shift.setNextTask(null);
+        }
+        return new Object[]{shifts,tasks1};
     }
 
 

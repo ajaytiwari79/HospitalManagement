@@ -17,7 +17,7 @@ public class VRPTaskDTO {
     private BigInteger id;
     private TaskAddress address;
     //Vrp settings
-    private Integer installationNumber;
+    private Long installationNumber;
     private Long citizenId;
     private String skill;
     private BigInteger taskTypeId;
@@ -98,11 +98,11 @@ public class VRPTaskDTO {
         this.address = address;
     }
 
-    public Integer getInstallationNumber() {
+    public Long getInstallationNumber() {
         return installationNumber;
     }
 
-    public void setInstallationNumber(Integer installationNumber) {
+    public void setInstallationNumber(Long installationNumber) {
         this.installationNumber = installationNumber;
     }
 }

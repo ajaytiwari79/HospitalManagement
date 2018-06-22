@@ -4,6 +4,8 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 
+import com.kairos.response.dto.web.planning.vrpPlanning.EmployeeDTO;
+import com.kairos.response.dto.web.planning.vrpPlanning.ShiftDTO;
 import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
@@ -83,14 +85,27 @@ public class VRPGeneratorService {
             locationsDistanceMatrix.addLocationDistance(new LocationPair(m.getFirstLatitude(),m.getFirstLongitude(),m.getSecondLattitude(),m.getSecondLongitude()),
                     new LocationPairDifference(m.getResponse().getRouteSummary().getLengthInMeters(),m.getResponse().getRouteSummary().getTravelTimeInSeconds(),m.getResponse().getRouteSummary().getTrafficDelayInSeconds()));
         });
-        List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = ObjectMapperUtils.copyPropertiesOfListByMapper(vrpTaskPlanningDTO.getTasks(),com.kairos.planner.vrp.taskplanning.model.Task.class);
-        List<Shift> shifts = ObjectMapperUtils.copyPropertiesOfListByMapper(vrpTaskPlanningDTO.getTasks(),Shift.class);
+        List<Task> tasks = new ArrayList<>(vrpTaskPlanningDTO.getTasks().size());
+        vrpTaskPlanningDTO.getTasks().forEach(t->{
+            tasks.add(new Task(t.getId(),t.getIntallationNo(),t.getLattitude(),t.getLongitude(),t.getSkills(),t.getDuration(),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity()));
+        });
+        List<Shift> shifts = getShiftList(employees);
         solution.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
         solution.setTasks(tasks);
         solution.setShifts(shifts);
         solution.setEmployees(employees);
         solution.setLocationsDistanceMatrix(locationsDistanceMatrix);
         return solution;
+    }
+
+    private List<Shift> getShiftList(List<Employee> employeeList){
+        List<Shift> shifts = new ArrayList<>();
+        employeeList.forEach(e->{
+            for (int i=4;i<=8;i++) {
+                shifts.add(new Shift(e.getId()+i, e, LocalDate.now().plusDays(1), null, null));
+            }
+        });
+        return shifts;
     }
 
 

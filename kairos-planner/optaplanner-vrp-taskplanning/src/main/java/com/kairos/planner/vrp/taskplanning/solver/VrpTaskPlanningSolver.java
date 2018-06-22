@@ -29,6 +29,12 @@ public class VrpTaskPlanningSolver {
         solver = solverFactory.buildSolver();
     }
 
+
+    public VrpTaskPlanningSolver(boolean onRequest){
+        solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        solver = solverFactory.buildSolver();
+    }
+
     public void solve(String problemXML) throws IOException {
         XStream xstream = getxStream();
         VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));

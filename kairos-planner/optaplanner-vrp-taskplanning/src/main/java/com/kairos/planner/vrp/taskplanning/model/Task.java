@@ -1,5 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -9,7 +11,9 @@ import org.optaplanner.core.api.domain.variable.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -18,6 +22,8 @@ import java.util.Set;
  * @date - 7/6/18
  */
 @PlanningEntity
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task extends TaskOrShift{
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     //TODO consider break in  sub tasks or dont consider merged tasks at all
@@ -36,7 +42,6 @@ public class Task extends TaskOrShift{
     @PlanningVariable(valueRangeProviderRefs = {
             "tasks","shifts" }, graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrShift prevTaskOrShift;
-
     @CustomShadowVariable(sources = @PlanningVariableReference(variableName = "prevTaskOrShift"),variableListenerClass = VrpTaskStartTimeListener.class)
     private LocalDateTime plannedStartTime;
 
@@ -58,7 +63,6 @@ public class Task extends TaskOrShift{
         this.post = post;
         this.city = city;
     }
-
 
 
     public String getId() {

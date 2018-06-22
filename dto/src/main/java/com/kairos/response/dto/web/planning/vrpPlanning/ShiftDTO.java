@@ -1,5 +1,8 @@
 package com.kairos.response.dto.web.planning.vrpPlanning;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,7 +11,8 @@ import java.util.List;
  * @author pradeep
  * @date - 20/6/18
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShiftDTO {
 
     private String id;

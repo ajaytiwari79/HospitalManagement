@@ -1,18 +1,33 @@
 package com.kairos.response.dto.web.planning.vrpPlanning;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.response.dto.TaskTypeSettingDTO;
+
 import java.util.Set;
 
 /**
  * @author pradeep
  * @date - 20/6/18
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EmployeeDTO {
 
     private String id;
     private String name;
     private Set<String> skills;
     private int efficiency;
+
+    public EmployeeDTO() {
+    }
+
+    public EmployeeDTO(String id, String name, Set<String> skills,int efficiency) {
+        this.id = id;
+        this.name = name;
+        this.skills = skills;
+        this.efficiency = efficiency;
+    }
 
     public String getId() {
         return id;

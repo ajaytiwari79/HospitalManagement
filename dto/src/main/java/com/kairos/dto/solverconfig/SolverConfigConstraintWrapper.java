@@ -13,23 +13,23 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolverConfigConstraintWrapper {
 
-    private List<ConstraintDTO> defaultconstraints;
+    private List<DefaultContraintsDTO> defaultConstraints;
     private List<SolverConfigDTO> solverConfigs;
 
     public SolverConfigConstraintWrapper() {
     }
 
-    public SolverConfigConstraintWrapper(List<ConstraintDTO> defaultconstraints, List<SolverConfigDTO> solverConfigs) {
-        this.defaultconstraints = defaultconstraints;
+    public SolverConfigConstraintWrapper(List<DefaultContraintsDTO> defaultConstraints, List<SolverConfigDTO> solverConfigs) {
+        this.defaultConstraints = defaultConstraints;
         this.solverConfigs = solverConfigs;
     }
 
-    public List<ConstraintDTO> getDefaultconstraints() {
-        return defaultconstraints;
+    public List<DefaultContraintsDTO> getDefaultConstraints() {
+        return defaultConstraints;
     }
 
-    public void setDefaultconstraints(List<ConstraintDTO> defaultconstraints) {
-        this.defaultconstraints = defaultconstraints;
+    public void setDefaultConstraints(List<DefaultContraintsDTO> defaultConstraints) {
+        this.defaultConstraints = defaultConstraints;
     }
 
     public List<SolverConfigDTO> getSolverConfigs() {

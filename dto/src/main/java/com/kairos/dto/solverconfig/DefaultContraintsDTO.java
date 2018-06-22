@@ -14,7 +14,15 @@ import java.util.List;
 public class DefaultContraintsDTO {
 
     private String category;
-    private List<ConstraintDTO> contraints;
+    private List<ConstraintDTO> constraints;
+
+    public DefaultContraintsDTO() {
+    }
+
+    public DefaultContraintsDTO(String category, List<ConstraintDTO> constraints) {
+        this.category = category;
+        this.constraints = constraints;
+    }
 
     public String getCategory() {
         return category;
@@ -24,11 +32,11 @@ public class DefaultContraintsDTO {
         this.category = category;
     }
 
-    public List<ConstraintDTO> getContraints() {
-        return contraints;
+    public List<ConstraintDTO> getConstraints() {
+        return constraints;
     }
 
-    public void setContraints(List<ConstraintDTO> contraints) {
-        this.contraints = contraints;
+    public void setConstraints(List<ConstraintDTO> constraints) {
+        this.constraints = constraints;
     }
 }

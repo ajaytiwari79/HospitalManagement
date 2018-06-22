@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web.planning.vrpPlanning;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
 
 import java.util.List;
@@ -8,13 +10,16 @@ import java.util.List;
  * @author pradeep
  * @date - 20/6/18
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VrpTaskPlanningDTO {
     private SolverConfigDTO solverConfig;
     private List<ShiftDTO> shifts;
     private List<EmployeeDTO> employees;
     private List<TaskDTO> tasks;
 
+    public VrpTaskPlanningDTO() {
+    }
 
     public VrpTaskPlanningDTO(SolverConfigDTO solverConfig, List<ShiftDTO> shifts, List<EmployeeDTO> employees, List<TaskDTO> tasks) {
         this.solverConfig = solverConfig;

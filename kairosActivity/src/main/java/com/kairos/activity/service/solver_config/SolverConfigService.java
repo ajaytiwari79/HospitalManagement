@@ -9,6 +9,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.dto.solverconfig.ConstraintDTO;
+import com.kairos.dto.solverconfig.DefaultContraintsDTO;
 import com.kairos.dto.solverconfig.SolverConfigConstraintWrapper;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
 import com.kairos.enums.solver_config.ConstraintCategory;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -68,7 +70,8 @@ public class SolverConfigService extends MongoBaseService {
     public SolverConfigConstraintWrapper getAllVRPSolverConfig(Long unitId) {
         List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
         List<SolverConfigDTO> solverConfigs = solverConfigRepository.getAllByUnitId(unitId);
-        return new SolverConfigConstraintWrapper(constraints, solverConfigs);
+        List<DefaultContraintsDTO> defaultContraints = constraints.stream().collect(Collectors.groupingBy(ConstraintDTO::getCategory,Collectors.toList())).entrySet().stream().map(c->new DefaultContraintsDTO(c.getKey().toValue(),c.getValue())).collect(Collectors.toList());
+        return new SolverConfigConstraintWrapper(defaultContraints, solverConfigs);
     }
 
 
@@ -104,7 +107,7 @@ public class SolverConfigService extends MongoBaseService {
         constraints.add(new Constraint("Do not allow zig-zag in same time window", "The rule for zig-zag applies to same time window.", ConstraintCategory.BREAK_CONSTRAINTS, PlanningType.VRPPLANNING, unitId));
         constraints.add(new Constraint("Task from same installation number", "Same place's installations should happen consecutively", ConstraintCategory.BREAK_CONSTRAINTS, PlanningType.VRPPLANNING, unitId));
         save(constraints);
-        List<ConstraintValue> constraintValues = constraints.stream().map(c -> new ConstraintValue(c.getId())).collect(Collectors.toList());
+        List<ConstraintValue> constraintValues = constraints.stream().map(c -> new ConstraintValue(c.getId(),null)).collect(Collectors.toList());
         SolverConfig solverConfig = new SolverConfig(unitId, "Default Configuration", false, PlanningType.VRPPLANNING, null, 300, constraintValues, true, SolverConfigStatus.READY);
         save(solverConfig);
     }

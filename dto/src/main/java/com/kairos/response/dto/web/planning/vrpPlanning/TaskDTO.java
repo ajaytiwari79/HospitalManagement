@@ -1,17 +1,23 @@
 package com.kairos.response.dto.web.planning.vrpPlanning;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 /**
  * @author pradeep
  * @date - 20/6/18
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDTO {
 
     private String id;
-    private int intallationNo;
+    private Long intallationNo;
     private Double lattitude;
     private Double longitude;
     private Set<String> skills;
@@ -23,11 +29,12 @@ public class TaskDTO {
     private int post;
     private String city;
     private LocalDateTime plannedStartTime;
+    private LocalDateTime plannedEndTime;
 
     public TaskDTO() {
     }
 
-    public TaskDTO(String id, int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public TaskDTO(String id, Long intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
         this.intallationNo = intallationNo;
         this.lattitude = lattitude;
@@ -42,6 +49,17 @@ public class TaskDTO {
         this.city = city;
     }
 
+
+
+
+    public LocalDateTime getPlannedEndTime() {
+        return plannedEndTime;
+    }
+
+    public void setPlannedEndTime(LocalDateTime plannedEndTime) {
+        this.plannedEndTime = plannedEndTime;
+    }
+
     public String getId() {
         return id;
     }
@@ -50,11 +68,11 @@ public class TaskDTO {
         this.id = id;
     }
 
-    public int getIntallationNo() {
+    public Long getIntallationNo() {
         return intallationNo;
     }
 
-    public void setIntallationNo(int intallationNo) {
+    public void setIntallationNo(Long intallationNo) {
         this.intallationNo = intallationNo;
     }
 

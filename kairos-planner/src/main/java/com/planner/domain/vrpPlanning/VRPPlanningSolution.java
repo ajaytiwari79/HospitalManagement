@@ -23,6 +23,16 @@ public class VRPPlanningSolution extends MongoBaseEntity {
     private List<Employee> employees;
     private List<Task> tasks;
 
+    public VRPPlanningSolution() {
+    }
+
+    public VRPPlanningSolution(BigInteger solverConfigId, List<Shift> shifts, List<Employee> employees, List<Task> tasks) {
+        this.solverConfigId = solverConfigId;
+        this.shifts = shifts;
+        this.employees = employees;
+        this.tasks = tasks;
+    }
+
     public BigInteger getSolverConfigId() {
         return solverConfigId;
     }
