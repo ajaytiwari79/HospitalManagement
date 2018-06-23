@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,8 @@ import java.util.Set;
 public class TaskDTO {
 
     private String id;
+    private String name;
+    private Long staffId;
     private Long intallationNo;
     private Double lattitude;
     private Double longitude;
@@ -30,6 +33,9 @@ public class TaskDTO {
     private String city;
     private LocalDateTime plannedStartTime;
     private LocalDateTime plannedEndTime;
+    private Date startTime;
+    private Date endTime;
+
 
     public TaskDTO() {
     }
@@ -49,8 +55,37 @@ public class TaskDTO {
         this.city = city;
     }
 
+    public Long getStaffId() {
+        return staffId;
+    }
 
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public LocalDateTime getPlannedEndTime() {
         return plannedEndTime;

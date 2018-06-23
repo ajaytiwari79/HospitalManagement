@@ -7,6 +7,7 @@ import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.planning.solution.TaskPlanningSolution;
+import com.kairos.response.dto.web.planning.vrpPlanning.TaskDTO;
 import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
@@ -37,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,20 +133,20 @@ public class PlannerService {
     }
 
     public boolean submitVRPPlanning(VrpTaskPlanningDTO vrpTaskPlanningDTO){
-        startVRPPlanningSolverOnThisVM(vrpTaskPlanningDTO);
+        //startVRPPlanningSolverOnThisVM(vrpTaskPlanningDTO);
         return true;
     }
 
-    @Async
+    /*@Async
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO){
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
         VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(true);
         solution = solver.solveProblemOnRequest(solution);
         Object[] objects = getSolvedTasks(solution.getShifts());
-        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<Shift>) objects[0],solution.getEmployees(),(List<Task>) objects[1]);
+        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<Shift>) objects[0],solution.getEmployees(),(List<TaskDTO>) objects[1]);
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
 
-    }
+    }*/
 
     public VrpTaskPlanningDTO getSolutionBySolverConfigId(BigInteger solverConfigId){
         VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(solverConfigId);
@@ -153,21 +155,32 @@ public class PlannerService {
     }
 
     private Object[] getSolvedTasks(List<Shift> shifts){
-        List<Task> tasks1 = new ArrayList<>();
+        List<TaskDTO> taskDTOS = new ArrayList<>();
+        List<TaskDTO> drivedTaskList = new ArrayList<>();
         for (Shift shift:shifts){
-            Task task = shift.getNextTask();
-            while (true){
-                tasks1.add(task);
-                if(task.getNextTask()!=null){
-                    task = task.getNextTask();
-                    tasks1.add(task);
-                }else {
-                    break;
+            Task nextTask = shift.getNextTask();
+            if(nextTask!=null){
+                while (true){
+                    TaskDTO taskDTO = new TaskDTO(nextTask.getId().toString(),nextTask.getInstallationNo(),new Double(nextTask.getLatitude()),new Double(nextTask.getLongitude()),null,nextTask.getDuration(),nextTask.getStreetName(),new Integer(nextTask.getHouseNo()),nextTask.getBlock(),nextTask.getFloorNo(),nextTask.getPost(),nextTask.getCity());
+                    taskDTO.setPlannedEndTime(nextTask.getPlannedStartTime());
+                    LocalDateTime drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
+                    taskDTO.setPlannedEndTime(drivingTimeStart);
+                    taskDTO.setStaffId(new Long(shift.getEmployee().getId()));
+                    taskDTOS.add(taskDTO);
+                    if(nextTask.getNextTask()!=null){
+                        nextTask = nextTask.getNextTask();
+                        TaskDTO drivedTask = new TaskDTO(nextTask.getId().toString(),nextTask.getInstallationNo(),new Double(nextTask.getLatitude()),new Double(nextTask.getLongitude()),null,nextTask.getDuration(),nextTask.getStreetName(),new Integer(nextTask.getHouseNo()),nextTask.getBlock(),nextTask.getFloorNo(),nextTask.getPost(),nextTask.getCity());
+                        drivedTask.setPlannedStartTime(drivingTimeStart);
+                        drivedTask.setPlannedEndTime(drivingTimeStart.plusSeconds(nextTask.getDrivingTimeSeconds()));
+                        drivedTaskList.add(taskDTO);
+                    }else {
+                        break;
+                    }
                 }
             }
             shift.setNextTask(null);
         }
-        return new Object[]{shifts,tasks1};
+        return new Object[]{shifts,taskDTOS};
     }
 
 

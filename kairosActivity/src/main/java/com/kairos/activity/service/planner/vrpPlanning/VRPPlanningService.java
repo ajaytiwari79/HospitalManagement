@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,9 +72,28 @@ public class VRPPlanningService extends MongoBaseService{
     public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId){
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,solverConfigId);
         VrpTaskPlanningDTO vrpTaskPlanningDTO = responseEnvelope.getData();
-        Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
-
+        List<TaskDTO> taskDTOS = getTasks(unitId,vrpTaskPlanningDTO.getTasks());
         return vrpTaskPlanningDTO;
+    }
+
+    public List<TaskDTO> getTasks(Long unitId,List<TaskDTO> taskDTOS){
+        Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getIntallationNo(),v->v));
+        Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
+        List<TaskDTO> tasks = new ArrayList<>();
+        for (Map.Entry<Long, List<VRPTaskDTO>> installationTasks : installationNOtasks.entrySet()) {
+            TaskDTO taskDTO = taskMap.get(installationTasks.getKey());
+            LocalDateTime startTime = taskDTO.getPlannedStartTime();
+            LocalDateTime updatedStartTime = startTime;
+            for (VRPTaskDTO vrpTaskDTO : installationTasks.getValue()) {
+                    TaskDTO task= new TaskDTO(vrpTaskDTO.getId().toString(),vrpTaskDTO.getInstallationNumber(),new Double(vrpTaskDTO.getAddress().getLatitude()),new Double(vrpTaskDTO.getAddress().getLongitude()),null,vrpTaskDTO.getDuration(),vrpTaskDTO.getAddress().getStreet(),new Integer(vrpTaskDTO.getAddress().getHouseNumber()),vrpTaskDTO.getAddress().getBlock(),vrpTaskDTO.getAddress().getFloorNo(),vrpTaskDTO.getAddress().getZip(),vrpTaskDTO.getAddress().getCity());
+                    task.setName(vrpTaskDTO.getTaskType().getTitle());
+                    task.setStartTime(Date.from(updatedStartTime.toInstant(ZoneOffset.of(ZoneOffset.systemDefault().getId()))));
+                    task.setEndTime(Date.from(updatedStartTime.plusMinutes(vrpTaskDTO.getDuration()).toInstant(ZoneOffset.of(ZoneOffset.systemDefault().getId()))));
+                    updatedStartTime = updatedStartTime.plusMinutes(vrpTaskDTO.getDuration());
+                    tasks.add(task);
+            }
+        }
+        return tasks;
     }
 
 
@@ -80,7 +101,7 @@ public class VRPPlanningService extends MongoBaseService{
         List<TaskDTO> taskDTOS = getTaskForPlanning(unitId);
         List<EmployeeDTO> employeeDTOs = getEmployees(unitId);
         //List<ShiftDTO> shiftDTOS = getShifts(employeeDTOs);
-        return new VrpTaskPlanningDTO(solverConfigDTO,null,employeeDTOs,taskDTOS);
+        return new VrpTaskPlanningDTO(solverConfigDTO,null,employeeDTOs,taskDTOS,null,null);
     }
 
     public List<TaskDTO> getTaskForPlanning(Long unitId){
@@ -89,7 +110,6 @@ public class VRPPlanningService extends MongoBaseService{
         List<TaskDTO> taskDTOS = new ArrayList<>(uniqueTaskList.size());
         Map<Long,Integer> intallationandDuration = tasks.stream().collect(groupingBy(VRPTaskDTO::getInstallationNumber,summingInt(VRPTaskDTO::getDuration)));
         Map<Long,Set<String>> intallationandSkill = tasks.stream().collect(groupingBy(VRPTaskDTO::getInstallationNumber,mapping(v->v.getTaskType().getTitle(),toSet())));
-        Map<Long,List<VRPTaskDTO>> installationNoTasks = tasks.stream().collect(Collectors.groupingBy(t->t.getInstallationNumber(),toList()));
         uniqueTaskList.forEach(t->{
             taskDTOS.add(new TaskDTO(t.getId().toString(),t.getInstallationNumber(),new Double(t.getAddress().getLatitude()),new Double(t.getAddress().getLongitude()),intallationandSkill.get(t.getInstallationNumber()),intallationandDuration.get(t.getInstallationNumber()),t.getAddress().getStreet(),new Integer(t.getAddress().getHouseNumber()),t.getAddress().getBlock(),t.getAddress().getFloorNo(),t.getAddress().getZip(),t.getAddress().getCity()));
         });

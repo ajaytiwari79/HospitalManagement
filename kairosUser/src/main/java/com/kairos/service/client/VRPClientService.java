@@ -38,7 +38,7 @@ public class VRPClientService  extends UserBaseService {
 
 
 
-    private double getValue(Cell cell){
+    private Double getValue(Cell cell){
         Double value;
         if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
             value =  cell.getNumericCellValue();
@@ -57,7 +57,7 @@ public class VRPClientService  extends UserBaseService {
             Row row = rows.get(i);
             VRPClient client = new VRPClient();
             client.setFirstName("Client "+(i-1));
-            client.setInstallationNumber((int) getValue(row.getCell(5)));
+            client.setInstallationNumber( getValue(row.getCell(5)).longValue());
             client.setLatitude(getValue(row.getCell(14)));
             client.setLongitude(getValue(row.getCell(14)));
             client.setBlock(row.getCell(9).getStringCellValue());
@@ -105,7 +105,7 @@ public class VRPClientService  extends UserBaseService {
 
     public void createTask(List<VRPTaskDTO> vrpTaskDTOS,Long unitId){
         List<VRPClient> vrpClients = vrpClientGraphRepository.getAllClient(unitId);
-        Map<Integer,VRPClient> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNumber(), c->c));
+        Map<Long,VRPClient> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNumber(), c->c));
         for (VRPTaskDTO taskDTO : vrpTaskDTOS) {
             VRPClient vrpClient = clientIdAndInstallationNo.get(taskDTO.getInstallationNumber());
             taskDTO.setCitizenId(vrpClient.getId());

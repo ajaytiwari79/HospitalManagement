@@ -1,8 +1,9 @@
 package com.planner.domain.task;
 
 import com.planner.domain.MongoBaseEntity;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author pradeep
@@ -11,7 +12,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Task extends MongoBaseEntity{
 
-    private int intallationNo;
+    private String id;
+    private String name;
+    private Long staffId;
+    private Long intallationNumber;
     private Double lattitude;
     private Double longitude;
     private String skill;
@@ -22,10 +26,15 @@ public class Task extends MongoBaseEntity{
     private int floorNo;
     private int post;
     private String city;
+    private LocalDateTime plannedStartTime;
+    private LocalDateTime plannedEndTime;
+    private Date startTime;
+    private Date endTime;
 
 
-    public Task(int intallationNo, Double lattitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
-        this.intallationNo = intallationNo;
+    public Task(String id, Long intallationNumber, Double lattitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+        this.id = id;
+        this.intallationNumber = intallationNumber;
         this.lattitude = lattitude;
         this.longitude = longitude;
         this.skill = skill;
@@ -105,18 +114,18 @@ public class Task extends MongoBaseEntity{
     public Task() {
     }
 
-    public Task(int intallationNo, Double lattitude, Double longitude) {
-        this.intallationNo = intallationNo;
+    public Task(Long intallationNumber, Double lattitude, Double longitude) {
+        this.intallationNumber = intallationNumber;
         this.lattitude = lattitude;
         this.longitude = longitude;
     }
 
-    public int getIntallationNo() {
-        return intallationNo;
+    public Long getIntallationNumber() {
+        return intallationNumber;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setIntallationNumber(Long intallationNumber) {
+        this.intallationNumber = intallationNumber;
     }
 
     public Double getLattitude() {

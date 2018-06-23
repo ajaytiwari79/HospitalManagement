@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Shift;
-import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.task.Task;
 
 import java.math.BigInteger;
 import java.util.List;

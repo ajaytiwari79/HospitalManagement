@@ -17,15 +17,35 @@ public class VrpTaskPlanningDTO {
     private List<ShiftDTO> shifts;
     private List<EmployeeDTO> employees;
     private List<TaskDTO> tasks;
+    private List<TaskDTO> drivingTimeList;
+    private List<TaskDTO> escalatedTaskList;
 
     public VrpTaskPlanningDTO() {
     }
 
-    public VrpTaskPlanningDTO(SolverConfigDTO solverConfig, List<ShiftDTO> shifts, List<EmployeeDTO> employees, List<TaskDTO> tasks) {
+    public VrpTaskPlanningDTO(SolverConfigDTO solverConfig, List<ShiftDTO> shifts, List<EmployeeDTO> employees, List<TaskDTO> tasks,List<TaskDTO> drivingTimeList,List<TaskDTO> escalatedTaskList) {
         this.solverConfig = solverConfig;
         this.shifts = shifts;
         this.employees = employees;
         this.tasks = tasks;
+        this.drivingTimeList = drivingTimeList;
+        this.escalatedTaskList = escalatedTaskList;
+    }
+
+    public List<TaskDTO> getEscalatedTaskList() {
+        return escalatedTaskList;
+    }
+
+    public void setEscalatedTaskList(List<TaskDTO> escalatedTaskList) {
+        this.escalatedTaskList = escalatedTaskList;
+    }
+
+    public List<TaskDTO> getDrivingTimeList() {
+        return drivingTimeList;
+    }
+
+    public void setDrivingTimeList(List<TaskDTO> drivingTimeList) {
+        this.drivingTimeList = drivingTimeList;
     }
 
     public List<ShiftDTO> getShifts() {

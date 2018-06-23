@@ -52,7 +52,7 @@ public class Task extends TaskOrShift{
     private Shift shift;
     private LocationsDistanceMatrix locationsDistanceMatrix;
     private boolean shiftBreak;
-    public Task(String id, int installationNo, Double latitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public Task(String id, Long installationNo, Double latitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
         this.installationNo = installationNo;
         this.latitude = latitude;
