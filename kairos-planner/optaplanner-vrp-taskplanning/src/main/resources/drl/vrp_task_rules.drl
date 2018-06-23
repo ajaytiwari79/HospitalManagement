@@ -14,8 +14,7 @@ salience 20
         if($m>0)
             scoreHolder.addHardConstraintMatch(kcontext,-$m);
         else
-            scoreHolder.addSoftConstraintMatch(kcontext,$m);
-
+            scoreHolder.addSoftConstraintMatch(kcontext,$m<<4);
 end
 
 
@@ -44,16 +43,12 @@ salience 21
         Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes)
         $ot: Integer(intValue>0) from ($minutes-330)
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
-end
-
-rule "Number of Task Per shift"
-salience 21
-
-    when
-        Shift($num:numberOfTasks && $num> 20)
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
+        if($ot>60){
+            scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
+        }
+        else{
+            scoreHolder.addSoftConstraintMatch(kcontext,-10);
+        }
 end
 
 rule "Shift out of boundary full day"
@@ -69,6 +64,16 @@ salience 22
             scoreHolder.addSoftConstraintMatch(kcontext,-10);
         }
 end
+
+rule "Number of Task Per shift"
+salience 21
+
+    when
+        Shift($num:numberOfTasks && $num> 20)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
+end
+
 
 rule "Driving Time"
 salience 22
