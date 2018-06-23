@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -311,16 +313,16 @@ public class PlannerController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
     }
 
-    /*@DeleteMapping(value = "/{solverConfigId}")
+    @DeleteMapping(value = "/{solverConfigId}")
     @ApiOperation("stop solver config")
     public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.stopToPlannerBySolverConfig(unitId,solverConfigId));
-    }*/
+    }
 
-    @DeleteMapping(value = "/{solverConfigId}")
+    @GetMapping(value = "/{solverConfigId}")
     @ApiOperation("get solution of solver config")
-    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId));
+    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId,@RequestParam(value = "date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId,date));
     }
 
 }

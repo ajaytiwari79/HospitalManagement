@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Shift;
 import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.staff.PlanningShift;
 import com.planner.domain.task.Task;
 
 import java.math.BigInteger;
@@ -19,18 +20,28 @@ import java.util.List;
 public class VRPPlanningSolution extends MongoBaseEntity {
 
     private BigInteger solverConfigId;
-    private List<Shift> shifts;
+    private List<PlanningShift> shifts;
     private List<Employee> employees;
     private List<Task> tasks;
+    private List<Task> drivingTimeList;
 
     public VRPPlanningSolution() {
     }
 
-    public VRPPlanningSolution(BigInteger solverConfigId, List<Shift> shifts, List<Employee> employees, List<Task> tasks) {
+    public VRPPlanningSolution(BigInteger solverConfigId, List<PlanningShift> shifts, List<Employee> employees, List<Task> tasks,List<Task> drivingTimeList) {
         this.solverConfigId = solverConfigId;
         this.shifts = shifts;
         this.employees = employees;
         this.tasks = tasks;
+        this.drivingTimeList = drivingTimeList;
+    }
+
+    public List<Task> getDrivingTimeList() {
+        return drivingTimeList;
+    }
+
+    public void setDrivingTimeList(List<Task> drivingTimeList) {
+        this.drivingTimeList = drivingTimeList;
     }
 
     public BigInteger getSolverConfigId() {
@@ -41,11 +52,11 @@ public class VRPPlanningSolution extends MongoBaseEntity {
         this.solverConfigId = solverConfigId;
     }
 
-    public List<Shift> getShifts() {
+    public List<PlanningShift> getShifts() {
         return shifts;
     }
 
-    public void setShifts(List<Shift> shifts) {
+    public void setShifts(List<PlanningShift> shifts) {
         this.shifts = shifts;
     }
 

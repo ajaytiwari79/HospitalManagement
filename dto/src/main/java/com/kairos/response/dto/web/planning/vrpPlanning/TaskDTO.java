@@ -3,10 +3,8 @@ package com.kairos.response.dto.web.planning.vrpPlanning;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,8 +18,8 @@ public class TaskDTO {
     private String id;
     private String name;
     private Long staffId;
-    private Long intallationNo;
-    private Double lattitude;
+    private Long installationNumber;
+    private Double latitude;
     private Double longitude;
     private Set<String> skills;
     private int duration;
@@ -33,17 +31,18 @@ public class TaskDTO {
     private String city;
     private LocalDateTime plannedStartTime;
     private LocalDateTime plannedEndTime;
-    private Date startTime;
-    private Date endTime;
+    private Long startTime;
+    private Long endTime;
+    private String color;
 
 
     public TaskDTO() {
     }
 
-    public TaskDTO(String id, Long intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public TaskDTO(String id, Long installationNumber, Double latitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
-        this.intallationNo = intallationNo;
-        this.lattitude = lattitude;
+        this.installationNumber = installationNumber;
+        this.latitude = latitude;
         this.longitude = longitude;
         this.skills = skills;
         this.duration = duration;
@@ -55,6 +54,14 @@ public class TaskDTO {
         this.city = city;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     public Long getStaffId() {
         return staffId;
     }
@@ -63,19 +70,19 @@ public class TaskDTO {
         this.staffId = staffId;
     }
 
-    public Date getStartTime() {
+    public Long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(Long startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public Long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }
 
@@ -103,20 +110,20 @@ public class TaskDTO {
         this.id = id;
     }
 
-    public Long getIntallationNo() {
-        return intallationNo;
+    public Long getInstallationNumber() {
+        return installationNumber;
     }
 
-    public void setIntallationNo(Long intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {

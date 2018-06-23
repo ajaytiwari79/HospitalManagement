@@ -60,8 +60,8 @@ public class ImportService {
             if (row.getRowNum() > 0) {
                 try {
                     Task task = new Task();
-                    task.setIntallationNumber((int) row.getCell(5).getNumericCellValue());
-                    task.setLattitude(row.getCell(14).getNumericCellValue());
+                    task.setInstallationNumber( (long)row.getCell(5).getNumericCellValue());
+                    task.setLatitude(row.getCell(14).getNumericCellValue());
                     task.setLongitude(row.getCell(15).getNumericCellValue());
                     task.setBlock(row.getCell(9).getStringCellValue());
                     task.setCity(row.getCell(13).getStringCellValue());

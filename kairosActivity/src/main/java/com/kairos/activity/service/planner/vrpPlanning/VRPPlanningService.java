@@ -5,7 +5,6 @@ import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.solver_config.SolverConfig;
-import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.activity.response.dto.TaskTypeSettingDTO;
@@ -13,6 +12,7 @@ import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.service.task_type.TaskTypeService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.ObjectUtils;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,10 +52,10 @@ public class VRPPlanningService extends MongoBaseService{
     @Inject private PlannerRestClient plannerRestClient;
 
     public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
-        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
-        SolverConfigDTO solverConfigDTO = ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
+        SolverConfigDTO solverConfigDTO = solverConfigRepository.getoneById(solverConfigId);
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,solverConfigDTO);
         plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
+        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
         save(solverConfig);
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
@@ -69,28 +70,41 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
 
-    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId){
+    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,solverConfigId);
-        VrpTaskPlanningDTO vrpTaskPlanningDTO = responseEnvelope.getData();
-        List<TaskDTO> taskDTOS = getTasks(unitId,vrpTaskPlanningDTO.getTasks());
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VrpTaskPlanningDTO.class);
+        List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
+        taskDTOS = getTasks(unitId,taskDTOS);
+        List<TaskDTO> drivingTimeList = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
+        drivingTimeList.forEach(t->{
+            t.setStartTime(Date.from(t.getPlannedStartTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
+            t.setEndTime(Date.from(t.getPlannedStartTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
+        });
+        List<ShiftDTO> shiftDTOS = vrpTaskPlanningDTO.getShifts().stream().filter(s-> DateUtils.asLocalDate(new Date(s.getStartTime())).equals(date)).collect(toList());
+        vrpTaskPlanningDTO.setShifts(shiftDTOS);
+        vrpTaskPlanningDTO.setDrivingTimeList(drivingTimeList);
+        vrpTaskPlanningDTO.setTasks(taskDTOS);
         return vrpTaskPlanningDTO;
     }
 
     public List<TaskDTO> getTasks(Long unitId,List<TaskDTO> taskDTOS){
-        Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getIntallationNo(),v->v));
+        Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getInstallationNumber(), v->v));
         Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
         List<TaskDTO> tasks = new ArrayList<>();
         for (Map.Entry<Long, List<VRPTaskDTO>> installationTasks : installationNOtasks.entrySet()) {
             TaskDTO taskDTO = taskMap.get(installationTasks.getKey());
-            LocalDateTime startTime = taskDTO.getPlannedStartTime();
-            LocalDateTime updatedStartTime = startTime;
-            for (VRPTaskDTO vrpTaskDTO : installationTasks.getValue()) {
+            if(taskDTO!=null){
+                LocalDateTime updatedStartTime = taskDTO.getPlannedStartTime();;
+                for (VRPTaskDTO vrpTaskDTO : installationTasks.getValue()) {
                     TaskDTO task= new TaskDTO(vrpTaskDTO.getId().toString(),vrpTaskDTO.getInstallationNumber(),new Double(vrpTaskDTO.getAddress().getLatitude()),new Double(vrpTaskDTO.getAddress().getLongitude()),null,vrpTaskDTO.getDuration(),vrpTaskDTO.getAddress().getStreet(),new Integer(vrpTaskDTO.getAddress().getHouseNumber()),vrpTaskDTO.getAddress().getBlock(),vrpTaskDTO.getAddress().getFloorNo(),vrpTaskDTO.getAddress().getZip(),vrpTaskDTO.getAddress().getCity());
+
                     task.setName(vrpTaskDTO.getTaskType().getTitle());
-                    task.setStartTime(Date.from(updatedStartTime.toInstant(ZoneOffset.of(ZoneOffset.systemDefault().getId()))));
-                    task.setEndTime(Date.from(updatedStartTime.plusMinutes(vrpTaskDTO.getDuration()).toInstant(ZoneOffset.of(ZoneOffset.systemDefault().getId()))));
+                    task.setStartTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
+                    task.setEndTime(Date.from(updatedStartTime.plusMinutes(vrpTaskDTO.getDuration()).atZone(ZoneId.systemDefault()).toInstant()).getTime());
+                    task.setColor(vrpTaskDTO.getTaskType().getColorForGantt());
                     updatedStartTime = updatedStartTime.plusMinutes(vrpTaskDTO.getDuration());
                     tasks.add(task);
+                }
             }
         }
         return tasks;

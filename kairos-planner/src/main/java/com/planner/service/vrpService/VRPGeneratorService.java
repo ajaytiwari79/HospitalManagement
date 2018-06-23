@@ -4,21 +4,15 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 
-import com.kairos.response.dto.web.planning.vrpPlanning.EmployeeDTO;
-import com.kairos.response.dto.web.planning.vrpPlanning.ShiftDTO;
 import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;
 import com.planner.service.tomtomService.TomTomService;
 import com.planner.util.wta.FileIOUtil;
-import com.thoughtworks.xstream.XStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +81,7 @@ public class VRPGeneratorService {
         });
         List<Task> tasks = new ArrayList<>(vrpTaskPlanningDTO.getTasks().size());
         vrpTaskPlanningDTO.getTasks().forEach(t->{
-            tasks.add(new Task(t.getId(),t.getIntallationNo(),t.getLattitude(),t.getLongitude(),t.getSkills(),t.getDuration(),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity()));
+            tasks.add(new Task(t.getId(),t.getInstallationNumber(),t.getLatitude(),t.getLongitude(),t.getSkills(),t.getDuration(),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity()));
         });
         List<Shift> shifts = getShiftList(employees);
         solution.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());

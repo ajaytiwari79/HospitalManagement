@@ -12,11 +12,10 @@ import java.util.Date;
 
 public class Task extends MongoBaseEntity{
 
-    private String id;
     private String name;
     private Long staffId;
-    private Long intallationNumber;
-    private Double lattitude;
+    private Long installationNumber;
+    private Double latitude;
     private Double longitude;
     private String skill;
     private int duration;
@@ -32,10 +31,10 @@ public class Task extends MongoBaseEntity{
     private Date endTime;
 
 
-    public Task(String id, Long intallationNumber, Double lattitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    public Task(String id, Long installationNumber, Double latitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
-        this.intallationNumber = intallationNumber;
-        this.lattitude = lattitude;
+        this.installationNumber = installationNumber;
+        this.latitude = latitude;
         this.longitude = longitude;
         this.skill = skill;
         this.duration = duration;
@@ -45,6 +44,61 @@ public class Task extends MongoBaseEntity{
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public void setSkill(String skill) {
+        this.skill = skill;
+    }
+
+    public LocalDateTime getPlannedStartTime() {
+        return plannedStartTime;
+    }
+
+    public void setPlannedStartTime(LocalDateTime plannedStartTime) {
+        this.plannedStartTime = plannedStartTime;
+    }
+
+    public LocalDateTime getPlannedEndTime() {
+        return plannedEndTime;
+    }
+
+    public void setPlannedEndTime(LocalDateTime plannedEndTime) {
+        this.plannedEndTime = plannedEndTime;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public int getDuration() {
@@ -114,26 +168,26 @@ public class Task extends MongoBaseEntity{
     public Task() {
     }
 
-    public Task(Long intallationNumber, Double lattitude, Double longitude) {
-        this.intallationNumber = intallationNumber;
-        this.lattitude = lattitude;
+    public Task(Long installationNumber, Double latitude, Double longitude) {
+        this.installationNumber = installationNumber;
+        this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public Long getIntallationNumber() {
-        return intallationNumber;
+    public Long getInstallationNumber() {
+        return installationNumber;
     }
 
-    public void setIntallationNumber(Long intallationNumber) {
-        this.intallationNumber = intallationNumber;
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {

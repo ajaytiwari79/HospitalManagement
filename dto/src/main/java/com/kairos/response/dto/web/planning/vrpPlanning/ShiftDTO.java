@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,13 +17,15 @@ import java.util.List;
 public class ShiftDTO {
 
     private String id;
+    private Long staffId;
     private EmployeeDTO employee;
     private LocalDate localDate;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private Date startTime;
+    private Date endTime;
     private List<TaskDTO> tasks;
+    private String color;
 
-    public ShiftDTO(String id, EmployeeDTO employee, LocalDate localDate, LocalDateTime startTime, LocalDateTime endTime) {
+    public ShiftDTO(String id, EmployeeDTO employee, LocalDate localDate, Date startTime, Date endTime) {
         this.id = id;
         this.employee = employee;
         this.localDate = localDate;
@@ -30,8 +33,24 @@ public class ShiftDTO {
         this.endTime = endTime;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
 
     public ShiftDTO() {
+        this.color = "";
     }
 
     public List<TaskDTO> getTasks() {
@@ -42,19 +61,19 @@ public class ShiftDTO {
         this.tasks = tasks;
     }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public Long getStartTime() {
+        return startTime.getTime();
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
+    public Long getEndTime() {
+        return endTime.getTime();
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 

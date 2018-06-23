@@ -61,6 +61,8 @@ public class PlannerRestClient {
                 return HttpMethod.DELETE;
             case UPDATE:
                 return HttpMethod.PUT;
+            case GET:
+                return HttpMethod.GET;
             default:return null;
 
         }
@@ -84,7 +86,7 @@ public class PlannerRestClient {
             uri = "planner/submitVRPPlanning";
         }
         else if (t==null){
-            uri = "planner/vrp/%s";
+            uri = String.format("planner/vrp/%s",pathParams);
         }
         return uri;
     }

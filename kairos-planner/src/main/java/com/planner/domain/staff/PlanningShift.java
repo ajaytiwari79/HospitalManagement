@@ -1,19 +1,30 @@
 package com.planner.domain.staff;
 
-import com.planner.domain.common.BaseEntity;
+import com.planner.domain.MongoBaseEntity;
 import com.planner.enums.ShiftType;
 import org.joda.time.DateTime;
 //import org.springframework.data.cassandra.core.mapping.Table;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 //@Table
-public class PlanningShift extends BaseEntity {
+public class PlanningShift extends MongoBaseEntity {
 
     private String staffId;
-    private Date startDateTime;
-    private Date endDateTime;
+    private Date startTime;
+    private Date endTime;
     private ShiftType shiftType;
+
+    public PlanningShift() {
+    }
+
+    public PlanningShift(String staffId, Date startTime, Date endTime) {
+        this.staffId = staffId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
 
     public String getStaffId() {
         return staffId;
@@ -23,27 +34,27 @@ public class PlanningShift extends BaseEntity {
         this.staffId = staffId;
     }
 
-    public Date getStartDateTime() {
-        return startDateTime;
+    public Date getStartTime() {
+        return startTime;
     }
     public DateTime getStartDate(){
-         return new DateTime(startDateTime);
+         return new DateTime(startTime);
     }
 
     public DateTime getEndDate(){
-        return new DateTime(endDateTime);
+        return new DateTime(endTime);
     }
 
-    public void setStartDateTime(Date startDateTime) {
-        this.startDateTime = startDateTime;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public Date getEndDateTime() {
-        return endDateTime;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setEndDateTime(Date endDateTime) {
-        this.endDateTime = endDateTime;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public ShiftType getShiftType() {

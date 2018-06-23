@@ -29,14 +29,14 @@ public class TaskService {
 
     public List<com.kairos.planner.vrp.taskplanning.model.Task> getUniqueTask(){
         List<Task> taskList = taskRepository.findAll();
-        List<Task> uniqueTaskList = taskList.stream().filter(ObjectUtils.distinctByKey(task -> task.getIntallationNumber())).collect(toList());
+        List<Task> uniqueTaskList = taskList.stream().filter(ObjectUtils.distinctByKey(task -> task.getInstallationNumber())).collect(toList());
         List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = new ArrayList<>();
-        Map<Long,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getIntallationNumber,summingInt(Task::getDuration)));
-        Map<Long,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getIntallationNumber,mapping(Task::getSkill,toSet())));
-        Map<Long,Task> taskMap= uniqueTaskList.stream().collect(Collectors.toMap(t->t.getIntallationNumber(), t->t));
+        Map<Long,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getInstallationNumber,summingInt(Task::getDuration)));
+        Map<Long,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getInstallationNumber,mapping(Task::getSkill,toSet())));
+        Map<Long,Task> taskMap= uniqueTaskList.stream().collect(Collectors.toMap(t->t.getInstallationNumber(), t->t));
         intallationandDuration.entrySet().forEach(t->{
             Task task = taskMap.get(t.getKey());
-            tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(task.getId(),task.getIntallationNumber(),task.getLattitude(),task.getLongitude(),intallationandSkill.get(task.getIntallationNumber()),t.getValue(),task.getStreetName(),task.getHouseNo(),task.getBlock(),task.getFloorNo(),task.getPost(),task.getCity()));
+            tasks.add(new com.kairos.planner.vrp.taskplanning.model.Task(task.getId(),task.getInstallationNumber(),task.getLatitude(),task.getLongitude(),intallationandSkill.get(task.getInstallationNumber()),t.getValue(),task.getStreetName(),task.getHouseNo(),task.getBlock(),task.getFloorNo(),task.getPost(),task.getCity()));
         });
         return tasks;
     }

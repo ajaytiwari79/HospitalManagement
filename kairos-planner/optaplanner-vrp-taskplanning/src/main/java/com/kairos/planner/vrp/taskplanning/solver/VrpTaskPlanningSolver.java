@@ -28,13 +28,14 @@ public class VrpTaskPlanningSolver {
 
 
     public VrpTaskPlanningSolver(){
-        solverFactory = SolverFactory.createFromXmlFile(new File(config));
-        solver = solverFactory.buildSolver();
+        /*solverFactory = SolverFactory.createFromXmlFile(new File(config));
+        solver = solverFactory.buildSolver();*/
     }
 
 
-    public VrpTaskPlanningSolver(boolean onRequest){
+    public VrpTaskPlanningSolver(List<File> drlFileList){
         solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        //solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
         solver = solverFactory.buildSolver();
     }
 
@@ -44,7 +45,7 @@ public class VrpTaskPlanningSolver {
         solve(problem);
     }
 
-    private XStream getxStream() {
+    public XStream getxStream() {
         XStream xstream= new XStream();
         xstream.setMode(XStream.ID_REFERENCES);
         xstream.processAnnotations(LocationPair.class);
@@ -113,7 +114,7 @@ public class VrpTaskPlanningSolver {
 
     }
 
-    public VrpTaskPlanningSolution solveProblemOnRequest(VrpTaskPlanningSolution problem) {
+    public Object[] solveProblemOnRequest(VrpTaskPlanningSolution problem) {
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
@@ -121,11 +122,15 @@ public class VrpTaskPlanningSolver {
         VrpTaskPlanningSolution solution=null;
         try {
             solution = solver.solve(problem);
+            DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
+
+            director.setWorkingSolution(solution);
+            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            return new Object[]{solution,indictmentMap};
         }catch (Exception e){
             //e.printStackTrace();
             throw  e;
         }
-        return solution;
     }
 
     private String getShiftChainInfo(Shift shift) {
