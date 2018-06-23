@@ -13,9 +13,9 @@ import java.util.Objects;
 public class VrpPlanningUtil {
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     public static boolean isConsecutive(Task task1, Task task2) {
-        if(Objects.equals(task1.getNextTask(),task2) || Objects.equals(task1.getPrevTaskOrShift(),task2)){
-            return true;
-        }
+        /*if(Objects.equals(task1.getNextTask(),task2) || Objects.equals(task1.getPrevTaskOrShift(),task2)){
+           false return true;
+        }*/
         Task temp=task1;
         while (temp.getPrevTaskOrShift() instanceof Task){
             Task prev = (Task) temp.getPrevTaskOrShift();
@@ -42,7 +42,8 @@ public class VrpPlanningUtil {
         return !task1.getId().equals(task2.getId()) && task1.getShift().getId().equals(task2.getShift().getId());
     }
     public static boolean hasSameLocation(Task task1,Task task2){
-        return Objects.equals(task1.getLatitude(),task2.getLatitude()) &&Objects.equals(task1.getLongitude(),task2.getLongitude());
+        return (task1.isShiftBreak() || task2.isShiftBreak()) ||
+                Objects.equals(task1.getLatitude(),task2.getLatitude()) &&Objects.equals(task1.getLongitude(),task2.getLongitude());
     }
 
     public static boolean hasSameSkillset(Task task, Task task1) {
@@ -50,6 +51,7 @@ public class VrpPlanningUtil {
     }
 
     public static int getMissingSkills(Task task, Employee employee) {
+        if(task.isShiftBreak()) return 0;
         if(Objects.equals(employee.getSkills(),task.getSkills())){
             return 0;
         }else if(employee.getSkills().containsAll(task.getSkills())){
