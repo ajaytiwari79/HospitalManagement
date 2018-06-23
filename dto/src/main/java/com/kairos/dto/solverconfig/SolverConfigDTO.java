@@ -18,6 +18,7 @@ public class SolverConfigDTO {
 
     private BigInteger id;
     private String name;
+    private Long unitId;
     private boolean isTemplate;
     private PlanningType phase;
     private BigInteger parentSolverConfigId;
@@ -25,6 +26,15 @@ public class SolverConfigDTO {
     private List<ConstraintValueDTO> constraints;
     private SolverConfigStatus status;
     private boolean isDefault;
+
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
     public SolverConfigStatus getStatus() {
         return status;

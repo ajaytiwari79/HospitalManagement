@@ -91,7 +91,7 @@ public class VRPClientService  extends UserBaseService {
             request.put("streetName",vrpClient.getStreetName());
             request.put("postalCode",""+vrpClient.getZipCode());
             request.put("countryCode","DK");
-            Map response = new HashMap();//tomTomRestClient.getfromTomtom(request);
+            Map response = tomTomRestClient.getfromTomtom(request);
             if(response!=null){
                 vrpClientList.add(vrpClient);
             }

@@ -325,4 +325,11 @@ public class PlannerController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId,date));
     }
 
+    @PostMapping(value = "/vrp_completed/{solverConfigId}")
+    @ApiOperation("create default solver config")
+    public ResponseEntity<Map<String, Object>> planningCompleted(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.planningCompleted(unitId,solverConfigId));
+    }
+
+
 }

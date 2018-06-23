@@ -26,7 +26,7 @@ public class Shift extends TaskOrShift{
 
     private LocalDateTime startTime;
     @CustomShadowVariable(variableListenerClass = ShiftEndTimeListener.class,
-            sources = @PlanningVariableReference(entityClass = Task.class,variableName = "nextTask"))
+            sources = @PlanningVariableReference(entityClass = Task.class, variableName = "nextTask"))
     private LocalDateTime endTime;
 
 
@@ -81,42 +81,46 @@ public class Shift extends TaskOrShift{
         this.endTime = endTime;
     }
 
-    public static LocalTime getDefaultShiftStart(){
-        return LocalTime.of(7,0);
+    public static LocalTime getDefaultShiftStart() {
+        return LocalTime.of(7, 0);
     }
-    public int getNumberOfTasks(){
-        int i=0;
-        Task task=getNextTask();
-        while (task!=null){
+
+    public int getNumberOfTasks() {
+        int i = 0;
+        Task task = getNextTask();
+        while (task != null) {
             i++;
-            task=task.getNextTask();
+            task = task.getNextTask();
         }
         return i;
     }
 
-    public int getTotalPlannedMinutesFromChain(){
-        int d=0;
-        Task task=getNextTask();
-        while (task!=null){
-            d+=task.getPlannedDuration()+task.getDrivingTime();
-            task=task.getNextTask();
+    public int getTotalPlannedMinutesFromChain() {
+        int d = 0;
+        Task task = getNextTask();
+        while (task != null) {
+            d += task.getPlannedDuration() + task.getDrivingTime();
+            task = task.getNextTask();
         }
         return d;
     }
-    public int getTotalPlannedMinutes(){
-        if(endTime==null)return 0;
-        return (int)ChronoUnit.MINUTES.between(getStartTime(), endTime);
+
+    public int getTotalPlannedMinutes() {
+        if (endTime == null) return 0;
+        return (int) ChronoUnit.MINUTES.between(getStartTime(), endTime);
     }
 
-    public boolean isHalfWorkDay(){
-        return localDate.getDayOfWeek().getValue()==5;
+    public boolean isHalfWorkDay() {
+        return localDate.getDayOfWeek().getValue() == 5;
     }
-    public boolean isFullWorkDay(){
-        return localDate.getDayOfWeek().getValue()<5;
+
+    public boolean isFullWorkDay() {
+        return localDate.getDayOfWeek().getValue() < 5;
     }
+
     @Override
     public String toString() {
-        return "Shift{" +id+
+        return "Shift{" + id +
                 ":" + employee.getName() +
                 ":" + localDate +
                 '}';
@@ -142,54 +146,78 @@ public class Shift extends TaskOrShift{
                 .toHashCode();
     }
 
-    public String getTaskChainString(){
+    public String getTaskChainString() {
         StringBuilder sb = new StringBuilder();
-        Task temp=getNextTask();
-        int duration=0;
-        while (temp!=null){
-            sb.append("[("+temp.isEmployeeEligible()+":"+temp.getDrivingTime()+")"+temp.toString()+"]->");
-            duration+= temp.getDrivingTime()+temp.getPlannedDuration();
-            temp=temp.getNextTask();
+        Task temp = getNextTask();
+        int duration = 0;
+        while (temp != null) {
+            sb.append("[(Drive:" +  temp.getDrivingTime() + ")" + temp.toString() +"planTime:"+temp.getPlannedStartTime()+ "]->");
+            duration += temp.getDrivingTime() + temp.getPlannedDuration();
+            temp = temp.getNextTask();
         }
-        return "TotalDur("+duration+"):Drive("+getChainDrivingTime()+")("+getStartTime()+":"+endTime+")"+sb.toString();
+        return "TotalDur(" + duration + "):Drive(" + getChainDrivingTime() + ")(" + getStartTime() + ":" + endTime + ")" + sb.toString();
     }
 
-    public String getLocationsString(){
+    public String getLocationsString() {
         StringBuilder sb = new StringBuilder();
-        Task temp=getNextTask();
-        while (temp!=null){
-            sb.append(temp.getLatLongString()+" -> ");
-            temp=temp.getNextTask();
+        Task temp = getNextTask();
+        while (temp != null) {
+            sb.append(temp.getLatLongString() + " -> ");
+            temp = temp.getNextTask();
         }
         return sb.toString();
     }
 
 
     public int getChainDuration() {
-        int duration=0;
-        Task temp=getNextTask();
-        while (temp!=null){
-            duration+=temp.getDrivingTime()+temp.getPlannedDuration();
-            temp=temp.getNextTask();
+        int duration = 0;
+        Task temp = getNextTask();
+        while (temp != null) {
+            duration += temp.getDrivingTime() + temp.getPlannedDuration();
+            temp = temp.getNextTask();
         }
         return duration;
     }
+
     public int getChainDrivingTime() {
-        int duration=0;
-        Task temp=getNextTask();
-        while (temp!=null){
-            duration+=temp.getDrivingTime();
-            temp=temp.getNextTask();
+        int duration = 0;
+        Task temp = getNextTask();
+        while (temp != null) {
+            duration += temp.getDrivingTime();
+            temp = temp.getNextTask();
         }
         return duration;
     }
-    public List<Task> getTaskList(){
-        List<Task> tasks= new ArrayList<>();
-        Task temp=getNextTask();
-        while (temp!=null){
+
+    public List<Task> getTaskList() {
+        List<Task> tasks = new ArrayList<>();
+        Task temp = getNextTask();
+        while (temp != null) {
             tasks.add(temp);
-            temp=temp.getNextTask();
+            temp = temp.getNextTask();
         }
         return tasks;
+    }
+
+    public int getNumberOfBreaks() {
+        int i=0;
+        Task temp = getNextTask();
+        while (temp != null) {
+            if(temp.isShiftBreak())
+                i++;
+            temp = temp.getNextTask();
+        }
+        return i;
+
+    }
+    public Task getBreak() {
+        Task temp = getNextTask();
+        while (temp != null) {
+            if(temp.isShiftBreak())
+                return temp;
+            temp = temp.getNextTask();
+        }
+        return null;
+
     }
 }

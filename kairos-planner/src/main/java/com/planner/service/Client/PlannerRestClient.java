@@ -27,16 +27,16 @@ public class PlannerRestClient {
     @Autowired
     private RestTemplate restTemplate;
     private static String activityServiceUrl;
-   // @Value("${gateway.activityservice.url}")
+    @Value("${gateway.activityservice.url}")
     public  void setActivityServiceUrl(String activityServiceUrl) {
         PlannerRestClient.activityServiceUrl = activityServiceUrl;
     }
 
     public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation,Object... pathParams) {
-        final String baseUrl = getPlannerBaseUrl();
+        final String baseUrl = getActivityBaseUrl();
 
         try {
-            String url=baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams);
+            String url=baseUrl + unitId +  getURI(t,integrationOperation,pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
@@ -71,15 +71,11 @@ public class PlannerRestClient {
         }
     }
     public static <T>String getURI(T t,IntegrationOperation integrationOperation,Object... pathParams){
-        String uri=null;
-        if (t instanceof VrpTaskPlanningDTO){
-            uri = "planner/submitVRPPlanning";
-        }
-        return uri;
+        return String.format("/planner/vrp_completed/%s",pathParams);
     }
 
-    public static final String getPlannerBaseUrl(){
-        String baseUrl=new StringBuilder(activityServiceUrl+"unit/").toString();
+    public static final String getActivityBaseUrl(){
+        String baseUrl=new StringBuilder(activityServiceUrl+"organization/24/unit/").toString();
         return baseUrl;
 
     }

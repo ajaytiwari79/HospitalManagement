@@ -1,5 +1,6 @@
 package com.planner.service.taskPlanningService;
 
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
 import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
@@ -22,6 +23,7 @@ import com.planner.repository.config.SolverConfigRepository;
 import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
 import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
+import com.planner.service.Client.PlannerRestClient;
 import com.planner.service.config.DroolsConfigService;
 import com.planner.service.config.PathProvider;
 import com.planner.service.config.SolverConfigService;
@@ -65,7 +67,7 @@ public class PlannerService {
     @Autowired private TomTomService tomTomService;
     @Autowired private VRPGeneratorService vrpGeneratorService;
     @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
-   // @Autowired private
+    @Autowired private PlannerRestClient plannerRestClient;
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
         PlanningProblem planningProblem = (PlanningProblem) planningRepository.findById(id,PlanningProblem.class);
@@ -136,6 +138,10 @@ public class PlannerService {
     }
 
     public boolean submitVRPPlanning(VrpTaskPlanningDTO vrpTaskPlanningDTO){
+        VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
+        if(solution!=null){
+            vrpPlanningMongoRepository.delete(solution);
+        }
         startVRPPlanningSolverOnThisVM(vrpTaskPlanningDTO);
         return true;
     }
@@ -151,7 +157,7 @@ public class PlannerService {
         Object[] solvedTasks = getSolvedTasks(solution.getShifts());
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2]);
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
-
+        plannerRestClient.publish(null,vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE,vrpTaskPlanningDTO.getSolverConfig().getId());
     }
 
     private List<File> getDrlFileList(SolverConfigDTO solverConfigDTO){
@@ -177,7 +183,7 @@ public class PlannerService {
     }
 
     private Object[] getSolvedTasks(List<Shift> shifts){
-        List<com.planner.domain.task.Task> taskDTOS = new ArrayList<>();
+        List<com.planner.domain.task.Task> tasks = new ArrayList<>();
         List<com.planner.domain.task.Task> drivedTaskList = new ArrayList<>();
         List<PlanningShift> planningShifts = new ArrayList<>(shifts.size());
         for (Shift shift:shifts){
@@ -190,7 +196,7 @@ public class PlannerService {
                     LocalDateTime drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
                     task.setPlannedEndTime(drivingTimeStart);
                     task.setStaffId(new Long(shift.getEmployee().getId()));
-                    taskDTOS.add(task);
+                    tasks.add(task);
                     if(nextTask.getNextTask()!=null){
                         nextTask = nextTask.getNextTask();
                         com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task(nextTask.getId().toString(),nextTask.getInstallationNo(),new Double(nextTask.getLatitude()),new Double(nextTask.getLongitude()),null,nextTask.getDrivingTimeSeconds(),nextTask.getStreetName(),new Integer(nextTask.getHouseNo()),nextTask.getBlock(),nextTask.getFloorNo(),nextTask.getPost(),nextTask.getCity());
@@ -205,7 +211,7 @@ public class PlannerService {
             }
             shift.setNextTask(null);
         }
-        return new Object[]{planningShifts,taskDTOS,drivedTaskList};
+        return new Object[]{planningShifts,tasks,drivedTaskList};
     }
 
 

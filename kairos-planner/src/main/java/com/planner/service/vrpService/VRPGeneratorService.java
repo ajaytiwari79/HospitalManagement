@@ -81,7 +81,7 @@ public class VRPGeneratorService {
         });
         List<Task> tasks = new ArrayList<>(vrpTaskPlanningDTO.getTasks().size());
         vrpTaskPlanningDTO.getTasks().forEach(t->{
-            tasks.add(new Task(t.getId(),t.getInstallationNumber(),t.getLatitude(),t.getLongitude(),t.getSkills(),t.getDuration(),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity()));
+            tasks.add(new Task(t.getId(),t.getInstallationNumber(),t.getLatitude(),t.getLongitude(),t.getSkills(),t.getDuration(),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity(),false));
         });
         List<Shift> shifts = getShiftList(employees);
         solution.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());

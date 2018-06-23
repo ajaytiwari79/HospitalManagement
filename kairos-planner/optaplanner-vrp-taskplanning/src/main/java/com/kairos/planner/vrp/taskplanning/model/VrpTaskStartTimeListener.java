@@ -60,7 +60,6 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
     }
 
     private void updatePlannedTime(Task task, LocalDateTime plannedDateTime, ScoreDirector scoreDirector){
-
         if(Objects.equals(task.getPlannedStartTime(),plannedDateTime)) return;
         scoreDirector.beforeVariableChanged(task,"plannedStartTime");
         task.setPlannedStartTime(plannedDateTime);
@@ -68,7 +67,7 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
     }
 
 
-
+    @Deprecated
     private void updateStartTimeFromStart(ScoreDirector scoreDirector, Task task) {
 
         try{

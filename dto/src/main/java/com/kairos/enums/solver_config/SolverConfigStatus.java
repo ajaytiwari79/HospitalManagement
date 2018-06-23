@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SolverConfigStatus {
 
-    IN_PROGRESS("VRP planning"),ON_HOLD("On hold"),READY("Ready");
+    IN_PROGRESS("VRP planning"),ON_HOLD("On hold"),READY("Ready"),COMPLETED("Completed");
 
     private String value;
     SolverConfigStatus(String value) {

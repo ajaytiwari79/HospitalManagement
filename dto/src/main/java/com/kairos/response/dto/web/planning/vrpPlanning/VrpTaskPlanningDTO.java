@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class VrpTaskPlanningDTO {
     private List<EmployeeDTO> employees;
     private List<TaskDTO> tasks;
     private List<TaskDTO> drivingTimeList;
-    private List<TaskDTO> escalatedTaskList;
+    private List<TaskDTO> escalatedTaskList = new ArrayList<>();
 
     public VrpTaskPlanningDTO() {
     }

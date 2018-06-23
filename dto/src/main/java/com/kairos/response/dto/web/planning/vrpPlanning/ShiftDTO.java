@@ -50,7 +50,7 @@ public class ShiftDTO {
     }
 
     public ShiftDTO() {
-        this.color = "";
+        this.color = "#efefef";
     }
 
     public List<TaskDTO> getTasks() {

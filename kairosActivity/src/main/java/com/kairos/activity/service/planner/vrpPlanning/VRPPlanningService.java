@@ -62,6 +62,13 @@ public class VRPPlanningService extends MongoBaseService{
         return solverConfigDTO;
     }
 
+    public Boolean planningCompleted(Long unitId,BigInteger solverConfigId){
+        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
+        solverConfig.setStatus(SolverConfigStatus.COMPLETED);
+        save(solverConfig);
+        return true;
+    }
+
     public SolverConfigDTO stopToPlannerBySolverConfig(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.ON_HOLD);
@@ -97,7 +104,7 @@ public class VRPPlanningService extends MongoBaseService{
                 LocalDateTime updatedStartTime = taskDTO.getPlannedStartTime();;
                 for (VRPTaskDTO vrpTaskDTO : installationTasks.getValue()) {
                     TaskDTO task= new TaskDTO(vrpTaskDTO.getId().toString(),vrpTaskDTO.getInstallationNumber(),new Double(vrpTaskDTO.getAddress().getLatitude()),new Double(vrpTaskDTO.getAddress().getLongitude()),null,vrpTaskDTO.getDuration(),vrpTaskDTO.getAddress().getStreet(),new Integer(vrpTaskDTO.getAddress().getHouseNumber()),vrpTaskDTO.getAddress().getBlock(),vrpTaskDTO.getAddress().getFloorNo(),vrpTaskDTO.getAddress().getZip(),vrpTaskDTO.getAddress().getCity());
-
+                    task.setStaffId(taskDTO.getStaffId());
                     task.setName(vrpTaskDTO.getTaskType().getTitle());
                     task.setStartTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
                     task.setEndTime(Date.from(updatedStartTime.plusMinutes(vrpTaskDTO.getDuration()).atZone(ZoneId.systemDefault()).toInstant()).getTime());

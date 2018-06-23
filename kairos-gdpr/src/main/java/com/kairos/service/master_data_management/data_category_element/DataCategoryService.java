@@ -1,6 +1,6 @@
 package com.kairos.service.master_data_management.data_category_element;
 
-import com.kairos.dto.master_data.DataCategoryDto;
+import com.kairos.dto.master_data.DataCategoryDTO;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataCategoryMongoRepository;
@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.constant.AppConstant.IDS_LIST;
-import static com.kairos.constant.AppConstant.DATA_EMELENTS_LIST;
+import static com.kairos.constants.AppConstant.IDS_LIST;
+import static com.kairos.constants.AppConstant.DATA_EMELENTS_LIST;
 
 
 @Service
@@ -40,7 +40,7 @@ public class DataCategoryService extends MongoBaseService {
 
     /*add data category with multiple data element, create data element and get ids from data element service
      */
-    public DataCategory addDataCategoryAndDataElement(Long countryId, DataCategoryDto dataCategoryDto) {
+    public DataCategory addDataCategoryAndDataElement(Long countryId, DataCategoryDTO dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent()) {
@@ -106,7 +106,7 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public DataCategory updateDataCategoryAndDataElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
+    public DataCategory updateDataCategoryAndDataElement(Long countryId, BigInteger id, DataCategoryDTO dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !id.equals(dataCategory.getId())) {
