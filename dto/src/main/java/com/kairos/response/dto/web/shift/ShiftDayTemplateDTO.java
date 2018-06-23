@@ -16,9 +16,6 @@ public class ShiftDayTemplateDTO {
     @NotNull(message = "error.shiftTemplate.activityId.notnull")
     private BigInteger activityId;
     private Long unitId;
-    @Range(min = 0)
-    @NotNull(message = "error.shiftTemplate.staffId.notnull")
-    private Long createdBy;// using userId here
     @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
@@ -30,15 +27,14 @@ public class ShiftDayTemplateDTO {
         //Default Constructor
     }
 
-    public ShiftDayTemplateDTO(BigInteger id, String name, String remarks, @Range(min = 0) @NotNull(message = "error.shiftTemplate.activityId.notnull") BigInteger activityId, Long unitId,
-                               @Range(min = 0) @NotNull(message = "error.shiftTemplate.staffId.notnull") Long createdBy, LocalTime startTime, LocalTime endTime, boolean isMainShift,
+    public ShiftDayTemplateDTO(BigInteger id, String name, String remarks, @Range(min = 0) @NotNull(message = "error.shiftTemplate.activityId.notnull") BigInteger activityId, Long unitId
+                               , LocalTime startTime, LocalTime endTime, boolean isMainShift,
                                List<ShiftDayTemplateDTO> subShifts) {
         this.id = id;
         this.name = name;
         this.remarks = remarks;
         this.activityId = activityId;
         this.unitId = unitId;
-        this.createdBy = createdBy;
         this.startTime = startTime;
         this.endTime = endTime;
         this.isMainShift = isMainShift;
@@ -83,14 +79,6 @@ public class ShiftDayTemplateDTO {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
     }
 
     public LocalTime getStartTime() {
