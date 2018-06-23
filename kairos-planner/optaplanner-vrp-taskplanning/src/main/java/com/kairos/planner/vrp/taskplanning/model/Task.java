@@ -310,5 +310,15 @@ public class Task extends TaskOrShift{
         //in between 1100 to 1330
         return mins >=660 && mins<=810;
     }
+    //0 means 1st task
+    public int getOrder(){
+        int i=0;
+        Task temp=this;
+        while(temp.prevTaskOrShift instanceof Task){
+            temp= (Task) temp.prevTaskOrShift;
+            i++;
+        }
+        return  i;
+    }
 
 }

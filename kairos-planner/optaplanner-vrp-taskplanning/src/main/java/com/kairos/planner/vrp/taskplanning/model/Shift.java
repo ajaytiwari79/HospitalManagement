@@ -216,4 +216,37 @@ public class Shift extends TaskOrShift {
         return null;
 
     }
+    public LocalDateTime[] getFirstInterval(){
+        Task temp = getNextTask();
+        while (temp != null) {
+            if(temp.isShiftBreak())
+                break;
+            temp = temp.getNextTask();
+        }
+        return new LocalDateTime[]{getNextTask().getPlannedStartTime(),temp.getPlannedEndTime()};
+    }
+    public LocalDateTime[] getSecondInterval(){
+        Task temp = getNextTask();
+        boolean breakFound=false;
+        while (temp != null) {
+            if(!breakFound && temp.isShiftBreak()){
+                breakFound=true;
+            }
+            temp = temp.getNextTask();
+        }
+        return null;
+    }
+    public Task getLongestTask(){
+        Task longest= getNextTask();
+        if(longest==null) return null;
+        Task temp = longest.getNextTask();
+        while (temp != null) {
+            if(!temp.isShiftBreak() && temp.getDuration()>longest.getDuration()){
+                longest=temp;
+            }
+            temp = temp.getNextTask();
+        }
+        return longest;
+    }
+
 }

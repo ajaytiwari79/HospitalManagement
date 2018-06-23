@@ -27,6 +27,16 @@ salience 20
         scoreHolder.addSoftConstraintMatch(kcontext,-1);
 end
 
+rule "Longest Task"
+salience 20
+    when
+        $shift:Shift(nextTask!=null);
+        //$task:$shift.getLongestTask();
+        $order: Integer(intValue>0) from ($shift.getLongestTask().getOrder())
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-1);
+end
+
 rule "Shift out of boundary half day"
 salience 21
 
