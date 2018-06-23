@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data_management.asset_management;
 
 
-import com.kairos.dto.master_data.AssetTypeDto;
+import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 import com.kairos.service.master_data_management.asset_management.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constant.ApiConstant.API_STORAGE_TYPE_URL;
+import static com.kairos.constants.ApiConstant.API_STORAGE_TYPE_URL;
 /*
  *
  *  created by bobby 17/5/2018
@@ -104,7 +104,7 @@ public class AssetTypeController {
 
     @ApiOperation("update subAsset by id")
     @PostMapping("/subAsset/add")
-    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,  @Valid @RequestBody AssetTypeDto assetTypeDto) {
+    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,  @Valid @RequestBody AssetTypeDTO assetTypeDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

@@ -1,33 +1,28 @@
 package com.kairos.persistance.repository.master_data_management.processing_activity_masterdata;
 
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDto;
+import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDto;
-import com.mongodb.QueryOperators;
+import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
-import javax.print.Doc;
 
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.DELETED;
-import static com.kairos.constant.AppConstant.ID;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,7 +34,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
     @Override
-    public MasterProcessingActivityResponseDto getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id) {
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id) {
 
         Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
         Aggregation aggregation = Aggregation.newAggregation(
@@ -47,12 +42,12 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation)
         );
-        AggregationResults<MasterProcessingActivityResponseDto> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDto.class);
+        AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
         return result.getUniqueMappedResult();
     }
 
     @Override
-    public List<MasterProcessingActivityResponseDto> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId) {
+    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId) {
         Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -60,13 +55,13 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation)
         );
-        AggregationResults<MasterProcessingActivityResponseDto> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDto.class);
+        AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
         return result.getMappedResults();
 
     }
 
     @Override
-    public List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId, FilterSelectionDto filterSelectionDto) {
+    public List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false));
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {

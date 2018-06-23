@@ -13,13 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constant.ApiConstant.API_ACCOUNT_TYPE_URL;
-import static com.kairos.constant.ApiConstant.PARENT_ORGABNIZATION;
+import static com.kairos.constants.ApiConstant.API_ACCOUNT_TYPE_URL;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.Set;
 /*
  *
  *  created by bobby 20/4/2018

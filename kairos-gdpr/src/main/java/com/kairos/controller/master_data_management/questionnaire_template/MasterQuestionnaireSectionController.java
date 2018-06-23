@@ -1,6 +1,6 @@
 package com.kairos.controller.master_data_management.questionnaire_template;
 
-import com.kairos.dto.master_data.MasterQuestionnaireSectionDto;
+import com.kairos.dto.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.service.master_data_management.questionnaire_template.MasterQuestionnaireSectionService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;
@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import java.math.BigInteger;
 
-import static com.kairos.constant.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
+import static com.kairos.constants.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
 
 @RestController
 @RequestMapping(API_MASTER_QUESTIONNAIRE_TEMPLATE)
@@ -36,7 +34,7 @@ public class MasterQuestionnaireSectionController {
      */
     @PostMapping("/{id}/section")
     @ApiOperation(value = "create and add questionniare section to questionnaire template ")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> questionniareSectionsDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
@@ -50,7 +48,7 @@ public class MasterQuestionnaireSectionController {
 
     @PutMapping("/{id}/section/update")
     @ApiOperation(value = "update list of Questionniare section and deleted section if deleted property is true")
-    public ResponseEntity updateAndDeletedQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDto> questionniareSectionsDto) {
+    public ResponseEntity updateAndDeletedQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {

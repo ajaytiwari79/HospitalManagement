@@ -52,7 +52,7 @@
             <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalPillarMoveIteratorFactory</moveIteratorFactoryClass>
         </moveIteratorFactory>
         <moveIteratorFactory>
-        <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
+            <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
         </moveIteratorFactory>
     </unionMoveSelector>
         <acceptor>

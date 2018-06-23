@@ -170,7 +170,8 @@ public class AuthController {
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(organizationId));
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
 
     @PreAuthorize("hasPermission()")

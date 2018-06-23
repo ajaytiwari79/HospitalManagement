@@ -1,24 +1,18 @@
 package com.kairos.controller.master_data_management.questionnaire_template;
 
 
-import com.kairos.dto.master_data.MasterQuestionDto;
 import com.kairos.service.master_data_management.questionnaire_template.MasterQuestionService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.ws.rs.POST;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
 
-import static com.kairos.constant.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
+import static com.kairos.constants.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
 
 @RestController
 @RequestMapping(API_MASTER_QUESTIONNAIRE_TEMPLATE)
@@ -66,7 +60,7 @@ public class MasterQuestionController {
     }
 
   /*  @PutMapping("/section/{id}/question")
-    public ResponseEntity<Object> updateMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionDto> masterQuestionDto) {
+    public ResponseEntity<Object> updateMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionDTO> masterQuestionDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {

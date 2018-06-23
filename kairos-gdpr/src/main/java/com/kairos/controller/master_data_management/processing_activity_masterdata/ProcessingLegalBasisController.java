@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
-import static com.kairos.constant.ApiConstant.API_PROCESSING_LEGAL_BASIS;
+import static com.kairos.constants.ApiConstant.API_PROCESSING_LEGAL_BASIS;
 /*
  *
  *  created by bobby 20/5/2018

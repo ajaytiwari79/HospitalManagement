@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import javax.inject.Inject;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.DELETED;
 import java.math.BigInteger;
 import java.util.List;
 
