@@ -1,13 +1,31 @@
 package com.planner.appConfig;
 
 
+import org.apache.commons.io.IOUtils;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-//@Configuration
-//@EnableResourceServer
-public class ResourceServerConfiguration {//extends ResourceServerConfigurerAdapter
+import java.io.IOException;
+
+@Configuration
+@EnableResourceServer
+public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 	
-    /*Logger log = LoggerFactory.getLogger(ResourceServerConfiguration.class);
+    Logger log = LoggerFactory.getLogger(ResourceServerConfiguration.class);
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -30,7 +48,7 @@ public class ResourceServerConfiguration {//extends ResourceServerConfigurerAdap
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
     	 JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
-    	    *//*Resource resource = new ClassPathResource("public.txt");
+    	    Resource resource = new ClassPathResource("public.txt");
     	    String publicKey = null;
     	    try {
     	        publicKey = IOUtils.toString(resource.getInputStream(),"UTF-8");
@@ -38,7 +56,7 @@ public class ResourceServerConfiguration {//extends ResourceServerConfigurerAdap
     	        throw new RuntimeException(e);
     	    }
 
-          converter.setVerifierKey(publicKey);*//*
+          converter.setVerifierKey(publicKey);
         //anilm2 use commented code if certificate not install
         converter.setSigningKey("123456");
           	    return converter;
@@ -50,5 +68,5 @@ public class ResourceServerConfiguration {//extends ResourceServerConfigurerAdap
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());
         return defaultTokenServices;
-    }*/
+    }
 }

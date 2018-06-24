@@ -54,11 +54,11 @@ public class VRPPlanningService extends MongoBaseService{
     public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
         SolverConfigDTO solverConfigDTO = solverConfigRepository.getoneById(solverConfigId);
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,solverConfigDTO);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
         save(solverConfig);
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
+        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
         return solverConfigDTO;
     }
 
