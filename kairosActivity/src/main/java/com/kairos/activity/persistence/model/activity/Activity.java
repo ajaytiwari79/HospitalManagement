@@ -334,6 +334,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
         details.put("id", id);
         details.put("name", this.name);
         details.put("parentId", this.parentId);
+        details.put("permissionsActivityTab",this.permissionsActivityTab);
         return details;
     }
 
