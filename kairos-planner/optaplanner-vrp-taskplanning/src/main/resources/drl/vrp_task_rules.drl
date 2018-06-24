@@ -12,7 +12,7 @@ salience 20
         $task:Task(prevTaskOrShift!=null, $m:missingSkills , $m!=0);
     then
         if($m>0)
-            scoreHolder.addHardConstraintMatch(kcontext,-$m);
+            scoreHolder.addHardConstraintMatch(kcontext,-$m*2);
         else
             scoreHolder.addSoftConstraintMatch(kcontext,$m<<4);
 end
@@ -114,5 +114,5 @@ salience 22
     when
         Task(isShiftBreak()  && !isBreakInWindow())
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-1);
+        scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end
