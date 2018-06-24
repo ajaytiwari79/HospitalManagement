@@ -92,6 +92,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -1636,7 +1637,8 @@ public class StaffService extends UserBaseService {
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
         //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult,StaffAdditionalInfoDTO.class);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO=new StaffAdditionalInfoDTO();
+        BeanUtils.copyProperties(staffAdditionalInfoQueryResult,staffAdditionalInfoDTO);
        // StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionCTA(unitPositionId,unitId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());

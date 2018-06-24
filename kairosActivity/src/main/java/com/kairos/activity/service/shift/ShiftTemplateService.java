@@ -11,6 +11,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.userContext.UserContext;
+import com.kairos.response.dto.web.shift.ShiftCreationPojoData;
 import com.kairos.response.dto.web.shift.ShiftDayTemplateDTO;
 import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 import org.springframework.beans.BeanUtils;
@@ -86,11 +87,11 @@ public class ShiftTemplateService extends MongoBaseService {
         return shiftDayTemplateDTO;
     }
 
-    public boolean createShiftUsingTemplate(Long unitId, BigInteger shiftTemplateId, Long staffId, Long unitPositionId, LocalDate startDate,LocalDate endDate){
-        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftTemplateId);
+    public boolean createShiftUsingTemplate(Long unitId, ShiftCreationPojoData shiftCreationPojoData){
+        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftCreationPojoData.getShiftTemplateId());
         List<ShiftDayTemplate> shiftDayTemplate=shiftDayTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getShiftDayTemplateIds());
         shiftDayTemplate.forEach(shiftTemplate1 ->{
-            ShiftDTO shiftDTO=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,staffId,unitPositionId,startDate,endDate,shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
+            ShiftDTO shiftDTO=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,shiftCreationPojoData.getStaffId(),shiftCreationPojoData.getUnitPositionId(),shiftCreationPojoData.getStartDate(),shiftCreationPojoData.getEndDate(),shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
             shiftService.createShift(unitId,shiftDTO,"Organization",false);
         });
         return true;

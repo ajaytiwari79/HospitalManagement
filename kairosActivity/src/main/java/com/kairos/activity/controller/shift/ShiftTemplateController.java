@@ -2,6 +2,7 @@ package com.kairos.activity.controller.shift;
 
 import com.kairos.activity.service.shift.ShiftTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.response.dto.web.shift.ShiftCreationPojoData;
 import com.kairos.response.dto.web.shift.ShiftDayTemplateDTO;
 import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 import io.swagger.annotations.Api;
@@ -55,11 +56,10 @@ public class ShiftTemplateController {
     }
 
     @ApiOperation("create shift using template")
-    @GetMapping(value = "/shift_template/{shiftTemplateId}/staff/{staffId}")
+    @PostMapping(value = "shift/shift_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @PathVariable BigInteger shiftTemplateId, @PathVariable Long staffId,
-                                                                        @PathVariable Long unitPositionId, @RequestParam("startDate")LocalDate startDate,@RequestParam("endDate")LocalDate endDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.createShiftUsingTemplate(unitId,shiftTemplateId,staffId, unitPositionId,startDate,endDate));
+    public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftCreationPojoData shiftCreationPojoData){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.createShiftUsingTemplate(unitId,shiftCreationPojoData));
     }
 
 
