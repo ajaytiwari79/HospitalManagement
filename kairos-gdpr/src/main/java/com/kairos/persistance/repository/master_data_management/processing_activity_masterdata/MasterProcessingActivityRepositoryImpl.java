@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -34,11 +35,11 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
     @Override
-    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id) {
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,Long organizationId,BigInteger id) {
 
         Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("isSubProcess").is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation)
         );
@@ -47,11 +48,11 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId) {
+    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId) {
         Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation)
         );
@@ -61,8 +62,8 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false));
+    public List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId, FilterSelectionDTO filterSelectionDto) {
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId));
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
               query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));

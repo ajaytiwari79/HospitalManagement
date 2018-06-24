@@ -18,6 +18,7 @@ import java.util.List;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static com.kairos.constants.AppConstant.ID;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 
 public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetRepository {
@@ -49,9 +50,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto) {
+    public List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto) {
 
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false));
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId));
 
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size()!=0) {

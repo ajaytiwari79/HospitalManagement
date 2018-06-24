@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 
 
@@ -39,12 +40,12 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
 
 
     @Override
-    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId) {
+    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId) {
 
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
@@ -62,11 +63,11 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
     }
 
     @Override
-    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId, BigInteger id) {
+    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId,BigInteger id) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),

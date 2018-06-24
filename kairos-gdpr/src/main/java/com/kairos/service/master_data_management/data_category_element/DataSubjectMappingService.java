@@ -32,24 +32,22 @@ public class DataSubjectMappingService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    public DataSubjectMapping addDataSubjectAndMapping(Long countryId, DataSubjectMappingDTO dataSubjectMappingDto) {
+    public DataSubjectMapping addDataSubjectAndMapping(Long countryId, Long organizationId, DataSubjectMappingDTO dataSubjectMappingDto) {
 
-        DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
+        DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, organizationId, dataSubjectMappingDto.getName());
         if (Optional.ofNullable(existing).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }
-        dataCategoryService.getDataCategoryByIds(countryId, dataSubjectMappingDto.getDataCategories());
+        if (dataCategoryService.getDataCategoryByIds(countryId, organizationId, dataSubjectMappingDto.getDataCategories()).size() != dataSubjectMappingDto.getDataCategories().size()) {
+            exceptionService.invalidRequestException("message.invalid.request", "");
+        }
         DataSubjectMapping dataSubjectMapping = new DataSubjectMapping();
-        if (dataSubjectMappingDto.getOrganizationTypes().size() != 0) {
-            dataSubjectMapping.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
-        }
-        if (dataSubjectMappingDto.getOrganizationSubTypes().size() != 0) {
-            dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
-        }
-
+        dataSubjectMapping.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
+        dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
         dataSubjectMapping.setName(dataSubjectMappingDto.getName());
         dataSubjectMapping.setDescription(dataSubjectMappingDto.getDescription());
         dataSubjectMapping.setCountryId(countryId);
+        dataSubjectMapping.setOrganizationId(organizationId);
         dataSubjectMapping.setDataCategories(dataSubjectMappingDto.getDataCategories());
         save(dataSubjectMapping);
         return dataSubjectMapping;
@@ -57,8 +55,8 @@ public class DataSubjectMappingService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataSubjectAndMapping(Long countryId, BigInteger id) {
-        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByIdAndNonDeleted(countryId, id);
+    public Boolean deleteDataSubjectAndMapping(Long countryId, Long organizationId, BigInteger id) {
+        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
@@ -69,8 +67,8 @@ public class DataSubjectMappingService extends MongoBaseService {
 
     }
 
-    public DataSubjectMappingResponseDto getDataSubjectAndMappingWithData(Long countryId, BigInteger id) {
-        DataSubjectMappingResponseDto dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategory(countryId, id);
+    public DataSubjectMappingResponseDto getDataSubjectAndMappingWithData(Long countryId, Long organizationId, BigInteger id) {
+        DataSubjectMappingResponseDto dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategory(countryId, organizationId,id);
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
@@ -78,21 +76,21 @@ public class DataSubjectMappingService extends MongoBaseService {
     }
 
 
-    public List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithData(Long countryId) {
-        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategory(countryId);
-        }
+    public List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithData(Long countryId, Long organizationId) {
+        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategory(countryId,organizationId);
+    }
 
 
-    public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, BigInteger id, DataSubjectMappingDTO dataSubjectMappingDto) {
-        DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, dataSubjectMappingDto.getName());
-        if (Optional.ofNullable(existing).isPresent()&&id!=existing.getId()) {
+    public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, Long organizationId, BigInteger id, DataSubjectMappingDTO dataSubjectMappingDto) {
+        DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, organizationId, dataSubjectMappingDto.getName());
+        if (Optional.ofNullable(existing).isPresent() && id != existing.getId()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }
-        existing = dataSubjectMappingRepository.findByIdAndNonDeleted(countryId, id);
+        existing = dataSubjectMappingRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(existing).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
-        dataCategoryService.getDataCategoryByIds(countryId, dataSubjectMappingDto.getDataCategories());
+        dataCategoryService.getDataCategoryByIds(countryId, organizationId, dataSubjectMappingDto.getDataCategories());
         DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription());
         dataSubjectMapping.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
         dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());

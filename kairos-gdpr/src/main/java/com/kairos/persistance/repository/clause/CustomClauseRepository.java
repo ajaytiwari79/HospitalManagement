@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface CustomClauseRepository {
 
-    List<Clause> getClauseDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto);
+    List<Clause> getClauseDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
     Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
 

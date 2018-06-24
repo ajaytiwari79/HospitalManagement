@@ -36,63 +36,63 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<DataDisposal> dataDisposals) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId,@PathVariable Long organizationId,@Valid @RequestBody ValidateListOfRequestBody<DataDisposal> dataDisposals) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposals.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId,organizationId,dataDisposals.getRequestBody()));
 
     }
 
 
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId,organizationId,id));
 
     }
 
 
     @ApiOperation("get all DataDisposal ")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllDataDisposal() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal());
+    public ResponseEntity<Object> getAllDataDisposal(@PathVariable Long countryId,@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal(countryId,organizationId));
 
     }
 
     @ApiOperation("get DataDisposal by name")
     @GetMapping("/name")
-    public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId, name));
+    public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(countryId,organizationId,name));
 
     }
 
 
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteDataDisposal(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(countryId,organizationId,id));
 
     }
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable BigInteger id, @Valid @RequestBody DataDisposal dataDisposal) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @Valid @RequestBody DataDisposal dataDisposal) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(id, dataDisposal));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId,organizationId,id, dataDisposal));
 
     }
 

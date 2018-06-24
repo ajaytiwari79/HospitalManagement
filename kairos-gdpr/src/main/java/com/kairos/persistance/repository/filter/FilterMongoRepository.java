@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FilterMongoRepository extends MongoRepository<FilterGroup, BigInteger>, CustomeFilterMongoRepository {
 
-
+//Todo add organizationId also
     @Query("{'accessModule.moduleId':?0,countryId:?1}")
     FilterGroup findFilterGroupByModuleId(String moduleId, Long countryId);
 

@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 
 public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryRepository {
@@ -27,13 +28,13 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
 
     @Override
-    public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, BigInteger id) {
+    public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId,Long organizationId,BigInteger id) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation)
         );
@@ -45,13 +46,13 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     }
 
     @Override
-    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId) {
+    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation)
         );

@@ -29,23 +29,22 @@ public class AccountTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    public AccountType createAccountType(Long countryId,AccountType accountType) {
+    public AccountType createAccountType(Long countryId,Long organizationId,AccountType accountType) {
 
-        AccountType exists = accountTypeRepository.findByTypeOfAccount(countryId,accountType.getName());
+        AccountType exists = accountTypeRepository.findByName(countryId,organizationId,accountType.getName());
         if (Optional.ofNullable(exists).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate","message.accountType",accountType.getName());
-        } else {
+        }
             AccountType newAccount = new AccountType();
             newAccount.setName(accountType.getName());
             newAccount.setCountryId(countryId);
+            newAccount.setOrganizationId(organizationId);
             return save(newAccount);
         }
-        return null;
-    }
 
 
-    public AccountType getAccountByName(Long countryId,String name) {
-        AccountType account = accountTypeRepository.findByTypeOfAccount(countryId,name);
+    public AccountType getAccountByName(Long countryId,Long organizationId,String name) {
+        AccountType account = accountTypeRepository.findByName(countryId,organizationId,name);
         if (Optional.ofNullable(account).isPresent()) {
             return account;
         } else
@@ -53,23 +52,23 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountTypeList(Long countryId,Set<BigInteger> ids) {
-        return accountTypeRepository.getAccountTypeList(countryId,ids);
+    public List<AccountType> getAccountTypeList(Long countryId,Long organizationId,Set<BigInteger> ids) {
+        return accountTypeRepository.getAccountTypeList(countryId,organizationId,ids);
 
     }
 
 
-    public List<AccountType> getAllAccountType(Long countryId)
+    public List<AccountType> getAllAccountType(Long countryId,Long organizationId)
     {
-   return accountTypeRepository.getAllAccountType(countryId);
+   return accountTypeRepository.getAllAccountType(countryId,organizationId);
     }
 
 
 
 
-    public AccountType getAccountTypeById(Long countryId,BigInteger id) {
+    public AccountType getAccountTypeById(Long countryId,Long organizationId,BigInteger id) {
 
-        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId,id);
+        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exists).isPresent()) {
           exceptionService.dataNotFoundByIdException("message.dataNotFound","message.accountType",id);
         }
@@ -77,21 +76,21 @@ public class AccountTypeService extends MongoBaseService {
 
     }
 
-    public AccountType updateAccountName(Long countryId,BigInteger id,AccountType accountType) {
+    public AccountType updateAccountName(Long countryId,Long organizationId,BigInteger id,AccountType accountType) {
 
-        AccountType exists = accountTypeRepository.findByNameAndNonDeleted(countryId,accountType.getName());
+        AccountType exists = accountTypeRepository.findByName(countryId,organizationId,accountType.getName());
         if (Optional.ofNullable(exists).isPresent()&&!id.equals(exists.getId())) {
             throw  new DuplicateDataException("Account type exist for "+accountType.getName());
         }
-        exists=accountTypeRepository.findByIdAndNonDeleted(countryId,id);
+        exists=accountTypeRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         exists.setName(accountType.getName());
         return exists;
 
     }
 
 
-    public Boolean deleteAccountType(BigInteger id) {
-        AccountType exists = accountTypeRepository.findByid(id);
+    public Boolean deleteAccountType(Long countryId,Long organizationId,BigInteger id) {
+        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw  new DataNotFoundByIdException("Account type exist for id "+id);
         }

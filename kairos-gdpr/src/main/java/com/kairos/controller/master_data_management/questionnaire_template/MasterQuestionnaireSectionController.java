@@ -28,33 +28,33 @@ public class MasterQuestionnaireSectionController {
 
     /**
      * @param countryId
-     * @param id
+     * @param templateId
      * @param questionniareSectionsDto
      * @return
      */
-    @PostMapping("/{id}/section")
+    @PostMapping("/{templateId}/section")
     @ApiOperation(value = "create and add questionniare section to questionnaire template ")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        } else if (id == null) {
+        } else if (templateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, id, questionniareSectionsDto.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, organizationId,templateId, questionniareSectionsDto.getRequestBody()));
 
 
     }
 
 
-    @PutMapping("/{id}/section/update")
+    @PutMapping("/{templateId}/section/update")
     @ApiOperation(value = "update list of Questionniare section and deleted section if deleted property is true")
-    public ResponseEntity updateAndDeletedQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
+    public ResponseEntity updateQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        } else if (id == null) {
+        } else if (templateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.updateExistingQuestionniareSectionsAndCreateNewSectionsWithQuestions(countryId, id, questionniareSectionsDto.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.updateExistingQuestionniareSectionsAndCreateNewSectionsWithQuestions(countryId,organizationId,templateId, questionniareSectionsDto.getRequestBody()));
 
 
     }
@@ -62,13 +62,13 @@ public class MasterQuestionnaireSectionController {
 
 
     @DeleteMapping("/section/{id}")
-    public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId,@PathVariable Long organizationId,  @PathVariable BigInteger id) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.deletedQuestionniareSection(countryId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.deletedQuestionniareSection(countryId,organizationId,id));
     }
 
 

@@ -15,7 +15,7 @@ public interface CustomMasterAssetRepository {
 
     FilterQueryResult getMasterAssetFilter(Long countryId);
 
-    List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto);
+    List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
      Criteria buildQuery(FilterSelection filterSelection,FilterType filterType, Query query);
 

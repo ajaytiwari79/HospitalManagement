@@ -38,61 +38,61 @@ public class ProcessingPurposeController {
 
     @ApiOperation("add processing purpose")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<ProcessingPurpose> processingPurposes) {
+    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingPurpose> processingPurposes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, processingPurposes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, organizationId, processingPurposes.getRequestBody()));
 
     }
 
 
     @ApiOperation("get processing purpose by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, organizationId, id));
 
     }
 
 
     @ApiOperation("get all processing purpose")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllProcessingPurpose() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose());
+    public ResponseEntity<Object> getAllProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(countryId, organizationId));
 
     }
 
     @ApiOperation("get Processing purpose by name")
     @GetMapping("/name")
-    public ResponseEntity<Object> getProcessingPurposeByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(countryId, name));
+    public ResponseEntity<Object> getProcessingPurposeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(countryId, organizationId, name));
 
     }
 
 
     @ApiOperation("delete processing purpose by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(countryId, organizationId, id));
 
     }
 
     @ApiOperation("update processing purpose by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable BigInteger id, @Valid @RequestBody ProcessingPurpose processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingPurpose processingPurpose) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(id, processingPurpose));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(countryId, organizationId, id, processingPurpose));
 
     }
 

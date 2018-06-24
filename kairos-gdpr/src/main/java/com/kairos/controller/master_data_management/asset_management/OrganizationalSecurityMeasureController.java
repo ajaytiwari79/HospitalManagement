@@ -37,64 +37,64 @@ public class OrganizationalSecurityMeasureController {
 
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/add")
-    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId,@Valid  @RequestBody ValidateListOfRequestBody<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+    public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId,@Valid  @RequestBody ValidateListOfRequestBody<OrganizationalSecurityMeasure> orgSecurityMeasures) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId, orgSecurityMeasures.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(countryId,organizationId,orgSecurityMeasures.getRequestBody()));
 
     }
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId,organizationId,id));
 
     }
 
 
     @ApiOperation("get all OrganizationalSecurityMeasure ")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllOrganizationalSecurityMeasure() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure());
+    public ResponseEntity<Object> getAllOrganizationalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(countryId,organizationId));
 
     }
 
 
     @ApiOperation("get Organizational Security Measure by name")
     @GetMapping("/name")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId, name));
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId,organizationId,name));
 
     }
 
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(countryId,organizationId,id));
 
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable BigInteger id,  @Valid @RequestBody OrganizationalSecurityMeasure orgSecurityMeasure) {
+    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id,  @Valid @RequestBody OrganizationalSecurityMeasure orgSecurityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(id, orgSecurityMeasure));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(countryId,organizationId,id, orgSecurityMeasure));
 
     }
 

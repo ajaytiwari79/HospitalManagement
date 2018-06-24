@@ -38,65 +38,65 @@ public class AssetTypeController {
 
     @ApiOperation("add AssetType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> assetTypes) {
+    public ResponseEntity<Object> createStorageType(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> assetTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetType(countryId, assetTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetType(countryId,organizationId,assetTypes.getRequestBody()));
 
     }
 
 
     @ApiOperation("get AssetType by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getStorageType(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getStorageType(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAssetType(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAssetType(countryId,organizationId,id));
 
     }
 
 
     @ApiOperation("get all AssetType ")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllStorageType() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAllAssetType());
+    public ResponseEntity<Object> getAllStorageType(@PathVariable Long countryId,@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAllAssetType(countryId,organizationId));
 
     }
 
 
     @ApiOperation("get AssetType by name")
     @GetMapping("/name")
-    public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAssetTypeByName(countryId, name));
+    public ResponseEntity<Object> getStorageTypeByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.getAssetTypeByName(countryId,organizationId,name));
 
     }
 
 
     @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteStorageType(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteStorageType(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.deleteAssetType(countryId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.deleteAssetType(countryId,organizationId,id));
 
     }
 
     @ApiOperation("update subAsset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateStorageType(@PathVariable BigInteger id,  @Valid @RequestBody AssetType assetType) {
+    public ResponseEntity<Object> updateStorageType(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id,  @Valid @RequestBody AssetType assetType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.updateAssetType(id, assetType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.updateAssetType(countryId,organizationId,id, assetType));
 
     }
 
@@ -104,12 +104,12 @@ public class AssetTypeController {
 
     @ApiOperation("update subAsset by id")
     @PostMapping("/subAsset/add")
-    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,  @Valid @RequestBody AssetTypeDTO assetTypeDto) {
+    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody AssetTypeDTO assetTypeDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetTypeAndAddSubAssetTypes(countryId,assetTypeDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageTypeService.createAssetTypeAndAddSubAssetTypes(countryId,organizationId,assetTypeDto));
     }
 
 

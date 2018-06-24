@@ -9,8 +9,8 @@ public interface CustomDataCategoryRepository {
 
 
 
-    DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, BigInteger id);
+    DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId,Long organizationId,BigInteger id);
 
-    List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId);
+    List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId);
 
 }

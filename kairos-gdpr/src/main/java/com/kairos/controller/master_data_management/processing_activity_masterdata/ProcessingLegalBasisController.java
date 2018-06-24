@@ -37,62 +37,62 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/add")
-    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingLegalBasis> legalBases) {
+    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingLegalBasis> legalBases) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId, legalBases.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.createProcessingLegalBasis(countryId,organizationId,legalBases.getRequestBody()));
 
     }
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId,organizationId,id));
 
     }
 
 
     @ApiOperation("get all ProcessingLegalBasis ")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllProcessingLegalBasis() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis());
+    public ResponseEntity<Object> getAllProcessingLegalBasis(@PathVariable Long countryId,@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis(countryId,organizationId));
 
     }
 
     @ApiOperation("get ProcessingLegalBasis by name")
     @GetMapping("/name")
-    public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId, name));
+    public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId,organizationId,name));
 
     }
 
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(countryId,organizationId,id));
 
     }
 
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable BigInteger id,@Valid @RequestBody ProcessingLegalBasis legalBasis) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id,@Valid @RequestBody ProcessingLegalBasis legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(id, legalBasis));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId,organizationId,id, legalBasis));
 
     }
 

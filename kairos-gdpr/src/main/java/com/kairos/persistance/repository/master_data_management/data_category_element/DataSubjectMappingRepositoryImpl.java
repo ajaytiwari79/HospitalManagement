@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -26,13 +27,13 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     private MongoTemplate mongoTemplate;
 
     @Override
-    public DataSubjectMappingResponseDto getDataSubjectAndMappingWithDataCategory(Long countryId, BigInteger id) {
+    public DataSubjectMappingResponseDto getDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId, BigInteger id) {
 
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFileds();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("data_category", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
                 lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
@@ -53,13 +54,13 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public List<DataSubjectMappingResponseDto>getAllDataSubjectAndMappingWithDataCategory(Long countryId)
+    public List<DataSubjectMappingResponseDto>getAllDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId)
     {
 
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFileds();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("data_category", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
                 lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),

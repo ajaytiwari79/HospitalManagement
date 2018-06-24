@@ -32,10 +32,10 @@ public class FilterController {
      * @return
      */
     @GetMapping("/category/{moduleId}")
-    public ResponseEntity<Object> getFilterData(@PathVariable Long countryId, @PathVariable String moduleId) {
+    public ResponseEntity<Object> getFilterData(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable String moduleId) {
 
         if (countryId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterCategories(countryId, moduleId));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterCategories(countryId,organizationId, moduleId));
         } else if (StringUtils.isBlank(moduleId)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "module id is empty or null");
 
@@ -52,7 +52,7 @@ public class FilterController {
      * @return Filter data on the basis of filter type selection and Ids
      */
     @PostMapping("/data/{moduleId}")
-    public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
+    public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
 
         if (countryId == null) {
 
@@ -61,7 +61,7 @@ public class FilterController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, true, "module id is empty or null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterDataWithFilterSelection(countryId, moduleId, filterSelectionDto).getData());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterDataWithFilterSelection(countryId,organizationId,moduleId, filterSelectionDto).getData());
 
 
     }

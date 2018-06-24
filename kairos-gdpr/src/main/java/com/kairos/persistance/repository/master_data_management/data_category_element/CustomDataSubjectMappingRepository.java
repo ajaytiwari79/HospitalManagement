@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface CustomDataSubjectMappingRepository {
 
-    DataSubjectMappingResponseDto getDataSubjectAndMappingWithDataCategory(Long countryId, BigInteger id);
+    DataSubjectMappingResponseDto getDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId, BigInteger id);
 
-    List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithDataCategory(Long countryId);
+    List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId);
 
 
 }

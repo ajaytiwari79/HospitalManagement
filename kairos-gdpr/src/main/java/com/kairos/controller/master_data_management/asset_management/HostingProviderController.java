@@ -37,62 +37,62 @@ public class HostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/add")
-    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<HostingProvider> hostingProviders) {
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<HostingProvider> hostingProviders) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviders.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId,organizationId,hostingProviders.getRequestBody()));
 
     }
 
 
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
 
         } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, id));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId,organizationId,id));
 
     }
 
 
     @ApiOperation("get all HostingProvider ")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllHostingProvider() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider());
+    public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long countryId,@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider(countryId,organizationId));
 
     }
 
     @ApiOperation("get hosting provider by name ")
     @GetMapping("/name")
-    public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId, @RequestParam String name) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId, name));
+    public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId,organizationId,name));
 
     }
 
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(countryId,organizationId,id));
 
     }
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable BigInteger id, @Valid @RequestBody HostingProvider hostingProvider) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @Valid @RequestBody HostingProvider hostingProvider) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(id, hostingProvider));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId,organizationId,id, hostingProvider));
 
     }
 

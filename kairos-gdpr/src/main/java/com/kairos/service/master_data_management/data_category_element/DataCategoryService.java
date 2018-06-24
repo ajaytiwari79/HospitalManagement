@@ -38,20 +38,24 @@ public class DataCategoryService extends MongoBaseService {
     private DataElementMognoRepository dataElementMognoRepository;
 
 
-    /*add data category with multiple data element, create data element and get ids from data element service
+    /**
+     *
+     * @param countryId
+     * @param dataCategoryDto
+     * @return
      */
-    public DataCategory addDataCategoryAndDataElement(Long countryId, DataCategoryDTO dataCategoryDto) {
+    public DataCategory addDataCategoryAndDataElement(Long countryId,Long organizationId,DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
+        DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId,organizationId,dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
-        Map<String, Object> dataElementList = new HashMap<>();
-        dataElementList = dataElementService.createDataElements(countryId, dataCategoryDto.getDataElements());
+        Map<String, Object> dataElementList = dataElementService.createDataElements(countryId,organizationId,dataCategoryDto.getDataElements());
         try {
             DataCategory newDataCategory = new DataCategory();
             newDataCategory.setCountryId(countryId);
             newDataCategory.setName(dataCategoryDto.getName());
+            newDataCategory.setOrganizationId(organizationId);
             newDataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
             dataCategory = save(newDataCategory);
         } catch (Exception e) {
@@ -62,8 +66,8 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataCategory(Long countryId, BigInteger id) {
-        DataCategory dataCategory = dataCategoryMongoRepository.findByIdAndNonDeleted(countryId, id);
+    public Boolean deleteDataCategory(Long countryId,Long organizationId,BigInteger id) {
+        DataCategory dataCategory = dataCategoryMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
@@ -75,8 +79,8 @@ public class DataCategoryService extends MongoBaseService {
 
 
     //get data  category with data element
-    public DataCategoryResponseDto getDataCategoryWithDataElement(Long countryId, BigInteger id) {
-        DataCategoryResponseDto dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementById(countryId, id);
+    public DataCategoryResponseDto getDataCategoryWithDataElement(Long countryId,Long organizationId,BigInteger id) {
+        DataCategoryResponseDto dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementById(countryId,organizationId,id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
@@ -85,14 +89,14 @@ public class DataCategoryService extends MongoBaseService {
     }
 
     //get data  category with data element
-    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId) {
-        return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
+    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId) {
+        return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId,organizationId);
     }
 
 
     //get data  category with data element
-    public List<DataCategory> getDataCategoryByIds(Long countryId, Set<BigInteger> ids) {
-        List<DataCategory> dataCategories = dataCategoryMongoRepository.findDataCategoryByIds(countryId, ids);
+    public List<DataCategory> getDataCategoryByIds(Long countryId,Long organizationId,Set<BigInteger> ids) {
+        List<DataCategory> dataCategories = dataCategoryMongoRepository.findDataCategoryByIds(countryId,organizationId,ids);
         Set<BigInteger> dataCategoryIds = new HashSet<>();
         dataCategories.forEach(dataCategory -> {
             dataCategoryIds.add(dataCategory.getId());
@@ -106,9 +110,9 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public DataCategory updateDataCategoryAndDataElement(Long countryId, BigInteger id, DataCategoryDTO dataCategoryDto) {
+    public DataCategory updateDataCategoryAndDataElement(Long countryId,Long organizationId,BigInteger id, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
+        DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId,organizationId,dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !id.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
@@ -116,7 +120,7 @@ public class DataCategoryService extends MongoBaseService {
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
-        Map<String, Object> dataElementListMap = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
+        Map<String, Object> dataElementListMap = dataElementService.updateDataElementAndCreateNewDataElement(countryId,organizationId,dataCategoryDto.getDataElements());
         try {
             dataCategory.setName(dataCategoryDto.getName());
             dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
