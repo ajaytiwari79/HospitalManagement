@@ -33,7 +33,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     public MasterProcessingActivity createMasterProcessingActivity(Long countryId, Long organizationId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
-        if (masterProcessingActivityRepository.findByNameAndCountryId(countryId,organizationId,masterProcessingActivityDto.getName()) != null) {
+        if (masterProcessingActivityRepository.findByName(countryId,organizationId,masterProcessingActivityDto.getName()) != null) {
 
             throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
         }
@@ -111,7 +111,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     public MasterProcessingActivity updateMasterProcessingActivity(Long countryId, Long organizationId, BigInteger id, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByNameAndCountryId(countryId, organizationId, masterProcessingActivityDto.getName());
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByName(countryId, organizationId, masterProcessingActivityDto.getName());
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
             throw new DuplicateDataException("processing Activity with name Already Exist" + exists.getName());
         }

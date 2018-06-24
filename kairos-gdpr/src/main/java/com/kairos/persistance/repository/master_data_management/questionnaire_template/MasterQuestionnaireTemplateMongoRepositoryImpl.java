@@ -8,7 +8,9 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
@@ -38,6 +40,16 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
     Document projectionOperation = Document.parse(projection);
     Document groupDataOperation = Document.parse(groupData);
 
+
+    @Override
+    public MasterQuestionnaireTemplate findByName(Long countryId, Long organizationId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, MasterQuestionnaireTemplate.class);
+
+    }
 
     @Override
     public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId) {

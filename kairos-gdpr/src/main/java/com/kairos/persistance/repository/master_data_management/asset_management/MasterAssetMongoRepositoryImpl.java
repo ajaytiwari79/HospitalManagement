@@ -4,11 +4,13 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -26,6 +28,16 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
     @Inject
     private MongoTemplate mongoTemplate;
+
+    @Override
+    public MasterAsset findByName(Long countryId, Long organizationId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, MasterAsset.class);
+
+    }
 
     @Override
     public FilterQueryResult getMasterAssetFilter(Long countryId) {

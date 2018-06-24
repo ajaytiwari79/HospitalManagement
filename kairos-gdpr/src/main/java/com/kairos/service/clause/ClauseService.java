@@ -67,7 +67,7 @@ public class ClauseService extends MongoBaseService {
 
     public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) throws RepositoryException {
 
-        if (clauseRepository.findByTitleAndCountry(countryId, organizationId, clauseDto.getTitle()) != null) {
+        if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle());
         }
         if (clauseDto.getAccountTypes().size() == 0) {
@@ -106,7 +106,7 @@ public class ClauseService extends MongoBaseService {
 
     public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) throws RepositoryException {
 
-        Clause exists = clauseRepository.findByTitleAndCountry(countryId, organizationId, clauseDto.getTitle());
+        Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
         if (Optional.ofNullable(exists).isPresent() && !clauseId.equals(exists.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }

@@ -34,7 +34,7 @@ public class DataSubjectMappingService extends MongoBaseService {
 
     public DataSubjectMapping addDataSubjectAndMapping(Long countryId, Long organizationId, DataSubjectMappingDTO dataSubjectMappingDto) {
 
-        DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, organizationId, dataSubjectMappingDto.getName());
+        DataSubjectMapping existing = dataSubjectMappingRepository.findByName(countryId, organizationId, dataSubjectMappingDto.getName());
         if (Optional.ofNullable(existing).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }
@@ -82,7 +82,7 @@ public class DataSubjectMappingService extends MongoBaseService {
 
 
     public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, Long organizationId, BigInteger id, DataSubjectMappingDTO dataSubjectMappingDto) {
-        DataSubjectMapping existing = dataSubjectMappingRepository.findByCountryIdAndName(countryId, organizationId, dataSubjectMappingDto.getName());
+        DataSubjectMapping existing = dataSubjectMappingRepository.findByName(countryId, organizationId, dataSubjectMappingDto.getName());
         if (Optional.ofNullable(existing).isPresent() && id != existing.getId()) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }

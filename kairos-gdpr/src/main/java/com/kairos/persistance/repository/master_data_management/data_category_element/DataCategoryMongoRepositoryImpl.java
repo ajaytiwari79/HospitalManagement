@@ -8,7 +8,9 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 
@@ -27,6 +29,15 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     private MongoTemplate mongoTemplate;
 
 
+    @Override
+    public DataCategory findByName(Long countryId, Long organizationId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, DataCategory.class);
+
+    }
     @Override
     public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId,Long organizationId,BigInteger id) {
 

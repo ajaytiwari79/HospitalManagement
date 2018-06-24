@@ -37,7 +37,7 @@ public class MasterAssetService extends MongoBaseService {
     public MasterAsset addMasterAsset(Long countryId, Long organizationId, MasterAssetDTO masterAssetDto) {
 
 
-        if (masterAssetMongoRepository.findByNameAndCountry(countryId, organizationId, masterAssetDto.getName()) != null) {
+        if (masterAssetMongoRepository.findByName(countryId, organizationId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
         MasterAsset newAsset = new MasterAsset();
@@ -61,7 +61,7 @@ public class MasterAssetService extends MongoBaseService {
     public MasterAsset updateMasterAsset(Long countryId, Long organizationId, BigInteger id, MasterAssetDTO masterAssetDto) {
 
 
-        MasterAsset exists = masterAssetMongoRepository.findByNameAndCountry(countryId, organizationId, masterAssetDto.getName());
+        MasterAsset exists = masterAssetMongoRepository.findByName(countryId, organizationId, masterAssetDto.getName());
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }

@@ -46,7 +46,7 @@ public class DataCategoryService extends MongoBaseService {
      */
     public DataCategory addDataCategoryAndDataElement(Long countryId,Long organizationId,DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId,organizationId,dataCategoryDto.getName());
+        DataCategory dataCategory = dataCategoryMongoRepository.findByName(countryId,organizationId,dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
@@ -112,7 +112,7 @@ public class DataCategoryService extends MongoBaseService {
 
     public DataCategory updateDataCategoryAndDataElement(Long countryId,Long organizationId,BigInteger id, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId,organizationId,dataCategoryDto.getName());
+        DataCategory dataCategory = dataCategoryMongoRepository.findByName(countryId,organizationId,dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !id.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }

@@ -14,6 +14,8 @@ import java.util.List;
 public interface CustomMasterProcessingActivity {
 
 
+   MasterProcessingActivity findByName(Long countryId,Long organizationId,String name);
+
    MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,Long organizationId, BigInteger id);
 
    List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId);
