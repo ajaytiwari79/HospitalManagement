@@ -7,6 +7,7 @@ import com.kairos.dto.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
 import com.mongodb.MongoClientException;
 import org.slf4j.Logger;
@@ -30,12 +31,14 @@ public class MasterProcessingActivityService extends MongoBaseService {
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
+
 
     public MasterProcessingActivity createMasterProcessingActivity(Long countryId, Long organizationId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
-        if (masterProcessingActivityRepository.findByName(countryId,organizationId,masterProcessingActivityDto.getName()) != null) {
-
-            throw new DuplicateDataException("asset for name " + masterProcessingActivityDto.getName() + " already exists");
+        if (masterProcessingActivityRepository.findByName(countryId, organizationId, masterProcessingActivityDto.getName()) != null) {
+            exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
         }
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(countryId, masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription());
         Map<String, Object> subProcessingActivity = new HashMap<>();
@@ -83,7 +86,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             subProcessingActivityList.add(subProcessingActivity);
         }
 
-        checkForDuplicacyByName(countryId,organizationId,checkDuplicateInSubProcess);
+        checkForDuplicacyByName(countryId, organizationId, checkDuplicateInSubProcess);
         subProcessingActivityList = save(subProcessingActivityList);
         List<BigInteger> subProcessingActicitiesIds = new ArrayList<>();
         subProcessingActivityList.forEach(o -> subProcessingActicitiesIds.add(o.getId()));
@@ -94,9 +97,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     }
 
-
-    public void checkForDuplicacyByName(Long countryId,Long orgId,List<String> subProcessingAcitivityNames) {
-        List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(countryId,orgId,subProcessingAcitivityNames);
+    public void checkForDuplicacyByName(Long countryId, Long orgId, List<String> subProcessingAcitivityNames) {
+        List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.masterProcessingActivityListByNames(countryId, orgId, subProcessingAcitivityNames);
         if (processingActivities.size() != 0) {
             throw new DuplicateDataException(" sub processing acitvity " + processingActivities.get(0).getName() + " exist");
         }
@@ -143,8 +145,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
         return exists;
     }
 
-    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId,Long organizationId, BigInteger id) {
-        MasterProcessingActivityResponseDTO result = masterProcessingActivityRepository.getMasterProcessingActivityWithSubProcessingActivity(countryId,organizationId, id);
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, Long organizationId, BigInteger id) {
+        MasterProcessingActivityResponseDTO result = masterProcessingActivityRepository.getMasterProcessingActivityWithSubProcessingActivity(countryId, organizationId, id);
         if (!Optional.of(result).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         } else
@@ -153,14 +155,14 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessing(Long countryId,Long organizationId) {
-        return masterProcessingActivityRepository.getMasterProcessingActivityListWithSubProcessingActivity(countryId,organizationId);
+    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessing(Long countryId, Long organizationId) {
+        return masterProcessingActivityRepository.getMasterProcessingActivityListWithSubProcessingActivity(countryId, organizationId);
 
     }
 
 
-    public Boolean deleteMasterProcessingActivity(Long countryId,Long organizationId,BigInteger id) {
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId,organizationId,id);
+    public Boolean deleteMasterProcessingActivity(Long countryId, Long organizationId, BigInteger id) {
+        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, id);
         if (exists == null) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
@@ -170,11 +172,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
         return true;
 
     }
-
-
-
-
-
 
 
 }

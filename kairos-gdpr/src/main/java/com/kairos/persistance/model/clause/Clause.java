@@ -23,7 +23,6 @@ public class Clause extends MongoBaseEntity {
     @NotNull
     private String description;
 
-
     private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
     private List<OrganizationTypeAndServiceBasicDTO> organizationServices;

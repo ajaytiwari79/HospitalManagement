@@ -50,7 +50,6 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private AccountTypeMongoRepository accountTypeMongoRepository;
 
-
     @Inject
     private ComparisonUtils comparisonUtils;
 
@@ -68,7 +67,7 @@ public class ClauseService extends MongoBaseService {
     public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) throws RepositoryException {
 
         if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
-            exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle());
+            exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
         }
         if (clauseDto.getAccountTypes().size() == 0) {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
@@ -90,8 +89,7 @@ public class ClauseService extends MongoBaseService {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
             throw new RuntimeException(e.getMessage());
-
-        }
+            }
 
     }
 
@@ -137,7 +135,6 @@ public class ClauseService extends MongoBaseService {
 
 
     public List<Clause> getClauseList(Long countryId, Long organizationId, Set<BigInteger> clausesId) {
-
         return clauseRepository.getClauseListByIds(countryId, organizationId, clausesId);
     }
 

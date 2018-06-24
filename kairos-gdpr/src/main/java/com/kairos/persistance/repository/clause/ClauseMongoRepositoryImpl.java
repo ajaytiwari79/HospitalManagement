@@ -32,7 +32,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public Clause findByTitle(Long countryId, Long organizationId, String title) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("title").is(title).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").is(title).and(ORGANIZATION_ID).is(organizationId));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, Clause.class);
