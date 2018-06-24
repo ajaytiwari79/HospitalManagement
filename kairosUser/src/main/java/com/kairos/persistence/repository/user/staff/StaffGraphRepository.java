@@ -448,7 +448,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (org:Organization) WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WITH staff, user\n" +
             "MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:IN_UNIT]-(o:Organization)\n" +
-            "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
+            "with  collect({id: id(staff),firstName:staff.firstName,lastName:staff.lastName, gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
             "RETURN  id(o) as unitId, staffData as staffList")
     List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
 

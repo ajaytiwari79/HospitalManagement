@@ -32,13 +32,20 @@ public class VrpTaskPlanningSolver {
         solver = solverFactory.buildSolver();
     }
 
+
+    public VrpTaskPlanningSolver(List<File> drlFileList){
+        solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        //solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+        solver = solverFactory.buildSolver();
+    }
+
     public void solve(String problemXML,boolean addBreaks) throws IOException {
         XStream xstream = getxStream();
         VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));
         solve(problem,addBreaks);
     }
 
-    private XStream getxStream() {
+    public XStream getxStream() {
         XStream xstream= new XStream();
         xstream.setMode(XStream.ID_REFERENCES);
         xstream.processAnnotations(LocationPair.class);
@@ -132,6 +139,25 @@ public class VrpTaskPlanningSolver {
         }
         log.info("Tasks details Done.");
 
+    }
+
+    public Object[] solveProblemOnRequest(VrpTaskPlanningSolution problem) {
+        AtomicInteger at=new AtomicInteger(0);
+        problem.getTasks().forEach(t->{
+            t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
+        });
+        VrpTaskPlanningSolution solution=null;
+        try {
+            solution = solver.solve(problem);
+            DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
+
+            director.setWorkingSolution(solution);
+            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            return new Object[]{solution,indictmentMap};
+        }catch (Exception e){
+            //e.printStackTrace();
+            throw  e;
+        }
     }
 
     private String getShiftChainInfo(Shift shift) {
