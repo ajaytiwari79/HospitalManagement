@@ -40,7 +40,7 @@ public class ShiftTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.getAllShiftTemplates(unitId));
     }
 
-    @ApiOperation("update a Shift Template")
+    @ApiOperation("update a Shift of Template")
     @PutMapping(value = "/shift_template/{shiftDayTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable BigInteger shiftDayTemplateId,  @RequestBody @Valid ShiftDayTemplateDTO shiftDayTemplateDTO) {
@@ -53,13 +53,6 @@ public class ShiftTemplateController {
     public ResponseEntity<Map<String, Object>> deleteShift(@PathVariable BigInteger shiftTemplateId) {
         shiftTemplateService.deleteShiftTemplate(shiftTemplateId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-    }
-
-    @ApiOperation("create shift using template")
-    @PostMapping(value = "shift/shift_template")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftCreationPojoData shiftCreationPojoData){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.createShiftUsingTemplate(unitId,shiftCreationPojoData));
     }
 
 

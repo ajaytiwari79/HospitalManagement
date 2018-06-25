@@ -13,6 +13,8 @@ import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.shift.ShiftDayTemplate;
+import com.kairos.activity.persistence.model.shift.ShiftTemplate;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.model.wta.StaffWTACounter;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
@@ -28,6 +30,8 @@ import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.activity.persistence.repository.shift.ShiftDayTemplateMongoRepository;
+import com.kairos.activity.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.time_bank.TimeBankMongoRepository;
 import com.kairos.activity.persistence.repository.wta.StaffWTACounterRepository;
@@ -68,6 +72,7 @@ import com.kairos.response.dto.web.FunctionDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 
+import com.kairos.response.dto.web.shift.ShiftCreationPojoData;
 import com.kairos.response.dto.web.staff.StaffAccessRoleDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
@@ -158,6 +163,8 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private LocaleService localeService;
     @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject private ShiftTemplateRepository shiftTemplateRepository;
+    @Inject private ShiftDayTemplateMongoRepository shiftDayTemplateMongoRepository;
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
@@ -1118,5 +1125,15 @@ public class ShiftService extends MongoBaseService {
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
 
         return activities;
+    }
+
+    public boolean createShiftUsingTemplate(Long unitId, ShiftCreationPojoData shiftCreationPojoData){
+        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftCreationPojoData.getShiftTemplateId());
+        List<ShiftDayTemplate> shiftDayTemplate=shiftDayTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getShiftDayTemplateIds());
+        shiftDayTemplate.forEach(shiftTemplate1 ->{
+            ShiftDTO shiftDTO=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,shiftCreationPojoData.getStaffId(),shiftCreationPojoData.getUnitPositionId(),shiftCreationPojoData.getStartDate(),shiftCreationPojoData.getEndDate(),shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
+            createShift(unitId,shiftDTO,"Organization",false);
+        });
+        return true;
     }
 }

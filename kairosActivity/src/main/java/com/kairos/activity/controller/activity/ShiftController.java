@@ -6,6 +6,7 @@ import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.activity.shift.CopyShiftDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.response.dto.web.shift.ShiftCreationPojoData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -141,5 +142,12 @@ public class ShiftController {
                                                                             @RequestParam(value = "startDate", required = false) String startDate,
                                                                             @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, startDate, endDate, expertiseId));
+    }
+
+    @ApiOperation("create shift using template")
+    @PostMapping(value = "shift/from_shift_template")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftCreationPojoData shiftCreationPojoData){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftCreationPojoData));
     }
 }

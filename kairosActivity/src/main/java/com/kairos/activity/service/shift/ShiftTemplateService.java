@@ -87,32 +87,4 @@ public class ShiftTemplateService extends MongoBaseService {
         return shiftDayTemplateDTO;
     }
 
-    public boolean createShiftUsingTemplate(Long unitId, ShiftCreationPojoData shiftCreationPojoData){
-        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftCreationPojoData.getShiftTemplateId());
-        List<ShiftDayTemplate> shiftDayTemplate=shiftDayTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getShiftDayTemplateIds());
-        shiftDayTemplate.forEach(shiftTemplate1 ->{
-            ShiftDTO shiftDTO=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,shiftCreationPojoData.getStaffId(),shiftCreationPojoData.getUnitPositionId(),shiftCreationPojoData.getStartDate(),shiftCreationPojoData.getEndDate(),shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
-            shiftService.createShift(unitId,shiftDTO,"Organization",false);
-        });
-        return true;
-    }
-
-    //
-//    public List<ShiftDayTemplateDTO> getAllShiftTemplatesByStaffId(Long unitId, Long staffId){
-//        return shiftDayTemplateMongoRepository.getAllShiftTemplatesByStaffId(unitId,staffId);
-//    }
-//
-//
-//
-//    public boolean deleteShiftTemplate(Long unitId, BigInteger shiftTemplateId){
-//        ShiftDayTemplate shiftDayTemplate = shiftDayTemplateMongoRepository.findByIdAndUnitIdAndDeletedFalse(shiftTemplateId,unitId);
-//        if(!Optional.ofNullable(shiftDayTemplate).isPresent()){
-//            exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent",shiftTemplateId);
-//        }
-//        shiftDayTemplate.setDeleted(true);
-//        save(shiftDayTemplate);
-//        return true;
-//
-//    }
-
 }
