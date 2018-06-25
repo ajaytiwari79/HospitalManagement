@@ -35,6 +35,11 @@ public class PlanningAppConfig {
         SpringApplication.run(PlanningAppConfig.class, args);
     }
 
+    static{
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
+    }
+
     @Bean(name ="schedulerRestTemplate")
     public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder.interceptors(new UserContextInterceptor())
