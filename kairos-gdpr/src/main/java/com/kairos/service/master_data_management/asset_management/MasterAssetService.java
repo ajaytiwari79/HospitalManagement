@@ -1,9 +1,8 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.custome_exception.*;
-import com.kairos.dto.master_data.MasterAssetDto;
+import com.kairos.custom_exception.*;
+import com.kairos.dto.master_data.MasterAssetDTO;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -27,8 +26,6 @@ public class MasterAssetService extends MongoBaseService {
     @Inject
     MasterAssetMongoRepository masterAssetMongoRepository;
 
-    @Inject
-    OrganizationTypeRestClient organizationTypeAndServiceRestClient;
 
     @Inject
     ComparisonUtils comparisonUtils;
@@ -37,7 +34,7 @@ public class MasterAssetService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    public MasterAsset addMasterAsset(Long countryId, MasterAssetDto masterAssetDto) {
+    public MasterAsset addMasterAsset(Long countryId, MasterAssetDTO masterAssetDto) {
 
         MasterAsset newAsset = new MasterAsset();
         if (masterAssetMongoRepository.findByNameAndCountry(countryId, masterAssetDto.getName()) != null) {
@@ -75,7 +72,7 @@ public class MasterAssetService extends MongoBaseService {
     }
 
 
-    public MasterAsset updateMasterAsset(BigInteger id, MasterAssetDto masterAssetDto) {
+    public MasterAsset updateMasterAsset(BigInteger id, MasterAssetDTO masterAssetDto) {
 
 
         MasterAsset exists = masterAssetMongoRepository.findByNameAndCountry(UserContext.getCountryId(), masterAssetDto.getName());
@@ -136,15 +133,15 @@ public class MasterAssetService extends MongoBaseService {
 
 /*
 
-    public Map<String, List<OrganizationTypeAndServiceBasicDto>> organizationTypeAndSubTypeFilter(Set<Long> orgTypeIds, List<OrganizationTypeAndServiceBasicDto> organizationTypeList) {
-        List<OrganizationTypeAndServiceBasicDto> organizationTypes = new ArrayList<>();
+    public Map<String, List<OrganizationTypeAndServiceBasicDTO>> organizationTypeAndSubTypeFilter(Set<Long> orgTypeIds, List<OrganizationTypeAndServiceBasicDTO> organizationTypeList) {
+        List<OrganizationTypeAndServiceBasicDTO> organizationTypes = new ArrayList<>();
 
-        Map<String, List<OrganizationTypeAndServiceBasicDto>> result = new HashMap<>();
+        Map<String, List<OrganizationTypeAndServiceBasicDTO>> result = new HashMap<>();
         Iterator iterator = orgTypeIds.iterator();
 
         while (iterator.hasNext()) {
             Long orgTypeId = (Long) iterator.next();
-            for (OrganizationTypeAndServiceBasicDto orgType : organizationTypeList) {
+            for (OrganizationTypeAndServiceBasicDTO orgType : organizationTypeList) {
                 if (orgTypeId.equals(orgType.getId())) {
                     organizationTypes.add(orgType);
                     System.err.println(organizationTypes.get(0).getName());
@@ -161,15 +158,15 @@ public class MasterAssetService extends MongoBaseService {
     }
 
 
-    public Map<String, List<OrganizationTypeAndServiceBasicDto>> organizationServiceAndSubServiceFilter(Set<Long> orgServiceIds, List<OrganizationTypeAndServiceBasicDto> organizationServiceList) {
-        List<OrganizationTypeAndServiceBasicDto> organizationServices = new ArrayList<>();
+    public Map<String, List<OrganizationTypeAndServiceBasicDTO>> organizationServiceAndSubServiceFilter(Set<Long> orgServiceIds, List<OrganizationTypeAndServiceBasicDTO> organizationServiceList) {
+        List<OrganizationTypeAndServiceBasicDTO> organizationServices = new ArrayList<>();
 
-        Map<String, List<OrganizationTypeAndServiceBasicDto>> result = new HashMap<>();
+        Map<String, List<OrganizationTypeAndServiceBasicDTO>> result = new HashMap<>();
         Iterator iterator = orgServiceIds.iterator();
 
         while (iterator.hasNext()) {
             Long orgTypeId = (Long) iterator.next();
-            for (OrganizationTypeAndServiceBasicDto orgService : organizationServiceList) {
+            for (OrganizationTypeAndServiceBasicDTO orgService : organizationServiceList) {
                 if (orgTypeId.equals(orgService.getId())) {
                     organizationServices.add(orgService);
                     break;

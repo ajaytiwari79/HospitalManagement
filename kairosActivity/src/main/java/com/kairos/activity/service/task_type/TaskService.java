@@ -58,9 +58,7 @@ import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResp
 import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.activity.util.userContext.UserContext;
-import com.kairos.response.dto.web.client.VRPClientDTO;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.bson.Document;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -1594,8 +1592,8 @@ public class TaskService extends MongoBaseService {
             Row row = rows.get(i);
             Task task = new Task();
             TaskAddress taskAddress = new TaskAddress();
-            taskAddress.setLatitude(getValue(row.getCell(14)).toString());
-            taskAddress.setLongitude(getValue(row.getCell(14)).toString());
+            taskAddress.setLatitude(getConstraintValue(row.getCell(14)).toString());
+            taskAddress.setLongitude(getConstraintValue(row.getCell(14)).toString());
             taskAddress.setCity(row.getCell(13).getStringCellValue());
             taskAddress.setFloorNumber((int) row.getCell(10).getNumericCellValue());
             taskAddress.setHouseNumber( ""+row.getCell(8).getNumericCellValue());
@@ -1603,7 +1601,7 @@ public class TaskService extends MongoBaseService {
             taskAddress.setStreet(row.getCell(7).getStringCellValue());
             taskAddress.setBlock(row.getCell(9).getStringCellValue());
             task.setAddress(taskAddress);
-            task.setInstallationNumber(getValue(row.getCell(5)).intValue());
+            task.setInstallationNumber(getConstraintValue(row.getCell(5)).intValue());
             task.setDuration((int) row.getCell(0).getNumericCellValue());
             task.setCitizenId(installationAndCitizenId.get(task.getInstallationNumber()));
             task.setUnitId(unitId);
@@ -1621,7 +1619,7 @@ public class TaskService extends MongoBaseService {
         List<VRPTaskDTO> newTasks = new ArrayList<>();
         for (VRPTaskDTO task : taskDTOS) {
             if(!taskTypeIds.containsKey(task.getSkill())){
-                exceptionService.dataNotFoundException("message.taskType.enddate.required",task.getSkill());
+                exceptionService.dataNotFoundException("message.taskType.notExists",task.getSkill());
             }
             if(!installationNoAndTaskTypeId.containsKey(new Integer(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
                 task.setUnitId(unitId);

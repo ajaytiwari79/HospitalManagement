@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
-import static com.kairos.constant.ApiConstant.API_DATA_DISPOSAL_URL;
+import static com.kairos.constants.ApiConstant.API_DATA_DISPOSAL_URL;
 /*
  *
  *  created by bobby 16/5/2018

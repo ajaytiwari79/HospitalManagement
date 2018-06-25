@@ -1,11 +1,14 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +32,11 @@ public class Employment extends UserBaseEntity {
     private Staff staff;
     private Long endDateMillis;
     private Long startDateMillis;
-
+    @Convert(LocalDateConverter.class)
+    private LocalDate mainEmploymentStartDate;
+    @Convert(LocalDateConverter.class)
+    private LocalDate mainEmploymentEndDate;
+    private boolean mainEmployment;
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
     }
@@ -105,5 +112,29 @@ public class Employment extends UserBaseEntity {
     public Employment(String name, Staff staff) {
         this.name = name;
         this.staff = staff;
+    }
+
+    public LocalDate getMainEmploymentStartDate() {
+        return mainEmploymentStartDate;
+    }
+
+    public void setMainEmploymentStartDate(LocalDate mainEmploymentStartDate) {
+        this.mainEmploymentStartDate = mainEmploymentStartDate;
+    }
+
+    public LocalDate getMainEmploymentEndDate() {
+        return mainEmploymentEndDate;
+    }
+
+    public void setMainEmploymentEndDate(LocalDate mainEmploymentEndDate) {
+        this.mainEmploymentEndDate = mainEmploymentEndDate;
+    }
+
+    public boolean isMainEmployment() {
+        return mainEmployment;
+    }
+
+    public void setMainEmployment(boolean mainEmployment) {
+        this.mainEmployment = mainEmployment;
     }
 }

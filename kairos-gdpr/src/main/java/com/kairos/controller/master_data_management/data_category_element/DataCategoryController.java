@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data_management.data_category_element;
 
 
-import com.kairos.dto.master_data.DataCategoryDto;
+import com.kairos.dto.master_data.DataCategoryDTO;
 import com.kairos.service.master_data_management.data_category_element.DataCategoryService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -14,7 +14,7 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constant.ApiConstant.API_DATA_CATEGORY_URL;
+import static com.kairos.constants.ApiConstant.API_DATA_CATEGORY_URL;
 
 @RestController
 @RequestMapping(API_DATA_CATEGORY_URL)
@@ -27,7 +27,7 @@ public class DataCategoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId, @Valid @RequestBody DataCategoryDto dataCategoryDto) {
+    public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         if (countryId == null) {
 
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
@@ -73,13 +73,13 @@ public class DataCategoryController {
 
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDto dataCategoryDto) {
+    public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndElement(countryId,id, dataCategoryDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(countryId,id, dataCategoryDto));
 
 
     }

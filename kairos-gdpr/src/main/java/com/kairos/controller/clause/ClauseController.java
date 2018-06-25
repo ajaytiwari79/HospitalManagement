@@ -1,10 +1,10 @@
 package com.kairos.controller.clause;
 
-import static com.kairos.constant.ApiConstant.API_CLAUSES_URL;
+import static com.kairos.constants.ApiConstant.API_CLAUSES_URL;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.dto.master_data.ClauseDto;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.dto.master_data.ClauseDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.service.clause.paginated_result_service.PaginatedResultsRetrievedEvent;
@@ -48,7 +48,7 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping("/add")
-    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
+    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDTO clauseDto) throws RepositoryException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, clauseDto));
     }
 
@@ -62,11 +62,6 @@ public class ClauseController {
 
     }
 
-    /*@ApiOperation("get clause by multi select")
-    @PostMapping("/clause")
-    public ResponseEntity<Object> getClause(@RequestBody ClauseGetQueryDto clauseQueryDto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(clauseQueryDto));
-    }*/
 
     @ApiOperation("delete clause by id")
     @DeleteMapping("/delete/{id}")
@@ -80,7 +75,7 @@ public class ClauseController {
 
     @ApiOperation("update clause description")
     @PutMapping("/update/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDto clauseDto) throws RepositoryException {
+    public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto) throws RepositoryException {
 
         if (clauseId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clauseId cannot be null or empty");

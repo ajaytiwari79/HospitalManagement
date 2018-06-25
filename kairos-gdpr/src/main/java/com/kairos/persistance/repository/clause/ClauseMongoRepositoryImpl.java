@@ -1,8 +1,8 @@
 package com.kairos.persistance.repository.clause;
 
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDto;
+import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,9 +14,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ID;
+import static com.kairos.constants.AppConstant.DELETED;
 
 
 public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
@@ -27,7 +27,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<Clause> getClauseDataWithFilterSelection(Long countryId, FilterSelectionDto filterSelectionDto) {
+    public List<Clause> getClauseDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false));
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
 

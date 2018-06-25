@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import static com.kairos.constant.ApiConstant.API_PROCESSING_ACTIVITY;
+import static com.kairos.constants.ApiConstant.API_PROCESSING_ACTIVITY;
 
 @RestController
 @RequestMapping(value = API_PROCESSING_ACTIVITY)
