@@ -2,6 +2,7 @@ package com.kairos.controller.user;
 
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.service.auth.UserService;
+import com.kairos.service.staff.StaffService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,8 @@ public class UserController {
     @Inject
     UserService userService;
 
+    @Inject
+    StaffService staffService;
    /* @Inject
     TaskReportService taskReportService;*/
     /**
@@ -114,8 +117,6 @@ public class UserController {
     ResponseEntity<Map<String, Object>> updateDateOfBirthOfUserByCPRNumber() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateDateOfBirthOfUserByCPRNumber());
     }
-
-
 
 
 }

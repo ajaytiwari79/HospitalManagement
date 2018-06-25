@@ -2050,4 +2050,9 @@ public class StaffService extends UserBaseService {
         return accessGroupService.getStaffAccessRoles(unitId,staff.getId());
     }
 
+
+    public List<Long> getStaffIdsByUserId(Long UserId){
+        return staffGraphRepository.getStaffByUserId(UserId);
+
+    }
 }

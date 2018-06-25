@@ -666,5 +666,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessRolesOfStaffByUserId(unitId));
     }
 
+    @RequestMapping(value = "/get_staff_ids/user/{userId}", method = RequestMethod.GET)
+    @ApiOperation("get staff ids by userid")
+    ResponseEntity<Map<String, Object>> getStaffIdsByUserId(@PathVariable long userId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsByUserId(userId));
+    }
+
+
 
 }

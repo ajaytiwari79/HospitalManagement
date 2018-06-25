@@ -379,8 +379,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     StaffFavouriteFilter getStaffFavouriteFiltersById(Long staffId, Long staffFavouriteFiltersId);
 
 
-    @Query("MATCH (u:User)-[:BELONGS_TO]-(s:Staff) where id(u)={0} return s ")
-    Staff getStaffByUserId(Long id);
+    @Query("MATCH (u:User)-[:BELONGS_TO]-(s:Staff) where id(u)={0} return id(s) as id ")
+    List<Long> getStaffByUserId(Long id);
 
     @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
             "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} return staff")

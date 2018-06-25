@@ -60,6 +60,9 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/staff/access_roles", null),UserAccessRoleDTO.class);
     }
 
-
+    public List<Long> getStaffIdsByUserId(Long userId){
+        List<Long> staffIds=genericRestClient.publish(null,userId,true,IntegrationOperation.GET,"/staff/get_staff_ids/user/{userId}",null,userId);
+        return staffIds;
+    }
 
 }
