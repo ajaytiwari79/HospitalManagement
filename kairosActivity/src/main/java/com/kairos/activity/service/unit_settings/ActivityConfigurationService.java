@@ -43,7 +43,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
-    public void createDefaultPhaseSettings(Long unitId, Long countryId, List<Phase> phases) {
+    public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases) {
         // TODO REMOVE
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty())
@@ -53,7 +53,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
         Optional<PresenceTypeDTO> extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny();
         BigInteger normalPlannedTypeId = normalPlannedType.isPresent() ? normalPlannedType.get().getId() : null;
-        BigInteger extraTimePlannedTypeId = normalPlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
+        BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
         for (Phase phase : phases) {
             switch (phase.getName()) {
                 case DRAFT_PHASE_NAME:
@@ -138,9 +138,9 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(unitId);
         List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
         List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
-        List<TimeTypeDTO> topLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
+        List<TimeTypeDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
-        ActivityConfigurationWrapper activityConfigurationWrapper = new ActivityConfigurationWrapper(phases, topLevelTimeTypes, plannedTimeTypes);
+        ActivityConfigurationWrapper activityConfigurationWrapper = new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes);
 
         return activityConfigurationWrapper;
     }

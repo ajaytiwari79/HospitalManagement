@@ -2,8 +2,8 @@ package com.kairos.activity.unit_settings.activity_configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.response.dto.web.cta.PhaseDTO;
+import com.kairos.response.dto.web.cta.TimeTypeDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
 import java.math.BigInteger;

@@ -290,7 +290,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
-        activityConfigurationService.createDefaultPhaseSettings(countryId,unitId, phases);
+        activityConfigurationService.createDefaultSettings(countryId,unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId);
         return true;
     }

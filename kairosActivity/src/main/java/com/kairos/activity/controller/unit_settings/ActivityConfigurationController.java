@@ -41,7 +41,7 @@ public class ActivityConfigurationController {
     @PostMapping
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultPhaseSettings(@PathVariable Long unitId, @RequestParam("countryId") Long countryId) {
-        activityConfigurationService.createDefaultPhaseSettings(unitId, countryId, null);
+        activityConfigurationService.createDefaultSettings(unitId, countryId, null);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
