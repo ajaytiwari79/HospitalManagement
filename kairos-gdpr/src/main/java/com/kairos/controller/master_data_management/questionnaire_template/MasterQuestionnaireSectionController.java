@@ -59,7 +59,7 @@ public class MasterQuestionnaireSectionController {
 
     }
 
-
+    @ApiOperation("delete questionnaire section by id ")
     @DeleteMapping("/section/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {

@@ -84,7 +84,7 @@ public class AccountTypeService extends MongoBaseService {
 
     }
 
-    public AccountType updateAccountName(Long countryId, Long organizationId, BigInteger id, AccountType accountType) {
+    public AccountType updateAccountTypeName(Long countryId, Long organizationId, BigInteger id, AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByName(countryId, organizationId, accountType.getName());
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
@@ -97,7 +97,7 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAccountType(Long countryId, Long organizationId, BigInteger id) {
+    public Boolean deleteAccountTypeById(Long countryId, Long organizationId, BigInteger id) {
         AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("Account type exist for id " + id);

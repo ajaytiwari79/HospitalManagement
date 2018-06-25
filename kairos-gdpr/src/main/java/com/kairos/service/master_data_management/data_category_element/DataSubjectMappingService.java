@@ -31,7 +31,13 @@ public class DataSubjectMappingService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param dataSubjectMappingDto request body of Data Subject ANd Mapping
+     * @return new Data Subject Object
+     */
     public DataSubjectMapping addDataSubjectAndMapping(Long countryId, Long organizationId, DataSubjectMappingDTO dataSubjectMappingDto) {
 
         DataSubjectMapping existing = dataSubjectMappingRepository.findByName(countryId, organizationId, dataSubjectMappingDto.getName());
@@ -75,15 +81,28 @@ public class DataSubjectMappingService extends MongoBaseService {
         return dataSubjectMapping;
     }
 
-
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of DataSubject With Data category List
+     */
     public List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithData(Long countryId, Long organizationId) {
         return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategory(countryId,organizationId);
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param id  id of dataSUbjectMapping model
+     * @param dataSubjectMappingDto request body for updating Data Subject Mapping Object
+     * @return updated Data SubjectMapping object
+     */
     public DataSubjectMapping updateDataSubjectAndMapping(Long countryId, Long organizationId, BigInteger id, DataSubjectMappingDTO dataSubjectMappingDto) {
         DataSubjectMapping existing = dataSubjectMappingRepository.findByName(countryId, organizationId, dataSubjectMappingDto.getName());
-        if (Optional.ofNullable(existing).isPresent() && id != existing.getId()) {
+        if (Optional.ofNullable(existing).isPresent() && !id.equals(existing.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data subject", dataSubjectMappingDto.getName());
         }
         existing = dataSubjectMappingRepository.findByIdAndNonDeleted(countryId, organizationId, id);
@@ -91,12 +110,12 @@ public class DataSubjectMappingService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
         dataCategoryService.getDataCategoryByIds(countryId, organizationId, dataSubjectMappingDto.getDataCategories());
-        DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription());
-        dataSubjectMapping.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
-        dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
-        dataSubjectMapping.setCountryId(countryId);
-        dataSubjectMapping.setDataCategories(dataSubjectMappingDto.getDataCategories());
-        return save(dataSubjectMapping);
+        existing.setName(dataSubjectMappingDto.getName());
+        existing.setDescription(dataSubjectMappingDto.getDescription());
+        existing.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
+        existing.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
+        existing.setDataCategories(dataSubjectMappingDto.getDataCategories());
+        return save(existing);
     }
 
 

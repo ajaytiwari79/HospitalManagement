@@ -5,6 +5,7 @@ import com.kairos.dto.master_data.DataCategoryDTO;
 import com.kairos.service.master_data_management.data_category_element.DataCategoryService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class DataCategoryController {
     private DataCategoryService dataCategoryService;
 
 
+    @ApiOperation("add data category ")
     @PostMapping("/add")
     public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         if (countryId == null) {
@@ -37,7 +39,7 @@ public class DataCategoryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.addDataCategoryAndDataElement(countryId, organizationId, dataCategoryDto));
     }
 
-
+    @ApiOperation("get data category by id with data Elements ")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
@@ -54,7 +56,7 @@ public class DataCategoryController {
 
     }
 
-
+    @ApiOperation("get all data category ")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
@@ -66,7 +68,7 @@ public class DataCategoryController {
 
     }
 
-
+    @ApiOperation("delete data category by id ")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataCategory(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {

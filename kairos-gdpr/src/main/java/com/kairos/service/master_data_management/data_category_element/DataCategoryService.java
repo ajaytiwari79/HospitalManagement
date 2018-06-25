@@ -110,6 +110,14 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param id id of Data Category
+     * @param dataCategoryDto request body of Data Category contains List of Existing Data Elements and New Data Elements
+     * @return
+     */
     public DataCategory updateDataCategoryAndDataElement(Long countryId,Long organizationId,BigInteger id, DataCategoryDTO dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByName(countryId,organizationId,dataCategoryDto.getName());

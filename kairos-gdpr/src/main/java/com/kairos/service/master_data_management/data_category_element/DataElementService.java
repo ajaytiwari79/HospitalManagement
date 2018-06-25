@@ -30,6 +30,14 @@ public class DataElementService extends MongoBaseService {
     @Inject
     private DataElementMognoRepository dataElementMognoRepository;
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param dataElementsDto request body for creating New Data Elements
+     * @return map of Data Elements ids List  and new Data Elements List
+     */
     public Map<String, Object> createDataElements(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
@@ -101,7 +109,13 @@ public class DataElementService extends MongoBaseService {
         return save(exist);
     }
 
-
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param dataElementsDto request body contain list Of Existing Data Elements which needs to be Update and List of New Data Elements
+     * @return map of Data Elements ids List and updated and new Data Elements List
+     */
     public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
@@ -136,7 +150,13 @@ public class DataElementService extends MongoBaseService {
     }
 
 
-    //Fixme add Check for duplicate name in data Elemenets dusing update and also check if id is same or not
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param dataElementsDto request body for updating Existing Data Elements List
+     * @return  map of Data Elements contain ids List and updated  Data Elements List
+     */
     public Map<String, Object> updateDataElementsList(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
         Map<BigInteger, DataElementDTO> dataElementsDtoList = new HashMap<>();

@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.questionnaire_template;
 import com.kairos.service.master_data_management.questionnaire_template.MasterQuestionService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,11 @@ import javax.inject.Inject;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
+import static com.kairos.constants.ApiConstant.API_MASTER_QUESTION_SECTION;
 
 @RestController
-@RequestMapping(API_MASTER_QUESTIONNAIRE_TEMPLATE)
-@Api(API_MASTER_QUESTIONNAIRE_TEMPLATE)
+@RequestMapping(API_MASTER_QUESTION_SECTION)
+@Api(API_MASTER_QUESTION_SECTION)
 public class MasterQuestionController {
 
 
@@ -24,11 +25,9 @@ public class MasterQuestionController {
     private MasterQuestionService masterQuestionService;
 
 
-
-
-
+    @ApiOperation("get question of Questionnaire section by id ")
     @GetMapping("/question/{id}")
-    public ResponseEntity<Object> getMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getMasterQuestionById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } if (countryId == null) {
@@ -40,7 +39,7 @@ public class MasterQuestionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestion(countryId,organizationId,id));
     }
 
-
+    @ApiOperation("get All question of Questionnaire section")
     @GetMapping("/question/all")
     public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId) {
         if (countryId == null) {

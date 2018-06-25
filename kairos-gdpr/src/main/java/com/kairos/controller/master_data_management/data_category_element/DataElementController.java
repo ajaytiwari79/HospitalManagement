@@ -7,6 +7,7 @@ import com.kairos.service.master_data_management.data_category_element.DataEleme
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class DataElementController {
     private DataElementService dataElementService;
 
 
+    @ApiOperation("create  data Element ")
     @PostMapping("/add")
     public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDTO> dataElements) {
         if (countryId == null) {
@@ -41,6 +43,7 @@ public class DataElementController {
     }
 
 
+    @ApiOperation("get data Element by id")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
@@ -56,7 +59,7 @@ public class DataElementController {
 
     }
 
-
+    @ApiOperation("get All data Element ")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllDataElement(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
@@ -69,7 +72,7 @@ public class DataElementController {
 
     }
 
-
+    @ApiOperation("deleted  data element by id ")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
@@ -86,6 +89,7 @@ public class DataElementController {
     }
 
 
+    @ApiOperation("update  data Eelements ")
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElement dataElements) {
         if (id == null) {
