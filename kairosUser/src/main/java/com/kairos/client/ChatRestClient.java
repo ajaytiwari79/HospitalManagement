@@ -36,16 +36,13 @@ public class ChatRestClient {
      * @param staffChatDetails
      * @return
      * @auther Vipul Pandey
-     * used to create the phases in default
+     * used to register staff to chat server
      */
     public StaffChatDetails registerUser(StaffChatDetails staffChatDetails) {
         StaffChatDetails staffChatDetails1 = new StaffChatDetails();
 
         try {
 
-//            ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>> typeReference =
-//                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
-//                    };
             HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
