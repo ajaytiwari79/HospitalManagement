@@ -49,7 +49,7 @@ public class ShiftWithActivityDTO {
     private ShiftState shiftState;
     private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
     //TODO need to fetch dynamically @Vipul
-    private BigInteger presenceTypeId=new BigInteger("3");
+    private BigInteger plannedTypeId =new BigInteger("3");
 
 
     public ShiftState getShiftState() {
@@ -269,11 +269,11 @@ public class ShiftWithActivityDTO {
         return new Interval(startDate.getTime(),endDate.getTime());
     }
 
-    public BigInteger getPresenceTypeId() {
-        return presenceTypeId;
+    public BigInteger getPlannedTypeId() {
+        return plannedTypeId;
     }
 
-    public void setPresenceTypeId(BigInteger presenceTypeId) {
-        this.presenceTypeId = presenceTypeId;
+    public void setPlannedTypeId(BigInteger plannedTypeId) {
+        this.plannedTypeId = plannedTypeId;
     }
 }

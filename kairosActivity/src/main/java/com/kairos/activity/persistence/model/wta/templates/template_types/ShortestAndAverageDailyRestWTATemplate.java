@@ -5,20 +5,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
-import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.util.DateTimeInterval;
-import com.kairos.activity.util.DateUtils;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,7 +110,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPresenceTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);

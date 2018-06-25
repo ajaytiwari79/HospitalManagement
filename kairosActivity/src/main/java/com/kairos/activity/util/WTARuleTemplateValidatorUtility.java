@@ -7,12 +7,8 @@ package com.kairos.activity.util;
 
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
-import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.persistence.model.period.PlanningPeriod;
-import com.kairos.activity.persistence.model.wta.StaffWTACounter;
 import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
@@ -243,14 +239,14 @@ public class WTARuleTemplateValidatorUtility {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         if(timeTypeIds!=null && !timeTypeIds.isEmpty()){
             shifts.forEach(s->{
-                if((timeTypeIds==null || timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds==null || plannedTimeIds.contains(s.getPresenceTypeId())) && (activitieIds==null || activitieIds.contains(s.getActivity().getId())))){
+                if((timeTypeIds==null || timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds==null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds==null || activitieIds.contains(s.getActivity().getId())))){
                     shiftQueryResultWithActivities.add(s);
                 }
             });
         }/*
         if(plannedTimeIds!=null && !plannedTimeIds.isEmpty()){
             shifts.forEach(s->{
-                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPresenceTypeId())){
+                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPlannedTypeId())){
                     shiftQueryResultWithActivities.add(s);
                 }
             });

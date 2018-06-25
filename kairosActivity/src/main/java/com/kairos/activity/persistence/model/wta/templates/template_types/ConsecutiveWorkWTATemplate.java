@@ -129,7 +129,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
-            if ((timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && plannedTimeIds.contains(infoWrapper.getShift().getPresenceTypeId()))) {
+            if ((timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()))) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
                 if (timeInterval != null) {
                     List<ShiftWithActivityDTO> shiftQueryResultWithActivities = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
