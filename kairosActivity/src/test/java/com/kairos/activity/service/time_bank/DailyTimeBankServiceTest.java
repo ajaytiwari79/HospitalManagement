@@ -33,21 +33,7 @@ public class DailyTimeBankServiceTest {
     Interval interval = null;
 
 
-    @Test
-    public void getTimeBank(){
 
-        DateTime startDateTime = new DateTime().withTimeAtStartOfDay();
-        DateTime endDateTime = new DateTime().plusDays(7).withTimeAtStartOfDay();
-        int days = (int)new Duration(startDateTime,endDateTime).getStandardDays()+1;
-        Long startMillis = new Date().getTime();
-
-        //timeBankService.setTimeBankCalculationService(new TimeBankCalculationService());
-        List<CalculatedTimeBankByDateDTO> timeBanks = timeBankService.getTimeBankFromCurrentDateByUEP(145l);
-        timeBanks.forEach(ct->{
-            logger.info("date "+ct.getDate()+" - "+ct.getTimeBankMin());
-        });
-        logger.info("endTime "+(new Date().getTime()-startMillis));
-    }
 
     @Test
     public void getIntervals(){

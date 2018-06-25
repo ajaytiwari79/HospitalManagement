@@ -22,13 +22,9 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
     private String intervalUnit;
-    private LocalDate validationStartDate;
-    private long shiftsLimit;
-    private boolean onlyCompositeShifts;//(checkbox)
 
     private List<BigInteger> timeTypeIds;
-    private List<BigInteger> activityIds;
-    private List<Long> plannedTimeIds;
+    private List<BigInteger> plannedTimeIds;
     protected List<PartOfDay> partOfDays;
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
@@ -51,19 +47,12 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -98,13 +87,6 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalUnit = intervalUnit;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -120,22 +102,6 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public void setRecommendedValue(float recommendedValue) {
         this.recommendedValue = recommendedValue;
-    }
-
-    public long getShiftsLimit() {
-        return shiftsLimit;
-    }
-
-    public void setShiftsLimit(long shiftsLimit) {
-        this.shiftsLimit = shiftsLimit;
-    }
-
-    public boolean isOnlyCompositeShifts() {
-        return onlyCompositeShifts;
-    }
-
-    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
-        this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
 

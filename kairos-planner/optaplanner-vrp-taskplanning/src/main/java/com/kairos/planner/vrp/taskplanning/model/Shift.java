@@ -1,5 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -15,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @PlanningEntity
-public class Shift extends TaskOrShift {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Shift extends TaskOrShift{
     private String id;
     private Employee employee;
     private LocalDate localDate;

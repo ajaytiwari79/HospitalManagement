@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.processing_activity_masterd
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSubject;
 import com.kairos.service.master_data_management.processing_activity_masterdata.DataSubjectService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -15,9 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
-import static com.kairos.constant.ApiConstant.API_DATASUBJECT_URL;
+import static com.kairos.constants.ApiConstant.API_DATASUBJECT_URL;
 /*
  *
  *  created by bobby 19/5/2018
@@ -37,11 +37,11 @@ public class DataSubjectController {
 
     @ApiOperation("add DataSubject")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSubject(@PathVariable Long countryId, @RequestBody List<DataSubject> dataSubjects) {
+    public ResponseEntity<Object> createDataSubject(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<DataSubject> dataSubjects) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.createDataSubject(countryId, dataSubjects));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectService.createDataSubject(countryId, dataSubjects.getRequestBody()));
 
     }
 

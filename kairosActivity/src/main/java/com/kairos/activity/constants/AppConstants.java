@@ -238,12 +238,30 @@ public class AppConstants {
     public static final int MAX_ONE_ACTIVITY_PER_SHIFT = 10;
 
 
+
+    //RuleTemplate
+    public static final String MONTHS = "MONTHS";
+    public static final String WEEKS = "WEEKS";
+    public static final String DAYS = "DAYS";
+    public static final String YEARS = "YEARS";
+
+
     // Default Unit Age Settings
     public static final int YOUNGER_AGE = 18;
     public static final int OLDER_AGE = 62;
 
     public static final String PAID_BREAK = "PAID BREAK";
     public static final String UNPAID_BREAK = "UNPAID BREAK";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
     public static final String SHIFT = "SHIFT";
+    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift.";
+    public static final String OPENSHIFT_SUBJECT = "Open Shift";
+    public static final String NOTIFY="NOTIFY";
+    public static final String ASSIGN="ASSIGN";
+    public static final String SHIFT_NOTIFICATION="SHIFT_NOTIFICATION";
+    public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
+    public static final String DECLINE="DECLINE";
+    public static final String ASSIGN_OR_NOTIFY="ASSIGN_OR_NOTIFY";
 }

@@ -2,11 +2,15 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.util.TimeInterval;
 
 
 import java.math.BigInteger;
@@ -14,6 +18,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getValueByPhase;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -27,11 +35,9 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
-    private LocalDate validationStartDate;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -69,19 +75,12 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -118,13 +117,6 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.intervalLength = intervalLength;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
 
     public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
         this.noOfPartOfDayWorked = noOfPartOfDayWorked;
@@ -137,6 +129,33 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
     }
 
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
+            if(timeInterval!=null) {
+                DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
+                shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
+                if (!isValid) {
+                    if(limitAndCounter[1]!=null) {
+                        int counterValue =  limitAndCounter[1] - 1;
+                        if(counterValue<0){
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        }else {
+                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        }
+                    }else {
+                        throw new InvalidRequestException(getName() + " is Broken");
+                    }
+                }
+            }
+        }
+        return "";
+    }
 
 
 }

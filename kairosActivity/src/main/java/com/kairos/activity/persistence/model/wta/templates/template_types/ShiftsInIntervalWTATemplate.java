@@ -2,11 +2,15 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.util.TimeInterval;
 
 
 import java.math.BigInteger;
@@ -15,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.getValueByPhase;
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.isValid;
+
 /**
  * Created by pawanmandhan on 5/8/17.
  */
@@ -22,16 +30,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
-    private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
     private String intervalUnit;
-    private LocalDate validationStartDate;
-    private long shiftsLimit;
-    private boolean onlyCompositeShifts;//(checkbox)
-
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY,PartOfDay.EVENING,PartOfDay.NIGHT);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -54,19 +56,12 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -76,13 +71,6 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
-    }
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
     }
 
     public long getIntervalLength() {
@@ -101,13 +89,6 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -125,38 +106,46 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.recommendedValue = recommendedValue;
     }
 
-    public long getShiftsLimit() {
-        return shiftsLimit;
-    }
-
-    public void setShiftsLimit(long shiftsLimit) {
-        this.shiftsLimit = shiftsLimit;
-    }
-
-    public boolean isOnlyCompositeShifts() {
-        return onlyCompositeShifts;
-    }
-
-    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
-        this.onlyCompositeShifts = onlyCompositeShifts;
-    }
 
     public ShiftsInIntervalWTATemplate(String name,  boolean disabled,
-                                       String description, long intervalLength, String intervalUnit,
-                                       LocalDate validationStartDate, long shiftsLimit, boolean onlyCompositeShifts) {
+                                       String description, long intervalLength, String intervalUnit) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.balanceType = balanceType;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
-        this.validationStartDate =validationStartDate;
-        this.shiftsLimit =shiftsLimit;
-        this.onlyCompositeShifts=onlyCompositeShifts;
         wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     }
     public ShiftsInIntervalWTATemplate() {
         wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getPresenceTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
+            TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
+            if(timeInterval!=null) {
+                DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
+                shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
+                if (!isValid) {
+                    if(limitAndCounter[1]!=null) {
+                        int counterValue =  limitAndCounter[1] - 1;
+                        if(counterValue<0){
+                            throw new InvalidRequestException(getName() + " is Broken");
+                        }else {
+                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        }
+                    }else {
+                        throw new InvalidRequestException(getName() + " is Broken");
+                    }
+                }
+            }
+        }
+        return "";
     }
 }

@@ -108,7 +108,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		converters.add(mappingJackson2XmlHttpMessageConverter());
 
 	}
-    @Profile("!development")
+    @Profile("!local")
     @LoadBalanced
 	@Primary
 	@Bean
@@ -119,7 +119,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-    @Profile("!development")
+    @Profile("!local")
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
@@ -128,7 +128,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-    @Profile("development")
+    @Profile("local")
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
@@ -138,7 +138,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
                 .build();
         return template;
     }
-    @Profile("development")
+    @Profile("local")
     @Bean(name ="schedulerRestTemplate")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder

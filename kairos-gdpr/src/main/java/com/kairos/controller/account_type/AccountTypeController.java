@@ -13,13 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constant.ApiConstant.API_ACCOUNT_TYPE_URL;
-import static com.kairos.constant.ApiConstant.PARENT_ORGABNIZATION;
+import static com.kairos.constants.ApiConstant.API_ACCOUNT_TYPE_URL;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.Set;
 /*
  *
  *  created by bobby 20/4/2018
@@ -41,9 +39,9 @@ public class AccountTypeController {
     @PostMapping("/add")
     public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (countryId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, accountTypeService.createAccountType(countryId, accountType));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
         }
-        return ResponseHandler.invalidResponse(HttpStatus.OK, true, "country id can not be null");
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id can not be null");
     }
 
     @ApiOperation(value = "account type by name")
@@ -59,22 +57,14 @@ public class AccountTypeController {
 
     }
 
- /*   @ApiOperation(value ="accounts  by ids list" )
-    @RequestMapping(value = "/account_list", method = RequestMethod.POST)
-    public ResponseEntity<Object> getAccountList(@RequestBody Set<BigInteger> accountIds) {
-        if (accountIds.size()==0) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Account List in Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountListByIds(accountIds));
-
-    }
-*/
-
-
     @ApiOperation(value = "all account type ")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<Object> getAllAccounts() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType());
+    public ResponseEntity<Object> getAllAccounts(@PathVariable Long countryId) {
+        if (countryId==null)
+        {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType(countryId));
 
     }
 
@@ -97,22 +87,18 @@ public class AccountTypeController {
     public ResponseEntity<Object> updateAccountName(@PathVariable BigInteger id, @PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (id == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
-
         }
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.updateAccountName(countryId, id, accountType));
-
-
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.updateAccountName(countryId, id, accountType));
     }
 
 
     @ApiOperation(value = "update account type ")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteAccountType(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteAccountType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, "id cannot be null");
+            return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
         } else
             return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.deleteAccountType(id));
-
 
     }
 

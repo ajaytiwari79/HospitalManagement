@@ -42,6 +42,12 @@ public class EnvConfig {
     @Value("${webservice.imagesPath}")
     private String imagesPath;
 
+    @Value("${tomtom.geocode.url}")
+    private String tomtomGeoCodeUrl;
+
+    @Value("${tomtom.key}")
+    private String tomtomKey;
+
     public String getGoogleCalendarAPIV3Url(String vCardId){
 
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);
@@ -95,4 +101,13 @@ public class EnvConfig {
     public void setImagesPath(String imagesPath) {
         this.imagesPath = imagesPath;
     }
+
+    public String getTomtomGeoCodeUrl() {
+        return tomtomGeoCodeUrl;
+    }
+
+    public String getTomtomKey() {
+        return tomtomKey;
+    }
+
 }

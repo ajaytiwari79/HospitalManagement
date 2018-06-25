@@ -2,9 +2,14 @@ package com.kairos.activity.persistence.repository.activity;
 
 import com.kairos.activity.persistence.model.activity.Shift;
 
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+
+import com.kairos.activity.persistence.query_result.DateWiseShiftResponse;
+import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.response.dto.web.ShiftCountDTO;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +17,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
+import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.Fields.field;
+import static org.springframework.data.mongodb.core.aggregation.Fields.from;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
+
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -42,7 +56,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         update.set("phase.description", PhaseDescription);
 
 
-        UpdateResult updateResult = mongoTemplate. updateMulti(query, update, Shift.class);
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, Shift.class);
 
         logger.info(query.toString() + " " + updateResult.toString());
 
@@ -57,7 +71,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitEmploymentPositionId)
                         .and("startDate").lte(endDate).and("endDate").gte(startDate)),
@@ -73,15 +87,18 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                         .andInclude("subShift.activity")
                         .and("activity").arrayElementAt(0).as("activity")
         );
-        AggregationResults<ShiftQueryResultWithActivity> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResultWithActivity.class);
+        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
 
     public List<ShiftQueryResult> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("startDate").gte(startDate).and("endDate").lt(endDate)),
-
+                project("unitId", "startDate", "endDate", "activityId", "staffId", "unitPositionId", "shiftState", "allowedBreakDurationInMinute"),
                 sort(Sort.Direction.ASC, "staffId"));
+
+
+        //AggregationResults<Object> result1 = mongoTemplate.aggregate(aggregation, Shift.class, Object.class);
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
         return result.getMappedResults();
     }
@@ -106,5 +123,53 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
         return result.getMappedResults();
     }
+
+
+    public List<ShiftQueryResult> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
+                        .and("startDate").gte(startDate).and("endDate").lte(endDate)),
+                graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts"),
+                sort(Sort.Direction.ASC, "startDate"));
+        AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
+        return result.getMappedResults();
+    }
+
+    public List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").gte(startDate).and("parentOpenShiftId").exists(true)),
+                group("unitPositionId").count().as("count"),
+                project("count").and("_id").as("unitPositionId"),
+                sort(Sort.Direction.DESC, "count")
+
+        );
+
+        AggregationResults<ShiftCountDTO> shiftCounts = mongoTemplate.aggregate(aggregation, Shift.class, ShiftCountDTO.class);
+
+        return shiftCounts.getMappedResults();
+
+    }
+
+    public List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds) {
+/*
+*  db.shifts.aggregate([
+{"$match":{"_id":{"$in":["9955","9946","9947","9948"]}}},
+{"$project":{onlyDate:{ $dateToString: { format: "%Y-%m-%d", date: "$startDate" }} ,shift:"$$ROOT"}},
+{$group:{"_id":"$onlyDate",data:{"$push":"$shift"}}}
+]).pretty()
+* */
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("_id").in(shiftIds)),
+                project().and(DateOperators.dateOf("startDate").toString("%Y-%m-%d")).as("currentDate")
+                        .and("$$ROOT").as("shift"),
+                group("currentDate").push("shift").as("shiftsList"),
+                project().and("_id").as("currentDate").and("shiftsList").as("shifts")
+                , sort(Sort.Direction.ASC, "currentDate")
+        );
+        AggregationResults<DateWiseShiftResponse> shiftData = mongoTemplate.aggregate(aggregation, Shift.class, DateWiseShiftResponse.class);
+        return shiftData.getMappedResults();
+
+    }
+
 
 }

@@ -1,11 +1,13 @@
 package com.kairos.response.dto.web.wta;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +24,16 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     private long numberShiftsPerPeriod;
     private long numberOfWeeks;
     private String fromDayOfWeek; //(day of week)
-    private long fromTime;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime fromTime;
     private boolean proportional;
-    private long toTime;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime toTime;
     private String toDayOfWeek;
     private long intervalLength;
     private String intervalUnit;
     private boolean restingTimeAllowed;
     private int restingTime;
-
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
@@ -104,11 +107,11 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public long getToTime() {
+    public LocalTime getToTime() {
         return toTime;
     }
 
-    public void setToTime(long toTime) {
+    public void setToTime(LocalTime toTime) {
         this.toTime = toTime;
     }
 
@@ -144,11 +147,11 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
         this.fromDayOfWeek = fromDayOfWeek;
     }
 
-    public long getFromTime() {
+    public LocalTime getFromTime() {
         return fromTime;
     }
 
-    public void setFromTime(long fromTime) {
+    public void setFromTime(LocalTime fromTime) {
         this.fromTime = fromTime;
     }
 
@@ -161,8 +164,8 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     }
 
     public NumberOfWeekendShiftsInPeriodWTATemplateDTO(String name, boolean disabled,
-                                                       String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
-                                                       String toDayOfWeek, long toTime) {
+                                                       String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, LocalTime fromTime, boolean proportional,
+                                                       String toDayOfWeek, LocalTime toTime) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;

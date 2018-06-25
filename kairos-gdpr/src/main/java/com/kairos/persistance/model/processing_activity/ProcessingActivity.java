@@ -23,7 +23,6 @@ public class ProcessingActivity extends MongoBaseEntity {
     Long processOwnerStaff;
     List<DataSubject> dataSubjects;
     List<ProcessingPurpose> processingPurposes;
-    AssetType assetType;
     OrganizationalSecurityMeasure organizationalSecurityMeasure;
     TechnicalSecurityMeasure technicalSecurityMeasure;
     Long organisationId;
@@ -86,13 +85,6 @@ public class ProcessingActivity extends MongoBaseEntity {
         this.processingPurposes = processingPurposes;
     }
 
-    public AssetType getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(AssetType assetType) {
-        this.assetType = assetType;
-    }
 
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure() {
         return organizationalSecurityMeasure;

@@ -18,7 +18,7 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     StaffingLevel findByUnitIdAndCurrentDateAndDeletedFalse(Long unitId, Date currentDate);
     boolean existsByUnitIdAndCurrentDateAndDeletedFalse(Long unitId, Date currentDate);
     List<StaffingLevel> findByUnitIdAndCurrentDateBetweenAndDeletedFalse(Long unitId, Date startDate, Date endDate);
-    @Query("{'deleted':false,'unitId':?0,'currentDate':{'$gte':?1,'$lte':?2},'absenceStaffingLevelInterval':{'$ne': null}}")
-    List<StaffingLevel> findByUnitIdAndCurrentDateBetweenAndDeletedFalseForAbsence(Long unitId, Date startDate, Date endDate);
+    @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
+    List<StaffingLevel> findByUnitIdAndCurrentDate(Long unitId, Date startDate, Date endDate);
 
 }

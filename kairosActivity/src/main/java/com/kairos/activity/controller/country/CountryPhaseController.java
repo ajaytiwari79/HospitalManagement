@@ -45,6 +45,13 @@ public class CountryPhaseController {
     @GetMapping(value = COUNTRY_URL+"/phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPhasesByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesWithCategoryByCountryId(countryId));
+    }
+
+    @ApiOperation(value = "get All  Phases in country")
+    @GetMapping(value = COUNTRY_URL+"/phase/all")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPhases(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesByCountryId(countryId));
     }
 

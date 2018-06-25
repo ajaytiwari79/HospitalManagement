@@ -3,7 +3,7 @@ package com.kairos.activity.task_type;
 import com.kairos.activity.KairosActivityApplication;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.persistence.model.task_type.TaskTypeResource;
-import com.kairos.activity.response.dto.CreateTaskTypeDTO;
+import com.kairos.activity.response.dto.TaskTypeDTO;
 import com.kairos.activity.response.dto.task_type.TaskTypeCopyDTO;
 import com.kairos.activity.response.dto.task_type.TaskTypeResourceDTO;
 import org.junit.Assert;
@@ -44,8 +44,8 @@ public class TaskTypeServiceIntegrationTest {
 
         TaskTypeCopyDTO taskTypeCopyDTO = new TaskTypeCopyDTO(Arrays.asList("Personal care","Health care"));
         HttpEntity<TaskTypeCopyDTO> entity = new HttpEntity<>(taskTypeCopyDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CreateTaskTypeDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CreateTaskTypeDTO>>>(){};
-        ResponseEntity<RestTemplateResponseEnvelope<List<CreateTaskTypeDTO>>> response = restTemplate.exchange(
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeDTO>>>(){};
+        ResponseEntity<RestTemplateResponseEnvelope<List<TaskTypeDTO>>> response = restTemplate.exchange(
                 baseUrl+"/task_type/19/clone",
                 HttpMethod.POST, entity, typeReference);
         Assert.assertEquals(HttpStatus.CREATED,response.getStatusCode());

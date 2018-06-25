@@ -1,7 +1,7 @@
 package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.enums.FilterType;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
@@ -11,11 +11,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilterSelection {
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotNullOrEmpty(message = "Filter Category name cannot be empty")
     private FilterType name;
 
-    @NotEmpty
-    @NotNull
+    @NotEmpty(message = "Value can't be Empty")
+    @NotNull(message = "Value can't be  Null")
     private List<Long> value;
 
     public FilterSelection() {

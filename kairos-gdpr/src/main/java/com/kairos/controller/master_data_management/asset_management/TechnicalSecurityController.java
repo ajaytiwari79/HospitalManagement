@@ -3,6 +3,7 @@ package com.kairos.controller.master_data_management.asset_management;
 import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.service.master_data_management.asset_management.TechnicalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -14,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
-import static com.kairos.constant.ApiConstant.API_TECH_SECURITY_MEASURE_URL;
+import static com.kairos.constants.ApiConstant.API_TECH_SECURITY_MEASURE_URL;
 /*
  *
  *  created by bobby 17/5/2018
@@ -36,11 +36,11 @@ public class TechnicalSecurityController {
 
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/add")
-    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId, @RequestBody List<TechnicalSecurityMeasure> securityMeasures) {
+    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<TechnicalSecurityMeasure> securityMeasures) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(countryId, securityMeasures.getRequestBody()));
 
     }
 
@@ -52,7 +52,6 @@ public class TechnicalSecurityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
-
         } else
             return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, id));
 

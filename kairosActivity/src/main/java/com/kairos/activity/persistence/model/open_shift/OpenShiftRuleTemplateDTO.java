@@ -32,7 +32,6 @@ public class OpenShiftRuleTemplateDTO {
     private Integer maximumShiftHours;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BigInteger openShiftIntervalId;
-    private Integer minOpenShiftHours;
     private PlannerNotificationInfo plannerNotificationInfo;
 
 
@@ -174,14 +173,6 @@ public class OpenShiftRuleTemplateDTO {
 
     public void setOpenShiftIntervalId(BigInteger openShiftIntervalId) {
         this.openShiftIntervalId = openShiftIntervalId;
-    }
-
-    public Integer getMinOpenShiftHours() {
-        return minOpenShiftHours;
-    }
-
-    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
-        this.minOpenShiftHours = minOpenShiftHours;
     }
 
     public PlannerNotificationInfo getPlannerNotificationInfo() {

@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.processing_activity_masterd
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSource;
 import com.kairos.service.master_data_management.processing_activity_masterdata.DataSourceService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -15,9 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
-import static com.kairos.constant.ApiConstant.API_DATASOURCE_URL;
+import static com.kairos.constants.ApiConstant.API_DATASOURCE_URL;
 /*
  *
  *  created by bobby 19/5/2018
@@ -37,11 +37,11 @@ public class DataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId, @RequestBody List<DataSource> dataSource) {
+    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<DataSource> dataSource) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource.getRequestBody()));
 
     }
 

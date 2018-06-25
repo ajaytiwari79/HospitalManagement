@@ -1,7 +1,9 @@
 package com.kairos.activity.persistence.repository.open_shift;
 
-import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.kairos.activity.persistence.model.open_shift.OpenShift;
+import com.kairos.activity.persistence.model.open_shift.OpenShiftActivityWrapper;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +11,9 @@ import java.util.List;
  * Created by vipul on 14/5/18.
  */
 public interface CustomOpenShiftMongoRepository {
-    List<OpenShiftResponseDTO> getOpenShiftsByUnitIdAndSelectedDate(Long unitId, Date selectedDate);
+
+    List<OpenShift> getOpenShiftsByUnitIdAndDate(Long unitId, Date startDate, Date endDate);
+
+    OpenShiftActivityWrapper getOpenShiftAndActivity(BigInteger openShiftId, Long unitId);
 
 }

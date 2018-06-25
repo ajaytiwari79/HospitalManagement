@@ -1,9 +1,9 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.AccessorPartyMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -99,7 +99,10 @@ public class AccessorPartyService extends MongoBaseService {
 
 
         AccessorParty exist = accessorPartyMongoRepository.findByName(UserContext.getCountryId(), accessorParty.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("Name Already Exist");
         } else {
             exist=accessorPartyMongoRepository.findByid(id);

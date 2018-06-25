@@ -1,9 +1,9 @@
 package com.kairos.persistance.repository.master_data_management.asset_management;
 
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDto;
-import com.kairos.persistance.model.enums.FilterType;
+import com.kairos.dto.FilterSelectionDTO;
+import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,9 +16,9 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constant.AppConstant.ID;
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.ID;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.DELETED;
 
 public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetRepository {
 
@@ -49,7 +49,7 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDto filterSelectionDto) {
+    public List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto) {
 
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false));
 

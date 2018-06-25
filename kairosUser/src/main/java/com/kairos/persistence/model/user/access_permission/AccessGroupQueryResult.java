@@ -14,6 +14,7 @@ public class AccessGroupQueryResult {
     private boolean typeOfTaskGiver;
     private String description;
     private String role;
+    private boolean enabled = true;
 
     public long getId() {
         return id;
@@ -61,5 +62,13 @@ public class AccessGroupQueryResult {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

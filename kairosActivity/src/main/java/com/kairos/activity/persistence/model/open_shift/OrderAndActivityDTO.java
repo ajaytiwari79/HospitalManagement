@@ -9,6 +9,7 @@ import java.util.List;
 public class OrderAndActivityDTO {
     private List<ActivityDTO> activities;
     private List<Order> orders;
+    private Integer minOpenShiftHours;
 
     public OrderAndActivityDTO() {
         //Default Constructor
@@ -28,5 +29,13 @@ public class OrderAndActivityDTO {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 }

@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSource;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSourceMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -12,8 +12,6 @@ import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -99,8 +97,11 @@ public class DataSourceService extends MongoBaseService {
 
     public DataSource updateDataSource(BigInteger id, DataSource dataSource) {
 
-        DataSource exist = dataSourceMongoRepository.findByName(UserContext.getCountryId(),dataSource.getName());
+        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(UserContext.getCountryId(),dataSource.getName());
         if (Optional.ofNullable(exist).isPresent()) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+dataSource.getName());
         } else {
             exist=dataSourceMongoRepository.findByid(id);
@@ -115,7 +116,7 @@ public class DataSourceService extends MongoBaseService {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByName(countryId, name);
+            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

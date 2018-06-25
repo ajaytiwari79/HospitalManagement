@@ -29,7 +29,6 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
     private Integer maximumShiftHours;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BigInteger openShiftIntervalId;
-    private Integer minOpenShiftHours;
     private PlannerNotificationInfo plannerNotificationInfo;
 
     public OpenShiftRuleTemplate() {
@@ -163,14 +162,6 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
 
     public void setPromptPlanner(boolean promptPlanner) {
         this.promptPlanner = promptPlanner;
-    }
-
-    public Integer getMinOpenShiftHours() {
-        return minOpenShiftHours;
-    }
-
-    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
-        this.minOpenShiftHours = minOpenShiftHours;
     }
 
     public PlannerNotificationInfo getPlannerNotificationInfo() {

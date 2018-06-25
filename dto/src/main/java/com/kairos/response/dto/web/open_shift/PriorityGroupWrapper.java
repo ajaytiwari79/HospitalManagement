@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.open_shift;
 
-import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 
 import java.util.List;
 

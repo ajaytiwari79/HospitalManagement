@@ -103,6 +103,26 @@ public class Task extends TaskDemand {
 
     private boolean locationChanged;
 
+    //Vrp settings
+    private Long installationNumber;
+    private String citizenName;
+
+    public String getCitizenName() {
+        return citizenName;
+    }
+
+    public void setCitizenName(String citizenName) {
+        this.citizenName = citizenName;
+    }
+
+    public Long getInstallationNumber() {
+        return installationNumber;
+    }
+
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
+    }
+
     public Integer getExtraPenalty() {
         return extraPenalty;
     }

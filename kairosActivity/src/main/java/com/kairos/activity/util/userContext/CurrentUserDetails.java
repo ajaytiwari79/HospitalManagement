@@ -11,6 +11,7 @@ public class CurrentUserDetails {
     private  int age;
     private Long countryId;
     private boolean hubMember;
+    private String language;
 
     public boolean isPasswordUpdated() {
         return passwordUpdated;
@@ -106,5 +107,13 @@ public class CurrentUserDetails {
 
     public void setHubMember(boolean hubMember) {
         this.hubMember = hubMember;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

@@ -6,6 +6,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -27,7 +28,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     private long daysWorked;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
@@ -41,11 +42,11 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -110,6 +111,33 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     }
     public ConsecutiveRestPartOfDayWTATemplate() {
         wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+       /* if(shifts.size()<2) return true;
+        WTARuleTemplateValidatorUtility.sortShifts(shifts);
+        List<LocalDate> dates=getSortedDates(shifts);
+
+        int l=1;
+        int consDays=0;
+        int totalRestUnder=0;
+        while (l<dates.size()){
+            if(dates.get(l-1).equals(dates.get(l).minusDays(1)) && isNightShift(shifts.get(l),timeSlotWrapper)&& isNightShift(shifts.get(l-1),timeSlotWrapper)){
+                consDays++;
+            }else{
+                consDays=0;
+            }
+            if(consDays>=nightsWorked){
+                ZonedDateTime start= DateUtils.getZoneDateTime(shifts.get(l-1).getEndDate());
+                ZonedDateTime end=DateUtils.getZoneDateTime(shifts.get(l).getStartDate());
+                int diff=new DateTimeInterval(start,end).getMinutes()- minimumRest;//FIXME
+                totalRestUnder+=diff;
+                consDays=0;
+            }
+            l++;
+        }*/
+        return "";
     }
 
 }

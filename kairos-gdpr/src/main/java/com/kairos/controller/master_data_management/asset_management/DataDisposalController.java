@@ -3,6 +3,7 @@ package com.kairos.controller.master_data_management.asset_management;
 import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.service.master_data_management.asset_management.DataDisposalService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -14,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 
-import static com.kairos.constant.ApiConstant.API_DATA_DISPOSAL_URL;
+import static com.kairos.constants.ApiConstant.API_DATA_DISPOSAL_URL;
 /*
  *
  *  created by bobby 16/5/2018
@@ -36,11 +36,11 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @RequestBody List<DataDisposal> dataDisposals) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<DataDisposal> dataDisposals) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposals));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposals.getRequestBody()));
 
     }
 

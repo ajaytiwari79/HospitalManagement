@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.activity.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by vipul on 5/12/17.
@@ -277,10 +278,10 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation("update organization Mapping details  of activity Type")
-    @PutMapping(value = "/activity/organizationMapping")
+    @PutMapping(value = "/activity/{activityId}/organizationMapping")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingActivityDTO organizationMappingActivityDTO) {
-        activityService.updateOrgMappingDetailOfActivity(organizationMappingActivityDTO);
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingActivityDTO organizationMappingActivityDTO,@PathVariable BigInteger activityId) {
+        activityService.updateOrgMappingDetailOfActivity(organizationMappingActivityDTO, activityId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
@@ -338,5 +339,14 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithTimeTypesByUnit(unitId,countryId));
 
     }
+
+    @ApiOperation(value = "Create default data for  Organization")
+    @RequestMapping(value = "/organization_default_data", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId,@RequestParam Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationActivityService.createDefaultDataForOrganization(unitId,countryId));
+    }
+
 
 }
