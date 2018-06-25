@@ -34,6 +34,7 @@ public class TaskDTO {
     private Long startTime;
     private Long endTime;
     private String color;
+    private boolean breakTime;
 
 
     public TaskDTO() {
@@ -52,6 +53,14 @@ public class TaskDTO {
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+    public boolean isBreakTime() {
+        return breakTime;
+    }
+
+    public void setBreakTime(boolean breakTime) {
+        this.breakTime = breakTime;
     }
 
     public String getColor() {
