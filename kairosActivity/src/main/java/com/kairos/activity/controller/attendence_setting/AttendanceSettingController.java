@@ -17,8 +17,8 @@ import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.activity.constants.ApiConstants.PARENT_ORGANIZATION_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL + "/user")
-@Api(value = API_ORGANIZATION_URL + "/user")
+@RequestMapping(API_ORGANIZATION_UNIT_URL + "/user")
+@Api(value = API_ORGANIZATION_UNIT_URL + "/user")
 public class AttendanceSettingController {
 
    @Inject
