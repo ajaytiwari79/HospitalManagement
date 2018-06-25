@@ -24,6 +24,12 @@ public class FunctionDTO {
         //Default Constructor
     }
 
+    public FunctionDTO(Long id, String name, String icon) {
+        this.id = id;
+        this.name = name;
+        this.icon = icon;
+    }
+
     public Long getId() {
         return id;
     }

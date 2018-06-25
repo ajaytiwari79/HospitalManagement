@@ -53,15 +53,15 @@ public class ShiftRequestPhasePlanningSolutionService {
         List<ActivityDTO> activityDTOS = mapper.convertValue(shiftPlanningInfo.get("activities"),new TypeReference<List<ActivityDTO>>(){});
         //mapper.registerModule(new JavaTimeModule());
         List<PresenceStaffingLevelDto> staffingLevelDtos = mapper.convertValue(shiftPlanningInfo.get("staffingLevel"),new TypeReference<List<StaffingLevelDto>>(){});
-        Map<BigInteger,ActivityPlannerEntity> activityMap = getActivityMap(activityDTOS);
+        Map<BigInteger,Activity> activityMap = getActivityMap(activityDTOS);
         List<StaffDTO> staffDTOS = mapper.convertValue(shiftPlanningInfo.get("staffs"),new TypeReference<List<StaffDTO>>(){});
         Object[] objects = getStaffingLevel(staffingLevelDtos,activityMap);
         shiftPlanningSolution.setActivityLineIntervals((List<ActivityLineInterval>)objects[0]);
         shiftPlanningSolution.setSkillLineIntervals((List<SkillLineInterval>)objects[1]);
-        shiftPlanningSolution.setActivities(new ArrayList<>((Set<ActivityPlannerEntity>)objects[2]));
+        shiftPlanningSolution.setActivities(new ArrayList<>((Set<Activity>)objects[2]));
         List<LocalDate> weekDates = new ArrayList<LocalDate>((Set)objects[3]);
         shiftPlanningSolution.setWeekDates(weekDates);
-        List<EmployeePlanningFact> employees = getEmployee(staffDTOS,activityMap.entrySet().stream().map(a->a.getValue()).collect(Collectors.toList()));
+        List<Employee> employees = getEmployee(staffDTOS,activityMap.entrySet().stream().map(a->a.getValue()).collect(Collectors.toList()));
         shiftPlanningSolution.setShifts(generateShiftForAssignments(employees,weekDates));
         shiftPlanningSolution.setEmployees(employees);
         //shiftPlanningSolution.setPossibleStartDateTimes();
@@ -85,13 +85,13 @@ public class ShiftRequestPhasePlanningSolutionService {
                 ,new File("src/main/resources/com/kairos/shiftplanning/rules/activityConstraintsRule.drl"));
     }
 
-    private List<EmployeePlanningFact> getEmployee(List<StaffDTO> staffDTOS, List<ActivityPlannerEntity> activities){
-        List<EmployeePlanningFact> employees = new ArrayList<>(staffDTOS.size());
+    private List<Employee> getEmployee(List<StaffDTO> staffDTOS, List<Activity> activities){
+        List<Employee> employees = new ArrayList<>(staffDTOS.size());
         ShiftPlanningGenerator shiftPlanningGenerator = new ShiftPlanningGenerator();
         WorkingTimeConstraints workingTimeConstraints = shiftPlanningGenerator.getWTA();
         CollectiveTimeAgreement collectiveTimeAgreement = shiftPlanningGenerator.getCTA(activities);
         staffDTOS.forEach(s->{
-            EmployeePlanningFact employee =null;// new EmployeePlanningFact(s.getId().toString(),s.getFirstName(),getEmployeeSkills(s.getSkillSet()), expertiseId);
+            Employee employee =null;// new Employee(s.getId().toString(),s.getFirstName(),getEmployeeSkills(s.getSkillSet()), expertiseId);
             employee.setWorkingTimeConstraints(workingTimeConstraints);
             employee.setBaseCost(new BigDecimal(1.5));
             employee.setCollectiveTimeAgreement(collectiveTimeAgreement);
@@ -101,7 +101,7 @@ public class ShiftRequestPhasePlanningSolutionService {
         return employees;
     }
 
-    public List<ShiftRequestPhase> generateShiftForAssignments(List<EmployeePlanningFact> employees, List<LocalDate> weekDates) {
+    public List<ShiftRequestPhase> generateShiftForAssignments(List<Employee> employees, List<LocalDate> weekDates) {
         List<ShiftRequestPhase> shiftList = new ArrayList<>();
         employees.forEach(e->{
             weekDates.forEach(w->{
@@ -115,14 +115,14 @@ public class ShiftRequestPhasePlanningSolutionService {
         return shiftList;
     }
 
-    public Map<BigInteger,ActivityPlannerEntity> getActivityMap(List<ActivityDTO> activityDTOS){
-        Map<BigInteger,ActivityPlannerEntity> activityMap = new HashMap<>(activityDTOS.size());
+    public Map<BigInteger,Activity> getActivityMap(List<ActivityDTO> activityDTOS){
+        Map<BigInteger,Activity> activityMap = new HashMap<>(activityDTOS.size());
         ActivityConstraints activityConstraints = new ShiftPlanningGenerator().getActivityContraints();
         int i=0;
         for (ActivityDTO activityDTO : activityDTOS) {
-            ActivityPlannerEntity activityPlannerEntity = new ActivityPlannerEntity(activityDTO.getId().toString(), getSkills(activityDTO.getSkillActivityTab().getActivitySkills()), 5, activityDTO.getName(),new TimeType(activityDTO.getTimeType().getId().toString(),activityDTO.getTimeType().getLabel()), ++i,i, null);
-            activityPlannerEntity.setActivityConstraints(activityConstraints);
-            activityMap.put(activityDTO.getId(), activityPlannerEntity);
+            Activity activity = new Activity(activityDTO.getId().toString(), getSkills(activityDTO.getSkillActivityTab().getActivitySkills()), 5, activityDTO.getName(),new TimeType(activityDTO.getTimeType().getId().toString(),activityDTO.getTimeType().getLabel()), ++i,i, null);
+            activity.setActivityConstraints(activityConstraints);
+            activityMap.put(activityDTO.getId(), activity);
         }
         return activityMap;
     }
@@ -137,24 +137,24 @@ public class ShiftRequestPhasePlanningSolutionService {
 
     }
 
-    public Object[] getStaffingLevel(List<PresenceStaffingLevelDto> staffingLevelDtos, Map<BigInteger,ActivityPlannerEntity> activityMap){
+    public Object[] getStaffingLevel(List<PresenceStaffingLevelDto> staffingLevelDtos, Map<BigInteger,Activity> activityMap){
         List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
         List<SkillLineInterval> skillLineIntervals = new ArrayList<>();
         Set<LocalDate> weekDates = new HashSet<>(staffingLevelDtos.size());
-        Set<ActivityPlannerEntity> activities = new HashSet<>();
+        Set<Activity> activities = new HashSet<>();
         staffingLevelDtos.forEach(stl->{
             stl.getPresenceStaffingLevelInterval().forEach(sli->{
                 sli.getStaffingLevelActivities().forEach(sla->{
                     IntStream.range(0,sla.getMinNoOfStaff()).forEachOrdered(i->{
-                        ActivityPlannerEntity activityPlannerEntity = activityMap.get(new BigInteger(sla.getActivityId().toString()));
+                        Activity activity = activityMap.get(new BigInteger(sla.getActivityId().toString()));
                         //need to clarify require and staffNo.
                         ActivityLineInterval activityLineInterval;
-                        if(activityPlannerEntity.isTypeAbsence()){
-                            activityLineInterval = new ActivityLineInterval(new Random().toString(),asDate(sli.getStaffingLevelDuration().getFrom()).withTimeAtStartOfDay(), 1440, true, activityPlannerEntity,12);
+                        if(activity.isTypeAbsence()){
+                            activityLineInterval = new ActivityLineInterval(new Random().toString(),asDate(sli.getStaffingLevelDuration().getFrom()).withTimeAtStartOfDay(), 1440, true, activity,12);
                         }else {
-                            activityLineInterval = new ActivityLineInterval(new Random().toString(), asDate(sli.getStaffingLevelDuration().getFrom()), 15, true, activityPlannerEntity, i);
+                            activityLineInterval = new ActivityLineInterval(new Random().toString(), asDate(sli.getStaffingLevelDuration().getFrom()), 15, true, activity, i);
                         }
-                        activities.add(activityPlannerEntity);
+                        activities.add(activity);
                         activityLineIntervals.add(activityLineInterval);
                     });
                 });

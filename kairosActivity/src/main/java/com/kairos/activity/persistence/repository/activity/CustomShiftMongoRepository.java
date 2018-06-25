@@ -1,9 +1,13 @@
 package com.kairos.activity.persistence.repository.activity;
 
 
+import com.kairos.activity.persistence.query_result.DateWiseShiftResponse;
+
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.response.dto.web.ShiftCountDTO;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -23,5 +27,11 @@ public interface CustomShiftMongoRepository {
     List<Long> getUnitIdListOfShiftBeforeDate(Date date);
 
     List<ShiftQueryResult> getShiftsByUnitBeforeDate(Long unitId, Date endDate);
+
+    List<ShiftQueryResult> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId);
+
+    List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
+
+    List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds);
 
 }

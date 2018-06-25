@@ -37,4 +37,10 @@ public class StaffAndActivitySkillSpecification extends AbstractActivitySpecific
         return true;
 
     }
+
+    @Override
+    public List<String> isSatisfiedString(Activity activity) {
+        return null;
+    }
+
 }

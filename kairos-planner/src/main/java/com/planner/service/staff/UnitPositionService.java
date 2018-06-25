@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,7 +23,7 @@ import java.util.List;
 public class UnitPositionService  {
     @Autowired
     private UnitPositionRepository unitPositionRepository;
-    public void addUnitPosition(Long staffKairosId, Long unitId, UnitPositionWtaDTO unitPositionWtaDTO) {
+    public void addUnitPosition( Long unitId, UnitPositionWtaDTO unitPositionWtaDTO) {
         UnitPosition unitPosition=new UnitPosition();
         WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO.getWtaResponseDTO());
         BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
@@ -30,8 +31,21 @@ public class UnitPositionService  {
         unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
         unitPositionRepository.save(unitPosition);
     }
+    public void addUnitPositions( Long unitId, List<UnitPositionWtaDTO> unitPositionWtaDTOs) {
+        List<UnitPosition> unitPositions= new ArrayList<>();
+        for(UnitPositionWtaDTO unitPositionWtaDTO:unitPositionWtaDTOs){
+            UnitPosition unitPosition=new UnitPosition();
+            WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO.getWtaResponseDTO());
+            BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
+            unitPosition.setWorkingTimeAgreement(wta);
+            unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
+            unitPositions.add(unitPosition);
+        }
 
-    public void updateUnitPosition(Long staffKairosId, Long unitId, Long unitPositionKairosId, UnitPositionWtaDTO unitPositionWtaDTO) {
+        unitPositionRepository.saveAll(unitPositions);
+    }
+
+    public void updateUnitPosition( Long unitId, Long unitPositionKairosId, UnitPositionWtaDTO unitPositionWtaDTO) {
         UnitPosition unitPosition=unitPositionRepository.findByKairosId(BigInteger.valueOf(unitPositionKairosId)).get();
         WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO.getWtaResponseDTO());
         BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");

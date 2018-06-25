@@ -6,7 +6,6 @@ import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.config.env.EnvConfig;
-import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
 import com.kairos.activity.persistence.model.activity.Activity;
@@ -276,7 +275,7 @@ public class StaffingLevelService extends MongoBaseService {
         final AtomicInteger counter = new AtomicInteger(0);
         staffingLevel.getPresenceStaffingLevelInterval().
                 stream().filter(staffingLevelInterval -> {
-            StaffingLevelDuration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
+            Duration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
             LocalTime from = staffingLevelDuration.getFrom();
             int startCounter = counter.get();
             if (from.compareTo(shiftStartTime.plusMinutes(startCounter)) == 0) {
@@ -312,7 +311,7 @@ public class StaffingLevelService extends MongoBaseService {
         int detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
         final AtomicInteger counter = new AtomicInteger(0);
         staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval -> {
-            StaffingLevelDuration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
+            Duration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
             LocalTime from = staffingLevelDuration.getFrom();
             int startCounter = counter.get();
             if (from.compareTo(previousShiftStartTime.plusMinutes(startCounter)) == 0) {
@@ -343,7 +342,7 @@ public class StaffingLevelService extends MongoBaseService {
      */
     public StaffingLevel createDefaultStaffingLevel(ShiftNotificationEvent shiftNotificationEvent) {
 
-        StaffingLevelDuration duration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
+        Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         StaffingLevelSetting staffingLevelSetting = new StaffingLevelSetting(15, duration);
 
         PhaseDTO phase = phaseService.getUnitPhaseByDate(shiftNotificationEvent.getUnitId(), shiftNotificationEvent.getCurrentDate());
@@ -355,7 +354,7 @@ public class StaffingLevelService extends MongoBaseService {
         int startTimeCounter = 0;
         LocalTime startTime = LocalTime.MIN;
         for (int i = 0; i <= 95; i++) {
-            StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(i, 0, 0, new StaffingLevelDuration(startTime.plusMinutes(startTimeCounter),
+            StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(i, 0, 0, new Duration(startTime.plusMinutes(startTimeCounter),
                     startTime.plusMinutes(startTimeCounter += 15)));
             staffingLevelInterval.setAvailableNoOfStaff(0);
             StaffingLevelIntervals.add(staffingLevelInterval);
@@ -401,7 +400,6 @@ public class StaffingLevelService extends MongoBaseService {
         List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
                 activity.getValue())).collect(Collectors.toList());
         Map<String, Object> activityTypesAndSkills = new HashMap<>();
-        logger.info("organization type and subtypes {}", activityTypeCategoryListMap);
         activityTypesAndSkills.put("activities", activityCategoryListDTOS);
         activityTypesAndSkills.put("orgazationSkill", organizationSkillAndOrganizationTypesDTO.getAvailableSkills());
         return activityTypesAndSkills;
@@ -459,7 +457,7 @@ public class StaffingLevelService extends MongoBaseService {
         PresenceStaffingLevelDto staffingDTO;
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
         StaffingLevelTimeSlotDTO staffingLevelTimeSlot;
-        StaffingLevelDuration duration;
+        Duration duration;
         StaffingLevelSetting staffingLevelSetting;
         LocalTime fromTime;
         LocalTime toTime;
@@ -472,7 +470,7 @@ public class StaffingLevelService extends MongoBaseService {
         int seq = 0;
         DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
         Map<String, String> firstData = processedData.get(0);
-        duration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
+        duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         staffingLevelSetting = new StaffingLevelSetting(15, duration);
 
         try {
@@ -496,7 +494,7 @@ public class StaffingLevelService extends MongoBaseService {
                 seq = 0;
                 staffingDTO = new PresenceStaffingLevelDto();
                 staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
-                duration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
+                duration = new Duration(LocalTime.MIN, LocalTime.MAX);
                 staffingLevelSetting = new StaffingLevelSetting(15, duration);
                 try {
                     date = sourceFormat.parse(singleData.get("forDay"));
@@ -537,7 +535,7 @@ public class StaffingLevelService extends MongoBaseService {
 
             fromTime = LocalTime.parse(fromTimeS.substring(0, 2) + ":" + fromTimeS.substring(2, 4));
             toTime = LocalTime.parse(toTimeS.substring(0, 2) + ":" + toTimeS.substring(2, 4));
-            duration = new StaffingLevelDuration(fromTime, toTime);
+            duration = new Duration(fromTime, toTime);
             staffingLevelTimeSlot = new StaffingLevelTimeSlotDTO(seq++, Integer.parseInt(singleData.get("min")), Integer.parseInt(singleData.get("max")), duration);
 
             activitySet = new HashSet<StaffingLevelActivity>();
@@ -623,7 +621,7 @@ public class StaffingLevelService extends MongoBaseService {
                     LocalTime fromTime = LocalTime.parse("0000" + (String) csvRecord.get(0), dateTimeFormatter);
                     LocalTime toTime = LocalTime.parse("0000" + (String) csvRecord.get(1), dateTimeFormatter);
 
-                    StaffingLevelDuration staffingLevelIntervalDuration = new StaffingLevelDuration(fromTime, toTime);
+                    Duration staffingLevelIntervalDuration = new Duration(fromTime, toTime);
                     StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(new Integer(csvRecord.get(2)), new Integer(csvRecord.get(3)), staffingLevelIntervalDuration);
 
                     if (initialCountAdded == false) {
@@ -885,7 +883,7 @@ public class StaffingLevelService extends MongoBaseService {
             absenceStaffingLevelInterval.setAvailableNoOfStaff(absenceStaffingLevelInterval.getAvailableNoOfStaff()+1);
         }
         else {
-            StaffingLevelDuration duration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
+            Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
             StaffingLevelInterval absenceStaffingLevelInterval = new StaffingLevelInterval(0,0,duration,1);
             staffingLevel.getAbsenceStaffingLevelInterval().add(absenceStaffingLevelInterval);
         }
@@ -909,7 +907,7 @@ public class StaffingLevelService extends MongoBaseService {
         int detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
         final AtomicInteger counter = new AtomicInteger(0);
         staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval -> {
-            StaffingLevelDuration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
+            Duration staffingLevelDuration = staffingLevelInterval.getStaffingLevelDuration();
             LocalTime from = staffingLevelDuration.getFrom();
             int startCounter = counter.get();
             if (from.compareTo(previousShiftStartTime.plusMinutes(startCounter)) == 0) {

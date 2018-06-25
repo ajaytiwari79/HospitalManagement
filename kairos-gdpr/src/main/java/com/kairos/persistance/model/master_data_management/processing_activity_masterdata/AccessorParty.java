@@ -5,13 +5,15 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 
-@Document(collection = "access_party")
+@Document(collection = "accessor_party")
 public class AccessorParty extends MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;

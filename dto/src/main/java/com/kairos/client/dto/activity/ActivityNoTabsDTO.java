@@ -8,7 +8,6 @@ public class ActivityNoTabsDTO {
     private String name;
     private List<Long> expertises;
     private String description;
-    private BigInteger categoryId;
     private List<Long> activitySkills;
     private List<Long> employementTypes;
     private long minLength;
@@ -46,14 +45,6 @@ public class ActivityNoTabsDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public BigInteger getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(BigInteger categoryId) {
-        this.categoryId = categoryId;
     }
 
     public List<Long> getActivitySkills() {
@@ -99,12 +90,11 @@ public class ActivityNoTabsDTO {
     public ActivityNoTabsDTO() {
     }
 
-    public ActivityNoTabsDTO(BigInteger id, String name, List<Long> expertises, String description, BigInteger categoryId, List<Long> activitySkills, List<Long> employementTypes, long minLength, long maxLength, long maxAllocations) {
+    public ActivityNoTabsDTO(BigInteger id, String name, List<Long> expertises, String description, List<Long> activitySkills, List<Long> employementTypes, long minLength, long maxLength, long maxAllocations) {
         this.id = id;
         this.name = name;
         this.expertises = expertises;
         this.description = description;
-        this.categoryId = categoryId;
         this.activitySkills = activitySkills;
         this.employementTypes = employementTypes;
         this.minLength = minLength;

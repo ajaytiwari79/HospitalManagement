@@ -3,7 +3,7 @@ package com.kairos.activity.client;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.staff.OrganizationStaffWrapper;
 import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;

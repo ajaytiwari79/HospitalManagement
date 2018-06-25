@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.enums.shift.ShiftState;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -52,6 +53,9 @@ public class Shift extends MongoBaseEntity {
 
     private BigInteger parentOpenShiftId;
     Long allowedBreakDurationInMinute;
+
+    // from which shift it is copied , if we need to undo then we need this
+    private BigInteger copiedFromShiftId;
 
     public Shift() {
     }
@@ -208,6 +212,7 @@ public class Shift extends MongoBaseEntity {
         isMainShift = mainShift;
     }
 
+
     @Override
     public String toString() {
         return "Shift{" +
@@ -284,6 +289,7 @@ public class Shift extends MongoBaseEntity {
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
         shiftQueryResult.setShiftState(this.getShiftState());
+        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         return shiftQueryResult;
     }
 
@@ -295,6 +301,8 @@ public class Shift extends MongoBaseEntity {
         this.externalId = externalId;
 
     }
+
+
 
     public Long getUnitPositionId() {
         return unitPositionId;
@@ -326,5 +334,36 @@ public class Shift extends MongoBaseEntity {
 
     public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-        }
+    }
+
+    public BigInteger getCopiedFromShiftId() {
+        return copiedFromShiftId;
+    }
+
+    public void setCopiedFromShiftId(BigInteger copiedFromShiftId) {
+        this.copiedFromShiftId = copiedFromShiftId;
+    }
+
+    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, ShiftState shiftState, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.remarks = remarks;
+        this.activityId = activityId;
+        this.staffId = staffId;
+        this.phase = phase;
+        this.unitId = unitId;
+        this.scheduledMinutes = scheduledMinutes;
+        this.durationMinutes = durationMinutes;
+        this.isMainShift = isMainShift;
+        this.externalId = externalId;
+        this.unitPositionId = unitPositionId;
+        this.shiftState = shiftState;
+        this.parentOpenShiftId = parentOpenShiftId;
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+        this.copiedFromShiftId = copiedFromShiftId;
+    }
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+    }
 }

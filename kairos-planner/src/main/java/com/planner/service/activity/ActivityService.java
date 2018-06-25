@@ -15,7 +15,7 @@ public class ActivityService  {
     @Autowired
     private ActivityRepository activityRepository;
     public void createActivity(Long unitId, ActivityNoTabsDTO activityDTO) {
-        Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getCategoryId(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId(), unitId);
+        Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId(), unitId);
         activityRepository.save(activity);
     }
 
@@ -29,7 +29,7 @@ public class ActivityService  {
     public void createActivities(Long unitId, List<ActivityNoTabsDTO> activityDTOs) {
         List<Activity> acts=new ArrayList<>();
         for(ActivityNoTabsDTO activityDTO:activityDTOs){
-            Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getCategoryId(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId(), unitId);
+            Activity activity= new Activity(activityDTO.getName(),activityDTO.getExpertises(),activityDTO.getDescription(),activityDTO.getActivitySkills(),activityDTO.getEmployementTypes(),activityDTO.getMinLength(),activityDTO.getMaxLength(),activityDTO.getMaxAllocations(),activityDTO.getId(), unitId);
             acts.add(activity);
         }
         activityRepository.saveAll(acts);

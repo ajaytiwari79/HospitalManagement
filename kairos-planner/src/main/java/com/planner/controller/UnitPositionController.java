@@ -10,28 +10,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_UNIT_URL + "/staff/{staffId}/unitposition")
+@RequestMapping(API_UNIT_URL+"/unitposition")
 public class UnitPositionController {
     @Autowired
     private UnitPositionService unitPositionService;
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("add unit position")
     public ResponseEntity<Map<String, Object>> addUnitPosition(@RequestBody UnitPositionWtaDTO unitPositionDTO,
-                                                               @PathVariable Long unitId,@PathVariable(name = "staffId") Long staffKairosId) {
-        unitPositionService.addUnitPosition(staffKairosId,unitId,unitPositionDTO);
+                                                               @PathVariable Long unitId) {
+        unitPositionService.addUnitPosition(unitId,unitPositionDTO);
+        return ResponseHandler.generateResponse("Success",HttpStatus.OK);
+
+    }
+    @RequestMapping(value = "/multiple", method = RequestMethod.POST)
+    @ApiOperation("add unit position")
+    public ResponseEntity<Map<String, Object>> addUnitPositions(@RequestBody List<UnitPositionWtaDTO> unitPositionDTOs,
+                                                               @PathVariable Long unitId) {
+        unitPositionService.addUnitPositions(unitId,unitPositionDTOs);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);
 
     }
     @RequestMapping(value = "/{unitPositionKairosId}", method = RequestMethod.PUT)
     @ApiOperation("update unit position")
     public ResponseEntity<Map<String, Object>> updateUnitPosition(@RequestBody UnitPositionWtaDTO unitPositionDTO,
-                                                               @PathVariable Long unitId,@PathVariable(name = "staffId") Long staffKairosId,@PathVariable Long unitPositionKairosId) {
-        unitPositionService.updateUnitPosition(staffKairosId,unitId,unitPositionKairosId,unitPositionDTO);
+                                                               @PathVariable Long unitId,@PathVariable Long unitPositionKairosId) {
+        unitPositionService.updateUnitPosition(unitId,unitPositionKairosId,unitPositionDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);
 
     }

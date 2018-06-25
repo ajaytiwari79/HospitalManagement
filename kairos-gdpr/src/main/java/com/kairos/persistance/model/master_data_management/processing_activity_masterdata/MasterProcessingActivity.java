@@ -37,6 +37,16 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     @NotNull(message = "error.message.countryId.cannot.be.null")
     private Long countryId;
 
+    private Boolean isSubProcess=false;
+
+    public Boolean getSubProcess() {
+        return isSubProcess;
+    }
+
+    public void setSubProcess(Boolean subProcess) {
+        isSubProcess = subProcess;
+    }
+
     public Long getCountryId() {
         return countryId;
     }

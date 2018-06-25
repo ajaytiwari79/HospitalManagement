@@ -1,5 +1,6 @@
 package com.kairos.client;
 
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.EscalatedTasksWrapper;
@@ -278,6 +279,29 @@ public class TaskServiceRestClient {
         }
         return null;
 
+    }
+
+    public void createTaskBYExcel(List<VRPTaskDTO> vrpTaskDTOS){
+        String baseUrl = getBaseUrl(true);
+        try {
+            HttpEntity<List<VRPTaskDTO>> request = new HttpEntity<>(vrpTaskDTOS);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/importTask",
+                            HttpMethod.POST, request, typeReference);
+
+            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            exceptionService.runtimeException("message.exception.taskmicroservice",e.getMessage());
+
+        }
     }
 
 

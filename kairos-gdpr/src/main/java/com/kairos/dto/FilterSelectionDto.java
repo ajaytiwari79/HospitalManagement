@@ -2,56 +2,32 @@ package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FilterSelectionDto {
 
-    private List<String> searchTags;
 
-    private FilterSelection organizationTypes;
-    private FilterSelection organizationSubTypes;
-    private FilterSelection organizationServices;
-    private FilterSelection organizationSubServices;
+    @NotEmpty(message = "Selection List cannot Empty")
+    private List<FilterSelection> filtersData;
 
 
-    public List<String> getSearchTags() {
-        return searchTags;
+    private String moduleId;
+
+    public List<FilterSelection> getFiltersData() {
+        return filtersData;
     }
 
-    public void setSearchTags(List<String> searchTags) {
-        this.searchTags = searchTags;
+    public void setFiltersData(List<FilterSelection> filtersData) {
+        this.filtersData = filtersData;
     }
 
-    public FilterSelection getOrganizationTypes() {
-        return organizationTypes;
+    public String getModuleId() {
+        return moduleId;
     }
 
-    public void setOrganizationTypes(FilterSelection organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public FilterSelection getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(FilterSelection organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public FilterSelection getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(FilterSelection organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public FilterSelection getOrganizationSubServices() {
-        return organizationSubServices;
-    }
-
-    public void setOrganizationSubServices(FilterSelection organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 }

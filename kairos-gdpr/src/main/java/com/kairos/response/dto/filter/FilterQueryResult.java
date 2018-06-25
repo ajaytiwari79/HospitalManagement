@@ -2,36 +2,24 @@ package com.kairos.response.dto.filter;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class FilterQueryResult {
 
-    private BigInteger id;
-
-    private List<FilterAttributes> organizationTypes;
-
-    private List<FilterAttributes> organizationSubTypes;
-    private List<FilterAttributes> organizationServices;
-    private List<FilterAttributes> organizationSubServices;
-    private List<FilterAttributes> accountTypes;
+    private List<FilterAttributes> organizationTypes = new ArrayList<>();
+    private List<FilterAttributes> organizationSubTypes = new ArrayList<>();
+    private List<FilterAttributes> organizationServices = new ArrayList<>();
+    private List<FilterAttributes> organizationSubServices = new ArrayList<>();
+    private List<FilterAttributes> accountTypes = new ArrayList<>();
 
     public List<FilterAttributes> getAccountTypes() {
         return accountTypes;
     }
 
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
 
     public void setAccountTypes(List<FilterAttributes> accountTypes) {
         this.accountTypes = accountTypes;
@@ -68,6 +56,5 @@ public class FilterQueryResult {
     public void setOrganizationSubServices(List<FilterAttributes> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
-
 
 }

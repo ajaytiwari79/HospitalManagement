@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state=ActivityStateEnum.DRAFT;
+
     @Indexed
     private Long unitId;
     private BigInteger parentId;
@@ -66,6 +69,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.name = name;
         this.description = description;
         this.tags = tags;
+
     }
 
 
@@ -326,12 +330,8 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.permissionsActivityTab = permissionsActivityTab;
     }
 
-    public HashMap retrieveBasicDetails() {
-        HashMap details = new HashMap(2);
-        details.put("id", id);
-        details.put("name", this.name);
-        details.put("parentId", this.parentId);
-        return details;
+    public ActivityDTO retrieveBasicDetails() {
+        return new ActivityDTO(id,name,parentId);
     }
 
     public String getExternalId() {

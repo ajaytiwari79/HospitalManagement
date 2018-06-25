@@ -1,7 +1,6 @@
 package com.kairos.activity.service.open_shift;
 
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
@@ -11,7 +10,7 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderOpenshiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
-import com.kairos.response.dto.web.open_shift.PriorityGroupDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -51,6 +50,15 @@ public class OrderService extends MongoBaseService {
        openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupService.createPriorityGroups(order.getId(),orderOpenshiftResponseDTO.getPriorityGroups());
        orderOpenshiftResponseDTO.setPriorityGroups(priorityGroupDTOS);
+       BigInteger id = null;
+       for(PriorityGroupDTO priorityGroupDTO:priorityGroupDTOS) {
+           if("PRIORITY_GROUP1".equals(priorityGroupDTO.getName())) {
+               id = priorityGroupDTO.getId();
+               break;
+           }
+       }
+       priorityGroupService.notifyStaffByPriorityGroup(id);
+
        return orderOpenshiftResponseDTO;
        }
 
@@ -87,8 +95,7 @@ public class OrderService extends MongoBaseService {
 
 
     public List<Order> getOrdersByUnitId(Long unitId) {
-
-        List<Order> orders = orderMongoRepository.findOrdersByUnitId(unitId);
+       List<Order> orders = orderMongoRepository.findOrdersByUnitId(unitId);
         return orders;
     }
 

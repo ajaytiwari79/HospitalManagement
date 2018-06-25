@@ -20,7 +20,7 @@ public class StaffingLevelTemplateDTO {
     private List<Long> dayType=new ArrayList<>();
     private List<Day> validDays =new ArrayList<Day>();
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelInterval> staffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
     private boolean deleted ;
 
@@ -99,12 +99,12 @@ public class StaffingLevelTemplateDTO {
     public void setStaffingLevelSetting(StaffingLevelSetting staffingLevelSetting) {
         this.staffingLevelSetting = staffingLevelSetting;
     }
-    public List<StaffingLevelInterval> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelInterval> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
 

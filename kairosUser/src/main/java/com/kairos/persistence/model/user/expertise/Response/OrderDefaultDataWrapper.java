@@ -1,14 +1,13 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.persistence.model.organization.DayType;
-import com.kairos.persistence.model.timetype.PresenceTypeDTO;
-import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
-import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.FunctionDTO;
+import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
 import java.util.List;
 
@@ -23,13 +22,14 @@ public class OrderDefaultDataWrapper {
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
     private List<com.kairos.persistence.model.user.country.DayType> dayTypes;
+    private Integer minOpenShiftHours;
 
     public OrderDefaultDataWrapper() {
         //Default Constructor
     }
 
     public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
-                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
+                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes,Integer minOpenShiftHours) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
@@ -40,6 +40,7 @@ public class OrderDefaultDataWrapper {
         this.functions = functions;
         this.reasonCodes = reasonCodes;
         this.dayTypes = dayTypes;
+        this.minOpenShiftHours=minOpenShiftHours;
     }
 
     public List<OrderResponseDTO> getOrders() {
@@ -120,5 +121,13 @@ public class OrderDefaultDataWrapper {
 
     public void setDayTypes(List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
         this.dayTypes = dayTypes;
+    }
+
+    public Integer getMinOpenShiftHours() {
+        return minOpenShiftHours;
+    }
+
+    public void setMinOpenShiftHours(Integer minOpenShiftHours) {
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 }

@@ -5,7 +5,7 @@ import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.dto.ClauseTagDto;
+import com.kairos.dto.master_data.ClauseTagDto;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
@@ -28,7 +28,8 @@ public class ClauseTagService extends MongoBaseService {
 
     @Inject
     ClauseTagMongoRepository clauseTagMongoRepository;
-    @Inject private
+    @Inject
+    private
     MessageSource messageSource;
 
 
@@ -86,7 +87,7 @@ public class ClauseTagService extends MongoBaseService {
 
 
     public ClauseTag updateClauseTag(BigInteger id, String clauseTag) {
-                if (StringUtils.isBlank(clauseTag)) {
+        if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
 
         }
@@ -123,20 +124,15 @@ public class ClauseTagService extends MongoBaseService {
                 existClauseTagIds.add(tagDto.getId());
             }
         }
-
-
         List<ClauseTag> exists = clauseTagMongoRepository.findTagByNames(UserContext.getCountryId(), clauseTagsName);
         if (exists.size() != 0) {
 
             throw new DuplicateDataException("tag is already with name " + exists.get(0).getName());
         }
-        if (clauseTagList.size()!=0)
-        {
+        if (clauseTagList.size() != 0) {
             clauseTagList = save(clauseTagList);
         }
 
-
-        System.err.println("dssds" + existClauseTagIds.size());
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(UserContext.getCountryId(), existClauseTagIds));
         return clauseTagList;
     }

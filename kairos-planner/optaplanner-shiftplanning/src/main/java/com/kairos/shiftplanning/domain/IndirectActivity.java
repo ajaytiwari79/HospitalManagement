@@ -21,10 +21,10 @@ public class IndirectActivity {
     private DateTime startTime;
     private int duration;
     private boolean canBeMoved;
-    private List<EmployeePlanningFact> employees;
+    private List<Employee> employees;
     private String type;
     private boolean locked;
-    public IndirectActivity(UUID id, int duration, boolean canBeMoved, List<EmployeePlanningFact> employees, String type, boolean locked) {
+    public IndirectActivity(UUID id, int duration, boolean canBeMoved, List<Employee> employees, String type, boolean locked) {
         this.id = id;
         this.duration = duration;
         this.canBeMoved = canBeMoved;
@@ -70,11 +70,11 @@ public class IndirectActivity {
         this.canBeMoved = canBeMoved;
     }
 
-    public List<EmployeePlanningFact> getEmployees() {
+    public List<Employee> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(List<EmployeePlanningFact> employees) {
+    public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
 
@@ -88,7 +88,7 @@ public class IndirectActivity {
     public Interval getInterval(){
         return startTime ==null? null: new Interval(startTime, startTime.plusMinutes(duration));
     }
-    public boolean hasEmployee(EmployeePlanningFact employee){
+    public boolean hasEmployee(Employee employee){
         return employees !=null && employees.contains(employee);
     }
     public boolean overlapsInterval(Interval interval){

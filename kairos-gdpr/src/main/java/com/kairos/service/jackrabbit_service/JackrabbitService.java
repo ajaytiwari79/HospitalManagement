@@ -9,8 +9,7 @@ import com.kairos.persistance.repository.agreement_template.AgreementSectionMong
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDto;
 import com.kairos.response.dto.clause.ClauseBasicResponseDto;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
@@ -69,13 +68,11 @@ public class JackrabbitService {
             String file = clauseFileContent(clause);
             InputStream inputStream = new ByteArrayInputStream(file.getBytes());
 
-
             Node rootNode = session.getRootNode();
             Node parentClauseNode;
             if (!rootNode.hasNode(CLAUSE_PARENT_NODE)) {
                 parentClauseNode = rootNode.addNode(CLAUSE_PARENT_NODE, NODE_TYPE_UNSTRUCTURED);
                 parentClauseNode.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
-
             }
             parentClauseNode = rootNode.getNode(CLAUSE_PARENT_NODE);
             Node clauseVersioningNode = parentClauseNode.addNode(CLAUSE_CHILD_NODE + id, "nt:unstructured");
@@ -83,14 +80,12 @@ public class JackrabbitService {
             clauseVersioningNode.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
             clauseVersioningNode.setProperty("title", clause.getTitle());
 
-
             Node content = clauseVersioningNode.addNode(JCR_CONTENT, NODE_TYPE_RESOURCE);
             Binary binary = session.getValueFactory().createBinary(inputStream);
             content.setProperty(JCR_DATA, binary);
             session.save();
             clauseVersioningNode.checkin();
             return true;
-
         } catch (RepositoryException e) {
             clauseMongoRepository.delete(clause);
             clauseTagMongoRepository.deleteAll(clause.getTags());
@@ -178,7 +173,6 @@ public class JackrabbitService {
 
             }
 
-
         } catch (Exception e) {
 
             logger.warn(e.getMessage());
@@ -202,9 +196,7 @@ public class JackrabbitService {
             while (versions.hasNext()) {
                 versionList.add(versions.nextVersion().getName());
             }
-
             return versionList;
-
         } catch (Exception e) {
 
             logger.warn(e.getMessage());
@@ -220,10 +212,8 @@ public class JackrabbitService {
     public Boolean addAgreementTemplateJackrabbit(BigInteger id, PolicyAgreementTemplate agreementTemplate, List<AgreementSectionResponseDto> sectionResponseDto) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         try {
-
             String file = policyAgreementTemplateFileContent(sectionResponseDto, agreementTemplate);
             InputStream targetStream = new ByteArrayInputStream(file.getBytes());
-
             Node rootNode = session.getRootNode();
             Node parentClauseNode;
             if (!rootNode.hasNode(AGREEMENT_TEMPLATE_PARENT_NODE)) {
@@ -236,18 +226,15 @@ public class JackrabbitService {
             agreementTemplateVersioningNode.addMixin("mix:versionable");
             agreementTemplateVersioningNode.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
             agreementTemplateVersioningNode.setProperty("name", agreementTemplate.getName());
-
             Node content = agreementTemplateVersioningNode.addNode(JCR_CONTENT, NODE_TYPE_RESOURCE);
             Binary binary = session.getValueFactory().createBinary(targetStream);
             content.setProperty(JCR_DATA, binary);
             targetStream.close();
             session.save();
             agreementTemplateVersioningNode.checkin();
-
             return true;
 
         } catch (RepositoryException e) {
-
             agreementSectionMongoRepository.deleteAll(agreementSectionMongoRepository.findAgreementSectionByIds(UserContext.getCountryId(),agreementTemplate.getAgreementSections()));
             policyAgreementTemplateRepository.delete(agreementTemplate);
             logger.warn(e.getMessage());
@@ -268,19 +255,15 @@ public class JackrabbitService {
     public Boolean agreementTemplateVersioning(BigInteger id, PolicyAgreementTemplate agreementTemplate, List<AgreementSectionResponseDto> sectionResponseDto) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         try {
-
             String content = policyAgreementTemplateFileContent(sectionResponseDto, agreementTemplate);
             InputStream targetStream = new ByteArrayInputStream(content.getBytes());
-
             Node rootNode = session.getRootNode();
             Node agreementTemplateVersionNode = rootNode.getNode(AGREEMENT_TEMPLATE_PARENT_NODE + "/" + AGREEMENT_TEMPLATE_CHILD_NODE + id);
             logger.info("clausenode.isnode()  " + agreementTemplateVersionNode.isNode());
             if (agreementTemplateVersionNode.isNode()) {
-
                 agreementTemplateVersionNode.checkout();
                 agreementTemplateVersionNode.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
                 agreementTemplateVersionNode.setProperty("name", agreementTemplate.getName());
-
                 Node contentNode = agreementTemplateVersionNode.getNode(JCR_CONTENT);
                 if (!contentNode.isNode()) {
                     throw new JackrabbitNodeNotFoundException("policy document template file Node not found");
@@ -323,7 +306,6 @@ public class JackrabbitService {
         } finally {
             session.logout();
         }
-
         return null;
     }
 
@@ -346,7 +328,6 @@ public class JackrabbitService {
                     s = bufferedReader.readLine();
                 }
                 currentNode.getNode(Node.JCR_CONTENT).getProperty(JCR_DATA).getBinary().dispose();
-
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -373,7 +354,6 @@ public class JackrabbitService {
                         .lines().collect(Collectors.joining("\n"));
             }
 
-
         } catch (Exception e) {
             logger.warn(e.getMessage());
             e.printStackTrace();
@@ -387,38 +367,29 @@ public class JackrabbitService {
 
 
     public String policyAgreementTemplateFileContent(List<AgreementSectionResponseDto> sectionResponseDto, PolicyAgreementTemplate policyAgreementTemplate) {
-        StringBuffer context = new StringBuffer();
-        context.append("HEADER");
-        context.append("\n");
-        context.append(policyAgreementTemplate.getName());
-        context.append("\n");
-        context.append(policyAgreementTemplate.getDescription());
-        context.append("\n");
+        StringBuilder context = new StringBuilder();
+        context.append("HEADER"+"\n");
+        context.append(policyAgreementTemplate.getName()+"\n");
+        context.append(policyAgreementTemplate.getDescription()+"\n");
         sectionResponseDto.forEach(section -> {
-
-                    context.append(section.getTitle());
-                    context.append("\n");
+                    context.append(section.getTitle()+"\n");
                     for (ClauseBasicResponseDto clause : section.getClauses()) {
-                        context.append(clause.getTitle());
-                        context.append("\n");
-                        context.append(clause.getDescription());
-                        context.append("\n");
+                        context.append(clause.getTitle()+"\n");
+                        context.append(clause.getDescription()+"\n");
+
                     }
                 }
         );
 
-        return context.toString();
+        return new String(context);
     }
 
 
     public String clauseFileContent(Clause clause) {
-        StringBuffer context = new StringBuffer();
-        context.append("HEADER");
-        context.append("\n");
-        context.append(clause.getTitle());
-        context.append("\n");
-        context.append(clause.getDescription());
-        context.append("\n");
+        StringBuilder context = new StringBuilder();
+        context.append("HEADER"+"\n");
+        context.append(clause.getTitle()+"\n");
+        context.append(clause.getDescription()+"\n");
         return context.toString();
     }
 

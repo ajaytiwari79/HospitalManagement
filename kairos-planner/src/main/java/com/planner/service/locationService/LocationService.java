@@ -1,8 +1,10 @@
 package com.planner.service.locationService;
 
+import com.kairos.planner.vrp.taskplanning.model.LocationInfo;
 import com.planner.domain.location.LocationDistance;
 import com.planner.domain.location.PlanningLocation;
 import com.planner.repository.locationRepository.LocationRepository;
+import com.planner.repository.locationRepository.PlanningLocationRepository;
 import com.planner.responseDto.locationDto.OptaLocationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class LocationService {
@@ -21,26 +26,27 @@ public class LocationService {
     private LocationRepository locationRepository;
     @Autowired
     private GraphHopperService graphHopperService;
+    @Autowired private PlanningLocationRepository planningLocationRepository;
 
 
     public void saveList(List<PlanningLocation> planningLocations) {
-        locationRepository.saveList(planningLocations);
+        planningLocationRepository.saveAll(planningLocations);
     }
 
     public void save(PlanningLocation planningLocation) {
-        locationRepository.save(planningLocation);
+        planningLocationRepository.save(planningLocation);
     }
 
     public PlanningLocation findOne(String id) {
-        return (PlanningLocation) locationRepository.findById(id, PlanningLocation.class);
+        return (PlanningLocation) planningLocationRepository.findById(id).get();
     }
 
     public List<PlanningLocation> findByIds(List<String> ids) {
-        return (List<PlanningLocation>) locationRepository.findByIds(ids, PlanningLocation.class);
+        return (List<PlanningLocation>) planningLocationRepository.findAllById(ids);
     }
 
     public PlanningLocation getLocationByLatLong(double latitude, double logitude) {
-        return locationRepository.getLocationByLatLong(latitude, logitude);
+        return planningLocationRepository.getLocationByLatLong(latitude, logitude);
     }
 
     public PlanningLocation saveLocation(OptaLocationDTO optaLocationDTO) {
@@ -55,11 +61,11 @@ public class LocationService {
         if(optaLocationDTO.getZip()!=null){
             planningLocation.setZip(optaLocationDTO.getZip());
         }
-        planningLocation = (PlanningLocation) locationRepository.save(planningLocation);
+        planningLocation = (PlanningLocation) planningLocationRepository.save(planningLocation);
         return planningLocation;
     }
 
-    /*public void saveLocations(List<OptaLocationDTO> locationDTOS){
+    public void saveLocations(List<OptaLocationDTO> locationDTOS){
         List<PlanningLocation> planningLocations = new ArrayList<>();
         for (OptaLocationDTO locationDTO:locationDTOS) {
             PlanningLocation planningLocation = new PlanningLocation();
@@ -74,13 +80,13 @@ public class LocationService {
             planningLocations.add(planningLocation);
         }
         saveList(planningLocations);
-    }*/
+    }
 
     public boolean saveLocationDistances() {
-        List<PlanningLocation> planningLocations = locationRepository.findAll(PlanningLocation.class);
+        List<PlanningLocation> planningLocations = planningLocationRepository.findAll();
         List<LocationDistance> locationDistances = getAllLocationDistances();
         List<LocationDistance> updatedLocationDistances = graphHopperService.getLocationDistances(planningLocations, locationDistances);
-        locationRepository.saveList(updatedLocationDistances);
+        locationRepository.saveAll(updatedLocationDistances);
         return true;
     }
 
@@ -88,35 +94,35 @@ public class LocationService {
     public boolean saveLocationDistance(PlanningLocation planningLocation) {
         List<LocationDistance> locationDistances = getAllLocationDistances();
         List<LocationDistance> updatedLocationDistances = graphHopperService.getLocationDistancesByPlanningLocation(planningLocation, locationDistances);
-        locationRepository.saveList(updatedLocationDistances);
+        locationRepository.saveAll(updatedLocationDistances);
         return true;
     }
 
 
     public List<LocationDistance> getAllLocationDistances() {
-        return locationRepository.getAllLocationDistances();
+        return locationRepository.findAll();
     }
 
     public void deleteList(List<PlanningLocation> planningLocations) {
-        locationRepository.deleteList(planningLocations);
+        planningLocationRepository.deleteAll(planningLocations);
     }
 
     public List<PlanningLocation> getAllPlanningLocations() {
-        return locationRepository.findAll(PlanningLocation.class);
+        return planningLocationRepository.findAll();
     }
 
-    public List<PlanningLocation> getAllByUnitIdWithUnitLocation(long unitId) {
+    /*public List<PlanningLocation> getAllByUnitIdWithUnitLocation(long unitId) {
         List<PlanningLocation> planningLocations = new ArrayList<>();
         planningLocations.add(getUnitAddressBy(unitId));
         planningLocations.addAll(locationRepository.getAllByUnitId(unitId));
         return planningLocations;
-    }
+    }*/
 
-    public PlanningLocation getUnitAddressBy(long unitId) {
+    /*public PlanningLocation getUnitAddressBy(long unitId) {
         return locationRepository.getUnitAddressBy(unitId);
-    }
+    }*/
 
-    /*public void update(PlanningLocation planningLocation){
+    public void update(PlanningLocation planningLocation){
         PlanningLocation planningLocation1 = findOne(planningLocation.getId());
         planningLocation1.setCity(planningLocation.getCity());
         planningLocation1.setCountry(planningLocation.getCountry());
@@ -126,7 +132,7 @@ public class LocationService {
         planningLocation1.setLongitude(planningLocation.getLongitude());
         planningLocation1.setStreet(planningLocation.getStreet());
         planningLocation1.setZip(planningLocation.getZip());
-        locationRepository.save(planningLocation1);
+        planningLocationRepository.save(planningLocation1);
     }
 
     public void updateList(List<PlanningLocation> planningLocations){
@@ -144,5 +150,20 @@ public class LocationService {
             updatedPlanningLocation.add(planningLocation1);
         }
         saveList(updatedPlanningLocation);
-    }*/
+    }
+
+    public void saveLocation(List<LocationDistance> locationDistances){
+        locationRepository.saveAll(locationDistances);
+    }
+
+    public Map<Integer,Map<Integer,LocationInfo>> getLocationMap(){
+        List<LocationDistance> locationDistances = locationRepository.findAll();
+        Map<Integer,List<LocationDistance>> locationMap = locationDistances.stream().collect(Collectors.groupingBy(l->l.getFirstInstallationNo(),Collectors.toList()));
+        Map<Integer,Map<Integer,LocationInfo>> locationInfoMap = new HashMap<>();
+        locationMap.entrySet().forEach(l->{
+            locationInfoMap.put(l.getKey(),l.getValue().stream().collect(Collectors.toMap(ld->ld.getSecondInstallationNo(),ld->new LocationInfo(ld.getSecondInstallationNo(),ld.getDistanceByCar().intValue(),(int)ld.getTimeByCar().intValue()))));
+        });
+        return locationInfoMap;
+    }
+
 }

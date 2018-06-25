@@ -3,6 +3,7 @@ package com.kairos.service.master_data_management.processing_activity_masterdata
 
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DataNotExists;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSubject;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSubjectMongoRepository;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-
+// removed from Processing master data
 @Service
 public class DataSubjectService extends MongoBaseService {
 
@@ -97,12 +98,12 @@ public class DataSubjectService extends MongoBaseService {
     public DataSubject updateDataSubject(BigInteger id, DataSubject dataSubject) {
 
 
-        DataSubject exist = dataSubjectMongoRepository.findByid(id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
+        DataSubject exist = dataSubjectMongoRepository.findByName(UserContext.getCountryId(),dataSubject.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            throw new DuplicateDataException("data  exist for  "+dataSubject.getName());
         } else {
+            exist=dataSubjectMongoRepository.findByid(id);
             exist.setName(dataSubject.getName());
-
             return save(exist);
 
         }

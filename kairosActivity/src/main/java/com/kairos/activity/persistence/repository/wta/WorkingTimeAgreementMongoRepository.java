@@ -10,12 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 27/7/17.
  */
 @Repository
-public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger>,CustomWorkingTimeAgreementMongoRepostory {
+public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger>, CustomWorkingTimeAgreementMongoRepostory {
 
     @Query("{name:?0,countryId:?1,deleted:false}")
     WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
@@ -57,9 +58,9 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     List<WTAResponseDTO> getWtaByOrganization(Long organizationId);*/
 
 
-   /* @Query("{}")
-    void removeOldWorkingTimeAgreement(BigInteger wtaId, Long organizationId, Long endDateInMillis);
-*/
+    /* @Query("{}")
+     void removeOldWorkingTimeAgreement(BigInteger wtaId, Long organizationId, Long endDateInMillis);
+ */
     @Query("{id:?0,deleted:false}")
     WorkingTimeAgreement removeOldParentWTAMapping(BigInteger wtaId);
 
@@ -73,5 +74,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
     @Query("")
     WTAResponseDTO findRuleTemplateByWTAId(BigInteger wtaId);*/
+
+    @Query("{_id:{$in:?0}, deleted:false}")
+    List<WorkingTimeAgreement> findAllByIdsInAndDeletedFalse(Set<BigInteger> ids);
 
 }

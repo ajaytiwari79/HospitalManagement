@@ -1,7 +1,9 @@
 package com.kairos.persistance.repository.master_data_management.asset_management;
 
+import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDto;
-import com.kairos.persistance.model.clause.Clause;
+import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -9,11 +11,14 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Optional;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static com.kairos.constant.AppConstant.ID;
+import static com.kairos.constant.AppConstant.COUNTRY_ID;
+import static com.kairos.constant.AppConstant.DELETED;
 
 public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetRepository {
 
@@ -23,7 +28,6 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
     @Override
     public FilterQueryResult getMasterAssetFilter(Long countryId) {
-
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and("deleted").is(false)),
@@ -38,7 +42,6 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
                         .addToSet("organizationSubServices").as("organizationSubServices")
 
         );
-
         AggregationResults<FilterQueryResult> result = mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
         return result.getUniqueMappedResult();
 
@@ -46,25 +49,45 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetListWithFilterData(Long countryId, FilterSelectionDto filterSelectionDto) {
+    public List<MasterAsset> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDto filterSelectionDto) {
 
-        Query query = new Query(Criteria.where("countryId").is(countryId).and("deleted").is(false));
-        if (Optional.ofNullable(filterSelectionDto.getOrganizationTypes()).isPresent()) {
-            query.addCriteria(Criteria.where(filterSelectionDto.getOrganizationTypes().getName() + "._id").in(filterSelectionDto.getOrganizationTypes().getValues()));
-        }
-        if (Optional.ofNullable(filterSelectionDto.getOrganizationSubTypes()).isPresent()) {
-            query.addCriteria(Criteria.where(filterSelectionDto.getOrganizationSubTypes().getName() + "._id").in(filterSelectionDto.getOrganizationSubTypes().getValues()));
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false));
 
-        }
-        if (Optional.ofNullable(filterSelectionDto.getOrganizationServices()).isPresent()) {
-            query.addCriteria(Criteria.where(filterSelectionDto.getOrganizationServices().getName() + "._id").in(filterSelectionDto.getOrganizationServices().getValues()));
+        filterSelectionDto.getFiltersData().forEach(filterSelection -> {
+            if (filterSelection.getValue().size()!=0) {
 
-        }
-        if (Optional.ofNullable(filterSelectionDto.getOrganizationSubServices()).isPresent()) {
-            query.addCriteria(Criteria.where(filterSelectionDto.getOrganizationSubServices().getName() + "._id").in(filterSelectionDto.getOrganizationSubServices().getValues()));
-        }
-
-        return (List<MasterAsset>)mongoTemplate.find(query, MasterAsset.class);
+                query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));
+            }
+        });
+        return mongoTemplate.find(query, MasterAsset.class);
 
     }
+
+
+    @Override
+    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query) {
+
+        switch (filterType) {
+            case ACCOUNT_TYPES:
+                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+            case ORGANIZATION_TYPES:
+                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+
+            case ORGANIZATION_SUB_TYPES:
+                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+            case ORGANIZATION_SERVICES:
+                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+
+            case ORGANIZATION_SUB_SERVICES:
+                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+            default:
+                throw new InvalidRequestException("data not found for Filtertype " + filterType);
+
+
+        }
+
+
+    }
+
+
 }

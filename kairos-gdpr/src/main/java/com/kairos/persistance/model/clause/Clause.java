@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class Clause extends MongoBaseEntity {
     @NotNull
     private String description;
 
+
     private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
     private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
     private List<OrganizationTypeAndServiceBasicDto> organizationServices;
     private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
     private List<AccountType> accountTypes;
 
-    @NotNull
     private Long countryId;
 
     public Long getCountryId() {

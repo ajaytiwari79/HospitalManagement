@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.asset_management;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingProvider;
 import com.kairos.service.master_data_management.asset_management.HostingProviderService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -37,11 +38,11 @@ public class HostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/add")
-    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @RequestBody List<HostingProvider> hostingProviders) {
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<HostingProvider> hostingProviders) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviders));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviders.getRequestBody()));
 
     }
 

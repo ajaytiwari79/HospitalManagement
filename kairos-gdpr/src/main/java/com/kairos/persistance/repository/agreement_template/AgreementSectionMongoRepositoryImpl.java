@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.agreement_template;
 
 import com.kairos.persistance.model.agreement_template.AgreementSection;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDto;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -10,6 +10,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSectionRepository {
 
@@ -41,7 +42,7 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
     }
 
     @Override
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,List<BigInteger> ids) {
+    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,Set<BigInteger> ids) {
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where("deleted").is(false).and("_id").in(ids).and("countryId").is(countryId)),

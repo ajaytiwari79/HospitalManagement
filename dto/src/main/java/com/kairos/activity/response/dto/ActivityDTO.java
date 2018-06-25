@@ -9,6 +9,7 @@ import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivi
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,9 @@ public class ActivityDTO {
     private Long countryActivityId;
     private SkillActivityTab skillActivityTab;
     private TimeTypeDTO timeType;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private BigInteger parentId;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -42,6 +46,15 @@ public class ActivityDTO {
 
     public ActivityDTO() {
         //default constructor
+    }
+
+
+    public BigInteger getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
@@ -184,6 +197,22 @@ public class ActivityDTO {
         this.compositeActivities = compositeActivities;
     }
 
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
     public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
         return balanceSettingsActivityTab;
     }
@@ -213,6 +242,12 @@ public class ActivityDTO {
         this.isParentActivity = isParentActivity;
         this.generalActivityTab = generalActivityTab;
         this.tags = tags;
+    }
+
+    public ActivityDTO(BigInteger id, String name,BigInteger parentId) {
+        this.id = id;
+        this.name = name;
+        this.parentId = parentId;
     }
 }
 

@@ -2,11 +2,8 @@ package com.kairos.service.master_data_management.asset_management;
 
 
 import com.kairos.client.OrganizationTypeRestClient;
-import com.kairos.client.OrganizationTypeAndServiceRestClientRequestDto;
-import com.kairos.client.OrganizationTypeAndServiceResultDto;
 import com.kairos.custome_exception.*;
-import com.kairos.dto.MasterAssetDto;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.dto.master_data.MasterAssetDto;
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.persistance.repository.master_data_management.asset_management.MasterAssetMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -46,7 +43,6 @@ public class MasterAssetService extends MongoBaseService {
         if (masterAssetMongoRepository.findByNameAndCountry(countryId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         } else {
-
             if (masterAssetDto.getOrganizationTypes()!=null&&masterAssetDto.getOrganizationTypes().size()!=0) {
                 newAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
 
@@ -60,7 +56,7 @@ public class MasterAssetService extends MongoBaseService {
 
             }
             if (masterAssetDto.getOrganizationSubServices()!=null&&masterAssetDto.getOrganizationSubServices().size()!=0) {
-                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+                newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
 
@@ -100,7 +96,7 @@ public class MasterAssetService extends MongoBaseService {
 
             }
             if (masterAssetDto.getOrganizationSubServices() != null && masterAssetDto.getOrganizationSubServices().size() != 0) {
-                exists.setOrganizationSubServices(masterAssetDto.getOrganizationTypes());
+                exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
 
             }
             exists.setName(masterAssetDto.getName());

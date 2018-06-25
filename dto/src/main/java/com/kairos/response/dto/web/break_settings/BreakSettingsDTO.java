@@ -1,10 +1,13 @@
 package com.kairos.response.dto.web.break_settings;
 
+import javax.validation.constraints.Min;
 import java.math.BigInteger;
 
 public class BreakSettingsDTO {
     private Long unitId;
+    @Min(value = 1, message = "shift duration cant be zero")
     private Long shiftDurationInMinute;
+    @Min(value = 1, message = "Break duration cant be zero")
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
     private BigInteger id;

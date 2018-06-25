@@ -1,5 +1,7 @@
 package com.kairos.activity.spec;
 
+import java.util.List;
+
 /**
  * Created by vipul on 30/1/18.
  */
@@ -14,6 +16,7 @@ public interface ActivitySpecification<T> {
 
     /**
      * Create a new specification that is the AND operation of {@code this} specification and another specification.
+     *
      * @param activitySpecification Specification to AND.
      * @return A new specification.
      */
@@ -21,8 +24,11 @@ public interface ActivitySpecification<T> {
 
     /**
      * Create a new specification that is the OR operation of {@code this} specification and another specification.
+     *
      * @param activitySpecification Specification to OR.
      * @return A new specification.
      */
     ActivitySpecification<T> or(ActivitySpecification<T> activitySpecification);
+
+    List<String> isSatisfiedString(T t);
 }

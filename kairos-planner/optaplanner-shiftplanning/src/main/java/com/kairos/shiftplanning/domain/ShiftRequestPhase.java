@@ -22,7 +22,7 @@ import java.util.*;
 public class ShiftRequestPhase implements Shift{
     private static Logger log= LoggerFactory.getLogger(ShiftRequestPhase.class);
     private UUID id;
-    private EmployeePlanningFact employee;
+    private Employee employee;
     //@CustomShadowVariable(variableListenerClass = ShiftIntervalListener.class,
       //      sources = @PlanningVariableReference(variableName = "shift",entityClass = ActivityLineInterval.class))
     @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,
@@ -50,7 +50,7 @@ public class ShiftRequestPhase implements Shift{
     private boolean isLocked;
     private boolean isCreatedByStaff;
 
-    public ShiftRequestPhase(EmployeePlanningFact employee, LocalDate date) {
+    public ShiftRequestPhase(Employee employee, LocalDate date) {
         this.employee = employee;
         this.date = date;
     }
@@ -100,11 +100,11 @@ public class ShiftRequestPhase implements Shift{
 
 
 
-    public EmployeePlanningFact getEmployee() {
+    public Employee getEmployee() {
         return employee;
     }
 
-    public void setEmployee(EmployeePlanningFact employee) {
+    public void setEmployee(Employee employee) {
         this.employee = employee;
     }
 
@@ -128,7 +128,7 @@ public class ShiftRequestPhase implements Shift{
     }*/
 
    /* public void breakActivityContraints(ActivityLineInterval activityLineInterval,HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext,int index){
-        activityLineInterval.getActivityPlannerEntity().breakActivityContraints(scoreHolder,kContext,index);
+        activityLineInterval.getActivity().breakActivityContraints(scoreHolder,kContext,index);
     }*/
 
     /*public int checkConstraints(List<Shift> shifts, int index){
@@ -356,15 +356,15 @@ public class ShiftRequestPhase implements Shift{
                 '}';
     }
 
-    public ShiftRequestPhase getShiftByActivity(ActivityPlannerEntity activityPlannerEntity, List<ShiftRequestPhase> shifts){
+    public ShiftRequestPhase getShiftByActivity(Activity activity, List<ShiftRequestPhase> shifts){
         for (ShiftRequestPhase shift:shifts) {
 
         }
         return null;
     }
-    public boolean hasIntervalsForActivity(ActivityPlannerEntity activityPlannerEntity){
+    public boolean hasIntervalsForActivity(Activity activity){
         for(ActivityLineInterval ali:activityLineIntervals){
-            if(ali.getActivityPlannerEntity().getId().equals(activityPlannerEntity.getId())){
+            if(ali.getActivity().getId().equals(activity.getId())){
                 return true;
             }
         }
@@ -374,7 +374,7 @@ public class ShiftRequestPhase implements Shift{
         return id.toString().substring(0,6);
     }
     public boolean isAbsenceActivityApplied(){
-        return CollectionUtils.isNotEmpty(activityLineIntervals) && new ArrayList<>(activityLineIntervals).get(0).getActivityPlannerEntity().isTypeAbsence();
+        return CollectionUtils.isNotEmpty(activityLineIntervals) && new ArrayList<>(activityLineIntervals).get(0).getActivity().isTypeAbsence();
     }
     public int getMissingBreakTimes(){
         int totalMins=getMinutes();
@@ -410,7 +410,7 @@ public class ShiftRequestPhase implements Shift{
         //log.info("true");
         return true;
     }
-    public boolean hasAnyEmployee(List<EmployeePlanningFact> emps){
+    public boolean hasAnyEmployee(List<Employee> emps){
         //log.info("E"+this.getPrettyId()+":::"+emps.contains(this.employee));
         return emps.contains(this.employee);
     }

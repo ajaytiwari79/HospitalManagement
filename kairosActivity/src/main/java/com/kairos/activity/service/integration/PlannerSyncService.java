@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 @Service
@@ -56,6 +57,6 @@ public class PlannerSyncService {
     }
 
     public ActivityNoTabsDTO createActivityDTO(Activity activity) {
-        return new ActivityNoTabsDTO(activity.getId(),activity.getName(),activity.getExpertises(),activity.getDescription(),activity.getGeneralActivityTab().getCategoryId(),activity.getSkillActivityTab().getActivitySkillIds(),activity.getEmploymentTypes(),0l,0l,0l);
+        return new ActivityNoTabsDTO(activity.getId(),activity.getName(),activity.getExpertises(),activity.getDescription(),activity.getSkillActivityTab()==null?new ArrayList<>():activity.getSkillActivityTab().getActivitySkillIds(),activity.getEmploymentTypes(),0l,0l,0l);
     }
 }

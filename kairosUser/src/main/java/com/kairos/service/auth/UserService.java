@@ -1,5 +1,6 @@
 package com.kairos.service.auth;
 
+import com.kairos.activity.util.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
@@ -9,12 +10,14 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.SmsService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -60,6 +63,8 @@ public class UserService extends UserBaseService {
     private AccessGroupService accessGroupService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
 
 
     /**
@@ -300,7 +305,7 @@ public class UserService extends UserBaseService {
             return null;
         }
         currentUser = generateTokenToUser(currentUser);
-        Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
+        Organization org =  staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
@@ -388,7 +393,7 @@ public class UserService extends UserBaseService {
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
-        List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+            List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
@@ -578,5 +583,24 @@ public class UserService extends UserBaseService {
         }
        save(currentUser);
         return true;
+    }
+
+
+    public boolean updateDateOfBirthOfUserByCPRNumber(){
+        List<User> users = userGraphRepository.findAll();
+
+        users.stream().forEach(user -> {
+            String cprNumber = user.getCprNumber();
+            Date dateOfBirth = Optional.ofNullable(user.getCprNumber()).isPresent() ? CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : DateUtils.getCurrentDate();
+            user.setDateOfBirth( Optional.ofNullable(user.getCprNumber()).isPresent() ?
+                    CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
+        });
+        save(users);
+        return true;
+    }
+
+    public String getSystemLanguageOfUser(Long userId){
+        String language =  countryGraphRepository.getSystemLanguageOfUser(userId);
+        return (Optional.ofNullable(language).orElse(""));
     }
 }

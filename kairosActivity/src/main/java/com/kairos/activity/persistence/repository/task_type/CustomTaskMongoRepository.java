@@ -5,6 +5,7 @@ import com.kairos.activity.persistence.query_result.EscalatedTasksWrapper;
 import com.kairos.activity.persistence.query_result.StaffAssignedTasksWrapper;
 import com.kairos.activity.persistence.query_result.TaskCountWithAssignedUnit;
 import com.kairos.activity.persistence.query_result.TaskWrapper;
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -45,6 +46,6 @@ public interface CustomTaskMongoRepository {
     int deleteExceptionsFromTasks(long clientId, long unitId, List<BigInteger> exceptionIds);
 
     public List<Task> getTaskByException(long citizenId, long unitId, BigInteger exceptionId);
-
+    public List<VRPTaskDTO> getAllTasksByUnitId(Long unitId);
 
 }
