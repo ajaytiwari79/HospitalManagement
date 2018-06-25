@@ -2,6 +2,7 @@ package com.kairos.activity.service.user_service_data;
 
 import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
+import com.kairos.activity.persistence.repository.user_service_data.UnitAndParentOrganizationAndCountryIdsMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,11 @@ import java.util.List;
 public class UnitDataService extends MongoBaseService {
 
     @Inject
-    GenericIntegrationService genericIntegrationService;
+    private GenericIntegrationService genericIntegrationService;
+
+    @Inject
+    private UnitAndParentOrganizationAndCountryIdsMongoRepository unitDataRepository;
+
 
     public void addParentOrganizationAndCountryIdForUnit(Long unitId, Long parentOrganizationId, Long countryId){
         UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = new UnitAndParentOrganizationAndCountryIds(unitId, parentOrganizationId, countryId);
@@ -32,5 +37,15 @@ public class UnitDataService extends MongoBaseService {
         });
         save(unitAndParentOrganizationAndCountryIds);
         return true;
+    }
+
+    public Long getParentOrganizationId(Long unitId){
+        UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = unitDataRepository.findByUnitId(unitId);
+        return unitAndParentOrganizationAndCountryIds.getParentOrganizationId();
+    }
+
+    public Long getCountryId(Long unitId){
+        UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = unitDataRepository.findByUnitId(unitId);
+        return unitAndParentOrganizationAndCountryIds.getCountryId();
     }
 }
