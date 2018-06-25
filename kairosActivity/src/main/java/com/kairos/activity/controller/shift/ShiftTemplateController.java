@@ -2,8 +2,7 @@ package com.kairos.activity.controller.shift;
 
 import com.kairos.activity.service.shift.ShiftTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
-import com.kairos.response.dto.web.shift.ShiftCreationPojoData;
-import com.kairos.response.dto.web.shift.ShiftDayTemplateDTO;
+import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
 import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -40,12 +38,14 @@ public class ShiftTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.getAllShiftTemplates(unitId));
     }
 
-    @ApiOperation("update a Shift of Template")
-    @PutMapping(value = "/shift_template/{shiftDayTemplateId}")
+
+    @ApiOperation("update Individual Shift Template")
+    @PutMapping(value = "/individual_shift_template/{IndividualShiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable BigInteger shiftDayTemplateId,  @RequestBody @Valid ShiftDayTemplateDTO shiftDayTemplateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateShiftDayTemplate(shiftDayTemplateId, shiftDayTemplateDTO));
+    public ResponseEntity<Map<String, Object>> updateIndividualShift(@PathVariable BigInteger individualShiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateIndividualShiftTemplate(individualShiftTemplateId, individualShiftTemplateDTO));
     }
+
 
     @ApiOperation("delete a Shift Template")
     @DeleteMapping(value = "/shift_template/{shiftTemplateId}")
@@ -53,6 +53,27 @@ public class ShiftTemplateController {
     public ResponseEntity<Map<String, Object>> deleteShift(@PathVariable BigInteger shiftTemplateId) {
         shiftTemplateService.deleteShiftTemplate(shiftTemplateId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    @ApiOperation("add Individual Shift Template")
+    @PostMapping(value = "shift_template/{shiftTemplateId}/individual_shift_template")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addIndividualShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.addIndividualShiftTemplate(shiftTemplateId, individualShiftTemplateDTO));
+    }
+
+    @ApiOperation("update Individual Shift Template")
+    @PutMapping(value = "/individual_shift_template/{IndividualShiftTemplateId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable BigInteger individualShiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateIndividualShiftTemplate(individualShiftTemplateId, individualShiftTemplateDTO));
+    }
+
+    @ApiOperation("delete Individual Shift Template")
+    @PostMapping(value = "shift_template/{shiftTemplateId}/individual_shift_template/{IndividualShiftTemplateId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteIndividualShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @PathVariable BigInteger individualShiftTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.deleteIndividualShiftTemplate(shiftTemplateId, individualShiftTemplateId));
     }
 
 

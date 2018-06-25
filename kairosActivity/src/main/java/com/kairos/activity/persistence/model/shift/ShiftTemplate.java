@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ShiftTemplate extends MongoBaseEntity {
     private String name;
-    private Set<BigInteger> shiftDayTemplateIds;
+    private Set<BigInteger> individualShiftTemplateIds;
     private Long unitId;
     private Long createdBy;
 
@@ -17,10 +17,10 @@ public class ShiftTemplate extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public ShiftTemplate(BigInteger id,String name, Set<BigInteger> shiftDayTemplateIds, Long unitId, Long createdBy) {
+    public ShiftTemplate(BigInteger id, String name, Set<BigInteger> individualShiftTemplateIds, Long unitId, Long createdBy) {
         this.id=id;
         this.name = name;
-        this.shiftDayTemplateIds = shiftDayTemplateIds;
+        this.individualShiftTemplateIds = individualShiftTemplateIds;
         this.unitId = unitId;
         this.createdBy = createdBy;
     }
@@ -33,12 +33,12 @@ public class ShiftTemplate extends MongoBaseEntity {
         this.name = name;
     }
 
-    public Set<BigInteger> getShiftDayTemplateIds() {
-        return shiftDayTemplateIds=Optional.ofNullable(shiftDayTemplateIds).orElse(new HashSet<>());
+    public Set<BigInteger> getIndividualShiftTemplateIds() {
+        return individualShiftTemplateIds =Optional.ofNullable(individualShiftTemplateIds).orElse(new HashSet<>());
     }
 
-    public void setShiftDayTemplateIds(Set<BigInteger> shiftDayTemplateIds) {
-        this.shiftDayTemplateIds = shiftDayTemplateIds;
+    public void setIndividualShiftTemplateIds(Set<BigInteger> individualShiftTemplateIds) {
+        this.individualShiftTemplateIds = individualShiftTemplateIds;
     }
 
     public Long getUnitId() {

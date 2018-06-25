@@ -4,7 +4,6 @@ import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
-import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
@@ -13,7 +12,7 @@ import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.persistence.model.shift.ShiftDayTemplate;
+import com.kairos.activity.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.activity.persistence.model.shift.ShiftTemplate;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.model.wta.StaffWTACounter;
@@ -30,7 +29,7 @@ import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.activity.persistence.repository.shift.ShiftDayTemplateMongoRepository;
+import com.kairos.activity.persistence.repository.shift.IndividualShiftTemplateMongoRepository;
 import com.kairos.activity.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.time_bank.TimeBankMongoRepository;
@@ -59,13 +58,11 @@ import com.kairos.activity.shift.ShiftFunctionWrapper;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftWrapper;
 import com.kairos.activity.spec.*;
-import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.util.DateUtils;
 
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.enums.shift.ShiftState;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.response.dto.web.AppliedFunctionDTO;
 import com.kairos.response.dto.web.FunctionDTO;
@@ -74,7 +71,6 @@ import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
 
 import com.kairos.response.dto.web.shift.ShiftCreationPojoData;
 import com.kairos.response.dto.web.staff.StaffAccessRoleDTO;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -92,7 +88,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.*;
 
@@ -164,7 +159,7 @@ public class ShiftService extends MongoBaseService {
     private LocaleService localeService;
     @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private ShiftTemplateRepository shiftTemplateRepository;
-    @Inject private ShiftDayTemplateMongoRepository shiftDayTemplateMongoRepository;
+    @Inject private IndividualShiftTemplateMongoRepository individualShiftTemplateMongoRepository;
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
@@ -1129,8 +1124,8 @@ public class ShiftService extends MongoBaseService {
 
     public boolean createShiftUsingTemplate(Long unitId, ShiftCreationPojoData shiftCreationPojoData){
         ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftCreationPojoData.getShiftTemplateId());
-        List<ShiftDayTemplate> shiftDayTemplate=shiftDayTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getShiftDayTemplateIds());
-        shiftDayTemplate.forEach(shiftTemplate1 ->{
+        List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
+        individualShiftTemplate.forEach(shiftTemplate1 ->{
             ShiftDTO shiftDTO=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,shiftCreationPojoData.getStaffId(),shiftCreationPojoData.getUnitPositionId(),shiftCreationPojoData.getStartDate(),shiftCreationPojoData.getEndDate(),shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
             createShift(unitId,shiftDTO,"Organization",false);
         });

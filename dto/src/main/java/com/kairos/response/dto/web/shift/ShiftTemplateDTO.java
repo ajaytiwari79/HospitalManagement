@@ -2,12 +2,11 @@ package com.kairos.response.dto.web.shift;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 public class ShiftTemplateDTO {
     private BigInteger id;
     private String name;
-    private List<ShiftDayTemplateDTO> shifts;
+    private List<IndividualShiftTemplateDTO> shifts;
     private Long createdBy;
     private Long unitId;
 
@@ -15,7 +14,7 @@ public class ShiftTemplateDTO {
         //Default Constructor
     }
 
-    public ShiftTemplateDTO(BigInteger id, String name, List<ShiftDayTemplateDTO> shifts, Long createdBy, Long unitId) {
+    public ShiftTemplateDTO(BigInteger id, String name, List<IndividualShiftTemplateDTO> shifts, Long createdBy, Long unitId) {
         this.id = id;
         this.name = name;
         this.shifts = shifts;
@@ -39,11 +38,11 @@ public class ShiftTemplateDTO {
         this.name = name;
     }
 
-    public List<ShiftDayTemplateDTO> getShifts() {
+    public List<IndividualShiftTemplateDTO> getShifts() {
         return shifts;
     }
 
-    public void setShifts(List<ShiftDayTemplateDTO> shifts) {
+    public void setShifts(List<IndividualShiftTemplateDTO> shifts) {
         this.shifts = shifts;
     }
 
