@@ -1,8 +1,8 @@
 package com.kairos.activity.persistence.model.unit_settings;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
 
 public class ActivityConfiguration extends MongoBaseEntity {
     private Long unitId;

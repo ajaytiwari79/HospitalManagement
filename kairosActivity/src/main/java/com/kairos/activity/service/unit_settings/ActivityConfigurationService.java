@@ -10,20 +10,19 @@ import com.kairos.activity.persistence.repository.unit_settings.ActivityConfigur
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.enums.unit_settings.TimeTypeEnum;
+import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
+import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
+import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.ActivityConfigurationDTO;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.ActivityConfigurationWrapper;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.PresencePlannedTime;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -79,7 +78,6 @@ public class ActivityConfigurationService extends MongoBaseService {
             }
         }
         save(activityConfigurations);
-
     }
 
     private void createDefaultPresentSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long unitId) {
@@ -91,32 +89,48 @@ public class ActivityConfigurationService extends MongoBaseService {
         activityConfigurations.add(new ActivityConfiguration(unitId, new AbsencePlannedTime(phaseId, applicablePlannedTimeId, false)));
     }
 
-    public ActivityConfigurationDTO updateActivityConfiguration(Long unitId, ActivityConfigurationDTO activityConfigurationDTO) {
-        /**
-         * If this is Absence then user might select time type id based.
-         **/
-        ActivityConfiguration activityConfiguration = null;
-        if (activityConfigurationDTO.getTimeType().equals(TimeTypeEnum.PRESENCE)) {
-            activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, activityConfigurationDTO.getPresencePlannedTime().getPhaseId());
-        } else if (activityConfigurationDTO.getTimeType().equals(TimeTypeEnum.ABSENCE)) {
-            activityConfiguration = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId, activityConfigurationDTO.getAbsencePlannedTime().getPhaseId());
-
+    public PresencePlannedTime updatePresenceActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
+        ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, presencePlannedTime.getPhaseId());
+        if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("error.presenceActivityConfiguration.notFound");
         }
-        BeanUtils.copyProperties(activityConfigurationDTO, activityConfiguration);
-        activityConfiguration.setUnitId(unitId);
+        activityConfiguration.getPresencePlannedTime().setManagementPlannedTimeId(presencePlannedTime.getManagementPlannedTimeId());
+        activityConfiguration.getPresencePlannedTime().setStaffPlannedTimeId(presencePlannedTime.getStaffPlannedTimeId());
+
         save(activityConfiguration);
-        activityConfigurationDTO.setId(activityConfiguration.getId());
-        return activityConfigurationDTO;
+        return presencePlannedTime;
     }
 
-    public List<ActivityConfigurationDTO> getActivityConfiguration(Long unitId, TimeTypeEnum timeTypeEnum) {
-        List<ActivityConfigurationDTO> activityConfigurations = new ArrayList<>();
-        if (timeTypeEnum.equals(TimeTypeEnum.ABSENCE)) {
-            activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId);
+    public AbsencePlannedTime updateAbsenceActivityConfiguration(Long unitId, AbsencePlannedTime absencePlannedTime) {
+        ActivityConfiguration activityConfiguration;
+        if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
+            activityConfiguration = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId, absencePlannedTime.getPhaseId(), true);
+            if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
+                exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
+            }
+            activityConfiguration.getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
+            activityConfiguration.getAbsencePlannedTime().setException(true);
         } else {
-            activityConfigurations = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId);
+            activityConfiguration = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId, absencePlannedTime.getPhaseId(), false);
+            if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
+                exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
+            }
         }
-        return activityConfigurations;
+        activityConfiguration.getAbsencePlannedTime().setPlannedTimeId(absencePlannedTime.getPlannedTimeId());
+        save(activityConfiguration);
+        return absencePlannedTime;
+
+    }
+
+    public Map<Boolean, List<ActivityConfigurationDTO>> getAbsenceActivityConfiguration(Long unitId) {
+        List<ActivityConfigurationDTO> activityConfigurations = new ArrayList<>();
+        activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        Map<Boolean, List<ActivityConfigurationDTO>> mappedData = activityConfigurations.stream().collect(Collectors.groupingBy(x -> x.getException(), Collectors.toList()));
+        return mappedData;
+    }
+
+    public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {
+        return activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
     }
 
     public ActivityConfigurationWrapper getDefaultData(Long unitId) {

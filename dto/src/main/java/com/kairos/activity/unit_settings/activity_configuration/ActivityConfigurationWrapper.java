@@ -1,4 +1,4 @@
-package com.kairos.response.dto.web.unit_settings.activity_configuration;
+package com.kairos.activity.unit_settings.activity_configuration;
 
 
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;

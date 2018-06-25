@@ -1,10 +1,10 @@
-package com.kairos.response.dto.web.unit_settings.activity_configuration;
+package com.kairos.activity.unit_settings.activity_configuration;
 
 import java.math.BigInteger;
 
 public class AbsencePlannedTime {
     private BigInteger phaseId;
-    private BigInteger timeTypeId;
+    private BigInteger timeTypeId;  // if exception is true then time type is null
     private BigInteger plannedTimeId;
     boolean exception = false;
 

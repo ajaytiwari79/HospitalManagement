@@ -1,9 +1,9 @@
 package com.kairos.activity.controller.unit_settings;
 
 import com.kairos.activity.service.unit_settings.ActivityConfigurationService;
+import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.activity.util.response.ResponseHandler;
-import com.kairos.enums.unit_settings.TimeTypeEnum;
-import com.kairos.response.dto.web.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -23,11 +23,18 @@ public class ActivityConfigurationController {
     @Inject
     private ActivityConfigurationService activityConfigurationService;
 
-    @ApiOperation("Update Activity Configuration ")
-    @PutMapping
+    @ApiOperation("Update presence Activity Configuration ")
+    @PutMapping(value = "/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateActivityConfiguration(@PathVariable Long unitId, @RequestBody ActivityConfigurationDTO activityConfigurationDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateActivityConfiguration(unitId, activityConfigurationDTO));
+    public ResponseEntity<Map<String, Object>> updatePresenceActivityConfiguration(@PathVariable Long unitId, @RequestBody PresencePlannedTime presencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updatePresenceActivityConfiguration(unitId, presencePlannedTime));
+    }
+
+    @ApiOperation("Update absence Activity Configuration ")
+    @PutMapping(value = "/absence")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @RequestBody AbsencePlannedTime absencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId, absencePlannedTime));
     }
 
     @ApiOperation("CREATE Activity Configuration ")
@@ -38,13 +45,18 @@ public class ActivityConfigurationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-    @ApiOperation("Get Activity Configuration")
-    @GetMapping
+    @ApiOperation("Get presence Activity Configuration")
+    @GetMapping(value = "/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityConfiguration(@PathVariable Long unitId, @RequestParam("timeType") TimeTypeEnum timeTypeEnum) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getActivityConfiguration(unitId, timeTypeEnum));
+    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfiguration(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfiguration (unitId));
     }
-
+    @ApiOperation("Get absence Activity Configuration")
+    @GetMapping(value = "/absence")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPresenceActivityConfiguration(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfiguration(unitId));
+    }
     @ApiOperation("Get default data ")
     @GetMapping(value = "/default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
