@@ -1119,4 +1119,10 @@ public class ShiftService extends MongoBaseService {
 
         return activities;
     }
+
+    public ShiftQueryResult getShiftByStaffIdAndDate(List<Long> staffIds,Date date){
+        ShiftQueryResult shiftQueryResults=shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds,date);
+
+        return shiftQueryResults;
+    }
 }
