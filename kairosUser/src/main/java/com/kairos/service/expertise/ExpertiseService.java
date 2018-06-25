@@ -710,16 +710,7 @@ public class ExpertiseService extends UserBaseService {
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
         }
-
-        Iterable<EmploymentType> employmentTypes = employmentTypeGraphRepository.findAllById(expertiseEmploymentTypeDTO.getEmploymentTypeIds());
-        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
-        employmentTypes.forEach(employmentType -> {
-            ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(expertise.get(),
-                    employmentType, expertiseEmploymentTypeDTO.getIncludedPlannedTime(), expertiseEmploymentTypeDTO.getExcludedPlannedTime());
-            expertiseEmploymentList.add(expertiseEmploymentTypeRelationship);
-
-        });
-        expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
+        linkPlannedTimeTypeWithExpertise(expertiseEmploymentTypeDTO, expertise.get());
         return true;
     }
 
@@ -727,28 +718,31 @@ public class ExpertiseService extends UserBaseService {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
-
         }
         List<ExpertisePlannedTimeQR> expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
         return expertiseEmploymentTypeRelationships;
     }
 
-    public Boolean updatePlannedTimeInExpertise(Long unitId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+    public Boolean updatePlannedTimeInExpertise(ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseEmploymentTypeDTO.getExpertiseId());
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
         }
-        expertiseEmploymentTypeRelationshipGraphRepository.removeAllPreviousEmploymentType;
+        expertiseEmploymentTypeRelationshipGraphRepository.removeAllPreviousEmploymentType(expertiseEmploymentTypeDTO.getExpertiseId());
+        linkPlannedTimeTypeWithExpertise(expertiseEmploymentTypeDTO, expertise.get());
+        return true;
+    }
+
+    private void linkPlannedTimeTypeWithExpertise(ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO, Expertise expertise) {
         Iterable<EmploymentType> employmentTypes = employmentTypeGraphRepository.findAllById(expertiseEmploymentTypeDTO.getEmploymentTypeIds());
         List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
         employmentTypes.forEach(employmentType -> {
-            ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(expertise.get(),
+            ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(expertise,
                     employmentType, expertiseEmploymentTypeDTO.getIncludedPlannedTime(), expertiseEmploymentTypeDTO.getExcludedPlannedTime());
             expertiseEmploymentList.add(expertiseEmploymentTypeRelationship);
 
         });
         expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
-        return true;
     }
 
     public Map<String, Object> getPlannedTimeAndEmploymentType(Long unitId) {

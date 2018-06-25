@@ -152,4 +152,10 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeAndEmploymentType(unitId));
     }
 
+    @ApiOperation(value = "block planned time for employment type and expertise ")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long unitId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseEmploymentTypeDTO));
+    }
+
 }

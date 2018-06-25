@@ -12,11 +12,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.EXPER
 
 @Repository
 public interface ExpertiseEmploymentTypeRelationshipGraphRepository extends Neo4jBaseRepository<ExpertiseEmploymentTypeRelationship, Long> {
-    @Query("")
-    ExpertiseEmploymentTypeRelationship findPlannedTimeByExpertiseAndEmploymentType(Long expertiseId, Long employmentTypeId);
+    @Query("match(expertise:Expertise) where id(expertise)={0} " +
+            "match(expertise)-[relation:" + EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT + "]->(employmentType:EmploymentType)\n DETACH DELETE relation")
+    void removeAllPreviousEmploymentType(Long expertiseId);
 
     @Query("match(expertise:Expertise) where id(expertise)={0} " +
-            "match(e)-[relation:" + EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT + "]-(employmentType:EmploymentType)\n" +
+            "match(expertise)-[relation:" + EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT + "]->(employmentType:EmploymentType)\n" +
             "return relation.excludedPlannedTime as excludedPlannedTime,relation.includedPlannedTime as includedPlannedTime ,collect(employmentType) as employmentTypes")
     List<ExpertisePlannedTimeQR> findPlannedTimeByExpertise(Long expertiseId);
 }
