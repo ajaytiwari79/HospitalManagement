@@ -40,7 +40,10 @@ public class ProcessingPurposeController {
     @PostMapping("/add")
     public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingPurpose> processingPurposes) {
         if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.createProcessingPurpose(countryId, organizationId, processingPurposes.getRequestBody()));
 
@@ -51,12 +54,16 @@ public class ProcessingPurposeController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
-        } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, organizationId, id));
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, organizationId, id));
 
     }
 
@@ -64,6 +71,12 @@ public class ProcessingPurposeController {
     @ApiOperation("get all processing purpose")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(countryId, organizationId));
 
     }
@@ -71,6 +84,11 @@ public class ProcessingPurposeController {
     @ApiOperation("get Processing purpose by name")
     @GetMapping("/name")
     public ResponseEntity<Object> getProcessingPurposeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(countryId, organizationId, name));
 
     }
@@ -80,7 +98,13 @@ public class ProcessingPurposeController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(countryId, organizationId, id));
 
@@ -90,7 +114,13 @@ public class ProcessingPurposeController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingPurpose processingPurpose) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(countryId, organizationId, id, processingPurpose));
 

@@ -72,14 +72,14 @@ public class ClauseService extends MongoBaseService {
         if (clauseDto.getAccountTypes().size() == 0) {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
         }
-        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId,organizationId,clauseDto.getTags());
+        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
         Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
         newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
         newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
         newclause.setOrganizationServices(clauseDto.getOrganizationServices());
         newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
         newclause.setOrganizationId(organizationId);
-        newclause.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId, organizationId, clauseDto.getAccountTypes()));
+        newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, organizationId, clauseDto.getAccountTypes()));
         newclause.setTags(tagList);
         try {
             newclause = save(newclause);
@@ -89,7 +89,7 @@ public class ClauseService extends MongoBaseService {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
             throw new RuntimeException(e.getMessage());
-            }
+        }
 
     }
 
@@ -112,7 +112,7 @@ public class ClauseService extends MongoBaseService {
         if (!Optional.ofNullable(exists).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
-        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId,organizationId,clauseDto.getTags());
+        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
         exists.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId, organizationId, clauseDto.getAccountTypes()));
         try {
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());

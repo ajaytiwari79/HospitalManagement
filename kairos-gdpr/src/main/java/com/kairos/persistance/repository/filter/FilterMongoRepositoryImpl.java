@@ -106,7 +106,6 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
             throw new InvalidRequestException("module name is null");
         }
         switch (domainName) {
-
             case CLAUSE_MODULE_NAME:
                 return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
             case ASSET_MODULE_NAME:

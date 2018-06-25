@@ -27,59 +27,74 @@ public class DataCategoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
+    public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         if (countryId == null) {
-
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.addDataCategoryAndDataElement(countryId,organizationId,dataCategoryDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.addDataCategoryAndDataElement(countryId, organizationId, dataCategoryDto));
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataCategoryWithDataElements(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,dataCategoryService.getDataCategoryWithDataElement(countryId,organizationId,id));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElement(countryId, organizationId, id));
 
     }
 
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllDataCategoryWithDataElements(@PathVariable Long countryId,@PathVariable Long organizationId) {
-       if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+    public ResponseEntity<Object> getAllDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,dataCategoryService.getAllDataCategoryWithDataElement(countryId,organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getAllDataCategoryWithDataElement(countryId, organizationId));
 
     }
 
 
-
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteDataCategory(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteDataCategory(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.deleteDataCategory(countryId,organizationId, id));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.deleteDataCategory(countryId, organizationId, id));
 
     }
 
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        } else if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+    public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(countryId,organizationId,id, dataCategoryDto));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(countryId, organizationId, id, dataCategoryDto));
 
 
     }

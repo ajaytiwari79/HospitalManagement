@@ -29,55 +29,75 @@ public class DataElementController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDTO> dataElements) {
+    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDTO> dataElements) {
         if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id Cannotbe null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.createDataElements(countryId,organizationId,dataElements.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.createDataElements(countryId, organizationId, dataElements.getRequestBody()));
 
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataElement(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id Cannotbe null");
-        } else if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id Cannotbe null");
+    public ResponseEntity<Object> getDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getDataElement(countryId,organizationId,id));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getDataElement(countryId, organizationId, id));
 
     }
 
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllDataElement(@PathVariable Long countryId,@PathVariable Long organizationId) {
+    public ResponseEntity<Object> getAllDataElement(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id Cannotbe null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getAllDataElements(countryId,organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getAllDataElements(countryId, organizationId));
 
     }
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteDataElement(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id Cannotbe null");
-        } else if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id Cannotbe null");
+    public ResponseEntity<Object> deleteDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.deleteDataElement(countryId,organizationId,id));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.deleteDataElement(countryId, organizationId, id));
 
     }
 
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @Valid @RequestBody DataElement dataElements) {
+    public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElement dataElements) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id Cannotbe null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.updateDataElement(countryId,organizationId,id, dataElements));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.updateDataElement(countryId, organizationId, id, dataElements));
 
     }
 

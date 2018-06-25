@@ -11,8 +11,10 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,22 +31,22 @@ public class AccountTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    public AccountType createAccountType(Long countryId,Long organizationId,AccountType accountType) {
+    public AccountType createAccountType(Long countryId, Long organizationId, AccountType accountType) {
 
-        AccountType exists = accountTypeRepository.findByName(countryId,organizationId,accountType.getName());
+        AccountType exists = accountTypeRepository.findByName(countryId, organizationId, accountType.getName());
         if (Optional.ofNullable(exists).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate","message.accountType",accountType.getName());
+            exceptionService.duplicateDataException("message.duplicate", "message.accountType", accountType.getName());
         }
-            AccountType newAccount = new AccountType();
-            newAccount.setName(accountType.getName());
-            newAccount.setCountryId(countryId);
-            newAccount.setOrganizationId(organizationId);
-            return save(newAccount);
-        }
+        AccountType newAccount = new AccountType();
+        newAccount.setName(accountType.getName());
+        newAccount.setCountryId(countryId);
+        newAccount.setOrganizationId(organizationId);
+        return save(newAccount);
+    }
 
 
-    public AccountType getAccountByName(Long countryId,Long organizationId,String name) {
-        AccountType account = accountTypeRepository.findByName(countryId,organizationId,name);
+    public AccountType getAccountByName(Long countryId, Long organizationId, String name) {
+        AccountType account = accountTypeRepository.findByName(countryId, organizationId, name);
         if (Optional.ofNullable(account).isPresent()) {
             return account;
         } else
@@ -52,57 +54,59 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountTypeList(Long countryId,Long organizationId,Set<BigInteger> ids) {
-        return accountTypeRepository.getAccountTypeList(countryId,organizationId,ids);
+    public List<AccountType> getAccountTypeList(Long countryId, Long organizationId, Set<BigInteger> ids) {
+        List<AccountType> accountTypes = accountTypeRepository.getAccountTypeList(countryId, organizationId, ids);
+        if (accountTypes.size() != ids.size()) {
+            Set<BigInteger> accounTypeIds = new HashSet<>();
+            accountTypes.forEach(accountType -> {
+                accounTypeIds.add(accountType.getId());
+            });
+            ids.removeAll(accounTypeIds);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "account type ", ids.iterator().next());
+        }
+        return accountTypes;
 
     }
 
 
-    public List<AccountType> getAllAccountType(Long countryId,Long organizationId)
-    {
-   return accountTypeRepository.getAllAccountType(countryId,organizationId);
+    public List<AccountType> getAllAccountType(Long countryId, Long organizationId) {
+        return accountTypeRepository.getAllAccountType(countryId, organizationId);
     }
 
 
+    public AccountType getAccountTypeById(Long countryId, Long organizationId, BigInteger id) {
 
-
-    public AccountType getAccountTypeById(Long countryId,Long organizationId,BigInteger id) {
-
-        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
-          exceptionService.dataNotFoundByIdException("message.dataNotFound","message.accountType",id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accountType", id);
         }
         return exists;
 
     }
 
-    public AccountType updateAccountName(Long countryId,Long organizationId,BigInteger id,AccountType accountType) {
+    public AccountType updateAccountName(Long countryId, Long organizationId, BigInteger id, AccountType accountType) {
 
-        AccountType exists = accountTypeRepository.findByName(countryId,organizationId,accountType.getName());
-        if (Optional.ofNullable(exists).isPresent()&&!id.equals(exists.getId())) {
-            throw  new DuplicateDataException("Account type exist for "+accountType.getName());
+        AccountType exists = accountTypeRepository.findByName(countryId, organizationId, accountType.getName());
+        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
+            throw new DuplicateDataException("Account type exist for " + accountType.getName());
         }
-        exists=accountTypeRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        exists = accountTypeRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         exists.setName(accountType.getName());
         return exists;
 
     }
 
 
-    public Boolean deleteAccountType(Long countryId,Long organizationId,BigInteger id) {
-        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+    public Boolean deleteAccountType(Long countryId, Long organizationId, BigInteger id) {
+        AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
-            throw  new DataNotFoundByIdException("Account type exist for id "+id);
+            throw new DataNotFoundByIdException("Account type exist for id " + id);
         }
         exists.setDeleted(true);
         save(exists);
         return true;
 
     }
-
-
-
-
 
 
 }

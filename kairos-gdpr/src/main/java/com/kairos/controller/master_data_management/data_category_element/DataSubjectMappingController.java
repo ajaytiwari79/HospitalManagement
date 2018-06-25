@@ -26,49 +26,68 @@ public class DataSubjectMappingController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId,@PathVariable Long organizationId, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
+    public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
         if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.addDataSubjectAndMapping(countryId,organizationId,dataSubjectMappingDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.addDataSubjectAndMapping(countryId, organizationId, dataSubjectMappingDto));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteDataSubjectAndMapping(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        } else if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+    public ResponseEntity<Object> deleteDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.deleteDataSubjectAndMapping(countryId,organizationId,id));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.deleteDataSubjectAndMapping(countryId, organizationId, id));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        } else if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+    public ResponseEntity<Object> getDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithData(countryId,organizationId,id));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithData(countryId, organizationId, id));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId,@PathVariable Long organizationId) {
+    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithData(countryId,organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithData(countryId, organizationId));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id cannot be null");
-        } else if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+    public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateDataSubjectAndMapping(countryId,organizationId,id, dataSubjectMappingDto));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateDataSubjectAndMapping(countryId, organizationId, id, dataSubjectMappingDto));
     }
 
 

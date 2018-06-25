@@ -39,7 +39,10 @@ public class ResponsibilityTypeController {
     @PostMapping("/add")
     public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<ResponsibilityType> responsibilityTypes) {
         if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, organizationId, responsibilityTypes.getRequestBody()));
 
@@ -50,12 +53,16 @@ public class ResponsibilityTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
-        } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId, organizationId, id));
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId, organizationId, id));
 
     }
 
@@ -63,6 +70,11 @@ public class ResponsibilityTypeController {
     @ApiOperation("get all ResponsibilityType ")
     @GetMapping("/all")
     public ResponseEntity<Object> getAllResponsibilityType(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllResponsibilityType(countryId, organizationId));
 
     }
@@ -70,6 +82,11 @@ public class ResponsibilityTypeController {
     @ApiOperation("get ResponsibilityType by name")
     @GetMapping("/name")
     public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(countryId, organizationId, name));
 
     }
@@ -79,7 +96,13 @@ public class ResponsibilityTypeController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(countryId, organizationId, id));
 
@@ -89,7 +112,13 @@ public class ResponsibilityTypeController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody ResponsibilityType responsibilityType) {
         if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, organizationId, id, responsibilityType));
 

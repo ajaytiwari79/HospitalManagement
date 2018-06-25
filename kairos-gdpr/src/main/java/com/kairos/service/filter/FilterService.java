@@ -71,6 +71,7 @@ public class FilterService {
             Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
             AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
+
             if (Optional.ofNullable(filterQueryResult).isPresent()) {
                 filterTypes.forEach(filterType -> {
                     filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType));
