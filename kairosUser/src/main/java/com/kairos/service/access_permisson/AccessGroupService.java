@@ -740,6 +740,8 @@ public class AccessGroupService extends UserBaseService {
                 accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.HUB.toString()));
         accessGroupForParentOrganizationCreation.put("organization",
                 accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.ORGANIZATION.toString()));
+        accessGroupForParentOrganizationCreation.put("union",
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.UNION.toString()));
         return accessGroupForParentOrganizationCreation;
     }
 
