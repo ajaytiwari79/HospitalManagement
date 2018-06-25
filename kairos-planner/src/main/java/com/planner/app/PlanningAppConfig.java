@@ -28,6 +28,7 @@ import java.time.LocalDate;
 @EnableScheduling
 @SpringBootApplication
 @EnableEurekaClient
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableMongoRepositories(basePackages ={"com.planner.repository"})
 public class PlanningAppConfig {
     public static void main(String[] args) {
