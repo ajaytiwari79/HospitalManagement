@@ -24,7 +24,7 @@ import java.util.List;
  * Created by prabjot on 4/10/16.
  */
 @Configuration
-//@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 public class MongoConfig extends AbstractMongoConfiguration implements EnvironmentAware {
     @Value("spring.data.mongodb.database")
     private String DB_NAME;
@@ -39,7 +39,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements Environme
     }
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient(new MongoClientURI(MONGO_URI));
+        return new MongoClient(new MongoClientURI(this.environment.getProperty(MONGO_URI)));
     }
     @Bean
     public DB getDb(){

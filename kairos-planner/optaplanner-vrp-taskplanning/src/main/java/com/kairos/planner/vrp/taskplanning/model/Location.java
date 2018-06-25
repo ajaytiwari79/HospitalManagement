@@ -7,12 +7,12 @@ public class Location {
     private Double latitude;
     private Double longitude;
     private int id;
-    private int num;
+    private long num;
 
     public Location() {
     }
 
-    public Location(Double latitude, Double longitude, int id, int num) {
+    public Location(Double latitude, Double longitude, int id, long num) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.id = id;
@@ -43,11 +43,11 @@ public class Location {
         this.id = id;
     }
 
-    public int getNum() {
+    public long getNum() {
         return num;
     }
 
-    public void setNum(int num) {
+    public void setNum(long num) {
         this.num = num;
     }
 

@@ -1,16 +1,14 @@
 package com.kairos.persistance.model.clause;
 
 
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +23,10 @@ public class Clause extends MongoBaseEntity {
     @NotNull
     private String description;
 
-
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
     private List<AccountType> accountTypes;
 
     private Long countryId;
@@ -66,35 +63,35 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
+    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
+    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

@@ -4,7 +4,6 @@ import com.kairos.persistance.repository.master_data_management.asset_management
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.master_data_management.processing_activity_masterdata.DataSubjectService;
 import com.kairos.service.master_data_management.processing_activity_masterdata.ProcessingPurposeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,6 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
-    @Inject
-    private DataSubjectService dataSubjectService;
 
     @Inject
     private ProcessingPurposeService processingPurposeService;
@@ -34,7 +31,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
 /*
 
-    ProcessingActivity createProcessingActivity(ProcessingActivityDto processingActivityDto) {
+    ProcessingActivity createProcessingActivity(ProcessingActivityDTO processingActivityDto) {
 
         List<BigInteger> dataSubectids, processingPurposeids;
         dataSubectids = processingActivityDto.getDataSubjects();

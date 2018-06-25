@@ -1,11 +1,12 @@
 package com.kairos.persistance.repository.clause;
 
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDto;
+import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -14,9 +15,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
+import static com.kairos.constants.AppConstant.ID;
+import static com.kairos.constants.AppConstant.DELETED;
 
 
 public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
@@ -27,8 +29,18 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<Clause> getClauseDataWithFilterSelection(Long countryId, FilterSelectionDto filterSelectionDto) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false));
+    public Clause findByTitle(Long countryId, Long organizationId, String title) {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").is(title).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, Clause.class);
+    }
+
+    @Override
+    public List<Clause> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId));
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
 
             if (filterSelection.getValue().size() != 0) {

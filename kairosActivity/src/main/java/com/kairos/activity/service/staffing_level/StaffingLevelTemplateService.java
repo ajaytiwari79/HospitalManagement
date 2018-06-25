@@ -48,7 +48,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         StaffingLevelTemplate staffingLevelTemplate=StaffingLevelTemplateDTO.buildStaffingLevelTemplate(staffingLevelTemplateDTO);
         this.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate,staffingLevelTemplateDTO);
-        staffingLevelTemplateDTO.setStaffingLevelInterval( staffingLevelTemplateDTO.getStaffingLevelInterval().stream()
+        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval( staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
         return staffingLevelTemplateDTO;
 
@@ -68,7 +68,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             staffingLevelTemplate=StaffingLevelTemplateDTO.updateStaffingTemplate(staffingTemplateId,staffingLevelTemplateDTO,staffingLevelTemplate);
             this.save(staffingLevelTemplate);
             BeanUtils.copyProperties(staffingLevelTemplate,staffingLevelTemplateDTO);
-            staffingLevelTemplateDTO.setStaffingLevelInterval( staffingLevelTemplate.getStaffingLevelInterval().stream()
+            staffingLevelTemplateDTO.setPresenceStaffingLevelInterval( staffingLevelTemplate.getPresenceStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
 
 

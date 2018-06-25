@@ -9,6 +9,6 @@ import java.util.Map;
 
 public interface PriorityGroupRuleFilter {
 
-
+//todo remove prioritygroupdto and send only required data in constructor
     public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO);
 }

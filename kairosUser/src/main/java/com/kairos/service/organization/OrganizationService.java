@@ -9,10 +9,8 @@ import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
-import com.kairos.constants.ApiConstants;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
-import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
@@ -354,7 +352,7 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-        workingTimeAgreementRestClient.assignWTAToOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
@@ -450,7 +448,7 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-        workingTimeAgreementRestClient.assignWTAToOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
@@ -846,7 +844,7 @@ public class OrganizationService extends UserBaseService {
 
         }
 
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findByIdIn(organizationDTO.getBusinessTypeId());
+        List<BusinessType> businessTypes = businessTypeGraphRepository.findByIdIn(organizationDTO.getBusinessTypeIds());
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(organizationDTO.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationDTO.getSubTypeId());
         unit.setBusinessTypes(businessTypes);
@@ -891,11 +889,11 @@ public class OrganizationService extends UserBaseService {
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
 //        phaseRestClient.createDefaultPhases(unit.getId());
 //        periodRestClient.createDefaultPeriodSettings(unit.getId());
-        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),unit.getCountry().getId());
+        priorityGroupIntegrationService.crateDefaultDataForOrganization(unit.getId(),parent.getCountry().getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
-        workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getSubTypeId(), unit.getId(), country.getId());
+        workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationDTO.getSubTypeId(), unit.getId(), country.getId());
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
 
         Map<String, Object> response = new HashMap<>();

@@ -251,7 +251,7 @@ public class TaskController {
     }
 
     @ApiOperation(value = "get All VRPTask by Organization")
-    @GetMapping(value = "/vrpTask")
+    @GetMapping(value = "/vrpTasks")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTasks(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

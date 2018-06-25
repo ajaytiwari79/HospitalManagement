@@ -1,7 +1,7 @@
 package com.kairos.persistance.model.master_data_management.asset_management;
 
 
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,14 +20,14 @@ public class MasterAsset extends MongoBaseEntity {
     private String description;
 
     @NotNull(message = "error.message.cannot.be.null")
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
 
     @NotNull
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    private List <OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
     @NotNull
-    private List <OrganizationTypeAndServiceBasicDto> organizationServices;
+    private List <OrganizationTypeAndServiceBasicDTO> organizationServices;
     @NotNull
-    private List <OrganizationTypeAndServiceBasicDto> organizationSubServices;
+    private List <OrganizationTypeAndServiceBasicDTO> organizationSubServices;
 
     private Long countryId;
 
@@ -55,35 +55,35 @@ public class MasterAsset extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
+    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
+    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 }

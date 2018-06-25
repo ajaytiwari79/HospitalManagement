@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSource;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSourceMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -12,8 +12,6 @@ import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -29,9 +27,9 @@ public class DataSourceService extends MongoBaseService {
     private DataSourceMongoRepository dataSourceMongoRepository;
 
 
-    public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSource> dataSources) {
+    public Map<String, List<DataSource>> createDataSource(Long countryId,Long organizationId,List<DataSource> dataSources) {
         Map<String, List<DataSource>> result = new HashMap<>();
-        List<DataSource> existing = new ArrayList<>();
+
         List<DataSource> newDataSources = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (dataSources.size() != 0) {
@@ -42,7 +40,7 @@ public class DataSourceService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            existing = dataSourceMongoRepository.findByCountryAndNameList(countryId, names);
+            List<DataSource> existing = dataSourceMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
             existing.forEach(item -> names.remove(item.getName()));
 
             if (names.size()!=0) {
@@ -51,6 +49,7 @@ public class DataSourceService extends MongoBaseService {
                     DataSource newDataSource = new DataSource();
                     newDataSource.setName(name);
                     newDataSource.setCountryId(countryId);
+                    newDataSource.setOrganizationId(organizationId);
                     newDataSources.add(newDataSource);
 
                 }
@@ -66,14 +65,14 @@ public class DataSourceService extends MongoBaseService {
 
     }
 
-    public List<DataSource> getAllDataSource() {
-        return dataSourceMongoRepository.findAllDataSources(UserContext.getCountryId());
+    public List<DataSource> getAllDataSource(Long countryId,Long organizationId) {
+        return dataSourceMongoRepository.findAllDataSources(countryId,organizationId);
     }
 
 
-    public DataSource getDataSource(Long countryId, BigInteger id) {
+    public DataSource getDataSource(Long countryId,Long organizationId,BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId,organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -83,9 +82,9 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataSource(BigInteger id) {
+    public Boolean deleteDataSource(Long countryId,Long organizationId,BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByid(id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -97,9 +96,9 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public DataSource updateDataSource(BigInteger id, DataSource dataSource) {
+    public DataSource updateDataSource(Long countryId,Long organizationId,BigInteger id, DataSource dataSource) {
 
-        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(UserContext.getCountryId(),dataSource.getName());
+        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId,organizationId,dataSource.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
@@ -114,11 +113,11 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public DataSource getDataSourceByName(Long countryId, String name) {
+    public DataSource getDataSourceByName(Long countryId,Long organizationId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
+            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId,organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

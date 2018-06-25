@@ -104,7 +104,7 @@ public class Task extends TaskDemand {
     private boolean locationChanged;
 
     //Vrp settings
-    private Integer installationNumber;
+    private Long installationNumber;
     private String citizenName;
 
     public String getCitizenName() {
@@ -115,11 +115,11 @@ public class Task extends TaskDemand {
         this.citizenName = citizenName;
     }
 
-    public Integer getInstallationNumber() {
+    public Long getInstallationNumber() {
         return installationNumber;
     }
 
-    public void setInstallationNumber(Integer installationNumber) {
+    public void setInstallationNumber(Long installationNumber) {
         this.installationNumber = installationNumber;
     }
 

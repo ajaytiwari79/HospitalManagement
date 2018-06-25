@@ -1,5 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -9,21 +11,32 @@ import org.optaplanner.core.api.domain.variable.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author pradeep
  * @date - 7/6/18
  */
 @PlanningEntity
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task extends TaskOrShift{
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     //TODO consider break in  sub tasks or dont consider merged tasks at all
     private String id;
-    private int intallationNo;
-    private Double lattitude;
+    private long installationNo;
+    private Double latitude;
     private Double longitude;
     private Set<String> skills;
     private int duration;
@@ -36,7 +49,6 @@ public class Task extends TaskOrShift{
     @PlanningVariable(valueRangeProviderRefs = {
             "tasks","shifts" }, graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrShift prevTaskOrShift;
-
     @CustomShadowVariable(sources = @PlanningVariableReference(variableName = "prevTaskOrShift"),variableListenerClass = VrpTaskStartTimeListener.class)
     private LocalDateTime plannedStartTime;
 
@@ -44,10 +56,11 @@ public class Task extends TaskOrShift{
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
     private LocationsDistanceMatrix locationsDistanceMatrix;
-    public Task(String id,int intallationNo, Double lattitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
+    private boolean shiftBreak;
+    public Task(String id, long installationNo, Double latitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city,boolean shiftBreak) {
         this.id = id;
-        this.intallationNo = intallationNo;
-        this.lattitude = lattitude;
+        this.installationNo = installationNo;
+        this.latitude = latitude;
         this.longitude = longitude;
         this.skills = skills;
         this.duration = duration;
@@ -57,10 +70,14 @@ public class Task extends TaskOrShift{
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+        this.shiftBreak=shiftBreak;
+    }
+    public Task(long installationNo,  int duration ,boolean shiftBreak) {
+        this(UUID.randomUUID().toString(),installationNo,0d,0d, null,duration,null,0,null,0,0,null,shiftBreak);
     }
 
-
-
+    public Task() {
+    }
     public String getId() {
         return id;
     }
@@ -148,29 +165,22 @@ public class Task extends TaskOrShift{
         this.skills = skills;
     }
 
-    public Task() {
+
+
+    public long getInstallationNo() {
+        return installationNo;
     }
 
-    public Task(int intallationNo, Double lattitude, Double longitude) {
-        this.intallationNo = intallationNo;
-        this.lattitude = lattitude;
-        this.longitude = longitude;
+    public void setInstallationNo(long installationNo) {
+        this.installationNo = installationNo;
     }
 
-    public int getIntallationNo() {
-        return intallationNo;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
-    }
-
-    public Double getLattitude() {
-        return lattitude;
-    }
-
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {
@@ -203,21 +213,33 @@ public class Task extends TaskOrShift{
     }
 
     public double getPlannedDuration(){
-        return this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
+        return shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
     }
     //for rules only
     public int getDrivingTimeSeconds(){
+        /*if(!false){
+            return 0;
+        }*/
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
         }
-        if(prevTaskOrShift instanceof Shift) return 0;
-        Task prevTask=(Task)prevTaskOrShift;
-        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLattitude(),prevTask.getLongitude(),this.getLattitude(),this.getLongitude()));
+        if(prevTaskOrShift instanceof Shift || shiftBreak) return 0;
+        Task prevTask=getPreviousValidTask((Task)prevTaskOrShift);
+        if(prevTask==null) return 0;
+        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
+        if(lpd==null){
+            int i=0;
+        }
         return lpd.getTime();
-
-
     }
 
+    private Task getPreviousValidTask(Task task) {
+            while(task.isShiftBreak() && task.getPrevTaskOrShift() instanceof Task){
+                task= (Task) task.getPrevTaskOrShift();
+            }
+
+            return task.isShiftBreak() ?null : task;
+    }
 
     public int getDrivingTime(){
         int mins=(int)Math.ceil(getDrivingTimeSeconds()/60d);
@@ -233,22 +255,22 @@ public class Task extends TaskOrShift{
         Task task = (Task) o;
 
         return new EqualsBuilder()
-                .append(intallationNo, task.intallationNo)
+                .append(installationNo, task.installationNo)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(intallationNo)
+                .append(installationNo)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                + intallationNo +
-                "-" + duration +
+                +installationNo +
+                "-" + duration +(shiftBreak?"(break)":"")+
                 '}';
     }
 
@@ -261,19 +283,40 @@ public class Task extends TaskOrShift{
     }
 
     public String getLatLongString(){
-        return lattitude+":"+longitude;
+        return latitude +":"+longitude;
     }
     public boolean isConsecutive(Task task){
-        //If chain(shift) is different.. dont even consider this constraint
-        boolean consecutive = !VrpPlanningUtil.hasSameChain(this, task) || VrpPlanningUtil.isConsecutive(this, task);
-        return consecutive;
+        return VrpPlanningUtil.isConsecutive(this, task);
     }
     public boolean isEmployeeEligible(){
-        return shift==null || shift.getEmployee().getSkills().containsAll(this.skills);
+        return shift==null || shiftBreak || shift.getEmployee().getSkills().containsAll(this.skills);
     }
     public boolean hasSameLocation(Task task){
         return VrpPlanningUtil.hasSameLocation(this,task);
     }
+    public boolean hasSameChain(Task task){
+        return VrpPlanningUtil.hasSameChain(this,task);
+    }
+    public boolean hasSameSkillset(Task task){
+        return VrpPlanningUtil.hasSameSkillset(this,task);
+    }
+    public int getMissingSkills(){
+            return VrpPlanningUtil.getMissingSkills(this,this.getShift().getEmployee());
+    }
 
+    public boolean isShiftBreak() {
+        return shiftBreak;
+    }
+
+    public void setShiftBreak(boolean shiftBreak) {
+        this.shiftBreak = shiftBreak;
+    }
+    public boolean isBreakInWindow(){
+
+        if(plannedStartTime==null) return true;
+        int mins=plannedStartTime.get(ChronoField.MINUTE_OF_DAY);
+        //in between 1100 to 1330
+        return mins >=660 && mins<=810;
+    }
 
 }

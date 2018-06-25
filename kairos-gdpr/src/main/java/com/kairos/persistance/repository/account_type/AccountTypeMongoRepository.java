@@ -12,22 +12,19 @@ import java.util.Set;
 @Repository
 public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,BigInteger> {
 
-   @Query("{deleted:false,countryId:?0,_id:?1}")
-   AccountType findByIdAndNonDeleted(Long countryId,BigInteger id);
+   @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
+   AccountType findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-   @Query("{deleted:false,countryId:?0}")
-   List<AccountType> getAllAccountType(Long countryId);
+   @Query("{deleted:false,countryId:?0,organizationId:?1}")
+   List<AccountType> getAllAccountType(Long countryId,Long organizationId);
 
-   @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-   List<AccountType> getAccountTypeList(Long countryId,Set<BigInteger> ids);
+   @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
+   List<AccountType> getAccountTypeList(Long countryId,Long organizationId,Set<BigInteger> ids);
 
    AccountType findByid(BigInteger id);
 
-   @Query("{name:?1,countryId:?0,deleted:false}")
-   AccountType findByTypeOfAccount(Long countryId,String typeOfAccount);
-
-   @Query("{deleted:false,countryId:?0,name:?1}")
-  AccountType findByNameAndNonDeleted(Long countryId,String name);
+   @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
+  AccountType findByName(Long countryId,Long organizationId,String name);
 
 
 

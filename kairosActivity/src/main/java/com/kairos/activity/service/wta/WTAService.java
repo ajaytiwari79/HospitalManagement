@@ -18,6 +18,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
+import com.kairos.activity.service.solver_config.SolverConfigService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -74,7 +75,7 @@ public class WTAService extends MongoBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     private OrganizationRestClient organizationRestClient;
-
+    @Inject private SolverConfigService solverConfigService;
     @Autowired
     private ExceptionService exceptionService;
 
@@ -503,6 +504,7 @@ public class WTAService extends MongoBaseService {
         });
         if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);
+            solverConfigService.createDefaultConfig(organisationId);
         }
         return true;
     }
