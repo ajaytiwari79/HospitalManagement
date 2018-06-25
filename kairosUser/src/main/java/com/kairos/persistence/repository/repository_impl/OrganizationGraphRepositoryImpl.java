@@ -53,19 +53,26 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters, Boolean fetchStaffHavingUnitPosition){
         String matchRelationshipQueryForStaff = "";
         if(Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()){
-            matchRelationshipQueryForStaff+= " MATCH (unitPos)-["+HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) "+
-                    "WHERE id(employmentType) IN {employmentTypeIds} with user, staff, unitPos,expertiseList,employmentList ";
+            matchRelationshipQueryForStaff+= " MATCH (unitPos)-[empRelation:"+HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) "+
+                    "WHERE id(employmentType) IN {employmentTypeIds}  ";
+        } else {
+            matchRelationshipQueryForStaff+= " OPTIONAL MATCH (unitPos)-[empRelation:"+HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType)  ";
         }
         if(Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()){
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-["+HAS_EXPERTISE_IN+"]-(expertise:Expertise) "+
-                    "WHERE id(expertise) IN {expertiseIds} with user, staff, unitPos,expertiseList,employmentList ";
+                    "WHERE id(expertise) IN {expertiseIds} ";
+        } else {
+            matchRelationshipQueryForStaff+= " OPTIONAL MATCH (unitPos)-["+HAS_EXPERTISE_IN+"]-(expertise:Expertise)  ";
         }
         if(Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()){
-            matchRelationshipQueryForStaff+= " Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds} with engineerType, staff, user,expertiseList ,employmentList ";
+            matchRelationshipQueryForStaff+= " Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds}  ";
 
         } else {
-            matchRelationshipQueryForStaff+= " OPTIONAL Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) with engineerType, staff, user, expertiseList,employmentList ";
+            matchRelationshipQueryForStaff+= " OPTIONAL Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) ";
         }
+        matchRelationshipQueryForStaff+= " with engineerType, staff, user, "+
+                "CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name,employmentTypeCategory:empRelation.employmentTypeCategory}) END as employmentList, "+
+                "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList";
         return matchRelationshipQueryForStaff;
     }
 
@@ -108,15 +115,15 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         String query = "";
         if(fetchStaffHavingUnitPosition){
             query+= " MATCH (staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPos:UnitPosition{deleted:false})-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={unitId}"+
-                    " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText)+
-                    " match (emp:EmploymentType)<-[relation:"+HAS_EMPLOYMENT_TYPE+"]-(unitPos)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
-                    " with user ,staff, collect({id:id(expertise),name:expertise.name}) as expertiseList ,collect({id:id(emp),name:emp.name,employmentTypeCategory:relation.employmentTypeCategory}) as employmentList \n";
+                    " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText) + " WITH user, staff, unitPos";
+//                    " match (emp:EmploymentType)<-[relation:"+HAS_EMPLOYMENT_TYPE+"]-(unitPos)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
+//                    " with user, unitPos,staff, collect({id:id(expertise),name:expertise.name}) as expertiseList ,collect({id:id(emp),name:emp.name,employmentTypeCategory:relation.employmentTypeCategory}) as employmentList \n";
         } else {
             query+= " MATCH (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]-(staff:Staff) where id(organization)={parentOrganizationId} "+
                     " MATCH (staff)-[:"+BELONGS_TO+"]->(user:User)  "+ getMatchQueryForPropertiesOfStaffByFilters(filters, searchText)+
-                    " with user, staff OPTIONAL MATCH (staff)-[:"+BELONGS_TO_STAFF+"]-(unitPos:UnitPosition{deleted:false})-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos "+
-                    " optional match (emp:EmploymentType)<-[relation:"+HAS_EMPLOYMENT_TYPE+"]-(unitPos)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
-                    " with user ,staff, collect({id:id(expertise),name:expertise.name}) as expertiseList ,collect({id:id(emp),name:emp.name,employmentTypeCategory:relation.employmentTypeCategory}) as employmentList \n";
+                    " with user, staff OPTIONAL MATCH (staff)-[:"+BELONGS_TO_STAFF+"]-(unitPos:UnitPosition{deleted:false})-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos ";
+//                    " optional match (emp:EmploymentType)<-[relation:"+HAS_EMPLOYMENT_TYPE+"]-(unitPos)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
+//                    " with user, unitPos,staff, collect({id:id(expertise),name:expertise.name}) as expertiseList ,collect({id:id(emp),name:emp.name,employmentTypeCategory:relation.employmentTypeCategory}) as employmentList \n";
         }
 
         query+= getMatchQueryForRelationshipOfStaffByFilters(filters, fetchStaffHavingUnitPosition);
