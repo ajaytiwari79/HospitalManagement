@@ -66,6 +66,10 @@ public class VrpTaskPlanningSolver {
         //TODO ease efficiency for debugging
         //problem.getEmployees().forEach(e->e.setEfficiency(100));
         log.info("Number of tasks:"+problem.getTasks().size());
+        LocationPair locationPair = new ArrayList<LocationPair>(problem.getLocationsDistanceMatrix().getTable().keySet()).get(2);
+        LocationPairDifference locationsDifference = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair);
+        LocationPairDifference locationsDifference2 = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair.getReversePair());
+
         VrpTaskPlanningSolution solution=null;
         try {
             solution = solver.solve(problem);
