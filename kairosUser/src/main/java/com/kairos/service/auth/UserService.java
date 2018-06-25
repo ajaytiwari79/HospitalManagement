@@ -422,7 +422,7 @@ public class UserService extends UserBaseService {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class)));
             }
-            permissionData.setHub(true);
+            permissionData.setHub(false);
             permissionData.setOrganizationPermissions(unitPermission);
         }
         return permissionData;
