@@ -14,7 +14,8 @@ import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTi
 import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
 import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
-import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.response.dto.web.cta.PhaseResponseDTO;
+import com.kairos.response.dto.web.cta.TimeTypeResponseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import org.springframework.stereotype.Service;
 
@@ -58,18 +59,18 @@ public class ActivityConfigurationService extends MongoBaseService {
             switch (phase.getName()) {
                 case DRAFT_PHASE_NAME:
                     createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    getDefaultAbsenceSettings(phase.getId(), extraTimePlannedTypeId, activityConfigurations, unitId);
+                    createDefaultAbsenceSettings(phase.getId(), extraTimePlannedTypeId, activityConfigurations, unitId);
                     break;
                 case REQUEST_PHASE_NAME:
-                    getDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
                     createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
                     break;
                 case CONSTRUCTION_PHASE_NAME:
-                    getDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
                     createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
                     break;
                 case PUZZLE_PHASE_NAME:
-                    getDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
                     createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
                     break;
                 default:
@@ -84,7 +85,7 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     }
 
-    private void getDefaultAbsenceSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long unitId) {
+    private void createDefaultAbsenceSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long unitId) {
         activityConfigurations.add(new ActivityConfiguration(unitId, new AbsencePlannedTime(phaseId, applicablePlannedTimeId, false)));
     }
 
@@ -135,10 +136,10 @@ public class ActivityConfigurationService extends MongoBaseService {
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
-        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(unitId);
+        List<PhaseResponseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(unitId);
         List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
         List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
-        List<TimeTypeDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
+        List<TimeTypeResponseDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         ActivityConfigurationWrapper activityConfigurationWrapper = new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes);
 

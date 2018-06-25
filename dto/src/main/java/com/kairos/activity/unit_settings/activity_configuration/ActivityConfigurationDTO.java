@@ -2,8 +2,8 @@ package com.kairos.activity.unit_settings.activity_configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.cta.PhaseDTO;
-import com.kairos.response.dto.web.cta.TimeTypeDTO;
+import com.kairos.response.dto.web.cta.PhaseResponseDTO;
+import com.kairos.response.dto.web.cta.TimeTypeResponseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
 import java.math.BigInteger;
@@ -12,11 +12,11 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityConfigurationDTO {
     private BigInteger id;
-    private PhaseDTO phase;
+    private PhaseResponseDTO phase;
     private PresenceTypeDTO managementPlannedTime;
     private PresenceTypeDTO staffPlannedTime;
     private PresenceTypeDTO plannedTime; // for activity.
-    private TimeTypeDTO timeType;
+    private TimeTypeResponseDTO timeType;
     private Boolean exception;
 
     public ActivityConfigurationDTO() {
@@ -31,11 +31,11 @@ public class ActivityConfigurationDTO {
         this.id = id;
     }
 
-    public PhaseDTO getPhase() {
+    public PhaseResponseDTO getPhase() {
         return phase;
     }
 
-    public void setPhase(PhaseDTO phase) {
+    public void setPhase(PhaseResponseDTO phase) {
         this.phase = phase;
     }
 
@@ -63,11 +63,11 @@ public class ActivityConfigurationDTO {
         this.plannedTime = plannedTime;
     }
 
-    public TimeTypeDTO getTimeType() {
+    public TimeTypeResponseDTO getTimeType() {
         return timeType;
     }
 
-    public void setTimeType(TimeTypeDTO timeType) {
+    public void setTimeType(TimeTypeResponseDTO timeType) {
         this.timeType = timeType;
     }
 

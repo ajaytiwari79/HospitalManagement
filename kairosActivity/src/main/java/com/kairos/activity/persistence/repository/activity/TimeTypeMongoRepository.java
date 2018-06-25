@@ -4,6 +4,7 @@ package com.kairos.activity.persistence.repository.activity;
 import com.kairos.activity.persistence.model.activity.TimeType;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
+import com.kairos.response.dto.web.cta.TimeTypeResponseDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -38,5 +39,5 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     List<TimeTypeDTO> getTopLevelTimeTypeIds(Long countryId);
 
     @Query("{upperLevelTimeTypeId:{$in:?0},deleted : false}")
-    List<TimeTypeDTO> findAllChildByParentId(List<BigInteger> id);
+    List<TimeTypeResponseDTO> findAllChildByParentId(List<BigInteger> id);
 }

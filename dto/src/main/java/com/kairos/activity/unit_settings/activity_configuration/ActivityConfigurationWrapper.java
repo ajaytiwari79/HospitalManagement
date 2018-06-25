@@ -1,37 +1,37 @@
 package com.kairos.activity.unit_settings.activity_configuration;
 
 
-import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.response.dto.web.cta.PhaseResponseDTO;
+import com.kairos.response.dto.web.cta.TimeTypeResponseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ActivityConfigurationWrapper {
-    List<PhaseDTO> phases = new ArrayList<>();
-    List<TimeTypeDTO> topLevelTimeTypes = new ArrayList<>();
+    List<PhaseResponseDTO> phases = new ArrayList<>();
+    List<TimeTypeResponseDTO> topLevelTimeTypes = new ArrayList<>();
     List<PresenceTypeDTO> plannedTimeTypes = new ArrayList<>();
 
-    public ActivityConfigurationWrapper(List<PhaseDTO> phases, List<TimeTypeDTO> topLevelTimeTypes, List<PresenceTypeDTO> plannedTimeTypes) {
+    public ActivityConfigurationWrapper(List<PhaseResponseDTO> phases, List<TimeTypeResponseDTO> topLevelTimeTypes, List<PresenceTypeDTO> plannedTimeTypes) {
         this.phases = phases;
         this.topLevelTimeTypes = topLevelTimeTypes;
         this.plannedTimeTypes = plannedTimeTypes;
     }
 
-    public List<PhaseDTO> getPhases() {
+    public List<PhaseResponseDTO> getPhases() {
         return phases;
     }
 
-    public void setPhases(List<PhaseDTO> phases) {
+    public void setPhases(List<PhaseResponseDTO> phases) {
         this.phases = phases;
     }
 
-    public List<TimeTypeDTO> getTopLevelTimeTypes() {
+    public List<TimeTypeResponseDTO> getTopLevelTimeTypes() {
         return topLevelTimeTypes;
     }
 
-    public void setTopLevelTimeTypes(List<TimeTypeDTO> topLevelTimeTypes) {
+    public void setTopLevelTimeTypes(List<TimeTypeResponseDTO> topLevelTimeTypes) {
         this.topLevelTimeTypes = topLevelTimeTypes;
     }
 
