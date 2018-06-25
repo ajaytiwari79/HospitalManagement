@@ -192,14 +192,14 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
     }
 
     @Override
-    public Map getAllTasksInstallationNoAndTaskTypeId(Long unitId){
+    public Map<Long,BigInteger> getAllTasksInstallationNoAndTaskTypeId(Long unitId){
         Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("unitId").is(unitId).and("isDeleted").is(false)),
                 //lookup("task_types","taskTypeId","_id","taskType"),
                 new CustomAggregationOperation(Document.parse("{ \"$project\" : { \"installationIdandtaskType\" : { \"$concat\" : [{$substr: [\"$installationNumber\",0,64]},\"$taskTypeId\"] } } }"))
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,Task.class, Map.class);
-        Map<Integer,BigInteger> installationNoAndTaskTypeId = new HashMap<>();
-        results.getMappedResults().forEach(t->installationNoAndTaskTypeId.put(new Integer((String) t.get("installationIdandtaskType")),new BigInteger((String)t.get("_id"))));
+        Map<Long,BigInteger> installationNoAndTaskTypeId = new HashMap<>();
+        results.getMappedResults().forEach(t->installationNoAndTaskTypeId.put(new Long((String) t.get("installationIdandtaskType")),new BigInteger((String)t.get("_id"))));
         return installationNoAndTaskTypeId;
     }
 
