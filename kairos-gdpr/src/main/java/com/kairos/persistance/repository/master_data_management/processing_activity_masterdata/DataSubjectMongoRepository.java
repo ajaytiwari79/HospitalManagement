@@ -14,21 +14,21 @@ import java.util.Set;
 @Repository
 public interface DataSubjectMongoRepository extends MongoRepository<DataSubject,BigInteger> {
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
-    DataSubject findByIdAndNonDeleted(Long countryId,BigInteger id);
+    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
+    DataSubject findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
-    DataSubject findByName(Long countryId,String name);
+    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
+    DataSubject findByName(Long countryId,Long organizationId,String name);
 
-    @Query("{countryId:?0,_id:{$in:?1}}")
-    List<DataSubject> getDataSubjectList(Long countryId,List<BigInteger> ids);
+    @Query("{countryId:?0,organizationId:?1,_id:{$in:?2}}")
+    List<DataSubject> getDataSubjectList(Long countryId,Long organizationId,List<BigInteger> ids);
 
     DataSubject findByid(BigInteger id);
 
 
-    @Query("{countryId:?0,deleted:false}")
-    List<DataSubject> findAllDataSubjects(Long countryId);
+    @Query("{countryId:?0,organizationId:?1,deleted:false}")
+    List<DataSubject> findAllDataSubjects(Long countryId,Long organizationId);
 
-    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
-    List<DataSubject>  findByCountryAndNameList(Long countryId, Set<String> name);
+    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
+    List<DataSubject>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
 }
