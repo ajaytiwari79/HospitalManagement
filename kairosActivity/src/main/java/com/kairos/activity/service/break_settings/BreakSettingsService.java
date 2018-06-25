@@ -4,6 +4,7 @@ import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.break_settings.BreakSettingsDTO;
 import org.springframework.stereotype.Service;
 

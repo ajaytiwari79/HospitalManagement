@@ -41,7 +41,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         if (Optional.ofNullable(shift.getActivity().getExpertises()).isPresent() && !shift.getActivity().getExpertises().isEmpty()) {
             expertiseIds.addAll(shift.getActivity().getExpertises());
             if (expertiseIds.contains(expertise.getId())) {
-                Collections.emptyList();
+                return Collections.emptyList();
             }
             return Arrays.asList("message.activity.expertise.match");
         }
