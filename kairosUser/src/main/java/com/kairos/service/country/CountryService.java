@@ -495,7 +495,7 @@ public class CountryService extends UserBaseService {
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
          List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
-         List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
+         List<PhaseResponseDTO> phases = phaseRestClient.getPhases(countryId);
          List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
 
          //wrap data into wrapper class

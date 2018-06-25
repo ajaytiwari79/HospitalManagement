@@ -9,7 +9,7 @@ import java.util.Map;
 public class CTARuleTemplateDefaultDataWrapper {
     private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     private List<DayTypeDTO> dayTypes=new ArrayList<>();
-    private List<PhaseDTO> phases=new ArrayList<>();
+    private List<PhaseResponseDTO> phases=new ArrayList<>();
     private List<com.kairos.activity.response.dto.activity.TimeTypeDTO> timeTypes=new ArrayList<>();
     private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
     private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
@@ -46,11 +46,11 @@ public class CTARuleTemplateDefaultDataWrapper {
         this.dayTypes = dayTypes;
     }
 
-    public List<PhaseDTO> getPhases() {
+    public List<PhaseResponseDTO> getPhases() {
         return phases;
     }
 
-    public void setPhases(List<PhaseDTO> phases) {
+    public void setPhases(List<PhaseResponseDTO> phases) {
         this.phases = phases;
     }
 
