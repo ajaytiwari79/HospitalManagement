@@ -48,14 +48,14 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findAllActivitiesWithTimeTypesByUnit(Long unitId);
 
-    Activity findByNameAndDateAndCountryId(String name,Long countryId,Date date);
+    Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId,LocalDate startDate,LocalDate endDate);
 
-    Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId,Date date);
-
-    Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,Date date);
+    Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,LocalDate startDate,LocalDate endDate);
 
     Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId);
-    Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate);
-    Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate);
+
+    Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate,LocalDate endDate);
+
+    Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate,LocalDate endDate);
 
 }
