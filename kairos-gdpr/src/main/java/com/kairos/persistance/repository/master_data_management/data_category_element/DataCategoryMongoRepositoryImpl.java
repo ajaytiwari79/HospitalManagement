@@ -17,8 +17,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import java.math.BigInteger;
 import java.util.List;
 
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.DELETED;
 
 public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryRepository {
 

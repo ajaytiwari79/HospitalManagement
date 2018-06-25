@@ -1,6 +1,6 @@
 package com.kairos.service.master_data_management.data_category_element;
 
-import com.kairos.dto.master_data.DataCategoryDto;
+import com.kairos.dto.master_data.DataCategoryDTO;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataCategoryMongoRepository;
@@ -11,13 +11,13 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import static com.kairos.constant.AppConstant.IDS_LIST;
-import static com.kairos.constant.AppConstant.DATA_EMELENTS_LIST;
 
-
+import static com.kairos.constants.AppConstant.IDS_LIST;
+import static com.kairos.constants.AppConstant.DATA_EMELENTS_LIST;
 
 
 @Service
@@ -40,7 +40,7 @@ public class DataCategoryService extends MongoBaseService {
 
     /*add data category with multiple data element, create data element and get ids from data element service
      */
-    public DataCategory addDataCategoryAndDataElement(Long countryId, DataCategoryDto dataCategoryDto) {
+    public DataCategory addDataCategoryAndDataElement(Long countryId, DataCategoryDTO dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent()) {
@@ -106,26 +106,25 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    public DataCategory updateDataCategoryAndElement(Long countryId, BigInteger id, DataCategoryDto dataCategoryDto) {
+    public DataCategory updateDataCategoryAndDataElement(Long countryId, BigInteger id, DataCategoryDTO dataCategoryDto) {
 
         DataCategory dataCategory = dataCategoryMongoRepository.findByCountryIdAndName(countryId, dataCategoryDto.getName());
-        if (Optional.ofNullable(dataCategory).isPresent() && id.equals(dataCategory.getId())) {
+        if (Optional.ofNullable(dataCategory).isPresent() && !id.equals(dataCategory.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
         dataCategory = dataCategoryMongoRepository.findByid(id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
-        Map<String, Object> dataElementList = new HashMap<>();
+        Map<String, Object> dataElementListMap = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
         try {
-            dataElementList = dataElementService.updateDataElementAndCreateNewDataElement(countryId, dataCategoryDto.getDataElements());
             dataCategory.setName(dataCategoryDto.getName());
-            dataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
+            dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
             dataCategory = save(dataCategory);
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_EMELENTS_LIST));
         }
 
         return dataCategory;

@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data_management.data_category_element;
 
 
-import com.kairos.dto.master_data.DataElementDto;
+import com.kairos.dto.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataElement;
 import com.kairos.service.master_data_management.data_category_element.DataElementService;
 import com.kairos.utils.ResponseHandler;
@@ -16,7 +16,7 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constant.ApiConstant.API_DATA_ELEMENT_URL;
+import static com.kairos.constants.ApiConstant.API_DATA_ELEMENT_URL;
 
 @RestController
 @RequestMapping(API_DATA_ELEMENT_URL)
@@ -29,7 +29,7 @@ public class DataElementController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDto> dataElements) {
+    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDTO> dataElements) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id Cannotbe null");
         }

@@ -34,7 +34,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
 /*
 
-    ProcessingActivity createProcessingActivity(ProcessingActivityDto processingActivityDto) {
+    ProcessingActivity createProcessingActivity(ProcessingActivityDTO processingActivityDto) {
 
         List<BigInteger> dataSubectids, processingPurposeids;
         dataSubectids = processingActivityDto.getDataSubjects();

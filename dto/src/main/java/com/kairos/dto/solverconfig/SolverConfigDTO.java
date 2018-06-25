@@ -1,23 +1,55 @@
 package com.kairos.dto.solverconfig;
 
-import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.solver_config.PlanningType;
+import com.kairos.enums.solver_config.SolverConfigStatus;
 
 import java.math.BigInteger;
 import java.util.List;
 
+/**
+ * @author pradeep
+ * @date - 20/6/18
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolverConfigDTO {
-    private BigInteger id;
-    private List<WTATemplateType> templateTypes;
 
-    public SolverConfigDTO() {
+    private BigInteger id;
+    private String name;
+    private Long unitId;
+    private boolean isTemplate;
+    private PlanningType phase;
+    private BigInteger parentSolverConfigId;
+    private Integer terminationTime;
+    private List<ConstraintValueDTO> constraints;
+    private SolverConfigStatus status;
+    private boolean isDefault;
+
+
+    public Long getUnitId() {
+        return unitId;
     }
 
-    private long terminationSeconds;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
-    public SolverConfigDTO(BigInteger id, List<WTATemplateType> templateTypes, long terminationSeconds) {
-        this.id = id;
-        this.templateTypes = templateTypes;
-        this.terminationSeconds = terminationSeconds;
+    public SolverConfigStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SolverConfigStatus status) {
+        this.status = status;
+    }
+
+    public List<ConstraintValueDTO> getConstraints() {
+        return constraints;
+    }
+
+    public void setConstraints(List<ConstraintValueDTO> constraints) {
+        this.constraints = constraints;
     }
 
     public BigInteger getId() {
@@ -28,19 +60,52 @@ public class SolverConfigDTO {
         this.id = id;
     }
 
-    public List<WTATemplateType> getTemplateTypes() {
-        return templateTypes;
+    public String getName() {
+        return name;
     }
 
-    public void setTemplateTypes(List<WTATemplateType> templateTypes) {
-        this.templateTypes = templateTypes;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public long getTerminationSeconds() {
-        return terminationSeconds;
+    public boolean isTemplate() {
+        return isTemplate;
     }
 
-    public void setTerminationSeconds(long terminationSeconds) {
-        this.terminationSeconds = terminationSeconds;
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
+    public PlanningType getPhase() {
+        return phase;
+    }
+
+    public void setPhase(PlanningType phase) {
+        this.phase = phase;
+    }
+
+
+    public BigInteger getParentSolverConfigId() {
+        return parentSolverConfigId;
+    }
+
+    public void setParentSolverConfigId(BigInteger parentSolverConfigId) {
+        this.parentSolverConfigId = parentSolverConfigId;
+    }
+
+    public Integer getTerminationTime() {
+        return terminationTime;
+    }
+
+    public void setTerminationTime(Integer terminationTime) {
+        this.terminationTime = terminationTime;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 }

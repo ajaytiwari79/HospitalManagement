@@ -84,5 +84,8 @@ public class StaticField {
     public static final String BASE_SOLVER_CONFIG_FIRST_PHASE = "com/kairos/shiftplanning/configuration/BASE_SHIFT_PLANNING_PHASE1_SOLVER.xml";
     public static final String SOLVER_CONFIG_DRL_PARENT_TAG="scroreDirectorFactory";
 
+    //Vrp planning
+	public static final String VRPPROBLEM_SUBMIT = "Vrp problem Submited";
+
 
 }

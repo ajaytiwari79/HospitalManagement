@@ -52,7 +52,7 @@ public class TomTomService {
     String [] keys = {"xvb1VJX66SrM187drGq52jrAo5wo1kRL","pxlAcwIFHNCPKpVODeMlmew1qoLx9ZGx","I0JgGGfWVTAipGAoCKyzwLTQ6RAaYqGF","nUocn0Xi8thXJZYGHYVbSIxpxCzK6Jca"};
 
     public void getLocationData() {
-        List<Task> tasks = taskService.getUniqueTask().stream().filter(ObjectUtils.distinctByKey(task -> task.getLattitude()+task.getLongitude())).collect(toList());
+        List<Task> tasks = taskService.getUniqueTask().stream().filter(ObjectUtils.distinctByKey(task -> task.getLatitude()+task.getLongitude())).collect(toList());
         List<List<Task>> subTaskList = getSubLists(tasks.subList(96,tasks.size()));
         //int i = 0;
         for (List<Task> origin : subTaskList) {
@@ -86,11 +86,11 @@ public class TomTomService {
             List<Matrix> matrices = response.getMatrix().get(i);
             for (int j=0;j<destination.size();j++){
                 Matrix matrix = matrices.get(j);
-                matrix.setFirstLatitude(origin.get(i).getLattitude());
+                matrix.setFirstLatitude(origin.get(i).getLatitude());
                 matrix.setFirstLongitude(origin.get(i).getLongitude());
-                matrix.setSecondLattitude(destination.get(j).getLattitude());
+                matrix.setSecondLattitude(destination.get(j).getLatitude());
                 matrix.setSecondLongitude(destination.get(j).getLongitude());
-                locationDistances.add(new LocationDistance(origin.get(i).getIntallationNo(),destination.get(j).getIntallationNo(),(double)matrix.getResponse().getRouteSummary().getLengthInMeters(),(double)matrix.getResponse().getRouteSummary().getTravelTimeInSeconds()));
+                locationDistances.add(new LocationDistance(origin.get(i).getInstallationNo(),destination.get(j).getInstallationNo(),(double)matrix.getResponse().getRouteSummary().getLengthInMeters(),(double)matrix.getResponse().getRouteSummary().getTravelTimeInSeconds()));
             }
         }
         tomTomRepository.save(response);
@@ -104,7 +104,7 @@ public class TomTomService {
         for (Task fromTask : fromTasks) {
             Map<String, Double> latLong = new HashMap<>();
             Map<String, Map> point = new HashMap<>();
-            latLong.put("latitude", fromTask.getLattitude());
+            latLong.put("latitude", fromTask.getLatitude());
             latLong.put("longitude", fromTask.getLongitude());
             point.put("point", latLong);
             points.add(point);
@@ -114,7 +114,7 @@ public class TomTomService {
         for (Task task : toTask) {
             Map<String, Double> latLong = new HashMap<>();
             Map<String, Map> point = new HashMap<>();
-            latLong.put("latitude", task.getLattitude());
+            latLong.put("latitude", task.getLatitude());
             latLong.put("longitude", task.getLongitude());
             point.put("point", latLong);
             points.add(point);

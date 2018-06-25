@@ -1,7 +1,7 @@
 package com.kairos.controller.filter;
 
 
-import com.kairos.dto.FilterSelectionDto;
+import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.service.filter.FilterService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constant.ApiConstant.API_FILTER;
+import static com.kairos.constants.ApiConstant.API_FILTER;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -52,7 +52,7 @@ public class FilterController {
      * @return Filter data on the basis of filter type selection and Ids
      */
     @PostMapping("/data/{moduleId}")
-    public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDto filterSelectionDto) {
+    public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
 
         if (countryId == null) {
 
