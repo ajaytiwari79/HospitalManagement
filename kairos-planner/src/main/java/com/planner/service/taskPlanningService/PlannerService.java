@@ -176,11 +176,10 @@ public class PlannerService {
         /*VrpTaskPlanningSolution solution = (VrpTaskPlanningSolution)new VrpTaskPlanningSolver().getxStream().fromXML(new File("optaplanner-vrp-taskplanning/src/main/resources/solution-2594soft.xml"));
 
         Object[] solvedTasks = getSolvedTasks(solution.getShifts());
-        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2]);*/
-        VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(solverConfigId);
-       /* vrpPlanningSolution.setSolverConfigId(solverConfigId);
-        vrpPlanningMongoRepository.save(vrpPlanningSolution);
-*/
+        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2]);
+        */VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(solverConfigId);
+        //vrpPlanningSolution.setSolverConfigId(solverConfigId);
+        //vrpPlanningMongoRepository.save(vrpPlanningSolution);
 /*
         */return ObjectMapperUtils.copyPropertiesByMapper(solution,VrpTaskPlanningDTO.class);
     }

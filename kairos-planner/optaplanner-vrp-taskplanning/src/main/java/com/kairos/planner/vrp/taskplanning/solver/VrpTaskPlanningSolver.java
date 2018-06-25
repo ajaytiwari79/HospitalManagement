@@ -28,8 +28,8 @@ public class VrpTaskPlanningSolver {
 
 
     public VrpTaskPlanningSolver(){
-        /*solverFactory = SolverFactory.createFromXmlFile(new File(config));
-        solver = solverFactory.buildSolver();*/
+        solverFactory = SolverFactory.createFromXmlFile(new File(config));
+        solver = solverFactory.buildSolver();
     }
 
 
