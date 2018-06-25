@@ -45,6 +45,10 @@ public class ShiftQueryResult {
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
 
+    public ShiftQueryResult() {
+        //DC
+    }
+
 
 
     public int getDurationMinutes() {
@@ -151,8 +155,7 @@ public class ShiftQueryResult {
         this.staffId = staffId;
     }
 
-    public ShiftQueryResult() {
-    }
+
 
     public Integer getWeekCount() {
         if (!overrideWeekCount) {

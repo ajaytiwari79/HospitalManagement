@@ -16,8 +16,8 @@ import javax.validation.constraints.Pattern;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountType extends MongoBaseEntity {
 
-    @NotNullOrEmpty
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
+    @NotNullOrEmpty(message = "Name cannot be empty")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "special character and numberic data is not allowed")
     private String name;
 
     private Long countryId;

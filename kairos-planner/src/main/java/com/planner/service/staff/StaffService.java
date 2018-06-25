@@ -1,5 +1,4 @@
 package com.planner.service.staff;
-import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
 import com.planner.domain.staff.Staff;
 import com.planner.repository.staff.StaffRepository;
 import org.slf4j.Logger;
@@ -15,7 +14,7 @@ import java.util.List;
 @Transactional
 public class StaffService {
     private static Logger log= LoggerFactory.getLogger(StaffService.class);
-    @Autowired
+   /* @Autowired
     private StaffRepository staffRepository;
     public void createStaff(Long unitId, StaffBasicDetailsDTO staffDTO) {
         Staff staff = new Staff(staffDTO.getFirstName(),staffDTO.getLastName(),staffDTO.getSkills());
@@ -36,6 +35,6 @@ public class StaffService {
         staff.setSkills(staffDTO.getSkills());
         staffRepository.save(staff);
 
-    }
+    }*/
 
 }

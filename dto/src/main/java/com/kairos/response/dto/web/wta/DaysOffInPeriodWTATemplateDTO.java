@@ -21,9 +21,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long intervalLength;
     private String intervalUnit;
-    private LocalDate validationStartDate;
-    private long daysLimit;
-    private List<PartOfDay> partOfDays;
     private MinMaxSetting minMaxSetting;
     private boolean restingTimeAllowed;
     private int restingTime;
@@ -61,15 +58,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
-
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -87,15 +75,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalUnit = intervalUnit;
     }
 
-    public long getDaysLimit() {
-        return daysLimit;
-    }
-
-    public void setDaysLimit(long daysLimit) {
-        this.daysLimit = daysLimit;
-    }
-
-
 
     public long getIntervalLength() {
         return intervalLength;
@@ -105,13 +84,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalLength = intervalLength;
     }
 
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
 
     public DaysOffInPeriodWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;

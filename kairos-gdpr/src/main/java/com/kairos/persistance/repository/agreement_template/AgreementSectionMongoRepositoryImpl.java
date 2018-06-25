@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.agreement_template;
 
 import com.kairos.persistance.model.agreement_template.AgreementSection;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -21,34 +21,34 @@ public class AgreementSectionMongoRepositoryImpl implements CustomAgreementSecti
 
 
     @Override
-    public AgreementSectionResponseDto getAgreementSectionWithDataById(BigInteger id) {
+    public AgreementSectionResponseDTO getAgreementSectionWithDataById(BigInteger id) {
         Aggregation aggregation=Aggregation.newAggregation(
                 match(Criteria.where("_id").is(id).and("deleted").is(false)),
                 lookup("clause","clauseIds","_id","clauses")
         );
-        AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);
+        AggregationResults<AgreementSectionResponseDTO> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDTO.class);
         return  response.getUniqueMappedResult();
 
     }
     @Override
-    public List<AgreementSectionResponseDto> getAllAgreementSectionWithData(Long countryId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSectionWithData(Long countryId) {
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where("deleted").is(false)),
                 lookup("clause","clauseIds","_id","clauses")
         );
-        AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);
+        AggregationResults<AgreementSectionResponseDTO> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDTO.class);
         return  response.getMappedResults();
     }
 
     @Override
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,Set<BigInteger> ids) {
+    public List<AgreementSectionResponseDTO> getAgreementSectionWithDataList(Long countryId, Set<BigInteger> ids) {
         Aggregation aggregation=Aggregation.newAggregation(
 
                 match(Criteria.where("deleted").is(false).and("_id").in(ids).and("countryId").is(countryId)),
                 lookup("clause","clauseIds","_id","clauses")
         );
-        AggregationResults<AgreementSectionResponseDto> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDto.class);
+        AggregationResults<AgreementSectionResponseDTO> response=mongoTemplate.aggregate(aggregation,AgreementSection.class,AgreementSectionResponseDTO.class);
         return  response.getMappedResults();
 
     }

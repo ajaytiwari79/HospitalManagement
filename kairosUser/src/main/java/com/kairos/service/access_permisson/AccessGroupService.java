@@ -104,6 +104,8 @@ public class AccessGroupService extends UserBaseService {
         }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
+        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
@@ -213,6 +215,11 @@ public class AccessGroupService extends UserBaseService {
         }
         save(organization);
         return countryAndOrgAccessGroupIdsMap;
+    }
+
+    public List<AccessGroup> getAccessGroupsForUnit(long organizationId) {
+
+        return accessGroupRepository.getAccessGroupsForUnit(organizationId);
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
@@ -593,6 +600,7 @@ public class AccessGroupService extends UserBaseService {
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
 
@@ -751,6 +759,15 @@ public class AccessGroupService extends UserBaseService {
         UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,
                 accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString()),
                 accessGroupRepository.checkIfUserHasAccessByRoleInUnit(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString())
+        );
+        return userAccessRoleDTO;
+    }
+
+    public UserAccessRoleDTO getStaffAccessRoles(Long unitId,Long staffId) {
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO(unitId,
+                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.STAFF.toString(),staffId),
+                accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId),staffId
         );
         return userAccessRoleDTO;
     }

@@ -8,11 +8,11 @@ package com.kairos.activity.persistence.model.wta.templates;
 public class PhaseTemplateValue {
     private int phaseId;
     private String phaseName;
-    private short staffValue=0;
-    private short managementValue=0;
+    private short staffValue;
+    private short managementValue;
     private boolean disabled=true;
-    private int optionalFrequency=0;
-    private boolean optional=false;
+    private int optionalFrequency;
+    private boolean optional;
     private int sequence;
 
     public int getOptionalFrequency() {

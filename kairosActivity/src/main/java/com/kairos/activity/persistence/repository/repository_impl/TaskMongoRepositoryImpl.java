@@ -8,10 +8,13 @@ import com.kairos.activity.persistence.query_result.TaskWrapper;
 import com.kairos.activity.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.activity.persistence.repository.task_type.CustomTaskMongoRepository;
 
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
+import com.kairos.client.dto.TaskAddress;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.util.JSON;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -177,5 +180,27 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
         mongoTemplate.updateMulti(query,update,Task.class);
     }
 
+
+    @Override
+    public List<VRPTaskDTO> getAllTasksByUnitId(Long unitId){
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("unitId").is(unitId).and("isDeleted").is(false)),
+        lookup("task_types","taskTypeId","_id","taskType"),
+                project("duration","unitId","address","installationNumber","citizenId","citizenName","taskType").and("taskType").arrayElementAt(0).as("taskType")
+        );
+        AggregationResults<VRPTaskDTO> results = mongoTemplate.aggregate(aggregation,Task.class, VRPTaskDTO.class);
+        return results.getMappedResults();
+    }
+
+    @Override
+    public Map getAllTasksInstallationNoAndTaskTypeId(Long unitId){
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("unitId").is(unitId).and("isDeleted").is(false)),
+                //lookup("task_types","taskTypeId","_id","taskType"),
+                new CustomAggregationOperation(Document.parse("{ \"$project\" : { \"installationIdandtaskType\" : { \"$concat\" : [{$substr: [\"$installationNumber\",0,64]},\"$taskTypeId\"] } } }"))
+        );
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,Task.class, Map.class);
+        Map<Integer,BigInteger> installationNoAndTaskTypeId = new HashMap<>();
+        results.getMappedResults().forEach(t->installationNoAndTaskTypeId.put(new Integer((String) t.get("installationIdandtaskType")),new BigInteger((String)t.get("_id"))));
+        return installationNoAndTaskTypeId;
+    }
 
 }

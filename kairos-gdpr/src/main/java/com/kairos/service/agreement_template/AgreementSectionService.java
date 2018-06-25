@@ -1,14 +1,13 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
-import com.kairos.response.dto.agreement_template.AgreementSectionResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
@@ -40,7 +39,7 @@ public class AgreementSectionService extends MongoBaseService {
 
     public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
 
-        List<AgreementSectionResponseDto> result = new ArrayList<>();
+        List<AgreementSectionResponseDTO> result = new ArrayList<>();
         Set<BigInteger> ids = new HashSet<>();
         Map<String, Object> response = new HashMap<>();
 
@@ -78,9 +77,9 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public AgreementSectionResponseDto getAgreementSectionWithDataById(Long countryId, BigInteger id) {
+    public AgreementSectionResponseDTO getAgreementSectionWithDataById(Long countryId, BigInteger id) {
 
-        AgreementSectionResponseDto exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
+        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
@@ -89,9 +88,9 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public List<AgreementSectionResponseDto> getAllAgreementSection(Long countryId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSection(Long countryId) {
 
-        List<AgreementSectionResponseDto> result = agreementSectionMongoRepository.getAllAgreementSectionWithData(countryId);
+        List<AgreementSectionResponseDTO> result = agreementSectionMongoRepository.getAllAgreementSectionWithData(countryId);
         if (result.size() != 0) {
             return result;
         }
@@ -100,7 +99,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public List<AgreementSectionResponseDto> getAgreementSectionWithDataList(Long countryId,Set<BigInteger> ids) {
+    public List<AgreementSectionResponseDTO> getAgreementSectionWithDataList(Long countryId, Set<BigInteger> ids) {
         return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId,ids);
 
     }

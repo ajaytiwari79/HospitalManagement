@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.kairos.activity.persistence.enums.task_type.TaskTypeEnum;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.activity.response.dto.TaskTypeDTO;
 import com.kairos.activity.view_handler.json_view_handler.TaskTypeViewHandler;
 import org.apache.commons.validator.GenericValidator;
 import org.joda.time.DateTime;
@@ -31,6 +32,7 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
     private  boolean uploadPicture;
     private  String generalDescription;
     private  String icon;
+    private int duration;
 
 
 
@@ -222,11 +224,20 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         this.externalId = externalId;
     }
 
-    public TaskType(String title, String description, Long subServiceId, Date expiresOn) {
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public TaskType(String title, String description, Long subServiceId, Date expiresOn,int duration) {
         this.title = title;
         this.description = description;
         this.subServiceId = subServiceId;
         this.expiresOn = expiresOn;
+        this.duration = duration;
     }
     public boolean isExportedToVisitour() {
         return isExportedToVisitour;
@@ -356,16 +367,17 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         this.vehicleRequired = vehicleRequired;
     }
 
-    public Map<String, Object> getBasicTaskTypeInfo() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", this.getId());
-        map.put("title", this.title);
-        map.put("description", this.description);
-        map.put("subServiceId", this.subServiceId);
-        map.put("expiresOn", this.expiresOn);
-        map.put("status", this.isEnabled);
-        map.put("parentTaskTypeId",this.rootId);
-        return map;
+    public TaskTypeDTO getBasicTaskTypeInfo() {
+        TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
+        taskTypeDTO.setId(this.getId());
+        taskTypeDTO.setDescription(this.description);
+        taskTypeDTO.setDuration(this.duration);
+        taskTypeDTO.setExpiresOn(this.expiresOn);
+        taskTypeDTO.setTags(this.tags);
+        taskTypeDTO.setParentTaskTypeId(this.rootId);
+        taskTypeDTO.setServiceId(this.subServiceId);
+        taskTypeDTO.setTitle(this.title);
+        return taskTypeDTO;
     }
 
     public void saveAgreementSettings(String union, String agreement, Date startPeriod, Date endPeriod) {
@@ -560,6 +572,7 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
     }
 
     public void saveGeneralSettings(Map<String, Object> map) {
+        this.duration = (int)map.get("duration");
         this.title = (String) map.get("title");
         this.uniqueName = (String) map.get("uniqueName");
         this.colorForGantt = (String) map.get("colorForGantt");
@@ -577,6 +590,7 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
 
     public Map<String, Object> getGeneralSettings(String filePath) {
         Map<String, Object> map = new HashMap<>();
+        map.put("duration",this.duration);
         map.put("title", this.title);
       //  map.put("uniqueName", this.uniqueName);
         map.put("colorForGantt", this.colorForGantt);

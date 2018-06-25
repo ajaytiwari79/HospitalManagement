@@ -4,6 +4,7 @@ package com.kairos.controller.master_data_management.asset_management;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingType;
 import com.kairos.service.master_data_management.asset_management.HostingTypeService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.validate_list.ValidateListOfRequestBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
-import static com.kairos.constant.ApiConstant.API_HOSTING_TYPE_URL;
+
+import static com.kairos.constants.ApiConstant.API_HOSTING_TYPE_URL;
 /*
  *
  *  created by bobby 17/5/2018
@@ -36,11 +37,11 @@ public class HostingTypeController {
 
     @ApiOperation("add HostingType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createHostingType(@PathVariable Long countryId,@RequestBody List<HostingType> hostingTypes) {
+    public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<HostingType> hostingTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId,hostingTypes));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(countryId,hostingTypes.getRequestBody()));
 
     }
 
@@ -87,7 +88,7 @@ public class HostingTypeController {
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable BigInteger id, @Valid @RequestBody HostingType hostingtype) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable BigInteger id, @Valid  @RequestBody HostingType hostingtype) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id is null");
         }

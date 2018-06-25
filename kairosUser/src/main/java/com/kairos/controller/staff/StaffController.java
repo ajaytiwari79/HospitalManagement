@@ -5,8 +5,12 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+
 import com.kairos.response.dto.web.PasswordUpdateDTO;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
@@ -28,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.QueryParam;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +68,7 @@ public class StaffController {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject private VRPClientService vrpClientService;
 
 
 
@@ -397,6 +403,7 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId,
                                                                 @RequestParam("file") MultipartFile multipartFile,
                                                                 @RequestParam("accessGroupId") Long accessGroupId) {
+        vrpClientService.importClients(unitId,multipartFile);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffService.batchAddStaffToDatabase(unitId, multipartFile, accessGroupId));
     }
@@ -571,8 +578,8 @@ public class StaffController {
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId,
-                                                                      @PathVariable Long unitPositionId,@RequestParam("activityDayTypes") List<Long> activityDayTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type,activityDayTypes));
+                                                                      @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
@@ -618,11 +625,46 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getUnitWiseStaff() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitWiseStaffList());
     }
+    @RequestMapping(value = "/priority_group", method = RequestMethod.POST)
+    @ApiOperation("get Staff by StaffId ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByPriorityGroup(@PathVariable long unitId, @RequestBody StaffIncludeFilterDTO staffIncludeFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByStaffIncludeFilterForPriorityGroups(staffIncludeFilterDTO,unitId));
+    }
 
     @ApiOperation(value = "Staff personalized view in daily view")
-    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.PUT)
+    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
     }
+
+    @ApiOperation(value = "update and set main emloyment setting")
+    @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(staffId,employmentDTO,confirm));
+    }
+
+    @ApiOperation(value ="remove main employment")
+    @RequestMapping(value = "/{staffId}/remove_main_employment",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String ,Object>> removeMainEmployment(@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.removeMainEmployment(staffId));
+    }
+
+
+    @RequestMapping(value = "/emails", method = RequestMethod.POST)
+    @ApiOperation("get email addresses of staffs")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEmailsOfStaffByStaffIds(@RequestBody List<Long> staffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getEmailsOfStaffByStaffIds(staffIds));
+    }
+
+    @RequestMapping(value = "/access_roles", method = RequestMethod.GET)
+    @ApiOperation("get access roles of staffs")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessRolesOfStaffByUserId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessRolesOfStaffByUserId(unitId));
+    }
+
+
 }

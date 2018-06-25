@@ -1,10 +1,8 @@
 package com.kairos.controller.agreement_template;
 
 
-import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.userContext.UserContext;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,13 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Set;
 
-import static com.kairos.constant.ApiConstant.API_AGREEMENT_SECTION_URL;
+import static com.kairos.constants.ApiConstant.API_AGREEMENT_SECTION_URL;
 /*
  *
  *  created by bobby 10/5/2018

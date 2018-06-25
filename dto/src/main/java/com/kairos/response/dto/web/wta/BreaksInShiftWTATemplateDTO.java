@@ -16,7 +16,7 @@ import java.util.List;
 public class BreaksInShiftWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<BreakTemplateValue> breakTemplateValues;
     private List<BigInteger> timeTypeIds;
-    private List<Long> plannedTimeIds;
+    private List<BigInteger> plannedTimeIds;
 
 
     public List<BigInteger> getTimeTypeIds() {
@@ -27,11 +27,11 @@ public class BreaksInShiftWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 

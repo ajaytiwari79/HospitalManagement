@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -65,6 +66,11 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     }
     public DaysOffAfterASeriesWTATemplate() {
         wtaTemplateType = WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public DaysOffAfterASeriesWTATemplate(String name, boolean disabled, String description, long intervalLength, String intervalUnit, int nightShiftSequence) {

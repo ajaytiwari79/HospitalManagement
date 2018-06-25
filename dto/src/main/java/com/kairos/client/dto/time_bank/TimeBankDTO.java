@@ -45,6 +45,7 @@ public class TimeBankDTO {
 
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
+    private int minutesFromCta;
 
     public TimeBankDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
@@ -52,6 +53,14 @@ public class TimeBankDTO {
         this.staffId = staffId;
         this.workingDaysInWeek = workingDaysInWeek;
         this.totalWeeklyMin = totalWeeklyMins;
+    }
+
+    public int getMinutesFromCta() {
+        return minutesFromCta;
+    }
+
+    public void setMinutesFromCta(int minutesFromCta) {
+        this.minutesFromCta = minutesFromCta;
     }
 
     public int getTotalTimeBankDiff() {

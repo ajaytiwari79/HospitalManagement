@@ -20,6 +20,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.activity.response.dto.TaskDTO;
+import com.kairos.activity.response.dto.TaskTypeDTO;
 import com.kairos.activity.service.activity_stream.NotificationService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
@@ -529,7 +530,7 @@ public class AbsencePlanningService {
     public Map<String, Object> getCommonDataOfOrganization(Long unitId){
         Map<String, Object> data = new HashMap<String, Object>();
         Map<String, Object> response=organizationRestClient.getCommonDataOfOrganization(unitId);
-        List<Map<String, Object>> taskTypes = new ArrayList<>();
+        List<TaskTypeDTO> taskTypes = new ArrayList<>();
         for (TaskType taskType : taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(unitId,true)) {
             taskTypes.add(taskType.getBasicTaskTypeInfo());
         }

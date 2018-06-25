@@ -15,13 +15,12 @@ import java.util.SortedSet;
 public class AgreementSection extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.title.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Title cannot be empty")
     private String title;
 
     @NotNull
     private List<BigInteger> clauseIds;
 
-    @NotNull
     private Long countryId;
 
     public Long getCountryId() {

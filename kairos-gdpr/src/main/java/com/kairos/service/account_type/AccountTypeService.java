@@ -1,20 +1,18 @@
 package com.kairos.service.account_type;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,10 +59,9 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAllAccountType()
+    public List<AccountType> getAllAccountType(Long countryId)
     {
-   return accountTypeRepository.getAllAccountType(UserContext.getCountryId());
-
+   return accountTypeRepository.getAllAccountType(countryId);
     }
 
 
@@ -83,7 +80,7 @@ public class AccountTypeService extends MongoBaseService {
     public AccountType updateAccountName(Long countryId,BigInteger id,AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByNameAndNonDeleted(countryId,accountType.getName());
-        if (Optional.ofNullable(exists).isPresent()) {
+        if (Optional.ofNullable(exists).isPresent()&&!id.equals(exists.getId())) {
             throw  new DuplicateDataException("Account type exist for "+accountType.getName());
         }
         exists=accountTypeRepository.findByIdAndNonDeleted(countryId,id);
@@ -94,7 +91,6 @@ public class AccountTypeService extends MongoBaseService {
 
 
     public Boolean deleteAccountType(BigInteger id) {
-
         AccountType exists = accountTypeRepository.findByid(id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw  new DataNotFoundByIdException("Account type exist for id "+id);

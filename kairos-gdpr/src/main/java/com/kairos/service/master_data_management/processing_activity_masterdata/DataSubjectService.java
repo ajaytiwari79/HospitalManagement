@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSubject;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSubjectMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-
+// removed from Processing master data
 @Service
 public class DataSubjectService extends MongoBaseService {
 
@@ -99,7 +99,10 @@ public class DataSubjectService extends MongoBaseService {
 
 
         DataSubject exist = dataSubjectMongoRepository.findByName(UserContext.getCountryId(),dataSubject.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+dataSubject.getName());
         } else {
             exist=dataSubjectMongoRepository.findByid(id);

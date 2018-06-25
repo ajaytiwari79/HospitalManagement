@@ -2,12 +2,14 @@ package com.kairos.activity.controller.task;
 import com.kairos.activity.client.dto.staff.KMDShift;
 import com.kairos.activity.response.dto.BulDeleteTaskDTO;
 import com.kairos.activity.response.dto.TaskActiveUpdationDTO;
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.activity.service.kmdNexus.AuthService;
 import com.kairos.activity.service.planner.PlannerService;
 import com.kairos.activity.service.planner.TaskExceptionService;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.constants.ApiConstants;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.response.dto.web.client.VRPClientDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -238,6 +241,32 @@ public class TaskController {
     public ResponseEntity<Map<String,Object>> assignGivenTaskToUser(@PathVariable BigInteger taskId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,taskService.assignGivenTaskToUser(taskId));
     }
+
+    @ApiOperation(value = "import Unit Task Excel File")
+    @PostMapping(value = "/importTask")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> importVrpTask(@PathVariable Long unitId, @RequestBody List<VRPTaskDTO> taskDTOS) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                taskService.importTask(unitId,taskDTOS));
+    }
+
+    @ApiOperation(value = "get All VRPTask by Organization")
+    @GetMapping(value = "/vrpTasks")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTasks(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                taskService.getAllTask(unitId));
+    }
+
+    @ApiOperation(value = "get VRPTask by Id")
+    @GetMapping(value = "/vrpTask/{taskId}")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTask(@PathVariable Long unitId,@PathVariable BigInteger taskId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                taskService.getTask(taskId));
+    }
+
+
 
 
 

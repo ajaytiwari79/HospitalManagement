@@ -22,13 +22,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private double maximumVetoPercentage;
-
-
     private List<BigInteger> activityIds;
-    private List<Long> plannedTimeIds;
-    protected List<PartOfDay> partOfDays;
-    protected float recommendedValue;
+    private float recommendedValue;
     private MinMaxSetting minMaxSetting;
     private int numberOfWeeks;
     private LocalDate validationStartDate;
@@ -59,14 +54,6 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
     public float getRecommendedValue() {
         return recommendedValue;
     }
@@ -83,14 +70,6 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -98,20 +77,13 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public double getMaximumVetoPercentage() {
-        return maximumVetoPercentage;
-    }
 
-    public void setMaximumVetoPercentage(double maximumVetoPercentage) {
-        this.maximumVetoPercentage = maximumVetoPercentage;
-    }
 
     public VetoPerPeriodWTATemplateDTO(String name, boolean disabled,
-                                       String description, double maximumVetoPercentage) {
+                                       String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.maximumVetoPercentage =maximumVetoPercentage;
 
     }
     public VetoPerPeriodWTATemplateDTO() {

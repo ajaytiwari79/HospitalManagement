@@ -8,7 +8,7 @@ import com.kairos.activity.persistence.repository.activity.ActivityMongoReposito
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.pay_out.PayOutMongoRepository;
 import com.kairos.activity.persistence.model.pay_out.DailyPayOutEntry;
-import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.response.dto.pay_out.CalculatedPayOutByDateDTO;
 import com.kairos.response.dto.pay_out.PayOutDTO;
@@ -82,7 +82,7 @@ public class PayOutService extends MongoBaseService {
         payOutMongoRepository.deleteAll(dailyPayOuts);
         dailyPayOuts = new ArrayList<>();
         Interval interval = new Interval(startDate, startDate.plusDays(1).withTimeAtStartOfDay());
-        List<ShiftQueryResultWithActivity> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
         DailyPayOutEntry dailyPayOut = new DailyPayOutEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         shifts = filterSubshifts(shifts);
         if (shifts != null && !shifts.isEmpty()) {
@@ -103,12 +103,12 @@ public class PayOutService extends MongoBaseService {
     }
 
 
-    public List<ShiftQueryResultWithActivity> filterSubshifts(List<ShiftQueryResultWithActivity> shifts){
-        List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
-        for (ShiftQueryResultWithActivity shift : shifts) {
+    public List<ShiftWithActivityDTO> filterSubshifts(List<ShiftWithActivityDTO> shifts){
+        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
+        for (ShiftWithActivityDTO shift : shifts) {
             if (shift.getSubShift() != null && shift.getSubShift().getStartDate() != null) {
-                ShiftQueryResultWithActivity shiftQueryResultWithActivity = new ShiftQueryResultWithActivity(shift.getStartDate(), shift.getEndDate(), shift.getActivity());
-                shiftQueryResultWithActivities.add(shiftQueryResultWithActivity);
+                ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO(shift.getStartDate(), shift.getEndDate(), shift.getActivity());
+                shiftQueryResultWithActivities.add(shiftWithActivityDTO);
             } else {
                 shiftQueryResultWithActivities.add(shift);
             }
@@ -158,8 +158,8 @@ public class PayOutService extends MongoBaseService {
     }
 
 
-    public Map<Long, List<ShiftQueryResultWithActivity>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities) {
-        Map<Long, List<ShiftQueryResultWithActivity>> shiftsMap = new HashMap<>(unitPositionIds.size());
+    public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
+        Map<Long, List<ShiftWithActivityDTO>> shiftsMap = new HashMap<>(unitPositionIds.size());
         unitPositionIds.forEach(uEPId -> {
             shiftsMap.put(uEPId, getShiftsByUEP(uEPId, shiftQueryResultWithActivities));
         });
@@ -167,10 +167,10 @@ public class PayOutService extends MongoBaseService {
     }
 
 
-    public List<ShiftQueryResultWithActivity> getShiftsByUEP(Long unitPositionId, List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities) {
-        List<ShiftQueryResultWithActivity> shifts = new ArrayList<>();
+    public List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
+        List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftQueryResultWithActivities.forEach(s -> {
-            if (s.getUnitEmploymentPositionId().equals(unitPositionId)) {
+            if (s.getUnitPositionId().equals(unitPositionId)) {
                 shifts.add(s);
             }
         });
@@ -180,7 +180,7 @@ public class PayOutService extends MongoBaseService {
 
     public List<CalculatedPayOutByDateDTO> getPayOutFromCurrentDateByUEP(Long unitPositonId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(145l);//payOutRestClient.getCTAbyUnitEmployementPosition(unitEmploymentPositonId);
-        List<ShiftQueryResultWithActivity> shifts = null;//shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitEmploymentPositonId,new Date(),new Date());
+        List<ShiftWithActivityDTO> shifts = null;//shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitEmploymentPositonId,new Date(),new Date());
         return payOutCalculationService.getPayOutByDates(unitPositionWithCtaDetailsDTO, shifts, 365);
     }
 
@@ -193,7 +193,7 @@ public class PayOutService extends MongoBaseService {
     public PayOutDTO getAdvanceViewPayOut(Long unitId, Long unitPositionId, String query, Date startDate, Date endDate) {
         PayOutDTO payOutDTO = null;
         List<DailyPayOutEntry> dailyPayOuts = payOutMongoRepository.findAllByUnitPositionAndDate(unitPositionId, startDate, endDate);
-        List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, startDate, endDate);
+        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, startDate, endDate);
         shiftQueryResultWithActivities = filterSubshifts(shiftQueryResultWithActivities);
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
         int totalPayOutBeforeStartDate = 0;

@@ -11,7 +11,7 @@ public class StaffingLevelInterval {
     private int minNoOfStaff;
     private int maxNoOfStaff;
     private int availableNoOfStaff;
-    private  StaffingLevelDuration staffingLevelDuration;
+    private Duration staffingLevelDuration;
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
 
@@ -19,13 +19,13 @@ public class StaffingLevelInterval {
         // default constractor
     }
 
-    public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, StaffingLevelDuration staffingLevelDuration) {
+    public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
-    public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, StaffingLevelDuration staffingLevelDuration,int availableNoOfStaff) {
+    public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration, int availableNoOfStaff) {
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
         this.staffingLevelDuration = staffingLevelDuration;
@@ -33,7 +33,7 @@ public class StaffingLevelInterval {
     }
 
     public StaffingLevelInterval(int sequence, int minNoOfStaff, int maxNoOfStaff,
-                                 StaffingLevelDuration staffingLevelDuration) {
+                                 Duration staffingLevelDuration) {
         this.sequence=sequence;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
@@ -72,11 +72,11 @@ public class StaffingLevelInterval {
         this.availableNoOfStaff = availableNoOfStaff;
     }
 
-    public StaffingLevelDuration getStaffingLevelDuration() {
+    public Duration getStaffingLevelDuration() {
         return staffingLevelDuration;
     }
 
-    public void setStaffingLevelDuration(StaffingLevelDuration staffingLevelDuration) {
+    public void setStaffingLevelDuration(Duration staffingLevelDuration) {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 

@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -97,8 +97,11 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(BigInteger id, TechnicalSecurityMeasure techSecurityMeasure) {
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(UserContext.getCountryId(),techSecurityMeasure.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(UserContext.getCountryId(),techSecurityMeasure.getName());
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+techSecurityMeasure.getName());
         } else {
             exist=technicalSecurityMeasureMongoRepository.findByid(id);
@@ -111,9 +114,8 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, String name) {
 
-
         if (!StringUtils.isBlank(name)) {
-            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(countryId, name);
+            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

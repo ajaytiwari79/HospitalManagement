@@ -19,7 +19,7 @@ import com.planner.service.locationService.LocationService;
 import com.planner.service.skillService.SkillService;
 import com.planner.service.staffService.ShiftService;
 import com.planner.service.staffService.TaskStaffService;
-import com.planner.service.taskService.TaskService;
+import com.planner.service.taskService.PlanningTaskService;
 import com.planner.service.taskService.TaskTypeService;
 import com.planner.service.vehicleService.VehicleService;
 import org.joda.time.DateTime;
@@ -36,7 +36,7 @@ public class TaskPlanningSolutionService {
 
     private static Logger logger = LoggerFactory.getLogger(TaskPlanningSolutionService.class);
 
-    @Autowired private TaskService taskService;
+    @Autowired private PlanningTaskService planningTaskService;
     @Autowired private TaskTypeService taskTypeService;
     @Autowired private SkillService skillService;
     @Autowired private TaskStaffService taskStaffService;
@@ -97,7 +97,7 @@ public class TaskPlanningSolutionService {
 
     private void getTaskList(TaskPlanningSolution taskPlanningSolution, long unitId,Date startDate,Date endDate,Map<String,Skill> skillMap) {
         Map<String,Location> locationsMap = getLocationsMap();
-        List<PlanningTask> planningTasks = taskService.getAllTasksForPLanning(unitId,startDate,endDate);
+        List<PlanningTask> planningTasks = planningTaskService.getAllTasksForPLanning(unitId,startDate,endDate);
         Map<String,Citizen> citizenMap = getCitizenMap(unitId);
         Map<String,TaskType> taskTypeMap = getTaskTypesMap(unitId,skillMap);
         List<Task> tasks = new ArrayList<>();
@@ -274,10 +274,10 @@ public class TaskPlanningSolutionService {
             if(employee!=null){
                 availabilityRequest.setEmployee(employeeMap.get(planningShift.getStaffId()));
                 employees.add(employee);
-                availabilityRequest.setStartTime(new DateTime(planningShift.getStartDateTime()));
-                availabilityRequest.setEndTime(new DateTime(planningShift.getEndDateTime()));
+                availabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
+                availabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
                 availabilityRequest.setId(planningShift.getId());
-                availabilityRequest.setExternalId(planningShift.getExternalId());
+//                availabilityRequest.setExternalId(planningShift.getExternalId());
                 availabilityRequests.add(availabilityRequest);
 
             }else continue;
@@ -319,14 +319,14 @@ public class TaskPlanningSolutionService {
             {
                 AvailabilityRequest availabilityRequest = new AvailabilityRequest();
                 availabilityRequest.setId(planningShift.getId());
-                availabilityRequest.setEndTime(new DateTime(planningShift.getEndDateTime()));
-                availabilityRequest.setStartTime(new DateTime(planningShift.getStartDateTime()));
+                availabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
+                availabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
                 availabilityRequests.add(availabilityRequest);
             }else{
                 UnavailabilityRequest unavailabilityRequest = new UnavailabilityRequest();
                 unavailabilityRequest.setId(planningShift.getId());
-                unavailabilityRequest.setStartTime(new DateTime(planningShift.getStartDateTime()));
-                unavailabilityRequest.setEndTime(new DateTime(planningShift.getEndDateTime()));
+                unavailabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
+                unavailabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
                 unavailabilityRequests.add(unavailabilityRequest);
             }
         }

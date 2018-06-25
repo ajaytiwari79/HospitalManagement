@@ -1,25 +1,22 @@
 package com.kairos.controller.master_data_management.asset_management;
 
 
-import com.kairos.dto.MasterAssetDto;
+import com.kairos.dto.master_data.MasterAssetDTO;
 import com.kairos.service.master_data_management.asset_management.MasterAssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constant.ApiConstant.API_MASTER_ASSET_URL;
-import static com.kairos.constant.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_MASTER_ASSET_URL;
 
 /*
  *
@@ -40,7 +37,7 @@ public class MasterAssetController {
 
     @ApiOperation(value = "add master asset")
     @RequestMapping(value = "/add_asset", method = RequestMethod.POST)
-    public ResponseEntity<Object> addMasterAsset(@PathVariable Long countryId, @Validated @RequestBody MasterAssetDto masterAssetDto) {
+    public ResponseEntity<Object> addMasterAsset(@PathVariable Long countryId, @Validated @RequestBody MasterAssetDTO masterAssetDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id is null");
         }
@@ -55,7 +52,7 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id, @Valid @RequestBody MasterAssetDto asset) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable BigInteger id, @Validated @RequestBody MasterAssetDTO asset) {
 
         if (id != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(id, asset));

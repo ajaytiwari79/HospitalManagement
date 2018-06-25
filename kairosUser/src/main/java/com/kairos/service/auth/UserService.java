@@ -1,21 +1,26 @@
 package com.kairos.service.auth;
 
 import com.kairos.activity.util.DateUtils;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.user.auth.*;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.SmsService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
@@ -62,6 +67,10 @@ public class UserService extends UserBaseService {
     private AccessGroupService accessGroupService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private AccessPageService accessPageService;
 
 
     /**
@@ -302,7 +311,7 @@ public class UserService extends UserBaseService {
             return null;
         }
         currentUser = generateTokenToUser(currentUser);
-        Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
+        Organization org =  staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
@@ -374,6 +383,50 @@ public class UserService extends UserBaseService {
         return userOrganizationsDTO;
     }
 
+    public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults){
+        Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
+        for (AccessPageQueryResult permissionn : accessPageQueryResults) {
+            if(unitPermissionMap.containsKey(permissionn.getModuleId())){
+                AccessPageQueryResult existingPermission = unitPermissionMap.get(permissionn.getModuleId());
+                existingPermission.setRead(existingPermission.isRead() || permissionn.isRead());
+                existingPermission.setWrite(existingPermission.isWrite() || permissionn.isWrite());
+                existingPermission.setActive(existingPermission.isRead() || existingPermission.isWrite());
+                unitPermissionMap.put(permissionn.getModuleId(),existingPermission );
+            } else {
+                permissionn.setActive(permissionn.isRead() || permissionn.isWrite());
+                unitPermissionMap.put(permissionn.getModuleId(),permissionn);
+            }
+        }
+        return unitPermissionMap;
+    }
+
+    public UnitWiseStaffPermissionsDTO getPermission(Long organizationId){
+        long currentUserId = UserContext.getUserDetails().getId();
+        UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
+        permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
+        if(permissionData.isHub()){
+            Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
+            HashMap<String, Object> unitPermissionMap = new HashMap<>();
+            for (AccessPageQueryResult permission : permissions) {
+                permission.setActive(permission.isRead() || permission.isWrite());
+                unitPermissionMap.put(permission.getModuleId(), permission);
+            }
+            permissionData.setHubPermissions(unitPermissionMap);
+            
+        } else {
+
+            List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId);
+            HashMap<Long, Object> unitPermission = new HashMap<>();
+            for (UserPermissionQueryResult userPermissionQueryResult: unitWisePermissions){
+                unitPermission.put(userPermissionQueryResult.getUnitId(),
+                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class)));
+            }
+            permissionData.setOrganizationPermissions(unitPermission);
+        }
+        return permissionData;
+    }
+
     /**
      * @param organizationId
      * @return list of permissions.
@@ -390,7 +443,7 @@ public class UserService extends UserBaseService {
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
-        List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+            List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
@@ -594,5 +647,10 @@ public class UserService extends UserBaseService {
         });
         save(users);
         return true;
+    }
+
+    public String getSystemLanguageOfUser(Long userId){
+        String language =  countryGraphRepository.getSystemLanguageOfUser(userId);
+        return (Optional.ofNullable(language).orElse(""));
     }
 }

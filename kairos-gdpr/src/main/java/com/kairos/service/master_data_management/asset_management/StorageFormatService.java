@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageFormat;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -96,11 +96,14 @@ public class StorageFormatService extends MongoBaseService {
 
     public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(),storageFormat.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data  exist for  "+storageFormat.getName());
+        StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(UserContext.getCountryId(), storageFormat.getName());
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
+            throw new DuplicateDataException("data  exist for  " + storageFormat.getName());
         } else {
-            exist=storageFormatMongoRepository.findByid(id);
+            exist = storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
             return save(exist);
 
@@ -112,7 +115,7 @@ public class StorageFormatService extends MongoBaseService {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByName(countryId, name);
+            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

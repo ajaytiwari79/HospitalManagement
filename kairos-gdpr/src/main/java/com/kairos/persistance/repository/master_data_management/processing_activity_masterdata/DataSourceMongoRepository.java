@@ -17,7 +17,7 @@ public interface DataSourceMongoRepository extends MongoRepository<DataSource,Bi
     DataSource findByIdAndNonDeleted(Long countryId,BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
-    DataSource findByName(Long countryId,String name);
+    DataSource findByNameAndCountryId(Long countryId,String name);
 
     @Query("{_id:{$in:?0}}")
     List<DataSource> dataSourceList(List<BigInteger> ids);

@@ -1,17 +1,15 @@
 package com.kairos.activity.persistence.model.staffing_level;
 
-import java.math.BigInteger;
-
 public class StaffingLevelSetting {
     private int defaultDetailLevelMinutes=15;
     private Integer detailLevelMinutes;
-    private StaffingLevelDuration duration;
+    private Duration duration;
 
     public StaffingLevelSetting() {
         //default constructor
     }
 
-    public StaffingLevelSetting(Integer detailLevelMinutes, StaffingLevelDuration duration) {
+    public StaffingLevelSetting(Integer detailLevelMinutes, Duration duration) {
         this.detailLevelMinutes = detailLevelMinutes;
         this.duration = duration;
     }
@@ -24,11 +22,11 @@ public class StaffingLevelSetting {
         this.detailLevelMinutes = detailLevelMinutes;
     }
 
-    public StaffingLevelDuration getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
-    public void setDuration(StaffingLevelDuration duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
