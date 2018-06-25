@@ -1,0 +1,22 @@
+package com.kairos.persistence.repository.user.expertise;
+
+import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
+import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQR;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT;
+
+@Repository
+public interface ExpertiseEmploymentTypeRelationshipGraphRepository extends Neo4jBaseRepository<ExpertiseEmploymentTypeRelationship, Long> {
+    @Query("")
+    ExpertiseEmploymentTypeRelationship findPlannedTimeByExpertiseAndEmploymentType(Long expertiseId, Long employmentTypeId);
+
+    @Query("match(expertise:Expertise) where id(expertise)={0} " +
+            "match(e)-[relation:" + EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT + "]-(employmentType:EmploymentType)\n" +
+            "return relation.excludedPlannedTime as excludedPlannedTime,relation.includedPlannedTime as includedPlannedTime ,collect(employmentType) as employmentTypes")
+    List<ExpertisePlannedTimeQR> findPlannedTimeByExpertise(Long expertiseId);
+}

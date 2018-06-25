@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.country;
+package com.kairos.persistence.model.user.country.employment_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

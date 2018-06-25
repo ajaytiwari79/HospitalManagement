@@ -18,6 +18,7 @@ import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryR
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;

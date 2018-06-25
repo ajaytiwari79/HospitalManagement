@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -122,11 +121,9 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     }
 
-    public Map<Boolean, List<ActivityConfigurationDTO>> getAbsenceActivityConfiguration(Long unitId) {
-        List<ActivityConfigurationDTO> activityConfigurations = new ArrayList<>();
-        activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
-        Map<Boolean, List<ActivityConfigurationDTO>> mappedData = activityConfigurations.stream().collect(Collectors.groupingBy(x -> x.getException(), Collectors.toList()));
-        return mappedData;
+    public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
+        List<ActivityConfigurationDTO> activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        return activityConfigurations;
     }
 
     public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {

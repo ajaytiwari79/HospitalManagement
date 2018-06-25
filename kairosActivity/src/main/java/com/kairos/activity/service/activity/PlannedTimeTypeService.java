@@ -33,11 +33,11 @@ public class PlannedTimeTypeService extends MongoBaseService {
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
-    public void verifyCountry(Long countryId){
+    public void verifyCountry(Long countryId) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Country not found by Id while creating Planned Time type in country" + countryId);
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
     }
@@ -47,7 +47,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         PlannedTimeType plannedTimeType = plannedTimeTypeRepository.findByNameAndDeletedAndCountryId("(?i)" + presenceTypeDTO.getName(), false, countryId);
         if (Optional.ofNullable(plannedTimeType).isPresent()) {
             logger.error("Planned Time type already exist in country By Name " + presenceTypeDTO.getName());
-            exceptionService.duplicateDataException("message.presenceType.name.alreadyExist",presenceTypeDTO.getName());
+            exceptionService.duplicateDataException("message.presenceType.name.alreadyExist", presenceTypeDTO.getName());
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
         save(plannedTimeType);
@@ -78,8 +78,8 @@ public class PlannedTimeTypeService extends MongoBaseService {
 
     public PresenceTypeDTO updatePresenceType(Long countryId, BigInteger presenceTypeId, PresenceTypeDTO presenceTypeDTO) {
         List<PlannedTimeType> plannedTimeTypes = plannedTimeTypeRepository.findByNameAndDeletedAndCountryIdExcludingCurrent(countryId, presenceTypeDTO.getName(), false);
-        if (plannedTimeTypes.size()>1) {
-            exceptionService.duplicateDataException("message.presenceType.name.alreadyExist",presenceTypeDTO.getName());
+        if (plannedTimeTypes.size() > 1) {
+            exceptionService.duplicateDataException("message.presenceType.name.alreadyExist", presenceTypeDTO.getName());
         }
         Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(presenceTypeId);
         if (!presenceTypeOptional.isPresent()) {
@@ -90,5 +90,11 @@ public class PlannedTimeTypeService extends MongoBaseService {
         plannedTimeType.setName(presenceTypeDTO.getName());
         save(plannedTimeType);
         return presenceTypeDTO;
+    }
+
+    public List<PresenceTypeDTO> getAllPresenceTypesByCountry(Long countryId) {
+        List<PresenceTypeDTO> presenceTypeDTOList =
+                plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+        return presenceTypeDTOList;
     }
 }

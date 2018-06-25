@@ -11,6 +11,7 @@ import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.persistence.model.user.country.DayType;
 
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;

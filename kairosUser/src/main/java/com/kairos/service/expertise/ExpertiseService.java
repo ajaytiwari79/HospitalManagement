@@ -12,12 +12,12 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
+import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.pay_table.PayGrade;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -25,11 +25,9 @@ import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
-import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
-import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
+import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
@@ -37,6 +35,7 @@ import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.*;
 import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
@@ -97,6 +96,11 @@ public class ExpertiseService extends UserBaseService {
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
     @Inject
     private PriorityGroupRestClient priorityGroupRestClient;
+    @Inject
+    private ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
+
+    @Inject
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -145,11 +149,11 @@ public class ExpertiseService extends UserBaseService {
             }
         }
 
-        TimeSlot timeSlot =  new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
+        TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-                null,null,null,null, countryId,expertise.getId() );
-        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO,countryId,false, IntegrationOperation.CREATE,
-                "/expertise/"+expertise.getId()+"/night_worker_setting",null);
+                null, null, null, null, countryId, expertise.getId());
+        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return expertiseResponseDTO;
     }
 
@@ -701,5 +705,63 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
+    public Boolean addPlannedTimeInExpertise(Long unitId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseEmploymentTypeDTO.getExpertiseId());
+        if (!expertise.isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
+        }
+
+        Iterable<EmploymentType> employmentTypes = employmentTypeGraphRepository.findAllById(expertiseEmploymentTypeDTO.getEmploymentTypeIds());
+        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
+        employmentTypes.forEach(employmentType -> {
+            ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(expertise.get(),
+                    employmentType, expertiseEmploymentTypeDTO.getIncludedPlannedTime(), expertiseEmploymentTypeDTO.getExcludedPlannedTime());
+            expertiseEmploymentList.add(expertiseEmploymentTypeRelationship);
+
+        });
+        expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
+        return true;
+    }
+
+    public List<ExpertisePlannedTimeQR> getPlannedTimeInExpertise(Long expertiseId) {
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
+        if (!Optional.ofNullable(expertise).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+
+        }
+        List<ExpertisePlannedTimeQR> expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
+        return expertiseEmploymentTypeRelationships;
+    }
+
+    public Boolean updatePlannedTimeInExpertise(Long unitId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseEmploymentTypeDTO.getExpertiseId());
+        if (!expertise.isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
+        }
+        expertiseEmploymentTypeRelationshipGraphRepository.removeAllPreviousEmploymentType;
+        Iterable<EmploymentType> employmentTypes = employmentTypeGraphRepository.findAllById(expertiseEmploymentTypeDTO.getEmploymentTypeIds());
+        List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
+        employmentTypes.forEach(employmentType -> {
+            ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(expertise.get(),
+                    employmentType, expertiseEmploymentTypeDTO.getIncludedPlannedTime(), expertiseEmploymentTypeDTO.getExcludedPlannedTime());
+            expertiseEmploymentList.add(expertiseEmploymentTypeRelationship);
+
+        });
+        expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
+        return true;
+    }
+
+    public Map<String, Object> getPlannedTimeAndEmploymentType(Long unitId) {
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<EmploymentTypeQueryResult> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByOrganization(unitId, false);
+        Map<String, Object> countryDetail = new HashMap<>();
+        countryDetail.put("countryId", countryId);
+        List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyPropertiesOfListByMapper
+                (priorityGroupRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
+
+        countryDetail.put("employmentTypes", employmentTypes);
+        countryDetail.put("presenceTypes", presenceTypes);
+        return countryDetail;
+    }
 
 }

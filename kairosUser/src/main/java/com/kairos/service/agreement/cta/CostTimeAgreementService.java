@@ -10,7 +10,7 @@ import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCat
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Currency;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
