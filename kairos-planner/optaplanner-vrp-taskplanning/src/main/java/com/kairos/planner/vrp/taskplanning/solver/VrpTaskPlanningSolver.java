@@ -32,13 +32,20 @@ public class VrpTaskPlanningSolver {
         solver = solverFactory.buildSolver();
     }
 
-    public void solve(String problemXML) throws IOException {
-        XStream xstream = getxStream();
-        VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));
-        solve(problem);
+
+    public VrpTaskPlanningSolver(List<File> drlFileList){
+        solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        //solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+        solver = solverFactory.buildSolver();
     }
 
-    private XStream getxStream() {
+    public void solve(String problemXML,boolean addBreaks) throws IOException {
+        XStream xstream = getxStream();
+        VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) xstream.fromXML(new File(problemXML));
+        solve(problem,addBreaks);
+    }
+
+    public XStream getxStream() {
         XStream xstream= new XStream();
         xstream.setMode(XStream.ID_REFERENCES);
         xstream.processAnnotations(LocationPair.class);
@@ -47,8 +54,9 @@ public class VrpTaskPlanningSolver {
         return xstream;
     }
 
-    public void solve(VrpTaskPlanningSolution problem) throws IOException {
+    public void solve(VrpTaskPlanningSolution problem,boolean addBreaks) throws IOException {
         printProblemInfo(problem);
+        if(addBreaks)
         addBreaks(problem);
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
@@ -69,17 +77,29 @@ public class VrpTaskPlanningSolver {
         getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
         int totalDrivingTime=0;
         StringBuilder sbs= new StringBuilder("Locs data:\n");
+        StringBuilder sbTom= new StringBuilder("Locs data for tomtom:\n");
         StringBuilder shiftChainInfo= new StringBuilder("Shift chain data:\n");
         for(Shift shift: solution.getShifts()){
-            StringBuffer sb= new StringBuffer(shift+":::"+shift.getNumberOfTasks()+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
+            StringBuffer sb= new StringBuffer(shift+":::"+(shift.getNumberOfTasks()<10?0+""+shift.getNumberOfTasks():shift.getNumberOfTasks())+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
             log.info(sb.toString());
             sbs.append(shift.getId()+":"+getLocationList(shift).toString()+"\n");
+            sbTom.append(shift.getId()+":"+getLocationListForTomTom(shift).toString()+"\n");
             shiftChainInfo.append(shift.getId()+":"+getShiftChainInfo(shift)+"\n");
             totalDrivingTime+=shift.getChainDrivingTime();
         }
         log.info(sbs.toString());
+        log.info(sbTom.toString());
         log.info(shiftChainInfo.toString());
         log.info("total driving time:"+totalDrivingTime);
+
+        log.info("per employee mins:");
+        Map<String,IntSummaryStatistics> map=problem.getShifts().stream().collect(Collectors.groupingBy(s->s.getEmployee().getName(),Collectors.summarizingInt(s->s.getChainDuration())));
+        map.entrySet().forEach(e->{
+            log.info(e.getKey()+"---"+e.getValue().getSum());
+        });
+
+        printBreaksInfo(solution.getShifts());
+
         DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 
         director.setWorkingSolution(solution);
@@ -89,8 +109,22 @@ public class VrpTaskPlanningSolver {
 
     }
 
+    private void printBreaksInfo(List<Shift> shifts) {
+        log.info("Breaks info.");
+        shifts.forEach(s->{
+            log.info(s.getId()+"-"+s.getEmployee().getName()+"->"+s.getBreak()+(s.getBreak()==null?"":s.getBreak().getPlannedStartTime()));
+        });
+        log.info("-------------");
+    }
+
     private void addBreaks(VrpTaskPlanningSolution problem) {
         List<Task> breaks=new ArrayList<>();
+        int maxBreaks=problem.getEmployees().size()*4;
+        for (int i = 0; i <maxBreaks ; i++) {
+            breaks.add(new Task(1000000000l+i,30,true));
+        }
+        problem.getTasks().addAll(breaks);
+        Collections.shuffle(problem.getTasks());
 
     }
 
@@ -99,12 +133,31 @@ public class VrpTaskPlanningSolver {
         problem.getTasks().forEach(t->{
             log.info(t+"-----"+t.getSkills());
         });
-        Map<Set<String>,List<Task>> map=problem.getTasks().stream().collect(Collectors.groupingBy(t->t.getSkills()));
-        for(Map.Entry<Set<String>,List<Task>> e:map.entrySet()){
+        Map<String,List<Task>> map=problem.getTasks().stream().collect(Collectors.groupingBy(t->t.getSkills()==null?"break":t.getSkills().toString()));
+        for(Map.Entry<String,List<Task>> e:map.entrySet()){
             log.info(e.getKey()+"----------"+e.getValue().stream().mapToInt(t->t.getDuration()).sum());
         }
         log.info("Tasks details Done.");
 
+    }
+
+    public Object[] solveProblemOnRequest(VrpTaskPlanningSolution problem) {
+        AtomicInteger at=new AtomicInteger(0);
+        problem.getTasks().forEach(t->{
+            t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
+        });
+        VrpTaskPlanningSolution solution=null;
+        try {
+            solution = solver.solve(problem);
+            DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
+
+            director.setWorkingSolution(solution);
+            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            return new Object[]{solution,indictmentMap};
+        }catch (Exception e){
+            //e.printStackTrace();
+            throw  e;
+        }
     }
 
     private String getShiftChainInfo(Shift shift) {
@@ -138,10 +191,21 @@ public class VrpTaskPlanningSolver {
         int i=0;
         while(temp!=null){
             Location location = new Location(temp.getLatitude(), temp.getLongitude(), ++i, temp.getInstallationNo());
-            if(!list.contains(location)){
+            //if(!list.contains(location)){
+            if(!temp.isShiftBreak())
                 list.add(location);
-            }
+            //}
             temp=temp.getNextTask();
+        }
+        return list;
+    }
+    public List<String> getLocationListForTomTom(Shift shift){
+        List<String> list= new ArrayList<>();
+        Task temp=shift.getNextTask();
+        while(temp!=null){
+            if(!temp.isShiftBreak())
+                list.add("{lat:"+temp.getLatitude()+",lon:"+temp.getLongitude()+"}");
+                temp=temp.getNextTask();
         }
         return list;
     }
@@ -155,7 +219,7 @@ public class VrpTaskPlanningSolver {
             log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
             constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
                 constraintMatch.getJustificationList().forEach(o -> {
-                    log.info(constraintMatch.getScore()+"---" + o+"---------"+((Task)o).getShift());
+                    log.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift():""));
                 });
             });
 

@@ -37,13 +37,27 @@ salience 21
         scoreHolder.addHardConstraintMatch(kcontext,-$ot);
 end
 
+rule "Number of Task Per shift"
+salience 21
+
+    when
+        Shift($num:numberOfTasks && $num> 20)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
+end
+
 rule "Shift out of boundary full day"
 salience 22
     when
         Shift(isFullWorkDay() && $minutes:totalPlannedMinutes)
-        $ot: Integer(intValue>0) from ($minutes-510)
+        $ot: Integer(intValue>0) from ($minutes-540)
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
+        if($ot>60){
+            scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
+        }
+        else{
+            scoreHolder.addSoftConstraintMatch(kcontext,-10);
+        }
 end
 
 rule "Driving Time"
@@ -56,8 +70,8 @@ end
 rule "Consecutive tasks"
 salience 22
     when
-        $t1:Task(prevTaskOrShift!=null)
-        $t2:Task(prevTaskOrShift!=null && hasSameChain($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
+        $t1:Task(prevTaskOrShift!=null && !shiftBreak)
+        $t2:Task(prevTaskOrShift!=null && !shiftBreak && hasSameChain($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end
@@ -65,8 +79,25 @@ end
 rule "Consecutive tasks if same skillSet"
 salience 22
     when
-        $t1:Task(prevTaskOrShift!=null)
-        $t2:Task(prevTaskOrShift!=null && !id.equals($t1.id) && hasSameSkillset($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
+        $t1:Task(prevTaskOrShift!=null && !shiftBreak)
+        $t2:Task(prevTaskOrShift!=null && !shiftBreak && !id.equals($t1.id) && hasSameSkillset($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
+end
+
+//breaks rules
+rule "Full day shifts must have breaks"
+salience 22
+    when
+        Shift(isFullWorkDay()  && $brks:numberOfBreaks, $brks!=1)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,$brks==0?-1:-$brks);
+end
+
+rule "Break window"
+salience 22
+    when
+        Task(isShiftBreak()  && !isBreakInWindow())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,-1);
 end

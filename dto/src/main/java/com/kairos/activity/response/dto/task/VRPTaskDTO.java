@@ -14,15 +14,33 @@ import java.math.BigInteger;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VRPTaskDTO {
+    private BigInteger id;
     private TaskAddress address;
     //Vrp settings
-    private Integer installationNumber;
+    private Long installationNumber;
     private Long citizenId;
     private String skill;
     private BigInteger taskTypeId;
     private String citizenName;
     private TaskTypeDTO taskType;
     private Long unitId;
+    private int duration;
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public Long getUnitId() {
         return unitId;
@@ -80,11 +98,11 @@ public class VRPTaskDTO {
         this.address = address;
     }
 
-    public Integer getInstallationNumber() {
+    public Long getInstallationNumber() {
         return installationNumber;
     }
 
-    public void setInstallationNumber(Integer installationNumber) {
+    public void setInstallationNumber(Long installationNumber) {
         this.installationNumber = installationNumber;
     }
 }

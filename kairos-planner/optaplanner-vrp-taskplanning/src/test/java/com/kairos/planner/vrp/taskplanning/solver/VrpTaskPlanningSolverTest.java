@@ -17,13 +17,13 @@ public class VrpTaskPlanningSolverTest {
 
     @Test
     public void solve() throws IOException {
-        boolean readFromSolution=false;
+        boolean readFromSolution=true;
         if(readFromSolution){
             //solution -3 drive.xml
-//            new VrpTaskPlanningSolver().solve("src/main/resources/solution.xml");
-            new VrpTaskPlanningSolver().solve("src/main/resources/solution -3 drive.xml");
+            new VrpTaskPlanningSolver().solve("src/main/resources/solution.xml",false);
+            //new VrpTaskPlanningSolver().solve("src/main/resources/best_solution_breaks_0h0M.xml",false);
         }else{
-            new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml");
+            new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml",true);
         }
 
     }

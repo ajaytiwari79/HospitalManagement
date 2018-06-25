@@ -55,7 +55,7 @@ public class ShiftPlanningService {
 
     public RecomendationPlanningDTO submitRecomendationProblem(RecomendationPlanningDTO planningDTO){
 
-        /*SolverConfigDTO solverConfigDTO = solverConfigService.getOneForPlanning(planningDTO.getSolverConfigId());
+        /*SolverConfigWTADTO solverConfigDTO = solverConfigService.getOneForPlanning(planningDTO.getSolverConfigId());
         boolean initialisedPlanner = initializeShiftPlanner(solverConfigDTO,planningDTO);
         if(initialisedPlanner){
             PlanningProblem planningProblem = new PlanningProblem();
