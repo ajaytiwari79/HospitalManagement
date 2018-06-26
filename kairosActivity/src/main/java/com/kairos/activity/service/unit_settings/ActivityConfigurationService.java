@@ -136,7 +136,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
-        List<PhaseResponseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(unitId);
+        List<PhaseResponseDTO> phases = phaseMongoRepository.getAllPlanningPhasesByUnit(unitId);
         List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
         List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
         List<TimeTypeResponseDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
