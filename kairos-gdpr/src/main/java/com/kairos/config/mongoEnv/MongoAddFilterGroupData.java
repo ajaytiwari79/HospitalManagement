@@ -1,4 +1,4 @@
-package com.kairos.config.mongoEnv_config;
+package com.kairos.config.mongoEnv;
 
 
 import com.kairos.dto.master_data.ModuleIdDTO;

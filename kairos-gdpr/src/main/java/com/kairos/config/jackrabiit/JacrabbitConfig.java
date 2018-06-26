@@ -1,7 +1,7 @@
-package com.kairos.config.jackrabiit_config;
+package com.kairos.config.jackrabiit;
 
 
-import com.kairos.config.mongoEnv_config.EnvConfig;
+import com.kairos.config.mongoEnv.EnvConfig;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
@@ -33,8 +33,8 @@ private EnvConfig environment;
         DB db = new MongoClient( new ServerAddress(environment.getMongoHost(),environment.getMongoPort()) ,credentialList).getDB(environment.getDataBaseName());
         DocumentNodeStore ns = new DocumentMK.Builder()
                 /*.setBlobStore((BlobStore)new FileBlobStore("mongorepository_jackrabit/blob"))*/.setMongoDB(db,1).getNodeStore();
-        Repository repo = new Jcr(new Oak(ns)).createRepository();
-        return repo;
+        return new Jcr(new Oak(ns)).createRepository();
+
     }
 
 
