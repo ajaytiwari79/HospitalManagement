@@ -30,6 +30,7 @@ public class ScheduledHoursService implements CounterService {
         return applicableCriteria;
     }
 
+    //TODO: Implimantation is pending as functionality chnaged.
     private int calculateData(Map applicableCriteria){
         List<AggregationOperation> operations = counterFilterService.getShiftFilterCriteria(applicableCriteria);
         List<Shift> shifts = counterRepository.getMappedValues(operations, Shift.class, ShiftDTO.class);
