@@ -4,6 +4,8 @@ public class AppConstant {
 
     public static final String ID = "._id";
     public static final String COUNTRY_ID = "countryId";
+    public static final String ORGANIZATION_ID = "organizationId";
+
     public static final String DELETED= "deleted";
 
     public static final String ASSET_MODULE_NAME = "Asset List";

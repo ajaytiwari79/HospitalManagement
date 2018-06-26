@@ -3,7 +3,7 @@ package com.kairos.activity.service.task_type;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.client.*;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.client.Client;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.staff.*;
@@ -14,7 +14,7 @@ import com.kairos.activity.persistence.enums.task_type.TaskTypeEnum;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.client_exception.ClientException;
-import com.kairos.activity.persistence.model.staffing_level.Day;
+import com.kairos.enums.Day;
 import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.persistence.model.task.TaskAddress;
 import com.kairos.activity.persistence.model.task.TaskStatus;
@@ -1615,13 +1615,13 @@ public class TaskService extends MongoBaseService {
         Set<String> skills = taskDTOS.stream().map(t->t.getSkill()).collect(Collectors.toSet());
         List<TaskType> taskTypes = taskTypeMongoRepository.findByName(unitId,new ArrayList<>(skills));
         Map<String,BigInteger> taskTypeIds = taskTypes.stream().collect(Collectors.toMap(t->t.getTitle(),t->t.getId()));
-        Map installationNoAndTaskTypeId = taskMongoRepository.getAllTasksInstallationNoAndTaskTypeId(unitId);
+        Map<Long,BigInteger> installationNoAndTaskTypeId = taskMongoRepository.getAllTasksInstallationNoAndTaskTypeId(unitId);
         List<VRPTaskDTO> newTasks = new ArrayList<>();
         for (VRPTaskDTO task : taskDTOS) {
             if(!taskTypeIds.containsKey(task.getSkill())){
                 exceptionService.dataNotFoundException("message.taskType.notExists",task.getSkill());
             }
-            if(!installationNoAndTaskTypeId.containsKey(new Integer(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
+            if(!installationNoAndTaskTypeId.containsKey(new Long(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
                 task.setUnitId(unitId);
                 task.setTaskTypeId(taskTypeIds.get(task.getSkill()));
                 newTasks.add(task);

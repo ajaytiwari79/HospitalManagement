@@ -1,6 +1,7 @@
 package com.kairos.activity.client.dto.organization;
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
+
+import com.kairos.response.dto.web.phase.PhaseDTO;
 
 import java.util.List;
 

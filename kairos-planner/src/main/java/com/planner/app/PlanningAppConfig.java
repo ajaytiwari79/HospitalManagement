@@ -28,11 +28,17 @@ import java.time.LocalDate;
 @EnableScheduling
 @SpringBootApplication
 @EnableEurekaClient
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableMongoRepositories(basePackages ={"com.planner.repository"})
 public class PlanningAppConfig {
     public static void main(String[] args) {
         //ch.qos.logback.classic.turbo.TurboFilter tf=null;
         SpringApplication.run(PlanningAppConfig.class, args);
+    }
+
+    static{
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
     }
 
     @Bean(name ="schedulerRestTemplate")

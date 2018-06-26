@@ -59,6 +59,6 @@ public class UnitSettingController {
     @PostMapping(value = "/unit_setting/open_shift_phase_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addDefaultOpenShiftPhaseSettings(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.createDefaultOpenShiftPhaseSettings(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.createDefaultOpenShiftPhaseSettings(unitId,null));
     }
 }

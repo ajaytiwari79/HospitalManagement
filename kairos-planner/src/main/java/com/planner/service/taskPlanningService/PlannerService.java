@@ -1,14 +1,12 @@
 package com.planner.service.taskPlanningService;
 
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
 import com.kairos.dto.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.dto.solverconfig.ConstraintValueDTO;
 import com.kairos.dto.solverconfig.SolverConfigDTO;
-import com.kairos.planner.vrp.taskplanning.model.*;
-import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.response.dto.web.planning.vrpPlanning.TaskDTO;
 import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
@@ -172,13 +170,14 @@ public class PlannerService {
     }
 
     public VrpTaskPlanningDTO getSolutionBySolverConfigId(BigInteger solverConfigId){
-        /*VrpTaskPlanningSolution solution = (VrpTaskPlanningSolution)new VrpTaskPlanningSolver().getxStream().fromXML(new File("optaplanner-vrp-taskplanning/src/main/resources/solution.xml"));
+        /*VrpTaskPlanningSolution solution = (VrpTaskPlanningSolution)new VrpTaskPlanningSolver().getxStream().fromXML(new File("optaplanner-vrp-taskplanning/src/main/resources/solution-2594soft.xml"));
 
         Object[] solvedTasks = getSolvedTasks(solution.getShifts());
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2]);
         */VRPPlanningSolution solution = vrpPlanningMongoRepository.getSolutionBySolverConfigId(solverConfigId);
-        /*vrpPlanningSolution.setSolverConfigId(solverConfigId);
-        vrpPlanningMongoRepository.save(vrpPlanningSolution);
+        //vrpPlanningSolution.setSolverConfigId(solverConfigId);
+        //vrpPlanningMongoRepository.save(vrpPlanningSolution);
+/*
         */return ObjectMapperUtils.copyPropertiesByMapper(solution,VrpTaskPlanningDTO.class);
     }
 
@@ -188,24 +187,39 @@ public class PlannerService {
         List<PlanningShift> planningShifts = new ArrayList<>(shifts.size());
         for (Shift shift:shifts){
             Task nextTask = shift.getNextTask();
-            planningShifts.add(new PlanningShift(shift.getEmployee().getId(), Date.from(shift.getStartTime().atZone(ZoneId.systemDefault()).toInstant()),Date.from(shift.getEndTime().atZone(ZoneId.systemDefault()).toInstant())));
-            if(nextTask!=null){
-                while (true){
-                    com.planner.domain.task.Task task = new com.planner.domain.task.Task(nextTask.getId().toString(),nextTask.getInstallationNo(),new Double(nextTask.getLatitude()),new Double(nextTask.getLongitude()),null,nextTask.getDuration(),nextTask.getStreetName(),new Integer(nextTask.getHouseNo()),nextTask.getBlock(),nextTask.getFloorNo(),nextTask.getPost(),nextTask.getCity());
-                    task.setPlannedStartTime(nextTask.getPlannedStartTime());
-                    LocalDateTime drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
-                    task.setPlannedEndTime(drivingTimeStart);
-                    task.setStaffId(new Long(shift.getEmployee().getId()));
-                    tasks.add(task);
-                    if(nextTask.getNextTask()!=null){
-                        nextTask = nextTask.getNextTask();
-                        com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task(nextTask.getId().toString(),nextTask.getInstallationNo(),new Double(nextTask.getLatitude()),new Double(nextTask.getLongitude()),null,nextTask.getDrivingTimeSeconds(),nextTask.getStreetName(),new Integer(nextTask.getHouseNo()),nextTask.getBlock(),nextTask.getFloorNo(),nextTask.getPost(),nextTask.getCity());
-                        drivedTask.setPlannedStartTime(drivingTimeStart);
-                        drivedTask.setStaffId(new Long(shift.getEmployee().getId()));
-                        drivedTask.setPlannedEndTime(drivingTimeStart.plusSeconds(nextTask.getDrivingTimeSeconds()));
-                        drivedTaskList.add(drivedTask);
-                    }else {
-                        break;
+            if(shift.getEndTime()!=null) {
+                planningShifts.add(new PlanningShift(shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), Shift.getDefaultShiftStart()), Date.from(shift.getEndTime().atZone(ZoneId.systemDefault()).toInstant())));
+                int i = 0;
+                if (nextTask != null) {
+                    while (true) {
+                        LocalDateTime drivingTimeStart = null;
+                        if(nextTask.isShiftBreak()){
+                            com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_"+i+""+ nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, nextTask.getDrivingTimeSeconds(), nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+                            drivedTask.setPlannedStartTime(nextTask.getPlannedStartTime());
+                            drivedTask.setStaffId(new Long(shift.getEmployee().getId()));
+                            drivedTask.setBreakTime(true);
+                            drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
+                            drivedTask.setPlannedEndTime(drivingTimeStart);
+                            drivedTaskList.add(drivedTask);
+                        }else {
+                            com.planner.domain.task.Task task = new com.planner.domain.task.Task(nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, nextTask.getDuration(), nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+                            task.setPlannedStartTime(nextTask.getPlannedStartTime());
+                            drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
+                            task.setPlannedEndTime(drivingTimeStart);
+                            task.setStaffId(new Long(shift.getEmployee().getId()));
+                            tasks.add(task);
+                        }
+                        if (nextTask.getNextTask() != null) {
+                            nextTask = nextTask.getNextTask();
+                            com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_"+i+"" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, nextTask.getDrivingTimeSeconds(), nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+                            drivedTask.setPlannedStartTime(drivingTimeStart);
+                            drivedTask.setStaffId(new Long(shift.getEmployee().getId()));
+                            drivedTask.setPlannedEndTime(drivingTimeStart.plusSeconds(nextTask.getDrivingTimeSeconds()));
+                            drivedTaskList.add(drivedTask);
+                        } else if(nextTask.getNextTask() == null){
+                            break;
+                        }
+                        i++;
                     }
                 }
             }

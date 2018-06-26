@@ -95,6 +95,8 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = HAS_STAFF_SETTINGS)
     private StaffSettings staffSettings;
+    private String access_token;
+    private String user_id;
 
 
     public Staff(String firstName) {
@@ -488,6 +490,23 @@ public class Staff extends UserBaseEntity {
     public void setStaffSettings(StaffSettings staffSettings) {
         this.staffSettings = staffSettings;
     }
+
+    public String getAccess_token() {
+        return access_token;
+    }
+
+    public void setAccess_token(String access_token) {
+        this.access_token = access_token;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
     /*    public Gender getGender() {
 
 /*    public Gender getGender() {

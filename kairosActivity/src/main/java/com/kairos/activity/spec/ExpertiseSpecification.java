@@ -1,7 +1,6 @@
 package com.kairos.activity.spec;
 
 
-import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.shift.Expertise;
 import com.kairos.activity.service.exception.ExceptionService;
@@ -41,7 +40,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         if (Optional.ofNullable(shift.getActivity().getExpertises()).isPresent() && !shift.getActivity().getExpertises().isEmpty()) {
             expertiseIds.addAll(shift.getActivity().getExpertises());
             if (expertiseIds.contains(expertise.getId())) {
-                Collections.emptyList();
+                return Collections.emptyList();
             }
             return Arrays.asList("message.activity.expertise.match");
         }

@@ -10,8 +10,6 @@ public class BalanceSettingsActivityTab implements Serializable{
 
 
     private Integer addTimeTo;
-    private String addDayTo;
-    private BigInteger presenceTypeId;
     private BigInteger timeTypeId;
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
@@ -28,21 +26,11 @@ public class BalanceSettingsActivityTab implements Serializable{
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
 
-    public BalanceSettingsActivityTab(Integer addTimeTo, String addDayTo,BigInteger timeTypeId, BigInteger presenceTypeId, Boolean onCallTimePresentPresent, Boolean negativeDayBalancePresent) {
+    public BalanceSettingsActivityTab(Integer addTimeTo, BigInteger timeTypeId, Boolean onCallTimePresentPresent, Boolean negativeDayBalancePresent) {
         this.addTimeTo = addTimeTo;
-        this.addDayTo = addDayTo;
         this.timeTypeId = timeTypeId;
-        this.presenceTypeId = presenceTypeId;
         this.onCallTimePresent = onCallTimePresentPresent;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
-    }
-
-    public BigInteger getPresenceTypeId() {
-        return presenceTypeId;
-    }
-
-    public void setPresenceTypeId(BigInteger presenceTypeId) {
-        this.presenceTypeId = presenceTypeId;
     }
 
     public void setOnCallTimePresent(boolean onCallTimePresent) {
@@ -63,14 +51,6 @@ public class BalanceSettingsActivityTab implements Serializable{
 
     public Boolean getNegativeDayBalancePresent() {
         return negativeDayBalancePresent;
-    }
-
-    public String getAddDayTo() {
-        return addDayTo;
-    }
-
-    public void setAddDayTo(String addDayTo) {
-        this.addDayTo = addDayTo;
     }
 
     public BigInteger getTimeTypeId() {

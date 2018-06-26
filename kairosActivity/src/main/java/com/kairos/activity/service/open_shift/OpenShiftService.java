@@ -116,8 +116,8 @@ public class OpenShiftService extends MongoBaseService {
             OpenShift openShift = new OpenShift();
             BeanUtils.copyProperties(openShiftResponseDTO,openShift,openShiftResponseDTO.getStartDate().toString());
             openShift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
-            openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getFromTime()):
-                    DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getFromTime()));
+            openShift.setEndDate(openShiftResponseDTO.getFromTime().isAfter(openShiftResponseDTO.getToTime())?DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate().plusDays(1),openShiftResponseDTO.getToTime()):
+                    DateUtils.getDateByLocalDateAndLocalTime(openShiftResponseDTO.getStartDate(),openShiftResponseDTO.getToTime()));
             openShifts.add(openShift);
 
         }
@@ -207,7 +207,7 @@ public class OpenShiftService extends MongoBaseService {
    public OpenShiftWrapper fetchOpenShiftDataByStaff(Long unitId,  BigInteger openShiftId,  Long staffId){
         OpenShiftActivityWrapper openShiftActivityWrapper =openShiftMongoRepository.getOpenShiftAndActivity(openShiftId,unitId);
         Long unitPositionId=genericIntegrationService.getUnitPositionId(unitId,staffId, openShiftActivityWrapper.getExpertiseId());
-       com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+        com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
         OpenShift openShift=openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         Date startDate=DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
         Date endDate =DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));

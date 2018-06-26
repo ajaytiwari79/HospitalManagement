@@ -9,7 +9,7 @@ import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -299,7 +299,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "WITH CASE WHEN size(unitManagers)>0 THEN unitManagers[0] ELSE null END as unitManager,\n" +
             "CASE WHEN size(accessGroups)>0 THEN accessGroups[0] ELSE null END as accessGroup,\n" +
             "level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality,companyCategory\n" +
-            "return collect({unitManager:CASE WHEN unitManager IS NULL THEN null ELSE  {id:id(unitManager), firstName:unitManager.firstName, lastName:unitManager.lastName, cprNumber:unitManager.cprNumber, accessGroupId:id(accessGroup)} END ,id:id(org),levelId:id(level),companyCategoryId:id(companyCategory),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,boardingCompleted:org.boardingCompleted,desiredUrl:org.desiredUrl,shortCompanyName:org.shortCompanyName,kairosCompanyId:org.kairosCompanyId,companyType:org.companyType,vatId:org.vatId,costCenter:org.costCenter,costCenterId:org.costCenterId,companyUnitType:org.companyUnitType,contactAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCodeId:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
+            "return collect({unitManager:CASE WHEN unitManager IS NULL THEN null ELSE  {id:id(unitManager), firstName:unitManager.firstName, lastName:unitManager.lastName, cprNumber:unitManager.cprNumber, accessGroupId:id(accessGroup), accessGroupName:accessGroup.name} END ,id:id(org),levelId:id(level),companyCategoryId:id(companyCategory),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,boardingCompleted:org.boardingCompleted,desiredUrl:org.desiredUrl,shortCompanyName:org.shortCompanyName,kairosCompanyId:org.kairosCompanyId,companyType:org.companyType,vatId:org.vatId,costCenter:org.costCenter,costCenterId:org.costCenterId,companyUnitType:org.companyUnitType,contactAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCodeId:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getParentOrganizationOfRegion(long countryId);
 
     @Query("MATCH (organization:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false,boardingCompleted:false})-[:HAS_SUB_ORGANIZATION]->(org:Organization) \n" +
@@ -778,5 +778,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH (org:Organization)-[:"+HAS_SETTING+"]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
-
+    @Query("Match (union:Organization{isEnable:true}) where id (union) IN {0}  return union")
+    List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 }

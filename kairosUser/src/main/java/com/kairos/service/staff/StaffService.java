@@ -5,9 +5,8 @@ import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.util.ObjectMapperUtils;
-
 import com.kairos.activity.util.DateUtils;
-
+import com.kairos.client.ChatRestClient;
 import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
@@ -69,6 +68,7 @@ import com.kairos.response.dto.web.employment_dto.EmploymentOverlapDTO;
 import com.kairos.response.dto.web.employment_dto.MainEmploymentResultDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.response.dto.web.staff.StaffChatDetails;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -190,9 +190,12 @@ public class StaffService extends UserBaseService {
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
     private PlannerSyncService plannerSyncService;
-    @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
+    @Inject
+    private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private ChatRestClient chatRestClient;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1069,6 +1072,7 @@ public class StaffService extends UserBaseService {
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
         staff.setClient(client);
+        addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
@@ -1638,15 +1642,15 @@ public class StaffService extends UserBaseService {
         //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult,StaffAdditionalInfoDTO.class);
-       // StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionCTA(unitPositionId,unitId);
+        // StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionCTA(unitPositionId, unitId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.activity.client.dto.TimeSlotWrapper.class));
         staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes,DayTypeDTO.class));
+        staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
         UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);
         staffAdditionalInfoDTO.setUser(userAccessRole);
         if (Optional.ofNullable(unitPosition).isPresent()) {
@@ -1655,7 +1659,7 @@ public class StaffService extends UserBaseService {
             //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
-        UserAccessRoleDTO userAccessRoleDTO=accessGroupService.getStaffAccessRoles(unitId,staffId);
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staffId);
         staffAdditionalInfoQueryResult.setUserAccessRoleDTO(userAccessRoleDTO);
         return staffAdditionalInfoDTO;
 
@@ -2045,10 +2049,31 @@ public class StaffService extends UserBaseService {
         return staffGraphRepository.getEmailsOfStaffByStaffIds(staffIds);
     }
 
-    public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId){
+    public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-        return accessGroupService.getStaffAccessRoles(unitId,staff.getId());
+        return accessGroupService.getStaffAccessRoles(unitId, staff.getId());
     }
+
+    public boolean registerAllStaffsToChatServer() {
+        List<Staff> staffList=staffGraphRepository.findAll();
+        staffList.forEach(staff -> {
+            addStaffInChatServer(staff);
+            save(staff);
+        });
+        return true;
+    }
+
+
+
+    private void addStaffInChatServer(Staff staff){
+        Map<String,String> auth=new HashMap<>();
+        auth.put("type","m.login.dummy");
+        auth.put("session",staff.getId().toString());
+        StaffChatDetails staffChatDetails=new StaffChatDetails(auth,staff.getEmail(),staff.getFirstName()+"@kairos");
+        StaffChatDetails chatDetails=chatRestClient.registerUser(staffChatDetails);
+        staff.setAccess_token(chatDetails.getAccess_token());
+        staff.setUser_id(chatDetails.getUser_id());
+        }
 
 }

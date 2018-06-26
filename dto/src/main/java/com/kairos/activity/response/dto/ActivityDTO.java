@@ -38,12 +38,23 @@ public class ActivityDTO {
     private TimeTypeDTO timeType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private BigInteger parentId;
+
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
     private List<Long> tags = new ArrayList<>();
 
     public ActivityDTO() {
         //default constructor
+    }
+
+
+    public BigInteger getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
@@ -231,6 +242,12 @@ public class ActivityDTO {
         this.isParentActivity = isParentActivity;
         this.generalActivityTab = generalActivityTab;
         this.tags = tags;
+    }
+
+    public ActivityDTO(BigInteger id, String name,BigInteger parentId) {
+        this.id = id;
+        this.name = name;
+        this.parentId = parentId;
     }
 }
 

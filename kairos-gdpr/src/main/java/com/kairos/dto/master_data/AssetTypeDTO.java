@@ -12,7 +12,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetTypeDTO {
 
-
     private BigInteger id;
 
     @NotNullOrEmpty(message = "Title cannot be empty ")

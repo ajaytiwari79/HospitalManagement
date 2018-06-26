@@ -17,6 +17,7 @@ public class UnitManagerDTO {
     @NotNull(message = "error.lastname.notnull")
     private String lastName;
     private String email;
+    private String accessGroupName;
 
     public UnitManagerDTO(){
         // default constructor
@@ -60,5 +61,13 @@ public class UnitManagerDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAccessGroupName() {
+        return accessGroupName;
+    }
+
+    public void setAccessGroupName(String accessGroupName) {
+        this.accessGroupName = accessGroupName;
     }
 }

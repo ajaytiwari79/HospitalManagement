@@ -1,6 +1,5 @@
 package com.kairos.activity.controller.period;
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.service.period.PeriodSettingsService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.period.PeriodSettingsDTO;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;

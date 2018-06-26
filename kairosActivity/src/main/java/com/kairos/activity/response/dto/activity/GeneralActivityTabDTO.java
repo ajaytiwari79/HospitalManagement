@@ -28,10 +28,6 @@ public class GeneralActivityTabDTO {
     private  String shortName;
     private boolean eligibleForUse=true;
     private String ultraShortName;
-
-    private boolean overRuleCtaWta;
-    private String payrollType;
-    private String payrollSystem;
     private LocalDate startDate;
     private LocalDate endDate;
 
@@ -62,8 +58,6 @@ public class GeneralActivityTabDTO {
                 ", originalIconName='" + originalIconName + '\'' +
                 ", modifiedIconName='" + modifiedIconName + '\'' +
                 ", tags=" + tags +
-                ", payrollType=" + payrollType +
-                ", payrollSystem=" + payrollSystem +
                 '}';
     }
 
@@ -74,7 +68,7 @@ public class GeneralActivityTabDTO {
     public GeneralActivityTab buildGeneralActivityTab() {
         GeneralActivityTab generalActivityTab =
                 new GeneralActivityTab(name, code, printoutSymbol,categoryId, colorPresent, backgroundColor, textColor, description,this.isActive,
-                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta, this.payrollSystem, this.payrollType,this.startDate,this.endDate);
+                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName, this.startDate,this.endDate);
         return generalActivityTab;
     }
 
@@ -210,27 +204,6 @@ public class GeneralActivityTabDTO {
         this.modifiedIconName = modifiedIconName;
     }
 
-
-    public boolean isOverRuleCtaWta() {
-        return overRuleCtaWta;
-    }
-
-    public void setOverRuleCtaWta(boolean overRuleCtaWta) {
-        this.overRuleCtaWta = overRuleCtaWta;
-    }
-
-    public String getPayrollType() {
-        return payrollType;
-    }
-
-    public void setPayrollType(String payrollType) {
-        this.payrollType = payrollType;
-    }
-
-    public String getPayrollSystem() {
-        return payrollSystem;
-    }
-
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -247,9 +220,6 @@ public class GeneralActivityTabDTO {
         this.endDate = endDate;
     }
 
-    public void setPayrollSystem(String payrollSystem) {
-        this.payrollSystem = payrollSystem;
-    }
 
 
 }

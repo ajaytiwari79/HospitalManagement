@@ -1,6 +1,6 @@
 package com.kairos.activity.client;
 
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;

@@ -8,10 +8,13 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 
 
@@ -39,12 +42,22 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
 
 
     @Override
-    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId) {
+    public MasterQuestionnaireTemplate findByName(Long countryId, Long organizationId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, MasterQuestionnaireTemplate.class);
+
+    }
+
+    @Override
+    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId) {
 
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
@@ -62,11 +75,11 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
     }
 
     @Override
-    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId, BigInteger id) {
+    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId,BigInteger id) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
