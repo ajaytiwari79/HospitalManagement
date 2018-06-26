@@ -70,7 +70,7 @@ public class MasterAssetController {
         }  if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, true, masterAssetService.updateMasterAsset(countryId,organizationId,id,assetDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateMasterAsset(countryId,organizationId,id,assetDTO));
     }
 
 
