@@ -1147,21 +1147,4 @@ public class ShiftService extends MongoBaseService {
         return activities;
     }
 
-    private void validateActivityWithStaffEmployment(Shift shift, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
-        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
-        PhaseTemplateValue phaseTemplateValue1 = null;
-        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
-                phaseTemplateValue1 = phaseTemplateValue;
-            }
-        }
-        if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-            if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
-                exceptionService.actionNotPermittedException("message.staff.employmentType.absent");
-            }
-        }
-
-
-    }
 }
