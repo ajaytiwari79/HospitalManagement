@@ -6,7 +6,7 @@ import java.util.List;
 public class ShiftTemplateDTO {
     private BigInteger id;
     private String name;
-    private List<IndividualShiftTemplateDTO> shifts;
+    private List<IndividualShiftTemplateDTO> shiftList;
     private Long createdBy;
     private Long unitId;
 
@@ -14,10 +14,10 @@ public class ShiftTemplateDTO {
         //Default Constructor
     }
 
-    public ShiftTemplateDTO(BigInteger id, String name, List<IndividualShiftTemplateDTO> shifts, Long createdBy, Long unitId) {
+    public ShiftTemplateDTO(BigInteger id, String name, List<IndividualShiftTemplateDTO> shiftList, Long createdBy, Long unitId) {
         this.id = id;
         this.name = name;
-        this.shifts = shifts;
+        this.shiftList = shiftList;
         this.createdBy = createdBy;
         this.unitId = unitId;
     }
@@ -38,12 +38,12 @@ public class ShiftTemplateDTO {
         this.name = name;
     }
 
-    public List<IndividualShiftTemplateDTO> getShifts() {
-        return shifts;
+    public List<IndividualShiftTemplateDTO> getShiftList() {
+        return shiftList;
     }
 
-    public void setShifts(List<IndividualShiftTemplateDTO> shifts) {
-        this.shifts = shifts;
+    public void setShiftList(List<IndividualShiftTemplateDTO> shiftList) {
+        this.shiftList = shiftList;
     }
 
     public Long getCreatedBy() {

@@ -28,20 +28,18 @@ public class ShiftTemplateService extends MongoBaseService {
     @Inject private ShiftService shiftService;
 
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO){
-        List<IndividualShiftTemplateDTO> individualShiftTemplateDTO =shiftTemplateDTO.getShifts();
+        List<IndividualShiftTemplateDTO> individualShiftTemplateDTO =shiftTemplateDTO.getShiftList();
         List<IndividualShiftTemplate> individualShiftTemplates =ObjectMapperUtils.copyProperties(individualShiftTemplateDTO,IndividualShiftTemplate.class);
         save(individualShiftTemplates);
-        Set<BigInteger> shiftDayTemplateIds=new HashSet<>();
-        individualShiftTemplates.forEach(individualShiftTemplate -> {shiftDayTemplateIds.add(individualShiftTemplate.getId());});
-        ShiftTemplate shiftTemplate=Optional.ofNullable(shiftTemplateDTO.getId()).isPresent()?shiftTemplateRepository.findOneById(shiftTemplateDTO.getId()):
-        new ShiftTemplate(shiftTemplateDTO.getId(),shiftTemplateDTO.getName(),shiftDayTemplateIds,unitId,UserContext.getUserDetails().getId());
-        shiftTemplate.getIndividualShiftTemplateIds().addAll(shiftDayTemplateIds);
-        shiftTemplate.setName(shiftTemplateDTO.getName());
+        Set<BigInteger> individualShiftTemplateIds=new HashSet<>();
+        individualShiftTemplates.forEach(individualShiftTemplate -> {individualShiftTemplateIds.add(individualShiftTemplate.getId());});
+        ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
+        shiftTemplate.getIndividualShiftTemplateIds().addAll(individualShiftTemplateIds);
         save(shiftTemplate);
         //Preparing DTO Object to return
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(individualShiftTemplates,IndividualShiftTemplateDTO.class);
         shiftTemplateDTO.setId(shiftTemplate.getId());
-        shiftTemplateDTO.setShifts(individualShiftTemplateDTOS);
+        shiftTemplateDTO.setShiftList(individualShiftTemplateDTOS);
         return shiftTemplateDTO;
     }
 

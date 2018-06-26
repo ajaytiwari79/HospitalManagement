@@ -7,6 +7,7 @@ import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
+import com.kairos.activity.service.shift.ShiftTemplateService;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
@@ -44,6 +45,7 @@ import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
+import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -114,7 +116,7 @@ public class ActivityService extends MongoBaseService {
     private StaffRestClient staffRestClient;
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
-
+    @Inject private ShiftTemplateService shiftTemplateService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {

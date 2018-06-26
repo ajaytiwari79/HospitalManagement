@@ -17,8 +17,7 @@ public class ShiftTemplate extends MongoBaseEntity {
         //Default Constructor
     }
 
-    public ShiftTemplate(BigInteger id, String name, Set<BigInteger> individualShiftTemplateIds, Long unitId, Long createdBy) {
-        this.id=id;
+    public ShiftTemplate(String name, Set<BigInteger> individualShiftTemplateIds, Long unitId, Long createdBy) {
         this.name = name;
         this.individualShiftTemplateIds = individualShiftTemplateIds;
         this.unitId = unitId;
