@@ -88,38 +88,39 @@ public class OrganizationActivityService extends MongoBaseService {
     ActivityConfigurationService activityConfigurationService;
 
 
-    public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
-        logger.info("activityId,{}", activityId);
-        Activity activity = activityMongoRepository.findOne(activityId);
-        List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
-        List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        for (PhaseDTO phaseDTO : phaseDTOList) {
-            PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), false, false);
-            phaseTemplateValues.add(phaseTemplateValue);
-        }
-        activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
-
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
-        }
+    public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
+        ActivityDTO activityDetail = null;
+        Activity activityCopied;
         if (checked) {
-            Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
-            save(activityCopied);
-
+            Activity activity = activityMongoRepository.findOne(activityId);
+            if (!Optional.ofNullable(activity).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+            }
+            Activity isActivityAlreadyExist = activityMongoRepository.findByNameIgnoreCaseAndUnitIdAndByDate(activity.getName().trim(), unitId,activity.getGeneralActivityTab().getStartDate(),activity.getGeneralActivityTab().getEndDate());
+            if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
+                exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+            }
+            List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+            for (PhaseDTO phaseDTO : phaseDTOList) {
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), false, false);
+                phaseTemplateValues.add(phaseTemplateValue);
+            }
+            activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
+            activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             if (!activity.getState().equals(ActivityStateEnum.LIVE)) {
                 activity.setState(ActivityStateEnum.LIVE);
                 save(activity);
             }
             plannerSyncService.publishActivity(unitId, activity, IntegrationOperation.CREATE);
-            return activityCopied.retrieveBasicDetails();
-
+            activityDetail = activityCopied.retrieveBasicDetails();
         } else {
-            Activity activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
+            activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
-            save(activityCopied);
 
         }
-        return null;
+        save(activityCopied);
+        return activityDetail;
     }
 
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {
@@ -176,24 +177,21 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateGeneralTab(GeneralActivityTabDTO generalDTO, Long unitId) {
+        if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
+            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
+        }
+        Activity isActivityAlreadyExist = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(),unitId, generalDTO.getStartDate(),generalDTO.getEndDate());
+        if(Optional.ofNullable(isActivityAlreadyExist).isPresent()&&generalDTO.getStartDate().isBefore(isActivityAlreadyExist.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
+        if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
+            exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+        }
         ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
-        if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
-        }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
-        //Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnit(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId());
-        Date date = DateUtils.asDate(generalDTO.getStartDate());
-        Activity IsActivityExists = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(), activity.getUnitId(), date);
-        if (Optional.ofNullable(IsActivityExists).isPresent()) {
-            if (!Optional.ofNullable(IsActivityExists.getGeneralActivityTab().getEndDate()).isPresent()) {
-                exceptionService.dataNotFoundException("message.activity.enddate.required", generalDTO.getName());
-            } else {
-                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-            }
-        }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
@@ -246,10 +244,12 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate());
+                findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(),activityDTO.getEndDate());
+        if(Optional.ofNullable(activity).isPresent()&&activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(activity).isPresent()) {
-            logger.error("ActivityName already exist" + activityDTO.getName());
-            exceptionService.duplicateDataException("message.activity.name", activityDTO.getName());
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
@@ -291,7 +291,7 @@ public class OrganizationActivityService extends MongoBaseService {
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         activityConfigurationService.createDefaultSettings(countryId,unitId, phases);
-        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId);
+        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId,phases);
         return true;
     }
 

@@ -13,25 +13,25 @@ import java.util.Set;
 public interface ProcessingPurposeMongoRepository extends MongoRepository<ProcessingPurpose, BigInteger> {
 
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
-    ProcessingPurpose findByIdAndNonDeleted(Long countryId,BigInteger id);
+    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
+    ProcessingPurpose findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{'countryId':?0,name:?1,deleted:false}")
-    ProcessingPurpose findByName(Long countryId,String name);
+    @Query("{'countryId':?0,organizationId:?1,name:?2,deleted:false}")
+    ProcessingPurpose findByName(Long countryId,Long organizationId,String name);
 
     ProcessingPurpose findByid(BigInteger id);
 
 
-    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<ProcessingPurpose> getProcessingPurposeList(Long countryId,List<BigInteger> ids);
+    @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
+    List<ProcessingPurpose> getProcessingPurposeList(Long countryId,Long organizationId,List<BigInteger> ids);
 
 
-    @Query("{countryId:?0,deleted:false}")
-    List<ProcessingPurpose> findAllProcessingPurposes(Long countryId);
+    @Query("{countryId:?0,organizationId:?1,deleted:false}")
+    List<ProcessingPurpose> findAllProcessingPurposes(Long countryId,Long organizationId);
 
 
-    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
-    List<ProcessingPurpose>  findByCountryAndNameList(Long countryId, Set<String> name);
+    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
+    List<ProcessingPurpose>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
 
 
 

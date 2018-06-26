@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class BreakSettingsController {
     @ApiOperation("Create break settings ")
     @PostMapping(value = "/break")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long unitId, @RequestBody BreakSettingsDTO breakSettingsDTO) {
+    public ResponseEntity<Map<String, Object>> createBreakSettings(@PathVariable Long unitId, @RequestBody @Valid BreakSettingsDTO breakSettingsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, breakSettingsService.createBreakSettings(unitId, breakSettingsDTO));
     }
 
@@ -45,7 +46,7 @@ public class BreakSettingsController {
     }
     @ApiOperation("update a particular break settings for unit")
     @PutMapping(value = "/break/{breakSettingsId}")
-    public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long unitId,@PathVariable BigInteger breakSettingsId,@RequestBody BreakSettingsDTO breakSettingsDTO){
+    public ResponseEntity<Map<String,Object>> updateBreakSettings(@PathVariable Long unitId,@PathVariable BigInteger breakSettingsId, @RequestBody @Valid BreakSettingsDTO breakSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true,breakSettingsService.updateBreakSettings(unitId,breakSettingsId,breakSettingsDTO));
     }
 }

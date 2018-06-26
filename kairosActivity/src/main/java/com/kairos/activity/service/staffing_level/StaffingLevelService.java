@@ -400,7 +400,6 @@ public class StaffingLevelService extends MongoBaseService {
         List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
                 activity.getValue())).collect(Collectors.toList());
         Map<String, Object> activityTypesAndSkills = new HashMap<>();
-        logger.info("organization type and subtypes {}", activityTypeCategoryListMap);
         activityTypesAndSkills.put("activities", activityCategoryListDTOS);
         activityTypesAndSkills.put("orgazationSkill", organizationSkillAndOrganizationTypesDTO.getAvailableSkills());
         return activityTypesAndSkills;

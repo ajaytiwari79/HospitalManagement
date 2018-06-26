@@ -117,20 +117,15 @@ public class ActivityService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
-        logger.info(activityDTO.getName());
-        Date date = DateUtils.asDate(activityDTO.getStartDate());
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
-        Activity activity = activityMongoRepository.findByNameAndDateAndCountryId(activityDTO.getName().trim(), countryId, date);
-        //Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId);
-
+        Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId,activityDTO.getStartDate(),activityDTO.getEndDate());
+        if(Optional.ofNullable(activity).isPresent()&&activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(activity).isPresent()) {
-            if (!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent()) {
-                exceptionService.dataNotFoundException("message.activity.enddate.required");
-            } else {
-                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-            }
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
         }
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId, activityDTO);
@@ -256,24 +251,19 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
-        logger.info(generalDTO.toString());
-        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
-        if (activityCategory == null) {
-            exceptionService.dataNotFoundByIdException("message.category.notExist");
-        }
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
-
-        Date date = DateUtils.asDate(generalDTO.getStartDate());
-        // Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
-        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate(generalDTO.getName().trim(), generalDTO.getActivityId(), countryId, date);
+        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate(generalDTO.getName().trim(), generalDTO.getActivityId(), countryId, generalDTO.getStartDate(),generalDTO.getEndDate());
+        if(Optional.ofNullable(isActivityAlreadyExists).isPresent()&&generalDTO.getStartDate().isBefore(isActivityAlreadyExists.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            if (!Optional.ofNullable(isActivityAlreadyExists.getGeneralActivityTab().getEndDate()).isPresent()) {
-                exceptionService.dataNotFoundException("message.activity.enddate.required", generalDTO.getName());
-            } else {
-                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-            }
+            exceptionService.dataNotFoundException(isActivityAlreadyExists.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+        }
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
@@ -305,8 +295,6 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-
-        logger.info("activity.getTags() ================ > " + activity.getTags());
         generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
@@ -1050,10 +1038,12 @@ public class ActivityService extends MongoBaseService {
     public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
         //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate());
+                findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate(),activityDTO.getEndDate());
+        if(Optional.ofNullable(activity).isPresent()&&activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(activity).isPresent()) {
-            logger.error("ActivityName already exist " + activityDTO.getName());
-            exceptionService.duplicateDataException("message.activity.name", activityDTO.getName());
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {

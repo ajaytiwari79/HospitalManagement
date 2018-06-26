@@ -29,6 +29,7 @@ public class Task extends MongoBaseEntity{
     private LocalDateTime plannedEndTime;
     private Date startTime;
     private Date endTime;
+    private boolean breakTime;
 
 
     public Task(String id, Long installationNumber, Double latitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
@@ -47,7 +48,13 @@ public class Task extends MongoBaseEntity{
     }
 
 
+    public boolean isBreakTime() {
+        return breakTime;
+    }
 
+    public void setBreakTime(boolean breakTime) {
+        this.breakTime = breakTime;
+    }
 
     public String getName() {
         return name;

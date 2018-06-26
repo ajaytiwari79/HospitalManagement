@@ -9,6 +9,7 @@ public abstract class AbstractSpecification<T> implements Specification<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract boolean isSatisfied(T t);
 
     @Override
@@ -20,6 +21,6 @@ public abstract class AbstractSpecification<T> implements Specification<T> {
     public Specification<T> or(final Specification<T> specification) {
         return new OrActivitySpecification<T>(this, specification);
     }
-
+    @Override
     public abstract List<String> isSatisfiedString(T t);
 }

@@ -761,5 +761,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH (org:Organization)-[:"+HAS_SETTING+"]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
-
+    @Query("Match (union:Organization{isEnable:true}) where id (union) IN {0}  return union")
+    List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 }
