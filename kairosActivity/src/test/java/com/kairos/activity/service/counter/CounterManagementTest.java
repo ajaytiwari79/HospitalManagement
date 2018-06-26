@@ -67,11 +67,8 @@ public class CounterManagementTest extends MongoBaseService {
         ctr.setType(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
         ctr = save(ctr);
 
-        ModuleCounter moduleCounter = new ModuleCounter();
+        ModuleCounter moduleCounter = new ModuleCounter(counterId, moduleId, ctr.getId());
         moduleCounter.setId(modulewiseCounterId);
-        moduleCounter.setCountryId(countryId);
-        moduleCounter.setCounterId(ctr.getId());
-        moduleCounter.setModuleId(moduleId);
         moduleCounter = save(moduleCounter);
 
         moduleCounter.setId(modulewiseCounterId2);
