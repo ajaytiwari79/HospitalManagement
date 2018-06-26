@@ -205,7 +205,7 @@ public class ShiftService extends MongoBaseService {
         mainShift.setMainShift(true);
         mainShift.setPlannedTimeId(shiftWithActivityDTO.getPlannedTypeId());
 
-        shiftQueryResults.addAll(addBreakInShifts(activity, mainShift, staffAdditionalInfoDTO, shiftDTO));
+        shiftQueryResults.addAll(addBreakInShifts(activity, mainShift, staffAdditionalInfoDTO));
         List<Integer> activityDayTypes = new ArrayList<>();
         if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
             activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
@@ -234,37 +234,49 @@ public class ShiftService extends MongoBaseService {
         Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUser()).isPresent() && staffAdditionalInfoDTO.getUser().getManagement();
         BigInteger plannedTimeId = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
                 || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK))
-                ? getAbsencePlannedTime(unitId, phaseId)
-                : getPresencePlannedTime(unitId, phaseId, managementPerson);
+                ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
+                : getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
 
         return plannedTimeId;
     }
 
-    private BigInteger getAbsencePlannedTime(Long unitId, BigInteger phaseId) {
+    private BigInteger getAbsencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
         List<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         BigInteger plannedTimeId = null;
         for (ActivityConfiguration act : activityConfiguration) {
             if (!Optional.ofNullable(act.getAbsencePlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
             }
-            plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
-            if (act.getAbsencePlannedTime().isException()) {
+
+            if (act.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(act.getAbsencePlannedTime().getTimeTypeId())) {
+                plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
                 break;
+            } else {
+                plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
             }
         }
+        // checking weather this is allowed to staff or not
+        plannedTimeId = getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), plannedTimeId);
+        //staffAdditionalInfoDTO.getUnitPosition().getExcludedPlannedTime().equals(plannedTimeId) ? staffAdditionalInfoDTO.getUnitPosition().getIncludedPlannedTime() : plannedTimeId;
         return plannedTimeId;
     }
 
-    private BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson) {
+    private BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        BigInteger plannedTimeId = null;
         if (!Optional.ofNullable(activityConfiguration).isPresent() && !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
         }
-
-        return (managementPerson) ? activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId() : activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId();
+        plannedTimeId = (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
+                : getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
+        return plannedTimeId;
     }
 
-    private List<ShiftQueryResult> addBreakInShifts(Activity activity, Shift mainShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO) {
+    private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
+        return staffUnitPositionDetails.getExcludedPlannedTime().equals(plannedTypeId) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+    }
+
+    private List<ShiftQueryResult> addBreakInShifts(Activity activity, Shift mainShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         logger.info("break Allowed = {}", activity.getRulesActivityTab().isBreakAllowed());
         if (activity.getRulesActivityTab().isBreakAllowed()) {
             Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
