@@ -3,7 +3,9 @@ package com.kairos.service.template_type;
 import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -24,31 +26,39 @@ public class TemplateTypeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-
     /**
      * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
      * @author vikash patwal
      * @param countryId
-     * @param templateData
-     * @throws DuplicateDataException
+     * @param templateType
+     * @throws InvalidRequestException
      * @return list
      */
-    public List<Object> createTemplateType(Long countryId,List<TemplateType> templateData) {
-        List<Object> resultData=new ArrayList<Object>();
-           for (TemplateType data : templateData) {
-                   TemplateType exists = templateTypeRepository.findByTemplateName(data.getTemplateName());
-                   if (java.util.Optional.ofNullable(exists).isPresent()) {
-                       Map<String, String> result = new HashMap<String, String>();
-                       result.put("error","template name "+data.getTemplateName()+" already exits");
-                       resultData.add(result);
-                   } else {
-                       TemplateType templateType = new TemplateType();
-                       templateType.setTemplateName(data.getTemplateName());
-                       save(templateType);
-                       resultData.add(templateType);
-                   }
-           }
-           return resultData;
+    public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateType> templateType) {
+        Map<String, List<TemplateType>> result = new HashMap<>();
+        List<TemplateType> existing = new ArrayList<>();
+        List<TemplateType> newDataTemplate = new ArrayList<>();
+        Set<String> templateName = new HashSet<>();
+            for (TemplateType temp : templateType) {
+                if (!org.apache.commons.lang3.StringUtils.isBlank(temp.getTemplateName())) {
+                    templateName.add(temp.getTemplateName());
+                } else
+                    throw new InvalidRequestException("name could not be empty or null");
+            }
+            existing = templateTypeRepository.findByNameList(templateName);
+            existing.forEach(item -> templateName.remove(item.getTemplateName()));
+            if (templateName.size() != 0) {
+                for (String name : templateName) {
+
+                    TemplateType templateType1 = new TemplateType();
+                    templateType1.setTemplateName(name);
+                    newDataTemplate.add(templateType1);
+                }
+                newDataTemplate = save(newDataTemplate);
+            }
+            result.put("alreadyExisting", existing);
+            result.put("newData", newDataTemplate);
+            return result;
     }
 
     /**
