@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -37,12 +38,20 @@ public class CounterManagementService extends MongoBaseService{
 
     //storeCounter -List
     public void storeCounters(List<Counter> counterDefs){
-        for(Counter counterDef: counterDefs){
-            Counter def = counterRepository.getCounterByType(counterDef.getType());
-            if(def != null)
-                overrideOldObject(counterDef, def);
-            save(counterDef);
-        }
+        List<CounterType> counterTypes = counterDefs.stream().map(def -> def.getType()).collect(Collectors.toList());
+        List<Counter> existingCounters = counterRepository.getCounterByTypes(counterTypes);
+        Map<CounterType, Counter> existingCounterIdMap = existingCounters.parallelStream().collect(Collectors.toMap(counter->counter.getType(), counter->counter));
+        List<Counter> countersToSave = new ArrayList<>();
+        counterDefs.forEach(counterDef ->{
+            Counter counter = existingCounterIdMap.get(counterDef.getType());
+            if(counter!=null){
+                overrideOldObject(counterDef, counter);
+            }else{
+                counter = counterDef;
+            }
+            countersToSave.add(counter);
+        });
+        save(countersToSave);
     }
 
     //storeCounter - Object

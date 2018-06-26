@@ -38,6 +38,10 @@ public class CounterRepository {
         return mongoTemplate.findOne(query, Counter.class);
     }
 
+    public List<Counter> getCounterByTypes(List<CounterType> types){
+        Query query = new Query(Criteria.where("type").in(types));
+        return mongoTemplate.find(query, Counter.class);
+    }
 
     //get ModuleWiseCounters List by country
     public List<ModuleCounter> getModuleCountersForCountry(BigInteger countryId) {
