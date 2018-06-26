@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.user.organization.UnitManagerDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -55,11 +56,7 @@ public class OrganizationDTO {
     private boolean boardingCompleted;
 
     // properties to create unit manager
-    private Long accessGroupId;
-    private String cprNumber;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private UnitManagerDTO unitManager;
 
 
     public Long getId() {
@@ -310,43 +307,11 @@ public class OrganizationDTO {
         this.preKairos = preKairos;
     }
 
-    public Long getAccessGroupId() {
-        return accessGroupId;
+    public UnitManagerDTO getUnitManager() {
+        return unitManager;
     }
 
-    public void setAccessGroupId(Long accessGroupId) {
-        this.accessGroupId = accessGroupId;
-    }
-
-    public String getCprNumber() {
-        return cprNumber;
-    }
-
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUnitManager(UnitManagerDTO unitManager) {
+        this.unitManager = unitManager;
     }
 }
