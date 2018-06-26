@@ -1,6 +1,5 @@
 package com.kairos.activity.service.unit_settings;
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.activity.persistence.repository.unit_settings.PhaseSettingsRepository;

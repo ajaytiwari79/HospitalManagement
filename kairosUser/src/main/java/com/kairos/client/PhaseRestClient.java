@@ -2,7 +2,7 @@ package com.kairos.client;
 
 import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.response.dto.web.cta.PhaseDTO;
+import com.kairos.response.dto.web.cta.PhaseResponseDTO;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,19 +100,19 @@ public class PhaseRestClient {
 
     }
 
-    public List<PhaseDTO> getPhases (Long countryId){
+    public List<PhaseResponseDTO> getPhases (Long countryId){
 
         final String baseUrl=getBaseUrl(false);
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseDTO>>> typeReference =
-                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseDTO>>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<List<PhaseDTO>>> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/country/"+countryId+"/phase/all",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
-            RestTemplateResponseEnvelope<List<PhaseDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<PhaseResponseDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

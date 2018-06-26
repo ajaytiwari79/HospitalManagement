@@ -23,11 +23,10 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
     @Override
     public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
-        int lastWorkingDaysWithActivity = priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity();
         int lastWorkingDaysWithUnit = priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit();
-        int shiftCount = 0;
-        BigInteger activityId = BigInteger.ZERO;
         for (Map.Entry<BigInteger, List<StaffUnitPositionQueryResult>> entry : openShiftStaffMap.entrySet()) {
+            BigInteger activityId = null;
+
             Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
             LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
             Date filterStartDate = DateUtils.asDate(openShiftDate.minusDays(lastWorkingDaysWithUnit));

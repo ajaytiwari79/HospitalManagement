@@ -1,7 +1,6 @@
 package com.kairos.activity.service.period;
 
 import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
@@ -15,6 +14,7 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.period.PeriodPhaseFlippingDateDTO;
 import com.kairos.response.dto.web.period.PlanningPeriodDTO;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

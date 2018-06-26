@@ -1,12 +1,13 @@
 package com.kairos.activity.service.activity;
 
 
+import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.SkillRestClient;
 import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
-import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
+import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
+import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
@@ -42,8 +43,11 @@ import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
-import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
+import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.response.dto.web.phase.PhaseWeeklyDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -114,24 +118,20 @@ public class ActivityService extends MongoBaseService {
     private StaffRestClient staffRestClient;
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
-        logger.info(activityDTO.getName());
-        Date date = DateUtils.asDate(activityDTO.getStartDate());
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
-        Activity activity = activityMongoRepository.findByNameAndDateAndCountryId(activityDTO.getName().trim(), countryId, date);
-        //Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId);
-
+        Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId,activityDTO.getStartDate(),activityDTO.getEndDate());
+        if(Optional.ofNullable(activity).isPresent()&&activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(activity).isPresent()) {
-            if (!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent()) {
-                exceptionService.dataNotFoundException("message.activity.enddate.required");
-            } else {
-                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-            }
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
         }
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId, activityDTO);
@@ -257,24 +257,19 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
-        logger.info(generalDTO.toString());
-        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
-        if (activityCategory == null) {
-            exceptionService.dataNotFoundByIdException("message.category.notExist");
-        }
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
-
-        Date date = DateUtils.asDate(generalDTO.getStartDate());
-        // Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
-        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate(generalDTO.getName().trim(), generalDTO.getActivityId(), countryId, date);
+        Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate(generalDTO.getName().trim(), generalDTO.getActivityId(), countryId, generalDTO.getStartDate(),generalDTO.getEndDate());
+        if(Optional.ofNullable(isActivityAlreadyExists).isPresent()&&generalDTO.getStartDate().isBefore(isActivityAlreadyExists.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            if (!Optional.ofNullable(isActivityAlreadyExists.getGeneralActivityTab().getEndDate()).isPresent()) {
-                exceptionService.dataNotFoundException("message.activity.enddate.required", generalDTO.getName());
-            } else {
-                exceptionService.dataNotFoundException("message.activity.active.alreadyExists");
-            }
+            exceptionService.dataNotFoundException(isActivityAlreadyExists.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+        }
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
@@ -306,8 +301,6 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-
-        logger.info("activity.getTags() ================ > " + activity.getTags());
         generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
@@ -477,12 +470,14 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
-        List<DayType> dayTypes = organizationRestClient.getDayTypesByCountryId(countryId);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= genericIntegrationService.getDayTypesAndEmploymentTypes(countryId);
+        List<DayType> dayTypes =dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<EmploymentTypeDTO> employmentTypeDTOS=dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
 
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
 
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes,employmentTypeDTOS);
         return activityTabsWrapper;
     }
 
@@ -897,7 +892,6 @@ public class ActivityService extends MongoBaseService {
                     new BalanceSettingsActivityTab();
             balanceSettingsActivityTab.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence() ? presenceTimeTypeId : absenceTimeTypeId);
             balanceSettingsActivityTab.setNegativeDayBalancePresent(timeCareActivity.getNegativeDayBalance());
-            balanceSettingsActivityTab.setAddDayTo(timeCareActivity.getBalanceDayType().replace(" ", "_"));
             activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
 
             //rules activity tab
@@ -1011,7 +1005,7 @@ public class ActivityService extends MongoBaseService {
             phaseTemplateValue.setName(phaseDTO.getName());
             phaseTemplateValue.setDescription(phaseDTO.getDescription());
             phaseTemplateValue.setEligibleForManagement(false);
-            phaseTemplateValue.setEligibleForStaff(false);
+            phaseTemplateValue.setEligibleEmploymentTypes(new ArrayList<>());
             phaseTemplateValues.add(phaseTemplateValue);
         }
         return phaseTemplateValues;
@@ -1040,7 +1034,7 @@ public class ActivityService extends MongoBaseService {
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException("message.activity.published", activityId);
         }
-        if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null || activity.getBalanceSettingsActivityTab().getPresenceTypeId() == null) {
+        if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null) {
             exceptionService.actionNotPermittedException("message.activity.timeTypeOrPresenceType.null", activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
@@ -1051,10 +1045,12 @@ public class ActivityService extends MongoBaseService {
     public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
         //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate());
+                findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate(),activityDTO.getEndDate());
+        if(Optional.ofNullable(activity).isPresent()&&activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())){
+            exceptionService.actionNotPermittedException("message.activity.overlaping");
+        }
         if (Optional.ofNullable(activity).isPresent()) {
-            logger.error("ActivityName already exist " + activityDTO.getName());
-            exceptionService.duplicateDataException("message.activity.name", activityDTO.getName());
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
