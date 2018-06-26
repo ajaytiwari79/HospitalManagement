@@ -33,6 +33,12 @@ public class TemplateTypeController {
     private TemplateTypeService templateTypeService;
 
 
+    /**
+     *
+     * @param countryId
+     * @param templateData
+     * @return
+     */
     @ApiOperation(value = "create new Template type")
     @PostMapping("/createTemplate")
     public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId,@Valid  @RequestBody ValidateListOfRequestBody<TemplateType> templateData) {
@@ -42,6 +48,12 @@ public class TemplateTypeController {
         return ResponseHandler.invalidResponse(HttpStatus.OK, true, "Data not found");
     }
 
+    /**
+     *
+     * @param countryId
+     * @param templateName
+     * @return
+     */
     @ApiOperation(value="Get template by name")
     @GetMapping("/getTemplateByName")
     public ResponseEntity<Object> getTemplateByName(@PathVariable Long countryId,@RequestParam String templateName) {
@@ -51,7 +63,13 @@ public class TemplateTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.getTemplateByName(countryId,templateName));
     }
 
-
+    /**
+     *
+     * @param id
+     * @param countryId
+     * @param templateType
+     * @return
+     */
     @ApiOperation(value="update template")
     @RequestMapping(value = "/updateTemplate", method = RequestMethod.PUT)
     public ResponseEntity<Object> updateTemplate(@RequestParam BigInteger id,@PathVariable Long countryId, @Valid @RequestBody TemplateType templateType) {
@@ -65,6 +83,12 @@ public class TemplateTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.updateTemplateName(id,countryId,templateType));
     }
 
+    /**
+     *
+     * @param countryId
+     * @param id
+     * @return
+     */
     @ApiOperation(value="delete template by id")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public ResponseEntity<Object> deleteTemplateType(@PathVariable Long countryId,@RequestParam BigInteger id) {
