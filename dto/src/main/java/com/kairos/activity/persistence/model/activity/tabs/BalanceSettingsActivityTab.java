@@ -7,8 +7,6 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BalanceSettingsActivityTab {
     private Integer addTimeTo;
-    private String addDayTo;
-    private BigInteger presenceTypeId;
     private BigInteger timeTypeId;;
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
@@ -23,22 +21,6 @@ public class BalanceSettingsActivityTab {
 
     public void setAddTimeTo(Integer addTimeTo) {
         this.addTimeTo = addTimeTo;
-    }
-
-    public String getAddDayTo() {
-        return addDayTo;
-    }
-
-    public void setAddDayTo(String addDayTo) {
-        this.addDayTo = addDayTo;
-    }
-
-    public BigInteger getPresenceTypeId() {
-        return presenceTypeId;
-    }
-
-    public void setPresenceTypeId(BigInteger presenceTypeId) {
-        this.presenceTypeId = presenceTypeId;
     }
 
     public BigInteger getTimeTypeId() {

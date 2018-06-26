@@ -94,5 +94,23 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getExpertiseAndEmploymentForUnit(unitId, false));
     }
 
+    @RequestMapping(value = COUNTRY_URL + "/day_types_and_employment_types", method = RequestMethod.GET)
+    @ApiOperation("get employment type and dayTypes of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypesAndEmploymentTypes (@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getDayTypesAndEmploymentTypes(countryId,false));
+    }
+
+    @RequestMapping(value = UNIT_URL + "/day_types_and_employment_types", method = RequestMethod.GET)
+    @ApiOperation("get employment type and dayTypes of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypesAndEmploymentTypesAtUnit (@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getDayTypesAndEmploymentTypesAtUnit(unitId,false));
+    }
+
+
+
+
+
 
 }

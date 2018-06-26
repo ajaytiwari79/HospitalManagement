@@ -769,6 +769,9 @@ public class UnitPositionService extends UserBaseService {
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
+        com.kairos.activity.response.dto.shift.EmploymentType employmentType=new com.kairos.activity.response.dto.shift.EmploymentType();
+        ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(),employmentType);
+        unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
         return unitPositionWithCtaDetailsDTO;
     }
 

@@ -59,6 +59,8 @@ public class Shift extends MongoBaseEntity {
 
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
+    //TODO need to fetch dynamically @Vipul
+    private BigInteger presenceTypeId=new BigInteger("3");
 
     public Shift() {
     }
@@ -385,5 +387,13 @@ public class Shift extends MongoBaseEntity {
     }
     public DateTimeInterval getInterval(){
         return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+    }
+
+    public BigInteger getPresenceTypeId() {
+        return presenceTypeId;
+    }
+
+    public void setPresenceTypeId(BigInteger presenceTypeId) {
+        this.presenceTypeId = presenceTypeId;
     }
 }
