@@ -61,9 +61,10 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/staff/access_roles", null),UserAccessRoleDTO.class);
     }
 
-    public StaffResultDTO getStaffIdsByUserId(Long userId){
-        StaffResultDTO staffAndOrganizationIds=genericRestClient.publish(null,userId,true,IntegrationOperation.GET,"/staff/get_staff_ids/user/{userId}",null,userId);
-        return staffAndOrganizationIds;
+    public List<StaffResultDTO> getStaffIdsByUserId(Long userId){
+        List<StaffResultDTO> staffResultDTOS=genericRestClient.publish(null,userId,true,IntegrationOperation.GET,"/staff/get_staff_ids/user/{userId}",null,userId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffResultDTOS,StaffResultDTO.class);
+
     }
 
 }

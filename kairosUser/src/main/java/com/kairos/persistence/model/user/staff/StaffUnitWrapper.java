@@ -1,35 +1,35 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.response.dto.web.organization.OrganizationIdAndNameResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
-import java.util.List;
 
 @QueryResult
 public class StaffUnitWrapper {
-    private List<Long> staffIds;
-    private List<Long> unitIds;
+    private Long staffId;
+    private Long unitId;
+    private String unitName;
 
-    public StaffUnitWrapper() {
+    public Long getStaffId() {
+        return staffId;
     }
 
-    public StaffUnitWrapper(List<Long> staffIds, List<Long> unitIds) {
-        this.staffIds = staffIds;
-        this.unitIds = unitIds;
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 
-    public List<Long> getStaffIds() {
-        return staffIds;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setStaffIds(List<Long> staffIds) {
-        this.staffIds = staffIds;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
-    public List<Long> getUnitIds() {
-        return unitIds;
+    public String getUnitName() {
+        return unitName;
     }
 
-    public void setUnitIds(List<Long> unitIds) {
-        this.unitIds = unitIds;
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 }

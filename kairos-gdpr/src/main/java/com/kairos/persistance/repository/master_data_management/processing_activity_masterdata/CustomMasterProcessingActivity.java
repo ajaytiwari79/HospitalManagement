@@ -14,11 +14,13 @@ import java.util.List;
 public interface CustomMasterProcessingActivity {
 
 
-   MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id);
+   MasterProcessingActivity findByName(Long countryId,Long organizationId,String name);
 
-   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId);
+   MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,Long organizationId, BigInteger id);
 
-   List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId);
+
+   List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
    Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
 

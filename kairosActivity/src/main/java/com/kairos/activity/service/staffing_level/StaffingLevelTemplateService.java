@@ -2,7 +2,6 @@ package com.kairos.activity.service.staffing_level;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.staffing_level.Day;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelTemplate;
@@ -49,7 +48,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         StaffingLevelTemplate staffingLevelTemplate=StaffingLevelTemplateDTO.buildStaffingLevelTemplate(staffingLevelTemplateDTO);
         this.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate,staffingLevelTemplateDTO);
-        staffingLevelTemplateDTO.setStaffingLevelInterval( staffingLevelTemplateDTO.getStaffingLevelInterval().stream()
+        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval( staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
         return staffingLevelTemplateDTO;
 
@@ -69,7 +68,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             staffingLevelTemplate=StaffingLevelTemplateDTO.updateStaffingTemplate(staffingTemplateId,staffingLevelTemplateDTO,staffingLevelTemplate);
             this.save(staffingLevelTemplate);
             BeanUtils.copyProperties(staffingLevelTemplate,staffingLevelTemplateDTO);
-            staffingLevelTemplateDTO.setStaffingLevelInterval( staffingLevelTemplate.getStaffingLevelInterval().stream()
+            staffingLevelTemplateDTO.setPresenceStaffingLevelInterval( staffingLevelTemplate.getPresenceStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
 
 

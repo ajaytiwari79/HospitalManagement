@@ -1,27 +1,23 @@
 package com.kairos.activity.persistence.model.attendence_setting;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.persistence.model.staffing_level.Duration;
+import com.kairos.response.dto.web.attendance.AttendanceDuration;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class AttendanceSetting extends MongoBaseEntity{
     private Long staffId;
     private Long unitId;
-    private LocalDate currentDate;
-    private List<Duration> attendanceDuration =new ArrayList<>();
-
+    private AttendanceDuration attendanceDuration ;
     public AttendanceSetting() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId, LocalDate currentDate) {
+    public AttendanceSetting(Long unitId, Long staffId) {
         this.staffId = staffId;
         this.unitId = unitId;
-        this.currentDate=currentDate;
+
 
     }
     public Long getStaffId() {
@@ -40,19 +36,12 @@ public class AttendanceSetting extends MongoBaseEntity{
         this.unitId = unitId;
     }
 
-    public LocalDate getCurrentDate() {
-        return currentDate;
-    }
 
-    public void setCurrentDate(LocalDate currentDate) {
-        this.currentDate = currentDate;
-    }
-
-    public List<Duration> getAttendanceDuration() {
+    public AttendanceDuration getAttendanceDuration() {
         return attendanceDuration;
     }
 
-    public void setAttendanceDuration(List<Duration> attendanceDuration) {
+    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
         this.attendanceDuration = attendanceDuration;
     }
 }

@@ -7,13 +7,15 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
 
 
 @Repository
 public interface AttendanceSettingRepository extends MongoBaseRepository<AttendanceSetting,BigInteger> {
 
-    @Query(value ="{unitId:?0,staffId:?1,currentDate:?2,deleted:false}" )
-    AttendanceSetting findbyUnitIdAndStaffIdAndDate(Long unitId, Long staffId,LocalDate date);
+    @Query(value ="{'attendanceDuration.checkIn':?2,unitId:?0,staffId:?1,deleted:false}" )
+    AttendanceSetting findByUnitIdAndStaffIdAndDate(Long unitId, Long staffId, Date date);
 
 
 

@@ -1,25 +1,37 @@
 package com.kairos.response.dto.web.staff;
 
+import com.kairos.response.dto.web.organization.OrganizationIdAndNameResult;
+
 import java.util.List;
+import java.util.Map;
 
 
 public class StaffResultDTO {
-    private List<Long> staffIds;
-    private List<Long> unitIds;
+    private Long staffId;
+    private Long unitId;
+    private String unitName;
 
-    public List<Long> getStaffIds() {
-        return staffIds;
+    public Long getStaffId() {
+        return staffId;
     }
 
-    public void setStaffIds(List<Long> staffIds) {
-        this.staffIds = staffIds;
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 
-    public List<Long> getUnitIds() {
-        return unitIds;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setUnitIds(List<Long> unitIds) {
-        this.unitIds = unitIds;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 }

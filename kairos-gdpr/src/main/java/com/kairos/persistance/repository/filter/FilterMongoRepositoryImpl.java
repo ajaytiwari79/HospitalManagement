@@ -30,6 +30,7 @@ import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
 import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 
 
 public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
@@ -39,9 +40,9 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriterias(Long countryId, List<FilterType> filterTypes) {
+    public Map<String, AggregationOperation> getFilterCriterias(Long countryId,Long organizationId,List<FilterType> filterTypes) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
-        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
+        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         filterTypes.forEach(filterType -> {
                     aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
                 }
@@ -105,7 +106,6 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
             throw new InvalidRequestException("module name is null");
         }
         switch (domainName) {
-
             case CLAUSE_MODULE_NAME:
                 return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
             case ASSET_MODULE_NAME:

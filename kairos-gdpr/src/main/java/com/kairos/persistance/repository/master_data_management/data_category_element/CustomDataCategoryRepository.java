@@ -1,5 +1,6 @@
 package com.kairos.persistance.repository.master_data_management.data_category_element;
 
+import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDto;
 
 import java.math.BigInteger;
@@ -9,8 +10,10 @@ public interface CustomDataCategoryRepository {
 
 
 
-    DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, BigInteger id);
+    DataCategory findByName(Long countryId, Long organizationId, String name);
 
-    List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId);
+    DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId,Long organizationId,BigInteger id);
+
+    List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId);
 
 }

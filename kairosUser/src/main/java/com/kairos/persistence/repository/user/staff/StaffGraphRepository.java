@@ -381,8 +381,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
-            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN collect(id(staff)) as staffIds,collect(id(org)) as unitIds")
-    StaffUnitWrapper getStaffByUserId(Long id);
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName ")
+    List<StaffUnitWrapper> getStaffByUserId(Long id);
 
     @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
             "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} return staff")
@@ -492,4 +492,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH(staff:Staff) where id(staff) in {0} RETURN staff.email")
     List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds);
+
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return id(staff)")
+    Long findStaffIdByUserId(Long userId, Long unitId);
 }
