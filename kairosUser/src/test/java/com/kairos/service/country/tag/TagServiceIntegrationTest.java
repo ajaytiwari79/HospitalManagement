@@ -3,7 +3,6 @@ package com.kairos.service.country.tag;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.response.dto.web.tag.ShowCountryTagSetting;
 import com.kairos.response.dto.web.tag.TagDTO;
@@ -27,10 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by prerna on 28/11/17.

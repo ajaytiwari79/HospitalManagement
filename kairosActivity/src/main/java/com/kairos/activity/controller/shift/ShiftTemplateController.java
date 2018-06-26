@@ -38,12 +38,11 @@ public class ShiftTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.getAllShiftTemplates(unitId));
     }
 
-
-    @ApiOperation("update Individual Shift Template")
-    @PutMapping(value = "/individual_shift_template/{IndividualShiftTemplateId}")
+    @ApiOperation("update  Shift Template")
+    @PutMapping(value = "/shift_template/{shiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateIndividualShift(@PathVariable BigInteger individualShiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateIndividualShiftTemplate(individualShiftTemplateId, individualShiftTemplateDTO));
+    public ResponseEntity<Map<String, Object>> updateShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @RequestBody @Valid ShiftTemplateDTO shiftTemplateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateShiftTemplate(shiftTemplateId, shiftTemplateDTO));
     }
 
 
@@ -65,9 +64,10 @@ public class ShiftTemplateController {
     @ApiOperation("update Individual Shift Template")
     @PutMapping(value = "/individual_shift_template/{IndividualShiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable BigInteger individualShiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
+    public ResponseEntity<Map<String, Object>> updateIndividualShift(@PathVariable BigInteger individualShiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateIndividualShiftTemplate(individualShiftTemplateId, individualShiftTemplateDTO));
     }
+
 
     @ApiOperation("delete Individual Shift Template")
     @PostMapping(value = "shift_template/{shiftTemplateId}/individual_shift_template/{IndividualShiftTemplateId}")

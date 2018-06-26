@@ -55,6 +55,16 @@ public class ShiftTemplateService extends MongoBaseService {
 
     }
 
+    public ShiftTemplateDTO updateShiftTemplate(BigInteger shiftTemplateId, ShiftTemplateDTO shiftTemplateDTO){
+        Optional<ShiftTemplate> shiftTemplate= shiftTemplateRepository.findById(shiftTemplateId);
+        if(!shiftTemplate.isPresent()|| shiftTemplate.get().isDeleted()){
+            exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
+        }
+        shiftTemplate.get().setName(shiftTemplateDTO.getName());
+        save(shiftTemplate.get());
+        return shiftTemplateDTO;
+    }
+
     public boolean deleteShiftTemplate(BigInteger shiftTemplateId){
         Optional<ShiftTemplate> shiftTemplate=shiftTemplateRepository.findById(shiftTemplateId);
         if(!shiftTemplate.isPresent() || shiftTemplate.get().isDeleted()){

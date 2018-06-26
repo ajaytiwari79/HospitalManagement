@@ -30,6 +30,16 @@ public class TaskTypeDTO {
     private int duration;
     private Long serviceId;
     private String parentTaskTypeId;
+    private String colorForGantt;
+
+
+    public String getColorForGantt() {
+        return colorForGantt;
+    }
+
+    public void setColorForGantt(String colorForGantt) {
+        this.colorForGantt = colorForGantt;
+    }
 
     private List<BigInteger> tags = new ArrayList<>();
 

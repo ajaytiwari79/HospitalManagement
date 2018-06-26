@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -33,30 +34,31 @@ public class ClauseTagService extends MongoBaseService {
     MessageSource messageSource;
 
 
-    public ClauseTag createClauseTag(Long countryId, String clauseTag) {
+    public ClauseTag createClauseTag(Long countryId, Long organizationId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
         }
-        ClauseTag exist = clauseTagMongoRepository.findByNameAndCountryId(countryId, clauseTag);
+        ClauseTag exist = clauseTagMongoRepository.findByNameAndCountryId(countryId, organizationId, clauseTag);
         if (Optional.ofNullable(exist).isPresent()) {
             throw new DuplicateDataException("tag already exist for  " + clauseTag);
         } else {
             ClauseTag newClauseTag = new ClauseTag();
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
+            newClauseTag.setOrganizationId(organizationId);
             return save(newClauseTag);
         }
     }
 
 
-    public List<ClauseTag> getAllClauseTag() {
-      return clauseTagMongoRepository.findAllClauseTag(UserContext.getCountryId());
+    public List<ClauseTag> getAllClauseTag(Long countryId, Long organizationId) {
+        return clauseTagMongoRepository.findAllClauseTag(countryId, organizationId);
     }
 
 
-    public ClauseTag getClauseTagById(Long countryId, BigInteger id) {
+    public ClauseTag getClauseTagById(Long countryId, Long organizationId, BigInteger id) {
 
-        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("clause tag not exist for id " + id);
         } else {
@@ -66,9 +68,9 @@ public class ClauseTagService extends MongoBaseService {
     }
 
 
-    public Boolean deleteClauseTagById(BigInteger id) {
+    public Boolean deleteClauseTagById(Long countryId, Long organizationId, BigInteger id) {
 
-        ClauseTag exist = clauseTagMongoRepository.findByid(id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -80,12 +82,11 @@ public class ClauseTagService extends MongoBaseService {
     }
 
 
-    public ClauseTag updateClauseTag(BigInteger id, String clauseTag) {
+    public ClauseTag updateClauseTag(Long countryId,Long organizationId,BigInteger id, String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
-
         }
-        ClauseTag exist = clauseTagMongoRepository.findByid(id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -96,7 +97,7 @@ public class ClauseTagService extends MongoBaseService {
     }
 
     //add tags in clause if tag exist then simply add and create new tag and add
-    public List<ClauseTag> addClauseTagAndGetClauseTagList(List<ClauseTagDTO> tagList) {
+    public List<ClauseTag> addClauseTagAndGetClauseTagList(Long countryId, Long organizationId, List<ClauseTagDTO> tagList) {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
         List<BigInteger> existClauseTagIds = new ArrayList<>();
@@ -109,7 +110,8 @@ public class ClauseTagService extends MongoBaseService {
                 }
                 clauseTagsName.add(tagDto.getName());
                 ClauseTag newTag = new ClauseTag();
-                newTag.setCountryId(UserContext.getCountryId());
+                newTag.setCountryId(countryId);
+                newTag.setOrganizationId(organizationId);
                 newTag.setName(tagDto.getName());
                 clauseTagList.add(newTag);
 
@@ -117,14 +119,14 @@ public class ClauseTagService extends MongoBaseService {
                 existClauseTagIds.add(tagDto.getId());
             }
         }
-        List<ClauseTag> exists = clauseTagMongoRepository.findTagByNames(UserContext.getCountryId(), clauseTagsName);
+        List<ClauseTag> exists = clauseTagMongoRepository.findTagByNames(countryId, organizationId, clauseTagsName);
         if (exists.size() != 0) {
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
             clauseTagList = save(clauseTagList);
         }
-        clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(UserContext.getCountryId(), existClauseTagIds));
+        clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;
     }
 

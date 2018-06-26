@@ -1,9 +1,7 @@
 package com.kairos.activity.service.break_settings;
 
 import com.kairos.activity.KairosActivityApplication;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.service.activity.ShiftIntegrationServiceTest;
 import com.kairos.response.dto.web.break_settings.BreakSettingsDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -23,8 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigInteger;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

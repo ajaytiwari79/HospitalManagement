@@ -274,10 +274,10 @@ public class TaskPlanningSolutionService {
             if(employee!=null){
                 availabilityRequest.setEmployee(employeeMap.get(planningShift.getStaffId()));
                 employees.add(employee);
-                availabilityRequest.setStartTime(new DateTime(planningShift.getStartDateTime()));
-                availabilityRequest.setEndTime(new DateTime(planningShift.getEndDateTime()));
+                availabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
+                availabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
                 availabilityRequest.setId(planningShift.getId());
-                availabilityRequest.setExternalId(planningShift.getExternalId());
+//                availabilityRequest.setExternalId(planningShift.getExternalId());
                 availabilityRequests.add(availabilityRequest);
 
             }else continue;
@@ -319,14 +319,14 @@ public class TaskPlanningSolutionService {
             {
                 AvailabilityRequest availabilityRequest = new AvailabilityRequest();
                 availabilityRequest.setId(planningShift.getId());
-                availabilityRequest.setEndTime(new DateTime(planningShift.getEndDateTime()));
-                availabilityRequest.setStartTime(new DateTime(planningShift.getStartDateTime()));
+                availabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
+                availabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
                 availabilityRequests.add(availabilityRequest);
             }else{
                 UnavailabilityRequest unavailabilityRequest = new UnavailabilityRequest();
                 unavailabilityRequest.setId(planningShift.getId());
-                unavailabilityRequest.setStartTime(new DateTime(planningShift.getStartDateTime()));
-                unavailabilityRequest.setEndTime(new DateTime(planningShift.getEndDateTime()));
+                unavailabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
+                unavailabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
                 unavailabilityRequests.add(unavailabilityRequest);
             }
         }

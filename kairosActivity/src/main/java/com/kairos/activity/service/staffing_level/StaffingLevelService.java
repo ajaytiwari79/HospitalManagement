@@ -4,7 +4,6 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.config.env.EnvConfig;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
@@ -26,6 +25,7 @@ import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.timeCareShift.Transstatus;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.util.serviceutil.StaffingLevelUtil;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -400,7 +400,6 @@ public class StaffingLevelService extends MongoBaseService {
         List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
                 activity.getValue())).collect(Collectors.toList());
         Map<String, Object> activityTypesAndSkills = new HashMap<>();
-        logger.info("organization type and subtypes {}", activityTypeCategoryListMap);
         activityTypesAndSkills.put("activities", activityCategoryListDTOS);
         activityTypesAndSkills.put("orgazationSkill", organizationSkillAndOrganizationTypesDTO.getAvailableSkills());
         return activityTypesAndSkills;

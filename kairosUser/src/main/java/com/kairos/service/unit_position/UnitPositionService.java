@@ -11,6 +11,7 @@ import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.persistence.model.user.country.DayType;
 
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
@@ -509,13 +510,18 @@ public class UnitPositionService extends UserBaseService {
 
         }
         Set<Long> olderFunctionsAddedInUnitPosition = oldUnitPosition.getFunctions() != null ? oldUnitPosition.getFunctions().stream().map(Function::getId).collect(Collectors.toSet()) : Collections.emptySet();
-        if (olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
-            if (!olderFunctionsAddedInUnitPosition.isEmpty())
-                unitPositionGraphRepository.removeOlderFunctionsFromUnitPosition(oldUnitPosition.getId());
-            List<Function> functions = functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctionIds());
-            if (functions.size() != unitPositionDTO.getFunctionIds().size()) {
-                exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
+        if (!olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
 
+            /*if (!olderFunctionsAddedInUnitPosition.isEmpty())
+                unitPositionGraphRepository.removeOlderFunctionsFromUnitPosition(oldUnitPosition.getId());*/
+
+            List<Function> functions = new ArrayList<>();
+            if(!unitPositionDTO.getFunctionIds().isEmpty()){
+                functions = functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctionIds());
+                if (functions.size() != unitPositionDTO.getFunctionIds().size()) {
+                    exceptionService.actionNotPermittedException("message.unitposition.functions.unable");
+
+                }
             }
             oldUnitPosition.setFunctions(functions);
         }

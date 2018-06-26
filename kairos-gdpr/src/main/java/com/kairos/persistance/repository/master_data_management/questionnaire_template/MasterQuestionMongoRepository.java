@@ -12,19 +12,19 @@ import java.util.Set;
 @Repository
 public interface MasterQuestionMongoRepository extends MongoRepository<MasterQuestion, BigInteger> {
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
-    MasterQuestion findByNameAndCountryId(Long countryId, String name);
+    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
+    MasterQuestion findByNameAndCountryId(Long countryId,Long organizationId, String name);
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
-    MasterQuestion findByIdAndNonDeleted(Long countryId, BigInteger id);
+    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
+    MasterQuestion findByIdAndNonDeleted(Long countryId,Long organizationId, BigInteger id);
 
     MasterQuestion findByid(BigInteger id);
 
-    @Query("{countryId:?0,deleted:false}")
-    List<MasterQuestion> getAllMasterQuestion(Long countryId);
+    @Query("{countryId:?0,organizationId:?1,deleted:false}")
+    List<MasterQuestion> getAllMasterQuestion(Long countryId,Long organizationId);
 
-    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<MasterQuestion> getMasterQuestionListByIds(Long countryId, List<BigInteger> ids);
+    @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
+    List<MasterQuestion> getMasterQuestionListByIds(Long countryId,Long organizationId, List<BigInteger> ids);
 
 
 
