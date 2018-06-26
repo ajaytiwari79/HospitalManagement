@@ -1,18 +1,21 @@
 package com.kairos.activity.service.counter;
 
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.counter.Counter;
 import com.kairos.activity.persistence.repository.counter.CounterRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
-import com.kairos.persistence.model.enums.FilterType;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import com.kairos.activity.enums.FilterType;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 public class ScheduledHoursService implements CounterService {
 

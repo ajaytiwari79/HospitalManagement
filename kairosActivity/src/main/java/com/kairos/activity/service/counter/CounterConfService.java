@@ -1,8 +1,8 @@
 package com.kairos.activity.service.counter;
 
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.counter.Counter;
-import com.kairos.activity.persistence.model.counter.FilterCriteria;
+import com.kairos.activity.client.counter.FilterCriteria;
 import com.kairos.activity.persistence.repository.counter.CounterRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
@@ -13,6 +13,11 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 @Service
 public class CounterConfService extends MongoBaseService {

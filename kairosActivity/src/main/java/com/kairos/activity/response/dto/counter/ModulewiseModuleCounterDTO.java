@@ -4,6 +4,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class ModulewiseModuleCounterDTO {
     private String moduleId;
     private List<ModulewiseCounterDTO> modulewiseCounterDTOs = new ArrayList<>();

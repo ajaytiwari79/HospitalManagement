@@ -1,5 +1,10 @@
 package com.kairos.activity.client.counter;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class CounterTypeDefDTO {
     private String name;
     private String typeName;

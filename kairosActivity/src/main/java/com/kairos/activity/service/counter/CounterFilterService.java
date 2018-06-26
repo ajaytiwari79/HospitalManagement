@@ -1,13 +1,18 @@
 package com.kairos.activity.service.counter;
 
-import com.kairos.activity.persistence.model.counter.FilterCriteria;
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.activity.client.counter.FilterCriteria;
+import com.kairos.activity.enums.FilterType;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 @Service
 public class CounterFilterService {

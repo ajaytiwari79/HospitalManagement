@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.kairos.activity.constants.ApiConstants.COUNTER_DATA_URL;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 @RestController
 @RequestMapping(COUNTER_DATA_URL)
 public class CounterDataController {

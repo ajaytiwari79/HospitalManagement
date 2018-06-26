@@ -3,6 +3,11 @@ package com.kairos.activity.response.dto.counter;
 import java.math.BigInteger;
 import java.util.List;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class CounterOrderDTO {
     private BigInteger id;
     private String moduleId;

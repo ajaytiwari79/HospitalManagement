@@ -4,6 +4,11 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class ModuleWiseCounter extends MongoBaseEntity {
     private String moduleId;
     private BigInteger counterId;

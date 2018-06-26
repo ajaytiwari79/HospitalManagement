@@ -5,6 +5,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.math.BigInteger;
 import java.util.List;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class ActivityFilterCriteria {
     private Criteria criteria;
 

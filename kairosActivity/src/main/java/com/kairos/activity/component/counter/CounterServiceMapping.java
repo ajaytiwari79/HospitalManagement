@@ -1,6 +1,6 @@
 package com.kairos.activity.component.counter;
 
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.service.counter.CounterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,11 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 @Component
 public class CounterServiceMapping {

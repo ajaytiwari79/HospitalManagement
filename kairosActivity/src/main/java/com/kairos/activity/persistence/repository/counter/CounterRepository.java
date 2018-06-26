@@ -1,6 +1,6 @@
 package com.kairos.activity.persistence.repository.counter;
 
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.counter.*;
 import com.kairos.activity.response.dto.counter.*;
@@ -17,6 +17,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 @Repository
 public class CounterRepository {

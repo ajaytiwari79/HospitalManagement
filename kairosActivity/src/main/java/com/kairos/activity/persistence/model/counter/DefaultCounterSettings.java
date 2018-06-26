@@ -1,9 +1,14 @@
 package com.kairos.activity.persistence.model.counter;
 
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 public class DefaultCounterSettings extends MongoBaseEntity {
     private BigInteger countryId;

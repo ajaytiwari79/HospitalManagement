@@ -2,6 +2,11 @@ package com.kairos.activity.response.dto.counter;
 
 import java.math.BigInteger;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class ModulewiseCounterDTO {
     private BigInteger id;
     private BigInteger counterId;

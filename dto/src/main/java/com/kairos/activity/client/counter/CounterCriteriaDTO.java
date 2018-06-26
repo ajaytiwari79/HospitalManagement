@@ -1,9 +1,12 @@
 package com.kairos.activity.client.counter;
 
-import com.kairos.activity.persistence.model.counter.FilterCriteria;
-
 import java.math.BigInteger;
 import java.util.List;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 public class CounterCriteriaDTO {
     private BigInteger counterId;

@@ -1,7 +1,7 @@
 package com.kairos.activity.service.counter;
 
-import com.kairos.activity.constants.CounterStore;
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.component.counter.CounterServiceMapping;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.counter.*;
 import com.kairos.activity.persistence.repository.counter.CounterRepository;
@@ -19,9 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 @Service
 public class CounterManagementService extends MongoBaseService{
-    @Inject private CounterStore counterStore;
+    @Inject private CounterServiceMapping counterServiceMapping;
     @Inject private CounterRepository counterRepository;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
@@ -255,11 +260,7 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     private CounterService getCounterService(CounterType counterType){
-        return counterStore.getService(counterType);
-    }
-
-    public void printData(){
-        logger.debug("\n\n\ncounter data: "+getCounterService(CounterType.RESTING_HOURS_PER_PRESENCE_DAY).getData());
+        return counterServiceMapping.getService(counterType);
     }
 
     //getCounterDefinitionList

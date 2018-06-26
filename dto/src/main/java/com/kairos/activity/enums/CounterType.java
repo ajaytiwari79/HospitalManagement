@@ -1,10 +1,14 @@
-package com.kairos.activity.enums.counter;
+package com.kairos.activity.enums;
 
-import com.kairos.activity.client.dto.counter.CounterTypeDefDTO;
+import com.kairos.activity.client.counter.CounterTypeDefDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @date: Jun 26th, 2018
+ */
 public enum CounterType {
     RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"), SCHEDULED_HOURS_NET("Scheduled Hours-Net");
     private String name;

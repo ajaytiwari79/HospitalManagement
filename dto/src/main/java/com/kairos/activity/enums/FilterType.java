@@ -1,8 +1,10 @@
-package com.kairos.persistence.model.enums;
+package com.kairos.activity.enums;
 
 /**
  * Created by prerna on 30/4/18.
+ * Modified By: mohit.shakya@oodlestechnologies.com on Jun 26th, 2018
  */
+
 public enum FilterType {
 
     EMPLOYMENT_TYPE("Employment Type"), EXPERTISE("Expertise"), STAFF_STATUS("Status"), GENDER("Gender"), ENGINEER_TYPE("Engineer Type"),

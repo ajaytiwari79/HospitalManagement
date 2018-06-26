@@ -5,6 +5,11 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 import java.util.List;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public class DefaultCounterOrder extends MongoBaseEntity {
     private BigInteger countryId;
     protected String moduleId;

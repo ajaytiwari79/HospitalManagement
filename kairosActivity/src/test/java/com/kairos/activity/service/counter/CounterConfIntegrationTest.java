@@ -2,11 +2,11 @@ package com.kairos.activity.service.counter;
 
 import com.kairos.activity.KairosActivityApplication;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.counter.Counter;
-import com.kairos.activity.persistence.model.counter.FilterCriteria;
+import com.kairos.activity.client.counter.FilterCriteria;
 import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.activity.enums.FilterType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,8 +1,7 @@
 package com.kairos.activity.controller.counters;
 
-import com.kairos.activity.client.dto.counter.CounterCriteriaDTO;
 import com.kairos.activity.persistence.model.counter.Counter;
-import com.kairos.activity.persistence.model.counter.FilterCriteria;
+import com.kairos.activity.client.counter.FilterCriteria;
 import com.kairos.activity.service.counter.CounterConfService;
 import com.kairos.activity.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.COUNTER_CONF_URL;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 @RestController
 @RequestMapping(COUNTER_CONF_URL)
