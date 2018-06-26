@@ -1,11 +1,9 @@
 package com.kairos.activity.spec;
 
-import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
-import com.kairos.activity.service.exception.ExceptionService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,7 +34,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-        return null;
+        return Collections.emptyList();
     }
 
 }

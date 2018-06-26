@@ -1,14 +1,14 @@
 package com.kairos.response.dto.web.cta;
 
-public class PhaseDTO {
+public class TimeTypeResponseDTO {
     private Long id;
     private String name;
 
-    public PhaseDTO() {
+    public TimeTypeResponseDTO() {
         //default constructor
     }
 
-    public PhaseDTO(Long id, String name) {
+    public TimeTypeResponseDTO(Long id, String name) {
         this.id = id;
         this.name = name;
     }

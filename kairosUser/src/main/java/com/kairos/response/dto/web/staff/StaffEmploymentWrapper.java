@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.staff;
 
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 
 import java.util.ArrayList;
 import java.util.List;

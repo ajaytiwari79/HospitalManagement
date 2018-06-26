@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.activity.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by vipul on 5/12/17.
@@ -71,13 +70,13 @@ public class OrganizationActivityController {
     @PutMapping(value = "/activity/general")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateGeneralTab(@PathVariable Long unitId, @RequestBody GeneralActivityTabDTO generalDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateGeneralTab(generalDTO,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateGeneralTab(generalDTO, unitId));
     }
 
     @ApiOperation("get General Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/general")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable Long unitId,@PathVariable BigInteger activityId) {
+    ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getGeneralTabOfActivity(activityId, unitId));
     }
 
@@ -258,8 +257,8 @@ public class OrganizationActivityController {
     @ApiOperation("update Opta PlannerSetting  details  of activity Type")
     @PutMapping(value = "/activity/{activityId}/opta_planner_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId,@RequestBody OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId,optaPlannerSettingActivityTab));
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId, @RequestBody OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId, optaPlannerSettingActivityTab));
     }
 
     // cta_wta_settings
@@ -280,7 +279,7 @@ public class OrganizationActivityController {
     @ApiOperation("update organization Mapping details  of activity Type")
     @PutMapping(value = "/activity/{activityId}/organizationMapping")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingActivityDTO organizationMappingActivityDTO,@PathVariable BigInteger activityId) {
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingActivityDTO organizationMappingActivityDTO, @PathVariable BigInteger activityId) {
         activityService.updateOrgMappingDetailOfActivity(organizationMappingActivityDTO, activityId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
@@ -319,11 +318,12 @@ public class OrganizationActivityController {
     ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
     }
+
     @ApiOperation(value = "Init optplanner integration")
     @RequestMapping(value = "/planner_integration", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organizationId,unitId));
+    public ResponseEntity<Map<String, Object>> initialOptaplannerSync(@PathVariable Long organizationId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organizationId, unitId));
     }
 
     @ApiOperation("Get all activity based on unitId")
@@ -332,21 +332,21 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getActivitiesWithBalanceSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithBalanceSettings(unitId));
     }
+
     @ApiOperation("Get all activity based on country")
     @GetMapping(value = "/activities_with_time_types")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long unitId,@RequestParam Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithTimeTypesByUnit(unitId,countryId));
+    public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long unitId, @RequestParam Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithTimeTypesByUnit(unitId, countryId));
 
     }
 
     @ApiOperation(value = "Create default data for  Organization")
     @RequestMapping(value = "/organization_default_data", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId,@RequestParam Long countryId) {
+    public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestParam Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationActivityService.createDefaultDataForOrganization(unitId,countryId));
+                organizationActivityService.createDefaultDataForOrganization(unitId, countryId));
     }
-
 
 }

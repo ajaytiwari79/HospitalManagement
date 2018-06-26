@@ -11,6 +11,7 @@ import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.persistence.model.user.country.DayType;
 
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
@@ -768,6 +769,9 @@ public class UnitPositionService extends UserBaseService {
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
+        com.kairos.activity.response.dto.shift.EmploymentType employmentType=new com.kairos.activity.response.dto.shift.EmploymentType();
+        ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(),employmentType);
+        unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
         return unitPositionWithCtaDetailsDTO;
     }
 

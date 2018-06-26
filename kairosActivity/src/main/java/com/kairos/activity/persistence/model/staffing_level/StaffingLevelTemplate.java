@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.enums.Day;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
