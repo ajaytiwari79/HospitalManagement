@@ -1,8 +1,8 @@
 package com.kairos.persistance.repository.filter;
 
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.InvalidRequestException;
-import com.kairos.dto.master_data.ModuleIdDto;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
@@ -25,11 +25,12 @@ import java.util.Map;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
-import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
+import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
+import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 
 
 public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
@@ -39,9 +40,9 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriterias(Long countryId, List<FilterType> filterTypes) {
+    public Map<String, AggregationOperation> getFilterCriterias(Long countryId,Long organizationId,List<FilterType> filterTypes) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
-        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
+        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         filterTypes.forEach(filterType -> {
                     aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
                 }
@@ -93,9 +94,9 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
     @Override
     public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
-        List<ModuleIdDto> moduleIdDto = filterGroup.getAccessModule();
+        List<ModuleIdDTO> moduleIdDto = filterGroup.getAccessModule();
         String domainName = new String();
-        for (ModuleIdDto moduleIdDto1 : moduleIdDto) {
+        for (ModuleIdDTO moduleIdDto1 : moduleIdDto) {
             if (moduleIdDto1.getModuleId().equalsIgnoreCase(moduleId)) {
                 domainName = moduleIdDto1.getName();
                 break;
@@ -105,7 +106,6 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
             throw new InvalidRequestException("module name is null");
         }
         switch (domainName) {
-
             case CLAUSE_MODULE_NAME:
                 return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
             case ASSET_MODULE_NAME:

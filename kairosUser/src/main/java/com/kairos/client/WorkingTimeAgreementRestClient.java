@@ -157,7 +157,7 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public Boolean assignWTAToOrganization(List<Long> subTypeIds,Long unitId,Long countryId){
+    public Boolean makeDefaultDateForOrganization(List<Long> subTypeIds, Long unitId, Long countryId){
         String baseUrl = getBaseUrl(false)+"/country/"+countryId;
         try {
             HttpEntity<List<Long>> request = new HttpEntity<>(subTypeIds);

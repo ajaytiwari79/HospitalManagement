@@ -1,7 +1,7 @@
 package com.kairos.config.mongoEnv_config;
 
 
-import com.kairos.dto.master_data.ModuleIdDto;
+import com.kairos.dto.master_data.ModuleIdDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
@@ -14,19 +14,18 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.CLAUSE_MODULE_NAME;
-import static com.kairos.constant.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
-import static com.kairos.constant.AppConstant.CLAUSE_MODULE_ID;
-import static com.kairos.constant.AppConstant.ASSET_MODULE_ID;
-import static com.kairos.constant.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
+import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
+import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
+import static com.kairos.constants.AppConstant.CLAUSE_MODULE_ID;
+import static com.kairos.constants.AppConstant.ASSET_MODULE_ID;
+import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
 
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class MongoAddFilterGroupData extends MongoBaseService implements CommandLineRunner {
@@ -53,8 +52,8 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
         List<FilterGroup> createfilterGroups = new ArrayList<>();
 
         if (clauseFilterGroup==null) {
-            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
-            ModuleIdDto moduleIdDto = new ModuleIdDto(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
+            List<ModuleIdDTO> moduleIdDtos = new ArrayList<>();
+            ModuleIdDTO moduleIdDto = new ModuleIdDTO(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
             List<FilterType> filterTypes = new ArrayList<FilterType>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);
@@ -67,8 +66,8 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
 
         }
         if (assetFilterGroup==null ) {
-            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
-            ModuleIdDto moduleIdDto = new ModuleIdDto(ASSET_MODULE_NAME, ASSET_MODULE_ID, false, true);
+            List<ModuleIdDTO> moduleIdDtos = new ArrayList<>();
+            ModuleIdDTO moduleIdDto = new ModuleIdDTO(ASSET_MODULE_NAME, ASSET_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
             List<FilterType> filterTypes = new ArrayList<FilterType>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);
@@ -80,8 +79,8 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
 
         }
         if ( processingActivityFilterGroup==null) {
-            List<ModuleIdDto> moduleIdDtos = new ArrayList<>();
-            ModuleIdDto moduleIdDto = new ModuleIdDto(MASTER_PROCESSING_ACTIVITY_MODULE_NAME, MASTER_PROCESSING_ACTIVITY_MODULE_ID, false, true);
+            List<ModuleIdDTO> moduleIdDtos = new ArrayList<>();
+            ModuleIdDTO moduleIdDto = new ModuleIdDTO(MASTER_PROCESSING_ACTIVITY_MODULE_NAME, MASTER_PROCESSING_ACTIVITY_MODULE_ID, false, true);
             moduleIdDtos.add(moduleIdDto);
             List<FilterType> filterTypes = new ArrayList<FilterType>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);

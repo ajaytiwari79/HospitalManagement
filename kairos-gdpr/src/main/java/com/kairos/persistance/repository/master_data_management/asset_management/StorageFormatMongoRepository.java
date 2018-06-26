@@ -14,18 +14,18 @@ public interface StorageFormatMongoRepository extends MongoRepository<StorageFor
 
 
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
-    StorageFormat findByIdAndNonDeleted(Long countryId,BigInteger id);
+    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
+    StorageFormat findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
-    StorageFormat findByName(Long countryId,String name);
+    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
+    StorageFormat findByNameAndCountryId(Long countryId,Long organizationId,String name);
 
     StorageFormat findByid(BigInteger id);
 
-    @Query("{countryId:?0,deleted:false}")
-    List<StorageFormat> findAllStorageFormats(Long countryId);
+    @Query("{countryId:?0,organizationId:?1,deleted:false}")
+    List<StorageFormat> findAllStorageFormats(Long countryId,Long organizationId);
 
-    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
-    List<StorageFormat>  findByCountryAndNameList(Long countryId,Set<String> name);
+    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
+    List<StorageFormat>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
 
 }

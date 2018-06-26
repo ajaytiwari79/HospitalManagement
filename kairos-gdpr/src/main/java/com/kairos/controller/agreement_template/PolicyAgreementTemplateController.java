@@ -1,6 +1,6 @@
 package com.kairos.controller.agreement_template;
 
-import com.kairos.dto.PolicyAgreementTemplateDto;
+import com.kairos.dto.PolicyAgreementTemplateDTO;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import java.math.BigInteger;
-import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
+import static com.kairos.constants.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 /*
  *
  *  created by bobby 10/5/2018
@@ -34,8 +34,8 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId,@Validated @RequestBody PolicyAgreementTemplateDto agreementTemplateDto) throws RepositoryException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(countryId,agreementTemplateDto));
+    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) throws RepositoryException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(countryId,organizationId,agreementTemplateDto));
 
     }
 
@@ -61,7 +61,7 @@ public class PolicyAgreementTemplateController {
     }
 
     @PutMapping("/update/{id}")
-    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable Long countryId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDto policyAgreementTemplateDto ) throws RepositoryException {
+    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto ) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }
@@ -70,7 +70,7 @@ public class PolicyAgreementTemplateController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId,id,policyAgreementTemplateDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId,organizationId,id,policyAgreementTemplateDto));
 
     }
 

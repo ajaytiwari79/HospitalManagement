@@ -6,18 +6,40 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
+import java.util.List;
 
 
 @Document(collection = "asset_type")
 public class AssetType extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "Name can't be empty or null")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
 
     private String nameInLowerCase;
+
+    private Boolean isSubAsset=false;
+
+    private List<BigInteger> subAssetTypes;
+
+    public List<BigInteger> getSubAssetTypes() {
+        return subAssetTypes;
+    }
+
+    public void setSubAssetTypes(List<BigInteger> subAssetTypes) {
+        this.subAssetTypes = subAssetTypes;
+    }
+
+    public Boolean getSubAsset() {
+        return isSubAsset;
+    }
+
+    public void setSubAsset(Boolean subAsset) {
+        isSubAsset = subAsset;
+    }
 
     public String getNameInLowerCase() {
         return nameInLowerCase;

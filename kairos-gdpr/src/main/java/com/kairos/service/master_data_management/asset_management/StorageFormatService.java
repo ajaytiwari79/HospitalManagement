@@ -1,15 +1,14 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageFormat;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.utils.userContext.UserContext;
-import jdk.nashorn.internal.runtime.options.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +26,9 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
-    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormat> storageFormats) {
+    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
+
         Map<String, List<StorageFormat>> result = new HashMap<>();
-        List<StorageFormat> existing = new ArrayList<>();
         Set<String> names = new HashSet<>();
         List<StorageFormat> newStorageFormats = new ArrayList<>();
         if (storageFormats.size() != 0) {
@@ -39,7 +38,7 @@ public class StorageFormatService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, names);
+            List<StorageFormat> existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
             existing.forEach(item -> names.remove(item.getName()));
             if (names.size() != 0) {
                 for (String name : names) {
@@ -47,6 +46,7 @@ public class StorageFormatService extends MongoBaseService {
                     StorageFormat newStorageFormat = new StorageFormat();
                     newStorageFormat.setName(name);
                     newStorageFormat.setCountryId(countryId);
+                    newStorageFormat.setOrganizationId(organizationId);
                     newStorageFormats.add(newStorageFormat);
 
                 }
@@ -64,14 +64,14 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public List<StorageFormat> getAllStorageFormat() {
-        return storageFormatMongoRepository.findAllStorageFormats(UserContext.getCountryId());
+    public List<StorageFormat> getAllStorageFormat(Long countryId, Long organizationId) {
+        return storageFormatMongoRepository.findAllStorageFormats(countryId, organizationId);
     }
 
 
-    public StorageFormat getStorageFormat(Long countryId, BigInteger id) {
+    public StorageFormat getStorageFormat(Long countryId, Long organizationId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -81,9 +81,9 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(BigInteger id) {
+    public Boolean deleteStorageFormat(Long countryId, Long organizationId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByid(id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -95,10 +95,13 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
+    public StorageFormat updateStorageFormat(Long countryId, Long organizationId, BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByName(UserContext.getCountryId(), storageFormat.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, organizationId, storageFormat.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  " + storageFormat.getName());
         } else {
             exist = storageFormatMongoRepository.findByid(id);
@@ -109,11 +112,11 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat getStorageFormatByName(Long countryId, String name) {
+    public StorageFormat getStorageFormatByName(Long countryId, Long organizationId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByName(countryId, name);
+            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

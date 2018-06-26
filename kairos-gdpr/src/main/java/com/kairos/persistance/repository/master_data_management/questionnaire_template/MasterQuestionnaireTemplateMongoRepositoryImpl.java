@@ -3,17 +3,19 @@ package com.kairos.persistance.repository.master_data_management.questionnaire_t
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateQueryResult;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDto;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static com.kairos.constant.AppConstant.COUNTRY_ID;
-import static com.kairos.constant.AppConstant.DELETED;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
+import static com.kairos.constants.AppConstant.DELETED;
 
 
 import javax.inject.Inject;
@@ -25,57 +27,37 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
     @Inject
     private MongoTemplate mongoTemplate;
 
+
+    final String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
+    final String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
+    final String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
+    final String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
+    final String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
+
+    Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
+    Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
+    Document sectionsAddFieldOperation = Document.parse(addFieldSections);
+    Document projectionOperation = Document.parse(projection);
+    Document groupDataOperation = Document.parse(groupData);
+
+
     @Override
-    public List<MasterQuestionnaireTemplateResponseDto> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId) {
+    public MasterQuestionnaireTemplate findByName(Long countryId, Long organizationId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, MasterQuestionnaireTemplate.class);
 
+    }
 
-      /*  String addFieldQuestion=CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-        Document addFieldsQuestionOperation=Document.parse(addFieldQuestion);
-
-        String addFieldAssetType=CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-        Document addFieldsAssetTypeOperation=Document.parse(addFieldQuestion);
-
-        Aggregation aggregation=Aggregation.newAggregation(
-
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
-                lookup("questionnaire_section","sections","_id","sections"),
-                lookup("storage_type","assetType","_id","assetType"),
-                unwind("sections",true),
-                lookup("question","sections.questions","_id","questions"),
-                new CustomAggregationOperation(addFieldsQuestionOperation),
-                new CustomAggregationOperation(addFieldsAssetTypeOperation),
-                unwind("questions",true),
-                group("$id")
-                .first("name").as("name")
-                        .first("description").as("description")
-                        .first("templateType").as("templateType")
-                        .first("assetType").as("assetType")
-                        .first("countryId").as("countryId")
-                        .first("deleted").as("deleted")
-                .addToSet("sections").as("sections")
-                .addToSet("questions").as("questions")
-
-
-
-
-        );*/
-
-        String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
-        String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-        String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-        String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
-        String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
-
-        Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
-        Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
-        Document sectionsAddFieldOperation = Document.parse(addFieldSections);
-        Document projectionOperation = Document.parse(projection);
-        Document groupDataOperation = Document.parse(groupData);
+    @Override
+    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId) {
 
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
@@ -88,59 +70,16 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
         );
 
 
-        AggregationResults<MasterQuestionnaireTemplateResponseDto> result = mongoTemplate.aggregate(aggregation, MasterQuestionnaireTemplate.class, MasterQuestionnaireTemplateResponseDto.class);
+        AggregationResults<MasterQuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterQuestionnaireTemplate.class, MasterQuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public MasterQuestionnaireTemplateResponseDto getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId, BigInteger id) {
-
-       /* String addFieldQuestion=CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-        Document addFieldsQuestionOperation=Document.parse(addFieldQuestion);
-
-        String addFieldAssetType=CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-        Document addFieldsAssetTypeOperation=Document.parse(addFieldQuestion);
-
-        Aggregation aggregation=Aggregation.newAggregation(
-
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("questionnaire_section","sections","_id","sections"),
-                lookup("storage_type","assetType","_id","assetType"),
-                unwind("sections",true),
-                lookup("question","sections.questions","_id","questions"),
-                new CustomAggregationOperation(addFieldsQuestionOperation),
-                new CustomAggregationOperation(addFieldsAssetTypeOperation),
-                unwind("questions",true),
-                group("$id")
-                        .first("name").as("name")
-                        .first("description").as("description")
-                        .first("templateType").as("templateType")
-                        .first("assetType").as("assetType")
-                        .first("countryId").as("countryId")
-                        .first("deleted").as("deleted")
-                        .addToSet("sections").as("sections")
-                        .addToSet("questions").as("questions")
-
-
-        );*/
-
-
-        String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
-        String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-        String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-        String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
-        String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
-
-        Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
-        Document questionsAddFieldOperation = Document.parse(addFieldQuestions);
-        Document sectionsAddFieldOperation = Document.parse(addFieldSections);
-        Document projectionOperation = Document.parse(projection);
-        Document groupDataOperation = Document.parse(groupData);
-
+    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId,BigInteger id) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 new CustomAggregationOperation(sectionsAddFieldOperation),
@@ -153,7 +92,7 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
         );
 
 
-        AggregationResults<MasterQuestionnaireTemplateResponseDto> result = mongoTemplate.aggregate(aggregation, MasterQuestionnaireTemplate.class, MasterQuestionnaireTemplateResponseDto.class);
+        AggregationResults<MasterQuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterQuestionnaireTemplate.class, MasterQuestionnaireTemplateResponseDTO.class);
         return result.getUniqueMappedResult();
     }
 }

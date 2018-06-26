@@ -6,6 +6,7 @@ import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
@@ -447,7 +448,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (org:Organization) WITH org\n" +
             "MATCH (org)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WITH staff, user\n" +
             "MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:IN_UNIT]-(o:Organization)\n" +
-            "with  collect({id: id(staff), gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
+            "with  collect({id: id(staff),firstName:staff.firstName,lastName:staff.lastName, gender :user.gender, pregnant:user.pregnant, dateOfBirth:user.dateOfBirth}) as staffData,o " +
             "RETURN  id(o) as unitId, staffData as staffList")
     List<UnitStaffQueryResult> getStaffListOfUnitWithBasicInfo();
 
@@ -472,6 +473,14 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     List<StaffUnitPositionDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
+
+
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(user:User)where id(staff)={0} with staff,user\n" +
+            "match (user)-[:"+BELONGS_TO+"]-(staffs:Staff)where id(staffs)<>{0} with staffs,user\n " +
+            "match (staffs)-[:"+BELONGS_TO+"]-(employment:Employment) with staffs,user,employment\n" +
+            "where (employment.mainEmploymentEndDate IS NULL OR employment.mainEmploymentEndDate>={1}) AND ((employment.mainEmploymentStartDate IS NOT NULL) AND({2} IS NULL OR employment.mainEmploymentStartDate<={2})) with user,employment,staffs\n" +
+            "match (employment)-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization) RETURN employment,organization.name as organizationName")
+    List<MainEmploymentQueryResult> getAllMainEmploymentByStaffId(Long StaffId, Long mainEmploymentStartDate, Long mainEmploymentEndDate );
 
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(expertise)={1} AND id(staff) IN {2}\n" +
             "MATCH(unitPosition)-[:"+IN_UNIT+"]-(organization:Organization) where id(organization)={0}   \n" +

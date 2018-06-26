@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.agreement_template;
 
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDto;
+import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -21,7 +21,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public PolicyAgreementTemplateResponseDto getPolicyAgreementWithDataById(Long countryId,BigInteger id) {
+    public PolicyAgreementTemplateResponseDTO getPolicyAgreementWithDataById(Long countryId, BigInteger id) {
 
 
         Aggregation aggregation=Aggregation.newAggregation(
@@ -42,13 +42,13 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         );
 
 
-        AggregationResults<PolicyAgreementTemplateResponseDto> result=mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDto.class);
+        AggregationResults<PolicyAgreementTemplateResponseDTO> result=mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDTO.class);
       return  result.getUniqueMappedResult();
     }
 
 
     @Override
-    public List<PolicyAgreementTemplateResponseDto> getPolicyAgreementWithData( Long countryId) {
+    public List<PolicyAgreementTemplateResponseDTO> getPolicyAgreementWithData(Long countryId) {
         Aggregation aggregation=Aggregation.newAggregation(
         match(Criteria.where("deleted").is(false)),
                 lookup("account_type","accountTypes","_id","accountTypes"),
@@ -65,7 +65,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         );
 
 
-        AggregationResults<PolicyAgreementTemplateResponseDto> result=mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDto.class);
+        AggregationResults<PolicyAgreementTemplateResponseDTO> result=mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDTO.class);
         return  result.getMappedResults();
     }
 }

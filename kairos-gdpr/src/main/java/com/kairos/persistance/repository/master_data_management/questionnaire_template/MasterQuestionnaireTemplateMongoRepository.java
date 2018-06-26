@@ -11,11 +11,11 @@ import java.math.BigInteger;
 @Repository
 public interface MasterQuestionnaireTemplateMongoRepository extends MongoRepository<MasterQuestionnaireTemplate,BigInteger> ,CustomQuestionnaireTemplateRepository {
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    MasterQuestionnaireTemplate findByIdAndNonDeleted(Long countryId,BigInteger id);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
+    MasterQuestionnaireTemplate findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{'name':{$regex:?1,$options:'i'}, 'deleted':false, 'countryId':?0}")
-    MasterQuestionnaireTemplate findByCountryIdAndName(Long countryId,String name);
+    @Query("{'name':?1, 'deleted':false, 'countryId':?0,organizationId:?1}")
+    MasterQuestionnaireTemplate findByCountryIdAndName(Long countryId,Long organizationId,String name);
 
     MasterQuestionnaireTemplate findByid(BigInteger id);
 

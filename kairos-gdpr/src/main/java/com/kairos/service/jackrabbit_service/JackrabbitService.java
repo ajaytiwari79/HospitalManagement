@@ -1,16 +1,16 @@
 package com.kairos.service.jackrabbit_service;
 
 
-import com.kairos.custome_exception.ClauseNotFoundJackRabbitException;
-import com.kairos.custome_exception.JackrabbitNodeNotFoundException;
+import com.kairos.custom_exception.ClauseNotFoundJackRabbitException;
+import com.kairos.custom_exception.JackrabbitNodeNotFoundException;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.response.dto.master_data.AgreementSectionResponseDto;
-import com.kairos.response.dto.clause.ClauseBasicResponseDto;
+import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +28,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.kairos.constant.JackRabbitConstant.CLAUSE_PARENT_NODE;
-import static com.kairos.constant.JackRabbitConstant.NODE_TYPE_UNSTRUCTURED;
-import static com.kairos.constant.JackRabbitConstant.CLAUSE_CHILD_NODE;
-import static com.kairos.constant.JackRabbitConstant.AGREEMENT_TEMPLATE_PARENT_NODE;
-import static com.kairos.constant.JackRabbitConstant.AGREEMENT_TEMPLATE_CHILD_NODE;
-import static com.kairos.constant.JackRabbitConstant.JCR_CONTENT;
-import static com.kairos.constant.JackRabbitConstant.NODE_TYPE_RESOURCE;
-import static com.kairos.constant.JackRabbitConstant.JCR_DATA;
+import static com.kairos.constants.JackRabbitConstant.CLAUSE_PARENT_NODE;
+import static com.kairos.constants.JackRabbitConstant.NODE_TYPE_UNSTRUCTURED;
+import static com.kairos.constants.JackRabbitConstant.CLAUSE_CHILD_NODE;
+import static com.kairos.constants.JackRabbitConstant.AGREEMENT_TEMPLATE_PARENT_NODE;
+import static com.kairos.constants.JackRabbitConstant.AGREEMENT_TEMPLATE_CHILD_NODE;
+import static com.kairos.constants.JackRabbitConstant.JCR_CONTENT;
+import static com.kairos.constants.JackRabbitConstant.NODE_TYPE_RESOURCE;
+import static com.kairos.constants.JackRabbitConstant.JCR_DATA;
 
 
 @Component
@@ -209,7 +209,7 @@ public class JackrabbitService {
     }
 
 
-    public Boolean addAgreementTemplateJackrabbit(BigInteger id, PolicyAgreementTemplate agreementTemplate, List<AgreementSectionResponseDto> sectionResponseDto) throws RepositoryException {
+    public Boolean addAgreementTemplateJackrabbit(BigInteger id, PolicyAgreementTemplate agreementTemplate, List<AgreementSectionResponseDTO> sectionResponseDto) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         try {
             String file = policyAgreementTemplateFileContent(sectionResponseDto, agreementTemplate);
@@ -252,7 +252,7 @@ public class JackrabbitService {
     }
 
 
-    public Boolean agreementTemplateVersioning(BigInteger id, PolicyAgreementTemplate agreementTemplate, List<AgreementSectionResponseDto> sectionResponseDto) throws RepositoryException {
+    public Boolean agreementTemplateVersioning(BigInteger id, PolicyAgreementTemplate agreementTemplate, List<AgreementSectionResponseDTO> sectionResponseDto) throws RepositoryException {
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         try {
             String content = policyAgreementTemplateFileContent(sectionResponseDto, agreementTemplate);
@@ -366,14 +366,14 @@ public class JackrabbitService {
     }
 
 
-    public String policyAgreementTemplateFileContent(List<AgreementSectionResponseDto> sectionResponseDto, PolicyAgreementTemplate policyAgreementTemplate) {
+    public String policyAgreementTemplateFileContent(List<AgreementSectionResponseDTO> sectionResponseDto, PolicyAgreementTemplate policyAgreementTemplate) {
         StringBuilder context = new StringBuilder();
         context.append("HEADER"+"\n");
         context.append(policyAgreementTemplate.getName()+"\n");
         context.append(policyAgreementTemplate.getDescription()+"\n");
         sectionResponseDto.forEach(section -> {
                     context.append(section.getTitle()+"\n");
-                    for (ClauseBasicResponseDto clause : section.getClauses()) {
+                    for (ClauseBasicResponseDTO clause : section.getClauses()) {
                         context.append(clause.getTitle()+"\n");
                         context.append(clause.getDescription()+"\n");
 

@@ -14,12 +14,12 @@ public interface DataSubjectMappingRepository extends MongoRepository<DataSubjec
 
     DataSubjectMapping findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    DataSubjectMapping findByIdAndNonDeleted(Long countryId, BigInteger id);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
+    DataSubjectMapping findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
 
-    @Query("{deleted:false,countryId:?0,name:?1}")
-    DataSubjectMapping findByCountryIdAndName(Long countryId,String name);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
+    DataSubjectMapping findByCountryIdAndName(Long countryId,Long organizationId,String name);
 
 
 }

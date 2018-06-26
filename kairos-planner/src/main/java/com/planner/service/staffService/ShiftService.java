@@ -29,11 +29,11 @@ public class ShiftService {
 
 
     public void saveList(List<PlanningShift> planningShifts) {
-        shiftRepository.saveList(planningShifts);
+        //shiftRepository.saveList(planningShifts);
     }
 
     public void save(PlanningShift planningShift) {
-        shiftRepository.save(planningShift);
+        //shiftRepository.save(planningShift);
     }
 
     public List<OptaShiftDTO> saveShifts(List<OptaShiftDTO> optaShiftDTOS) {
@@ -41,13 +41,13 @@ public class ShiftService {
         for (OptaShiftDTO optaShiftDto : optaShiftDTOS) {
             if (taskStaffService.exits(optaShiftDto.getKairosId(),optaShiftDto.getUnitId())) {
                 PlanningShift planningShift = new PlanningShift();
-                planningShift.setUnitId(optaShiftDto.getUnitId());
-                planningShift.setExternalId(optaShiftDto.getKairosId());
+               /* planningShift.setUnitId(optaShiftDto.getUnitId());
+                planningShift.setExternalId(optaShiftDto.getKairosId());*/
                 planningShift.setStaffId(getStaffId(optaShiftDto));
                 planningShift.setShiftType(ShiftType.getEnumByString(optaShiftDto.getShiftType()));
-                planningShift.setStartDateTime(optaShiftDto.getStartDateTime());
-                planningShift.setEndDateTime(optaShiftDto.getEndDateTime());
-                planningShift = (PlanningShift) shiftRepository.save(planningShift);
+                planningShift.setStartTime(optaShiftDto.getStartDateTime());
+                planningShift.setEndTime(optaShiftDto.getEndDateTime());
+                //planningShift = (PlanningShift) shiftRepository.save(planningShift);
                 optaShiftDto.setOptaPlannerId(planningShift.getId());
             }else{
                 log.warn("shift's staff not exits"+optaShiftDto.getStaffId());
@@ -91,12 +91,12 @@ public class ShiftService {
             optaShiftDTO.setOptaPlannerId(null);
             return optaShiftDTO;
         }
-        planningShift.setUnitId(optaShiftDTO.getUnitId());
+        //planningShift.setUnitId(optaShiftDTO.getUnitId());
         planningShift.setStaffId(getStaffId(optaShiftDTO));
         planningShift.setShiftType(ShiftType.valueOf(optaShiftDTO.getShiftType()));
-        planningShift.setStartDateTime(optaShiftDTO.getStartDateTime());
-        planningShift.setEndDateTime(optaShiftDTO.getEndDateTime());
-        planningShift = (PlanningShift) shiftRepository.save(planningShift);
+        planningShift.setStartTime(optaShiftDTO.getStartDateTime());
+        planningShift.setEndTime(optaShiftDTO.getEndDateTime());
+        //planningShift = (PlanningShift) shiftRepository.save(planningShift);
         optaShiftDTO.setOptaPlannerId(planningShift.getId());
         return optaShiftDTO;
     }
@@ -108,12 +108,12 @@ public class ShiftService {
             if (planningShift == null){
                 optaShiftDTO.setOptaPlannerId(null);
             }else{
-            planningShift.setUnitId(optaShiftDTO.getUnitId());
+            //planningShift.setUnitId(optaShiftDTO.getUnitId());
             planningShift.setStaffId(getStaffId(optaShiftDTO));
             planningShift.setShiftType(ShiftType.valueOf(optaShiftDTO.getShiftType()));
-            planningShift.setStartDateTime(optaShiftDTO.getStartDateTime());
-            planningShift.setEndDateTime(optaShiftDTO.getEndDateTime());
-            planningShift = (PlanningShift) shiftRepository.save(planningShift);
+            planningShift.setStartTime(optaShiftDTO.getStartDateTime());
+            planningShift.setEndTime(optaShiftDTO.getEndDateTime());
+           // planningShift = (PlanningShift) shiftRepository.save(planningShift);
             optaShiftDTO.setOptaPlannerId(planningShift.getId());
             }
             updatedOptaShiftDtos.add(optaShiftDTO);

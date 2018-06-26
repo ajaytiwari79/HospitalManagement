@@ -13,15 +13,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 
 public class VRPClient extends User {
 
-    private int installationNo;
-    private Double lattitude;
+    private Long installationNumber;
+    private Double latitude;
     private Double longitude;
     private int duration;
     private String streetName;
-    private int houseNo;
+    private int houseNumber;
     private String block;
-    private int floorNo;
-    private int postCode;
+    private int floorNumber;
+    private int zipCode;
     private String city;
 
     @Relationship(type = BELONGS_TO)
@@ -35,20 +35,20 @@ public class VRPClient extends User {
         this.organization = organization;
     }
 
-    public int getInstallationNo() {
-        return installationNo;
+    public Long getInstallationNumber() {
+        return installationNumber;
     }
 
-    public void setInstallationNo(int installationNo) {
-        this.installationNo = installationNo;
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {
@@ -76,12 +76,12 @@ public class VRPClient extends User {
         this.streetName = streetName;
     }
 
-    public int getHouseNo() {
-        return houseNo;
+    public int getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setHouseNo(int houseNo) {
-        this.houseNo = houseNo;
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public String getBlock() {
@@ -92,20 +92,20 @@ public class VRPClient extends User {
         this.block = block;
     }
 
-    public int getFloorNo() {
-        return floorNo;
+    public int getFloorNumber() {
+        return floorNumber;
     }
 
-    public void setFloorNo(int floorNo) {
-        this.floorNo = floorNo;
+    public void setFloorNumber(int floorNumber) {
+        this.floorNumber = floorNumber;
     }
 
-    public int getPostCode() {
-        return postCode;
+    public int getZipCode() {
+        return zipCode;
     }
 
-    public void setPostCode(int postCode) {
-        this.postCode = postCode;
+    public void setZipCode(int zipCode) {
+        this.zipCode = zipCode;
     }
 
     public String getCity() {

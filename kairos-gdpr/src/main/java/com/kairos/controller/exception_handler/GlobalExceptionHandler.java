@@ -1,9 +1,9 @@
 package com.kairos.controller.exception_handler;
 
 
-import com.kairos.custome_exception.*;
-import com.kairos.controller.exception_handler.dto.FieldErrorDTO;
-import com.kairos.controller.exception_handler.dto.ResponseEnvelope;
+import com.kairos.custom_exception.*;
+import com.kairos.dto.exception.FieldErrorDTO;
+import com.kairos.dto.exception.ResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -62,26 +62,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-@ExceptionHandler(value = {WorkSpaceExistException.class})
-@ResponseBody
-    protected ResponseEntity<Object> workSpaceExists(Exception ex , HttpServletRequest request)
-{
-
-    Map<String,Object> result=new HashMap<>();
-    result.put("message",ex.getMessage());
-    result.put("cause",ex.getCause());
-    result.put("request URl",request.getRequestURL());
-    return new ResponseEntity<>(result,HttpStatus.BAD_REQUEST);
-
-}
-
     @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class,OrganizationTypeException.class})
     @ResponseBody
-    protected ResponseEntity<Object> duplicateDataException(RuntimeException ex , HttpServletRequest request)
+    protected ResponseEntity<Object> exceptionHandler(RuntimeException ex , HttpServletRequest request)
     {
 
         Map<String,Object> result=new HashMap<>();
-        result.put("messgage",ex.getMessage());
+        result.put("message",ex.getMessage());
         result.put("cause",ex.getCause());
         result.put("request URl",request.getRequestURI());
         return new ResponseEntity<>(result,HttpStatus.BAD_REQUEST);

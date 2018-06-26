@@ -48,4 +48,6 @@ public interface CustomTaskMongoRepository {
     public List<Task> getTaskByException(long citizenId, long unitId, BigInteger exceptionId);
     public List<VRPTaskDTO> getAllTasksByUnitId(Long unitId);
 
+    public Map<Long,BigInteger> getAllTasksInstallationNoAndTaskTypeId(Long unitId);
+
 }

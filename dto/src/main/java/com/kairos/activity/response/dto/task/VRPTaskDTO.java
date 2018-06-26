@@ -1,5 +1,7 @@
 package com.kairos.activity.response.dto.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.response.dto.TaskTypeDTO;
 import com.kairos.client.dto.TaskAddress;
 
@@ -9,17 +11,44 @@ import java.math.BigInteger;
  * @author pradeep
  * @date - 14/6/18
  */
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VRPTaskDTO {
+    private BigInteger id;
     private TaskAddress address;
     //Vrp settings
-    private Integer installationNo;
+    private Long installationNumber;
     private Long citizenId;
     private String skill;
     private BigInteger taskTypeId;
     private String citizenName;
     private TaskTypeDTO taskType;
+    private Long unitId;
+    private int duration;
 
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
     public TaskTypeDTO getTaskType() {
         return taskType;
@@ -69,11 +98,11 @@ public class VRPTaskDTO {
         this.address = address;
     }
 
-    public Integer getInstallationNo() {
-        return installationNo;
+    public Long getInstallationNumber() {
+        return installationNumber;
     }
 
-    public void setInstallationNo(Integer installationNo) {
-        this.installationNo = installationNo;
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
     }
 }

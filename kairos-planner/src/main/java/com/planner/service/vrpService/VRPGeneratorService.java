@@ -4,18 +4,15 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 
+import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;
 import com.planner.service.tomtomService.TomTomService;
 import com.planner.util.wta.FileIOUtil;
-import com.thoughtworks.xstream.XStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +64,39 @@ public class VRPGeneratorService {
         List<Shift> shifts = new ArrayList<>();
         employeeList.forEach(e->{
             for (int i=4;i<=8;i++) {
-                shifts.add(new Shift(e.getId(), e, LocalDate.of(2018, 6, i), null, null));
+                shifts.add(new Shift(e.getId()+i, e, LocalDate.of(2018, 6, i), null, null));
+            }
+        });
+        return shifts;
+    }
+
+    public VrpTaskPlanningSolution getVRPProblemSolution(VrpTaskPlanningDTO vrpTaskPlanningDTO){
+        VrpTaskPlanningSolution solution = new VrpTaskPlanningSolution();
+        List<Employee> employees = ObjectMapperUtils.copyPropertiesOfListByMapper(vrpTaskPlanningDTO.getEmployees(),Employee.class);
+        List<Matrix> matrix=tomTomService.getMatrix();
+        LocationsDistanceMatrix locationsDistanceMatrix= new LocationsDistanceMatrix();
+        matrix.forEach(m->{
+            locationsDistanceMatrix.addLocationDistance(new LocationPair(m.getFirstLatitude(),m.getFirstLongitude(),m.getSecondLattitude(),m.getSecondLongitude()),
+                    new LocationPairDifference(m.getResponse().getRouteSummary().getLengthInMeters(),m.getResponse().getRouteSummary().getTravelTimeInSeconds(),m.getResponse().getRouteSummary().getTrafficDelayInSeconds()));
+        });
+        List<Task> tasks = new ArrayList<>(vrpTaskPlanningDTO.getTasks().size());
+        vrpTaskPlanningDTO.getTasks().forEach(t->{
+            tasks.add(new Task(t.getId(),t.getInstallationNumber(),t.getLatitude(),t.getLongitude(),t.getSkills(),t.getDuration(),t.getStreetName(),t.getHouseNo(),t.getBlock(),t.getFloorNo(),t.getPost(),t.getCity(),false));
+        });
+        List<Shift> shifts = getShiftList(employees);
+        solution.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
+        solution.setTasks(tasks);
+        solution.setShifts(shifts);
+        solution.setEmployees(employees);
+        solution.setLocationsDistanceMatrix(locationsDistanceMatrix);
+        return solution;
+    }
+
+    private List<Shift> getShiftList(List<Employee> employeeList){
+        List<Shift> shifts = new ArrayList<>();
+        employeeList.forEach(e->{
+            for (int i=4;i<=8;i++) {
+                shifts.add(new Shift(e.getId()+i, e, LocalDate.now().plusDays(1), null, null));
             }
         });
         return shifts;

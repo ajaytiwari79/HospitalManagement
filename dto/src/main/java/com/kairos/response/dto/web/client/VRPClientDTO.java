@@ -9,14 +9,14 @@ public class VRPClientDTO {
 
     private String firstName;
     private Long id;
-    private int installationNo;
-    private Double lattitude;
+    private Long installationNumber;
+    private Double latitude;
     private Double longitude;
     private String streetName;
-    private int houseNo;
+    private int houseNumber;
     private String block;
-    private int floorNo;
-    private int post;
+    private int floorNumber;
+    private int zipCode;
     private String city;
 
 
@@ -36,20 +36,20 @@ public class VRPClientDTO {
         this.id = id;
     }
 
-    public int getInstallationNo() {
-        return installationNo;
+    public Long getInstallationNumber() {
+        return installationNumber;
     }
 
-    public void setInstallationNo(int installationNo) {
-        this.installationNo = installationNo;
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {
@@ -69,12 +69,12 @@ public class VRPClientDTO {
         this.streetName = streetName;
     }
 
-    public int getHouseNo() {
-        return houseNo;
+    public int getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setHouseNo(int houseNo) {
-        this.houseNo = houseNo;
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public String getBlock() {
@@ -85,20 +85,20 @@ public class VRPClientDTO {
         this.block = block;
     }
 
-    public int getFloorNo() {
-        return floorNo;
+    public int getFloorNumber() {
+        return floorNumber;
     }
 
-    public void setFloorNo(int floorNo) {
-        this.floorNo = floorNo;
+    public void setFloorNumber(int floorNumber) {
+        this.floorNumber = floorNumber;
     }
 
-    public int getPost() {
-        return post;
+    public int getZipCode() {
+        return zipCode;
     }
 
-    public void setPost(int post) {
-        this.post = post;
+    public void setZipCode(int zipCode) {
+        this.zipCode = zipCode;
     }
 
     public String getCity() {

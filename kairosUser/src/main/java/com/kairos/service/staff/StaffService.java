@@ -5,10 +5,9 @@ import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.util.ObjectMapperUtils;
-
 import com.kairos.activity.util.DateUtils;
-
 import com.kairos.client.ChatRestClient;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -30,6 +29,7 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
@@ -51,6 +51,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
@@ -62,6 +63,8 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
+import com.kairos.response.dto.web.employment_dto.EmploymentOverlapDTO;
+import com.kairos.response.dto.web.employment_dto.MainEmploymentResultDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.response.dto.web.staff.StaffChatDetails;
@@ -102,7 +105,6 @@ import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.time.DayOfWeek;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -1913,6 +1915,134 @@ public class StaffService extends UserBaseService {
         return staffsUnitPositions;
     }
 
+    public boolean removeMainEmployment(Long staffId) {
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        employment.setMainEmploymentStartDate(null);
+        employment.setMainEmploymentEndDate(null);
+        employment.setMainEmployment(false);
+        save(employment);
+        return true;
+    }
+
+    public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO,Boolean confirm) {
+        if(employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())){
+            exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
+        }
+        Long mainEmploymentStartDate=DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentStartDate());
+        Long mainEmploymentEndDate=null;
+        if(employmentDTO.getMainEmploymentEndDate()!=null) {
+             mainEmploymentEndDate = DateUtil.getDateFromEpoch(employmentDTO.getMainEmploymentEndDate());
+            if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
+                exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
+            }
+        }
+        List<MainEmploymentQueryResult> mainEmploymentQueryResults = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
+        MainEmploymentResultDTO mainEmploymentResultDTO=new MainEmploymentResultDTO();
+            DateTimeInterval newEmploymentInterval = new DateTimeInterval(mainEmploymentStartDate, mainEmploymentEndDate);
+            List<Employment> employments = new ArrayList<>();
+                if (!mainEmploymentQueryResults.isEmpty()) {
+                for (MainEmploymentQueryResult mainEmploymentQueryResult : mainEmploymentQueryResults) {
+                    Employment employment = mainEmploymentQueryResult.getEmployment();
+                    EmploymentOverlapDTO employmentOverlapDTO = new EmploymentOverlapDTO();
+                    if(employment.getMainEmploymentEndDate()!=null&&employmentDTO.getMainEmploymentEndDate()!=null){
+                    DateTimeInterval employmentInterval = new DateTimeInterval(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate()), DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate()));
+                    if (newEmploymentInterval.containsInterval(employmentInterval)) {
+                            exceptionService.invalidRequestException("message.employment.alreadyexist",mainEmploymentQueryResult.getOrganizationName());
+                    } else {
+                        if (employmentInterval.contains(newEmploymentInterval.getStartDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentEndDate(newEmploymentInterval.getStartLocalDate().minusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        } else if (employmentInterval.contains(newEmploymentInterval.getEndDate())) {
+                            getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                            employment.setMainEmploymentStartDate(newEmploymentInterval.getEndLocalDate().plusDays(1));
+                            getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                        }
+                    }
+                    }else{
+                        if(employment.getMainEmploymentEndDate()==null&&employmentDTO.getMainEmploymentEndDate()!=null){
+                            if(DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())>mainEmploymentStartDate&&DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())<=mainEmploymentEndDate){
+                                getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                                employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
+                                getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            }else if(employment.getMainEmploymentStartDate().isBefore(employmentDTO.getMainEmploymentStartDate())){
+                                getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                                employment.setMainEmploymentEndDate(newEmploymentInterval.getStartLocalDate().minusDays(1));
+                                getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            }
+                            else{
+                                exceptionService.invalidRequestException("message.employment.alreadyexist",mainEmploymentQueryResult.getOrganizationName());
+                            }
+                        } else if(employment.getMainEmploymentEndDate()==null&&employmentDTO.getMainEmploymentEndDate()==null){
+                            if(employment.getMainEmploymentStartDate().isBefore(employmentDTO.getMainEmploymentStartDate())){
+                                getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                                employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
+                                getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            } else if(employment.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentStartDate())){
+                                getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                                employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
+                                getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            } else{
+                                exceptionService.invalidRequestException("message.employment.alreadyexist",mainEmploymentQueryResult.getOrganizationName());
+                            }
+                        } else {
+                            if(employment.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentStartDate())){
+                                getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                                employmentDTO.setMainEmploymentEndDate(employment.getMainEmploymentStartDate().minusDays(1));
+                                getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            } else if(mainEmploymentStartDate>DateUtil.getDateFromEpoch(employment.getMainEmploymentStartDate())&&mainEmploymentStartDate<=DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate())){
+                                getOldMainEmployment(employmentOverlapDTO, employment, mainEmploymentQueryResult);
+                                    employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentStartDate().minusDays(1));
+                                getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                            } else if(employment.getMainEmploymentStartDate().isEqual(employmentDTO.getMainEmploymentStartDate())){
+                                exceptionService.invalidRequestException("message.employment.alreadyexist",mainEmploymentQueryResult.getOrganizationName());
+                            }
+                        }
+                    }
+                    if(employment.getMainEmploymentEndDate()!=null&&employment.getMainEmploymentEndDate().isBefore(employment.getMainEmploymentStartDate())){
+                        employment.setMainEmploymentStartDate(null);
+                        employment.setMainEmploymentEndDate(null);
+                        employment.setMainEmployment(false);
+                        getAfterChangeMainEmployment(employmentOverlapDTO, employment);
+                    }
+                    employments.add(employment);
+                    mainEmploymentResultDTO.getEmploymentOverlapList().add(employmentOverlapDTO);
+                }
+
+                if (!confirm) {
+                    mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
+                    return mainEmploymentResultDTO;
+                } else {
+                    Employment employment = getEmployment(staffId, employmentDTO);
+                    employments.add(employment);
+                    save(employments);
+                }
+            } else {
+                Employment employment = getEmployment(staffId, employmentDTO);
+                save(employment);
+            }
+        mainEmploymentResultDTO.setEmploymentOverlapList(null);
+        mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
+        return mainEmploymentResultDTO;
+    }
+
+    public Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
+        employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
+        employment.setMainEmployment(true);
+        employmentDTO.setMainEmployment(true);
+        return employment;
+    }
+    public void getOldMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment, MainEmploymentQueryResult mainEmploymentQueryResult){
+        employmentOverlapDTO.setMainEmploymentStartDate(employment.getMainEmploymentStartDate());
+        employmentOverlapDTO.setMainEmploymentEndDate(employment.getMainEmploymentEndDate());
+        employmentOverlapDTO.setOrganizationName(mainEmploymentQueryResult.getOrganizationName());
+    }
+    public void getAfterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment) {
+        employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
+        employmentOverlapDTO.setAfterChangeEndDate(employment.getMainEmploymentEndDate());
+    }
     public List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds) {
         return staffGraphRepository.getEmailsOfStaffByStaffIds(staffIds);
     }
