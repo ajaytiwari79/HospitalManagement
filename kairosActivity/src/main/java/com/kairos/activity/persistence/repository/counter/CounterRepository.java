@@ -1,9 +1,12 @@
 package com.kairos.activity.persistence.repository.counter;
 
+import com.kairos.activity.client.counter.CounterOrderDTO;
+import com.kairos.activity.client.counter.ModuleCounterGroupingDTO;
+import com.kairos.activity.client.counter.RefCounterDefDTO;
+import com.kairos.activity.client.counter.RoleCounterDTO;
 import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.counter.*;
-import com.kairos.activity.response.dto.counter.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -37,42 +40,42 @@ public class CounterRepository {
 
 
     //get ModuleWiseCounters List by country
-    public List<ModuleWiseCounter> getModulewiseCountersForCountry(BigInteger countryId) {
+    public List<ModuleCounter> getModuleCountersForCountry(BigInteger countryId) {
         Query query = new Query(Criteria.where("countryId").is(countryId));
-        return mongoTemplate.find(query, ModuleWiseCounter.class);
+        return mongoTemplate.find(query, ModuleCounter.class);
     }
 
     //get modulewise countersIds for a country
-    public List<ModulewiseCounterGroupingDTO> getModulewiseCounterDTOsForCountry(BigInteger countryId) {
+    public List<ModuleCounterGroupingDTO> getModuleCounterDTOsForCountry(BigInteger countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("countryId").is(countryId)),
                 Aggregation.group("moduleId").addToSet("counterId").as("counterIds"),
                 Aggregation.project("counterIds")
         );
-        AggregationResults<ModulewiseCounterGroupingDTO> results = mongoTemplate.aggregate(aggregation, ModuleWiseCounter.class, ModulewiseCounterGroupingDTO.class);
+        AggregationResults<ModuleCounterGroupingDTO> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, ModuleCounterGroupingDTO.class);
         return results.getMappedResults();
     }
 
     //get role and moduleCounterId mapping for unit
-    public List<RolewiseCounterDTO> getRoleAndModuleCounterIdMapping(BigInteger unitId) {
+    public List<RoleCounterDTO> getRoleAndModuleCounterIdMapping(BigInteger unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("unitId").is(unitId)),
-                Aggregation.group("roleId").addToSet("modulewiseCounterId").as("modulewiseCounterIds"),
-                Aggregation.project("modulewiseCounterIds")
+                Aggregation.group("roleId").addToSet("moduleCounterId").as("moduleCounterIds"),
+                Aggregation.project("moduleCounterIds")
 
         );
 
-        AggregationResults<RolewiseCounterDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleWiseCounter.class, RolewiseCounterDTO.class);
+        AggregationResults<RoleCounterDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RoleCounterDTO.class);
         return results.getMappedResults();
     }
 
-    public List<BigInteger> getModuleWiseCountersIds(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
+    public List<BigInteger> getModuleCountersIds(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("countryId").is(countryId).and("moduleId").is(moduleId).and("counterId").in(refCounterIds)),
                 Aggregation.group("moduleId").addToSet("_id").as("ids"),
                 Aggregation.project("ids")
         );
-        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, ModuleWiseCounter.class, Map.class);
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, Map.class);
         List<Map> resultData = results.getMappedResults();
         if(resultData.isEmpty())
             return new ArrayList<BigInteger>();
@@ -89,9 +92,9 @@ public class CounterRepository {
         mongoTemplate.remove(query, claz);
     }
 
-    public void removeRoleWiseCounters(BigInteger roleId, List<BigInteger> refCounterIds){
+    public void removeRoleCounters(BigInteger roleId, List<BigInteger> refCounterIds){
         Query query = new Query(Criteria.where("roleId").is(roleId).and("refCounterId").in(refCounterIds));
-        mongoTemplate.remove(query, UnitRoleWiseCounter.class);
+        mongoTemplate.remove(query, UnitRoleCounter.class);
     }
 
     //get item by Id
@@ -108,21 +111,21 @@ public class CounterRepository {
 
 
     //counterRef and counter type mapping
-    public List<RefCounterDefDTO> getModuleWiseCounterDetails(String moduleId, BigInteger countryId){
+    public List<RefCounterDefDTO> getModuleCounterDetails(String moduleId, BigInteger countryId){
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("moduleId").is(moduleId).and("countryId").is(countryId)),
                 Aggregation.lookup("counter", "counterId","_id","counterType"),
                 Aggregation.project().and("counterType").arrayElementAt(0).as("counterType")
         );
 
-        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, ModuleWiseCounter.class, RefCounterDefDTO.class);
+        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, RefCounterDefDTO.class);
         return results.getMappedResults();
     }
 
-    public List<RefCounterDefDTO> getRolewiseCounterTypeDetails(BigInteger roleId, BigInteger unitId, String moduleId){
+    public List<RefCounterDefDTO> getRoleCounterTypeDetails(BigInteger roleId, BigInteger unitId, String moduleId){
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("roleId").is(roleId).and("unitId").is(unitId)),
-                Aggregation.lookup("moduleWiseCounter","refCounterId", "_id", "refCounter"),
+                Aggregation.lookup("moduleCounter","refCounterId", "_id", "refCounter"),
                 Aggregation.project().and("refCounter").arrayElementAt(0).as("refCounter"),
                 Aggregation.match(Criteria.where("refCounter.moduleId").is(moduleId)),
                 Aggregation.lookup("counter", "refCounter.counterId", "_id","counterDef" ),
@@ -130,7 +133,7 @@ public class CounterRepository {
                 Aggregation.project().and("counterDef.type").as("counterType")
         );
 
-        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleWiseCounter.class, RefCounterDefDTO.class);
+        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RefCounterDefDTO.class);
         return results.getMappedResults();
     }
 
@@ -154,7 +157,7 @@ public class CounterRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("unitId").is(unitId).and("moduleId").is(moduleId))
         );
-        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UnitWiseCounterOrder.class, CounterOrderDTO.class);
+        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UnitCounterOrder.class, CounterOrderDTO.class);
         return results.getMappedResults();
     }
 
@@ -162,7 +165,7 @@ public class CounterRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and("moduleId").is(moduleId))
         );
-        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UserWiseCounterOrder.class, CounterOrderDTO.class);
+        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UserCounterOrder.class, CounterOrderDTO.class);
         return results.getMappedResults();
     }
 

@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.counter;
+package com.kairos.activity.client.counter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

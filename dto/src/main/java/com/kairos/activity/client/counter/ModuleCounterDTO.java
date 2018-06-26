@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.counter;
+package com.kairos.activity.client.counter;
 
 import java.math.BigInteger;
 
@@ -7,7 +7,7 @@ import java.math.BigInteger;
  * @dated: Jun/26/2018
  */
 
-public class ModulewiseCounterDTO {
+public class ModuleCounterDTO {
     private BigInteger id;
     private BigInteger counterId;
 

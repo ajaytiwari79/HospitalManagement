@@ -1,9 +1,10 @@
 package com.kairos.activity.controller.counters;
 
+import com.kairos.activity.client.counter.CounterDistDTO;
 import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.counter.Counter;
-import com.kairos.activity.response.dto.counter.ModulewiseCounterGroupingDTO;
-import com.kairos.activity.response.dto.counter.RolewiseCounterDTO;
+import com.kairos.activity.client.counter.ModuleCounterGroupingDTO;
+import com.kairos.activity.client.counter.RoleCounterDTO;
 import com.kairos.activity.service.counter.CounterManagementService;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -29,6 +30,7 @@ import static com.kairos.activity.constants.ApiConstants.COUNTER_COUNTRY_DIST_UR
  * @dated: Jun/26/2018
  */
 
+//TODO: TO be modified according to latest proposed distribution functionality
 @RestController
 @RequestMapping(COUNTER_COUNTRY_DIST_URL)
 @Api(COUNTER_COUNTRY_DIST_URL)
@@ -39,33 +41,38 @@ public class CounterDistController {
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
-    public ResponseEntity<Map<String, Object>> getModulewiseCounterDistributionForCountry(@RequestParam BigInteger countryId){
+    public ResponseEntity<Map<String, Object>> getModuleCounterDistributionForCountry(@RequestParam BigInteger countryId){
         Map<String, Object> data = new HashMap();
         List<Counter> counters = counterManagementService.getAllCounters();
-        data.put("counterTypeDefs", CounterType.getCounterTypes());
-        data.put("countersIdMap", counterManagementService.getCounterTypeAndIdMapping(counters));
-        data.put("modulewiseCounters", counterManagementService.getModulewiseCountersForCountry(countryId));
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, data);
+        CounterDistDTO responseData = new CounterDistDTO(
+                CounterType.getCounterTypes(),
+                counterManagementService.getCounterTypeAndIdMapping(counters),
+                counterManagementService.getModuleCountersForCountry(countryId),
+                null
+        );
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
-    public ResponseEntity<Map<String, Object>> saveModulewiseCounterDistributionForCountry(@RequestBody List<ModulewiseCounterGroupingDTO> modulewiseCounters, @RequestParam BigInteger countryId){
-        counterManagementService.storeModuleWiseCounters(modulewiseCounters, countryId);
+    public ResponseEntity<Map<String, Object>> saveModuleCounterDistributionForCountry(@RequestBody List<ModuleCounterGroupingDTO> moduleCounters, @RequestParam BigInteger countryId){
+        counterManagementService.storeModuleCounters(moduleCounters, countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-    public ResponseEntity<Map<String, Object>> getRolewiseCounterDistributionForUnit(@RequestParam BigInteger unitId, @RequestParam BigInteger countryId){
+    public ResponseEntity<Map<String, Object>> getRoleCounterDistributionForUnit(@RequestParam BigInteger unitId, @RequestParam BigInteger countryId){
         Map<String, Object> data = new HashMap<>();
         List<Counter> counters = counterManagementService.getAllCounters();
-        data.put("counterTypeDefs", CounterType.getCounterTypes());
-        data.put("counterIdTypeMap", counterManagementService.getCounterIdAndTypeMapping(counters));
-        data.put("modulewiseCounters", counterManagementService.getModulewiseCountersForCountry(countryId));
-        data.put("rolewiseCounters", counterManagementService.getRolewiseCounterMapping(unitId));
+        CounterDistDTO responseData = new CounterDistDTO(
+                CounterType.getCounterTypes(),
+                counterManagementService.getCounterIdAndTypeMapping(counters),
+                counterManagementService.getModuleCountersForCountry(countryId),
+                counterManagementService.getRoleCounterMapping(unitId)
+        );
         //assuming UI have a unitLevelRoles list.
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, data);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
-    public ResponseEntity<Map<String, Object>> storeRolewiseCounterDistributionForUnit(@RequestBody List<RolewiseCounterDTO> rolewiseCounterDTOS, @RequestParam BigInteger unitId){
-        counterManagementService.storeRolewiseCountersForUnit(rolewiseCounterDTOS, unitId);
+    public ResponseEntity<Map<String, Object>> storeRoleCounterDistributionForUnit(@RequestBody List<RoleCounterDTO> roleCounterDTOS, @RequestParam BigInteger unitId){
+        counterManagementService.storeRoleCountersForUnit(roleCounterDTOS, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 

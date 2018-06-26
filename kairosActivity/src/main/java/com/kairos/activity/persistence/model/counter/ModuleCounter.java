@@ -9,16 +9,16 @@ import java.math.BigInteger;
  * @dated: Jun/26/2018
  */
 
-public class ModuleWiseCounter extends MongoBaseEntity {
+public class ModuleCounter extends MongoBaseEntity {
     private String moduleId;
     private BigInteger counterId;
     private BigInteger countryId;
 
-    public ModuleWiseCounter(){
+    public ModuleCounter(){
 
     }
 
-    public ModuleWiseCounter(BigInteger countryId, String moduleId, BigInteger counterId){
+    public ModuleCounter(BigInteger countryId, String moduleId, BigInteger counterId){
         this.counterId = counterId;
         this.moduleId = moduleId;
         this.countryId = countryId;

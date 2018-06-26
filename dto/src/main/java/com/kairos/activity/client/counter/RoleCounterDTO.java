@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.counter;
+package com.kairos.activity.client.counter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
  * @dated: Jun/26/2018
  */
 
-public class RolewiseCounterDTO {
+public class RoleCounterDTO {
     private BigInteger roleId;
     private List<BigInteger> modulewiseCounterIds = new ArrayList<>();
 
@@ -21,7 +21,7 @@ public class RolewiseCounterDTO {
         this.roleId = roleId;
     }
 
-    public List<BigInteger> getModulewiseCounterIds() {
+    public List<BigInteger> getModuleCounterIds() {
         return modulewiseCounterIds;
     }
 

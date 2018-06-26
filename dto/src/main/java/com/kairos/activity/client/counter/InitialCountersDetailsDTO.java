@@ -1,8 +1,6 @@
-package com.kairos.activity.response.dto.counter;
+package com.kairos.activity.client.counter;
 
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 public class InitialCountersDetailsDTO {
     private List<RefCounterDefDTO> counterDefs;

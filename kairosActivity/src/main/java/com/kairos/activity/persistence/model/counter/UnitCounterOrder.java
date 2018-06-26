@@ -8,14 +8,14 @@ import java.util.List;
  * @dated: Jun/26/2018
  */
 
-public class UnitWiseCounterOrder extends DefaultCounterOrder{
+public class UnitCounterOrder extends DefaultCounterOrder{
     protected BigInteger unitId;
 
-    public UnitWiseCounterOrder(){
+    public UnitCounterOrder(){
 
     }
 
-    public UnitWiseCounterOrder(BigInteger unitId, String moduleId, String tabId, List<BigInteger> orderedCounterIds){
+    public UnitCounterOrder(BigInteger unitId, String moduleId, String tabId, List<BigInteger> orderedCounterIds){
         this.unitId = unitId;
         this.moduleId = moduleId;
         this.tabId = tabId;

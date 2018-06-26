@@ -7,7 +7,7 @@ import java.math.BigInteger;
  * @dated: Jun/26/2018
  */
 
-public class UserWiseCounterOrder extends UnitWiseCounterOrder {
+public class UserCounterOrder extends UnitCounterOrder {
     private BigInteger userId;
 
     public BigInteger getUserId() {

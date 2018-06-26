@@ -3,8 +3,8 @@ import com.kairos.activity.KairosActivityApplication;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.counter.Counter;
-import com.kairos.activity.persistence.model.counter.ModuleWiseCounter;
-import com.kairos.activity.persistence.model.counter.UnitRoleWiseCounter;
+import com.kairos.activity.persistence.model.counter.ModuleCounter;
+import com.kairos.activity.persistence.model.counter.UnitRoleCounter;
 import com.kairos.activity.service.MongoBaseService;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
@@ -67,29 +67,29 @@ public class CounterManagementTest extends MongoBaseService {
         ctr.setType(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
         ctr = save(ctr);
 
-        ModuleWiseCounter moduleWiseCounter = new ModuleWiseCounter();
-        moduleWiseCounter.setId(modulewiseCounterId);
-        moduleWiseCounter.setCountryId(countryId);
-        moduleWiseCounter.setCounterId(ctr.getId());
-        moduleWiseCounter.setModuleId(moduleId);
-        moduleWiseCounter = save(moduleWiseCounter);
+        ModuleCounter moduleCounter = new ModuleCounter();
+        moduleCounter.setId(modulewiseCounterId);
+        moduleCounter.setCountryId(countryId);
+        moduleCounter.setCounterId(ctr.getId());
+        moduleCounter.setModuleId(moduleId);
+        moduleCounter = save(moduleCounter);
 
-        moduleWiseCounter.setId(modulewiseCounterId2);
-        moduleWiseCounter.setCountryId(countryId);
-        moduleWiseCounter.setCounterId(ctr.getId());
-        moduleWiseCounter.setModuleId(moduleId2);
-        moduleWiseCounter = save(moduleWiseCounter);
+        moduleCounter.setId(modulewiseCounterId2);
+        moduleCounter.setCountryId(countryId);
+        moduleCounter.setCounterId(ctr.getId());
+        moduleCounter.setModuleId(moduleId2);
+        moduleCounter = save(moduleCounter);
 
-        UnitRoleWiseCounter unitRoleWiseCounter = new UnitRoleWiseCounter(unitId, roleId, modulewiseCounterId);
-        unitRoleWiseCounter.setId(unitRoleCounterId);
-        unitRoleWiseCounter = save(unitRoleWiseCounter);
+        UnitRoleCounter unitRoleCounter = new UnitRoleCounter(unitId, roleId, modulewiseCounterId);
+        unitRoleCounter.setId(unitRoleCounterId);
+        unitRoleCounter = save(unitRoleCounter);
 
-        unitRoleWiseCounter = new UnitRoleWiseCounter(unitId, roleId, modulewiseCounterId2);
-        unitRoleWiseCounter = save(unitRoleWiseCounter);
+        unitRoleCounter = new UnitRoleCounter(unitId, roleId, modulewiseCounterId2);
+        unitRoleCounter = save(unitRoleCounter);
 
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("roleId").is(roleId).and("unitId").is(unitId)),
-                Aggregation.lookup("moduleWiseCounter","refCounterId", "_id", "refCounter"),
+                Aggregation.lookup("moduleCounter","refCounterId", "_id", "refCounter"),
                 Aggregation.project().and("refCounter").arrayElementAt(0).as("refCounter"),
                 Aggregation.match(Criteria.where("refCounter.moduleId").is("module_1")),
                 Aggregation.lookup("counter", "refCounter.counterId", "_id","counterDef" ),
@@ -98,7 +98,7 @@ public class CounterManagementTest extends MongoBaseService {
 
         );
 
-        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, UnitRoleWiseCounter.class, Map.class);
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, Map.class);
         ObjectMapper om = new ObjectMapper();
         System.out.println("results: "+om.convertValue(results.getMappedResults().get(0), Map.class));
 

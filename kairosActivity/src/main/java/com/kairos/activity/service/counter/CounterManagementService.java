@@ -1,11 +1,11 @@
 package com.kairos.activity.service.counter;
 
+import com.kairos.activity.client.counter.*;
 import com.kairos.activity.component.counter.CounterServiceMapping;
 import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.counter.*;
 import com.kairos.activity.persistence.repository.counter.CounterRepository;
-import com.kairos.activity.response.dto.counter.*;
 import com.kairos.activity.service.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,31 +86,31 @@ public class CounterManagementService extends MongoBaseService{
 
     //configuration for modulewise counters cofigurable at country level
 
-    public List<ModulewiseCounterGroupingDTO> getModulewiseCountersForCountry(BigInteger countryId){
-        return counterRepository.getModulewiseCounterDTOsForCountry(countryId);
+    public List<ModuleCounterGroupingDTO> getModuleCountersForCountry(BigInteger countryId){
+        return counterRepository.getModuleCounterDTOsForCountry(countryId);
     }
 
-    public List<ModuleWiseCounter> getModuleAndModuleCounterMappingForCountry(BigInteger countryId){
-        return counterRepository.getModulewiseCountersForCountry(countryId);
+    public List<ModuleCounter> getModuleAndModuleCounterMappingForCountry(BigInteger countryId){
+        return counterRepository.getModuleCountersForCountry(countryId);
     }
 
-    public void storeModuleWiseCounters(List<ModulewiseCounterGroupingDTO> modulesCounterMapping, BigInteger countryId){
+    public void storeModuleCounters(List<ModuleCounterGroupingDTO> modulesCounterMapping, BigInteger countryId){
         Map<String, Map<BigInteger, BigInteger>> moduleLevelCountersIdMap = getModuleLevelCountersIdMap(countryId);
-        for(ModulewiseCounterGroupingDTO moduleCountersData : modulesCounterMapping){
+        for(ModuleCounterGroupingDTO moduleCountersData : modulesCounterMapping){
             Map<BigInteger, BigInteger> counterIdMap = moduleLevelCountersIdMap.get(moduleCountersData.getModuleId());
             ManipulatableCounterIdsDTO counterIdsToModify = getCounterIdsToAddAndUpdate(counterIdMap, moduleCountersData.getCounterIds());
-            removeModulewiseCounters(counterIdsToModify.getCounterIdsToRemove(), moduleCountersData.getModuleId(), countryId);
-            storeModulewiseCounters(countryId, moduleCountersData.getModuleId(), counterIdsToModify.getCounterIdsToAdd());
+            removeModuleCounters(counterIdsToModify.getCounterIdsToRemove(), moduleCountersData.getModuleId(), countryId);
+            storeModuleCounters(countryId, moduleCountersData.getModuleId(), counterIdsToModify.getCounterIdsToAdd());
         }
     }
 
-    private void storeModulewiseCounters(BigInteger countryId, String moduleId, List<BigInteger> counterIds){
-        List<ModuleWiseCounter> moduleWiseCounterList = new ArrayList<>();
+    private void storeModuleCounters(BigInteger countryId, String moduleId, List<BigInteger> counterIds){
+        List<ModuleCounter> moduleCounterList = new ArrayList<>();
         for(BigInteger counterId: counterIds){
-            ModuleWiseCounter moduleWiseCounter = new ModuleWiseCounter(countryId, moduleId, counterId);
-            moduleWiseCounterList.add(moduleWiseCounter);
+            ModuleCounter moduleCounter = new ModuleCounter(countryId, moduleId, counterId);
+            moduleCounterList.add(moduleCounter);
         }
-        save(moduleWiseCounterList);
+        save(moduleCounterList);
     }
 
     private  ManipulatableCounterIdsDTO getCounterIdsToAddAndUpdate(Map<BigInteger, BigInteger> idMap, List<BigInteger> currentRefCounterIds){
@@ -126,68 +126,68 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     private Map<String, Map<BigInteger, BigInteger>> getModuleLevelCountersIdMap(BigInteger countryId){
-        List<ModulewiseCounterGroupingDTO> modulewiseCounterGroupingDTOList = counterRepository.getModulewiseCounterDTOsForCountry(countryId);
+        List<ModuleCounterGroupingDTO> moduleCounterGroupingDTOList = counterRepository.getModuleCounterDTOsForCountry(countryId);
         Map<String, Map<BigInteger, BigInteger>> moduleLevelCountersIdMap = new HashMap<>();
-        for(ModulewiseCounterGroupingDTO modulewiseCounterGroupingDTO : modulewiseCounterGroupingDTOList){
+        for(ModuleCounterGroupingDTO moduleCounterGroupingDTO : moduleCounterGroupingDTOList){
             Map<BigInteger, BigInteger> idMap = new HashMap<>();
-            for(BigInteger counterId : modulewiseCounterGroupingDTO.getCounterIds()){
+            for(BigInteger counterId : moduleCounterGroupingDTO.getCounterIds()){
                 idMap.put(counterId, counterId);
             }
-            moduleLevelCountersIdMap.put(modulewiseCounterGroupingDTO.getModuleId(), idMap);
+            moduleLevelCountersIdMap.put(moduleCounterGroupingDTO.getModuleId(), idMap);
         }
         return moduleLevelCountersIdMap;
     }
 
-    private void removeModulewiseCounters(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
+    private void removeModuleCounters(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
         //TODO:
-        List<BigInteger> moduleWiseCountersIds = counterRepository.getModuleWiseCountersIds(refCounterIds, moduleId, countryId);
-        counterRepository.removeAll("refCounterId", moduleWiseCountersIds, UnitRoleWiseCounter.class);
-        counterRepository.removeAll("_id", moduleWiseCountersIds, ModuleWiseCounter.class);
+        List<BigInteger> moduleCountersIds = counterRepository.getModuleCountersIds(refCounterIds, moduleId, countryId);
+        counterRepository.removeAll("refCounterId", moduleCountersIds, UnitRoleCounter.class);
+        counterRepository.removeAll("_id", moduleCountersIds, ModuleCounter.class);
     }
 
     ////////////////////////////////////////////////////////
 
     //get role wise moduleCounterId mapping
-    public List<RolewiseCounterDTO> getRolewiseCounterMapping(BigInteger unitId){
+    public List<RoleCounterDTO> getRoleCounterMapping(BigInteger unitId){
         return counterRepository.getRoleAndModuleCounterIdMapping(unitId);
     }
 
-    private Map<BigInteger, Map<BigInteger, BigInteger>> getRolewiseCounterIdMapping(BigInteger unitId){
-        List<RolewiseCounterDTO> rolewiseCounterDTOs = getRolewiseCounterMapping(unitId);
+    private Map<BigInteger, Map<BigInteger, BigInteger>> getRoleCounterIdMapping(BigInteger unitId){
+        List<RoleCounterDTO> roleCounterDTOS = getRoleCounterMapping(unitId);
         Map<BigInteger, Map<BigInteger, BigInteger>> roleLevelCountersIdMap = new HashMap<>();
-        for(RolewiseCounterDTO rolewiseCounterDTO: rolewiseCounterDTOs){
+        for(RoleCounterDTO roleCounterDTO : roleCounterDTOS){
             Map<BigInteger, BigInteger> idMap = new HashMap<>();
-            for(BigInteger modulewiseCounterId : rolewiseCounterDTO.getModulewiseCounterIds()){
-                idMap.put(modulewiseCounterId, modulewiseCounterId);
+            for(BigInteger moduleCounterId : roleCounterDTO.getModuleCounterIds()){
+                idMap.put(moduleCounterId, moduleCounterId);
             }
-            roleLevelCountersIdMap.put(rolewiseCounterDTO.getRoleId(), idMap);
+            roleLevelCountersIdMap.put(roleCounterDTO.getRoleId(), idMap);
         }
         return roleLevelCountersIdMap;
     }
 
-    public void storeRolewiseCountersForUnit(List<RolewiseCounterDTO> rolewiseCounterDTOs, BigInteger unitId){
-        Map<BigInteger, Map<BigInteger, BigInteger>> roleLevelCountersIdMap = getRolewiseCounterIdMapping(unitId);
+    public void storeRoleCountersForUnit(List<RoleCounterDTO> roleCounterDTOS, BigInteger unitId){
+        Map<BigInteger, Map<BigInteger, BigInteger>> roleLevelCountersIdMap = getRoleCounterIdMapping(unitId);
 //        Map<BigInteger, BigInteger> baseCounterIdMapping = *//
-        for(RolewiseCounterDTO rolewiseCounterDTO : rolewiseCounterDTOs){
-            Map<BigInteger, BigInteger> refCountersIdMap = roleLevelCountersIdMap.get(rolewiseCounterDTO.getRoleId());
-            ManipulatableCounterIdsDTO counterRefsToModify = getCounterIdsToAddAndUpdate(refCountersIdMap, rolewiseCounterDTO.getModulewiseCounterIds());
-            removeRolewiseCounterForUnit(rolewiseCounterDTO.getRoleId(), counterRefsToModify.getCounterIdsToRemove());
-            addRolewiseCounterRefsForUnit(unitId, rolewiseCounterDTO.getRoleId(), counterRefsToModify.getCounterIdsToAdd());
+        for(RoleCounterDTO roleCounterDTO : roleCounterDTOS){
+            Map<BigInteger, BigInteger> refCountersIdMap = roleLevelCountersIdMap.get(roleCounterDTO.getRoleId());
+            ManipulatableCounterIdsDTO counterRefsToModify = getCounterIdsToAddAndUpdate(refCountersIdMap, roleCounterDTO.getModuleCounterIds());
+            removeRoleCounterForUnit(roleCounterDTO.getRoleId(), counterRefsToModify.getCounterIdsToRemove());
+            addRoleCounterRefsForUnit(unitId, roleCounterDTO.getRoleId(), counterRefsToModify.getCounterIdsToAdd());
         }
     }
 
-    public void removeRolewiseCounterForUnit(BigInteger roleId, List<BigInteger> counterRefsToRemove){
+    public void removeRoleCounterForUnit(BigInteger roleId, List<BigInteger> counterRefsToRemove){
         //TODO: removal of counters
-        counterRepository.removeRoleWiseCounters(roleId, counterRefsToRemove);
+        counterRepository.removeRoleCounters(roleId, counterRefsToRemove);
     }
 
-    public void addRolewiseCounterRefsForUnit(BigInteger unitId, BigInteger roleId, List<BigInteger> countersRefToAdd){
-        List<UnitRoleWiseCounter> roleWiseCountersToAdd = new ArrayList<>();
+    public void addRoleCounterRefsForUnit(BigInteger unitId, BigInteger roleId, List<BigInteger> countersRefToAdd){
+        List<UnitRoleCounter> roleCountersToAdd = new ArrayList<>();
         for(BigInteger counterIdRef : countersRefToAdd){
-            UnitRoleWiseCounter unitRoleWiseCounter = new UnitRoleWiseCounter(unitId, roleId, counterIdRef);
-            roleWiseCountersToAdd.add(unitRoleWiseCounter);
+            UnitRoleCounter unitRoleCounter = new UnitRoleCounter(unitId, roleId, counterIdRef);
+            roleCountersToAdd.add(unitRoleCounter);
         }
-        save(roleWiseCountersToAdd);
+        save(roleCountersToAdd);
     }
 
     ///////////////////////////////////////////////////////
@@ -196,9 +196,9 @@ public class CounterManagementService extends MongoBaseService{
 
     public void setupInitialConfigurationForUnit(BigInteger countryId, BigInteger unitId){
         List<CounterOrderDTO> orders = counterRepository.getOrderedCountersListForCountry(countryId, null);
-        List<UnitWiseCounterOrder> unitCounterOrders = new ArrayList<>();
+        List<UnitCounterOrder> unitCounterOrders = new ArrayList<>();
         for(CounterOrderDTO counterOrderDTO : orders){
-            UnitWiseCounterOrder unitCounterOrder = new UnitWiseCounterOrder(unitId,
+            UnitCounterOrder unitCounterOrder = new UnitCounterOrder(unitId,
                     counterOrderDTO.getModuleId(),
                     counterOrderDTO.getTabId(),
                     counterOrderDTO.getOrderedCounterIds());
@@ -212,14 +212,14 @@ public class CounterManagementService extends MongoBaseService{
 
     public InitialCountersDetailsDTO getInitialCounterDataForCountry(String moduleId, BigInteger countryId){
         InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
-        initialCountersDetailsDTO.setCounterDefs(counterRepository.getModuleWiseCounterDetails(moduleId, countryId));
+        initialCountersDetailsDTO.setCounterDefs(counterRepository.getModuleCounterDetails(moduleId, countryId));
         initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForCountry(countryId, moduleId));
         return initialCountersDetailsDTO;
     }
 
     public InitialCountersDetailsDTO getInitialCounterDataForUnit(String moduleId, BigInteger unitId, BigInteger countryId){
         InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
-        initialCountersDetailsDTO.setCounterDefs(counterRepository.getModuleWiseCounterDetails(moduleId, countryId));
+        initialCountersDetailsDTO.setCounterDefs(counterRepository.getModuleCounterDetails(moduleId, countryId));
         initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUnit(unitId, moduleId));
         if(initialCountersDetailsDTO.getOrderedList() == null || initialCountersDetailsDTO.getOrderedList().isEmpty())
             setupInitialConfigurationForUnit(countryId, unitId);
@@ -229,7 +229,7 @@ public class CounterManagementService extends MongoBaseService{
 
     public InitialCountersDetailsDTO getInitialCounterDataForStaff(String moduleId, BigInteger staffId, BigInteger unitId, BigInteger roleId){
         InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
-        initialCountersDetailsDTO.setCounterDefs(counterRepository.getRolewiseCounterTypeDetails(roleId, unitId, moduleId));
+        initialCountersDetailsDTO.setCounterDefs(counterRepository.getRoleCounterTypeDetails(roleId, unitId, moduleId));
         initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUser(unitId, staffId, moduleId));
         if(initialCountersDetailsDTO.getOrderedList() == null || initialCountersDetailsDTO.getOrderedList().isEmpty())
             setupInitialConfigurationForStaff(); //TODO
@@ -270,6 +270,6 @@ public class CounterManagementService extends MongoBaseService{
 
     //getCountOfCounterModuleLinks
     public long getCounterModuleLinksCount(){
-        return counterRepository.getEntityItemList(ModuleWiseCounter.class).size();
+        return counterRepository.getEntityItemList(ModuleCounter.class).size();
     }
 }
