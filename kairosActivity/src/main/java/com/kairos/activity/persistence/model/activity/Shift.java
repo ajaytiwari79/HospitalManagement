@@ -61,6 +61,7 @@ public class Shift extends MongoBaseEntity {
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
     public Shift() {
+        //dc
     }
 
 
@@ -69,7 +70,6 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.unitPositionId = unitPositionId;
     }
-
 
 
     public List<BigInteger> getBrokenRuleTemplateIds() {
@@ -196,7 +196,7 @@ public class Shift extends MongoBaseEntity {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
-    public int getMinutes(){
+    public int getMinutes() {
         return getInterval().getMinutes();
     }
 
@@ -224,8 +224,8 @@ public class Shift extends MongoBaseEntity {
         return isMainShift;
     }
 
-    public DateTimeInterval getDateTimeInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.getEndDate().getTime());
+    public DateTimeInterval getDateTimeInterval() {
+        return new DateTimeInterval(this.startDate.getTime(), this.getEndDate().getTime());
     }
 
     public void setMainShift(boolean mainShift) {
@@ -323,7 +323,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
     public Long getUnitPositionId() {
         return unitPositionId;
     }
@@ -391,7 +390,10 @@ public class Shift extends MongoBaseEntity {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
     }
-    public DateTimeInterval getInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
+
+
 }

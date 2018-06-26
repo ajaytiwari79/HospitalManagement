@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.filter;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.activity.enums.FilterType;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.List;

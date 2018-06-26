@@ -1,10 +1,9 @@
 package com.kairos.activity.client;
 
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.response.dto.OrganizationTypeHierarchyQueryResult;
-import com.kairos.activity.util.userContext.UserContext;
 import com.kairos.response.dto.web.CountryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

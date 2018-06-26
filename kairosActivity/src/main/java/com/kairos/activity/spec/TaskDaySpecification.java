@@ -1,19 +1,15 @@
 package com.kairos.activity.spec;
 
-import com.kairos.activity.persistence.model.staffing_level.Day;
+import com.kairos.enums.Day;
 import com.kairos.activity.persistence.model.task.Task;
 import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.activity.service.task_type.TaskService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
-import static com.kairos.activity.persistence.model.staffing_level.Day.*;
+import static com.kairos.enums.Day.*;
 
 /**
  * Created by prabjot on 24/11/17.

@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.activity.tabs;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Created by pavan on 7/2/18.
@@ -12,7 +13,7 @@ public class PhaseTemplateValue implements Serializable {
     private BigInteger phaseId;
     private String name;
     private String description;
-    private boolean eligibleForStaff;
+    private List<Long> eligibleEmploymentTypes;
     private boolean eligibleForManagement;
 
     public BigInteger getPhaseId() {
@@ -39,12 +40,12 @@ public class PhaseTemplateValue implements Serializable {
         this.description = description;
     }
 
-    public boolean isEligibleForStaff() {
-        return eligibleForStaff;
+    public List<Long> getEligibleEmploymentTypes() {
+        return eligibleEmploymentTypes =Optional.ofNullable(eligibleEmploymentTypes).orElse(new ArrayList<>());
     }
 
-    public void setEligibleForStaff(boolean eligibleForStaff) {
-        this.eligibleForStaff = eligibleForStaff;
+    public void setEligibleEmploymentTypes(List<Long> eligibleEmploymentTypes) {
+        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
     }
 
     public boolean isEligibleForManagement() {
@@ -59,11 +60,11 @@ public class PhaseTemplateValue implements Serializable {
 
     }
 
-    public PhaseTemplateValue(BigInteger phaseId, String name, String description, boolean eligibleForStaff, boolean eligibleForManagement) {
+    public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement) {
         this.phaseId = phaseId;
         this.name = name;
         this.description = description;
-        this.eligibleForStaff = eligibleForStaff;
+        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
         this.eligibleForManagement = eligibleForManagement;
     }
 }
