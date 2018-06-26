@@ -77,11 +77,10 @@ public class CounterRepository {
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, Map.class);
         List<Map> resultData = results.getMappedResults();
-        if(resultData.isEmpty())
-            return new ArrayList<BigInteger>();
-        if(((Map)resultData.get(0)).get("ids") == null)
-            return new ArrayList<BigInteger>();
-        List<BigInteger> ids = (List<BigInteger>)((Map)resultData.get(0)).get("ids");
+        List ids = new ArrayList();
+        if(!resultData.isEmpty() && ((Map)resultData.get(0)).get("ids") != null) {
+            ids = (List)((Map)resultData.get(0)).get("ids");
+        }
         return ids;
     }
 
