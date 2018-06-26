@@ -1,10 +1,8 @@
 package com.kairos.persistance.model.agreement_template;
 
 
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
-import com.kairos.persistance.country.Country;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 
-import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,27 +15,26 @@ import java.util.Set;
 @Document(collection = "agreement_template")
 public class PolicyAgreementTemplate extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Name cannot be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "error.agreement.description.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNull(message = "error.list.cannot.be.empty")
+    @NotNull(message = "Account types cannot be empty ")
     private Set<BigInteger> accountTypes;
 
-    @NotNull(message = "error.list.cannot.be.empty")
+    @NotNull(message = "Sections cannot be emoty")
     private Set<BigInteger> agreementSections;
 
-    @NotNull(message = "error.countryId.cannot.be.null")
     private Long countryId;
 
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
-    private List<OrganizationTypeAndServiceBasicDto> organizationServices;
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubServices;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
 
 
     public String getName() {
@@ -81,35 +78,35 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.agreementSections = agreementSections;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationServices() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDto> organizationServices) {
+    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubServices() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDto> organizationSubServices) {
+    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

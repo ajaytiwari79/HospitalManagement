@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain.activityConstraint;
 
-import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
+import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.wta.ConstraintHandler;
@@ -46,7 +46,7 @@ public class LongestDuration implements ConstraintHandler {
         this.weight = weight;
     }
 
-    public int checkConstraints(ActivityPlannerEntity activityPlannerEntity, ShiftRequestPhase shift){
+    public int checkConstraints(Activity activity, ShiftRequestPhase shift){
 
         return 0;
     }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();;
     private LocalDate validationStartDate;
     private int numberOfWeeks;
     private boolean borrowLeave;
@@ -43,11 +44,11 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
@@ -69,6 +70,11 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     public ChildCareDaysCheckWTATemplate() {
        this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
     }
 
     public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,

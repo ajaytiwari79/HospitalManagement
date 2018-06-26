@@ -2,16 +2,22 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.activity.util.DateTimeInterval;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.kairos.activity.util.WTARuleTemplateValidatorUtility.*;
 
 
 /**
@@ -23,12 +29,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
-    private double maximumVetoPercentage;
-    private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> activityIds ;
+    private List<BigInteger> activityIds = new ArrayList<>();
     private int numberOfWeeks;
     private LocalDate validationStartDate;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
@@ -57,14 +60,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
     public float getRecommendedValue() {
         return recommendedValue;
     }
@@ -83,13 +78,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.activityIds = activityIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -99,26 +87,34 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public double getMaximumVetoPercentage() {
-        return maximumVetoPercentage;
-    }
-
-    public void setMaximumVetoPercentage(double maximumVetoPercentage) {
-        this.maximumVetoPercentage = maximumVetoPercentage;
-    }
 
     public VetoPerPeriodWTATemplate(String name, boolean disabled,
-                                    String description, double maximumVetoPercentage) {
+                                    String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.maximumVetoPercentage = maximumVetoPercentage;
         wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
 
     }
 
     public VetoPerPeriodWTATemplate() {
         wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
+    }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivity().getId())) {
+            DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
+            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
+            shifts = filterShifts(shifts, null, null, activityIds);
+            shifts.add(infoWrapper.getShift());
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+            boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
+            if (!isValid) {
+                throw new InvalidRequestException(getName() + " is Broken");
+            }
+        }
+        return "";
     }
 
 }

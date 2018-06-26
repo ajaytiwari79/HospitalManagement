@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ResponsibilityType;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -27,9 +27,9 @@ public class ResponsibilityTypeService extends MongoBaseService {
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
 
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId, List<ResponsibilityType> rsponsibilityTypes) {
+    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
+
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-        List<ResponsibilityType> existing = new ArrayList<>();
         List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (rsponsibilityTypes.size() != 0) {
@@ -40,7 +40,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            existing = responsibilityTypeMongoRepository.findByCountryAndNameList(countryId, names);
+            List<ResponsibilityType> existing = responsibilityTypeMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
             existing.forEach(item -> names.remove(item.getName()));
             if (names.size() != 0) {
                 for (String name : names) {
@@ -48,6 +48,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
                     ResponsibilityType newResponsibilityType = new ResponsibilityType();
                     newResponsibilityType.setName(name);
                     newResponsibilityType.setCountryId(countryId);
+                    newResponsibilityType.setOrganizationId(organizationId);
                     newResponsibilityTypes.add(newResponsibilityType);
 
                 }
@@ -64,14 +65,14 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
     }
 
-    public List<ResponsibilityType> getAllResponsibilityType() {
-        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(UserContext.getCountryId());
+    public List<ResponsibilityType> getAllResponsibilityType(Long countryId,Long organizationId) {
+        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,organizationId);
     }
 
 
-    public ResponsibilityType getResponsibilityType(Long countryId, BigInteger id) {
+    public ResponsibilityType getResponsibilityType(Long countryId,Long organizationId,BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId, id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -81,9 +82,9 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteResponsibilityType(BigInteger id) {
+    public Boolean deleteResponsibilityType(Long countryId,Long organizationId,BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByid(id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -95,11 +96,14 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public ResponsibilityType updateResponsibilityType(BigInteger id, ResponsibilityType responsibilityType) {
+    public ResponsibilityType updateResponsibilityType(Long countryId,Long organizationId,BigInteger id, ResponsibilityType responsibilityType) {
 
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(UserContext.getCountryId(),responsibilityType.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId,organizationId,responsibilityType.getName());
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+responsibilityType.getName());
         } else {
             exist=responsibilityTypeMongoRepository.findByid(id);
@@ -110,11 +114,11 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public ResponsibilityType getResponsibilityTypeByName(Long countryId, String name) {
+    public ResponsibilityType getResponsibilityTypeByName(Long countryId,Long organizationId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId, name);
+            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId,organizationId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

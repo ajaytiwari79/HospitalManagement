@@ -28,6 +28,11 @@ public class DateTimeInterval {
         this.end = end.toInstant().toEpochMilli();
     }
 
+    public DateTimeInterval(Date start, Date end) {
+        this.start = start.getTime();
+        this.end = end.getTime();
+    }
+
     public DateTimeInterval(Long start, Long end) {
         this.start = start;
         this.end = end;
@@ -178,7 +183,7 @@ public class DateTimeInterval {
     }
 
     public boolean containsInterval(DateTimeInterval interval){
-        return this.start>=interval.getStartMillis() && this.end>=interval.getEndMillis();
+        return this.start<=interval.getStartMillis() && this.end>=interval.getEndMillis();
     }
 
     public int getMinutes(){

@@ -7,31 +7,49 @@ package com.kairos.response.dto.web.client;
 
 public class VRPClientDTO {
 
-    private int intallationNo;
-    private Double lattitude;
+    private String firstName;
+    private Long id;
+    private Long installationNumber;
+    private Double latitude;
     private Double longitude;
-    private int duration;
     private String streetName;
-    private int houseNo;
+    private int houseNumber;
     private String block;
-    private int floorNo;
-    private int post;
+    private int floorNumber;
+    private int zipCode;
     private String city;
 
-    public int getIntallationNo() {
-        return intallationNo;
+
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setIntallationNo(int intallationNo) {
-        this.intallationNo = intallationNo;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Long getId() {
+        return id;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getInstallationNumber() {
+        return installationNumber;
+    }
+
+    public void setInstallationNumber(Long installationNumber) {
+        this.installationNumber = installationNumber;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {
@@ -42,13 +60,6 @@ public class VRPClientDTO {
         this.longitude = longitude;
     }
 
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
 
     public String getStreetName() {
         return streetName;
@@ -58,12 +69,12 @@ public class VRPClientDTO {
         this.streetName = streetName;
     }
 
-    public int getHouseNo() {
-        return houseNo;
+    public int getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setHouseNo(int houseNo) {
-        this.houseNo = houseNo;
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public String getBlock() {
@@ -74,20 +85,20 @@ public class VRPClientDTO {
         this.block = block;
     }
 
-    public int getFloorNo() {
-        return floorNo;
+    public int getFloorNumber() {
+        return floorNumber;
     }
 
-    public void setFloorNo(int floorNo) {
-        this.floorNo = floorNo;
+    public void setFloorNumber(int floorNumber) {
+        this.floorNumber = floorNumber;
     }
 
-    public int getPost() {
-        return post;
+    public int getZipCode() {
+        return zipCode;
     }
 
-    public void setPost(int post) {
-        this.post = post;
+    public void setZipCode(int zipCode) {
+        this.zipCode = zipCode;
     }
 
     public String getCity() {

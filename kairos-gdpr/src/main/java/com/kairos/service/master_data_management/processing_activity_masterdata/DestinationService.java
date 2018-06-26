@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.processing_activity_masterdata;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.Destination;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DestinationMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -27,9 +27,9 @@ public class DestinationService extends MongoBaseService {
     private DestinationMongoRepository destinationMongoRepository;
 
 
-    public Map<String, List<Destination>> createDestination(Long countryId, List<Destination> destinations) {
+    public Map<String, List<Destination>> createDestination(Long countryId, Long organizationId, List<Destination> destinations) {
+
         Map<String, List<Destination>> result = new HashMap<>();
-        List<Destination> existing = new ArrayList<>();
         List<Destination> newDestinations = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (destinations.size() != 0) {
@@ -40,7 +40,7 @@ public class DestinationService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            existing = destinationMongoRepository.findByCountryAndNameList(countryId, names);
+            List<Destination> existing = destinationMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
             existing.forEach(item -> names.remove(item.getName()));
 
             if (names.size() != 0) {
@@ -49,6 +49,7 @@ public class DestinationService extends MongoBaseService {
                     Destination newDestination = new Destination();
                     newDestination.setName(name);
                     newDestination.setCountryId(countryId);
+                    newDestination.setOrganizationId(organizationId);
                     newDestinations.add(newDestination);
 
                 }
@@ -65,14 +66,14 @@ public class DestinationService extends MongoBaseService {
 
     }
 
-    public List<Destination> getAllDestination() {
-        return destinationMongoRepository.findAllDestinations(UserContext.getCountryId());
+    public List<Destination> getAllDestination(Long countryId, Long organizationId) {
+        return destinationMongoRepository.findAllDestinations(countryId, organizationId);
     }
 
 
-    public Destination getDestination(Long countryId, BigInteger id) {
+    public Destination getDestination(Long countryId, Long organizationId, BigInteger id) {
 
-        Destination exist = destinationMongoRepository.findByIdAndNonDeleted(countryId, id);
+        Destination exist = destinationMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -82,9 +83,9 @@ public class DestinationService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDestination(BigInteger id) {
+    public Boolean deleteDestination(Long countryId, Long organizationId, BigInteger id) {
 
-        Destination exist = destinationMongoRepository.findByid(id);
+        Destination exist = destinationMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -96,14 +97,17 @@ public class DestinationService extends MongoBaseService {
     }
 
 
-    public Destination updateDestination(BigInteger id, Destination destination) {
+    public Destination updateDestination(Long countryId, Long organizationId, BigInteger id, Destination destination) {
 
 
-        Destination exist = destinationMongoRepository.findByName(UserContext.getCountryId(),destination.getName());
+        Destination exist = destinationMongoRepository.findByName(countryId, organizationId, destination.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data  exist for  "+destination.getName());
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
+            throw new DuplicateDataException("data  exist for  " + destination.getName());
         } else {
-            exist=destinationMongoRepository.findByid(id);
+            exist = destinationMongoRepository.findByid(id);
             exist.setName(destination.getName());
             return save(exist);
 
@@ -111,11 +115,11 @@ public class DestinationService extends MongoBaseService {
     }
 
 
-    public Destination getDestinationByName(Long countryId, String name) {
+    public Destination getDestinationByName(Long countryId, Long organizationId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            Destination exist = destinationMongoRepository.findByName(countryId, name);
+            Destination exist = destinationMongoRepository.findByName(countryId, organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

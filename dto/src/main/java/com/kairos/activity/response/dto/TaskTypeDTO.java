@@ -28,8 +28,18 @@ public class TaskTypeDTO {
 
     private Boolean status;
     private int duration;
-    private long serviceId;
+    private Long serviceId;
     private String parentTaskTypeId;
+    private String colorForGantt;
+
+
+    public String getColorForGantt() {
+        return colorForGantt;
+    }
+
+    public void setColorForGantt(String colorForGantt) {
+        this.colorForGantt = colorForGantt;
+    }
 
     private List<BigInteger> tags = new ArrayList<>();
 
@@ -45,11 +55,11 @@ public class TaskTypeDTO {
         //default constructor
     }
 
-    public long getServiceId() {
+    public Long getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(long serviceId) {
+    public void setServiceId(Long serviceId) {
         this.serviceId = serviceId;
     }
 

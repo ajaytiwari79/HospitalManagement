@@ -1,0 +1,19 @@
+package com.kairos.activity.controller.counters;
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import static com.kairos.activity.constants.ApiConstants.COUNTER_DATA_URL;
+
+@RestController
+@RequestMapping(COUNTER_DATA_URL)
+public class CounterDataController {
+
+    @GetMapping
+    public void getCounterData(@RequestParam String moduleId){
+
+    }
+}

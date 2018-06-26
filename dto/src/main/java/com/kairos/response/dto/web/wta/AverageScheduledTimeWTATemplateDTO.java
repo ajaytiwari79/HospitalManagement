@@ -6,6 +6,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,15 +20,28 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long intervalLength;
     private String intervalUnit;
-    private long validationStartDateMillis;
-    private boolean balanceAdjustment;
-    private boolean useShiftTimes;
-    private long maximumAvgTime;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
 
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -71,42 +85,15 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalLength = intervalLength;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
 
-
-    public boolean isBalanceAdjustment() {
-        return balanceAdjustment;
-    }
-
-    public void setBalanceAdjustment(boolean balanceAdjustment) {
-        this.balanceAdjustment = balanceAdjustment;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-    public boolean isUseShiftTimes() {
-        return useShiftTimes;
-    }
-
-    public void setUseShiftTimes(boolean useShiftTimes) {
-        this.useShiftTimes = useShiftTimes;
-    }
 
     public AverageScheduledTimeWTATemplateDTO(String name, boolean disabled,
                                               String description, long intervalLength, long validationStartDateMillis
             , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
         this.intervalLength = intervalLength;
-        this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.balanceAdjustment=balanceAdjustment;
-        this.useShiftTimes =useShiftTimes;
-        this.maximumAvgTime=maximumAvgTime;
         this.intervalUnit=intervalUnit;
 
     }
@@ -119,13 +106,6 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalUnit = intervalUnit;
     }
 
-    public long getMaximumAvgTime() {
-        return maximumAvgTime;
-    }
-
-    public void setMaximumAvgTime(long maximumAvgTime) {
-        this.maximumAvgTime = maximumAvgTime;
-    }
 
     public AverageScheduledTimeWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;

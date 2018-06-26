@@ -158,11 +158,12 @@ public class LocationService {
 
     public Map<Integer,Map<Integer,LocationInfo>> getLocationMap(){
         List<LocationDistance> locationDistances = locationRepository.findAll();
-        Map<Integer,List<LocationDistance>> locationMap = locationDistances.stream().collect(Collectors.groupingBy(l->l.getFirstInstallationNo(),Collectors.toList()));
+        Map<Long,List<LocationDistance>> locationMap = locationDistances.stream().collect(Collectors.groupingBy(l->l.getFirstInstallationNo(),Collectors.toList()));
         Map<Integer,Map<Integer,LocationInfo>> locationInfoMap = new HashMap<>();
+        /*
         locationMap.entrySet().forEach(l->{
             locationInfoMap.put(l.getKey(),l.getValue().stream().collect(Collectors.toMap(ld->ld.getSecondInstallationNo(),ld->new LocationInfo(ld.getSecondInstallationNo(),ld.getDistanceByCar().intValue(),(int)ld.getTimeByCar().intValue()))));
-        });
+        });*/
         return locationInfoMap;
     }
 

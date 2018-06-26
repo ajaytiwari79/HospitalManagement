@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.BreakTemplateValue;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -15,10 +16,10 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
+public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
     private List<BreakTemplateValue> breakTemplateValues;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();;
 
 
     public List<BigInteger> getTimeTypeIds() {
@@ -29,17 +30,23 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<Long> getPlannedTimeIds() {
+    public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = plannedTimeIds;
     }
 
     public BreaksInShiftWTATemplate() {
         this.wtaTemplateType = WTATemplateType.BREAK_IN_SHIFT;
     }
+
+    @Override
+    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        return "";
+    }
+
     public BreaksInShiftWTATemplate(String name,  boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {
         this.name = name;
         this.disabled = disabled;

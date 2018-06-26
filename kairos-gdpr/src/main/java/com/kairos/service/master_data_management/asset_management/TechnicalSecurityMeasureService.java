@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -27,9 +27,9 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
 
-    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
+    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, Long organizationId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
+
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
-        List<TechnicalSecurityMeasure> existing = new ArrayList<>();
         List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (techSecurityMeasures.size() != 0) {
@@ -39,20 +39,18 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            existing = technicalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, names);
+            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
             existing.forEach(item -> names.remove(item.getName()));
 
             if (names.size() != 0) {
                 for (String name : names) {
-
                     TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure();
                     newTechnicalSecurityMeasure.setName(name);
                     newTechnicalSecurityMeasure.setCountryId(countryId);
+                    newTechnicalSecurityMeasure.setOrganizationId(organizationId);
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-
-
                 newTechnicalMeasures = save(newTechnicalMeasures);
             }
             result.put("existing", existing);
@@ -65,14 +63,14 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public List<TechnicalSecurityMeasure> getAllTechnicalSecurityMeasure() {
-        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(UserContext.getCountryId());
+    public List<TechnicalSecurityMeasure> getAllTechnicalSecurityMeasure(Long countryId, Long organizationId) {
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId, organizationId);
     }
 
 
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, BigInteger id) {
+    public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, Long organizationId, BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -82,9 +80,9 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public Boolean deleteTechnicalSecurityMeasure(BigInteger id) {
+    public Boolean deleteTechnicalSecurityMeasure(Long countryId, Long organizationId, BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByid(id);
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -96,12 +94,15 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(BigInteger id, TechnicalSecurityMeasure techSecurityMeasure) {
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(UserContext.getCountryId(),techSecurityMeasure.getName());
+    public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(Long countryId, Long organizationId, BigInteger id, TechnicalSecurityMeasure techSecurityMeasure) {
+        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, organizationId, techSecurityMeasure.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            throw new DuplicateDataException("data  exist for  "+techSecurityMeasure.getName());
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
+            throw new DuplicateDataException("data  exist for  " + techSecurityMeasure.getName());
         } else {
-            exist=technicalSecurityMeasureMongoRepository.findByid(id);
+            exist = technicalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(techSecurityMeasure.getName());
             return save(exist);
 
@@ -109,11 +110,10 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, String name) {
-
+    public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, Long organizationId, String name) {
 
         if (!StringUtils.isBlank(name)) {
-            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByName(countryId, name);
+            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

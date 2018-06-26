@@ -4,14 +4,16 @@ package com.kairos.activity.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.util.DateTimeInterval;
+import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftState;
+import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,9 +52,10 @@ public class Shift extends MongoBaseEntity {
 
     private Long unitPositionId;
     private ShiftState shiftState;
+    private List<BigInteger> brokenRuleTemplateIds;
 
     private BigInteger parentOpenShiftId;
-    Long allowedBreakDurationInMinute;
+    private Long allowedBreakDurationInMinute;
 
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
@@ -67,6 +70,15 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
+
+
+    public List<BigInteger> getBrokenRuleTemplateIds() {
+        return brokenRuleTemplateIds;
+    }
+
+    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
+        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
+    }
 
     public Shift(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
                  long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
@@ -184,6 +196,10 @@ public class Shift extends MongoBaseEntity {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
+    public int getMinutes(){
+        return getInterval().getMinutes();
+    }
+
     public String getRemarks() {
         return remarks;
     }
@@ -208,13 +224,14 @@ public class Shift extends MongoBaseEntity {
         return isMainShift;
     }
 
+    public DateTimeInterval getDateTimeInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.getEndDate().getTime());
+    }
+
     public void setMainShift(boolean mainShift) {
         isMainShift = mainShift;
     }
 
-    public DateTimeInterval getInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
-    }
 
     @Override
     public String toString() {
@@ -366,6 +383,7 @@ public class Shift extends MongoBaseEntity {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
     }
-
-
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+    }
 }

@@ -1,10 +1,10 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.repository.master_data_management.asset_management.DataDisposalMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -27,9 +27,9 @@ public class DataDisposalService extends MongoBaseService {
     private DataDisposalMongoRepository dataDisposalMongoRepository;
 
 
-    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, List<DataDisposal> dataDisposals) {
+    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId,Long organizationId, List<DataDisposal> dataDisposals) {
+
         Map<String, List<DataDisposal>> result = new HashMap<>();
-        List<DataDisposal> existing = new ArrayList<>();
         List<DataDisposal> newDataDisposals = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (dataDisposals.size() != 0) {
@@ -40,7 +40,7 @@ public class DataDisposalService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            existing = dataDisposalMongoRepository.findByCountryAndNameList(countryId, names);
+            List<DataDisposal> existing = dataDisposalMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
             existing.forEach(item -> names.remove(item.getName()));
             if (names.size() != 0) {
                 for (String name : names) {
@@ -48,6 +48,7 @@ public class DataDisposalService extends MongoBaseService {
                     DataDisposal newDataDisposal = new DataDisposal();
                     newDataDisposal.setName(name);
                     newDataDisposal.setCountryId(countryId);
+                    newDataDisposal.setOrganizationId(organizationId);
                     newDataDisposals.add(newDataDisposal);
 
                 }
@@ -63,14 +64,14 @@ public class DataDisposalService extends MongoBaseService {
 
     }
 
-    public List<DataDisposal> getAllDataDisposal() {
-        return dataDisposalMongoRepository.findAllDataDisposals(UserContext.getCountryId());
+    public List<DataDisposal> getAllDataDisposal(Long countryId,Long organizationId) {
+        return dataDisposalMongoRepository.findAllDataDisposals(countryId,organizationId);
     }
 
 
-    public DataDisposal getDataDisposalById(Long countryId, BigInteger id) {
+    public DataDisposal getDataDisposalById(Long countryId,Long organizationId, BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
+        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -80,9 +81,9 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataDisposalById(BigInteger id) {
+    public Boolean deleteDataDisposalById(Long countryId,Long organizationId,BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByid(id);
+        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -94,11 +95,14 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public DataDisposal updateDataDisposal(BigInteger id, DataDisposal dataDisposal) {
+    public DataDisposal updateDataDisposal(Long countryId,Long organizationId,BigInteger id, DataDisposal dataDisposal) {
 
 
-        DataDisposal exist = dataDisposalMongoRepository.findByName(UserContext.getCountryId(),dataDisposal.getName());
+        DataDisposal exist = dataDisposalMongoRepository.findByName(countryId,organizationId,dataDisposal.getName());
         if (Optional.ofNullable(exist).isPresent()) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+dataDisposal.getName());
         } else {
             exist=dataDisposalMongoRepository.findByid(id);
@@ -109,11 +113,11 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public DataDisposal getDataDisposalByName(Long countryId, String name) {
+    public DataDisposal getDataDisposalByName(Long countryId,Long organizationId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, name);
+            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId,organizationId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

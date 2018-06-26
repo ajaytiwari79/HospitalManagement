@@ -12,12 +12,14 @@ import org.optaplanner.core.api.domain.solution.drools.ProblemFactProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
 @PlanningSolution
 public class VrpTaskPlanningSolution {
     private String id;
+    private BigInteger solverConfigId;
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "shifts")
     private List<Shift> shifts;
@@ -30,6 +32,15 @@ public class VrpTaskPlanningSolution {
     private LocationsDistanceMatrix locationsDistanceMatrix;
     @PlanningScore
     private HardMediumSoftLongScore hardMediumSoftScore;
+
+
+    public BigInteger getSolverConfigId() {
+        return solverConfigId;
+    }
+
+    public void setSolverConfigId(BigInteger solverConfigId) {
+        this.solverConfigId = solverConfigId;
+    }
 
     public String getId() {
         return id;

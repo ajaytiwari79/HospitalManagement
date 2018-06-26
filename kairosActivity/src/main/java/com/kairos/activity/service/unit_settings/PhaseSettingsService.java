@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PhaseSettingsService extends MongoBaseService {
@@ -30,7 +31,12 @@ public class PhaseSettingsService extends MongoBaseService {
         return phaseSettingsDTOS;
     }
 
+
+
     public boolean createDefaultPhaseSettings(Long unitId, List<Phase> phases){
+        if (!Optional.ofNullable(phases).isPresent()){
+            phases=ObjectMapperUtils.copyProperties(phaseService.getPhasesByUnit(unitId),Phase.class);
+        }
         List<PhaseSettings> phaseSettings=new ArrayList<>();
         phases.forEach(phase -> {
             PhaseSettings phaseSetting=new PhaseSettings(phase.getId(),phase.getName(),phase.getDescription(),true,true,true,true,unitId);

@@ -5,6 +5,6 @@ package com.kairos.persistence.model.user.agreement.cta;
  */
 public enum CalculationFor {
 
-    SCHEDULED_HOURS, BONUS_HOURS, FUNCTIONS
+    SCHEDULED_HOURS, BONUS_HOURS, FUNCTIONS, BALANCE_TYPE
 
 }

@@ -11,7 +11,7 @@ import com.kairos.activity.persistence.repository.night_worker.StaffQuestionnair
 import com.kairos.activity.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.activity.spec.ActivitySpecification;
+import com.kairos.activity.spec.Specification;
 import com.kairos.activity.spec.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.activity.spec.night_worker.StaffNonPregnancySpecification;
 import com.kairos.activity.util.DateUtils;
@@ -184,10 +184,10 @@ public class NightWorkerService extends MongoBaseService {
         List<Long> staffIdsEligibleForNightWorker = new ArrayList<>();
         List<Long> staffIdsNotEligibleForNightWorker = new ArrayList<>();
         staffList.stream().forEach(staffDTO -> {
-            ActivitySpecification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(unitAgeSetting.getYounger(),
+            Specification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(unitAgeSetting.getYounger(),
                     unitAgeSetting.getOlder());
-            ActivitySpecification<StaffDTO> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
-            ActivitySpecification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.and(nightWorkerPregnancySpecification);
+            Specification<StaffDTO> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
+            Specification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.and(nightWorkerPregnancySpecification);
 
             if(rulesSpecification.isSatisfied(staffDTO)){
                 staffIdsEligibleForNightWorker.add(staffDTO.getId());

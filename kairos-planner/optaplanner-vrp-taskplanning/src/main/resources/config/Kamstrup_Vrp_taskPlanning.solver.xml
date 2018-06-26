@@ -1,17 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-    <environmentMode>FULL_ASSERT</environmentMode>
+    <!--<environmentMode>FULL_ASSERT</environmentMode>-->
+    <!--<environmentMode>FAST_ASSERT</environmentMode>-->
     <solutionClass>com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution</solutionClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.TaskOrShift</entityClass>
-    <!--<entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>-->
+    <entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>
     <scoreDirectorFactory>
         <scoreDrl>drl/vrp_task_rules.drl</scoreDrl>
         <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
     </scoreDirectorFactory>
-    <constructionHeuristic/>
-    <localSearch/>
+    <constructionHeuristic>
+
+        <queuedEntityPlacer>
+            <entitySelector id="taskChainEntitySelector">
+                <entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+
+                <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
+                <valueSelector>
+                    <variableName>prevTaskOrShift</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>
+    <localSearch>
+    <unionMoveSelector>
+        <changeMoveSelector></changeMoveSelector>
+             <!--<selectedCountLimit>1000</selectedCountLimit>-->
+        <swapMoveSelector></swapMoveSelector>
+            <!-- <selectedCountLimit>100</selectedCountLimit>-->
+        <subChainChangeMoveSelector>
+            <!--<entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
+            <subChainSelector>
+                <valueSelector>
+                    <variableName>previousTaskOrShift</variableName>
+                </valueSelector>
+                <minimumSubChainSize>1</minimumSubChainSize>
+                <maximumSubChainSize>4</maximumSubChainSize>
+            </subChainSelector>
+            <selectReversingMoveToo>true</selectReversingMoveToo>
+            <filterClass>com.kairos.planning.domain.TaskChainChangeMoveFilter</filterClass>-->
+        </subChainChangeMoveSelector>
+        <subChainSwapMoveSelector>
+        <!--<entityClass>com.kairos.planner.vrp.taskplanning.model.Task</entityClass>
+        <subChainSelector>
+            <valueSelector>
+                <variableName>previousTaskOrShift</variableName>
+            </valueSelector>
+            <minimumSubChainSize>1</minimumSubChainSize>
+            <maximumSubChainSize>4</maximumSubChainSize>
+        </subChainSelector>
+        <selectReversingMoveToo>true</selectReversingMoveToo>
+        <filterClass>com.kairos.planning.domain.TaskChainSwapMoveFilter</filterClass>-->
+        </subChainSwapMoveSelector>
+    </unionMoveSelector>
+        <acceptor>
+            <lateAcceptanceSize>2000</lateAcceptanceSize>
+        </acceptor>
+        <forager>
+            <acceptedCountLimit>20</acceptedCountLimit>
+        </forager>
+    </localSearch>
+
     <termination>
-        <secondsSpentLimit>10</secondsSpentLimit>
+        <secondsSpentLimit>60</secondsSpentLimit>
     </termination>
 </solver>

@@ -1,12 +1,14 @@
 package com.kairos.persistance.model.master_data_management.data_category_element;
 
 
-import com.kairos.dto.OrganizationTypeAndServiceBasicDto;
+import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -16,15 +18,22 @@ public class DataSubjectMapping extends MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "name cannotbe null or empty")
+    @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "description cannotbe null or empty")
+    @NotNullOrEmpty(message = "Description Cannot be empty")
     private String description;
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationTypes;
+    @NotEmpty(message = "Organization Type cannot be empty")
+    @NotNull(message = "Organization Type cannot null")
+    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
 
-    private List<OrganizationTypeAndServiceBasicDto> organizationSubTypes;
+    @NotEmpty(message = "Organization Type cannot be empty")
+    @NotNull(message = "Organization Sub Type cannot be empty")
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
 
+    @NotNull(message = "Data category cannot null")
+    @NotEmpty(message = "Data Category cannot be empty")
     private Set<BigInteger> dataCategories;
 
     private Long countryId;
@@ -61,19 +70,19 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDto> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDto> getOrganizationSubTypes() {
+    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDto> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 

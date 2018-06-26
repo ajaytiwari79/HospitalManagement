@@ -1,10 +1,10 @@
 package com.kairos.service.processing_activity;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.processing_activity.HostingLocation;
 import com.kairos.persistance.repository.processing_activity.HostingLocationMongoRepository;
 import com.kairos.service.MongoBaseService;

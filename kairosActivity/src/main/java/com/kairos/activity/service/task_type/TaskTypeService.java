@@ -2,13 +2,11 @@ package com.kairos.activity.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.kairos.activity.client.CountryRestClient;
-import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.SkillRestClient;
-import com.kairos.activity.client.TimeSlotRestClient;
+import com.kairos.activity.client.*;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.activity.response.dto.TaskTypeSettingDTO;
 import com.kairos.activity.response.dto.staffTaskType.TaskTypeSettingWrapper;
@@ -79,6 +77,8 @@ public class TaskTypeService extends MongoBaseService {
 
     @Autowired
     private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
+
+    @Inject private OrganizationServiceRestClient organizationServiceRestClient;
 
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -1138,11 +1138,12 @@ public class TaskTypeService extends MongoBaseService {
             for(TaskType taskType : taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,id,true)){
                 selectedTaskTypes.add(taskType.getBasicTaskTypeInfo());
             }*/
-            if(parent == null){
+           /* if(parent == null){
                 visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
-            } else {
-                visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,parent.getId(),true));
-            }
+            } else {*/
+           //Todo why we use parent id when we don't set organisatio id on creating taskType @yasir
+                visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
+            //}
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,id,true));
         } else if(TEAM.equalsIgnoreCase(type)){
             //OrganizationDTO unit = organizationGraphRepository.getOrganizationByTeamId(id);
@@ -1280,7 +1281,7 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }*/
 
-    public TaskTypeSettingDTO updateOrCreateTaskTypeSetting(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
         TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
             taskTypeSetting = new TaskTypeSetting(staffId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());
@@ -1293,6 +1294,18 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }
 
+
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForClient(Long clientId,TaskTypeSettingDTO taskTypeSettingDTO){
+        TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByClientIdAndTaskType(clientId,taskTypeSettingDTO.getTaskTypeId());
+        if(taskTypeSetting ==null){
+            taskTypeSetting = new TaskTypeSetting(taskTypeSettingDTO.getTaskTypeId(),clientId);
+        }
+        taskTypeSetting.setDuration(taskTypeSettingDTO.getDuration());
+        save(taskTypeSetting);
+        taskTypeSettingDTO.setId(taskTypeSetting.getId());
+        return taskTypeSettingDTO;
+    }
+
     /*public List<TaskTypeSettingDTO> getTaskTypeSettingByStaff(Long staffId){
         return taskTypeSettingMongoRepository.findByStaffId(staffId);
     }*/
@@ -1300,14 +1313,30 @@ public class TaskTypeService extends MongoBaseService {
 
     public TaskTypeSettingWrapper getTaskTypeByOrganisationAndStaffSetting(Long organisationId, Long staffId){
         List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByStaffId(staffId);
-        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId);
+        List<Long> serviceIds = getServiceIds(organisationId);
+        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId,serviceIds);
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);
     }
 
-    public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long staffId){
-        List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(staffId);
-        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId);
+    public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long clientId){
+        List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(clientId);
+        List<Long> serviceIds = getServiceIds(organisationId);
+        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId,serviceIds);
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);
+    }
+
+    public List<Long> getServiceIds(Long organisationId){
+        List<Long> serviceIds = new ArrayList<>();
+        Map<String, Object> services = organizationServiceRestClient.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
+        List<Map> service = (List<Map>)services.get("selectedServices");
+        service.get(0).get("children");
+        service.forEach(t->{
+            List<Map> children = (List<Map>)t.get("children");
+            children.forEach(c->{
+                serviceIds.add(((Integer)c.get("id")).longValue());
+            });
+        });
+        return serviceIds;
     }
 
 

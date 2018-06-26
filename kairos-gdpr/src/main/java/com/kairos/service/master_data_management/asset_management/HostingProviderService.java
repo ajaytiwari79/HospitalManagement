@@ -1,11 +1,11 @@
 package com.kairos.service.master_data_management.asset_management;
 
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.custome_exception.InvalidRequestException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingProvider;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingProviderMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -28,9 +28,9 @@ public class HostingProviderService extends MongoBaseService {
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
-    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId, List<HostingProvider> hostingProviders) {
+    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
         Map<String, List<HostingProvider>> result = new HashMap<>();
-        List<HostingProvider> existing = new ArrayList<>();
+
         List<HostingProvider> newhostingProviders = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (hostingProviders.size() != 0) {
@@ -40,7 +40,7 @@ public class HostingProviderService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            existing = hostingProviderMongoRepository.findByCountryAndNameList(countryId, names);
+            List<HostingProvider> existing  = hostingProviderMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
             existing.forEach(item -> names.remove(item.getName()));
             if (names.size()!=0) {
                 for (String name : names) {
@@ -48,6 +48,7 @@ public class HostingProviderService extends MongoBaseService {
                     HostingProvider newHostingProvider = new HostingProvider();
                     newHostingProvider.setName(name);
                     newHostingProvider.setCountryId(countryId);
+                    newHostingProvider.setOrganizationId(organizationId);
                     newhostingProviders.add(newHostingProvider);
 
                 }
@@ -63,14 +64,14 @@ public class HostingProviderService extends MongoBaseService {
 
     }
 
-    public List<HostingProvider> getAllHostingProvider() {
-        return hostingProviderMongoRepository.findAllHostingProviders(UserContext.getCountryId());
+    public List<HostingProvider> getAllHostingProvider(Long countryId,Long organizationId) {
+        return hostingProviderMongoRepository.findAllHostingProviders(countryId,organizationId);
     }
 
 
-    public HostingProvider getHostingProviderById(Long countryId, BigInteger id) {
+    public HostingProvider getHostingProviderById(Long countryId,Long organizationId, BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId, id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -80,9 +81,9 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingProvider(BigInteger id) {
+    public Boolean deleteHostingProvider(Long countryId,Long organizationId,BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByid(id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -94,10 +95,13 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public HostingProvider updateHostingProvider(BigInteger id, HostingProvider hostingProvider) {
+    public HostingProvider updateHostingProvider(Long countryId,Long organizationId,BigInteger id, HostingProvider hostingProvider) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByName(UserContext.getCountryId(),hostingProvider.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,organizationId,hostingProvider.getName());
+        if (Optional.ofNullable(exist).isPresent() ) {
+            if (id.equals(exist.getId())) {
+                return exist;
+            }
             throw new DuplicateDataException("data  exist for  "+hostingProvider.getName());
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
@@ -108,11 +112,11 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public HostingProvider getHostingProviderByName(Long countryId, String name) {
+    public HostingProvider getHostingProviderByName(Long countryId, Long organizationId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId, name);
+            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,organizationId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

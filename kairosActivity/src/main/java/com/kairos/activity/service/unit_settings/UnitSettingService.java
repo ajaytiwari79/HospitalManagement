@@ -79,16 +79,19 @@ public class UnitSettingService extends MongoBaseService {
         return unitSettingsDTO;
     }
 
-    public boolean createDefaultOpenShiftPhaseSettings(Long unitId){
+    public boolean createDefaultOpenShiftPhaseSettings(Long unitId,List<Phase> phases){
+        if (!Optional.ofNullable(phases).isPresent()){
+            phases=ObjectMapperUtils.copyProperties(phaseService.getPhasesByUnit(unitId),Phase.class);
+        }
         List<UnitSettingDTO> openShiftPhaseSettings=unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         if(openShiftPhaseSettings.size()>0){
             exceptionService.actionNotPermittedException("openShift.already.exist",unitId);
         }
-        List<PhaseDTO> phases=phaseService.getPhasesByUnit(unitId);
+
         if(Optional.ofNullable(phases).isPresent()) {
             List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
             phases.forEach(phase -> {
-                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), true);
+                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false);
                 openShiftPhases.add(openShiftPhase);
             });
             OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);

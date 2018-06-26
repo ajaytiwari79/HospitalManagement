@@ -1,26 +1,14 @@
 package com.kairos.service.processing_activity;
 
-import com.kairos.custome_exception.DataNotExists;
-import com.kairos.custome_exception.DuplicateDataException;
-import com.kairos.dto.ProcessingActivityDto;
-import com.kairos.persistance.model.processing_activity.AssetType;
-import com.kairos.persistance.model.master_data_management.asset_management.OrganizationalSecurityMeasure;
-import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
-import com.kairos.persistance.model.processing_activity.ProcessingActivity;
-import com.kairos.persistance.repository.processing_activity.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.master_data_management.processing_activity_masterdata.DataSubjectService;
 import com.kairos.service.master_data_management.processing_activity_masterdata.ProcessingPurposeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProcessingActivityService extends MongoBaseService {
@@ -30,14 +18,10 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
-    @Inject
-    private DataSubjectService dataSubjectService;
 
     @Inject
     private ProcessingPurposeService processingPurposeService;
 
-    @Inject
-    private AssetTypeMongoRepository assetTypeMongoRepository;
 
     @Inject
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;
@@ -47,7 +31,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
 /*
 
-    ProcessingActivity createProcessingActivity(ProcessingActivityDto processingActivityDto) {
+    ProcessingActivity createProcessingActivity(ProcessingActivityDTO processingActivityDto) {
 
         List<BigInteger> dataSubectids, processingPurposeids;
         dataSubectids = processingActivityDto.getDataSubjects();

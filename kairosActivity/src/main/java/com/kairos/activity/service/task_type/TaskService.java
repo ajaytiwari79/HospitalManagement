@@ -39,6 +39,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.activity.response.dto.*;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.activity.serializers.MongoDateMapper;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
@@ -52,13 +53,12 @@ import com.kairos.activity.spec.MergeTaskSpecification;
 import com.kairos.activity.spec.TaskDaySpecification;
 import com.kairos.activity.spec.TaskSpecification;
 import com.kairos.activity.spec.TaskStaffTypeSpecification;
-import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.JsonUtils;
-import com.kairos.activity.util.TaskUtil;
+import com.kairos.activity.util.*;
 import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.activity.util.userContext.UserContext;
+import org.apache.poi.ss.usermodel.Cell;
 import org.bson.Document;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -699,6 +699,7 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
@@ -718,7 +719,7 @@ public class TaskService extends MongoBaseService {
         }
         if (!shiftsToCreate.isEmpty()) {
             save(shiftsToCreate);
-            timeBankService.saveTimeBanks(unitPositionDTO.getId(), shiftsToCreate);
+            timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(unitPositionDTO.getId(), shiftsToCreate);
         }
     }
@@ -1569,6 +1570,78 @@ public class TaskService extends MongoBaseService {
         }
         TaskSpecification<Task> taskDaySpecification = new TaskDaySpecification(days);
         TaskSpecification<Task> taskSpecification = taskDaySpecification.and(taskStaffSpecification).or(mergeTaskSpecification);
+    }
+
+
+    private Double getValue(Cell cell){
+        Double value = null;
+        if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
+            value =  cell.getNumericCellValue();
+        }else {
+            value = new Double(cell.getStringCellValue().replaceAll(",","."));
+
+        }
+        return value;
+    }
+
+    /*private List<Task> getVrpTasksByRows(List<Row> rows, Long unitId){
+        List<VRPClientDTO> vrpClientDTOS = vrpRestClient.getAllVRPClient();
+        Map<Integer,Long> installationAndCitizenId = vrpClientDTOS.stream().collect(Collectors.toMap(c->c.getInstallationNumber(),c->c.getId()));
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 2;i<rows.size();i++){
+            Row row = rows.get(i);
+            Task task = new Task();
+            TaskAddress taskAddress = new TaskAddress();
+            taskAddress.setLatitude(getConstraintValue(row.getCell(14)).toString());
+            taskAddress.setLongitude(getConstraintValue(row.getCell(14)).toString());
+            taskAddress.setCity(row.getCell(13).getStringCellValue());
+            taskAddress.setFloorNumber((int) row.getCell(10).getNumericCellValue());
+            taskAddress.setHouseNumber( ""+row.getCell(8).getNumericCellValue());
+            taskAddress.setZip(new Integer(row.getCell(12).getStringCellValue()));
+            taskAddress.setStreet(row.getCell(7).getStringCellValue());
+            taskAddress.setBlock(row.getCell(9).getStringCellValue());
+            task.setAddress(taskAddress);
+            task.setInstallationNumber(getConstraintValue(row.getCell(5)).intValue());
+            task.setDuration((int) row.getCell(0).getNumericCellValue());
+            task.setCitizenId(installationAndCitizenId.get(task.getInstallationNumber()));
+            task.setUnitId(unitId);
+            tasks.add(task);
+        }
+        return tasks;
+    }*/
+
+    public Boolean importTask(Long unitId, List<VRPTaskDTO> taskDTOS){
+       // List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
+        Set<String> skills = taskDTOS.stream().map(t->t.getSkill()).collect(Collectors.toSet());
+        List<TaskType> taskTypes = taskTypeMongoRepository.findByName(unitId,new ArrayList<>(skills));
+        Map<String,BigInteger> taskTypeIds = taskTypes.stream().collect(Collectors.toMap(t->t.getTitle(),t->t.getId()));
+        Map<Long,BigInteger> installationNoAndTaskTypeId = taskMongoRepository.getAllTasksInstallationNoAndTaskTypeId(unitId);
+        List<VRPTaskDTO> newTasks = new ArrayList<>();
+        for (VRPTaskDTO task : taskDTOS) {
+            if(!taskTypeIds.containsKey(task.getSkill())){
+                exceptionService.dataNotFoundException("message.taskType.notExists",task.getSkill());
+            }
+            if(!installationNoAndTaskTypeId.containsKey(new Long(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
+                task.setUnitId(unitId);
+                task.setTaskTypeId(taskTypeIds.get(task.getSkill()));
+                newTasks.add(task);
+            }
+        }
+        List<Task> tasks = ObjectMapperUtils.copyPropertiesOfListByMapper(newTasks,Task.class);//getVrpTasksByRows(rows,unitId);
+        save(tasks);
+        return true;
+    }
+
+    public List<VRPTaskDTO> getAllTask(Long unitId){
+        List<VRPTaskDTO> tasks = taskMongoRepository.getAllTasksByUnitId(unitId);
+        //return ObjectMapperUtils.copyPropertiesOfListByMapper(tasks,TaskDTO.class);
+        return tasks;//new ArrayList<>();
+
+    }
+
+    public TaskDTO getTask(BigInteger taskId){
+        Task task = taskMongoRepository.findOne(taskId);
+        return ObjectMapperUtils.copyPropertiesByMapper(task,TaskDTO.class);
     }
 
 
