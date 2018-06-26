@@ -384,6 +384,25 @@ public class OrganizationServiceService extends UserBaseService {
 
     }
 
+
+    /**
+     *
+     * @param orgTypesIds
+     * @return list of Organization services and Children SubServices
+     */
+    public List<Object> getOrgServicesByOrgSubTypesIds(Set<Long> orgTypesIds) {
+        List<Map<String, Object>> organizationServices = organizationServiceRepository.getOrgServicesByOrgSubTypesIds(orgTypesIds);
+        if (organizationServices != null) {
+            List<Object> objectList = new ArrayList<>();
+            for (Map<String, Object> map : organizationServices) {
+                Object o = map.get("result");
+                objectList.add(o);
+            }
+            return objectList;
+        }
+        return null;
+    }
+
    /* public HashMap<String, Object> getTaskTypes(long id, long subServiceId,String type) {
 
         List<Map<String,Object>> visibleTaskTypes = new ArrayList<>();;
