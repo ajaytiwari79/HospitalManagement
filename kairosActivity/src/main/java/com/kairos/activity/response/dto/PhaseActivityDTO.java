@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto;
 
-import com.kairos.activity.client.dto.DayType;
+
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.phase.PhaseWeeklyDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;

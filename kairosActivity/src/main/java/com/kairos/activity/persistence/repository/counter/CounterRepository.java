@@ -1,108 +1,104 @@
 package com.kairos.activity.persistence.repository.counter;
 
-import com.kairos.activity.persistence.enums.counter.CounterLevel;
-import com.kairos.activity.persistence.enums.counter.CounterType;
-import com.kairos.activity.persistence.model.counter.CounterAccessiblity;
-import com.kairos.activity.persistence.model.counter.CounterDefinition;
-import com.kairos.activity.persistence.model.counter.CounterModuleLink;
-import com.kairos.activity.persistence.model.counter.CustomCounterSettings;
-import com.kairos.activity.response.dto.counter.AvailableCounters;
-import com.kairos.activity.response.dto.counter.CounterAccessiblityDTO;
-import com.kairos.activity.response.dto.counter.CounterModuleLinkDTO;
-import com.kairos.activity.response.dto.counter.CustomCounterSettingDTO;
-import io.jsonwebtoken.lang.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.kairos.activity.client.counter.CounterOrderDTO;
+import com.kairos.activity.client.counter.ModuleCounterGroupingDTO;
+import com.kairos.activity.client.counter.RefCounterDefDTO;
+import com.kairos.activity.client.counter.RoleCounterDTO;
+import com.kairos.activity.enums.CounterType;
+import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.counter.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
 
 @Repository
 public class CounterRepository {
-    @Autowired
+
+    @Inject
     private MongoTemplate mongoTemplate;
 
     //get counter by type
-    public CounterDefinition getCounterByType(CounterType type){
+    public Counter getCounterByType(CounterType type) {
         Query query = new Query(Criteria.where("type").is(type));
-        return mongoTemplate.findOne(query, CounterDefinition.class);
+        return mongoTemplate.findOne(query, Counter.class);
     }
 
-    //getDefaultCountersListForModule
-    public List<CounterModuleLinkDTO> getCounterModuleLinks(String moduleId){
+    public List<Counter> getCounterByTypes(List<CounterType> types){
+        Query query = new Query(Criteria.where("type").in(types));
+        return mongoTemplate.find(query, Counter.class);
+    }
+
+    //get ModuleWiseCounters List by country
+    public List<ModuleCounter> getModuleCountersForCountry(BigInteger countryId) {
+        Query query = new Query(Criteria.where("countryId").is(countryId));
+        return mongoTemplate.find(query, ModuleCounter.class);
+    }
+
+    //get modulewise countersIds for a country
+    public List<ModuleCounterGroupingDTO> getModuleCounterDTOsForCountry(BigInteger countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("moduleId").is(moduleId)),
-                Aggregation.lookup("counterDefinition", "counterDefinitionId", "_id", "counterDefinition"),
-                Aggregation.project("moduleId").and("counterDefinition").arrayElementAt(0).as("counterDefinition")
+                Aggregation.match(Criteria.where("countryId").is(countryId)),
+                Aggregation.group("moduleId").addToSet("counterId").as("counterIds"),
+                Aggregation.project("counterIds")
         );
-        AggregationResults<CounterModuleLinkDTO> results = mongoTemplate.aggregate(aggregation, CounterModuleLink.class, CounterModuleLinkDTO.class);
+        AggregationResults<ModuleCounterGroupingDTO> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, ModuleCounterGroupingDTO.class);
         return results.getMappedResults();
     }
 
-    //getCounterModuleLink
-    public CounterModuleLink getCounterModuleLink(String moduleId, BigInteger counterDefinitionId){
-        Assert.notNull(moduleId, "Module Id can't be null!");
-        Query query = new Query(Criteria.where("moduleId").is(moduleId).and("counterDefinitionId").is(counterDefinitionId));
-        CounterModuleLink counterModuleLink = mongoTemplate.findOne(query, CounterModuleLink.class);
-        return counterModuleLink;
-    }
-
-    //deleteCounterModuleLink
-    public void deleteCounterModuleLink(BigInteger moduleId, BigInteger counterDefinitionId){
-        Query query = new Query(Criteria.where("moduleId").is(moduleId).and("counterDefinitionId").is(counterDefinitionId));
-        mongoTemplate.findAllAndRemove(query, CounterModuleLink.class);
-    }
-
-    public List<CounterAccessiblityDTO> getCounterAccessiblityList(BigInteger unitId, CounterLevel level){
+    //get role and moduleCounterId mapping for unit
+    public List<RoleCounterDTO> getRoleAndModuleCounterIdMapping(BigInteger unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-            Aggregation.match(Criteria.where("accessLevel").is(level).and("unitId").is(unitId)),
-            Aggregation.lookup("counterModuleLink", "counterModuleLinkId", "_id", "counterModule"),
-            Aggregation.project("accessLevel").andInclude("unitId").and("counterModule").arrayElementAt(0).as("counterModule")
+                Aggregation.match(Criteria.where("unitId").is(unitId)),
+                Aggregation.group("roleId").addToSet("moduleCounterId").as("moduleCounterIds"),
+                Aggregation.project("moduleCounterIds")
+
         );
-        AggregationResults<CounterAccessiblityDTO> results = mongoTemplate.aggregate(aggregation, CounterAccessiblity.class, CounterAccessiblityDTO.class);
+
+        AggregationResults<RoleCounterDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RoleCounterDTO.class);
         return results.getMappedResults();
     }
 
-    public void removeAccessiblitiesById(List<BigInteger> ids){
-        Query query = new Query(Criteria.where("_id").in(ids));
-        mongoTemplate.findAllAndRemove(query, CounterAccessiblity.class);
-    }
-
-    public void removeCustomCounterProfiles(List<BigInteger> accessiblityIds){
-        Query query = new Query(Criteria.where("_id").in(accessiblityIds));
-    }
-
-    public List<CounterDefinition> getAccessableCountersList(Long moduleId){
-        //get list of counter definitions.
+    public List<BigInteger> getModuleCountersIds(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
         Aggregation aggregation = Aggregation.newAggregation(
-            Aggregation.match(Criteria.where("moduleId").is(moduleId)),
-            Aggregation.lookup("counterDefinition", "counterDefinitionId", "_id", "counterDefinition"),
-            Aggregation.group("moduleId").addToSet("counterDefinition").as("counterDefinitions"),
-            Aggregation.project("moduleId").andInclude("counterDefinitions")
+                Aggregation.match(Criteria.where("countryId").is(countryId).and("moduleId").is(moduleId).and("counterId").in(refCounterIds)),
+                Aggregation.group("moduleId").addToSet("_id").as("ids"),
+                Aggregation.project("ids")
         );
-        AggregationResults<AvailableCounters> results = mongoTemplate.aggregate(aggregation, CounterDefinition.class, AvailableCounters.class);
-        List<AvailableCounters> availableCounters = results.getMappedResults();
-        return (availableCounters.isEmpty())?new ArrayList<CounterDefinition>():availableCounters.get(0).getCounterDefinitions();
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, Map.class);
+        List<Map> resultData = results.getMappedResults();
+        List ids = new ArrayList();
+        if(!resultData.isEmpty() && ((Map)resultData.get(0)).get("ids") != null) {
+            ids = (List)((Map)resultData.get(0)).get("ids");
+        }
+        return ids;
     }
 
-    //getList-configuredCounters
-    public List<CustomCounterSettingDTO> getConfiguredCounters(BigInteger staffId){
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("staffId").is(staffId)),
-                Aggregation.lookup("counterAccessiblity", "counterAccessiblityId", "_id", "counterAccessiblity"),
-                Aggregation.project("viewDefault").andInclude("level").andInclude("order").andInclude("configured").and("counterAccessiblity").arrayElementAt(0).as("counterAccessiblity")
-        );
-        AggregationResults<CustomCounterSettingDTO> results = mongoTemplate.aggregate(aggregation, CustomCounterSettings.class, CustomCounterSettingDTO.class);
-        return results.getMappedResults();
+    //removal of counters
+
+    public void removeAll(String fieldName, List values, Class claz){
+        Query query = new Query(Criteria.where(fieldName).in(values));
+        mongoTemplate.remove(query, claz);
     }
 
-    //public void setCustomCounterSetting
+    public void removeRoleCounters(BigInteger roleId, List<BigInteger> refCounterIds){
+        Query query = new Query(Criteria.where("roleId").is(roleId).and("refCounterId").in(refCounterIds));
+        mongoTemplate.remove(query, UnitRoleCounter.class);
+    }
 
     //get item by Id
     public Object getItemById(BigInteger id, Class claz){
@@ -114,6 +110,72 @@ public class CounterRepository {
     public void removeItemById(BigInteger id, Class claz){
         Query query = new Query(Criteria.where("id").is(id));
         mongoTemplate.remove(query, claz);
+    }
+
+
+    //counterRef and counter type mapping
+    public List<RefCounterDefDTO> getModuleCounterDetails(String moduleId, BigInteger countryId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("moduleId").is(moduleId).and("countryId").is(countryId)),
+                Aggregation.lookup("counter", "counterId","_id","counterType"),
+                Aggregation.project().and("counterType").arrayElementAt(0).as("counterType")
+        );
+
+        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, RefCounterDefDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List<RefCounterDefDTO> getRoleCounterTypeDetails(BigInteger roleId, BigInteger unitId, String moduleId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("roleId").is(roleId).and("unitId").is(unitId)),
+                Aggregation.lookup("moduleCounter","refCounterId", "_id", "refCounter"),
+                Aggregation.project().and("refCounter").arrayElementAt(0).as("refCounter"),
+                Aggregation.match(Criteria.where("refCounter.moduleId").is(moduleId)),
+                Aggregation.lookup("counter", "refCounter.counterId", "_id","counterDef" ),
+                Aggregation.project().and("counterDef").arrayElementAt(0).as("counterDef"),
+                Aggregation.project().and("counterDef.type").as("counterType")
+        );
+
+        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RefCounterDefDTO.class);
+        return results.getMappedResults();
+    }
+
+
+    // order counters list for tab
+    public List<CounterOrderDTO> getOrderedCountersListForCountry(BigInteger countryId, String moduleId){
+        Criteria criteria = Criteria.where("countryId").is(countryId).and("moduleId").is(moduleId);
+        if(moduleId == null)
+            criteria = Criteria.where("countryId").is(countryId);
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria)
+        );
+        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, DefaultCounterOrder.class, CounterOrderDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List<CounterOrderDTO> getOrderedCountersListForUnit(BigInteger unitId, String moduleId){
+        Criteria criteria = Criteria.where("unitId").is(unitId).and("moduleId").is(moduleId);
+        if(moduleId == null)
+            criteria = Criteria.where("unitId").is(unitId);
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("unitId").is(unitId).and("moduleId").is(moduleId))
+        );
+        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UnitCounterOrder.class, CounterOrderDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List<CounterOrderDTO> getOrderedCountersListForUser(BigInteger unitId, BigInteger staffId, String moduleId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and("moduleId").is(moduleId))
+        );
+        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UserCounterOrder.class, CounterOrderDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List getMappedValues(List<AggregationOperation> operations, Class fromClassType, Class toClassType ){
+        Aggregation aggregation = Aggregation.newAggregation(operations);
+        AggregationResults<Activity> results = mongoTemplate.aggregate(aggregation, fromClassType, toClassType);
+        return results.getMappedResults();
     }
 
     //test cases..

@@ -242,14 +242,14 @@ public class WTARuleTemplateValidatorUtility {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         if(timeTypeIds!=null && !timeTypeIds.isEmpty()){
             shifts.forEach(s->{
-                if((timeTypeIds==null || timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds==null || plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPresenceTypeId())) && (activitieIds==null || activitieIds.contains(s.getActivity().getId())))){
+                if((timeTypeIds==null || timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds==null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds==null || activitieIds.contains(s.getActivity().getId())))){
                     shiftQueryResultWithActivities.add(s);
                 }
             });
         }/*
         if(plannedTimeIds!=null && !plannedTimeIds.isEmpty()){
             shifts.forEach(s->{
-                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPresenceTypeId())){
+                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPlannedTypeId())){
                     shiftQueryResultWithActivities.add(s);
                 }
             });

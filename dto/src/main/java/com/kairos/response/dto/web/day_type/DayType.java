@@ -1,7 +1,7 @@
-package com.kairos.activity.client.dto;
+package com.kairos.response.dto.web.day_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.persistence.model.staffing_level.Day;
+import com.kairos.enums.Day;
 
 import java.util.ArrayList;
 import java.util.List;
