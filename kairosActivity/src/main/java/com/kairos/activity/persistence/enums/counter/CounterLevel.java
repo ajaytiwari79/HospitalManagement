@@ -6,7 +6,7 @@ package com.kairos.activity.persistence.enums.counter;
  */
 
 public enum CounterLevel {
-    INDIVIDUAL(""), ORGANIZATION(""), UNIT(""), NONE("");
+    INDIVIDUAL("Individual"), ORGANIZATION("Organization"), UNIT("Unit");
 
     private String name;
 
