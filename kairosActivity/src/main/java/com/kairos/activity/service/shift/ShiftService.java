@@ -231,7 +231,7 @@ public class ShiftService extends MongoBaseService {
         /**
          * This is used for checking the activity is for presence type
          **/
-        Boolean managementPerson = (Optional.ofNullable(staffAdditionalInfoDTO.getUser()).isPresent() && staffAdditionalInfoDTO.getUser().getManagement()) ? true : false;
+        Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUser()).isPresent() && staffAdditionalInfoDTO.getUser().getManagement();
         BigInteger plannedTimeId = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
                 || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK))
                 ? getAbsencePlannedTime(unitId, phaseId)
