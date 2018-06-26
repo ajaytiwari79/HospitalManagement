@@ -1,8 +1,9 @@
 package com.kairos.activity.persistence.repository.phase;
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
+
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;

@@ -1,7 +1,8 @@
 package com.kairos.controller.expertise;
 
-import com.kairos.response.dto.web.experties.AgeRangeDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
+import com.kairos.response.dto.web.experties.AgeRangeDTO;
+import com.kairos.response.dto.web.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.response.dto.web.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.FunctionalPaymentService;
@@ -16,8 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.text.ParseException;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -129,9 +130,32 @@ public class ExpertiseController {
 
     @ApiOperation(value = "publish a functional payment settings for expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/functional_payment/{functionalPaymentId}/publish", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> publishFunctionalPayment(@PathVariable Long functionalPaymentId,@RequestBody FunctionalPaymentDTO functionalPaymentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.publishFunctionalPayment(functionalPaymentId,functionalPaymentDTO));
+    public ResponseEntity<Map<String, Object>> publishFunctionalPayment(@PathVariable Long functionalPaymentId, @RequestBody FunctionalPaymentDTO functionalPaymentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.publishFunctionalPayment(functionalPaymentId, functionalPaymentDTO));
     }
 
+    @ApiOperation(value = "block planned time for employment type and expertise ")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> addPlannedTimeInExpertise(@PathVariable Long unitId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addPlannedTimeInExpertise(unitId, expertiseEmploymentTypeDTO));
+    }
+
+    @ApiOperation(value = "get planned time for employment type and expertise ")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getPlannedTimeInExpertise(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeInExpertise(expertiseId));
+    }
+
+    @ApiOperation(value = "All planned time and employment type")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/planned_time/default_data", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getPlannedTimeAndEmploymentType(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeAndEmploymentType(unitId));
+    }
+
+    @ApiOperation(value = "block planned time for employment type and expertise ")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long unitId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseEmploymentTypeDTO));
+    }
 
 }

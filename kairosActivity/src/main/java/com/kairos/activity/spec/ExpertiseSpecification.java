@@ -1,7 +1,6 @@
 package com.kairos.activity.spec;
 
 
-import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.shift.Expertise;
 import com.kairos.activity.service.exception.ExceptionService;

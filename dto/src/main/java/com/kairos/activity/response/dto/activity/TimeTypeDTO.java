@@ -11,7 +11,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeTypeDTO {
-
     private BigInteger id;
     private String timeTypes;
     private String label;

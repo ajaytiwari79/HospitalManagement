@@ -4,7 +4,7 @@ package com.kairos.service.integration;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 
 
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
