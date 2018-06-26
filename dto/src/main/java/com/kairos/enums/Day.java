@@ -1,4 +1,4 @@
-package com.kairos.activity.persistence.model.staffing_level;
+package com.kairos.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

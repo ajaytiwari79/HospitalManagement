@@ -1,11 +1,14 @@
 package com.kairos.activity.service.organization;
 
+import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.activity.service.unit_settings.UnitSettingService;
+import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
+
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
@@ -15,10 +18,9 @@ import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepos
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
-
+import com.kairos.activity.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ActivityWithUnitIdDTO;
-
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
@@ -29,13 +31,16 @@ import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.service.period.PeriodSettingsService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.service.unit_settings.ActivityConfigurationService;
 import com.kairos.activity.service.unit_settings.PhaseSettingsService;
+import com.kairos.activity.service.unit_settings.UnitSettingService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
-
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.response.dto.web.unit_settings.UnitSettingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +91,11 @@ public class OrganizationActivityService extends MongoBaseService {
     private UnitSettingRepository unitSettingRepository;
     @Inject
     private UnitSettingService unitSettingService;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
+
+    private @Inject
+    ActivityConfigurationService activityConfigurationService;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -96,24 +106,20 @@ public class OrganizationActivityService extends MongoBaseService {
             if (!Optional.ofNullable(activity).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
             }
-            Activity isActivityAlreadyExist = activityMongoRepository.findByNameIgnoreCaseAndUnitIdAndByDate(activity.getName().trim(), unitId,activity.getGeneralActivityTab().getStartDate(),activity.getGeneralActivityTab().getEndDate());
+            Activity isActivityAlreadyExist = activityMongoRepository.findByNameIgnoreCaseAndUnitIdAndByDate(activity.getName().trim(), unitId, activity.getGeneralActivityTab().getStartDate(), activity.getGeneralActivityTab().getEndDate());
             if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
-                exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+                exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-            for (PhaseDTO phaseDTO : phaseDTOList) {
-                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTO.getId(), phaseDTO.getName(), phaseDTO.getDescription(), false, false);
+            for (int i = 0; i < phaseDTOList.size(); i++) {
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement());
                 phaseTemplateValues.add(phaseTemplateValue);
             }
             activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
-            if (!activity.getState().equals(ActivityStateEnum.LIVE)) {
-                activity.setState(ActivityStateEnum.LIVE);
-                save(activity);
-            }
-            plannerSyncService.publishActivity(unitId, activity, IntegrationOperation.CREATE);
-            activityDetail = activityCopied.retrieveBasicDetails();
+            save(activityCopied);
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
@@ -180,12 +186,12 @@ public class OrganizationActivityService extends MongoBaseService {
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }
-        Activity isActivityAlreadyExist = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(),unitId, generalDTO.getStartDate(),generalDTO.getEndDate());
-        if(Optional.ofNullable(isActivityAlreadyExist).isPresent()&&generalDTO.getStartDate().isBefore(isActivityAlreadyExist.getGeneralActivityTab().getStartDate())){
+        Activity isActivityAlreadyExist = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(), unitId, generalDTO.getStartDate(), generalDTO.getEndDate());
+        if (Optional.ofNullable(isActivityAlreadyExist).isPresent() && generalDTO.getStartDate().isBefore(isActivityAlreadyExist.getGeneralActivityTab().getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.overlaping");
         }
         if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
-            exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+            exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
         }
         ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
         if (activityCategory == null) {
@@ -233,10 +239,11 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
+        List<DayType> dayTypes = ObjectMapperUtils.copyProperties(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
-        List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes, dayTypeEmploymentTypeWrapper.getEmploymentTypes());
 
         return activityTabsWrapper;
     }
@@ -244,12 +251,12 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(),activityDTO.getEndDate());
-        if(Optional.ofNullable(activity).isPresent()&&activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())){
+                findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(), activityDTO.getEndDate());
+        if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.overlaping");
         }
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate()==null ? "message.activity.enddate.required":"message.activity.active.alreadyExists");
+            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? "message.activity.enddate.required" : "message.activity.active.alreadyExists");
         }
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
@@ -290,7 +297,8 @@ public class OrganizationActivityService extends MongoBaseService {
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
-        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId,phases);
+        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
+        activityConfigurationService.createDefaultSettings(countryId,unitId, phases);
         return true;
     }
 

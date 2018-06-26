@@ -1,11 +1,9 @@
-package com.kairos.activity.client.dto.Phase;
+package com.kairos.response.dto.web.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.enums.phase.PhaseType;
+import com.kairos.persistence.model.enums.DurationType;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -24,7 +22,6 @@ public class PhaseDTO {
     private int duration;
     private DurationType durationType;
     private int sequence;
-    @Indexed
     private Long organizationId;
     private Long countryId;
     private BigInteger parentCountryPhaseId;
@@ -136,10 +133,7 @@ public class PhaseDTO {
         return phaseWeeklyDTO;
     }
 
-    public Phase buildPhaseForCountry() {
-        Phase phase = new Phase(this.name, this.description, this.duration, this.durationType, this.sequence, this.countryId, this.organizationId, this.parentCountryPhaseId, this.phaseType);
-        return phase;
-    }
+
 
     public int getDurationInDays() {
         return durationInDays;
