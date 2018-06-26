@@ -61,7 +61,7 @@ public class MasterAssetController {
 
     @ApiOperation(value = "update master asset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Validated @RequestBody MasterAssetDTO asset) {
+    public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Validated @RequestBody MasterAssetDTO assetDTO) {
 
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -69,9 +69,8 @@ public class MasterAssetController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }  if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+        return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, true, masterAssetService.updateMasterAsset(countryId,organizationId,id,assetDTO));
     }
 
 
