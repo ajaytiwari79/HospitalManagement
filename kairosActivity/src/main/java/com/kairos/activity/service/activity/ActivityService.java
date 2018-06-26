@@ -471,13 +471,13 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= genericIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes1 =dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayType> dayTypes =dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS=dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
 
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
 
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes1,employmentTypeDTOS);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes,employmentTypeDTOS);
         return activityTabsWrapper;
     }
 
