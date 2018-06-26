@@ -1615,13 +1615,13 @@ public class TaskService extends MongoBaseService {
         Set<String> skills = taskDTOS.stream().map(t->t.getSkill()).collect(Collectors.toSet());
         List<TaskType> taskTypes = taskTypeMongoRepository.findByName(unitId,new ArrayList<>(skills));
         Map<String,BigInteger> taskTypeIds = taskTypes.stream().collect(Collectors.toMap(t->t.getTitle(),t->t.getId()));
-        Map installationNoAndTaskTypeId = taskMongoRepository.getAllTasksInstallationNoAndTaskTypeId(unitId);
+        Map<Long,BigInteger> installationNoAndTaskTypeId = taskMongoRepository.getAllTasksInstallationNoAndTaskTypeId(unitId);
         List<VRPTaskDTO> newTasks = new ArrayList<>();
         for (VRPTaskDTO task : taskDTOS) {
             if(!taskTypeIds.containsKey(task.getSkill())){
                 exceptionService.dataNotFoundException("message.taskType.notExists",task.getSkill());
             }
-            if(!installationNoAndTaskTypeId.containsKey(new Integer(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
+            if(!installationNoAndTaskTypeId.containsKey(new Long(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
                 task.setUnitId(unitId);
                 task.setTaskTypeId(taskTypeIds.get(task.getSkill()));
                 newTasks.add(task);
