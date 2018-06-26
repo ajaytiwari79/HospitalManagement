@@ -46,7 +46,7 @@ public class ChatRestClient {
             HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            "http://xyz.example.com:8008/_matrix/client/r0/register?kind=user",
+                            "http://dev.kairosplanning.com:8008/_matrix/client/r0/register?kind=user",
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 
