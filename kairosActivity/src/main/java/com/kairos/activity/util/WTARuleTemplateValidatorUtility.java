@@ -12,13 +12,16 @@ import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
-import com.kairos.activity.persistence.model.wta.wrapper.*;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.persistence.model.user.country.Day;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 
 import java.math.BigInteger;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -268,8 +271,6 @@ public class WTARuleTemplateValidatorUtility {
                 case NUMBER_OF_PARTOFDAY:
                     NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = (NumberOfPartOfDayShiftsWTATemplate)ruleTemplate;
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift,numberOfPartOfDayShiftsWTATemplate.getIntervalUnit(),numberOfPartOfDayShiftsWTATemplate.getIntervalLength()));
-
-
                     break;
                 case DAYS_OFF_IN_PERIOD:
                     DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = (DaysOffInPeriodWTATemplate)ruleTemplate;

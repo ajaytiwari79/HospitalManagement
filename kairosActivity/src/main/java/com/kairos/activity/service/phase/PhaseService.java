@@ -2,7 +2,6 @@ package com.kairos.activity.service.phase;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
 import com.kairos.activity.persistence.model.phase.Phase;
@@ -12,6 +11,7 @@ import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.enums.phase.PhaseType;
+import com.kairos.response.dto.web.phase.PhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -45,8 +45,8 @@ public class PhaseService extends MongoBaseService {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
-            Phase phase = new Phase(phaseDTO.getName(),phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType() );
+            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType());
 
             phases.add(phase);
         }
@@ -57,12 +57,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     /*
-    *@Author vipul
-    */
+     *@Author vipul
+     */
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
@@ -78,10 +78,10 @@ public class PhaseService extends MongoBaseService {
         return phases;
     }
 
-    public Map<String,List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
+    public Map<String, List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id.notFound",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id.notFound", unitId);
         }
         List<PhaseDTO> phases = getPhasesByUnit(unitId);
         Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
@@ -143,9 +143,15 @@ public class PhaseService extends MongoBaseService {
             logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
             exceptionService.dataNotFoundByIdException("message.country.phase.sequence", phaseDTO.getCountryId());
         }
-        Phase phase = phaseDTO.buildPhaseForCountry();
+        Phase phase = buildPhaseForCountry(phaseDTO);
         phase.setCountryId(countryId);
         save(phase);
+        return phase;
+    }
+
+    public Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
+        Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
+                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType());
         return phase;
     }
 

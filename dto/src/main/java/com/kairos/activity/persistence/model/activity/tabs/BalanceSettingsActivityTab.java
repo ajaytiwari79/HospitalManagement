@@ -1,7 +1,6 @@
 package com.kairos.activity.persistence.model.activity.tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.web.cta.TimeTypeDTO;
 
 import java.math.BigInteger;
 

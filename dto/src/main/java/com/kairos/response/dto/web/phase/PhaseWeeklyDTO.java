@@ -1,4 +1,4 @@
-package com.kairos.activity.client.dto.Phase;
+package com.kairos.response.dto.web.phase;
 
 import java.math.BigInteger;
 

@@ -15,42 +15,51 @@ import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.activity.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.activity.constants.ApiConstants.UNIT_URL;
 
 /*
  * @author: Mohit Shakya
  * @usage: planned time type operations controller
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL+COUNTRY_URL+"/plannedTimeType")
+@RequestMapping(API_ORGANIZATION_URL)
 public class PlannedTimeTypeController {
 
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
 
     @ApiOperation(value = "Add PlannedTimeType by countryId")
-    @PostMapping
+    @PostMapping(value = COUNTRY_URL + "/plannedTimeType")
     public ResponseEntity<Map<String, Object>> addPlannedTimeType(@PathVariable Long countryId, @Validated @RequestBody PresenceTypeDTO presenceTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, plannedTimeTypeService.addPresenceType(presenceTypeDTO, countryId));
     }
 
     @ApiOperation(value = "Get all PlannedTimeType by countryId")
-    @GetMapping
+    @GetMapping(value = COUNTRY_URL + "/plannedTimeType")
     public ResponseEntity<Map<String, Object>> getAllPlannedTimeTypeByCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.getAllPresenceTypeByCountry(countryId));
     }
 
     @ApiOperation(value = "delete a PlannedTimeType by Id")
-    @DeleteMapping(value="/{plannedTimeTypeId}")
+    @DeleteMapping(value = COUNTRY_URL + "/plannedTimeType/{plannedTimeTypeId}")
     public ResponseEntity<Map<String, Object>> deletePlannedTimeTypeById(@PathVariable BigInteger plannedTimeTypeId) {
         plannedTimeTypeService.deletePresenceTypeById(plannedTimeTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @ApiOperation(value = "Update PlannedTimeType by Id")
-    @PutMapping("/{plannedTimeTypeId}")
+    @PutMapping(value = COUNTRY_URL + "/plannedTimeType/{plannedTimeTypeId}")
     public ResponseEntity<Map<String, Object>> updatePlannedTimeType(@PathVariable Long countryId,
-                                                                  @PathVariable BigInteger plannedTimeTypeId,
-                                                                  @Validated @RequestBody PresenceTypeDTO presenceTypeDTO) {
+                                                                     @PathVariable BigInteger plannedTimeTypeId,
+                                                                     @Validated @RequestBody PresenceTypeDTO presenceTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.updatePresenceType(countryId, plannedTimeTypeId, presenceTypeDTO));
     }
+
+    @ApiOperation(value = "Get all PlannedTimeType by countryId")
+    @GetMapping(value = UNIT_URL + "/plannedTimeType")
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypesByCountry(@RequestParam Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, plannedTimeTypeService.getAllPresenceTypesByCountry(countryId));
+    }
+
+
 }
