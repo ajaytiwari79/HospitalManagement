@@ -1,4 +1,6 @@
 package com.kairos.controller.template_type;
+import com.kairos.custom_exception.DataNotExists;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -33,10 +35,12 @@ public class TemplateTypeController {
 
 
     /**
-     *
+     * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
+     * @author vikash patwal
      * @param countryId
      * @param templateData
-     * @return
+     * @throws
+     * @return list
      */
     @ApiOperation(value = "create new Template type")
     @PostMapping("/createTemplate")
@@ -48,10 +52,12 @@ public class TemplateTypeController {
     }
 
     /**
-     *
+     * @description get template by name
+     * @author vikash patwal
      * @param countryId
      * @param templateName
-     * @return
+     * @throws DataNotExists
+     * @return TemplateType
      */
     @ApiOperation(value="Get template by name")
     @GetMapping("/getTemplateByName")
@@ -63,11 +69,13 @@ public class TemplateTypeController {
     }
 
     /**
-     *
+     * @description update template by id
+     * @author vikash patwal
      * @param id
      * @param countryId
      * @param templateType
-     * @return
+     * @throws DuplicateDataException
+     * @return TemplateType
      */
     @ApiOperation(value="update template")
     @RequestMapping(value = "/updateTemplate", method = RequestMethod.PUT)
@@ -83,10 +91,12 @@ public class TemplateTypeController {
     }
 
     /**
-     *
+     * @description template by id
+     * @author vikash patwal
      * @param countryId
      * @param id
-     * @return
+     * @throws DataNotFoundByIdException
+     * @returne Boolean
      */
     @ApiOperation(value="delete template by id")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)

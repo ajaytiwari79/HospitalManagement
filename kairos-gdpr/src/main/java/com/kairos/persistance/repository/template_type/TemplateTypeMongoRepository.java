@@ -7,6 +7,9 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 
+/**
+ * @Auther vikash patwal
+ */
 public interface TemplateTypeMongoRepository extends MongoRepository<TemplateType,BigInteger> {
 
 
