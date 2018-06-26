@@ -247,11 +247,9 @@ public class ShiftService extends MongoBaseService {
             if (!Optional.ofNullable(act.getAbsencePlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
             }
+            plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
             if (act.getAbsencePlannedTime().isException()) {
-                plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
                 break;
-            } else {
-                plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
             }
         }
         return plannedTimeId;
