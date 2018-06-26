@@ -101,23 +101,17 @@ public class ActivityConfigurationService extends MongoBaseService {
         return presencePlannedTime;
     }
 
-    public AbsencePlannedTime updateAbsenceActivityConfiguration(Long unitId, AbsencePlannedTime absencePlannedTime) {
-        ActivityConfiguration activityConfiguration;
-        if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
-            activityConfiguration = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId, absencePlannedTime.getPhaseId(), true);
-            if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
-            }
-            activityConfiguration.getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
-            activityConfiguration.getAbsencePlannedTime().setException(true);
-        } else {
-            activityConfiguration = activityConfigurationRepository.findAbsenceConfigurationByUnitIdAndPhaseId(unitId, absencePlannedTime.getPhaseId(), false);
-            if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
-                exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
-            }
+    public AbsencePlannedTime updateAbsenceActivityConfiguration(Long unitId, BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
+        Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
+        if (!Optional.of(activityConfiguration).isPresent()) {
+            exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
         }
-        activityConfiguration.getAbsencePlannedTime().setPlannedTimeId(absencePlannedTime.getPlannedTimeId());
-        save(activityConfiguration);
+        if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
+            activityConfiguration.get().getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
+            activityConfiguration.get().getAbsencePlannedTime().setException(true);
+        }
+        activityConfiguration.get().getAbsencePlannedTime().setPlannedTimeId(absencePlannedTime.getPlannedTimeId());
+        save(activityConfiguration.get());
         return absencePlannedTime;
 
     }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.ACTIVITY_CONFIGURATION;
@@ -31,10 +32,10 @@ public class ActivityConfigurationController {
     }
 
     @ApiOperation("Update absence Activity Configuration ")
-    @PutMapping(value = "/absence")
+    @PutMapping(value = "/{activityConfigurationId}/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @RequestBody AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId, absencePlannedTime));
+    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId ,@RequestBody AbsencePlannedTime absencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId,activityConfigurationId, absencePlannedTime));
     }
 
     @ApiOperation("CREATE Activity Configuration ")
@@ -49,14 +50,16 @@ public class ActivityConfigurationController {
     @GetMapping(value = "/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAbsenceActivityConfiguration(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfiguration (unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfiguration(unitId));
     }
+
     @ApiOperation("Get absence Activity Configuration")
     @GetMapping(value = "/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPresenceActivityConfiguration(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfiguration(unitId));
     }
+
     @ApiOperation("Get default data ")
     @GetMapping(value = "/default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
