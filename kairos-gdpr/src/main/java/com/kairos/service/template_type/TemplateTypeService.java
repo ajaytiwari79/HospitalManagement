@@ -28,21 +28,21 @@ public class TemplateTypeService extends MongoBaseService {
 
 
     public List<Object> createTemplateType(Long countryId,List<TemplateType> templateData) {
-        List<Object> allData=new ArrayList<Object>();
+        List<Object> resultData=new ArrayList<Object>();
            for (TemplateType data : templateData) {
                    TemplateType exists = templateTypeRepository.findByTemplateName(data.getTemplateName());
                    if (java.util.Optional.ofNullable(exists).isPresent()) {
                        Map<String, String> result = new HashMap<String, String>();
                        result.put("error","template name "+data.getTemplateName()+" already exits");
-                       allData.add(result);
+                       resultData.add(result);
                    } else {
                        TemplateType templateType = new TemplateType();
                        templateType.setTemplateName(data.getTemplateName());
                        save(templateType);
-                       allData.add(templateType);
+                       resultData.add(templateType);
                    }
            }
-           return allData;
+           return resultData;
     }
 
 
