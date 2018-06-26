@@ -8,6 +8,7 @@ import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,9 +61,9 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/staff/access_roles", null),UserAccessRoleDTO.class);
     }
 
-    public List<Long> getStaffIdsByUserId(Long userId){
-        List<Long> staffIds=genericRestClient.publish(null,userId,true,IntegrationOperation.GET,"/staff/get_staff_ids/user/{userId}",null,userId);
-        return staffIds;
+    public StaffResultDTO getStaffIdsByUserId(Long userId){
+        StaffResultDTO staffAndOrganizationIds=genericRestClient.publish(null,userId,true,IntegrationOperation.GET,"/staff/get_staff_ids/user/{userId}",null,userId);
+        return staffAndOrganizationIds;
     }
 
 }

@@ -68,6 +68,7 @@ import com.kairos.response.dto.web.employment_dto.EmploymentOverlapDTO;
 import com.kairos.response.dto.web.employment_dto.MainEmploymentResultDTO;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -92,6 +93,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -2051,8 +2053,9 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public List<Long> getStaffIdsByUserId(Long UserId){
-        return staffGraphRepository.getStaffByUserId(UserId);
-
+    public StaffResultDTO getStaffIdsByUserId(Long UserId){
+        StaffResultDTO staffResultDTO=new StaffResultDTO();
+        BeanUtils.copyProperties(staffGraphRepository.getStaffByUserId(UserId),staffResultDTO);
+        return staffResultDTO;
     }
 }

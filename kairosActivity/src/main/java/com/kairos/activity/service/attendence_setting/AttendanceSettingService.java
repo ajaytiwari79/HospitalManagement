@@ -9,6 +9,7 @@ import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -44,13 +45,9 @@ public Duration getAttendanceSetting(Long unitId, Long staffId) {
 }
 
 public Duration updateAttendanceSetting(Long userId, Duration attendanceDuration) {
-    List<Long> staffids=restClient.getStaffIdsByUserId(userId);
-    if(staffids.isEmpty())
-    {
-        exceptionService.actionNotPermittedException("userid not valid");
-    }
+    StaffResultDTO staffAndOrganizationIds=restClient.getStaffIdsByUserId(userId);
     Date date=DateUtils.getDateByLocalDateAndLocalTime( DateUtils.getCurrentLocalDate(),attendanceDuration.getFrom());
-    ShiftQueryResult shiftQueryResults=shiftService.getShiftByStaffIdAndDate(staffids,date);
+    ShiftQueryResult shiftQueryResults=shiftService.getShiftByStaffIdAndDate(staffAndOrganizationIds.getStaffIds(),date);
     if(!Optional.ofNullable(shiftQueryResults).isPresent()){
         exceptionService.actionNotPermittedException("not found");
     }

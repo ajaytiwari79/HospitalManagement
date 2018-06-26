@@ -12,6 +12,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -379,8 +380,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     StaffFavouriteFilter getStaffFavouriteFiltersById(Long staffId, Long staffFavouriteFiltersId);
 
 
-    @Query("MATCH (u:User)-[:BELONGS_TO]-(s:Staff) where id(u)={0} return id(s) as id ")
-    List<Long> getStaffByUserId(Long id);
+    @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN collect(id(staff)) as staffIds,collect(id(org)) as unitIds")
+    StaffUnitWrapper getStaffByUserId(Long id);
 
     @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
             "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} return staff")
