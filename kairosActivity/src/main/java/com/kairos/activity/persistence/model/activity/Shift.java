@@ -4,10 +4,9 @@ package com.kairos.activity.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.enums.shift.ShiftState;
-import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -59,6 +58,7 @@ public class Shift extends MongoBaseEntity {
 
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
+    private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
     public Shift() {
     }
@@ -362,6 +362,14 @@ public class Shift extends MongoBaseEntity {
 
     public void setCopiedFromShiftId(BigInteger copiedFromShiftId) {
         this.copiedFromShiftId = copiedFromShiftId;
+    }
+
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 
     public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, ShiftState shiftState, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {

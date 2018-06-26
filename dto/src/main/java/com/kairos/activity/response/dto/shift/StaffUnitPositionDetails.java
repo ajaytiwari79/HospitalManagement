@@ -40,6 +40,8 @@ public class StaffUnitPositionDetails {
     private List<AppliedFunctionDTO> appliedFunctions;
     private LocalDate unitPositionStartDate;
     private LocalDate unitPositionEndDate;
+    private BigInteger excludedPlannedTime;
+    private BigInteger includedPlannedTime;
 
     public StaffUnitPositionDetails() {
 
@@ -233,5 +235,21 @@ public class StaffUnitPositionDetails {
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
+    }
+
+    public BigInteger getExcludedPlannedTime() {
+        return excludedPlannedTime;
+    }
+
+    public void setExcludedPlannedTime(BigInteger excludedPlannedTime) {
+        this.excludedPlannedTime = excludedPlannedTime;
+    }
+
+    public BigInteger getIncludedPlannedTime() {
+        return includedPlannedTime;
+    }
+
+    public void setIncludedPlannedTime(BigInteger includedPlannedTime) {
+        this.includedPlannedTime = includedPlannedTime;
     }
 }
