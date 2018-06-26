@@ -7,7 +7,6 @@ import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
@@ -233,15 +232,11 @@ public class ShiftService extends MongoBaseService {
          * This is used for checking the activity is for presence type
          **/
         Boolean managementPerson = (Optional.ofNullable(staffAdditionalInfoDTO.getUser()).isPresent() && staffAdditionalInfoDTO.getUser().getManagement()) ? true : false;
-        BigInteger plannedTimeId;
-        if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
-                || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-            plannedTimeId = getAbsencePlannedTime(unitId, phaseId);
+        BigInteger plannedTimeId = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
+                || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK))
+                ? getAbsencePlannedTime(unitId, phaseId)
+                : getPresencePlannedTime(unitId, phaseId, managementPerson);
 
-        } else {
-            plannedTimeId = getPresencePlannedTime(unitId, phaseId, managementPerson);
-
-        }
         return plannedTimeId;
     }
 
