@@ -77,19 +77,13 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     public Map getCounterIdAndTypeMapping(List<Counter> counters){
-        Map<BigInteger, CounterType> counterIdTypeMap = new HashMap<>();
-        for(Counter definition : counters){
-            counterIdTypeMap.put(definition.getId(), definition.getType());
-        }
+        Map<BigInteger, CounterType> counterIdTypeMap = counters.parallelStream().collect(Collectors.toMap(counter -> counter.getId(), counter -> counter.getType()));
         return counterIdTypeMap;
     }
 
     //to identify counter definition for by id.
     public Map getCounterDefinitionByIdMap(List<Counter> counters){
-        Map<BigInteger, Counter> counterTypeIdMap = new HashMap<BigInteger, Counter>();
-        for(Counter definition : counters){
-            counterTypeIdMap.put(definition.getId(), definition);
-        }
+        Map<BigInteger, Counter> counterTypeIdMap = counters.parallelStream().collect(Collectors.toMap(counter -> counter.getId(), counter -> counter));
         return counterTypeIdMap;
     }
 
