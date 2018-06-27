@@ -262,14 +262,14 @@ public class OrganizationActivityController {
     }
 
     // cta_wta_settings
-    @ApiOperation("get cta and wta settings tab data of activity type")
+    @ApiOperation("get cta_response and wta settings tab data of activity type")
     @GetMapping(value = "/activity/{activityId}/cta_wta_settings")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getCtaAndWtaSettingsTabOfActivity(@PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCtaAndWtaSettingsTabOfActivity(activityId));
     }
 
-    @ApiOperation("update cta and wta settings  of activity Type")
+    @ApiOperation("update cta_response and wta settings  of activity Type")
     @PutMapping(value = "/activity/cta_wta_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateCtaAndWtaSettingsTabOfActivity(@RequestBody CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {

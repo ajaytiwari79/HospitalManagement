@@ -3,7 +3,7 @@ package com.kairos.controller.auth;
 import com.kairos.user.organization.Organization;
 import com.kairos.user.auth.OrganizationSelectionDTO;
 import com.kairos.user.auth.User;
-import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
+import com.kairos.user.patient.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.response.ResponseHandler;

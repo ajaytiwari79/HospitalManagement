@@ -6,7 +6,7 @@ import com.kairos.user.organization.AddressDTO;
 import com.kairos.user.organization.team.Team;
 import com.kairos.user.client.*;
 import com.kairos.user.staff.StaffClientData;
-import com.kairos.response.dto.web.ContactPersonDTO;
+import com.kairos.user.patient.web.ContactPersonDTO;
 import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;

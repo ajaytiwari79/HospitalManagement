@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.solver_config;
 
-import com.kairos.persistence.model.solver_config.SolverConfig;
-import com.kairos.dto.solverconfig.SolverConfigDTO;
-import org.springframework.data.mongodb.repository.Query;
+import com.kairos.planner.solverconfig.SolverConfigDTO;
 
 import java.math.BigInteger;
 import java.util.List;

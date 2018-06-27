@@ -3,7 +3,7 @@ package com.kairos.service.activity;
 import com.kairos.KairosActivityApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

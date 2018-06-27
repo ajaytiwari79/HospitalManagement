@@ -13,7 +13,7 @@ import com.kairos.client.dto.staff.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.dto.task.VRPTaskDTO;
+import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.enums.Day;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.enums.task_type.TaskTypeEnum;
@@ -38,7 +38,7 @@ import com.kairos.persistence.repository.repository_impl.TaskMongoRepositoryImpl
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.user.country.day_type.DayType;
 import com.kairos.serializers.MongoDateMapper;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;

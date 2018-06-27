@@ -1,16 +1,14 @@
 package com.kairos.controller.access_group;
 
-import com.kairos.user.access_permission.AccessPage;
 import com.kairos.user.access_permission.AccessPageDTO;
 import com.kairos.user.access_permission.AccessPageStatusDTO;
 import com.kairos.user.access_permission.Tab;
-import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
+import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +16,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.API_V1;
 

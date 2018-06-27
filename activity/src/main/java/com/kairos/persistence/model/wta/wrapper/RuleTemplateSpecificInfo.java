@@ -3,8 +3,8 @@ package com.kairos.persistence.model.wta.wrapper;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.util.DateTimeInterval;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

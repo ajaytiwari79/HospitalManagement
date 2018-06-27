@@ -10,7 +10,7 @@ import com.kairos.user.country.ReasonCode;
 import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
-import com.kairos.response.dto.web.ReasonCodeDTO;
+import com.kairos.user.patient.web.ReasonCodeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

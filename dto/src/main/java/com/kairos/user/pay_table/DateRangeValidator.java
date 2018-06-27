@@ -1,6 +1,6 @@
 package com.kairos.user.pay_table;
 
-import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
+import com.kairos.user.country.pay_group_area.PayGroupAreaDTO;
 import org.joda.time.DateTime;
 
 import javax.validation.ConstraintValidator;

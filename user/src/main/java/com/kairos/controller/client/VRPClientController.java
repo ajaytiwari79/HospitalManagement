@@ -1,6 +1,6 @@
 package com.kairos.controller.client;
 
-import com.kairos.response.dto.web.client.VRPClientDTO;
+import com.kairos.user.client.VRPClientDTO;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

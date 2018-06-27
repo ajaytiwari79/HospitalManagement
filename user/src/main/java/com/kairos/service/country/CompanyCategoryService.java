@@ -1,15 +1,11 @@
 package com.kairos.service.country;
 
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.user.country.CompanyCategory;
 import com.kairos.user.country.Country;
 import com.kairos.user.country.dto.CompanyCategoryResponseDTO;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.company_category.CompanyCategoryDTO;
+import com.kairos.user.organization.company_category.CompanyCategoryDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;

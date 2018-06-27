@@ -2,8 +2,8 @@ package com.kairos.controller.order;
 
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.open_shift.OrderOpenshiftResponseDTO;
-import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
+import com.kairos.activity.open_shift.OrderOpenshiftResponseDTO;
+import com.kairos.activity.open_shift.OrderResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

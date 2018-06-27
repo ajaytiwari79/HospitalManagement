@@ -13,7 +13,7 @@ import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.access_permission.AccessPageQueryResult;
 import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.Country;
-import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
+import com.kairos.user.access_group.CountryAccessGroupDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OrganizationService;

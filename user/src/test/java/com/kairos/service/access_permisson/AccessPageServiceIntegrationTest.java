@@ -9,11 +9,7 @@ import com.kairos.user.organization.Organization;
 import com.kairos.user.access_permission.AccessPage;
 import com.kairos.user.access_permission.AccessPageDTO;
 import com.kairos.user.country.Country;
-import com.kairos.user.country.equipment.Equipment;
-import com.kairos.user.country.equipment.EquipmentCategory;
-import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
-import com.kairos.response.dto.web.equipment.EquipmentDTO;
+import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
@@ -37,8 +33,6 @@ import javax.inject.Inject;
 
 import java.util.HashMap;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by prerna on 1/3/18.

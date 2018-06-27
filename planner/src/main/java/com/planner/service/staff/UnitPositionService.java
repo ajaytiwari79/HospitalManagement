@@ -1,8 +1,8 @@
 package com.planner.service.staff;
 
 import com.fasterxml.jackson.databind.util.BeanUtil;
-import com.kairos.response.dto.web.UnitPositionDTO;
-import com.kairos.response.dto.web.UnitPositionWtaDTO;
+import com.kairos.user.patient.web.UnitPositionDTO;
+import com.kairos.user.patient.web.UnitPositionWtaDTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import com.planner.domain.staff.UnitPosition;
 import com.planner.domain.wta.WTABaseRuleTemplate;

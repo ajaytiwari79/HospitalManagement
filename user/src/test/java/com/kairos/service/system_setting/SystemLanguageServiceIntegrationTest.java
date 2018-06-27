@@ -7,7 +7,7 @@ import com.kairos.config.OrderTestRunner;
 import com.kairos.user.organization.Organization;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.user.country.Country;
-import com.kairos.response.dto.web.system_setting.SystemLanguageDTO;
+import com.kairos.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OrganizationService;
 import org.junit.Assert;
@@ -28,8 +28,6 @@ import org.springframework.http.ResponseEntity;
 import javax.inject.Inject;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

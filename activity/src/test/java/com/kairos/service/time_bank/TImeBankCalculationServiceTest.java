@@ -6,7 +6,7 @@ import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.dto.ActivityDTO;
 import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.util.DateUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
 import org.joda.time.DateTime;

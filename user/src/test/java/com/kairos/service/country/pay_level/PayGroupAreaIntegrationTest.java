@@ -6,7 +6,7 @@ import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.user.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
-import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
+import com.kairos.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
@@ -23,9 +23,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import javax.inject.Inject;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by prabjot on 21/12/17.

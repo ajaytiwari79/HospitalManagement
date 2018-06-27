@@ -2,7 +2,7 @@ package com.kairos.controller.period;
 
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.period.PlanningPeriodDTO;
+import com.kairos.activity.period.PlanningPeriodDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.open_shift;
 
-import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.kairos.user.organization.time_slot;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.enums.time_slot.TimeSlotMode;
-import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
+import com.kairos.user.patient.web.organization.time_slot.TimeSlotSetDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;

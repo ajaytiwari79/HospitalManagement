@@ -1,7 +1,7 @@
 package com.kairos.service.staffing_level;
 
 import com.kairos.client.OrganizationRestClient;
-import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.user.country.day_type.DayType;
 import com.kairos.enums.Day;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelTemplate;

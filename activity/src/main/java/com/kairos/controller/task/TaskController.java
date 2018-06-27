@@ -2,7 +2,7 @@ package com.kairos.controller.task;
 import com.kairos.client.dto.staff.KMDShift;
 import com.kairos.activity.dto.BulDeleteTaskDTO;
 import com.kairos.activity.dto.TaskActiveUpdationDTO;
-import com.kairos.dto.task.VRPTaskDTO;
+import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.service.kmdNexus.AuthService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;

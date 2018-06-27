@@ -14,9 +14,9 @@ import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTi
 import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
 import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
-import com.kairos.response.dto.web.cta.PhaseResponseDTO;
-import com.kairos.response.dto.web.cta.TimeTypeResponseDTO;
-import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.user.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.user.agreement.cta.cta_response.TimeTypeResponseDTO;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

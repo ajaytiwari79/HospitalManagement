@@ -9,7 +9,7 @@ import com.kairos.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.user.staff.Staff;
-import com.kairos.response.dto.web.AppliedFunctionDTO;
+import com.kairos.user.patient.web.AppliedFunctionDTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

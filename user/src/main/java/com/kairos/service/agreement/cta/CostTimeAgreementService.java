@@ -25,8 +25,8 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
-import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
+import com.kairos.user.agreement.cta.cta_response.CTARuleTemplateCategoryWrapper;
+import com.kairos.user.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
@@ -531,7 +531,7 @@ public class CostTimeAgreementService extends UserBaseService {
             for(CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
                 CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
                 BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate);
-                // Check if cta exists with same rule template Id
+                // Check if cta_response exists with same rule template Id
                 if(!doUpdate || (doUpdate && !ruleTemplateIds.contains(ctaRuleTemplate.getId()))){
                     ctaRuleTemplate.cloneCTARuleTemplate();
 //                    ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
@@ -734,7 +734,7 @@ public class CostTimeAgreementService extends UserBaseService {
             // save(organization);
            } catch (Exception e){
                // Exception occured
-               logger.info("Exception occured on setting cta to organization");
+               logger.info("Exception occured on setting cta_response to organization");
            }
 
         });
@@ -754,7 +754,7 @@ public class CostTimeAgreementService extends UserBaseService {
                 save(organization);*/
             } catch (Exception e){
                 // Exception occured
-                logger.info("Exception occured on setting cta to organization");
+                logger.info("Exception occured on setting cta_response to organization");
             }
 
         });

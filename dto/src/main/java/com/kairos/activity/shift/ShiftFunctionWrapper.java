@@ -1,6 +1,6 @@
 package com.kairos.activity.shift;
 
-import com.kairos.response.dto.web.FunctionDTO;
+import com.kairos.user.patient.web.FunctionDTO;
 
 import java.time.LocalDate;
 import java.util.List;

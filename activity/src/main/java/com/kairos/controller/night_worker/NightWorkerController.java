@@ -2,8 +2,8 @@ package com.kairos.controller.night_worker;
 
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
-import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

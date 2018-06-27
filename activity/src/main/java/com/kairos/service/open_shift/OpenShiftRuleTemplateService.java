@@ -10,7 +10,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

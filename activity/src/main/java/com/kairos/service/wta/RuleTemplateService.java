@@ -18,9 +18,9 @@ import com.kairos.service.tag.TagService;
 import com.kairos.util.userContext.CurrentUserDetails;
 import com.kairos.util.userContext.UserContext;
 
-import com.kairos.response.dto.web.CountryDTO;
-import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
-import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
+import com.kairos.user.country.CountryDTO;
+import com.kairos.user.agreement.RuleTemplateWrapper;
+import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.activity.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

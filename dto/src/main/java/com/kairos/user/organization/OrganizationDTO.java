@@ -3,7 +3,7 @@ package com.kairos.user.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.organization.CompanyType;
 import com.kairos.activity.organization.CompanyUnitType;
-import com.kairos.user.organization.enums.OrganizationLevel;
+import com.kairos.enums.OrganizationLevel;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

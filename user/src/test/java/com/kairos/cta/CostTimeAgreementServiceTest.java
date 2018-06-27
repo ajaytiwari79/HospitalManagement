@@ -2,7 +2,6 @@ package com.kairos.cta;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.config.OrderTest;
 
 import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.user.organization.Organization;
@@ -11,12 +10,11 @@ import com.kairos.user.agreement.cta.*;
 import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.user.country.Country;
 import com.kairos.user.country.Currency;
-import com.kairos.user.country.DayType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
-import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
-import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
+import com.kairos.user.agreement.cta.cta_response.CTARuleTemplateCategoryWrapper;
+import com.kairos.user.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.country.CountryService;
@@ -33,7 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -45,14 +42,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -197,7 +190,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta",
+                baseUrl + "/cta_response",
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
@@ -215,7 +208,7 @@ public class CostTimeAgreementServiceTest {
             logger.info("CTA Id is null");
             createdCtaId = costTimeAgreementService.getCTAIdByNameAndCountry(nameOfCTA, countryId);
         }
-        // If CTA not found by Id check for cta by name
+        // If CTA not found by Id check for cta_response by name
         if (createdCtaId == null) {
             logger.info("CTA not found with name : {}", nameOfCTA);
             return;
@@ -242,7 +235,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta/" + createdCtaId,
+                baseUrl + "/cta_response/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId = response.getBody().getData().getId();
@@ -290,7 +283,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta/" + createdCtaId,
+                baseUrl + "/cta_response/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId = response.getBody().getData().getId();
@@ -346,7 +339,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionQueryResult>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<UnitPositionQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta/" + ctaLinkedWithUnitPosition.getId(),
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta_response/" + ctaLinkedWithUnitPosition.getId(),
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -360,7 +353,7 @@ public class CostTimeAgreementServiceTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<CTAListQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta",
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta_response",
                 HttpMethod.GET, null, resTypeReference);
 
         logger.info("STATUS CODE ---------------------> {}", response.getStatusCode());

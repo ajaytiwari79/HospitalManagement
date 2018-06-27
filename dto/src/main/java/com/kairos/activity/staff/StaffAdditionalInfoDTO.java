@@ -1,9 +1,9 @@
 package com.kairos.activity.staff;
 
-import com.kairos.activity.time_slot.TimeSlotWrapper;
-import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
 import org.joda.time.DateTimeZone;
 
 import java.time.ZoneId;

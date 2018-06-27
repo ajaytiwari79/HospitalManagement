@@ -50,17 +50,17 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.response.dto.web.PasswordUpdateDTO;
-import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
-import com.kairos.response.dto.web.StaffTaskDTO;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
-import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
-import com.kairos.response.dto.web.employment_dto.EmploymentOverlapDTO;
-import com.kairos.response.dto.web.employment_dto.MainEmploymentResultDTO;
-import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.response.dto.web.skill.SkillDTO;
-import com.kairos.response.dto.web.staff.StaffChatDetails;
+import com.kairos.user.patient.web.PasswordUpdateDTO;
+import com.kairos.user.patient.web.StaffAssignedTasksWrapper;
+import com.kairos.user.patient.web.StaffTaskDTO;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.client.ClientStaffInfoDTO;
+import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
+import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
+import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.user.country.skill.SkillDTO;
+import com.kairos.user.staff.staff.StaffChatDetails;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -1837,12 +1837,12 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<com.kairos.response.dto.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
+    public List<com.kairos.user.patient.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
         List<Staff> staffs = staffGraphRepository.getStaffByExperties(unitId, expertiesIds);
         List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s -> s.getId()).collect(Collectors.toList()));
-        List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
+        List<com.kairos.user.patient.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
-            com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
+            com.kairos.user.patient.web.StaffDTO staffDTO = new com.kairos.user.patient.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
             EmploymentUnitPositionDTO employmentUnitPositionDTO = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), true);
             List<UnitPositionQueryResult> unitPositions = employmentUnitPositionDTO.getUnitPositions();
             expertiesIds.forEach(expertiseId -> {

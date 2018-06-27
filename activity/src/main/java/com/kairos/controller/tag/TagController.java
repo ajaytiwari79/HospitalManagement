@@ -2,7 +2,7 @@ package com.kairos.controller.tag;
 
 import com.kairos.controller.staffing_level.StaffingLevelController;
 import com.kairos.enums.tags.MasterDataTypeEnum;
-import com.kairos.dto.tag.TagDTO;
+import com.kairos.activity.tag.TagDTO;
 import com.kairos.service.tag.TagService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

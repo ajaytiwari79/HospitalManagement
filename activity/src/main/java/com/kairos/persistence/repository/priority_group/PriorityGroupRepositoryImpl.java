@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.priority_group;
 
-import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.inject.Inject;

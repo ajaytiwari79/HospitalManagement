@@ -2,8 +2,8 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.user.organization.Level;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
-import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
+import com.kairos.user.patient.web.OrganizationTypeDTO;
+import com.kairos.user.patient.web.UpdateOrganizationTypeDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

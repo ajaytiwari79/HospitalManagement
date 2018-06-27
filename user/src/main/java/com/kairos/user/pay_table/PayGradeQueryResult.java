@@ -2,7 +2,7 @@ package com.kairos.user.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
+import com.kairos.user.country.pay_table.PayTableMatrixDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

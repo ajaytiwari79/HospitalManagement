@@ -1,22 +1,19 @@
 package com.kairos.persistence.repository.period;
 
 import com.kairos.persistence.model.period.PlanningPeriod;
-import com.kairos.persistence.model.phase.Phase;
 import com.kairos.util.DateUtils;
-import com.kairos.response.dto.web.period.PlanningPeriodDTO;
+import com.kairos.activity.period.PlanningPeriodDTO;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.CountOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -108,7 +105,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         );
 
-        AggregationResults<com.kairos.response.dto.web.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.response.dto.web.period.PlanningPeriodDTO.class);
+        AggregationResults<com.kairos.activity.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.activity.period.PlanningPeriodDTO.class);
         return result.getMappedResults();
     }*/
 
@@ -134,7 +131,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         );
 
-        AggregationResults<com.kairos.response.dto.web.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.response.dto.web.period.PlanningPeriodDTO.class);
+        AggregationResults<com.kairos.activity.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.activity.period.PlanningPeriodDTO.class);
         return result.getMappedResults();
     }
 

@@ -53,8 +53,8 @@ import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepositor
 import com.kairos.persistence.repository.user.unit_position.UnitPositionEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.response.dto.web.PositionWrapper;
-import com.kairos.response.dto.web.UnitPositionDTO;
+import com.kairos.user.patient.web.PositionWrapper;
+import com.kairos.user.patient.web.UnitPositionDTO;
 import com.kairos.activity.wta.WTADTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.service.UserBaseService;

@@ -10,14 +10,14 @@ import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
-import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
-import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
-import com.kairos.response.dto.web.organization.OrganizationSettingDTO;
-import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
-import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
-import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
+import com.kairos.user.patient.web.OrganizationExternalIdsDTO;
+import com.kairos.user.patient.web.TimeSlotsDeductionDTO;
+import com.kairos.user.client.ClientFilterDTO;
+import com.kairos.user.patient.web.organization.OrganizationServiceDTO;
+import com.kairos.user.patient.web.organization.OrganizationSettingDTO;
+import com.kairos.user.patient.web.organization.OrganizationSkillDTO;
+import com.kairos.user.patient.web.organization.time_slot.TimeSlotDTO;
+import com.kairos.user.patient.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CountryService;
@@ -1291,8 +1291,8 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openningHourService.setDefaultOpeningHours(unitId));
     }
 
-    @RequestMapping(value = UNIT_URL + "/cta/default-data", method = RequestMethod.GET)
-    @ApiOperation("get default data for cta rule template")
+    @RequestMapping(value = UNIT_URL + "/cta_response/default-data", method = RequestMethod.GET)
+    @ApiOperation("get default data for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(null, unitId));
     }

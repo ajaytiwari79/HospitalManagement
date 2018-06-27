@@ -9,8 +9,8 @@ import com.kairos.user.country.employment_type.EmploymentType;
 
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
-import com.kairos.response.dto.web.UnitPositionWtaDTO;
-import com.kairos.response.dto.web.staff.Staff;
+import com.kairos.user.patient.web.UnitPositionWtaDTO;
+import com.kairos.user.staff.staff.Staff;
 import com.kairos.activity.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,11 +1,10 @@
 package com.kairos.user.staff;
 
 import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;

@@ -4,7 +4,7 @@ import com.kairos.UserServiceApplication;
 import com.kairos.user.organization.AddressDTO;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.user.organization.ParentOrganizationDTO;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.user.patient.web.OrganizationTypeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;

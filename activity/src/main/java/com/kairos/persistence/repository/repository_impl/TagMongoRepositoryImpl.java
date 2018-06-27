@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.tag.CustomTagMongoRepository;
-import com.kairos.dto.tag.TagDTO;
+import com.kairos.activity.tag.TagDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;

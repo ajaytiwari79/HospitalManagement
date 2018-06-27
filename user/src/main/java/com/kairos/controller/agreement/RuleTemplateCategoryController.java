@@ -2,8 +2,8 @@ package com.kairos.controller.agreement;
 
 import com.kairos.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.response.dto.web.AddRuleTemplateCategoryDTO;
-import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
+import com.kairos.user.patient.web.AddRuleTemplateCategoryDTO;
+import com.kairos.user.patient.web.UpdateRuleTemplateCategoryDTO;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.response.ResponseHandler;

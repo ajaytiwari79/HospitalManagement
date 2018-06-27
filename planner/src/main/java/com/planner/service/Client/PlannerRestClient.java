@@ -3,8 +3,6 @@ package com.planner.service.Client;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
-import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
-import com.kairos.activity.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service

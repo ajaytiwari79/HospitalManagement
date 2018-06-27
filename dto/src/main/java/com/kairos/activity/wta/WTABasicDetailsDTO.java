@@ -2,9 +2,9 @@ package com.kairos.activity.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.response.dto.web.CountryDTO;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
-import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
+import com.kairos.user.country.CountryDTO;
+import com.kairos.user.patient.web.OrganizationTypeDTO;
+import com.kairos.user.country.experties.ExpertiseResponseDTO;
 
 import java.util.List;
 

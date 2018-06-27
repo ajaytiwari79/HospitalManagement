@@ -35,11 +35,11 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.response.dto.web.*;
-import com.kairos.response.dto.web.client.ClientExceptionTypesDTO;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
-import com.kairos.response.dto.web.client.ClientPersonalCalenderPrerequisiteDTO;
-import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
+import com.kairos.user.patient.web.*;
+import com.kairos.user.client.ClientExceptionTypesDTO;
+import com.kairos.user.client.ClientFilterDTO;
+import com.kairos.user.client.ClientPersonalCalenderPrerequisiteDTO;
+import com.kairos.user.client.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;

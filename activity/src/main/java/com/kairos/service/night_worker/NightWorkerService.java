@@ -16,11 +16,11 @@ import com.kairos.spec.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.spec.night_worker.StaffNonPregnancySpecification;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.response.dto.web.StaffDTO;
-import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
-import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
-import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
-import com.kairos.response.dto.web.staff.UnitStaffResponseDTO;
+import com.kairos.user.patient.web.StaffDTO;
+import com.kairos.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.activity.night_worker.QuestionAnswerDTO;
+import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.user.staff.staff.UnitStaffResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

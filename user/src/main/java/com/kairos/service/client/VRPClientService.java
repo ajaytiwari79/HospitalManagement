@@ -1,6 +1,6 @@
 package com.kairos.service.client;
 
-import com.kairos.dto.task.VRPTaskDTO;
+import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.ObjectUtils;
 import com.kairos.client.TaskServiceRestClient;
@@ -10,7 +10,7 @@ import com.kairos.user.organization.Organization;
 import com.kairos.user.client.VRPClient;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
-import com.kairos.response.dto.web.client.VRPClientDTO;
+import com.kairos.user.client.VRPClientDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.excel.ExcelService;
 import org.apache.poi.ss.usermodel.Cell;

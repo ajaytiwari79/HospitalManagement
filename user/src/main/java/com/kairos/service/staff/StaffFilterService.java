@@ -18,8 +18,8 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
-import com.kairos.response.dto.web.filter.FilterDetailDTO;
-import com.kairos.response.dto.web.staff.StaffEmploymentWrapper;
+import com.kairos.user.country.filter.FilterDetailDTO;
+import com.kairos.user.staff.staff.StaffEmploymentWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;

@@ -1,6 +1,6 @@
 package com.kairos.client;
 
-import com.kairos.response.dto.web.staff.StaffChatDetails;
+import com.kairos.user.staff.staff.StaffChatDetails;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +15,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by vipul on 25/9/17.

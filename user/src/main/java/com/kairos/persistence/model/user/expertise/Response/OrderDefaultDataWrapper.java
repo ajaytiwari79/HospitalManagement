@@ -6,8 +6,8 @@ import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.user.staff.StaffPersonalDetailDTO;
-import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
-import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.activity.open_shift.OrderResponseDTO;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 
 import java.util.List;
 

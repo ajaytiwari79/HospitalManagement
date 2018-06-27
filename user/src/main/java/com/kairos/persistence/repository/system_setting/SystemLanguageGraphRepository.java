@@ -1,10 +1,7 @@
 package com.kairos.persistence.repository.system_setting;
 
-import com.kairos.persistence.model.constants.RelationshipConstants;
-
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.response.dto.web.system_setting.SystemLanguageDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 

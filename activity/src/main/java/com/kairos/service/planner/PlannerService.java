@@ -2,9 +2,8 @@ package com.kairos.service.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.dto.*;
 import com.kairos.client.*;
-import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.user.country.day_type.DayType;
 import com.kairos.client.dto.client.Client;
 import com.kairos.client.dto.country.CountryHolidayCalender;
 import com.kairos.activity.organization.OrganizationDTO;
@@ -29,6 +28,7 @@ import com.kairos.persistence.model.task_demand.TaskDemandVisit;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeSkill;
 import com.kairos.persistence.model.task_type.TaskTypeSlaConfig;
+import com.kairos.user.client.OrganizationClientWrapper;
 import com.kairos.wrapper.TaskCountWithAssignedUnit;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;

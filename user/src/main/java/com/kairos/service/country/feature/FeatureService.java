@@ -1,7 +1,5 @@
 package com.kairos.service.country.feature;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.user.country.Country;
 import com.kairos.user.country.feature.Feature;
 import com.kairos.user.country.feature.FeatureQueryResult;
@@ -11,8 +9,8 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FeatureGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
-import com.kairos.response.dto.web.feature.FeatureDTO;
-import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
+import com.kairos.user.country.feature.FeatureDTO;
+import com.kairos.user.country.feature.VehicleFeaturesDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 

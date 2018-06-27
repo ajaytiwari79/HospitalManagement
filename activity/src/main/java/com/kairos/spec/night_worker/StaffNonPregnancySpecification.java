@@ -3,7 +3,7 @@ package com.kairos.spec.night_worker;
 
 import com.kairos.spec.AbstractActivitySpecification;
 import com.kairos.enums.Gender;
-import com.kairos.response.dto.web.StaffDTO;
+import com.kairos.user.patient.web.StaffDTO;
 
 import java.util.List;
 

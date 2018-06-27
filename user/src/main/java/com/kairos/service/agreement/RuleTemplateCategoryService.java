@@ -9,8 +9,10 @@ import com.kairos.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.RuleTemplateDTO;
-import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
+import com.kairos.user.patient.web.RuleTemplateDTO;
+import com.kairos.user.patient.web.UpdateRuleTemplateCategoryDTO
+
+        ;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;

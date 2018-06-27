@@ -6,8 +6,8 @@ import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import com.kairos.user.country.time_slot.TimeSlot;
 import com.kairos.enums.DurationType;
-import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
-import com.kairos.response.dto.web.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
+import com.kairos.activity.night_worker.ExpertiseNightWorkerSettingDTO;
+import com.kairos.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 
 import javax.management.timer.Timer;
 import java.time.*;

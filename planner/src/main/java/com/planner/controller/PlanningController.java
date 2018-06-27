@@ -1,7 +1,7 @@
 package com.planner.controller;
 
-import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
-import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
+import com.kairos.planner.planninginfo.PlanningSubmissionDTO;
+import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.commonUtil.OptaNotFoundException;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.commonUtil.StaticField;

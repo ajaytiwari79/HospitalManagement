@@ -3,7 +3,7 @@ package com.kairos.client.dto.organization;
 import com.kairos.client.dto.client.Municipality;
 import com.kairos.client.dto.client.ZipCode;
 import com.kairos.activity.organization.OrganizationDTO;
-import com.kairos.activity.dto.ContactAddressDTO;
+import com.kairos.activity.address.ContactAddressDTO;
 
 /**
  * Created by prabjot on 3/3/17.

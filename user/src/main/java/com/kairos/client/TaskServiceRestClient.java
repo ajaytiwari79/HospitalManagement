@@ -1,12 +1,12 @@
 package com.kairos.client;
 
-import com.kairos.dto.task.VRPTaskDTO;
+import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.response.dto.web.EscalatedTasksWrapper;
-import com.kairos.response.dto.web.KMDShift;
-import com.kairos.response.dto.web.ResponseEnvelope;
-import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
+import com.kairos.user.patient.web.EscalatedTasksWrapper;
+import com.kairos.user.patient.web.KMDShift;
+import com.kairos.user.patient.web.ResponseEnvelope;
+import com.kairos.user.patient.web.StaffAssignedTasksWrapper;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

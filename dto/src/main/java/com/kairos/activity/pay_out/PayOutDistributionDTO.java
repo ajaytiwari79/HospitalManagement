@@ -2,7 +2,7 @@ package com.kairos.activity.pay_out;
 
 public class PayOutDistributionDTO {
 
-    //cta ruletemplate based distributions
+    //cta_response ruletemplate based distributions
     private Long id;
     private String name;
     private int minutes;

@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.tag;
 
-import com.kairos.dto.tag.TagDTO;
-import org.springframework.stereotype.Repository;
+import com.kairos.activity.tag.TagDTO;
 
 import java.math.BigInteger;
 import java.util.List;

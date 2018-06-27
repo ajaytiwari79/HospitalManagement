@@ -11,9 +11,9 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.response.dto.web.CountryDTO;
+import com.kairos.user.country.CountryDTO;
 
-import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
+import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.activity.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.response.dto.web.enums.RuleTemplateCategoryType.CTA;
-import static com.kairos.response.dto.web.enums.RuleTemplateCategoryType.WTA;
+import static com.kairos.enums.RuleTemplateCategoryType.CTA;
+import static com.kairos.enums.RuleTemplateCategoryType.WTA;
 
 
 /**

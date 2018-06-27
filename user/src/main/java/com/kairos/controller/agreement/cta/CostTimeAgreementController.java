@@ -1,7 +1,7 @@
 package com.kairos.controller.agreement.cta;
 
 import com.kairos.user.agreement.cta.CTARuleTemplateDTO;
-import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
+import com.kairos.user.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ public class CostTimeAgreementController {
      * @param countryId
      * @return
      */
-    @RequestMapping(value = "/country/{countryId}/cta", method = RequestMethod.POST)
+    @RequestMapping(value = "/country/{countryId}/cta_response", method = RequestMethod.POST)
     @ApiOperation("Create CTA")
     public ResponseEntity<Map<String, Object>> createCTA(@PathVariable Long countryId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
@@ -35,7 +35,7 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.createCostTimeAgreement(countryId,collectiveTimeAgreementDTO));
     }
 
-    @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/country/{countryId}/cta_response/{ctaId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA")
     public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
@@ -43,7 +43,7 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.updateCostTimeAgreement(countryId, null, ctaId, collectiveTimeAgreementDTO));
     }
 
-    @RequestMapping(value = "/unit/{unitId}/cta/{ctaId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/unit/{unitId}/cta_response/{ctaId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA Of Unit")
     public ResponseEntity<Map<String, Object>> updateUnitCTA(@PathVariable Long unitId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
@@ -51,21 +51,21 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.updateCostTimeAgreement(null, unitId, ctaId, collectiveTimeAgreementDTO));
     }
 
-    @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/country/{countryId}/cta_response/{ctaId}", method = RequestMethod.DELETE)
     @ApiOperation("Delete CTA")
     public ResponseEntity<Map<String, Object>> deleteCTA(@PathVariable Long countryId, @PathVariable Long ctaId) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 costTimeAgreementService.deleteCostTimeAgreement(countryId, ctaId));
     }
 
-    @RequestMapping(value = "/country/{countryId}/cta", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/cta_response", method = RequestMethod.GET)
     @ApiOperation("GET CTA")
     public ResponseEntity<Map<String, Object>> getCTA(@PathVariable Long countryId) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 costTimeAgreementService.loadAllCTAByCountry(countryId));
     }
 
-    @RequestMapping(value = "/unit/{unitId}/cta", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/cta_response", method = RequestMethod.GET)
     @ApiOperation("GET CTA Of Unit")
     public ResponseEntity<Map<String, Object>> getCTAOfUnit(@PathVariable Long unitId) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -88,20 +88,20 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.updateCTARuleTemplate(countryId,templateId, ctaRuleTemplateDTO));
     }
 
-    @RequestMapping(value = "/unit/{unitId}/cta/expertise", method = RequestMethod.GET)
-    @ApiOperation("get expertise for cta rule template")
+    @RequestMapping(value = "/unit/{unitId}/cta_response/expertise", method = RequestMethod.GET)
+    @ApiOperation("get expertise for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getExpertiseForOrgCTA(unitId));
     }
 
     @ApiOperation(value = "Update Unit Position's CTA")
-    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
+    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta_response/{ctaId}")
     public ResponseEntity<Map<String, Object>> updateUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable Long ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.createCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, collectiveTimeAgreementDTO));
     }
 
     @ApiOperation(value = "get unit_position's CTA")
-    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
+    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta_response")
     public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getUnitPositionCTA(unitId, unitPositionId));
     }
@@ -115,13 +115,13 @@ public class CostTimeAgreementController {
     }
 
     @ApiOperation(value = "Get CTA by Organization sub type  by using sub type Id")
-    @RequestMapping(value = COUNTRY_URL + "/cta/organization_sub_type/{organizationSubTypeId}", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/cta_response/organization_sub_type/{organizationSubTypeId}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable long organizationSubTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(organizationSubTypeId));
     }
 
-    @ApiOperation(value = "link and unlink cta with org sub-type")
-    @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta/{ctaId}")
+    @ApiOperation(value = "link and unlink cta_response with org sub-type")
+    @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta_response/{ctaId}")
     public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable long countryId, @PathVariable long ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.setCTAWithOrganizationType(countryId, ctaId,collectiveTimeAgreementDTO, organizationSubTypeId, checked));
     }

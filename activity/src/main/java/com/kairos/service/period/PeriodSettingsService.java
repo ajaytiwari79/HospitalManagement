@@ -1,23 +1,18 @@
 package com.kairos.service.period;
 
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.period.PeriodSettings;
 import com.kairos.persistence.repository.period.PeriodSettingsMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.response.dto.web.period.PeriodSettingsDTO;
+import com.kairos.activity.period.PeriodSettingsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**

@@ -3,9 +3,9 @@ package com.kairos.persistence.model.user.open_shift;
 import com.kairos.dto.ActivityDTO;
 import com.kairos.dto.activity.TimeTypeDTO;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
-import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
-import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
+import com.kairos.user.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 
 import java.util.List;
 

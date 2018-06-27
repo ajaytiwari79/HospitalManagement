@@ -1,6 +1,5 @@
 package com.kairos.service.organizationMetadata;
 
-import com.kairos.util.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.user.organization.Organization;
@@ -9,15 +8,12 @@ import com.kairos.user.organization.PaymentSettingsDTO;
 import com.kairos.user.organization.PaymentSettingsQueryResult;
 import com.kairos.user.client.Client;
 import com.kairos.user.client.ClientHomeAddressQueryResult;
-import com.kairos.persistence.model.user.region.DayTimeWindow;
 import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
-import com.kairos.response.dto.web.localAreaTag.DayTimeWindowDTO;
-import com.kairos.response.dto.web.localAreaTag.LocalAreaTagDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;

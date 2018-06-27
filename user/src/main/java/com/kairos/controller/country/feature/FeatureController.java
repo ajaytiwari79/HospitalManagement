@@ -1,7 +1,7 @@
 package com.kairos.controller.country.feature;
 
-import com.kairos.response.dto.web.feature.FeatureDTO;
-import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
+import com.kairos.user.country.feature.FeatureDTO;
+import com.kairos.user.country.feature.VehicleFeaturesDTO;
 import com.kairos.service.country.feature.FeatureService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

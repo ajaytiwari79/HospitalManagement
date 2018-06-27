@@ -1,7 +1,7 @@
 package com.kairos.client.dto.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.user.country.day_type.DayType;
 
 /**
  * Created by oodles on 16/11/17.

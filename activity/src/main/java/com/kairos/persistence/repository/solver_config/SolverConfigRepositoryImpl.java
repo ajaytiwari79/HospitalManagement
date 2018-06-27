@@ -1,8 +1,7 @@
 package com.kairos.persistence.repository.solver_config;
 
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.solver_config.SolverConfig;
-import com.kairos.dto.solverconfig.SolverConfigDTO;
+import com.kairos.planner.solverconfig.SolverConfigDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -12,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;

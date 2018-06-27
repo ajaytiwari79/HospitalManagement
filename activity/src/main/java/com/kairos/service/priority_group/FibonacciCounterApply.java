@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
-import com.kairos.response.dto.web.open_shift.FibonacciCounter;
+import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.activity.open_shift.FibonacciCounter;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

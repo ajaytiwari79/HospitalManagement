@@ -7,7 +7,7 @@ import com.kairos.client.dto.client.Client;
 import com.kairos.client.dto.client.ClientOrganizationIds;
 import com.kairos.client.dto.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
-import com.kairos.activity.dto.OrganizationClientWrapper;
+import com.kairos.user.client.OrganizationClientWrapper;
 import com.kairos.activity.dto.ResponseEnvelope;
 import com.kairos.util.TaskDemandRequestWrapper;
 import com.kairos.util.TaskDemandVisitWrapper;

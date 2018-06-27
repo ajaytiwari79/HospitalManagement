@@ -2,7 +2,7 @@ package com.kairos.controller.open_shift;
 
 import com.kairos.service.open_shift.OpenShiftService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

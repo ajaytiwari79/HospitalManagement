@@ -1,9 +1,8 @@
 package com.kairos.persistence.repository.night_worker;
 
-import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
-import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.activity.night_worker.QuestionAnswerDTO;
+import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
 
-import java.util.Date;
 import java.util.List;
 
 /**

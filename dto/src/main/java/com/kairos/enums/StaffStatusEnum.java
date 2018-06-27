@@ -1,6 +1,6 @@
 package com.kairos.enums;
 
-import com.kairos.response.dto.web.filter.FilterDetailDTO;
+import com.kairos.user.country.filter.FilterDetailDTO;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

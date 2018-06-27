@@ -5,7 +5,7 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
 import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
-import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.user.patient.web.ActivityWithTimeTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

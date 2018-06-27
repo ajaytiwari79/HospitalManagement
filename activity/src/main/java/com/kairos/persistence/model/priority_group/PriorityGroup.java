@@ -2,8 +2,8 @@ package com.kairos.persistence.model.priority_group;
 
 import com.kairos.enums.PriorityGroupName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.response.dto.web.open_shift.priority_group.*;
-import com.kairos.response.dto.web.open_shift.priority_group.DecisionCriteria;
+import com.kairos.activity.open_shift.priority_group.*;
+import com.kairos.activity.open_shift.priority_group.DecisionCriteria;
 
 import java.math.BigInteger;
 import java.util.List;

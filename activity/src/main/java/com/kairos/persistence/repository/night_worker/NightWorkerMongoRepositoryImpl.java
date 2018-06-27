@@ -3,23 +3,16 @@ package com.kairos.persistence.repository.night_worker;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.NightWorkerQuestion;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
-import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.activity.night_worker.QuestionAnswerDTO;
+import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
 import org.bson.Document;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 

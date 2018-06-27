@@ -15,9 +15,9 @@ import com.kairos.persistence.repository.user.access_permission.AccessPageReposi
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
-import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
-import com.kairos.response.dto.web.cta.AccessGroupDTO;
+import com.kairos.user.access_group.CountryAccessGroupDTO;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
-import java.util.function.Predicate;
 
 import static com.kairos.constants.AppConstants.*;
 

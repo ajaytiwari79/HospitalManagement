@@ -1,6 +1,6 @@
 package com.kairos.controller.system_setting;
 
-import com.kairos.response.dto.web.system_setting.SystemLanguageDTO;
+import com.kairos.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

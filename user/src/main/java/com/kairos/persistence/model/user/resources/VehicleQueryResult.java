@@ -1,9 +1,8 @@
 package com.kairos.persistence.model.user.resources;
 
-import com.kairos.response.dto.web.feature.FeatureDTO;
+import com.kairos.user.country.feature.FeatureDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

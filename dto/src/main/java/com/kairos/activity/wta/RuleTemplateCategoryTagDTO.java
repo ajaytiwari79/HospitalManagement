@@ -1,7 +1,7 @@
 package com.kairos.activity.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.web.tag.TagDTO;
+import com.kairos.user.country.tag.TagDTO;
 
 
 import java.math.BigInteger;

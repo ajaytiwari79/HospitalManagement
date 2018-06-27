@@ -6,7 +6,7 @@ import com.kairos.controller.staffing_level.StaffingLevelController;
 import com.kairos.enums.tags.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.dto.tag.TagDTO;
+import com.kairos.activity.tag.TagDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;

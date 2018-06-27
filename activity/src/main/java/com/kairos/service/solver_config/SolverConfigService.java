@@ -8,10 +8,10 @@ import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.dto.solverconfig.ConstraintDTO;
-import com.kairos.dto.solverconfig.DefaultContraintsDTO;
-import com.kairos.dto.solverconfig.SolverConfigConstraintWrapper;
-import com.kairos.dto.solverconfig.SolverConfigDTO;
+import com.kairos.planner.solverconfig.ConstraintDTO;
+import com.kairos.planner.solverconfig.DefaultContraintsDTO;
+import com.kairos.planner.solverconfig.SolverConfigConstraintWrapper;
+import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.solver_config.ConstraintCategory;
 import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

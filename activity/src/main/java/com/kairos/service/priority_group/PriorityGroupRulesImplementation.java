@@ -4,11 +4,11 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kairos.activity.dto.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.activity.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.priority_group.priority_group_rules.*;
-import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
-import com.kairos.response.dto.web.open_shift.FibonacciCounter;
-import com.kairos.response.dto.web.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.activity.open_shift.FibonacciCounter;
+import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
 import org.springframework.stereotype.Component;
 
 import static java.util.stream.Collectors.groupingBy;

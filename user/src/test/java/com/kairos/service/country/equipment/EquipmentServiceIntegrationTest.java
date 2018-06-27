@@ -8,17 +8,13 @@ import com.kairos.user.country.equipment.Equipment;
 import com.kairos.user.country.equipment.EquipmentCategory;
 import com.kairos.user.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
-import com.kairos.response.dto.web.equipment.EquipmentDTO;
-import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
-import com.kairos.service.country.feature.FeatureService;
+import com.kairos.user.equipment.EquipmentCategoryDTO;
+import com.kairos.user.equipment.EquipmentDTO;
+import com.kairos.user.equipment.VehicleEquipmentDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,15 +25,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by prerna on 12/12/17.

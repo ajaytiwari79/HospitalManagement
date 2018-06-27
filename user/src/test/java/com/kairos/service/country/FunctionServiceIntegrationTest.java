@@ -2,7 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.response.dto.web.FunctionDTO;
+import com.kairos.user.patient.web.FunctionDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;

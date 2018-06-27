@@ -7,7 +7,7 @@ import com.kairos.activity.organization.OrganizationDTO;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
-import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.activity.phase.phase.PhaseDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;

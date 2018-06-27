@@ -2,7 +2,6 @@ package com.kairos.controller.organization;
 
 import com.kairos.user.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.response.dto.web.localAreaTag.DayTimeWindowDTO;
 import com.kairos.service.organizationMetadata.OrganizationMetadataService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -13,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;

@@ -2,12 +2,10 @@ package com.kairos.activity.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.util.ObjectMapperUtils;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
-
 /**
  * Created by vipul on 21/12/17.
  */
@@ -21,6 +19,7 @@ public class WTADTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
+    @NotNull(message = "error.RuleTemplate.description.notnull")
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;
@@ -87,7 +86,7 @@ public class WTADTO {
     }
 
     public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
-        return ruleTemplates;
+        return this.ruleTemplates;
     }
 
     public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {

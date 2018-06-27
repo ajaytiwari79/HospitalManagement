@@ -9,8 +9,8 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
-import com.kairos.response.dto.web.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
+import com.kairos.activity.night_worker.ExpertiseNightWorkerSettingDTO;
+import com.kairos.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

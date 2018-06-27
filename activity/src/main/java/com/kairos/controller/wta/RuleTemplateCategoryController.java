@@ -2,9 +2,8 @@ package com.kairos.controller.wta;
 
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
 
-import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
+import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.activity.wta.RuleTemplateCategoryDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

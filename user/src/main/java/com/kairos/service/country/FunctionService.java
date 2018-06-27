@@ -36,7 +36,7 @@ public class FunctionService extends UserBaseEntity{
     private ExceptionService exceptionService;
 
 
-    public FunctionDTO createFunction(Long countryId, com.kairos.response.dto.web.FunctionDTO functionDTO){
+    public FunctionDTO createFunction(Long countryId, com.kairos.user.patient.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
@@ -72,7 +72,7 @@ public class FunctionService extends UserBaseEntity{
 
     }
 
-    public FunctionDTO updateFunction(Long countryId, com.kairos.response.dto.web.FunctionDTO functionDTO){
+    public FunctionDTO updateFunction(Long countryId, com.kairos.user.patient.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);

@@ -5,7 +5,7 @@ import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.wrapper.DateWiseShiftResponse;
 
-import com.kairos.response.dto.web.ShiftCountDTO;
+import com.kairos.user.patient.web.ShiftCountDTO;
 
 import java.math.BigInteger;
 import java.util.Date;

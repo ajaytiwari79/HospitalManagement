@@ -1,7 +1,7 @@
 package com.kairos.controller.country.equipment;
 
-import com.kairos.response.dto.web.equipment.EquipmentDTO;
-import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
+import com.kairos.user.equipment.EquipmentDTO;
+import com.kairos.user.equipment.VehicleEquipmentDTO;
 import com.kairos.service.country.equipment.EquipmentService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

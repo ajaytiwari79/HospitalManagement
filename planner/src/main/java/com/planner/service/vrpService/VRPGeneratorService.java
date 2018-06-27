@@ -4,7 +4,7 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 
-import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
+import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;

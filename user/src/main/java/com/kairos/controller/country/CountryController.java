@@ -10,12 +10,12 @@ import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.response.dto.web.FunctionDTO;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
-import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
-import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
-import com.kairos.response.dto.web.experties.ExpertiseUpdateDTO;
-import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.user.patient.web.FunctionDTO;
+import com.kairos.user.patient.web.OrganizationTypeDTO;
+import com.kairos.user.patient.web.UpdateOrganizationTypeDTO;
+import com.kairos.user.country.experties.CountryExpertiseDTO;
+import com.kairos.user.country.experties.ExpertiseUpdateDTO;
+import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
@@ -1115,8 +1115,8 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
-    @ApiOperation("get default data for cta rule template")
+    @RequestMapping(value = COUNTRY_URL + "/cta_response/default-data", method = RequestMethod.GET)
+    @ApiOperation("get default data for cta_response rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId, null));
     }

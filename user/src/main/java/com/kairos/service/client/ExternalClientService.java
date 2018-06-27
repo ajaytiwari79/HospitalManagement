@@ -17,9 +17,9 @@ import com.kairos.persistence.repository.user.country.CitizenStatusGraphReposito
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.response.dto.web.CurrentAddress;
-import com.kairos.response.dto.web.PatientRelative;
-import com.kairos.response.dto.web.PatientWrapper;
+import com.kairos.user.patient.web.CurrentAddress;
+import com.kairos.user.patient.web.PatientRelative;
+import com.kairos.user.patient.web.PatientWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.region.RegionService;

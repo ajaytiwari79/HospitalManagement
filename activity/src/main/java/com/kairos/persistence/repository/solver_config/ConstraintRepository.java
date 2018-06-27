@@ -1,9 +1,8 @@
 package com.kairos.persistence.repository.solver_config;
 
-import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.model.solver_config.Constraint;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.solverconfig.ConstraintDTO;
+import com.kairos.planner.solverconfig.ConstraintDTO;
 import com.kairos.enums.solver_config.PlanningType;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

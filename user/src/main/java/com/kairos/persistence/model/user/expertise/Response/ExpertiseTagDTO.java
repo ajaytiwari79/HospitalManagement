@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.web.tag.TagDTO;
+import com.kairos.user.country.tag.TagDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

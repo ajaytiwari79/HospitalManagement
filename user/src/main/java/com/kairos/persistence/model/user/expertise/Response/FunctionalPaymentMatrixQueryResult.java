@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
-import com.kairos.response.dto.web.experties.SeniorityLevelFunctionDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.enums.FilterType;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
+import com.kairos.user.client.ClientFilterDTO;
 
 import java.util.List;
 import java.util.Map;

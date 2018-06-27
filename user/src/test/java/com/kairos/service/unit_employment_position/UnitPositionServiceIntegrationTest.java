@@ -9,7 +9,7 @@ import com.kairos.user.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.response.dto.web.UnitPositionDTO;
+import com.kairos.user.patient.web.UnitPositionDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.position_code.PositionCodeServiceIntegrationTest;
 import com.kairos.service.staff.EmploymentService;

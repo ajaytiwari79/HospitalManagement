@@ -1,10 +1,10 @@
 package com.kairos.activity.wta;
 
-import com.kairos.dto.ActivityDTO;
+import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
-import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
-import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
+import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.time_slot.TimeSlotDTO;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,9 +2,9 @@ package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TimeSlot;
-import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.user.country.day_type.DayType;
 import com.kairos.activity.dto.OrganizationTypeHierarchyQueryResult;
-import com.kairos.response.dto.web.CountryDTO;
+import com.kairos.user.country.CountryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

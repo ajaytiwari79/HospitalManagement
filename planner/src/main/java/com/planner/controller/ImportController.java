@@ -1,6 +1,5 @@
 package com.planner.controller;
 
-import com.kairos.dto.planninginfo.PlanningSubmissionDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.importService.ImportService;
 import com.planner.service.tomtomService.TomTomService;

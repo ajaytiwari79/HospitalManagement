@@ -314,7 +314,7 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCtaAndWtaSettingsTabOfActivity(activityId));
     }
 
-    @ApiOperation("update cta and wta settings  of activity Type")
+    @ApiOperation("update cta_response and wta settings  of activity Type")
     @PutMapping(value = "/activity/cta_wta_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateCtaAndWtaSettingsTabOfActivity(@RequestBody CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {

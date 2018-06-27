@@ -1,10 +1,8 @@
 package com.kairos.user.country.equipment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

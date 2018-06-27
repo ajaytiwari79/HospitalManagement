@@ -1,6 +1,6 @@
 package com.kairos.spec;
 
-import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.user.country.day_type.DayType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.enums.Day;
 import com.kairos.service.exception.ExceptionService;

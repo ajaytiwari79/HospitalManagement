@@ -15,7 +15,7 @@ import com.kairos.activity.wta.templates.template_types.*;
 import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.user.country.Day;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;

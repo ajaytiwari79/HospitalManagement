@@ -4,7 +4,6 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.user.organization.Organization;
 import com.kairos.user.organization.enums.OrganizationLevel;
@@ -25,8 +24,8 @@ import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
-import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.user.patient.web.organization.OrganizationSkillDTO;
+import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;

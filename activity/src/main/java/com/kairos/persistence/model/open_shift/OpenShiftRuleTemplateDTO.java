@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.AllowedLength;
 import com.kairos.enums.OpenShiftRuleTemplateType;
-import com.kairos.response.dto.web.open_shift.ActivitiesPerTimeType;
-import com.kairos.response.dto.web.open_shift.PlannerNotificationInfo;
-import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;
+import com.kairos.activity.open_shift.ActivitiesPerTimeType;
+import com.kairos.activity.open_shift.PlannerNotificationInfo;
+import com.kairos.activity.open_shift.ShiftAssignmentCriteria;
 
 import java.math.BigInteger;
 import java.util.List;

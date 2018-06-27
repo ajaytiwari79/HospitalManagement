@@ -11,7 +11,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtils;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseType;
-import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.activity.phase.PhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;

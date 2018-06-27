@@ -2,7 +2,7 @@ package com.kairos.controller.country;
 
 import com.kairos.service.phase.PhaseService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.activity.phase.PhaseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
