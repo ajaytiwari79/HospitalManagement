@@ -40,6 +40,7 @@ import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
@@ -715,17 +716,10 @@ public class ActivityService extends MongoBaseService {
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeek = date.get(weekOfWeekBasedYear);
         int currentDayOfWeek = date.getDayOfWeek().getValue();
-        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO();
-        phaseActivityDTO.setDayTypes(dayTypes);
-        // getting all phases by countryId as NO unit phase is configured
-
-//        List<PhaseDTO> phaseDTOs = phaseService.getPhasesByCountryId(countryId);
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
 
         // Set access Role of staff
-        phaseActivityDTO.setStaffAccessRole(staffRestClient.getAccessOfCurrentLoggedInStaff());
-
-        phaseActivityDTO.setApplicablePhases(phaseDTOs);
+        UserAccessRoleDTO userAccessRoleDTO= staffRestClient.getAccessOfCurrentLoggedInStaff();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
@@ -763,11 +757,10 @@ public class ActivityService extends MongoBaseService {
             }
         }
 
-        phaseActivityDTO.setActivities(activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId));
+        List<ActivityWithCompositeDTO> activities=activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
 
-        phaseActivityDTO.setPhases(phaseWeeklyDTOS);
         List<ShiftTemplateDTO> shiftTemplates =shiftTemplateService.getAllShiftTemplates(unitId);
-        phaseActivityDTO.setShiftTemplates(shiftTemplates);
+        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities,phaseWeeklyDTOS,dayTypes,userAccessRoleDTO,shiftTemplates,phaseDTOs);
         return phaseActivityDTO;
     }
 
