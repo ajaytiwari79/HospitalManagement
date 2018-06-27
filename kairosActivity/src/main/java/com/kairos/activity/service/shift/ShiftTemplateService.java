@@ -36,7 +36,6 @@ public class ShiftTemplateService extends MongoBaseService {
         individualShiftTemplates.forEach(individualShiftTemplate -> {individualShiftTemplateIds.add(individualShiftTemplate.getId());});
         ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
         save(shiftTemplate);
-        shiftTemplateDTO.setId(shiftTemplate.getId());
        //Preparing DTO Object to return
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(individualShiftTemplates,IndividualShiftTemplateDTO.class);
         shiftTemplateDTO.setId(shiftTemplate.getId());
@@ -45,9 +44,9 @@ public class ShiftTemplateService extends MongoBaseService {
     }
 
     public List<ShiftTemplateDTO> getAllShiftTemplates(Long unitId){
-        List<ShiftTemplate> shiftTemplate= shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId,UserContext.getUserDetails().getId());
+        List<ShiftTemplate> shiftTemplates= shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId,UserContext.getUserDetails().getId());
         List<ShiftTemplateDTO> shiftTemplateDTOS=new ArrayList<>();
-        shiftTemplate.forEach(shiftTemplateDTO -> {
+        shiftTemplates.forEach(shiftTemplateDTO -> {
             List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateMongoRepository.findAllByIdInAndDeletedFalse(shiftTemplateDTO.getIndividualShiftTemplateIds());
             ShiftTemplateDTO shiftTemplateDTO1=new ShiftTemplateDTO(shiftTemplateDTO.getId(),shiftTemplateDTO.getName(), individualShiftTemplateDTOS,shiftTemplateDTO.getCreatedBy(),shiftTemplateDTO.getUnitId());
             shiftTemplateDTOS.add(shiftTemplateDTO1);
