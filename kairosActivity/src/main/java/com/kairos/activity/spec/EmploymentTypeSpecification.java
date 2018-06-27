@@ -1,15 +1,11 @@
 package com.kairos.activity.spec;
 
 
-import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.shift.EmploymentType;
 import com.kairos.activity.service.exception.ExceptionService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
-
-import static com.kairos.activity.constants.AppConstants.SUCCESS;
 
 
 /**
@@ -25,14 +21,15 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
         this.employmentType = employmentType;
     }
 
+    @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-            if (Optional.ofNullable(shift.getActivity().getEmploymentTypes()).isPresent() && !shift.getActivity().getEmploymentTypes().isEmpty()) {
-                employmentTypeIds.addAll(shift.getActivity().getEmploymentTypes());
-                if (employmentTypeIds.contains(employmentType.getId())) {
-                    return Collections.EMPTY_LIST;
-                }
-                return Arrays.asList("message.activity.employement-type-match");
+        if (Optional.ofNullable(shift.getActivity().getEmploymentTypes()).isPresent() && !shift.getActivity().getEmploymentTypes().isEmpty()) {
+            employmentTypeIds.addAll(shift.getActivity().getEmploymentTypes());
+            if (employmentTypeIds.contains(employmentType.getId())) {
+                return Collections.EMPTY_LIST;
             }
+            return Arrays.asList("message.activity.employement-type-match");
+        }
         return Collections.emptyList();
 
     }

@@ -308,7 +308,7 @@ public class PlannerController {
     }
 
     @PostMapping(value = "/{solverConfigId}")
-    @ApiOperation("create default solver config")
+    @ApiOperation("submit solver config to planner")
     public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
     }
@@ -326,7 +326,7 @@ public class PlannerController {
     }
 
     @PostMapping(value = "/vrp_completed/{solverConfigId}")
-    @ApiOperation("create default solver config")
+    @ApiOperation("update solver config")
     public ResponseEntity<Map<String, Object>> planningCompleted(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.planningCompleted(unitId,solverConfigId));
     }

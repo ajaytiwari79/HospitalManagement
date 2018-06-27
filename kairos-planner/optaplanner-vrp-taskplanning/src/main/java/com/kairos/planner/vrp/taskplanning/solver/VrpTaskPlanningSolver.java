@@ -28,14 +28,14 @@ public class VrpTaskPlanningSolver {
 
 
     public VrpTaskPlanningSolver(){
-        /*solverFactory = SolverFactory.createFromXmlFile(new File(config));
-        solver = solverFactory.buildSolver();*/
+        solverFactory = SolverFactory.createFromXmlFile(new File(config));
+        solver = solverFactory.buildSolver();
     }
 
 
     public VrpTaskPlanningSolver(List<File> drlFileList){
-        solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
-        //solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+        //solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
         solver = solverFactory.buildSolver();
     }
 
@@ -66,6 +66,10 @@ public class VrpTaskPlanningSolver {
         //TODO ease efficiency for debugging
         //problem.getEmployees().forEach(e->e.setEfficiency(100));
         log.info("Number of tasks:"+problem.getTasks().size());
+        LocationPair locationPair = new ArrayList<LocationPair>(problem.getLocationsDistanceMatrix().getTable().keySet()).get(2);
+        LocationPairDifference locationsDifference = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair);
+        LocationPairDifference locationsDifference2 = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair.getReversePair());
+
         VrpTaskPlanningSolution solution=null;
         try {
             solution = solver.solve(problem);
@@ -135,7 +139,7 @@ public class VrpTaskPlanningSolver {
         });
         Map<String,List<Task>> map=problem.getTasks().stream().collect(Collectors.groupingBy(t->t.getSkills()==null?"break":t.getSkills().toString()));
         for(Map.Entry<String,List<Task>> e:map.entrySet()){
-            log.info(e.getKey()+"----------"+e.getValue().stream().mapToInt(t->t.getDuration()).sum());
+            log.info(e.getKey()+"----------"+e.getValue().stream().mapToInt(t->t.getDuration()).sum()+"------"+e.getValue());
         }
         log.info("Tasks details Done.");
 
@@ -219,7 +223,7 @@ public class VrpTaskPlanningSolver {
             log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
             constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
                 constraintMatch.getJustificationList().forEach(o -> {
-                    log.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift():""));
+                    log.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift()+""+((Task)o).getSkills():""));
                 });
             });
 

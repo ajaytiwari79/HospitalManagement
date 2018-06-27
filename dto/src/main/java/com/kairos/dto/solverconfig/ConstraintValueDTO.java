@@ -33,6 +33,15 @@ public class ConstraintValueDTO {
     private List<Integer> dynamicRuleValue;
 
     private Integer constraintValue;
+    private Integer penalityValue;
+
+    public Integer getPenalityValue() {
+        return penalityValue;
+    }
+
+    public void setPenalityValue(Integer penalityValue) {
+        this.penalityValue = penalityValue;
+    }
 
     public Integer getConstraintValue() {
         return constraintValue;

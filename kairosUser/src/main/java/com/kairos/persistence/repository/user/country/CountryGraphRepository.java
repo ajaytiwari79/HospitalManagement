@@ -5,12 +5,11 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 

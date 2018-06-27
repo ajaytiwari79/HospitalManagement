@@ -9,6 +9,8 @@ public final class ApiConstant {
     public static final String API_CLAUSES_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+"/clause";
     public static final String API_CLAUSE_TAG_URL = API_V1  + PARENT_ORGABNIZATION+COUNTRY_URL+"/clause_tag";
     public static final String API_ACCOUNT_TYPE_URL = API_V1 +PARENT_ORGABNIZATION+COUNTRY_URL+ "/account";
+    public static final String API_TEMPLATE_TYPE_URL = API_V1 +COUNTRY_URL+ "/template";
+
 
     //master asset data
     public static final String API_MASTER_ASSET_URL = API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/master_asset";

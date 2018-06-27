@@ -34,8 +34,8 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId,@Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) throws RepositoryException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(countryId,agreementTemplateDto));
+    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) throws RepositoryException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(countryId,organizationId,agreementTemplateDto));
 
     }
 
@@ -61,7 +61,7 @@ public class PolicyAgreementTemplateController {
     }
 
     @PutMapping("/update/{id}")
-    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable Long countryId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto ) throws RepositoryException {
+    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto ) throws RepositoryException {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }
@@ -70,7 +70,7 @@ public class PolicyAgreementTemplateController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId,id,policyAgreementTemplateDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId,organizationId,id,policyAgreementTemplateDto));
 
     }
 

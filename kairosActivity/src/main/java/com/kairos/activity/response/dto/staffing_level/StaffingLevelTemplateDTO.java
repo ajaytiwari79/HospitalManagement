@@ -3,6 +3,7 @@ package com.kairos.activity.response.dto.staffing_level;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.staffing_level.*;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelTemplatePeriod;
+import com.kairos.enums.Day;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 
@@ -20,7 +21,7 @@ public class StaffingLevelTemplateDTO {
     private List<Long> dayType=new ArrayList<>();
     private List<Day> validDays =new ArrayList<Day>();
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelInterval> staffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
     private boolean deleted ;
 
@@ -99,12 +100,12 @@ public class StaffingLevelTemplateDTO {
     public void setStaffingLevelSetting(StaffingLevelSetting staffingLevelSetting) {
         this.staffingLevelSetting = staffingLevelSetting;
     }
-    public List<StaffingLevelInterval> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelInterval> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
 
