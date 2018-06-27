@@ -10,13 +10,15 @@ import java.time.LocalDate;
 public class AttendanceSetting extends MongoBaseEntity{
     private Long staffId;
     private Long unitId;
+    private Long userId;
     private AttendanceDuration attendanceDuration ;
     public AttendanceSetting() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId) {
+    public AttendanceSetting(Long unitId, Long staffId,Long userId) {
         this.staffId = staffId;
         this.unitId = unitId;
+        this.userId=userId;
 
 
     }

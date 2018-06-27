@@ -672,6 +672,7 @@ public class StaffController {
     ResponseEntity<Map<String, Object>> getStaffIdsByUserId(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsByUserId(userId));
     }
+
     @RequestMapping(value = "/chat_server/register", method = RequestMethod.GET)
     @ApiOperation("register staffs to chat server")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

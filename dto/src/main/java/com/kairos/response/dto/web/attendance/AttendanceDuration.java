@@ -1,59 +1,33 @@
 package com.kairos.response.dto.web.attendance;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.time.LocalTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class AttendanceDuration {
 
-    private Long unitId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+//
+//    private LocalTime from;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+//    private LocalTime to;
 
-    private LocalTime from;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    private LocalTime to;
+    private LocalDateTime from;
+    private LocalDateTime to;
 
-    private Date checkIn;
-    private Date checkOut;
 
-    public LocalTime getFrom() {
+    public LocalDateTime getFrom() {
         return from;
     }
 
-    public void setFrom(LocalTime from) {
+    public void setFrom(LocalDateTime from) {
         this.from = from;
     }
 
-    public LocalTime getTo() {
+    public LocalDateTime getTo() {
         return to;
     }
 
-    public void setTo(LocalTime to) {
+    public void setTo(LocalDateTime to) {
         this.to = to;
     }
 
-    public Date getCheckIn() {
-        return checkIn;
-    }
-
-    public void setCheckIn(Date checkIn) {
-        this.checkIn = checkIn;
-    }
-
-    public Date getCheckOut() {
-        return checkOut;
-    }
-
-    public void setCheckOut(Date checkOut) {
-        this.checkOut = checkOut;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
 }
