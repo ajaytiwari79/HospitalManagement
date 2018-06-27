@@ -48,10 +48,10 @@ public class AttendanceSettingService extends MongoBaseService {
         return null;
     }
 
-    public AttendanceDTO updateAttendanceSetting(Long userId1, AttendanceDuration attendanceDuration) {
+    public AttendanceDTO updateAttendanceSetting( AttendanceDuration attendanceDuration) {
         AttendanceDTO attendanceDTO = null;
-  //      Long userId = Long.valueOf(UserContext.getUserId());
-        List<StaffResultDTO> staffAndOrganizationIds = restClient.getStaffIdsByUserId(userId1);
+        Long userId = Long.valueOf(UserContext.getUserDetails().getId());
+        List<StaffResultDTO> staffAndOrganizationIds = restClient.getStaffIdsByUserId(userId);
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException("error");
         }
