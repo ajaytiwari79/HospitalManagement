@@ -26,8 +26,6 @@ public class IndividualShiftTemplateDTO {
     private LocalTime endTime;
     private boolean isMainShift = true;
     private List<IndividualShiftTemplateDTO> subShifts;
-    private Date startDate;
-    private Date endDate;
 
     public IndividualShiftTemplateDTO() {
         //Default Constructor
@@ -117,21 +115,5 @@ public class IndividualShiftTemplateDTO {
 
     public void setSubShifts(List<IndividualShiftTemplateDTO> subShifts) {
         this.subShifts = subShifts;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 }
