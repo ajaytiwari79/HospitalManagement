@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.repository.shift.IndividualShiftTemplateM
 import com.kairos.activity.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.exception.ExceptionService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.userContext.UserContext;
 import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
@@ -28,15 +29,20 @@ public class ShiftTemplateService extends MongoBaseService {
     @Inject private ShiftService shiftService;
 
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO){
-        List<IndividualShiftTemplateDTO> individualShiftTemplateDTO =shiftTemplateDTO.getShiftList();
-        List<IndividualShiftTemplate> individualShiftTemplates =ObjectMapperUtils.copyProperties(individualShiftTemplateDTO,IndividualShiftTemplate.class);
+        List<IndividualShiftTemplateDTO> individualShiftTemplateDTOs =shiftTemplateDTO.getShiftList();
+        individualShiftTemplateDTOs.forEach(individualShiftTemplateDTO -> {
+            individualShiftTemplateDTO.setStartTime(DateUtils.asLocalTime(individualShiftTemplateDTO.getStart()));
+            individualShiftTemplateDTO.setEndTime(DateUtils.asLocalTime(individualShiftTemplateDTO.getEnd()));
+        });
+        List<IndividualShiftTemplate> individualShiftTemplates =ObjectMapperUtils.copyProperties(individualShiftTemplateDTOs,IndividualShiftTemplate.class);
         save(individualShiftTemplates);
         Set<BigInteger> individualShiftTemplateIds=new HashSet<>();
         individualShiftTemplates.forEach(individualShiftTemplate -> {individualShiftTemplateIds.add(individualShiftTemplate.getId());});
         ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
         shiftTemplate.getIndividualShiftTemplateIds().addAll(individualShiftTemplateIds);
         save(shiftTemplate);
-        //Preparing DTO Object to return
+        shiftTemplateDTO.setId(shiftTemplate.getId());
+       //Preparing DTO Object to return
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(individualShiftTemplates,IndividualShiftTemplateDTO.class);
         shiftTemplateDTO.setId(shiftTemplate.getId());
         shiftTemplateDTO.setShiftList(individualShiftTemplateDTOS);
@@ -100,6 +106,8 @@ public class ShiftTemplateService extends MongoBaseService {
         IndividualShiftTemplate individualShiftTemplate=ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO,IndividualShiftTemplate.class);
         save(individualShiftTemplate);
         shiftTemplate.getIndividualShiftTemplateIds().add(individualShiftTemplate.getId());
+        save(shiftTemplate);
+        individualShiftTemplateDTO.setId(individualShiftTemplate.getId());
         return individualShiftTemplateDTO;
     }
 
@@ -111,13 +119,8 @@ public class ShiftTemplateService extends MongoBaseService {
         individualShiftTemplate.setDeleted(true);
         save(individualShiftTemplate);
         ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftTemplateId);
-        shiftTemplate.getIndividualShiftTemplateIds().remove(shiftTemplate.getId());
+        shiftTemplate.getIndividualShiftTemplateIds().remove(individualShiftTemplate.getId());
         save(shiftTemplate);
         return true;
     }
-
-
-
-
-
 }

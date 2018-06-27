@@ -62,7 +62,7 @@ public class ShiftTemplateController {
     }
 
     @ApiOperation("update Individual Shift Template")
-    @PutMapping(value = "/individual_shift_template/{IndividualShiftTemplateId}")
+    @PutMapping(value = "/individual_shift_template/{individualShiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateIndividualShift(@PathVariable BigInteger individualShiftTemplateId,  @RequestBody @Valid IndividualShiftTemplateDTO individualShiftTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateIndividualShiftTemplate(individualShiftTemplateId, individualShiftTemplateDTO));
@@ -70,7 +70,7 @@ public class ShiftTemplateController {
 
 
     @ApiOperation("delete Individual Shift Template")
-    @PostMapping(value = "shift_template/{shiftTemplateId}/individual_shift_template/{IndividualShiftTemplateId}")
+    @DeleteMapping(value = "shift_template/{shiftTemplateId}/individual_shift_template/{individualShiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteIndividualShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @PathVariable BigInteger individualShiftTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.deleteIndividualShiftTemplate(shiftTemplateId, individualShiftTemplateId));

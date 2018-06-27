@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.shift;
 import java.math.BigInteger;
 import java.util.List;
 
+
 public class ShiftTemplateDTO {
     private BigInteger id;
     private String name;
