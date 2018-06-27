@@ -1,16 +1,16 @@
 package com.kairos.service.agreement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.user.agreement.cta.RuleTemplate;
-import com.kairos.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.user.country.Country;
+import com.kairos.persistence.model.agreement.cta.RuleTemplate;
+import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.agreement.wta.RuleTemplateCategoryDTO;
+import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.user.patient.web.RuleTemplateDTO;
-import com.kairos.user.patient.web.UpdateRuleTemplateCategoryDTO
+import com.kairos.wrapper.RuleTemplateDTO;
+import com.kairos.activity.web.UpdateRuleTemplateCategoryDTO
 
         ;
 import com.kairos.service.UserBaseService;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.user.agreement.cta.RuleTemplateCategoryType.CTA;
+import static com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType.CTA;
 
 /**
  * Created by vipul on 2/8/17.

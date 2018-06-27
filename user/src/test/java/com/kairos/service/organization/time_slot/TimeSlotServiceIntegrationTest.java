@@ -2,9 +2,9 @@ package com.kairos.service.organization.time_slot;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.user.organization.time_slot.TimeSlotSet;
-import com.kairos.user.patient.web.organization.time_slot.TimeSlotDTO;
-import com.kairos.user.patient.web.organization.time_slot.TimeSlotSetDTO;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.activity.web.organization.time_slot.TimeSlotDTO;
+import com.kairos.activity.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Ignore;

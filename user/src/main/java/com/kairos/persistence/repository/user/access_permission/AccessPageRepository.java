@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.user.organization.Organization;
-import com.kairos.user.access_permission.AccessPage;
-import com.kairos.user.access_permission.AccessPageDTO;
-import com.kairos.user.access_permission.AccessPageQueryResult;
-import com.kairos.user.access_permission.UserPermissionQueryResult;
-import com.kairos.user.auth.StaffPermissionQueryResult;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.access_permission.AccessPageDTO;
+import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

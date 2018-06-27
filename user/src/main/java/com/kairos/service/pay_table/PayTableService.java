@@ -1,12 +1,12 @@
 package com.kairos.service.pay_table;
 
 
-import com.kairos.user.organization.Level;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.FunctionDTO;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
-import com.kairos.user.pay_table.*;
+import com.kairos.persistence.model.pay_table.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
@@ -14,9 +14,9 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
-import com.kairos.user.pay_table.OrganizationLevelPayTableDTO;
+import com.kairos.persistence.model.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
-import com.kairos.user.country.pay_table.*;
+import com.kairos.persistence.model.country.pay_table.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;

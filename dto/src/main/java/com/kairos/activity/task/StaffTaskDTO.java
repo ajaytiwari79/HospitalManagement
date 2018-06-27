@@ -2,7 +2,7 @@ package com.kairos.activity.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.Gender;
-import com.kairos.user.patient.web.TaskWrapper;
+import com.kairos.activity.web.TaskWrapper;
 
 import java.util.List;
 

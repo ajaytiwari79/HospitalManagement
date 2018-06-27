@@ -1,11 +1,12 @@
 package com.kairos.persistence.repository.repository_impl;
-import com.kairos.persistence.model.task_type.TaskType;
+
+import com.kairos.activity.task_type.TaskTypeResponseDTO;
+import com.kairos.persistence.model.client.ClientFilterDTO;
 import com.kairos.persistence.model.task_demand.TaskDemand;
+import com.kairos.persistence.model.task_type.TaskType;
+import com.kairos.persistence.repository.task_type.CustomTaskTypeRepository;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;
-import com.kairos.persistence.repository.task_type.CustomTaskTypeRepository;
-import com.kairos.activity.dto.ClientFilterDTO;
-import com.kairos.activity.task_type.TaskTypeResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,7 +19,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -67,7 +71,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
         mongoTemplate.updateMulti(query, update,TaskType.class);
     }
 
-    @Override
+
     public List<TaskTypeAggregateResult> getCitizenTaskTypesOfUnit(Long unitId, ClientFilterDTO clientFilterDTO, List<String> taskTypeIdsByServiceIds) {
         Criteria criteria = Criteria.where("unitId").is(unitId).and("isDeleted").is(false);
         Criteria c = new Criteria();

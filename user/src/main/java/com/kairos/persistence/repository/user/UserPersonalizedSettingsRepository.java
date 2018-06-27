@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user;
 
-import com.kairos.user.user_personalized_settings.UserPersonalizedSettings;
-import com.kairos.user.user_personalized_settings.UserPersonalizedSettingsQueryResult;
+import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
+import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettingsQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 

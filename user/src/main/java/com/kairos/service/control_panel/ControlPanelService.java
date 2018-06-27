@@ -1,7 +1,7 @@
 package com.kairos.service.control_panel;
 import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
-import com.kairos.user.organization.Organization;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.control_panel.jobDetails.JobDetails;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;

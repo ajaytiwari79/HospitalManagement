@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.unit_position;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentCategory;
-import com.kairos.user.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.RelationshipEntity;

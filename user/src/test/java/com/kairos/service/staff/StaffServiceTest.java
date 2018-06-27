@@ -2,9 +2,9 @@ package com.kairos.service.staff;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.enums.Gender;
-import com.kairos.user.staff.Staff;
-import com.kairos.user.staff.StaffCreationDTO;
-import com.kairos.user.staff.StaffFilterDTO;
+import com.kairos.persistence.model.staff.Staff;
+import com.kairos.persistence.model.staff.StaffCreationDTO;
+import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;

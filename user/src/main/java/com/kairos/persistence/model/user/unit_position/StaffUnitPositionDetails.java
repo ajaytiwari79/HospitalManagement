@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
-import com.kairos.user.agreement.cta.CostTimeAgreement;
-import com.kairos.user.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.user.staff.Staff;
-import com.kairos.user.patient.web.AppliedFunctionDTO;
+import com.kairos.persistence.model.staff.Staff;
+import com.kairos.activity.web.AppliedFunctionDTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

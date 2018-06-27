@@ -1,10 +1,11 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.activity.dto.ShiftWithActivityDTO;
+
 import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.web.ShiftCountDTO;
 import com.kairos.persistence.model.activity.Shift;
-import com.kairos.user.patient.web.ShiftCountDTO;
 import com.kairos.wrapper.DateWiseShiftResponse;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,11 +2,11 @@ package com.kairos.persistence.model.user.expertise.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.user.organization.Level;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.organization.OrganizationService;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.expertise.CareDays;
-import com.kairos.user.pay_table.PayTable;
+import com.kairos.persistence.model.pay_table.PayTable;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

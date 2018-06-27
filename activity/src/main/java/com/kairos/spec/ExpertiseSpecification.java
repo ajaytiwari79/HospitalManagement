@@ -1,9 +1,8 @@
 package com.kairos.spec;
 
-
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.dto.shift.Expertise;
+import com.kairos.activity.shift.Expertise;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

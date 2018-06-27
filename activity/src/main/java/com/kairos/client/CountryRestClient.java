@@ -1,10 +1,10 @@
 package com.kairos.client;
 
+import com.kairos.activity.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TimeSlot;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.activity.dto.OrganizationTypeHierarchyQueryResult;
-import com.kairos.user.country.CountryDTO;
+import com.kairos.persistence.model.country.CountryDTO;
+import com.kairos.persistence.model.country.day_type.DayType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

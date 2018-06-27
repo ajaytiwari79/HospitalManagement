@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.user.country;
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.user.country.dto.EmploymentTypeDTO;
-import com.kairos.user.country.employment_type.EmploymentType;
-import com.kairos.user.country.employment_type.EmploymentTypeQueryResult;
+import com.kairos.persistence.model.country.dto.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

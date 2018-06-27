@@ -2,7 +2,7 @@ package com.kairos.client;
 
 import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.user.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

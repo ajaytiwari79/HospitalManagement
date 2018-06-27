@@ -1,8 +1,8 @@
 package com.kairos.wrapper.activity_category;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.activity.ActivityTagDTO;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
+import com.kairos.wrapper.activity.ActivityTagDTO;
 
 import java.util.ArrayList;
 import java.util.List;

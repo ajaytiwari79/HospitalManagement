@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.task_type;
 
+import com.kairos.activity.task_type.TaskTypeResponseDTO;
+import com.kairos.persistence.model.client.ClientFilterDTO;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;
-import com.kairos.activity.dto.ClientFilterDTO;
-import com.kairos.activity.task_type.TaskTypeResponseDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -20,7 +20,7 @@ public interface CustomTaskTypeRepository {
 
     void updateUnitTaskTypesStatus(BigInteger taskTypeId, boolean status);
 
-    List<TaskTypeAggregateResult> getCitizenTaskTypesOfUnit(Long unitId, ClientFilterDTO clientFilterDTO,List<String> taskTypeIdsByServiceIds);
+    List<TaskTypeAggregateResult> getCitizenTaskTypesOfUnit(Long unitId, ClientFilterDTO clientFilterDTO, List<String> taskTypeIdsByServiceIds);
 
     public List<TaskTypeResponseDTO> getAllTaskType();
 

@@ -1,7 +1,7 @@
 package com.kairos.config;
 
-import com.kairos.user.access_permission.AccessPage;
-import com.kairos.user.country.Country;
+import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;

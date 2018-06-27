@@ -1,7 +1,7 @@
 package com.kairos.service.auth;
 
-import com.kairos.user.auth.User;
-import com.kairos.user.auth.UserPrincipal;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;

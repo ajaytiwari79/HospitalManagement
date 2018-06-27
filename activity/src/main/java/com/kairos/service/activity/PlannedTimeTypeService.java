@@ -5,7 +5,7 @@ import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.CountryDTO;
+import com.kairos.persistence.model.country.CountryDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

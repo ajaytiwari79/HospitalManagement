@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.user.client;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.organization.team.Team;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
-import com.kairos.user.client.*;
-import com.kairos.user.country.CitizenStatus;
+import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.country.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;

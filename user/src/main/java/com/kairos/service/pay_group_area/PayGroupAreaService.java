@@ -1,7 +1,7 @@
 package com.kairos.service.pay_group_area;
 
-import com.kairos.user.organization.Level;
-import com.kairos.user.country.Country;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
@@ -10,8 +10,8 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaRelationshipRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
-import com.kairos.user.country.pay_group_area.PayGroupAreaDTO;
-import com.kairos.user.country.pay_group_area.PayGroupAreaResponse;
+import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaDTO;
+import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.joda.time.DateTime;

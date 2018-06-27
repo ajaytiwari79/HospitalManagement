@@ -7,11 +7,11 @@ import com.kairos.activity.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.client.GenericIntegrationService;
 import com.kairos.client.OrganizationRestClient;
-import com.kairos.user.country.day_type.DayType;
+import com.kairos.persistence.model.country.day_type.DayType;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.persistence.model.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 
 import com.kairos.persistence.model.activity.Activity;

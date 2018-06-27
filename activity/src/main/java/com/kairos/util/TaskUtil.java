@@ -1,5 +1,5 @@
 package com.kairos.util;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
+import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskStatus;
 

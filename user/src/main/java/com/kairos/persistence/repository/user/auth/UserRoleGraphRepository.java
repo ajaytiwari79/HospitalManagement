@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.auth;
 
-import com.kairos.user.auth.Role;
-import com.kairos.user.auth.UserRole;
+import com.kairos.persistence.model.auth.Role;
+import com.kairos.persistence.model.auth.UserRole;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 

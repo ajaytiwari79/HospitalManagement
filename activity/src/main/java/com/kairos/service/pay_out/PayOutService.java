@@ -1,26 +1,25 @@
 package com.kairos.service.pay_out;
 
 
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.client.pay_out.PayOutRestClient;
-import com.kairos.persistence.model.activity.Shift;
-import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
-import com.kairos.persistence.repository.pay_out.PayOutMongoRepository;
-import com.kairos.persistence.model.pay_out.DailyPayOutEntry;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.activity.pay_out.CalculatedPayOutByDateDTO;
 import com.kairos.activity.pay_out.PayOutDTO;
 import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.client.OrganizationRestClient;
+import com.kairos.client.pay_out.PayOutRestClient;
+import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.pay_out.DailyPayOutEntry;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.pay_out.PayOutMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.util.DateUtils;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

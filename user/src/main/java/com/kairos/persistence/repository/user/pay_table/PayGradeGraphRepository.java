@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.pay_table;
 
-import com.kairos.user.pay_table.PayGrade;
-import com.kairos.user.pay_table.PayTableMatrixQueryResult;
+import com.kairos.persistence.model.pay_table.PayGrade;
+import com.kairos.persistence.model.pay_table.PayTableMatrixQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

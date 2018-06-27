@@ -30,4 +30,8 @@ public class SkillActivityDTO {
     public void setActivitySkills(List<ActivitySkill> activitySkills) {
         this.activitySkills = activitySkills;
     }
+
+    public SkillActivityDTO(List<ActivitySkill> activitySkills) {
+        this.activitySkills = activitySkills;
+    }
 }

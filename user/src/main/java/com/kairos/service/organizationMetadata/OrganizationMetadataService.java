@@ -2,12 +2,12 @@ package com.kairos.service.organizationMetadata;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.organization.PaymentSettings;
-import com.kairos.user.organization.PaymentSettingsDTO;
-import com.kairos.user.organization.PaymentSettingsQueryResult;
-import com.kairos.user.client.Client;
-import com.kairos.user.client.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.PaymentSettings;
+import com.kairos.persistence.model.organization.PaymentSettingsDTO;
+import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ClientHomeAddressQueryResult;
 import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;

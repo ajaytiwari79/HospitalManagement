@@ -1,8 +1,8 @@
 package com.kairos.controller.user;
 
-import com.kairos.user.auth.User;
-import com.kairos.user.staff.StaffEmploymentDetail;
-import com.kairos.user.user_personalized_settings.UserPersonalizedSettingsDto;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.staff.StaffEmploymentDetail;
+import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettingsDto;
 import com.kairos.service.UserPersonalizedSettingsService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

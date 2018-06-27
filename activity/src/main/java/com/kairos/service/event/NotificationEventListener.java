@@ -1,11 +1,11 @@
 package com.kairos.service.event;
 
 import com.kairos.constants.AppConstants;
-import com.kairos.activity.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.util.event.ShiftNotificationEvent;
-import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.persistence.model.staff.unit_position.StaffUnitPositionQueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

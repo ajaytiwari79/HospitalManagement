@@ -11,6 +11,9 @@ public class CommunicationActivityTab implements Serializable{
     private long timeLength;
     private  boolean notifyAfterDeleteActivityType;
 
+    public CommunicationActivityTab() {
+    }
+
     public boolean isAllowCommunicationReminder() {
         return allowCommunicationReminder;
     }

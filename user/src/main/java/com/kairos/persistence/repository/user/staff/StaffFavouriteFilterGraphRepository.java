@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.user.filter.FilterGroup;
-import com.kairos.user.staff.StaffFavouriteFilter;
+import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

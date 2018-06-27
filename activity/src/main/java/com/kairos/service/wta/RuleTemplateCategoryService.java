@@ -11,7 +11,7 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.user.country.CountryDTO;
+import com.kairos.persistence.model.country.CountryDTO;
 
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.activity.wta.*;

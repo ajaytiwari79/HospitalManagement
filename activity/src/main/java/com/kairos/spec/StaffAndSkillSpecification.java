@@ -1,6 +1,6 @@
 package com.kairos.spec;
 
-import com.kairos.activity.dto.ShiftWithActivityDTO;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.util.ArrayList;
 import java.util.Collections;

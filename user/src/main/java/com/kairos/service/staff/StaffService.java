@@ -12,21 +12,21 @@ import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.enums.TimeSlotType;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.organization.UnitManagerDTO;
-import com.kairos.user.organization.enums.OrganizationLevel;
-import com.kairos.user.organization.organizationServicesAndLevelQueryResult;
-import com.kairos.user.organization.time_slot.TimeSlotSet;
-import com.kairos.user.organization.time_slot.TimeSlotWrapper;
-import com.kairos.user.access_permission.AccessGroup;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.access_permission.AccessPage;
-import com.kairos.user.auth.User;
-import com.kairos.user.client.Client;
-import com.kairos.user.client.ContactAddress;
-import com.kairos.user.client.ContactDetail;
-import com.kairos.user.country.DayType;
-import com.kairos.user.country.EngineerType;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.UnitManagerDTO;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.organization.organizationServicesAndLevelQueryResult;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupRole;
+import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
@@ -34,7 +34,7 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.user.staff.*;
+import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -50,17 +50,17 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.user.patient.web.PasswordUpdateDTO;
-import com.kairos.user.patient.web.StaffAssignedTasksWrapper;
-import com.kairos.user.patient.web.StaffTaskDTO;
+import com.kairos.activity.web.PasswordUpdateDTO;
+import com.kairos.activity.web.StaffAssignedTasksWrapper;
+import com.kairos.activity.web.StaffTaskDTO;
 import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.client.ClientStaffInfoDTO;
-import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.client.ClientStaffInfoDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.user.country.skill.SkillDTO;
-import com.kairos.user.staff.staff.StaffChatDetails;
+import com.kairos.persistence.model.country.skill.SkillDTO;
+import com.kairos.persistence.model.staff.staff.StaffChatDetails;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -1837,12 +1837,12 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<com.kairos.user.patient.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
+    public List<com.kairos.activity.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
         List<Staff> staffs = staffGraphRepository.getStaffByExperties(unitId, expertiesIds);
         List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s -> s.getId()).collect(Collectors.toList()));
-        List<com.kairos.user.patient.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
+        List<com.kairos.activity.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
-            com.kairos.user.patient.web.StaffDTO staffDTO = new com.kairos.user.patient.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
+            com.kairos.activity.web.StaffDTO staffDTO = new com.kairos.activity.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
             EmploymentUnitPositionDTO employmentUnitPositionDTO = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), true);
             List<UnitPositionQueryResult> unitPositions = employmentUnitPositionDTO.getUnitPositions();
             expertiesIds.forEach(expertiseId -> {

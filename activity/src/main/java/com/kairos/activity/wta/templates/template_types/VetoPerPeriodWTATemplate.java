@@ -2,13 +2,13 @@ package com.kairos.activity.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.WTATemplateType;
-import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.util.DateTimeInterval;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

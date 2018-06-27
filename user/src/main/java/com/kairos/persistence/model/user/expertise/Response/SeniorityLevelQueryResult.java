@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
-import com.kairos.user.country.FunctionDTO;
+import com.kairos.persistence.model.country.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.user.pay_table.PayGrade;
+import com.kairos.persistence.model.pay_table.PayGrade;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;

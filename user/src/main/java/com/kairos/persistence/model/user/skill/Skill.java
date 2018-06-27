@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.user.skill;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.user.auth.User;
-import com.kairos.user.country.tag.Tag;
-import com.kairos.user.country.skill.SkillDTO;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.country.skill.SkillDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;

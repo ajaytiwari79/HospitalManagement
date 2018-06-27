@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.staff;
-import com.kairos.user.staff.EmploymentAccessPageRelation;
+import com.kairos.persistence.model.staff.EmploymentAccessPageRelation;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 

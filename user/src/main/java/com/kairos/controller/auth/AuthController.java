@@ -1,9 +1,9 @@
 package com.kairos.controller.auth;
 
-import com.kairos.user.organization.Organization;
-import com.kairos.user.auth.OrganizationSelectionDTO;
-import com.kairos.user.auth.User;
-import com.kairos.user.patient.web.FirstTimePasswordUpdateDTO;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.auth.OrganizationSelectionDTO;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.activity.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.response.ResponseHandler;

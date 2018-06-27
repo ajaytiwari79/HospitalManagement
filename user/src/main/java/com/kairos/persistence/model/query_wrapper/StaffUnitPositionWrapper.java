@@ -2,7 +2,7 @@ package com.kairos.persistence.model.query_wrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.user.staff.Staff;
+import com.kairos.persistence.model.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

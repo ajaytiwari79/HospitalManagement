@@ -1,8 +1,8 @@
 package com.kairos.controller.pay_table;
 
-import com.kairos.user.country.pay_table.PayGradeDTO;
-import com.kairos.user.country.pay_table.PayTableUpdateDTO;
-import com.kairos.user.country.pay_table.PayTableDTO;
+import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
+import com.kairos.persistence.model.country.pay_table.PayTableUpdateDTO;
+import com.kairos.persistence.model.country.pay_table.PayTableDTO;
 import com.kairos.service.pay_table.PayTableService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

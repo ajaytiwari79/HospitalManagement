@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.google.common.collect.Lists;
-import com.kairos.user.access_permission.Tab;
+import com.kairos.persistence.model.access_permission.Tab;
 
 /**
  * Created by prabjot on 5/1/17.

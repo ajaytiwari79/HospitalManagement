@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.night_worker;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.user.country.time_slot.TimeSlot;
+import com.kairos.persistence.model.country.time_slot.TimeSlot;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 

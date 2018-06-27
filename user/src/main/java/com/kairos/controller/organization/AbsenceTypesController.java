@@ -1,6 +1,6 @@
 package com.kairos.controller.organization;
 
-import com.kairos.user.organization.AbsenceTypes;
+import com.kairos.persistence.model.organization.AbsenceTypes;
 import com.kairos.service.organization.AbsenceTypesService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

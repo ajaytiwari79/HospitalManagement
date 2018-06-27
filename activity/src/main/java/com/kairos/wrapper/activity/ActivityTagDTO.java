@@ -3,9 +3,12 @@ package com.kairos.wrapper.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.tag.TagDTO;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.PermissionsActivityTab;
 import com.kairos.enums.ActivityStateEnum;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
+import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
+import com.kairos.persistence.model.activity.tabs.PermissionsActivityTab;
+import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

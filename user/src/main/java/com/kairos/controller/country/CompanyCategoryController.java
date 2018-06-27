@@ -1,7 +1,7 @@
 package com.kairos.controller.country;
 
 
-import com.kairos.user.organization.company_category.CompanyCategoryDTO;
+import com.kairos.persistence.model.organization.company_category.CompanyCategoryDTO;
 import com.kairos.service.country.CompanyCategoryService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

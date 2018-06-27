@@ -1,5 +1,5 @@
 package com.kairos.service.organization;
-import com.kairos.user.organization.AbsenceTypes;
+import com.kairos.persistence.model.organization.AbsenceTypes;
 import com.kairos.persistence.repository.organization.AbsenceTypesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

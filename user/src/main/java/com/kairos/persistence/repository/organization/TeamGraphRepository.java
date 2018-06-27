@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.organization;
-import com.kairos.user.organization.OrganizationService;
-import com.kairos.user.organization.OrganizationServiceQueryResult;
-import com.kairos.user.organization.team.Team;
+import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.user.staff.Staff;
+import com.kairos.persistence.model.staff.Staff;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

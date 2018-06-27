@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
-import com.kairos.user.agreement.cta.CTARuleTemplate;
+import com.kairos.persistence.model.agreement.cta.CTARuleTemplate;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.user.agreement.cta.CTARuleTemplateQueryResult;
+import com.kairos.persistence.model.agreement.cta.CTARuleTemplateQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 

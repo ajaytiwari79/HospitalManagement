@@ -1,7 +1,7 @@
 package com.kairos.activity.shift;
 
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
-import com.kairos.user.staff.staff.StaffAccessRoleDTO;
+import com.kairos.persistence.model.staff.staff.StaffAccessRoleDTO;
 
 import java.util.List;
 

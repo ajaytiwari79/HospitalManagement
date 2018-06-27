@@ -4,7 +4,7 @@ import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.spec.AbstractActivitySpecification;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
-import com.kairos.user.country.time_slot.TimeSlot;
+import com.kairos.persistence.model.country.time_slot.TimeSlot;
 import com.kairos.enums.DurationType;
 import com.kairos.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;

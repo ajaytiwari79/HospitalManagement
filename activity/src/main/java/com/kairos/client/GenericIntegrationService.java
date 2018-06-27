@@ -1,12 +1,12 @@
 package com.kairos.client;
 
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.persistence.model.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

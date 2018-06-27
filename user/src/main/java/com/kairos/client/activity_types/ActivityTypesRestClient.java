@@ -1,8 +1,8 @@
 package com.kairos.client.activity_types;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.user.agreement.cta.cta_response.ActivityCategoryDTO;
-import com.kairos.user.agreement.cta.cta_response.ActivityTypeDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.ActivityCategoryDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.ActivityTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

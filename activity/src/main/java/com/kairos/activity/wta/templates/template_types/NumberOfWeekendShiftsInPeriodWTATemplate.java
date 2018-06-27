@@ -2,14 +2,14 @@ package com.kairos.activity.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
-import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.util.DateTimeInterval;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
-import static com.kairos.util.WTARuleTemplateValidatorUtility.isValid;
 
 
 /**

@@ -1,5 +1,5 @@
 package com.kairos.persistence.model.task_type;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
+import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

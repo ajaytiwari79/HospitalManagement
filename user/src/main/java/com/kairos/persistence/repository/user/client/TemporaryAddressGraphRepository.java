@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.client;
-import com.kairos.user.client.ClientTemporaryAddress;
+import com.kairos.persistence.model.client.ClientTemporaryAddress;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 

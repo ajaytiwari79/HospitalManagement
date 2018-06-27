@@ -2,14 +2,13 @@ package com.kairos.service.pay_out;
 
 import com.google.common.collect.Lists;
 import com.kairos.activity.pay_out.*;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.persistence.model.pay_out.PayOutCTADistribution;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.util.DateUtils;
-import com.kairos.response.dto.pay_out.*;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;

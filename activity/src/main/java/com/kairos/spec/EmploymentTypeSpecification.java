@@ -1,9 +1,8 @@
 package com.kairos.spec;
 
-
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.dto.shift.EmploymentType;
+import com.kairos.activity.shift.EmploymentType;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.util.*;
 

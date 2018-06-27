@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
-import com.kairos.user.staff.PartialLeave;
+import com.kairos.persistence.model.staff.PartialLeave;
 
 /**
  * Created by prabjot on 23/2/17.

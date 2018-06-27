@@ -1,10 +1,10 @@
 package com.kairos.client;
 
+import com.kairos.activity.staff.StaffAdditionalInfoDTO;
 import com.kairos.client.dto.ClientStaffInfoDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.client.dto.staff.StaffDTO;
-import com.kairos.user.staff.staff.UnitStaffResponseDTO;
+import com.kairos.persistence.model.staff.staff.UnitStaffResponseDTO;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

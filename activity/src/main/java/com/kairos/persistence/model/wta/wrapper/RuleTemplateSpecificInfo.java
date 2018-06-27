@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.wta.wrapper;
 
-import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.util.DateTimeInterval;
+import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
 import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.util.DateTimeInterval;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

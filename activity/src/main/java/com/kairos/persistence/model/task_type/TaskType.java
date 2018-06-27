@@ -3,9 +3,8 @@ package com.kairos.persistence.model.task_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
+import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.dto.TaskTypeDTO;
 import com.kairos.view_handler.json_view_handler.TaskTypeViewHandler;
 import org.apache.commons.validator.GenericValidator;
 import org.joda.time.DateTime;
@@ -367,18 +366,7 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         this.vehicleRequired = vehicleRequired;
     }
 
-    public TaskTypeDTO getBasicTaskTypeInfo() {
-        TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
-        taskTypeDTO.setId(this.getId());
-        taskTypeDTO.setDescription(this.description);
-        taskTypeDTO.setDuration(this.duration);
-        taskTypeDTO.setExpiresOn(this.expiresOn);
-        taskTypeDTO.setTags(this.tags);
-        taskTypeDTO.setParentTaskTypeId(this.rootId);
-        taskTypeDTO.setServiceId(this.subServiceId);
-        taskTypeDTO.setTitle(this.title);
-        return taskTypeDTO;
-    }
+
 
     public void saveAgreementSettings(String union, String agreement, Date startPeriod, Date endPeriod) {
         this.union = union;

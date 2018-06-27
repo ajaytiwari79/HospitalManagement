@@ -2,6 +2,9 @@ package com.kairos.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.activity.activity_tabs.BalanceSettingActivityTabDTO;
+import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
+import com.kairos.activity.activity.activity_tabs.TimeCalculationActivityDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 
 import java.math.BigInteger;
@@ -25,12 +28,11 @@ public class ActivityDTO {
     private String categoryName;
     private Long unitId = -1L;
     private boolean isParentActivity = true;
-    private GeneralActivityTab generalActivityTab;
-    private TimeCalculationActivityTab timeCalculationActivityTab;
+    private GeneralActivityTabDTO generalActivityTab;
+    private TimeCalculationActivityDTO timeCalculationActivityTab;
     private List<ActivityDTO> compositeActivities;
-    private BalanceSettingsActivityTab balanceSettingsActivityTab;
+    private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
     private Long countryActivityId;
-    private SkillActivityTab skillActivityTab;
     private TimeTypeDTO timeType;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -53,33 +55,6 @@ public class ActivityDTO {
         this.parentId = parentId;
     }
 
-    public TimeCalculationActivityTab getTimeCalculationActivityTab() {
-        return timeCalculationActivityTab;
-    }
-
-    public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
-        this.timeCalculationActivityTab = timeCalculationActivityTab;
-    }
-
-    public ActivityDTO(BigInteger id) {
-        this.id = id;
-    }
-
-    public List<Long> getExpertises() {
-        return expertises;
-    }
-
-    public void setExpertises(List<Long> expertises) {
-        this.expertises = expertises;
-    }
-
-    public SkillActivityTab getSkillActivityTab() {
-        return skillActivityTab;
-    }
-
-    public void setSkillActivityTab(SkillActivityTab skillActivityTab) {
-        this.skillActivityTab = skillActivityTab;
-    }
 
     public TimeTypeDTO getTimeType() {
         return timeType;
@@ -138,7 +113,6 @@ public class ActivityDTO {
     }
 
 
-
     public List<BigInteger> getTags() {
         List<BigInteger> tags = new ArrayList<>();
         for (Long tag : this.tags) {
@@ -177,13 +151,6 @@ public class ActivityDTO {
         isParentActivity = parentActivity;
     }
 
-    public GeneralActivityTab getGeneralActivityTab() {
-        return generalActivityTab;
-    }
-
-    public void setGeneralActivityTab(GeneralActivityTab generalActivityTab) {
-        this.generalActivityTab = generalActivityTab;
-    }
 
     public List<ActivityDTO> getCompositeActivities() {
         return compositeActivities;
@@ -209,11 +176,35 @@ public class ActivityDTO {
         this.endDate = endDate;
     }
 
-    public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
+    public List<Long> getExpertises() {
+        return expertises;
+    }
+
+    public void setExpertises(List<Long> expertises) {
+        this.expertises = expertises;
+    }
+
+    public GeneralActivityTabDTO getGeneralActivityTab() {
+        return generalActivityTab;
+    }
+
+    public void setGeneralActivityTab(GeneralActivityTabDTO generalActivityTab) {
+        this.generalActivityTab = generalActivityTab;
+    }
+
+    public TimeCalculationActivityDTO getTimeCalculationActivityTab() {
+        return timeCalculationActivityTab;
+    }
+
+    public void setTimeCalculationActivityTab(TimeCalculationActivityDTO timeCalculationActivityTab) {
+        this.timeCalculationActivityTab = timeCalculationActivityTab;
+    }
+
+    public BalanceSettingActivityTabDTO getBalanceSettingsActivityTab() {
         return balanceSettingsActivityTab;
     }
 
-    public void setBalanceSettingsActivityTab(BalanceSettingsActivityTab balanceSettingsActivityTab) {
+    public void setBalanceSettingsActivityTab(BalanceSettingActivityTabDTO balanceSettingsActivityTab) {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 
@@ -226,21 +217,7 @@ public class ActivityDTO {
         this.isParentActivity = isParentActivity;
     }
 
-    public ActivityDTO(BigInteger id, String name, String description, Long countryId, BigInteger categoryId, String categoryName, Long unitId, boolean isParentActivity,
-                       GeneralActivityTab generalActivityTab, List<Long> tags) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-        this.unitId = unitId;
-        this.isParentActivity = isParentActivity;
-        this.generalActivityTab = generalActivityTab;
-        this.tags = tags;
-    }
-
-    public ActivityDTO(BigInteger id, String name,BigInteger parentId) {
+    public ActivityDTO(BigInteger id, String name, BigInteger parentId) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;

@@ -1,4 +1,6 @@
 package com.kairos.persistence.repository.task_type;
+
+
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;

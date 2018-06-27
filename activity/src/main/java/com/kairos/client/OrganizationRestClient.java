@@ -1,13 +1,13 @@
 package com.kairos.client;
 
+import com.kairos.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
+import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.activity.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.staff.OrganizationStaffWrapper;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.organization.OrganizationDTO;
-import com.kairos.activity.organization.OrganizationTypeAndSubTypeDTO;
-import com.kairos.activity.dto.activity.OrganizationMappingActivityDTO;
+import com.kairos.persistence.model.country.day_type.DayType;
 import com.kairos.util.RestClientUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class OrganizationRestClient {

@@ -1,10 +1,8 @@
 package com.kairos.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.activity.tabs.CompositeShiftActivityTab;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,8 +30,4 @@ public class CompositeShiftActivityDTO {
         this.activityList = activityList;
     }
 
-    public CompositeShiftActivityTab buildCompositeShiftActivityTab() {
-        CompositeShiftActivityTab compositeShiftActivityTab = new CompositeShiftActivityTab(activityList);
-        return compositeShiftActivityTab;
-    }
 }

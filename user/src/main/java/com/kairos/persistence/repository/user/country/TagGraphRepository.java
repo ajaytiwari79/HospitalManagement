@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.country;
 
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-import com.kairos.user.country.tag.Tag;
-import com.kairos.user.country.tag.TagQueryResult;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

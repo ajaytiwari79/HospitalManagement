@@ -4,7 +4,7 @@ package com.kairos.persistence.repository.phase;
 import com.kairos.client.dto.organization.OrganizationPhaseDTO;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.user.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

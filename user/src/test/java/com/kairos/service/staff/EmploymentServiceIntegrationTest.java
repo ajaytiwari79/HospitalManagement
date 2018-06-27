@@ -3,7 +3,7 @@ package com.kairos.service.staff;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.user.patient.web.UnitPositionDTO;
+import com.kairos.activity.web.UnitPositionDTO;
 import com.kairos.service.unit_employment_position.UnitPositionServiceIntegrationTest;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.*;

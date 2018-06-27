@@ -6,16 +6,16 @@ package com.kairos.util;
  */
 
 
-import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.enums.MinMaxSetting;
-import com.kairos.enums.PartOfDay;
 import com.kairos.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.wta.templates.template_types.*;
+import com.kairos.enums.MinMaxSetting;
+import com.kairos.enums.PartOfDay;
+import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.country.Day;
+import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.user.country.Day;
-import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;

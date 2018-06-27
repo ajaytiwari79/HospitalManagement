@@ -1,16 +1,16 @@
 package com.kairos.controller.task;
 
-import com.kairos.persistence.model.task_type.TaskType;
-import com.kairos.persistence.model.task_type.MapPointer;
-import com.kairos.persistence.model.task_type.TaskTypeDefination;
-import com.kairos.dto.TaskTypeDTO;
-import com.kairos.dto.TaskTypeSettingDTO;
 import com.kairos.activity.task_type.TaskTypeCopyDTO;
-import com.kairos.activity.task_type.TaskTypeResourceDTO;
+import com.kairos.activity.task_type.TaskTypeDTO;
+import com.kairos.activity.task_type.TaskTypeSettingDTO;
 import com.kairos.activity.task_type.TaskTypeSlaConfigDTO;
+import com.kairos.persistence.model.task_type.MapPointer;
+import com.kairos.persistence.model.task_type.TaskType;
+import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.service.MapPointerService;
 import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -30,9 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**

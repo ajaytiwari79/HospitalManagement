@@ -1,7 +1,7 @@
 package com.kairos.controller.agreement.cta;
 
-import com.kairos.user.agreement.cta.CTARuleTemplateDTO;
-import com.kairos.user.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
+import com.kairos.persistence.model.agreement.cta.CTARuleTemplateDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

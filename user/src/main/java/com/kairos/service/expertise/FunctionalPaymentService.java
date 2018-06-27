@@ -1,6 +1,6 @@
 package com.kairos.service.expertise;
 
-import com.kairos.user.country.Function;
+import com.kairos.persistence.model.country.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
@@ -8,10 +8,10 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
-import com.kairos.user.country.experties.FunctionalPaymentMatrixDTO;
-import com.kairos.user.country.experties.FunctionalSeniorityLevelDTO;
-import com.kairos.user.country.experties.FunctionsDTO;
-import com.kairos.user.country.experties.SeniorityLevelFunctionDTO;
+import com.kairos.persistence.model.country.experties.FunctionalPaymentMatrixDTO;
+import com.kairos.persistence.model.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.persistence.model.country.experties.FunctionsDTO;
+import com.kairos.persistence.model.country.experties.SeniorityLevelFunctionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.specification.IsFunctionalPaymentAvailable;

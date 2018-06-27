@@ -1,10 +1,11 @@
 package com.kairos.spec;
 
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
+
+import com.kairos.activity.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.util.Collections;
 import java.util.List;

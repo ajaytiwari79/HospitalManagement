@@ -2,9 +2,6 @@ package com.kairos.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.activity.tabs.ActivityCategory;
-import com.kairos.persistence.model.activity.tabs.CTAAndWTASettingsActivityTab;
-
 import java.math.BigInteger;
 
 /**
@@ -19,7 +16,7 @@ public class ActivityWithCTAWTASettingsDTO {
 
     private String description;
 
-    private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
+    private CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTab;
 
     private BigInteger categoryId;
 
@@ -51,11 +48,11 @@ public class ActivityWithCTAWTASettingsDTO {
         this.description = description;
     }
 
-    public CTAAndWTASettingsActivityTab getCtaAndWtaSettingsActivityTab() {
+    public CTAAndWTASettingsActivityTabDTO getCtaAndWtaSettingsActivityTab() {
         return ctaAndWtaSettingsActivityTab;
     }
 
-    public void setCtaAndWtaSettingsActivityTab(CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab) {
+    public void setCtaAndWtaSettingsActivityTab(CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTab) {
         this.ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTab;
     }
 

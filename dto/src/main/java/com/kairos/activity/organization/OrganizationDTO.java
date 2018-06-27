@@ -2,7 +2,7 @@ package com.kairos.activity.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.OrganizationLevel;
-import com.kairos.user.patient.web.OrganizationTypeDTO;
+import com.kairos.activity.web.OrganizationTypeDTO;
 
 import java.util.List;
 

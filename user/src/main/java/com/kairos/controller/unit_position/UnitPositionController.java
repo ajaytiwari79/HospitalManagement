@@ -1,7 +1,7 @@
 package com.kairos.controller.unit_position;
 
 
-import com.kairos.user.patient.web.UnitPositionDTO;
+import com.kairos.activity.web.UnitPositionDTO;
 import com.kairos.activity.wta.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;

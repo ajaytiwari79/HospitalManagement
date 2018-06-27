@@ -1,5 +1,5 @@
 package com.kairos.service.integration;
-import com.kairos.user.organization.Organization;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;

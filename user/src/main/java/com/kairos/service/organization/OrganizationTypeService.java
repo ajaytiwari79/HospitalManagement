@@ -1,14 +1,14 @@
 package com.kairos.service.organization;
 
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.user.organization.*;
-import com.kairos.user.country.Country;
+import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.user.patient.web.OrganizationTypeDTO;
-import com.kairos.user.patient.web.OrganizationTypeAndSubTypeDto;
-import com.kairos.user.patient.web.UpdateOrganizationTypeDTO;
+import com.kairos.activity.web.OrganizationTypeDTO;
+import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
+import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;

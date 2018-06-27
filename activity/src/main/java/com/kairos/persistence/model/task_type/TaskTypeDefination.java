@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.task_type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
+import com.kairos.enums.task_type.TaskTypeEnum;
 
 import java.io.Serializable;
 

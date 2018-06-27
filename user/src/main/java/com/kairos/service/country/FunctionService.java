@@ -3,14 +3,14 @@ package com.kairos.service.country;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.user.organization.Level;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.Function;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.Function;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
-import com.kairos.user.country.FunctionDTO;
+import com.kairos.persistence.model.country.FunctionDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,7 @@ public class FunctionService extends UserBaseEntity{
     private ExceptionService exceptionService;
 
 
-    public FunctionDTO createFunction(Long countryId, com.kairos.user.patient.web.FunctionDTO functionDTO){
+    public FunctionDTO createFunction(Long countryId, com.kairos.activity.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
@@ -72,7 +72,7 @@ public class FunctionService extends UserBaseEntity{
 
     }
 
-    public FunctionDTO updateFunction(Long countryId, com.kairos.user.patient.web.FunctionDTO functionDTO){
+    public FunctionDTO updateFunction(Long countryId, com.kairos.activity.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);

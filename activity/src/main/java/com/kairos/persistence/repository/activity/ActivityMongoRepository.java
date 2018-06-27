@@ -1,14 +1,13 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.ActivityDTO;
 import org.springframework.data.mongodb.repository.CountQuery;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 

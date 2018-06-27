@@ -6,21 +6,21 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
-import com.kairos.user.organization.*;
-import com.kairos.user.organization.enums.OrganizationLevel;
-import com.kairos.user.organization.group.Group;
-import com.kairos.user.organization.team.Team;
-import com.kairos.user.organization.time_slot.TimeSlot;
-import com.kairos.user.access_permission.AccessGroup;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.user.auth.User;
-import com.kairos.user.client.*;
+import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupRole;
+import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
-import com.kairos.user.country.CitizenStatus;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.equipment.EquipmentCategory;
+import com.kairos.persistence.model.country.CitizenStatus;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
@@ -31,7 +31,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.user.staff.*;
+import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -192,9 +192,9 @@ public class BootDataService {
     private UserBaseRepository userBaseRepository;
 
     private List<Long> skillList;
-    private com.kairos.user.organization.OrganizationService homeCareService;
+    private com.kairos.persistence.model.organization.OrganizationService homeCareService;
 
-    private com.kairos.user.organization.OrganizationService medicalCareService;
+    private com.kairos.persistence.model.organization.OrganizationService medicalCareService;
 
     private Country denmark = null;
     private Country germany = null;
@@ -407,19 +407,19 @@ public class BootDataService {
     }
 
     private void createOrganizationServices() {
-        homeCareService = new com.kairos.user.organization.OrganizationService("Home Care");
+        homeCareService = new com.kairos.persistence.model.organization.OrganizationService("Home Care");
         homeCareService.setOrganizationSubService(Arrays.asList(
-                new com.kairos.user.organization.OrganizationService("Home Dusting"),
-                new com.kairos.user.organization.OrganizationService("Home Cooking"),
-                new com.kairos.user.organization.OrganizationService("Home Maintenance")));
+                new com.kairos.persistence.model.organization.OrganizationService("Home Dusting"),
+                new com.kairos.persistence.model.organization.OrganizationService("Home Cooking"),
+                new com.kairos.persistence.model.organization.OrganizationService("Home Maintenance")));
         homeCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
         homeCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
-        medicalCareService = new com.kairos.user.organization.OrganizationService("Medical Service");
+        medicalCareService = new com.kairos.persistence.model.organization.OrganizationService("Medical Service");
         medicalCareService.setOrganizationSubService(Arrays.asList(
-                new com.kairos.user.organization.OrganizationService("Basic Checkup"),
-                new com.kairos.user.organization.OrganizationService("Disease Diagnose"),
-                new com.kairos.user.organization.OrganizationService("Medication")));
+                new com.kairos.persistence.model.organization.OrganizationService("Basic Checkup"),
+                new com.kairos.persistence.model.organization.OrganizationService("Disease Diagnose"),
+                new com.kairos.persistence.model.organization.OrganizationService("Medication")));
         medicalCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
         medicalCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -1024,7 +1024,7 @@ public class BootDataService {
     }
 
     private void createCurrency() {
-        com.kairos.user.country.Currency currency = new com.kairos.user.country.Currency();
+        com.kairos.persistence.model.country.Currency currency = new com.kairos.persistence.model.country.Currency();
         currency.setName("krone");
         currency.setCreationDate(DateUtil.getCurrentDate().getTime());
         currency.setLastModificationDate(DateUtil.getCurrentDate().getTime());

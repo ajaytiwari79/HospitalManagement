@@ -17,12 +17,12 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.ObjectUtils;
 import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.solver_config.SolverConfigStatus;
-import com.kairos.user.patient.web.StaffDTO;
+import com.kairos.activity.web.StaffDTO;
 import com.kairos.vrp.vrpPlanning.EmployeeDTO;
 import com.kairos.vrp.vrpPlanning.ShiftDTO;
 import com.kairos.vrp.vrpPlanning.TaskDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.kairos.user.staff.staff.UnitStaffResponseDTO;
+import com.kairos.persistence.model.staff.staff.UnitStaffResponseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

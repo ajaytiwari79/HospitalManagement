@@ -1,11 +1,11 @@
 package com.kairos.controller.access_group;
 
 import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.user.access_permission.AccessGroup;
-import com.kairos.user.access_permission.AccessGroupPermissionDTO;
-import com.kairos.user.access_permission.AccessPermissionDTO;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupPermissionDTO;
+import com.kairos.persistence.model.access_permission.AccessPermissionDTO;
 import com.kairos.user.access_group.CountryAccessGroupDTO;
-import com.kairos.user.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

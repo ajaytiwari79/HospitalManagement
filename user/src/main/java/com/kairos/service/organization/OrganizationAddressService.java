@@ -1,13 +1,13 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.organization.OrganizationContactAddress;
-import com.kairos.user.organization.team.Team;
-import com.kairos.user.client.ContactAddress;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.Currency;
+import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
+import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.Currency;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;

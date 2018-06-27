@@ -2,34 +2,32 @@ package com.kairos.service.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.activity.task.*;
 import com.kairos.client.*;
-import com.kairos.user.country.day_type.DayType;
 import com.kairos.client.dto.client.Client;
 import com.kairos.client.dto.country.CountryHolidayCalender;
-import com.kairos.activity.organization.OrganizationDTO;
 import com.kairos.client.dto.skill.Skill;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.CitizenHealthStatus;
+import com.kairos.enums.Day;
+import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.CustomTimeScale;
+import com.kairos.persistence.model.client.OrganizationClientWrapper;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
-
+import com.kairos.persistence.model.country.day_type.DayType;
 import com.kairos.persistence.model.task.SkillExpertise;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskStatus;
-
-import com.kairos.enums.Day;
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.persistence.model.task_demand.TaskDemandVisit;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeSkill;
 import com.kairos.persistence.model.task_type.TaskTypeSlaConfig;
-import com.kairos.user.client.OrganizationClientWrapper;
-import com.kairos.wrapper.TaskCountWithAssignedUnit;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionTypeMongoRepository;
@@ -54,15 +52,15 @@ import com.kairos.util.DateUtils;
 import com.kairos.util.TaskDemandRequestWrapper;
 import com.kairos.util.TaskDemandVisitWrapper;
 import com.kairos.util.userContext.UserContext;
+import com.kairos.wrapper.TaskCountWithAssignedUnit;
+import com.kairos.wrapper.task.TaskGanttDTO;
+import com.kairos.wrapper.task.TaskUpdateDTO;
 import de.tourenserver.ArrayOfFixedCall;
 import de.tourenserver.CallInfoRec;
 import de.tourenserver.FixScheduleResponse;
 import de.tourenserver.FixedCall;
 import org.apache.commons.collections.map.HashedMap;
-
-
 import org.bson.Document;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,10 +97,7 @@ import static com.kairos.constants.AppConstants.MERGED_TASK_NAME;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 import static com.kairos.persistence.model.task.TaskStatus.CANCELLED;
-
-import static com.kairos.util.DateUtils.ISO_FORMAT;
-import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
-import static com.kairos.util.DateUtils.ONLY_DATE;
+import static com.kairos.util.DateUtils.*;
 import static java.time.ZoneId.systemDefault;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 

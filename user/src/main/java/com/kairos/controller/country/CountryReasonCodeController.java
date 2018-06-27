@@ -1,7 +1,7 @@
 package com.kairos.controller.country;
 
 import com.kairos.persistence.model.enums.ReasonCodeType;
-import com.kairos.user.patient.web.ReasonCodeDTO;
+import com.kairos.wrapper.ReasonCodeDTO;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

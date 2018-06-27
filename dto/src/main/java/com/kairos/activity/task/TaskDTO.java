@@ -242,12 +242,4 @@ public class TaskDTO {
                 '}';
     }
 
-//    public TaskDTO copyProperties(Task task){
-//        this.id = task.getId().toString();
-//        this.resource = task.getStaffId();
-//        this.taskTypeId = task.getTaskTypeId().toString();
-//        this.startDate = task.getStartDate();
-//        this.endDate = task.getEndDate();
-//        return this;
-//    }
 }

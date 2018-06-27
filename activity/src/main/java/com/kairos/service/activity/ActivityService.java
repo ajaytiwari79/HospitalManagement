@@ -3,18 +3,19 @@ package com.kairos.service.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.activity.ActivityWithUnitIdDTO;
+import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.*;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.activity.organization.OrganizationDTO;
 import com.kairos.activity.organization.OrganizationTypeAndSubTypeDTO;
-import com.kairos.activity.phase.PhaseActivityDTO;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.phase.PhaseWeeklyDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.staffing_level.StaffingLevel;
+import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.tag.TagDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.client.GenericIntegrationService;
@@ -43,9 +44,9 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.user.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.persistence.model.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.day_type.DayType;
+import com.kairos.persistence.model.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.timeCareShift.GetAllActivitiesResponse;
@@ -54,6 +55,7 @@ import com.kairos.util.timeCareShift.Transstatus;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.RulesActivityTabDTO;
+import com.kairos.wrapper.activity.SkillActivityDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -454,8 +456,6 @@ public class ActivityService extends MongoBaseService {
     }
 
     public IndividualPointsActivityTab getIndividualPointsTabOfActivity(BigInteger activityId) {
-
-
         Activity activity = activityMongoRepository.findOne(activityId);
         IndividualPointsActivityTab individualPointsActivityTab = activity.getIndividualPointsActivityTab();
         return individualPointsActivityTab;
@@ -492,7 +492,8 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateNotesTabOfActivity(NotesActivityDTO notesActivityDTO) {
-        NotesActivityTab notesActivityTab = notesActivityDTO.buildNotesActivityTab();
+        NotesActivityTab notesActivityTab = new NotesActivityTab();
+        ObjectMapperUtils.copyProperties(notesActivityDTO, notesActivityTab);
 
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(notesActivityDTO.getActivityId())));
         if (Optional.ofNullable(activity.getNotesActivityTab().getModifiedDocumentName()).isPresent()) {
@@ -520,7 +521,8 @@ public class ActivityService extends MongoBaseService {
 
 
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
-        CommunicationActivityTab communicationActivityTab = communicationActivityDTO.buildSMSReminderActivityTab();
+        CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab();
+        ObjectMapperUtils.copyProperties(communicationActivityDTO, communicationActivityTab);
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(communicationActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", communicationActivityDTO.getActivityId());
@@ -544,12 +546,13 @@ public class ActivityService extends MongoBaseService {
     // BONUS
 
     public ActivityTabsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO) {
-        BonusActivityTab bonusActivityTab = bonusActivityDTO.buildBonusActivityTab();
+
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(bonusActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", bonusActivityDTO.getActivityId());
         }
-        activity.setBonusActivityTab(bonusActivityTab);
+        BonusActivityTab bonusActivityTab = new BonusActivityTab(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
+                activity.setBonusActivityTab(bonusActivityTab);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(bonusActivityTab);
         return activityTabsWrapper;
@@ -593,7 +596,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", skillActivityDTO.getActivityId());
         }
-        SkillActivityTab skillActivityTab = skillActivityDTO.buildSkillActivityTab();
+        SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
 
 
         activity.setSkillActivityTab(skillActivityTab);
@@ -704,11 +707,13 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateCtaAndWtaSettingsTabOfActivity(CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {
-        CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTabDTO.buildCTAAndWTASettingActivityTab();
+
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(ctaAndWtaSettingsActivityTabDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", ctaAndWtaSettingsActivityTabDTO.getActivityId());
         }
+        CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(ctaAndWtaSettingsActivityTabDTO.isEligibleForCostCalculation());
+
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(ctaAndWtaSettingsActivityTab);

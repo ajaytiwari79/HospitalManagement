@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.country;
-import com.kairos.user.country.OwnershipType;
+import com.kairos.persistence.model.country.OwnershipType;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

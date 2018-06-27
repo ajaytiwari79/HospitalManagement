@@ -1,7 +1,7 @@
 package com.kairos.activity.task_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
+import com.kairos.enums.task_type.TaskTypeEnum;
 
 import javax.validation.constraints.NotNull;
 

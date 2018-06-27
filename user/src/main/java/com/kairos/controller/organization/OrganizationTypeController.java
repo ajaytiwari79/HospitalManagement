@@ -1,6 +1,6 @@
 package com.kairos.controller.organization;
 
-import com.kairos.user.organization.OrganizationType;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.util.response.ResponseHandler;

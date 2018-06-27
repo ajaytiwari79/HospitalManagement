@@ -1,6 +1,6 @@
     package com.kairos.controller.organization;
 
-    import com.kairos.user.organization.team.TeamDTO;
+    import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.service.organization.TeamService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

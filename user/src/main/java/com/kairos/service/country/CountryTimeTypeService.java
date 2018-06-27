@@ -1,5 +1,5 @@
 package com.kairos.service.country;
-import com.kairos.user.country.CountryTimeType;
+import com.kairos.persistence.model.country.CountryTimeType;
 import com.kairos.persistence.repository.user.country.CountryTimeTypeGraphRepository;
 import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;

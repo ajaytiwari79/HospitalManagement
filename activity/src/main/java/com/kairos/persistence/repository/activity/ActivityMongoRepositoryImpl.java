@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.activity.activity.ActivityWithCompositeDTO;
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
-import com.kairos.dto.ActivityDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.wrapper.activity.ActivityTagDTO;

@@ -1,7 +1,6 @@
 package com.kairos.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.activity.tabs.CommunicationActivityTab;
 
 import java.math.BigInteger;
 
@@ -54,10 +53,5 @@ public class CommunicationActivityDTO {
 
     public void setNotifyAfterDeleteActivityType(boolean notifyAfterDeleteActivityType) {
         this.notifyAfterDeleteActivityType = notifyAfterDeleteActivityType;
-    }
-
-    public CommunicationActivityTab buildSMSReminderActivityTab(){
-        CommunicationActivityTab communicationActivityTab =new CommunicationActivityTab(allowCommunicationReminder,timeUnit,timeLength,notifyAfterDeleteActivityType);
-        return communicationActivityTab;
     }
 }

@@ -2,8 +2,8 @@ package com.kairos.activity.wta;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.user.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.country.time_slot.TimeSlotDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 
 import java.util.ArrayList;

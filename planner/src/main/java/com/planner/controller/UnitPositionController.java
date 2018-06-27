@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.user.patient.web.UnitPositionWtaDTO;
+import com.kairos.activity.web.UnitPositionWtaDTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.UnitPositionService;

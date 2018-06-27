@@ -1,11 +1,11 @@
 package com.kairos.util.serviceutil;
 
-import com.kairos.activity.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.Duration;
+import com.kairos.activity.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.staffing_level.AbsenceStaffingLevelDto;
-import com.kairos.dto.staffing_level.PresenceStaffingLevelDto;
-import com.kairos.dto.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
+import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigInteger;

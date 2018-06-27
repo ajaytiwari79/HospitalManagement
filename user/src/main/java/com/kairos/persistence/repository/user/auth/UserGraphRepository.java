@@ -2,8 +2,8 @@ package com.kairos.persistence.repository.user.auth;
 
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.user.auth.TabPermission;
-import com.kairos.user.auth.User;
+import com.kairos.persistence.model.auth.TabPermission;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

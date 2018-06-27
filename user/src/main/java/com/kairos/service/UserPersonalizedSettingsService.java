@@ -1,7 +1,7 @@
 package com.kairos.service;
 
-import com.kairos.user.auth.User;
-import com.kairos.user.user_personalized_settings.*;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.user_personalized_settings.*;
 import com.kairos.persistence.repository.user.UserPersonalizedSettingsRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.springframework.beans.BeanUtils;

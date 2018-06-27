@@ -65,12 +65,7 @@ public class TimeCalculationActivityDTO {
         this.defaultStartTime = defaultStartTime;
     }
 
-    public TimeCalculationActivityTab buildTimeCalculationActivityTab(){
-        TimeCalculationActivityTab timeCalculationActivityTab =new TimeCalculationActivityTab(methodForCalculatingTime, fullDayCalculationType, fullWeekCalculationType, allowBreakReduction,
-                fixedTimeValue,methodForCalculatingTimeInMonths,balanceType,multiplyWith,multiplyWithValue,multiplyByVacationFactor,multiplyByFinalSchedule, breakTemplates,
-                dayTypes,fullWeekStart,fullWeekEnd,historyDuration,defaultStartTime);
-        return timeCalculationActivityTab;
-    }
+
     public String getMethodForCalculatingTime() {
         return methodForCalculatingTime;
     }

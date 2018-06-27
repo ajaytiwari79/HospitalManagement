@@ -63,14 +63,6 @@ public class GeneralActivityTabDTO {
     private String originalIconName;
     private String modifiedIconName;
     private List<BigInteger> tags = new ArrayList<>();
-
-    public GeneralActivityTab buildGeneralActivityTab() {
-        GeneralActivityTab generalActivityTab =
-                new GeneralActivityTab(name, code, printoutSymbol,categoryId, colorPresent, backgroundColor, textColor, description,this.isActive,
-                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName, this.startDate,this.endDate);
-        return generalActivityTab;
-    }
-
     public List<BigInteger> getTags() {
         return tags;
     }

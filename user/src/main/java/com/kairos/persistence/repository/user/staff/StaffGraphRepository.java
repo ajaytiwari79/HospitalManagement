@@ -1,15 +1,15 @@
 package com.kairos.persistence.repository.user.staff;
 
-import com.kairos.user.organization.Organization;
-import com.kairos.user.organization.StaffRelationship;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.user.auth.User;
-import com.kairos.user.client.ClientStaffRelation;
-import com.kairos.user.client.ContactDetail;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.client.ClientStaffRelation;
+import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.user.staff.*;
+import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

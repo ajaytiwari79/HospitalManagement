@@ -1,9 +1,8 @@
 package com.kairos.persistence.repository.task_type;
 
-import com.kairos.persistence.model.task.Task;
+import com.kairos.activity.task_type.TaskTypeDTO;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.TaskTypeDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -48,7 +47,7 @@ public interface TaskTypeMongoRepository extends MongoBaseRepository<TaskType,Bi
     TaskType findByOrganizationIdAndRootIdAndSubServiceId(long organizationId, BigInteger rootId, long subServiceId);
 
     @Query(value = "{organizationId:?0,deleted:false,'subServiceId':{$in:?1}}",fields = "{'title' : 1,'description':1}")
-    List<TaskTypeDTO> getTaskTypesOfOrganisation(Long organizationId,List<Long> serviceIds);
+    List<TaskTypeDTO> getTaskTypesOfOrganisation(Long organizationId, List<Long> serviceIds);
 
     @Query("{organizationId : ?0,deleted : false,title:{$in:?1}}")
     List<TaskType> findByName(Long unitId,List<String> name);

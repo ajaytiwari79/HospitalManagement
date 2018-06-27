@@ -1,7 +1,7 @@
 package com.planner.controller;
 
 import com.kairos.dto.staffing_level.StaffingLevelDto;
-import com.kairos.user.patient.web.UnitPositionDTO;
+import com.kairos.activity.web.UnitPositionDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.StaffService;
 import com.planner.service.staffinglevel.StaffingLevelService;

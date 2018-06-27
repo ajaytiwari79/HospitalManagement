@@ -13,6 +13,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.persistence.model.task_demand.TaskDemand.Status.VISITATED;
+
 /**
  * Created by prabjot on 14/10/16.
  */
@@ -34,7 +36,7 @@ public class TaskDemand extends MongoBaseEntity {
 
     @Min(value = 1, message = "error.TaskDemand.staffCount.minimumOne")
     protected int staffCount;
-    protected Status status = Status.VISITATED;
+    protected Status status = VISITATED;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     protected WeekFrequency weekdayFrequency;

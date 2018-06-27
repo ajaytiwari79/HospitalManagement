@@ -2,37 +2,33 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.kairos.client.*;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.client.dto.TimeSlot;
-import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.constants.AppConstants;
-import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
-import com.kairos.dto.TaskTypeSettingDTO;
-import com.kairos.dto.staffTaskType.TaskTypeSettingWrapper;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.CountryDTO;
 import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.activity.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.activity.tag.TagDTO;
+import com.kairos.activity.task_type.*;
+import com.kairos.client.*;
+import com.kairos.client.dto.TimeSlot;
 import com.kairos.client.dto.organization.OrganizationLevel;
 import com.kairos.client.dto.skill.Skill;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
+import com.kairos.constants.AppConstants;
+import com.kairos.enums.task_type.TaskTypeEnum;
+import com.kairos.persistence.model.country.CountryDTO;
+import com.kairos.persistence.model.country.day_type.DayType;
+import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.task_type.*;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoRepository;
-import com.kairos.dto.TaskTypeDTO;
-import com.kairos.activity.dto.OrganizationTypeHierarchyQueryResult;
-import com.kairos.activity.tag.TagDTO;
-import com.kairos.activity.task_type.TaskTypeResourceDTO;
-import com.kairos.activity.task_type.TaskTypeResponseDTO;
-import com.kairos.activity.task_type.TaskTypeSlaConfigDTO;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.FileUtil;
 import com.kairos.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.util.timeCareShift.TimeCareActivity;
+import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
 import org.apache.commons.validator.GenericValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +88,20 @@ public class TaskTypeService extends MongoBaseService {
         TaskType taskType = new TaskType(taskTypeDTO.getTitle(), taskTypeDTO.getDescription(),subServiceId, taskTypeDTO.getExpiresOn(), taskTypeDTO.getDuration());
         taskType.setTags(taskTypeDTO.getTags());
         save(taskType);
-        return taskType.getBasicTaskTypeInfo();
+        return getBasicTaskTypeInfo(taskType);
     }
-
+    public TaskTypeDTO getBasicTaskTypeInfo(TaskType taskType) {
+        TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
+        taskTypeDTO.setId(taskType.getId());
+        taskTypeDTO.setDescription(taskType.getDescription());
+        taskTypeDTO.setDuration(taskType.getDuration());
+        taskTypeDTO.setExpiresOn(taskType.getExpiresOn());
+        taskTypeDTO.setTags(taskType.getTags());
+        taskTypeDTO.setParentTaskTypeId(taskType.getRootId());
+        taskTypeDTO.setServiceId(taskType.getSubServiceId());
+        taskTypeDTO.setTitle(taskType.getTitle());
+        return taskTypeDTO;
+    }
     /*public List<Map<String, Object>> getTaskTypes(Long subServiceId) {
         List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId,0L);
         List<Map<String, Object>> response = new ArrayList<>(taskTypes.size());
@@ -108,7 +115,7 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId,0L);
         List<TaskTypeDTO> response = new ArrayList<>(taskTypes.size());
         for (TaskType taskType : taskTypes) {
-            response.add(taskType.getBasicTaskTypeInfo());
+            response.add(getBasicTaskTypeInfo(taskType));
         }
         return response;
     }
@@ -760,10 +767,9 @@ public class TaskTypeService extends MongoBaseService {
         copyProperties(taskType,copyObj,organizationId,subServiceId);
         save(copyObj);
         copySlaValues(taskType,Arrays.asList(copyObj),organizationId);
-        return copyObj.getBasicTaskTypeInfo();
+        return getBasicTaskTypeInfo(copyObj);
 
     }
-
 
     public TaskType copyProperties(TaskType source, TaskType target,long organizationId,long subServiceId){
         target.setOrganizationId(organizationId);
@@ -776,7 +782,7 @@ public class TaskTypeService extends MongoBaseService {
     public List<TaskTypeDTO> getTaskTypesOfOrganizations(long organizationId, long subService) {
         List<TaskTypeDTO> data = new ArrayList<>();
         for (TaskType taskType : taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId,true)) {
-            data.add(taskType.getBasicTaskTypeInfo());
+            data.add(getBasicTaskTypeInfo(taskType));
         }
         return data;
     }
@@ -1281,7 +1287,7 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }*/
 
-    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId, TaskTypeSettingDTO taskTypeSettingDTO){
         TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
             taskTypeSetting = new TaskTypeSetting(staffId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());

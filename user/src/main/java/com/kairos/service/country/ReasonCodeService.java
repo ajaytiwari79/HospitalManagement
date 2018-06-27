@@ -1,16 +1,13 @@
 package com.kairos.service.country;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.ReasonCodeType;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.ReasonCode;
-import com.kairos.user.country.ReasonCodeResponseDTO;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.ReasonCode;
+import com.kairos.persistence.model.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
-import com.kairos.user.patient.web.ReasonCodeDTO;
+import com.kairos.wrapper.ReasonCodeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

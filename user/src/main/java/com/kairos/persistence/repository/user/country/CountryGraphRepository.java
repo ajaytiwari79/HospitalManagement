@@ -1,12 +1,12 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.user.organization.Level;
-import com.kairos.user.organization.OrganizationType;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.employment_type.EmploymentType;
-import com.kairos.user.country.RelationType;
+import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -219,7 +219,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<Level> getLevelsByIdsIn(long countryId,List<Long> levelIds);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return id(employmentType) as id ,employmentType.name as name")
-    List<com.kairos.user.country.dto.EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
+    List<com.kairos.persistence.model.country.dto.EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
 
     @Query("Match (u:User) WHERE id(u)={0}\n" +
             "MATCH (u)<-[:BELONGS_TO]-(s:Staff)<-[:BELONGS_TO]-(e:Employment)<-[:HAS_EMPLOYMENTS]-(o:Organization)-[:BELONGS_TO]-(c:Country) \n" +

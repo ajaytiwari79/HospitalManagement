@@ -2,9 +2,7 @@ package com.kairos.persistence.model.activity;
 
 
 import com.kairos.enums.TimeTypes;
-import com.kairos.persistence.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;

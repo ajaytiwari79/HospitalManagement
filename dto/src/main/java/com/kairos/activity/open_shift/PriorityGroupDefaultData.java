@@ -1,7 +1,7 @@
 package com.kairos.activity.open_shift;
 
-import com.kairos.user.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.persistence.model.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.experties.ExpertiseResponseDTO;
 
 import java.util.List;
 

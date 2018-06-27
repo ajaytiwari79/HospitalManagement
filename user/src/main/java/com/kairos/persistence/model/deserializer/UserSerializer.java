@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.kairos.user.auth.User;
+import com.kairos.persistence.model.auth.User;
 
 
 import java.io.IOException;

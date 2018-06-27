@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.user.country.CountryAccessGroupRelationship;
+import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 

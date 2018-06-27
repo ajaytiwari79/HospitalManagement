@@ -2,6 +2,7 @@ package com.kairos.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
 
 import java.math.BigInteger;
 
@@ -19,7 +20,7 @@ public class CompositeActivityDTO {
     private String categoryName;
     private Long unitId = -1L;
     private boolean isParentActivity = true;
-    private GeneralActivityTab generalActivityTab;
+    private GeneralActivityTabDTO generalActivityTab;
     private Long countryActivityId;
 
     public CompositeActivityDTO() {
@@ -90,11 +91,11 @@ public class CompositeActivityDTO {
         isParentActivity = parentActivity;
     }
 
-    public GeneralActivityTab getGeneralActivityTab() {
+    public GeneralActivityTabDTO getGeneralActivityTab() {
         return generalActivityTab;
     }
 
-    public void setGeneralActivityTab(GeneralActivityTab generalActivityTab) {
+    public void setGeneralActivityTab(GeneralActivityTabDTO generalActivityTab) {
         this.generalActivityTab = generalActivityTab;
     }
 

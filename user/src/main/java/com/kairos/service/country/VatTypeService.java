@@ -1,6 +1,6 @@
 package com.kairos.service.country;
-import com.kairos.user.country.Country;
-import com.kairos.user.country.VatType;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.VatType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.VatTypeGraphRepository;
 import com.kairos.service.UserBaseService;

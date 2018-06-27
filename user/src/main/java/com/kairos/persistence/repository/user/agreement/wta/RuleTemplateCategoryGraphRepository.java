@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
-import com.kairos.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
+import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategoryTagDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 

@@ -2,8 +2,8 @@ package com.kairos.service.client;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
-import com.kairos.user.client.ClientMinimumDTO;
-import com.kairos.user.patient.web.ContactPersonDTO;
+import com.kairos.persistence.model.client.ClientMinimumDTO;
+import com.kairos.activity.web.ContactPersonDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

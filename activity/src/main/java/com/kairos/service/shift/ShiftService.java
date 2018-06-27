@@ -1,19 +1,28 @@
 package com.kairos.service.shift;
 
-import com.kairos.client.CountryRestClient;
-import com.kairos.client.GenericIntegrationService;
-import com.kairos.client.StaffRestClient;
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
-import com.kairos.persistence.model.break_settings.BreakSettings;
-import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.persistence.model.period.PlanningPeriod;
-import com.kairos.persistence.model.phase.Phase;
+import com.kairos.activity.open_shift.OpenShiftResponseDTO;
+import com.kairos.activity.shift.*;
+import com.kairos.activity.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.web.FunctionDTO;
+import com.kairos.client.CountryRestClient;
+import com.kairos.client.GenericIntegrationService;
+import com.kairos.client.StaffRestClient;
+import com.kairos.custom_exception.ActionNotPermittedException;
+import com.kairos.enums.shift.BreakPaymentSetting;
+import com.kairos.enums.shift.ShiftState;
+import com.kairos.persistence.model.access_permission.AccessGroupRole;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.break_settings.BreakSettings;
+import com.kairos.persistence.model.country.experties.AppliedFunctionDTO;
+import com.kairos.persistence.model.open_shift.OpenShift;
+import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.staff.staff.StaffAccessRoleDTO;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
@@ -21,7 +30,6 @@ import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
-import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -33,9 +41,6 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.dto.shift.StaffUnitPositionDetails;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
@@ -44,23 +49,16 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.wta.WTAService;
-import com.kairos.activity.shift.*;
 import com.kairos.spec.*;
+import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.WTARuleTemplateValidatorUtility;
 import com.kairos.util.event.ShiftNotificationEvent;
 import com.kairos.util.time_bank.TimeBankCalculationService;
-import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.enums.shift.ShiftState;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.country.experties.AppliedFunctionDTO;
-import com.kairos.user.patient.web.FunctionDTO;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.activity.open_shift.OpenShiftResponseDTO;
-import com.kairos.user.staff.staff.StaffAccessRoleDTO;
+import com.kairos.wrapper.DateWiseShiftResponse;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -194,7 +192,7 @@ public class ShiftService extends MongoBaseService {
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
         Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-        ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
+        ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO,activity);
 
         Phase phase = phaseService.getPhaseCurrentByUnit(shiftDTO.getUnitId(), shiftDTO.getStartDate());
         shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
@@ -400,7 +398,7 @@ public class ShiftService extends MongoBaseService {
         for (ShiftDTO shiftDTO : shiftDTOS) {
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-            ShiftWithActivityDTO shiftQueryResult = shiftDTO.buildResponse(activity);
+            ShiftWithActivityDTO shiftQueryResult = buildResponse(shiftDTO,activity);
             shiftQueryResult.setActivity(activity);
             validateShiftWithActivity(wtaQueryResultDTO, shiftQueryResult, staffAdditionalInfoDTO);
             Shift shift = buildShift(shiftQueryResult);
@@ -449,7 +447,7 @@ public class ShiftService extends MongoBaseService {
         Shift oldStateOfShift = new Shift();
         BeanUtils.copyProperties(shift, oldStateOfShift);
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-        ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
+        ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO,activity);
         validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         shift = buildShift(shiftWithActivityDTO);
         shift.setMainShift(true);
@@ -696,15 +694,15 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
 
-        shift = shiftDTO.buildShift();
+        shift = buildShift(shiftDTO);
         shift.setUnitId(unitId);
-        ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
+        ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO,activity);
         shiftWithActivityDTO.setActivity(activity);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
         validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
         if (shiftDTO.getSubShifts().size() == 0) {
-            shift = shiftDTO.buildShift();
+            shift = buildShift(shiftDTO);
             shift.setMainShift(true);
             save(shift);
             shiftQueryResult = shift.getShiftQueryResult();
@@ -713,7 +711,7 @@ public class ShiftService extends MongoBaseService {
             shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId());
             save(shifts);
             Set<BigInteger> subShiftsIds = shifts.parallelStream().map(Shift::getId).collect(Collectors.toSet());
-            shift = shiftDTO.buildShift();
+            shift = buildShift(shiftDTO);
             shift.setMainShift(true);
             shift.setUnitId(unitId);
             shift.setSubShifts(subShiftsIds);
@@ -772,7 +770,7 @@ public class ShiftService extends MongoBaseService {
 
         List<Shift> shifts = new ArrayList<>(shiftDTO.getSubShifts().size());
         for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
-            Shift subShifts = shiftDTO.getSubShifts().get(i).buildShift();
+            Shift subShifts = buildShift(shiftDTO.getSubShifts().get(i));
             subShifts.setMainShift(false);
             shifts.add(subShifts);
         }
@@ -1111,4 +1109,25 @@ public class ShiftService extends MongoBaseService {
         return activities;
     }
 
+    public Shift buildShift(ShiftDTO shiftDTO) {
+
+        Shift shift = new Shift(shiftDTO.getId(), shiftDTO.getName(), DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getStartLocalDate(), shiftDTO.getStartTime()),
+                DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getEndLocalDate(), shiftDTO.getEndTime()), shiftDTO.getBid(), shiftDTO.getpId(), shiftDTO.getBonusTimeBank(), shiftDTO.getAmount(),
+                shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), shiftDTO.getStaffId(), shiftDTO.getUnitId(), shiftDTO.getUnitPositionId());
+        shift.setDurationMinutes(shiftDTO.getDurationMinutes());
+        shift.setScheduledMinutes(shiftDTO.getScheduledMinutes());
+        shift.setShiftState(ShiftState.UNPUBLISHED);
+        shift.setAllowedBreakDurationInMinute(shiftDTO.getAllowedBreakDurationInMinute());
+        return shift;
+    }
+
+
+    public ShiftWithActivityDTO buildResponse(ShiftDTO shiftDTO, Activity activity) {
+        ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO(shiftDTO.getId(), activity.getName(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), shiftDTO.getBonusTimeBank(), shiftDTO.getAmount(),
+                shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), shiftDTO.getStaffId(), shiftDTO.getUnitPositionId(), shiftDTO.getUnitId(), activity);
+        shiftWithActivityDTO.setDurationMinutes(shiftDTO.getDurationMinutes());
+        shiftWithActivityDTO.setScheduledMinutes(shiftDTO.getScheduledMinutes());
+        shiftWithActivityDTO.setShiftState(ShiftState.UNPUBLISHED);
+        return shiftWithActivityDTO;
+    }
 }

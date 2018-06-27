@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.user.department;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.user.organization.Organization;
-import com.kairos.user.staff.Staff;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.staff.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import java.util.List;

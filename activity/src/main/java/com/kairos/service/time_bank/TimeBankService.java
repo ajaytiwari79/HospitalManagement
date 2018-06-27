@@ -1,24 +1,24 @@
 package com.kairos.service.time_bank;
 
 
+import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.activity.staff.StaffAdditionalInfoDTO;
+import com.kairos.activity.time_bank.CalculatedTimeBankByDateDTO;
+import com.kairos.activity.time_bank.TimeBankDTO;
+import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.client.OrganizationRestClient;
 import com.kairos.client.dto.TimeBankRestClient;
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ShiftMongoRepository;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.repository.time_bank.TimeBankMongoRepository;
-import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.activity.time_bank.CalculatedTimeBankByDateDTO;
-import com.kairos.activity.time_bank.TimeBankDTO;
-import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class TimeBankService extends MongoBaseService {
     @Inject
     private TimeTypeService timeTypeService;
 
-    public void saveTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO,  Shift shift) {
+    public void saveTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
         //UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
         staffAdditionalInfoDTO.getUnitPosition().setStaffId(shift.getStaffId());
         List<DailyTimeBankEntry> dailyTimeBanks = renewDailyTimeBank(staffAdditionalInfoDTO.getUnitPosition(),shift);

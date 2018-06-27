@@ -1,12 +1,12 @@
 package com.kairos.controller.staff;
 
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.auth.User;
+import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.user.staff.*;
+import com.kairos.persistence.model.staff.*;
 
-import com.kairos.user.patient.web.PasswordUpdateDTO;
+import com.kairos.activity.web.PasswordUpdateDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.service.access_permisson.AccessGroupService;

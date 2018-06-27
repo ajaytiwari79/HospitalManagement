@@ -1,6 +1,6 @@
 package com.kairos.service.auth;
 
-import com.kairos.user.auth.Role;
+import com.kairos.persistence.model.auth.Role;
 import com.kairos.persistence.repository.user.auth.RoleGraphRepository;
 import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;

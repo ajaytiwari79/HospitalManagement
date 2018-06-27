@@ -1,6 +1,6 @@
 package com.kairos.activity.shift;
 
-import com.kairos.user.staff.staff.Staff;
+import com.kairos.persistence.model.staff.staff.Staff;
 
 import java.util.List;
 

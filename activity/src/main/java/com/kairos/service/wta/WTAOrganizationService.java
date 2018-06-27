@@ -1,19 +1,19 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.client.OrganizationRestClient;
 import com.kairos.activity.organization.OrganizationDTO;
-import com.kairos.persistence.model.wta.WTAQueryResultDTO;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.activity.wta.WTADTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.wta.templates.WTABuilderService;
+import com.kairos.client.OrganizationRestClient;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.activity.dto.WTADTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

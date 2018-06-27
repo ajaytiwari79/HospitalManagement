@@ -1,7 +1,10 @@
 package com.kairos.service.planner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.dto.*;
+import com.kairos.activity.task.BulkUpdateTaskDTO;
+import com.kairos.activity.task.TaskActiveUpdationDTO;
+import com.kairos.activity.task.TaskDTO;
+import com.kairos.activity.task.TaskRestrictionDto;
 import com.kairos.client.ClientRestClient;
 import com.kairos.client.IntegrationRestClient;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
@@ -28,6 +31,7 @@ import com.kairos.spec.TaskSpecification;
 import com.kairos.spec.TaskStaffTypeSpecification;
 import com.kairos.util.DateUtils;
 import com.kairos.util.userContext.UserContext;
+import com.kairos.wrapper.task.TaskGanttDTO;
 import de.tourenserver.ArrayOfFixedCall;
 import de.tourenserver.CallInfoRec;
 import de.tourenserver.FixScheduleResponse;
@@ -54,8 +58,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.kairos.persistence.enums.task_type.TaskTypeEnum.TaskTypeStaff.EXCLUDED_EMPLOYEES;
-import static com.kairos.persistence.enums.task_type.TaskTypeEnum.TaskTypeStaff.PREFERRED_EMPLOYEES;
+import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.EXCLUDED_EMPLOYEES;
+import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.PREFERRED_EMPLOYEES;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 import static com.kairos.util.DateUtils.ISO_FORMAT;
