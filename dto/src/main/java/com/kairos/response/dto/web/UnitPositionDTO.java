@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.enums.EmploymentCategory;
+import com.kairos.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;

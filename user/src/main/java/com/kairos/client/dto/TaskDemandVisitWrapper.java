@@ -1,8 +1,8 @@
 package com.kairos.client.dto;
 
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
+import com.kairos.user.client.Client;
+import com.kairos.user.country.CountryHolidayCalender;
 
 import java.util.List;
 import java.util.Map;

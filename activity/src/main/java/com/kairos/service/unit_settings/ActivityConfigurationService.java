@@ -7,7 +7,7 @@ import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
-import com.kairos.dto.activity.TimeTypeDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;

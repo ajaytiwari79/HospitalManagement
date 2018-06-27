@@ -13,19 +13,19 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.enums.TimeSlotType;
-import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.user.organization.*;
+import com.kairos.user.organization.enums.OrganizationLevel;
+import com.kairos.user.organization.group.Group;
+import com.kairos.user.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactAddressDTO;
-import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.country.DayType;
-import com.kairos.persistence.model.user.country.FunctionDTO;
-import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
+import com.kairos.user.client.ContactAddress;
+import com.kairos.user.client.ContactAddressDTO;
+import com.kairos.user.country.*;
+import com.kairos.user.country.DayType;
+import com.kairos.user.country.FunctionDTO;
+import com.kairos.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.open_shift.RuleTemplateDefaultData;
@@ -37,8 +37,8 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
+import com.kairos.user.staff.Staff;
+import com.kairos.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -68,9 +68,9 @@ import com.kairos.response.dto.web.open_shift.PriorityGroupDefaultData;
 import com.kairos.response.dto.web.organization.OrganizationSettingDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
-import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
-import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
+import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.activity.wta.WTABasicDetailsDTO;
+import com.kairos.activity.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -257,10 +257,10 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findOne(id);
     }
 
-    public com.kairos.activity.client.dto.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
+    public com.kairos.activity.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
         Organization organization = organizationGraphRepository.findOne(id);
         Country country = organizationGraphRepository.getCountry(organization.getId());
-        com.kairos.activity.client.dto.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.activity.client.dto.organization.OrganizationDTO.class);
+        com.kairos.activity.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.activity.organization.OrganizationDTO.class);
         organizationDTO.setCountryId(country.getId());
         return organizationDTO;
     }

@@ -3,19 +3,16 @@ package com.kairos.service.integration;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
-import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
-import com.kairos.response.dto.web.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 @Transactional

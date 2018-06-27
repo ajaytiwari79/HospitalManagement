@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.client;
 
-import com.kairos.persistence.model.user.client.ClientTemporaryAddress;
+import com.kairos.user.client.ClientTemporaryAddress;
 
 /**
  * Created by prabjot on 13/11/17.

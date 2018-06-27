@@ -11,10 +11,10 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.response.dto.web.unit_settings.OpenShiftPhase;
-import com.kairos.response.dto.web.unit_settings.OpenShiftPhaseSetting;
-import com.kairos.response.dto.web.unit_settings.UnitAgeSettingDTO;
-import com.kairos.response.dto.web.unit_settings.UnitSettingDTO;
+import com.kairos.activity.unit_settings.OpenShiftPhase;
+import com.kairos.activity.unit_settings.OpenShiftPhaseSetting;
+import com.kairos.activity.unit_settings.UnitAgeSettingDTO;
+import com.kairos.activity.unit_settings.UnitSettingDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

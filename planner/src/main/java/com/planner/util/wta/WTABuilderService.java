@@ -1,7 +1,7 @@
 package com.planner.util.wta;
 
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.WTABaseRuleTemplateDTO;
 import com.planner.domain.wta.WTABaseRuleTemplate;
 import com.planner.domain.wta.templates.*;
 import org.springframework.stereotype.Service;

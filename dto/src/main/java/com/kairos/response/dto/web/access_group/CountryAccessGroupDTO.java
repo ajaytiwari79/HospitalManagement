@@ -2,8 +2,8 @@ package com.kairos.response.dto.web.access_group;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.user.access_permission.AccessGroupRole;
 
 import javax.validation.constraints.AssertTrue;
 

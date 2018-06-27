@@ -2,8 +2,8 @@ package com.kairos.response.dto.web.aggrements;
 
 
 
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
-import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.RuleTemplateCategoryTagDTO;
+import com.kairos.activity.wta.WTABaseRuleTemplateDTO;
 
 import java.util.List;
 

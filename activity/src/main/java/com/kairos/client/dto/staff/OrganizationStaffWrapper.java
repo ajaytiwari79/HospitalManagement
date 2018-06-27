@@ -1,6 +1,6 @@
 package com.kairos.client.dto.staff;
 
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
+import com.kairos.activity.organization.OrganizationDTO;
 
 /**
  * Created by vipul on 6/2/18.

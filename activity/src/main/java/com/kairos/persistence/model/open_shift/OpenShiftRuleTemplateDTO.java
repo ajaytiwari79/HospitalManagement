@@ -2,8 +2,8 @@ package com.kairos.persistence.model.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.AllowedLength;
-import com.kairos.persistence.model.enums.OpenShiftRuleTemplateType;
+import com.kairos.enums.AllowedLength;
+import com.kairos.enums.OpenShiftRuleTemplateType;
 import com.kairos.response.dto.web.open_shift.ActivitiesPerTimeType;
 import com.kairos.response.dto.web.open_shift.PlannerNotificationInfo;
 import com.kairos.response.dto.web.open_shift.ShiftAssignmentCriteria;

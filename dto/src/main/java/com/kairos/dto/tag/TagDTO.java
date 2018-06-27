@@ -2,7 +2,7 @@ package com.kairos.dto.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.tag.MasterDataTypeEnum;
+import com.kairos.enums.tags.MasterDataTypeEnum;
 
 import java.math.BigInteger;
 

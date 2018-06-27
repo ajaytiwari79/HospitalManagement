@@ -1,6 +1,6 @@
 package com.kairos.controller.user;
 
-import com.kairos.persistence.model.user.auth.User;
+import com.kairos.user.auth.User;
 import com.kairos.service.auth.UserService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

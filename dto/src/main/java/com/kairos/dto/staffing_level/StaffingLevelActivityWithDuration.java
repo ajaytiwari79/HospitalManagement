@@ -1,6 +1,6 @@
 package com.kairos.dto.staffing_level;
 
-import com.kairos.persistence.model.staffing_level.Duration;
+import com.kairos.activity.staffing_level.Duration;
 
 public class StaffingLevelActivityWithDuration {
 

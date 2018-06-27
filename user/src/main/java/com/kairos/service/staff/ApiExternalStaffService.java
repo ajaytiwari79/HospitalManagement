@@ -1,8 +1,8 @@
 package com.kairos.service.staff;
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.enums.OrganizationLevel;
+import com.kairos.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;

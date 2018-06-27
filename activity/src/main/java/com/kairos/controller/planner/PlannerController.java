@@ -2,10 +2,10 @@ package com.kairos.controller.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kairos.enums.CitizenHealthStatus;
-import com.kairos.dto.BulkUpdateTaskDTO;
-import com.kairos.dto.TaskDTO;
-import com.kairos.dto.TaskRestrictionDto;
-import com.kairos.dto.TaskUpdateDTO;
+import com.kairos.activity.dto.BulkUpdateTaskDTO;
+import com.kairos.activity.dto.TaskDTO;
+import com.kairos.activity.dto.TaskRestrictionDto;
+import com.kairos.activity.dto.TaskUpdateDTO;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;

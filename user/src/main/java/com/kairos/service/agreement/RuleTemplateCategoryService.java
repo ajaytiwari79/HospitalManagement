@@ -1,11 +1,11 @@
 package com.kairos.service.agreement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.agreement.cta.RuleTemplate;
+import com.kairos.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.user.agreement.wta.RuleTemplateCategoryDTO;
+import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType.CTA;
+import static com.kairos.user.agreement.cta.RuleTemplateCategoryType.CTA;
 
 /**
  * Created by vipul on 2/8/17.

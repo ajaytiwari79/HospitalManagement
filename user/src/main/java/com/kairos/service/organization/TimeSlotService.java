@@ -3,11 +3,11 @@ package com.kairos.service.organization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.persistence.model.enums.TimeSlotType;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.time_slot.TimeSlot;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotSetTimeSlotRelationship;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.time_slot.TimeSlot;
+import com.kairos.user.organization.time_slot.TimeSlotSet;
+import com.kairos.user.organization.time_slot.TimeSlotSetTimeSlotRelationship;
+import com.kairos.user.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepository;
@@ -26,8 +26,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.ADVANCE;
-import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
+import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
+import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 
 /**
  * Created by oodles on 18/10/16.

@@ -1,15 +1,11 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.activity.dto.ShiftWithActivityDTO;
+import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.persistence.model.activity.Shift;
-
-import com.kairos.dto.ShiftWithActivityDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
-
-import com.kairos.persistence.query_result.DateWiseShiftResponse;
-import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.response.dto.web.ShiftCountDTO;
+import com.kairos.wrapper.DateWiseShiftResponse;
 import com.mongodb.client.result.UpdateResult;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,22 +14,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.DateOperators;
-import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static org.springframework.data.mongodb.core.aggregation.Fields.field;
-import static org.springframework.data.mongodb.core.aggregation.Fields.from;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
-
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 

@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.user.country.feature.Feature;
-import com.kairos.persistence.model.user.country.feature.FeatureQueryResult;
+import com.kairos.user.country.feature.Feature;
+import com.kairos.user.country.feature.FeatureQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

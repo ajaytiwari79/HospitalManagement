@@ -1,7 +1,7 @@
 package com.kairos.dto.staffing_level;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.staffing_level.StaffingLevelSetting;
+import com.kairos.activity.staffing_level.StaffingLevelSetting;
 //import com.kairos.activity.util.validator.ExistingStaffingLevel;
 //import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.NotNull;

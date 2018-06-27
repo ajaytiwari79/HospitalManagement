@@ -2,7 +2,6 @@ package com.kairos.service.client_exception;
 
 import com.kairos.KairosActivityApplication;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
-import com.kairos.dto.AddressDTO;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 

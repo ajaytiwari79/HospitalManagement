@@ -1,9 +1,9 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.user.client.*;
-import com.kairos.persistence.model.user.country.HousingType;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.client.*;
+import com.kairos.user.country.HousingType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.user.client.AccessToLocationGraphRepository;

@@ -1,16 +1,14 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.persistence.model.activity.Activity;
+import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
+import com.kairos.activity.activity.ActivityWithCompositeDTO;
+import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.ActivityDTO;
-import com.kairos.dto.ActivityWithCompositeDTO;
-import com.kairos.dto.OrganizationTypeAndSubTypeDTO;
-import com.kairos.dto.activity.ActivityTagDTO;
-import com.kairos.dto.activity.ActivityWithCTAWTASettingsDTO;
-import com.kairos.dto.activity.OrganizationActivityDTO;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.wrapper.activity.ActivityTagDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 

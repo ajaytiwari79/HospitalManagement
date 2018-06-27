@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.cta;
 
-import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.AccessGroupRole;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.AssertTrue;

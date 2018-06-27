@@ -1,7 +1,7 @@
 package com.kairos.dto.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.kairos.persistence.model.staffing_level.StaffingLevelActivity;
+import com.kairos.activity.staffing_level.StaffingLevelActivity;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;

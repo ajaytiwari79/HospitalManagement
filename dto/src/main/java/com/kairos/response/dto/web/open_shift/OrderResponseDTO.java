@@ -1,7 +1,5 @@
 package com.kairos.response.dto.web.open_shift;
 
-import com.kairos.persistence.model.enums.InformationReciever;
-
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;

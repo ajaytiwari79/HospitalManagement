@@ -20,7 +20,7 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.dto.TaskGanttDTO;
+import com.kairos.activity.dto.TaskGanttDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.aggregator.AggregatorService;
 import com.kairos.service.exception.ExceptionService;

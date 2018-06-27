@@ -1,7 +1,7 @@
 package com.kairos.controller.activity;
 
 
-import com.kairos.dto.activity.TimeTypeDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

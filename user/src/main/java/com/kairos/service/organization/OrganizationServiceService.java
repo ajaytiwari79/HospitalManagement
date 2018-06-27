@@ -2,13 +2,13 @@ package com.kairos.service.organization;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
-import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.OrganizationExternalServiceRelationship;
+import com.kairos.user.organization.OrganizationServiceQueryResult;
+import com.kairos.user.organization.OrganizationType;
+import com.kairos.user.organization.enums.OrganizationLevel;
+import com.kairos.user.organization.team.Team;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
@@ -59,7 +59,7 @@ public class OrganizationServiceService extends UserBaseService {
 
 
     public Map<String, Object> updateOrganizationService(long id, String name, String description) {
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
             return null;
         }
@@ -69,11 +69,11 @@ public class OrganizationServiceService extends UserBaseService {
         return organizationService.retrieveDetails();
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService getOrganizationServiceById(Long id) {
+    public com.kairos.user.organization.OrganizationService getOrganizationServiceById(Long id) {
         return organizationServiceRepository.findOne(id);
     }
 
-    public List<com.kairos.persistence.model.organization.OrganizationService> getOrganizationServiceByName(Long countryId, String name) {
+    public List<com.kairos.user.organization.OrganizationService> getOrganizationServiceByName(Long countryId, String name) {
         return organizationServiceRepository.getByServiceName(countryId, name);
     }
 
@@ -86,13 +86,13 @@ public class OrganizationServiceService extends UserBaseService {
         return objectList;
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService updateOrganizationServiceById(com.kairos.persistence.model.organization.OrganizationService organizationService) {
+    public com.kairos.user.organization.OrganizationService updateOrganizationServiceById(com.kairos.user.organization.OrganizationService organizationService) {
         save(organizationService);
         return organizationService;
     }
 
     public boolean deleteOrganizationServiceById(Long id) {
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
             return false;
         }
@@ -104,8 +104,8 @@ public class OrganizationServiceService extends UserBaseService {
         return true;
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService addSubService(final long serviceId, com.kairos.persistence.model.organization.OrganizationService subService) {
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+    public com.kairos.user.organization.OrganizationService addSubService(final long serviceId, com.kairos.user.organization.OrganizationService subService) {
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
             return null;
         }
@@ -116,7 +116,7 @@ public class OrganizationServiceService extends UserBaseService {
             return null;
         }
 
-        List<com.kairos.persistence.model.organization.OrganizationService> subServices = organizationService.getOrganizationSubService();
+        List<com.kairos.user.organization.OrganizationService> subServices = organizationService.getOrganizationSubService();
         if (subServices != null) {
             subServices.add(subService);
         } else {
@@ -135,8 +135,8 @@ public class OrganizationServiceService extends UserBaseService {
 
     }
 
-    public Map<String, Object> addCountrySubService(final long serviceId, com.kairos.persistence.model.organization.OrganizationService subService) {
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+    public Map<String, Object> addCountrySubService(final long serviceId, com.kairos.user.organization.OrganizationService subService) {
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
             exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
 
@@ -149,7 +149,7 @@ public class OrganizationServiceService extends UserBaseService {
         }
 
         logger.info("Creating : " + subService.getName() + " In " + organizationService.getName());
-        List<com.kairos.persistence.model.organization.OrganizationService> subServicesList = organizationService.getOrganizationSubService();
+        List<com.kairos.user.organization.OrganizationService> subServicesList = organizationService.getOrganizationSubService();
 
         if (subServicesList != null) {
             subServicesList.add(subService);
@@ -194,7 +194,7 @@ public class OrganizationServiceService extends UserBaseService {
 
     public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected, String type) {
 
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
         if (organizationService == null) {
             exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
 
@@ -288,18 +288,18 @@ public class OrganizationServiceService extends UserBaseService {
     }
 
 
-    public com.kairos.persistence.model.organization.OrganizationService createOrganizationService(long countryId, com.kairos.persistence.model.organization.OrganizationService organizationService) {
+    public com.kairos.user.organization.OrganizationService createOrganizationService(long countryId, com.kairos.user.organization.OrganizationService organizationService) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             return null;
         }
         String name = "(?i)" + organizationService.getName();
-        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
+        com.kairos.user.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
         if (organizationService1 != null) {
             return organizationService1;
             //throw  new DuplicateDataException("Can't create organization service");
         }
-        List<com.kairos.persistence.model.organization.OrganizationService> organizationServices = country.getOrganizationServices();
+        List<com.kairos.user.organization.OrganizationService> organizationServices = country.getOrganizationServices();
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
         organizationServices.add(organizationService);
         country.setOrganizationServices(organizationServices);
@@ -307,19 +307,19 @@ public class OrganizationServiceService extends UserBaseService {
         return organizationService;
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService createCountryOrganizationService(long countryId, com.kairos.persistence.model.organization.OrganizationService organizationService) {
+    public com.kairos.user.organization.OrganizationService createCountryOrganizationService(long countryId, com.kairos.user.organization.OrganizationService organizationService) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             return null;
         }
         String name = "(?i)" + organizationService.getName();
-        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
+        com.kairos.user.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
         if (organizationService1 != null) {
             //exceptionService.duplicateDataException();
             exceptionService.duplicateDataException("message.organizationService.service.duplicate");
 
         }
-        List<com.kairos.persistence.model.organization.OrganizationService> organizationServices = country.getOrganizationServices();
+        List<com.kairos.user.organization.OrganizationService> organizationServices = country.getOrganizationServices();
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
         organizationServices.add(organizationService);
         country.setOrganizationServices(organizationServices);
@@ -327,7 +327,7 @@ public class OrganizationServiceService extends UserBaseService {
         return organizationService;
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService getByName(String name) {
+    public com.kairos.user.organization.OrganizationService getByName(String name) {
         return organizationServiceRepository.findByName(name);
     }
 
@@ -487,7 +487,7 @@ public class OrganizationServiceService extends UserBaseService {
         return getTaskTypes(id,subServiceId,type);
     }*/
 
-    public com.kairos.persistence.model.organization.OrganizationService saveImportedServices(com.kairos.persistence.model.organization.OrganizationService organizationService) {
+    public com.kairos.user.organization.OrganizationService saveImportedServices(com.kairos.user.organization.OrganizationService organizationService) {
         organizationServiceRepository.save(organizationService);
         return organizationService;
     }
@@ -505,10 +505,10 @@ public class OrganizationServiceService extends UserBaseService {
         return response;
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService mapImportedService(Long importedServiceId, Long serviceId) {
+    public com.kairos.user.organization.OrganizationService mapImportedService(Long importedServiceId, Long serviceId) {
 
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
-        com.kairos.persistence.model.organization.OrganizationService mappedOrganizationService = organizationServiceRepository.findOne(importedServiceId);
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+        com.kairos.user.organization.OrganizationService mappedOrganizationService = organizationServiceRepository.findOne(importedServiceId);
         organizationServiceRepository.removeOrganizationExternalServiceRelationship(importedServiceId);
         OrganizationExternalServiceRelationship organizationExternalServiceRelationship = new OrganizationExternalServiceRelationship();
         organizationExternalServiceRelationship.setExternalService(mappedOrganizationService);
@@ -523,8 +523,8 @@ public class OrganizationServiceService extends UserBaseService {
     }
 
 
-    public com.kairos.persistence.model.organization.OrganizationService findOne(Long id) {
-        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
+    public com.kairos.user.organization.OrganizationService findOne(Long id) {
+        com.kairos.user.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (!Optional.ofNullable(organizationService).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organizationService.id.notFound");
 

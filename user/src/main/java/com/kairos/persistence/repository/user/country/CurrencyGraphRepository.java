@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.country;
-import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.user.country.Currency;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

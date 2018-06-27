@@ -2,7 +2,7 @@ package com.kairos.response.dto.web.access_page;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.OrganizationCategory;
+import com.kairos.enums.OrganizationCategory;
 
 import javax.validation.constraints.NotNull;
 

@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
-import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
-import com.kairos.persistence.model.user.agreement.cta.CTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.user.agreement.cta.CTAListQueryResult;
+import com.kairos.user.agreement.cta.CTAResponseDTO;
+import com.kairos.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

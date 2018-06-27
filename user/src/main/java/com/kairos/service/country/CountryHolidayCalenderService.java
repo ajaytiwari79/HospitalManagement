@@ -1,8 +1,8 @@
 package com.kairos.service.country;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
-import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.user.country.Country;
+import com.kairos.user.country.CountryHolidayCalender;
+import com.kairos.user.country.DayType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;

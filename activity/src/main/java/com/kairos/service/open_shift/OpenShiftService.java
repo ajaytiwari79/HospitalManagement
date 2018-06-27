@@ -10,7 +10,7 @@ import com.kairos.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
-import com.kairos.dto.shift.ShiftDTO;
+import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.dto.shift.StaffUnitPositionDetails;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -212,7 +212,7 @@ public class OpenShiftService extends MongoBaseService {
         OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         Date startDate = DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
         Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId(), openShift.getStartDate().getTime());
-        com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+        com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
 
         Date endDate = DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));
         List<OpenShift> similarShifts = openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate, endDate);

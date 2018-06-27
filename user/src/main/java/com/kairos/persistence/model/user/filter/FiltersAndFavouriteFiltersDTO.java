@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.filter;
 
-import com.kairos.persistence.model.user.staff.StaffFavouriteFilter;
+import com.kairos.user.staff.StaffFavouriteFilter;
 
 import java.util.List;
 

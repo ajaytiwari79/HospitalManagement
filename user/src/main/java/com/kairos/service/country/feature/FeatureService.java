@@ -2,9 +2,9 @@ package com.kairos.service.country.feature;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.feature.Feature;
-import com.kairos.persistence.model.user.country.feature.FeatureQueryResult;
+import com.kairos.user.country.Country;
+import com.kairos.user.country.feature.Feature;
+import com.kairos.user.country.feature.FeatureQueryResult;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

@@ -2,9 +2,8 @@ package com.kairos.persistence.repository.phase;
 
 
 import com.kairos.client.dto.organization.OrganizationPhaseDTO;
-import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.query_result.PhaseWrapper;
 import com.kairos.enums.phase.PhaseType;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.response.dto.web.cta.PhaseResponseDTO;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import org.slf4j.Logger;
@@ -32,12 +31,6 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public List<PhaseWrapper> getAllOrganizationIdsHavingPhases() {
-        Aggregation aggregation = Aggregation.newAggregation(group("$organizationId").addToSet("$organizationId").as("organizationId"));
-        AggregationResults<PhaseWrapper> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseWrapper.class);
-        return result.getMappedResults();
-
-    }
 
     public List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction) {
         Query query = Query.query(Criteria.where("organizationId").is(unitId));

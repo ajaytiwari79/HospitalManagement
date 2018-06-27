@@ -1,13 +1,10 @@
 package com.kairos.persistence.repository.activity;
 
 
-import com.kairos.dto.ShiftWithActivityDTO;
+import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.dto.ShiftWithActivityDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.persistence.query_result.DateWiseShiftResponse;
+import com.kairos.wrapper.DateWiseShiftResponse;
 
-import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.response.dto.web.ShiftCountDTO;
 
 import java.math.BigInteger;

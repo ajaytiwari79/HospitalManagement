@@ -1,5 +1,5 @@
 package com.kairos.service.organization;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.user.organization.Organization;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.UserBaseService;

@@ -1,7 +1,7 @@
 package com.kairos.config.scheduler;
 
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.user.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.control_panel.ControlPanelService;

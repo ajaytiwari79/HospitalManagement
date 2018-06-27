@@ -2,7 +2,7 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.persistence.model.user.pay_table.FutureDate;
+import com.kairos.user.pay_table.FutureDate;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;

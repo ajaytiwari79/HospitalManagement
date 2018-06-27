@@ -1,7 +1,7 @@
 package com.kairos.controller.exception_handler;
 
 import com.kairos.custom_exception.*;
-import com.kairos.dto.ResponseEnvelope;
+import com.kairos.activity.dto.ResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;

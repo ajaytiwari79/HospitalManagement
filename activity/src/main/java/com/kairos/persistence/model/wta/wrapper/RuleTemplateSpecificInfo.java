@@ -1,9 +1,7 @@
 package com.kairos.persistence.model.wta.wrapper;
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.persistence.model.wta.StaffWTACounter;
-import com.kairos.dto.ShiftWithActivityDTO;
+import com.kairos.activity.dto.ShiftWithActivityDTO;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;

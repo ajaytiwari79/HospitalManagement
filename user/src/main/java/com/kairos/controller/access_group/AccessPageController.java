@@ -1,9 +1,9 @@
 package com.kairos.controller.access_group;
 
-import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
-import com.kairos.persistence.model.user.access_permission.AccessPageStatusDTO;
-import com.kairos.persistence.model.user.access_permission.Tab;
+import com.kairos.user.access_permission.AccessPage;
+import com.kairos.user.access_permission.AccessPageDTO;
+import com.kairos.user.access_permission.AccessPageStatusDTO;
+import com.kairos.user.access_permission.Tab;
 import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.util.response.ResponseHandler;

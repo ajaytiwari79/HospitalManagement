@@ -2,7 +2,7 @@ package com.kairos.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

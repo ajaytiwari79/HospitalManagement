@@ -1,14 +1,11 @@
 package com.kairos.spec.night_shift;
 
-import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.spec.AbstractActivitySpecification;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
-import com.kairos.persistence.model.common.TimeSlot;
-import com.kairos.persistence.model.enums.DurationType;
-import com.kairos.persistence.model.enums.IntervalUnit;
-import com.kairos.response.dto.web.StaffDTO;
+import com.kairos.user.country.time_slot.TimeSlot;
+import com.kairos.enums.DurationType;
 import com.kairos.response.dto.web.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.response.dto.web.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 

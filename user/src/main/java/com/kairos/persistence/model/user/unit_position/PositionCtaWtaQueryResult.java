@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.user.unit_position;
 
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

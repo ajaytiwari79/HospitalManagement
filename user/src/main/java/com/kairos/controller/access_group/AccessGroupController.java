@@ -1,9 +1,9 @@
 package com.kairos.controller.access_group;
 
 import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.access_permission.AccessGroupPermissionDTO;
-import com.kairos.persistence.model.user.access_permission.AccessPermissionDTO;
+import com.kairos.user.access_permission.AccessGroup;
+import com.kairos.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
 import com.kairos.response.dto.web.cta.AccessGroupDTO;
 import com.kairos.service.access_permisson.AccessGroupService;

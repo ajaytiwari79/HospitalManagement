@@ -1,8 +1,8 @@
 package com.kairos.client.dto;
 
-import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.user.organization.AbsenceTypes;
+import com.kairos.user.organization.OrganizationContactAddress;
+import com.kairos.user.staff.Staff;
 
 /**
  * Created by prabjot on 30/8/17.

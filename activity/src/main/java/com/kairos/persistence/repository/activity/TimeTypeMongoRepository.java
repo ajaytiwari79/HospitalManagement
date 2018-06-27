@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.dto.activity.TimeTypeDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.response.dto.web.cta.TimeTypeResponseDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

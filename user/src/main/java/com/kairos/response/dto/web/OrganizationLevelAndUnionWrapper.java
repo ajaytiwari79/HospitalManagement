@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.union.UnionQueryResult;
+import com.kairos.user.organization.Level;
+import com.kairos.user.organization.union.UnionQueryResult;
 import java.util.List;
 
 /**

@@ -1,13 +1,11 @@
 package com.kairos.response.dto.web.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.DurationType;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 /**

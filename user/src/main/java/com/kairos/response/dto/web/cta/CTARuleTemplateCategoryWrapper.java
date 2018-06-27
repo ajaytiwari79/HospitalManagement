@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web.cta;
 
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.user.agreement.cta.CTARuleTemplateQueryResult;
+import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;

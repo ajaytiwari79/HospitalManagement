@@ -1,7 +1,7 @@
 package com.kairos.controller.country;
 
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
-import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+import com.kairos.user.country.dto.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

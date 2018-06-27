@@ -1,7 +1,7 @@
 package com.planner.controller;
 
 import com.kairos.response.dto.web.UnitPositionWtaDTO;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.UnitPositionService;
 import io.swagger.annotations.ApiOperation;

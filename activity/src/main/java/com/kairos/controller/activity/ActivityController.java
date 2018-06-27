@@ -1,13 +1,14 @@
 package com.kairos.controller.activity;
 
 
-import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
+import com.kairos.activity.activity.activity_tabs.*;
+import com.kairos.activity.dto.SkillActivityDTO;
 import com.kairos.dto.ActivityDTO;
-import com.kairos.dto.SkillActivityDTO;
-import com.kairos.dto.activity.*;
+import com.kairos.activity.activity.activity_tabs.LocationActivityTabDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.wrapper.activity.RulesActivityTabDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

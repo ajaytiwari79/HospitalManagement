@@ -1,7 +1,7 @@
 package com.kairos.client.pay_out;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

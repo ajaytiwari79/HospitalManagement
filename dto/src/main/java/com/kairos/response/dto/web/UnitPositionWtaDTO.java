@@ -2,7 +2,7 @@ package com.kairos.response.dto.web;
 
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 
 public class UnitPositionWtaDTO {
     private Long id;

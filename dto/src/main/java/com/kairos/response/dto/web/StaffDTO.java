@@ -1,12 +1,12 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
 import com.kairos.response.dto.web.skill.SkillDTO;
 
 import java.time.LocalDate;
 import java.util.Set;
-import com.kairos.persistence.model.enums.StaffStatusEnum;
+import com.kairos.enums.StaffStatusEnum;
 
 
 /**

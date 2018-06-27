@@ -1,5 +1,5 @@
 package com.kairos.service.language;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageLevelGraphRepository;

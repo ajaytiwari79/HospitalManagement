@@ -11,7 +11,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.util.DateUtils;
-import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.DurationType;
 import com.kairos.response.dto.web.period.PeriodPhaseFlippingDateDTO;
 import com.kairos.response.dto.web.period.PlanningPeriodDTO;
 import com.kairos.response.dto.web.phase.PhaseDTO;

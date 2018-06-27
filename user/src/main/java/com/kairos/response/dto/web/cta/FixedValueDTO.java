@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web.cta;
 
 import com.kairos.persistence.model.enums.FixedValueType;
-import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.user.country.Currency;
 
 public class FixedValueDTO {
     private float amount;

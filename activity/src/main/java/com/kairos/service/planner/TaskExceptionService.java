@@ -1,6 +1,7 @@
 package com.kairos.service.planner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.dto.*;
 import com.kairos.client.ClientRestClient;
 import com.kairos.client.IntegrationRestClient;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
@@ -16,7 +17,6 @@ import com.kairos.persistence.repository.CustomTimeScaleRepository;
 import com.kairos.persistence.repository.client_aggregator.ClientAggregatorMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.dto.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
 import com.kairos.service.exception.ExceptionService;

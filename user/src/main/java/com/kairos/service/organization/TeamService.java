@@ -2,17 +2,17 @@ package com.kairos.service.organization;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.organization.team.TeamDTO;
-import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.OrganizationContactAddress;
+import com.kairos.user.organization.group.Group;
+import com.kairos.user.organization.team.Team;
+import com.kairos.user.organization.team.TeamDTO;
+import com.kairos.user.client.ContactAddress;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.user.staff.Staff;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -396,7 +396,7 @@ public class TeamService extends UserBaseService {
         return organizationGraphRepository.getTeamGroupServices(teamId);
     }
 
-    public List<com.kairos.persistence.model.organization.OrganizationService> addTeamSelectedServices(Long teamId, Long[] organizationService) {
+    public List<com.kairos.user.organization.OrganizationService> addTeamSelectedServices(Long teamId, Long[] organizationService) {
         return teamGraphRepository.addSelectedSevices(teamId,organizationService);
 
     }

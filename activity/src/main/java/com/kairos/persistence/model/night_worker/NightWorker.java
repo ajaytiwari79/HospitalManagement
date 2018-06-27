@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.night_worker;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.util.timeCareShift.Person;
-import com.kairos.persistence.model.enums.PersonType;
+import com.kairos.enums.PersonType;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

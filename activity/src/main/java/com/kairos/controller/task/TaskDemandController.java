@@ -1,13 +1,11 @@
 package com.kairos.controller.task;
 import com.kairos.persistence.model.task_demand.TaskDemand;
-import com.kairos.dto.ClientFilterDTO;
-import com.kairos.service.planner.PlannerService;
+import com.kairos.activity.dto.ClientFilterDTO;
 import com.kairos.service.task_type.TaskDemandService;
 import com.kairos.constants.ApiConstants;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

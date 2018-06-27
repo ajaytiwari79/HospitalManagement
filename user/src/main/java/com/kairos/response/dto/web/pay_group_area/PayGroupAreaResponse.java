@@ -2,7 +2,7 @@ package com.kairos.response.dto.web.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.organization.Level;
+import com.kairos.user.organization.Level;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import jdk.nashorn.internal.ir.annotations.Ignore;

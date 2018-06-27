@@ -1,7 +1,7 @@
 package com.kairos.controller.tag;
 
 import com.kairos.controller.staffing_level.StaffingLevelController;
-import com.kairos.persistence.model.tag.MasterDataTypeEnum;
+import com.kairos.enums.tags.MasterDataTypeEnum;
 import com.kairos.dto.tag.TagDTO;
 import com.kairos.service.tag.TagService;
 import com.kairos.util.response.ResponseHandler;
@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.inject.Inject;
 
 import java.math.BigInteger;
 import java.util.Map;

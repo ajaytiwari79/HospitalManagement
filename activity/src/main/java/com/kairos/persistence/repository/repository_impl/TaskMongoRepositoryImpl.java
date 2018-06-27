@@ -1,19 +1,15 @@
 package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.query_result.EscalatedTasksWrapper;
-import com.kairos.persistence.query_result.StaffAssignedTasksWrapper;
-import com.kairos.persistence.query_result.TaskCountWithAssignedUnit;
-import com.kairos.persistence.query_result.TaskWrapper;
+import com.kairos.wrapper.EscalatedTasksWrapper;
+import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
+import com.kairos.wrapper.TaskCountWithAssignedUnit;
+import com.kairos.wrapper.TaskWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.CustomTaskMongoRepository;
 
 import com.kairos.dto.task.VRPTaskDTO;
-import com.kairos.client.dto.TaskAddress;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
-import com.mongodb.util.JSON;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

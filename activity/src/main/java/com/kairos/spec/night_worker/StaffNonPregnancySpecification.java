@@ -2,11 +2,9 @@ package com.kairos.spec.night_worker;
 
 
 import com.kairos.spec.AbstractActivitySpecification;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
 import com.kairos.response.dto.web.StaffDTO;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 public class StaffNonPregnancySpecification extends AbstractActivitySpecification<StaffDTO> {

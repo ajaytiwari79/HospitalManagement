@@ -2,7 +2,7 @@ package com.kairos.controller.unit_position;
 
 
 import com.kairos.response.dto.web.UnitPositionDTO;
-import com.kairos.response.dto.web.wta.WTADTO;
+import com.kairos.activity.wta.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

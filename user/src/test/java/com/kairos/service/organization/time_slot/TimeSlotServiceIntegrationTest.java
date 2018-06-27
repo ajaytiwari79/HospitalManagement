@@ -2,7 +2,7 @@ package com.kairos.service.organization.time_slot;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.user.organization.time_slot.TimeSlotSet;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.ADVANCE;
+import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
 import static com.kairos.util.DateUtil.ONLY_DATE;
 
 /**

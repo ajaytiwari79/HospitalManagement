@@ -3,7 +3,7 @@ package com.kairos.dto.task;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.TaskTypeDTO;
-import com.kairos.client.dto.TaskAddress;
+import com.kairos.vrp.TaskAddress;
 
 import java.math.BigInteger;
 

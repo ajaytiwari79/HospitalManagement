@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
 
 import java.util.List;
 

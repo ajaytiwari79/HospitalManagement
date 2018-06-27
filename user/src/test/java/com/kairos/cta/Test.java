@@ -1,6 +1,6 @@
 package com.kairos.cta;
 
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateType;
+import com.kairos.user.agreement.cta.CTARuleTemplateType;
 
 public class Test {
     public static void main (String ...arg){

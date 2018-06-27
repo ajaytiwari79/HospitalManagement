@@ -5,7 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.user.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;

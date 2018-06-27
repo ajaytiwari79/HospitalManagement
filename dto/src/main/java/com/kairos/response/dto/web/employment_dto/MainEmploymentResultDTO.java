@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.employment_dto;
 
-import com.kairos.persistence.model.user.employment.EmploymentDTO;
+import com.kairos.user.employment.EmploymentDTO;
 
 import java.util.ArrayList;
 import java.util.List;

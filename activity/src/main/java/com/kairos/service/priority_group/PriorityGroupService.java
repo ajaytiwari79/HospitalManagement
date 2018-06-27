@@ -3,7 +3,7 @@ package com.kairos.service.priority_group;
 import com.kairos.client.GenericIntegrationService;
 import com.kairos.persistence.model.priority_group.*;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
-import com.kairos.dto.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.activity.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.mail.MailService;

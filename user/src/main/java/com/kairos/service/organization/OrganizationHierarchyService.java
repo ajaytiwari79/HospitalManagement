@@ -2,7 +2,7 @@ package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.persistence.model.common.QueryResult;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.user.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.springframework.stereotype.Service;

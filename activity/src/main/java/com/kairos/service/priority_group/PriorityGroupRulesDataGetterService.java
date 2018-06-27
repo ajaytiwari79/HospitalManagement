@@ -15,8 +15,7 @@ import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankMongoRepository;
-import com.kairos.dto.priority_group.PriorityGroupRuleDataDTO;
-import com.kairos.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
@@ -142,7 +141,7 @@ public class PriorityGroupRulesDataGetterService {
                 Long endDate = DateUtils.getLongFromLocalDate(openShiftDate);
                 Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftDate).getTime();
                 Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftDate);
-                com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
+                com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
                         Optional.ofNullable(staffUnitPositionQueryResult.getContractedMinByWeek()).isPresent()?staffUnitPositionQueryResult.getContractedMinByWeek():0,
                         Optional.ofNullable(staffUnitPositionQueryResult.getWorkingDaysPerWeek()).isPresent()?staffUnitPositionQueryResult.getWorkingDaysPerWeek():0,
                         DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));

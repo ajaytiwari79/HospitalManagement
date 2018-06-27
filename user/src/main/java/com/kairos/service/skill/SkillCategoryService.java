@@ -1,6 +1,6 @@
 package com.kairos.service.skill;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;

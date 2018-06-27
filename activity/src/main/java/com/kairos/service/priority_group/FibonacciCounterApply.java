@@ -1,13 +1,7 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.dto.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.time_bank.TimeBankCalculationService;
 import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.FibonacciCounter;
-import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

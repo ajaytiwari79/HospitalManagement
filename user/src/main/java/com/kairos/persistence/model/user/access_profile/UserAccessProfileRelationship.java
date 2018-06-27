@@ -2,8 +2,8 @@ package com.kairos.persistence.model.user.access_profile;
 
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.auth.User;
+import com.kairos.user.access_permission.AccessGroup;
+import com.kairos.user.auth.User;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.RelationshipEntity;

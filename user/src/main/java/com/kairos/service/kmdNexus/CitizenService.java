@@ -4,12 +4,12 @@ import com.kairos.util.DateUtils;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.constants.AppConstants;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.enums.OrganizationLevel;
+import com.kairos.user.auth.User;
+import com.kairos.user.client.Client;
+import com.kairos.user.country.Country;
+import com.kairos.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
@@ -186,8 +186,8 @@ public class CitizenService {
 
 
         HttpEntity<String> headersElements = new HttpEntity<String>("parameters", headers);
-        com.kairos.persistence.model.organization.OrganizationService service = null;
-        com.kairos.persistence.model.organization.OrganizationService subService = null;
+        com.kairos.user.organization.OrganizationService service = null;
+        com.kairos.user.organization.OrganizationService subService = null;
         Client client = null;
 
         for (Map<String, Object> map : citizens) {
@@ -212,7 +212,7 @@ public class CitizenService {
                         if (patientPathway.get("type").equals("patientPathwayReference") == true) {
                             service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("pathwayTypeId").toString());
                             if (service == null) {
-                                service = new com.kairos.persistence.model.organization.OrganizationService();
+                                service = new com.kairos.user.organization.OrganizationService();
                                 service.setName(patientPathway.get("name").toString());
                                 Optional serviceOptional = Optional.ofNullable(patientPathway.get("pathwayTypeId"));
                                 if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("pathwayTypeId").toString());
@@ -228,7 +228,7 @@ public class CitizenService {
                                         hasSubService = true;
                                         subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
                                         if (subService == null) {
-                                            subService = new com.kairos.persistence.model.organization.OrganizationService();
+                                            subService = new com.kairos.user.organization.OrganizationService();
                                             subService.setName(subPatientPathway.get("name").toString());
                                             Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get("pathwayTypeId"));
                                             if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
@@ -271,7 +271,7 @@ public class CitizenService {
      * @param service
      * @param subService
      */
-    public void getGrantsFromSubPatientPathway(JSONObject subPatientPathway, RestTemplate loginTemplate, HttpEntity<String> headersElements, Organization organization, Client client, com.kairos.persistence.model.organization.OrganizationService service, com.kairos.persistence.model.organization.OrganizationService subService) {
+    public void getGrantsFromSubPatientPathway(JSONObject subPatientPathway, RestTemplate loginTemplate, HttpEntity<String> headersElements, Organization organization, Client client, com.kairos.user.organization.OrganizationService service, com.kairos.user.organization.OrganizationService subService) {
 
         if (subPatientPathway.get("type").equals("orderReference") == true) {
             // logger.info("subPatientPathway----------> "+subPatientPathway.get("name"));
@@ -308,8 +308,8 @@ public class CitizenService {
      * @return
      */
     private Map<String, Object> getGrantObject(int grantId, RestTemplate loginTemplate, HttpEntity<String> headersElements,
-                                     Organization organization, Client client,
-                                     com.kairos.persistence.model.organization.OrganizationService service, com.kairos.persistence.model.organization.OrganizationService subService) {
+                                               Organization organization, Client client,
+                                               com.kairos.user.organization.OrganizationService service, com.kairos.user.organization.OrganizationService subService) {
         List grantTypes = new ArrayList();
 
         grantTypes.add("Serviceloven §83, stk. 1");
@@ -388,7 +388,7 @@ public class CitizenService {
                 subService = organizationServiceRepository.checkDuplicateSubServiceWithSpecialCharacters(service.getId(), "Sub "+service.getName());
                 logger.info("subservice create wigth same name----> "+subService);
                 if (subService == null) {
-                    subService = new com.kairos.persistence.model.organization.OrganizationService();
+                    subService = new com.kairos.user.organization.OrganizationService();
                     subService.setName("Sub "+service.getName());
                     subService.setKmdExternalId(service.getKmdExternalId());
                     subService.setImported(true);

@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.organization;
-import com.kairos.persistence.model.organization.AbsenceTypes;
+import com.kairos.user.organization.AbsenceTypes;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import java.util.List;

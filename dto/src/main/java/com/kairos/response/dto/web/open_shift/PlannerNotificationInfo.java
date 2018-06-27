@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.open_shift;
 
-import com.kairos.persistence.model.enums.InformationReciever;
+import com.kairos.enums.InformationReciever;
 
 import java.util.List;
 

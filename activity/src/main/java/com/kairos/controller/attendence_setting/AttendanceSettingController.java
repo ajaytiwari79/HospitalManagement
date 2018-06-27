@@ -1,6 +1,6 @@
 package com.kairos.controller.attendence_setting;
 
-import com.kairos.persistence.model.staffing_level.Duration;
+import com.kairos.activity.staffing_level.Duration;
 import com.kairos.service.attendence_setting.AttendanceSettingService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

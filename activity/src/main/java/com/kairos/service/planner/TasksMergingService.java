@@ -8,7 +8,7 @@ import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskStatus;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
-import com.kairos.dto.TaskGanttDTO;
+import com.kairos.activity.dto.TaskGanttDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.fls_visitour.schedule.TaskConverterService;

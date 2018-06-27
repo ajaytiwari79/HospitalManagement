@@ -2,7 +2,7 @@ package com.kairos.controller.break_settings;
 
 import com.kairos.service.break_settings.BreakSettingsService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.break_settings.BreakSettingsDTO;
+import com.kairos.activity.break_settings.BreakSettingsDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

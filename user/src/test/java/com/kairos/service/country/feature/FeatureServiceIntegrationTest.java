@@ -2,8 +2,8 @@ package com.kairos.service.country.feature;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.user.country.feature.Feature;
-import com.kairos.persistence.model.user.country.feature.FeatureQueryResult;
+import com.kairos.user.country.feature.Feature;
+import com.kairos.user.country.feature.FeatureQueryResult;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.response.dto.web.feature.FeatureDTO;

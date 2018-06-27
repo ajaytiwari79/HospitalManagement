@@ -1,6 +1,6 @@
 package com.kairos.enums;
 
-import com.kairos.activity.client.counter.CounterTypeDefDTO;
+import com.kairos.activity.counter.CounterTypeDefDTO;
 
 import java.util.ArrayList;
 import java.util.List;

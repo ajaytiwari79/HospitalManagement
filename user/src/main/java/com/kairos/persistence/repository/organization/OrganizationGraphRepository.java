@@ -1,15 +1,15 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.organization.union.UnionQueryResult;
-import com.kairos.persistence.model.organization.union.UnionResponseDTO;
+import com.kairos.user.organization.*;
+import com.kairos.user.organization.enums.OrganizationLevel;
+import com.kairos.user.organization.group.Group;
+import com.kairos.user.organization.union.UnionQueryResult;
+import com.kairos.user.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
+import com.kairos.user.client.Client;
+import com.kairos.user.client.ContactAddress;
+import com.kairos.user.country.Country;
+import com.kairos.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;

@@ -1,7 +1,7 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.dto.TimeCareOrganizationDTO;
+import com.kairos.activity.dto.TimeCareOrganizationDTO;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

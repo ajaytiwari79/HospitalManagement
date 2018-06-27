@@ -1,7 +1,7 @@
 package com.kairos.service.region;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.client.ContactAddress;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;

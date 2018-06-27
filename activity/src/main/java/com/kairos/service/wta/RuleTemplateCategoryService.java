@@ -2,9 +2,9 @@ package com.kairos.service.wta;
 
 import com.kairos.client.CountryRestClient;
 import com.kairos.client.OrganizationRestClient;
-import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.activity.wta.templates.RuleTemplateCategory;
+import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
@@ -14,7 +14,7 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.CountryDTO;
 
 import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
-import com.kairos.response.dto.web.wta.*;
+import com.kairos.activity.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

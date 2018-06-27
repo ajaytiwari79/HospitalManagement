@@ -1,5 +1,5 @@
 package com.kairos.controller.absencePlanning;
-import com.kairos.dto.TaskDTO;
+import com.kairos.activity.dto.TaskDTO;
 import com.kairos.service.absencePlanning.AbsencePlanningService;
 import com.kairos.service.mail.MailService;
 import com.kairos.util.response.ResponseHandler;

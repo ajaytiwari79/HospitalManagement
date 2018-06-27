@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.client;
 
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.user.organization.time_slot.TimeSlotWrapper;
 
 import java.util.List;
 import java.util.Map;

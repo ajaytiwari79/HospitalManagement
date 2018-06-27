@@ -1,8 +1,8 @@
 package com.kairos.response.dto.web.night_worker;
 
-import com.kairos.persistence.model.common.TimeSlot;
-import com.kairos.persistence.model.enums.CalculationUnit;
-import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.user.country.time_slot.TimeSlot;
+import com.kairos.enums.CalculationUnit;
+import com.kairos.enums.DurationType;
 
 public class ExpertiseNightWorkerSettingDTO {
 

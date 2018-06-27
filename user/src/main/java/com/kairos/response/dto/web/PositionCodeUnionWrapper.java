@@ -1,11 +1,11 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.organization.OrganizationBasicResponse;
-import com.kairos.persistence.model.organization.union.UnionResponseDTO;
-import com.kairos.persistence.model.user.country.FunctionDTO;
-import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
+import com.kairos.user.organization.OrganizationBasicResponse;
+import com.kairos.user.organization.union.UnionResponseDTO;
+import com.kairos.user.country.FunctionDTO;
+import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.user.staff.StaffExperienceInExpertiseDTO;
 
 import java.util.ArrayList;
 import java.util.List;

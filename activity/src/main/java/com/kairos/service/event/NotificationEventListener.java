@@ -1,7 +1,7 @@
 package com.kairos.service.event;
 
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.activity.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.util.event.ShiftNotificationEvent;

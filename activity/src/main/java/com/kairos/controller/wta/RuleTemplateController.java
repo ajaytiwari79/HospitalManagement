@@ -1,11 +1,11 @@
 package com.kairos.controller.wta;
 
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.activity.wta.templates.WTABuilderService;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.service.wta.RuleTemplateService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
-import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.RuleTemplateCategoryDTO;
+import com.kairos.activity.wta.WTABaseRuleTemplateDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

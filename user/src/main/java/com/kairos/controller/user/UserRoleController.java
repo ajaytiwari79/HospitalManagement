@@ -1,8 +1,8 @@
 package com.kairos.controller.user;
 
-import com.kairos.persistence.model.user.auth.Role;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.auth.UserRole;
+import com.kairos.user.auth.Role;
+import com.kairos.user.auth.User;
+import com.kairos.user.auth.UserRole;
 import com.kairos.service.auth.RoleServiceUser;
 import com.kairos.service.auth.UserRoleServiceUser;
 import com.kairos.service.auth.UserService;

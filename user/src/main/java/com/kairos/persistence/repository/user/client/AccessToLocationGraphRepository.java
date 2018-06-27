@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.client;
 
-import com.kairos.persistence.model.user.client.AccessToLocation;
+import com.kairos.user.client.AccessToLocation;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

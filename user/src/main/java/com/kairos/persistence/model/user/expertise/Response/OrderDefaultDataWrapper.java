@@ -1,11 +1,11 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.kairos.dto.ActivityDTO;
-import com.kairos.persistence.model.user.country.FunctionDTO;
-import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
+import com.kairos.user.country.FunctionDTO;
+import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
+import com.kairos.user.staff.StaffPersonalDetailDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 
@@ -21,7 +21,7 @@ public class OrderDefaultDataWrapper {
     private List<PresenceTypeDTO> plannedTime;
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
-    private List<com.kairos.persistence.model.user.country.DayType> dayTypes;
+    private List<com.kairos.user.country.DayType> dayTypes;
     private Integer minOpenShiftHours;
 
     public OrderDefaultDataWrapper() {
@@ -29,7 +29,7 @@ public class OrderDefaultDataWrapper {
     }
 
     public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
-                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.user.country.DayType> dayTypes,Integer minOpenShiftHours) {
+                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.user.country.DayType> dayTypes, Integer minOpenShiftHours) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
@@ -115,11 +115,11 @@ public class OrderDefaultDataWrapper {
         this.reasonCodes = reasonCodes;
     }
 
-    public List<com.kairos.persistence.model.user.country.DayType> getDayTypes() {
+    public List<com.kairos.user.country.DayType> getDayTypes() {
         return dayTypes;
     }
 
-    public void setDayTypes(List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
+    public void setDayTypes(List<com.kairos.user.country.DayType> dayTypes) {
         this.dayTypes = dayTypes;
     }
 

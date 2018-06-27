@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.attendence_setting;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.staffing_level.Duration;
+import com.kairos.activity.staffing_level.Duration;
 
 
 import java.time.LocalDate;

@@ -1,8 +1,7 @@
 package com.kairos.persistence.repository.staffing_level;
 
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.activity.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.math.BigInteger;

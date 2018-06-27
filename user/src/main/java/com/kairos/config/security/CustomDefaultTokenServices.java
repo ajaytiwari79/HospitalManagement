@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.persistence.model.user.auth.UserPrincipal;
+import com.kairos.user.auth.UserPrincipal;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

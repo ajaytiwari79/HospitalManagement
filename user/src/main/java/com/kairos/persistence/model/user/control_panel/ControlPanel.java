@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.control_panel;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.user.organization.Organization;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;

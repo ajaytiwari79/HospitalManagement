@@ -1,7 +1,7 @@
 package com.kairos.service.pay_group_area;
 
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.organization.Level;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;

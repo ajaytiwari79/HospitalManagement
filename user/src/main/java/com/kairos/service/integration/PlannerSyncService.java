@@ -4,14 +4,14 @@ package com.kairos.service.integration;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
+import com.kairos.user.country.employment_type.EmploymentType;
 
 
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.response.dto.web.UnitPositionWtaDTO;
 import com.kairos.response.dto.web.staff.Staff;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

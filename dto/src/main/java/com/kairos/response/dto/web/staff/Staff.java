@@ -1,11 +1,7 @@
 package com.kairos.response.dto.web.staff;
 
-import com.kairos.persistence.model.enums.StaffStatusEnum;
-import org.hibernate.validator.constraints.NotEmpty;
+import com.kairos.enums.StaffStatusEnum;
 
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 
 /**

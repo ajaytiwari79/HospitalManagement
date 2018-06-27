@@ -2,11 +2,7 @@ package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
-import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
-import com.kairos.dto.activity.TimeTypeDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

@@ -6,7 +6,7 @@ import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.phase.Phase;
 
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

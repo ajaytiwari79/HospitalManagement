@@ -2,8 +2,8 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.user.country.ReasonCode;
-import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
+import com.kairos.user.country.ReasonCode;
+import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.response.dto.web.ReasonCodeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;

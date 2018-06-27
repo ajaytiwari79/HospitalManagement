@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.query_wrapper;
 
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 
 /**

@@ -1,8 +1,8 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.user.organization.*;
+import com.kairos.user.country.*;
+import com.kairos.user.country.DayType;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;

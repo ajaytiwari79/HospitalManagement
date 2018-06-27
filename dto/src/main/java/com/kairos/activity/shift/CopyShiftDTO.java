@@ -1,6 +1,6 @@
 package com.kairos.activity.shift;
 
-import com.kairos.persistence.model.user.country.Day;
+import com.kairos.user.country.Day;
 
 import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;

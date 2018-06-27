@@ -2,8 +2,8 @@ package com.kairos.controller.unit_settings;
 
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.response.dto.web.unit_settings.UnitAgeSettingDTO;
-import com.kairos.response.dto.web.unit_settings.UnitSettingDTO;
+import com.kairos.activity.unit_settings.UnitAgeSettingDTO;
+import com.kairos.activity.unit_settings.UnitSettingDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

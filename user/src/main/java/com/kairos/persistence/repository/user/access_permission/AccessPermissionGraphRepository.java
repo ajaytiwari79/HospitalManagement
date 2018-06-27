@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.access_permission;
-import com.kairos.persistence.model.user.staff.AccessPermission;
+import com.kairos.user.staff.AccessPermission;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

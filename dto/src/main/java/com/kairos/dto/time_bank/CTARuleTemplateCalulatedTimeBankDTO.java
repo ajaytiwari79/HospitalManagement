@@ -1,6 +1,6 @@
 package com.kairos.dto.time_bank;
 
-import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
+import com.kairos.user.agreement.cta.CalculationFor;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

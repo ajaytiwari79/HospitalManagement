@@ -1,8 +1,8 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.agreement.wta.templates.WTABaseRuleTemplate;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.Relationship;
 

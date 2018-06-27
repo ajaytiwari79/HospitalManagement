@@ -1,8 +1,8 @@
 package com.kairos.service.organization;
 
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.organization.*;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

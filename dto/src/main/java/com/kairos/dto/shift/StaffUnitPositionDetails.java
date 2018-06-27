@@ -1,10 +1,10 @@
 package com.kairos.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
+import com.kairos.activity.time_bank.CTARuleTemplateDTO;
 import com.kairos.response.dto.web.AppliedFunctionDTO;
 import com.kairos.response.dto.web.staff.Staff;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

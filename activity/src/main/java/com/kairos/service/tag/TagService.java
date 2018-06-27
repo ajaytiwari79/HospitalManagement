@@ -3,7 +3,7 @@ package com.kairos.service.tag;
 import com.kairos.client.CountryRestClient;
 import com.kairos.client.OrganizationRestClient;
 import com.kairos.controller.staffing_level.StaffingLevelController;
-import com.kairos.persistence.model.tag.MasterDataTypeEnum;
+import com.kairos.enums.tags.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.dto.tag.TagDTO;
@@ -102,7 +102,7 @@ public class TagService extends MongoBaseService {
     }
 
 
-    public List<Tag> getCountryTagsByIdsAndMasterDataType(List<BigInteger> tags, com.kairos.persistence.model.enums.MasterDataTypeEnum type){
+    public List<Tag> getCountryTagsByIdsAndMasterDataType(List<BigInteger> tags, com.kairos.enums.MasterDataTypeEnum type){
         return null;
     }
 

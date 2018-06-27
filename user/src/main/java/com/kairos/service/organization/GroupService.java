@@ -1,8 +1,8 @@
 package com.kairos.service.organization;
 
 import com.kairos.persistence.model.common.QueryResult;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.group.Group;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -71,7 +71,7 @@ public class GroupService extends UserBaseService {
         return organizationGraphRepository.getGroupAllSelectedServices(groupId);
     }
 
-    public List<com.kairos.persistence.model.organization.OrganizationService> addGroupSelectedService(Long groupId, Long[] service) {
+    public List<com.kairos.user.organization.OrganizationService> addGroupSelectedService(Long groupId, Long[] service) {
         return groupGraphRepository.addSelectedService(groupId, service);
 
     }

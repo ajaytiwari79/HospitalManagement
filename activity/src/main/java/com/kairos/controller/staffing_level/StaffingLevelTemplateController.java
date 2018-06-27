@@ -1,6 +1,6 @@
 package com.kairos.controller.staffing_level;
 
-import com.kairos.dto.staffing_level.StaffingLevelTemplateDTO;
+import com.kairos.activity.dto.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.service.staffing_level.StaffingLevelTemplateService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

@@ -1,7 +1,7 @@
 package com.kairos.service.attendence_setting;
 
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
-import com.kairos.persistence.model.staffing_level.Duration;
+import com.kairos.activity.staffing_level.Duration;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.util.DateUtils;

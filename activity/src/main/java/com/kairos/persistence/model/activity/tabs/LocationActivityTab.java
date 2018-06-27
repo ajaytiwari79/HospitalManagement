@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
-import com.kairos.persistence.model.enums.LocationEnum;
+import com.kairos.enums.LocationEnum;
 
 import java.io.Serializable;
 import java.util.List;

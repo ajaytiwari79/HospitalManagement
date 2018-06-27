@@ -1,5 +1,5 @@
 package com.kairos.response.dto.web;
-import com.kairos.client.dto.TaskAddress;
+import com.kairos.vrp.TaskAddress;
 
 import java.util.Date;
 

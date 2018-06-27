@@ -1,6 +1,6 @@
 package com.kairos.service.expertise;
 
-import com.kairos.persistence.model.user.country.Function;
+import com.kairos.user.country.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;

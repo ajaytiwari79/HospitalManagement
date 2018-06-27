@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.tags.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

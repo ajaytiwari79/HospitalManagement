@@ -1,14 +1,14 @@
 package com.kairos.service.position_code;
 
 import com.kairos.persistence.model.enums.ReasonCodeType;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationBasicResponse;
-import com.kairos.persistence.model.organization.OrganizationHierarchyData;
-import com.kairos.persistence.model.organization.union.UnionResponseDTO;
-import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.organization.OrganizationBasicResponse;
+import com.kairos.user.organization.OrganizationHierarchyData;
+import com.kairos.user.organization.union.UnionResponseDTO;
+import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.user.staff.Staff;
+import com.kairos.user.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;

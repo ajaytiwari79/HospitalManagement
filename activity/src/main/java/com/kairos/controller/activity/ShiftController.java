@@ -1,6 +1,6 @@
 package com.kairos.controller.activity;
 
-import com.kairos.dto.shift.ShiftDTO;
+import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.activity.shift.CopyShiftDTO;

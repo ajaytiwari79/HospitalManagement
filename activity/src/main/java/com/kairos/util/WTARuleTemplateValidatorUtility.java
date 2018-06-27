@@ -8,13 +8,13 @@ package com.kairos.util;
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.enums.MinMaxSetting;
-import com.kairos.persistence.enums.PartOfDay;
-import com.kairos.persistence.model.wta.templates.PhaseTemplateValue;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.template_types.*;
+import com.kairos.enums.PartOfDay;
+import com.kairos.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.wta.templates.template_types.*;
 import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
-import com.kairos.dto.ShiftWithActivityDTO;
-import com.kairos.persistence.model.user.country.Day;
+import com.kairos.activity.dto.ShiftWithActivityDTO;
+import com.kairos.user.country.Day;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 
 import java.math.BigInteger;

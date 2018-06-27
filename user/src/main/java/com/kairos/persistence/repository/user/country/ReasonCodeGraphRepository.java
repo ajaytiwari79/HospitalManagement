@@ -2,8 +2,8 @@ package com.kairos.persistence.repository.user.country;
 
 
 import com.kairos.persistence.model.enums.ReasonCodeType;
-import com.kairos.persistence.model.user.country.ReasonCode;
-import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
+import com.kairos.user.country.ReasonCode;
+import com.kairos.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

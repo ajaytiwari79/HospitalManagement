@@ -1,10 +1,9 @@
 package com.kairos.response.dto.web.organization.time_slot;
 
-import com.kairos.persistence.model.enums.TimeSlotType;
-import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
+import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.time_slot.TimeSlotMode;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

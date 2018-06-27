@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
 import com.kairos.persistence.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task_demand.TaskDemand;
-import com.kairos.persistence.model.task_type.AbsencePlanningStatus;
+import com.kairos.activity.task.AbsencePlanningStatus;
 import com.kairos.persistence.model.task_type.AddressCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;

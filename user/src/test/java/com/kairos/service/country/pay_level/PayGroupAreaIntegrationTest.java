@@ -4,7 +4,7 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.user.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.exception.ExceptionService;

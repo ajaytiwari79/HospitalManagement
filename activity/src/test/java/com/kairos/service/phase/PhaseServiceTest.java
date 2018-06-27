@@ -3,7 +3,7 @@ package com.kairos.service.phase;
 import com.kairos.KairosActivityApplication;
 import com.kairos.client.OrganizationRestClient;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
+import com.kairos.activity.organization.OrganizationDTO;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;

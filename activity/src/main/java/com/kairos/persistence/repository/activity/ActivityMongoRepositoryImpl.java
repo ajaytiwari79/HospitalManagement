@@ -1,14 +1,12 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.activity.activity.ActivityWithCompositeDTO;
+import com.kairos.activity.activity.OrganizationActivityDTO;
+import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
+import com.kairos.dto.ActivityDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.dto.ActivityWithCompositeDTO;
-import com.kairos.dto.OrganizationTypeAndSubTypeDTO;
-import com.kairos.dto.activity.ActivityTagDTO;
-import com.kairos.dto.activity.ActivityWithCTAWTASettingsDTO;
-import com.kairos.dto.activity.OrganizationActivityDTO;
-import com.kairos.persistence.model.enums.ActivityStateEnum;
+import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -19,9 +17,11 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
-import com.kairos.persistence.model.user.staff.StaffUnitPositionQueryResult;
+import com.kairos.user.staff.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilterDTO;
 import org.springframework.stereotype.Repository;

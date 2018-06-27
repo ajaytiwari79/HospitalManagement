@@ -1,8 +1,8 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.response.dto.web.wta.WTADTO;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTADTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

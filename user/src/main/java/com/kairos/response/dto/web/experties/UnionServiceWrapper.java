@@ -2,8 +2,8 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.controller.organization_service.OrganizationServiceController;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.union.UnionQueryResult;
+import com.kairos.user.organization.Level;
+import com.kairos.user.organization.union.UnionQueryResult;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.util.List;

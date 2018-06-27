@@ -9,7 +9,7 @@ import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.dto.ActivityDTO;
-import com.kairos.dto.activity.ActivityTagDTO;
+import com.kairos.activity.dto.activity.ActivityTagDTO;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.activity.shift.ShiftPublishDTO;

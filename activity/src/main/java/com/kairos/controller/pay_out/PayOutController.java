@@ -3,7 +3,7 @@ package com.kairos.controller.pay_out;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.controller.task.TaskController;
-import com.kairos.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.util.response.ResponseHandler;
 import org.slf4j.Logger;

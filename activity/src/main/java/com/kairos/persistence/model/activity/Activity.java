@@ -6,16 +6,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.ActivityDTO;
-import com.kairos.persistence.model.enums.ActivityStateEnum;
+import com.kairos.enums.ActivityStateEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 

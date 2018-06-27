@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.auth;
 
-import com.kairos.persistence.model.user.auth.Role;
+import com.kairos.user.auth.Role;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 

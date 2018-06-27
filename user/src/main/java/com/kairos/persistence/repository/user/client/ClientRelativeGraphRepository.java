@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.client;
 
-import com.kairos.persistence.model.user.client.ClientRelativeRelation;
+import com.kairos.user.client.ClientRelativeRelation;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 /**

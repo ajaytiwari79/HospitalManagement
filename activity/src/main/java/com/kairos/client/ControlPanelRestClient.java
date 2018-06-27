@@ -1,7 +1,7 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.dto.ControlPanelDTO;
+import com.kairos.activity.dto.ControlPanelDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

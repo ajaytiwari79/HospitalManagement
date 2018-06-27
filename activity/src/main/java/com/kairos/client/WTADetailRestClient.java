@@ -2,8 +2,8 @@ package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.util.RestClientUrlUtil;
-import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
-import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
+import com.kairos.activity.wta.WTABasicDetailsDTO;
+import com.kairos.activity.wta.WTADefaultDataInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;

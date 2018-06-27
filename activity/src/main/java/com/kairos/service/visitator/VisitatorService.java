@@ -18,7 +18,7 @@ import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskPackageMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.dto.TaskDemandDTO;
+import com.kairos.activity.dto.TaskDemandDTO;
 import com.kairos.dto.TaskTypeDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.PlannerService;

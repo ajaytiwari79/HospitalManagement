@@ -4,7 +4,7 @@ import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.dto.shift.ShiftDTO;
+import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 

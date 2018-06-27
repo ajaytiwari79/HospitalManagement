@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.cta;
 
-import com.kairos.persistence.model.user.country.Day;
+import com.kairos.user.country.Day;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.kairos.controller.wta;
 
 
-import com.kairos.dto.WTADTO;
+import com.kairos.activity.dto.WTADTO;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.util.response.ResponseHandler;

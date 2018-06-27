@@ -1,11 +1,9 @@
 package com.kairos.persistence.repository.task_type;
 
-import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.model.task_type.TaskType;
-import com.kairos.persistence.query_result.OrgTaskTypeAggregateResult;
-import com.kairos.persistence.query_result.TaskTypeAggregateResult;
-import com.kairos.dto.ClientFilterDTO;
-import com.kairos.dto.task_type.TaskTypeResponseDTO;
+import com.kairos.wrapper.OrgTaskTypeAggregateResult;
+import com.kairos.wrapper.TaskTypeAggregateResult;
+import com.kairos.activity.dto.ClientFilterDTO;
+import com.kairos.activity.task_type.TaskTypeResponseDTO;
 
 import java.math.BigInteger;
 import java.util.List;

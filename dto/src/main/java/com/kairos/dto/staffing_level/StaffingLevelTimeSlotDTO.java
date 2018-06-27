@@ -1,14 +1,14 @@
 package com.kairos.dto.staffing_level;
 
-import com.kairos.persistence.model.staffing_level.StaffingLevelActivity;
-import com.kairos.persistence.model.staffing_level.Duration;
-import com.kairos.persistence.model.staffing_level.StaffingLevelSkill;
+import com.kairos.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.activity.staffing_level.Duration;
+import com.kairos.activity.staffing_level.StaffingLevelSkill;
 
 import java.util.HashSet;
 import java.util.Set;
 @Deprecated
 /**
- * Instead use {@link com.kairos.persistence.model.staffing_level.StaffingLevelInterval}
+ * Instead use {@link com.kairos.activity.staffing_level.StaffingLevelInterval}
  */
 public class StaffingLevelTimeSlotDTO {
     private int sequence;

@@ -2,7 +2,7 @@ package com.kairos.service.system_setting;
 
 
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.model.user.country.Country;
+import com.kairos.user.country.Country;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.system_setting.SystemLanguageDTO;

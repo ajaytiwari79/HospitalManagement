@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.task_type;
 
 import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.query_result.EscalatedTasksWrapper;
-import com.kairos.persistence.query_result.StaffAssignedTasksWrapper;
-import com.kairos.persistence.query_result.TaskCountWithAssignedUnit;
-import com.kairos.persistence.query_result.TaskWrapper;
+import com.kairos.wrapper.EscalatedTasksWrapper;
+import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
+import com.kairos.wrapper.TaskCountWithAssignedUnit;
+import com.kairos.wrapper.TaskWrapper;
 import com.kairos.dto.task.VRPTaskDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

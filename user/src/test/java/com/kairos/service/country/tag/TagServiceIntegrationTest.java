@@ -3,7 +3,7 @@ package com.kairos.service.country.tag;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.user.country.tag.Tag;
+import com.kairos.user.country.tag.Tag;
 import com.kairos.response.dto.web.tag.ShowCountryTagSetting;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.exception.ExceptionService;

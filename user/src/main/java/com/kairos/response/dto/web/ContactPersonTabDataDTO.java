@@ -1,12 +1,12 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.organization.OrganizationService;
-import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
+import com.kairos.user.organization.OrganizationService;
+import com.kairos.user.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
-import com.kairos.persistence.model.user.client.ClientMinimumDTO;
-import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
+import com.kairos.user.client.ClientMinimumDTO;
+import com.kairos.user.staff.StaffPersonalDetailDTO;
 
 import java.util.List;
 

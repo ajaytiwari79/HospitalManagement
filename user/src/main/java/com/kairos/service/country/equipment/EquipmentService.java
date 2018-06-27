@@ -2,11 +2,11 @@ package com.kairos.service.country.equipment;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.equipment.Equipment;
-import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
-import com.kairos.persistence.model.user.country.equipment.EquipmentQueryResult;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.country.Country;
+import com.kairos.user.country.equipment.Equipment;
+import com.kairos.user.country.equipment.EquipmentCategory;
+import com.kairos.user.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

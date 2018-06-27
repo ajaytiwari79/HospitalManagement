@@ -1,8 +1,8 @@
 package com.kairos.service.staffing_level;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.persistence.model.staffing_level.Duration;
-import com.kairos.persistence.model.staffing_level.StaffingLevelSetting;
+import com.kairos.activity.staffing_level.Duration;
+import com.kairos.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.service.activity.ActivityService;

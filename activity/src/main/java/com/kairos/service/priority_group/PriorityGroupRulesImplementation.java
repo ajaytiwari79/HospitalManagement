@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kairos.dto.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.activity.dto.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.priority_group.priority_group_rules.*;
 import com.kairos.response.dto.web.StaffUnitPositionQueryResult;
 import com.kairos.response.dto.web.open_shift.FibonacciCounter;

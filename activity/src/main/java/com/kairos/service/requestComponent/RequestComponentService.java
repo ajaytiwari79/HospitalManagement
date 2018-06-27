@@ -2,9 +2,9 @@ package com.kairos.service.requestComponent;
 
 import com.kairos.client.OrganizationRestClient;
 import com.kairos.client.StaffRestClient;
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
-import com.kairos.dto.RequestComponent;
-import com.kairos.dto.RequestType;
+import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.activity.dto.RequestComponent;
+import com.kairos.activity.dto.RequestType;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity_stream.NotificationService;
 import org.slf4j.Logger;

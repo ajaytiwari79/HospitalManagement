@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.country.Function;
+import com.kairos.user.country.Function;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;

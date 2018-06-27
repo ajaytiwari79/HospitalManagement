@@ -5,7 +5,7 @@ import com.kairos.util.response.ResponseHandler;
 import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
 
 import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
+import com.kairos.activity.wta.RuleTemplateCategoryDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

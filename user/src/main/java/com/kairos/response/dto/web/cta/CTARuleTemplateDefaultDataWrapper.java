@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.cta;
-import com.kairos.persistence.model.user.agreement.cta.CalculateValueIfPlanned;
-import com.kairos.persistence.model.user.country.FunctionDTO;
+import com.kairos.user.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.user.country.FunctionDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import java.util.ArrayList;
 import java.util.List;

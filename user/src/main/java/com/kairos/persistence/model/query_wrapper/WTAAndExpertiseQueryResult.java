@@ -2,7 +2,7 @@ package com.kairos.persistence.model.query_wrapper;
 
 
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult

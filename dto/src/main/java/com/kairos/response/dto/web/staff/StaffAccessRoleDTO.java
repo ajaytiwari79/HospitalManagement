@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.staff;
 
-import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.AccessGroupRole;
 
 import java.util.List;
 

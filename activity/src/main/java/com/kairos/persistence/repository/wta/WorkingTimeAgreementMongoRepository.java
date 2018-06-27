@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.wta;
 
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

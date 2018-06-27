@@ -1,5 +1,5 @@
 package com.kairos.service.auth;
-import com.kairos.persistence.model.user.auth.User;
+import com.kairos.user.auth.User;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

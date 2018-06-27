@@ -2,7 +2,7 @@ package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.user.agreement.wta.templates.RuleTemplateCategory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

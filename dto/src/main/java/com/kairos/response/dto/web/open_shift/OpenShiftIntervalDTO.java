@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.open_shift;
 
-import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.DurationType;
 
 import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;

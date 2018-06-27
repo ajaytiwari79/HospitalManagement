@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.skill;
-import com.kairos.persistence.model.user.auth.StaffSkillLevelRelationship;
+import com.kairos.user.auth.StaffSkillLevelRelationship;
 import com.kairos.persistence.model.user.skill.Skill;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;

@@ -1,14 +1,14 @@
 package com.kairos.controller.organization;
 
-import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.organization.team.TeamDTO;
-import com.kairos.persistence.model.user.client.ClientStaffDTO;
+import com.kairos.user.organization.*;
+import com.kairos.user.organization.group.Group;
+import com.kairos.user.organization.team.TeamDTO;
+import com.kairos.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.StaffFilterDTO;
+import com.kairos.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;

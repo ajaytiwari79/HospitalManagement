@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.config.neo4j.converter.LocalDateConverter;
 import com.kairos.config.neo4j.converter.LocalDateListConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.country.Function;
+import com.kairos.user.country.Function;
 import org.apache.catalina.LifecycleState;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.Property;

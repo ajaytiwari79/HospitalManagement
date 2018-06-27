@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.open_shift.priority_group;
 
-import com.kairos.persistence.model.enums.DayCheckPeriod;
+import com.kairos.enums.DayCheckPeriod;
 
 import java.time.DayOfWeek;
 import java.util.List;

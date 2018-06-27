@@ -1,5 +1,6 @@
 package com.kairos.service.staffing_level;
 
+import com.kairos.activity.dto.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.client.OrganizationRestClient;
 import com.kairos.client.StaffRestClient;
 import com.kairos.response.dto.web.day_type.DayType;
@@ -10,13 +11,13 @@ import com.kairos.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHan
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
-import com.kairos.persistence.model.staffing_level.*;
+import com.kairos.activity.staffing_level.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.dto.ActivityDTO;
-import com.kairos.dto.activity.ActivityCategoryListDTO;
-import com.kairos.dto.activity.ActivityTagDTO;
+import com.kairos.activity.dto.activity.ActivityCategoryListDTO;
+import com.kairos.activity.dto.activity.ActivityTagDTO;
 import com.kairos.dto.staffing_level.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;

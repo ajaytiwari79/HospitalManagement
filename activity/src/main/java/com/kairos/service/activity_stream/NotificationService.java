@@ -5,7 +5,7 @@ import com.kairos.client.dto.ClientStaffInfoDTO;
 import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.activity_stream.NotificationMongoRepository;
-import com.kairos.dto.RequestComponent;
+import com.kairos.activity.dto.RequestComponent;
 import com.kairos.service.mail.MailService;
 import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;

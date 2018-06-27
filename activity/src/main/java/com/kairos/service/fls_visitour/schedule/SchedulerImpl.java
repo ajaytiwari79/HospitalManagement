@@ -2,7 +2,7 @@ package com.kairos.service.fls_visitour.schedule;
 import com.kairos.client.StaffRestClient;
 import com.kairos.client.dto.staff.StaffDTO;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.TaskAppointmentSuggestionDTO;
+import com.kairos.activity.dto.TaskAppointmentSuggestionDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.enums.FlsCallResponse;
 import com.kairos.service.fls_visitour.wsclient.FlsClient;

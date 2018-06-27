@@ -1,12 +1,12 @@
 package com.kairos.service.client;
 
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.country.CitizenStatus;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.organization.Organization;
+import com.kairos.user.client.Client;
+import com.kairos.user.client.ClientOrganizationRelation;
+import com.kairos.user.client.ContactAddress;
+import com.kairos.user.client.ContactDetail;
+import com.kairos.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;

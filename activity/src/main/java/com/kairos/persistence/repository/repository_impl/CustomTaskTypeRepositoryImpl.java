@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.repository_impl;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_demand.TaskDemand;
-import com.kairos.persistence.query_result.OrgTaskTypeAggregateResult;
-import com.kairos.persistence.query_result.TaskTypeAggregateResult;
+import com.kairos.wrapper.OrgTaskTypeAggregateResult;
+import com.kairos.wrapper.TaskTypeAggregateResult;
 import com.kairos.persistence.repository.task_type.CustomTaskTypeRepository;
-import com.kairos.dto.ClientFilterDTO;
-import com.kairos.dto.task_type.TaskTypeResponseDTO;
+import com.kairos.activity.dto.ClientFilterDTO;
+import com.kairos.activity.task_type.TaskTypeResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;

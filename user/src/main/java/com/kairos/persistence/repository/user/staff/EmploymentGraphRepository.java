@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.user.staff;
 
-import com.kairos.persistence.model.user.staff.Employment;
-import com.kairos.persistence.model.user.staff.EmploymentQueryResult;
-import com.kairos.persistence.model.user.staff.EmploymentReasonCodeQueryResult;
-import com.kairos.persistence.model.user.staff.ExpiredEmploymentsQueryResult;
+import com.kairos.user.staff.Employment;
+import com.kairos.user.staff.EmploymentQueryResult;
+import com.kairos.user.staff.EmploymentReasonCodeQueryResult;
+import com.kairos.user.staff.ExpiredEmploymentsQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

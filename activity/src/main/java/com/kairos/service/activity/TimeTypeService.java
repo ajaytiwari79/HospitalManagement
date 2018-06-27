@@ -1,17 +1,12 @@
 package com.kairos.service.activity;
 
 
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.TimeTypeLinkedException;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.activity.tabs.ActivityCategory;
-import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
-import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
-import com.kairos.dto.activity.TimeTypeDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;

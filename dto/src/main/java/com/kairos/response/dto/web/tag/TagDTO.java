@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.tag;
 
-import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.enums.MasterDataTypeEnum;
 
 /**
  * Created by prerna on 10/11/17.

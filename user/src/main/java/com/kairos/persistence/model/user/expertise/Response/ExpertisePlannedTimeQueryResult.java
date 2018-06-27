@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
-import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
+import com.kairos.user.country.employment_type.EmploymentType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;

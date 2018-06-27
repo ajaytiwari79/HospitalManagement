@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.enums.EmploymentStatus;
-import com.kairos.persistence.model.user.staff.AccessPermission;
-import com.kairos.persistence.model.user.staff.UnitPermission;
+import com.kairos.user.staff.AccessPermission;
+import com.kairos.user.staff.UnitPermission;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

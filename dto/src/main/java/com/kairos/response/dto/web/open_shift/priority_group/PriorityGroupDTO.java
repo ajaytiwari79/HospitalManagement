@@ -1,9 +1,6 @@
 package com.kairos.response.dto.web.open_shift.priority_group;
 
-import com.kairos.persistence.model.enums.PriorityGroupName;
-import com.kairos.response.dto.web.open_shift.priority_group.DecisionCriteria;
-import com.kairos.response.dto.web.open_shift.priority_group.StaffExcludeFilter;
-import com.kairos.response.dto.web.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.enums.PriorityGroupName;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

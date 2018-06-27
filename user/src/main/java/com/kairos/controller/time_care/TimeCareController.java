@@ -1,8 +1,8 @@
 package com.kairos.controller.time_care;
 
 import com.kairos.persistence.model.time_care.TimeCareSkill;
-import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
-import com.kairos.persistence.model.user.staff.TimeCareStaffDTO;
+import com.kairos.user.staff.TimeCareEmploymentDTO;
+import com.kairos.user.staff.TimeCareStaffDTO;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.unit_position.UnitPositionService;

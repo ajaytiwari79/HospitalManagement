@@ -2,14 +2,14 @@ package com.kairos.service.phase;
 
 import com.kairos.client.CountryRestClient;
 import com.kairos.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
+import com.kairos.activity.organization.OrganizationDTO;
 import com.kairos.client.dto.organization.OrganizationPhaseDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtils;
-import com.kairos.persistence.model.enums.DurationType;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import org.slf4j.Logger;
