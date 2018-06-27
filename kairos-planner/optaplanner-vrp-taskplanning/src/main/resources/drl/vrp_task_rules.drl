@@ -116,3 +116,11 @@ salience 22
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end
+
+rule "Same road side tasks perference" // need to add check for one lane road
+salience 22
+    when
+        Task(prevTaskOrShift instanceof Task  && getFullStreetName().equals(((Task)prevTaskOrShift).getFullStreetName()) && !areHouseNumberSameLane((Task)prevTaskOrShift))
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-4);
+end
