@@ -15,4 +15,8 @@ public interface CustomActivityConfigurationRepository {
 
     List<ActivityConfigurationDTO> findAbsenceConfigurationByUnitId(Long unitId);
 
+    List<ActivityConfiguration> findAllAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
+
+    List<ActivityConfiguration> findAllPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
+
 }

@@ -72,4 +72,8 @@ public class LocationPair {
 
         return Objects.hash(fromLatitute, fromLongitude, toLatitute, toLongitude);
     }
+
+    public LocationPair getReversePair(){
+        return new LocationPair(toLatitute,toLongitude,fromLatitute,fromLongitude);
+    }
 }

@@ -12,10 +12,9 @@ salience 20
         $task:Task(prevTaskOrShift!=null, $m:missingSkills , $m!=0);
     then
         if($m>0)
-            scoreHolder.addHardConstraintMatch(kcontext,-$m);
+            scoreHolder.addHardConstraintMatch(kcontext,-$m*2);
         else
-            scoreHolder.addSoftConstraintMatch(kcontext,$m);
-
+            scoreHolder.addSoftConstraintMatch(kcontext,$m<<4);
 end
 
 
@@ -27,6 +26,16 @@ salience 20
         scoreHolder.addSoftConstraintMatch(kcontext,-1);
 end
 
+rule "Longest Task"
+salience 20
+    when
+        $shift:Shift(nextTask!=null);
+        //$task:$shift.getLongestTask();
+        $order: Integer(intValue>0) from ($shift.getLongestTask().getOrder())
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-1);
+end
+
 rule "Shift out of boundary half day"
 salience 21
 
@@ -34,16 +43,12 @@ salience 21
         Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes)
         $ot: Integer(intValue>0) from ($minutes-330)
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
-end
-
-rule "Number of Task Per shift"
-salience 21
-
-    when
-        Shift($num:numberOfTasks && $num> 20)
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
+        if($ot>60){
+            scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
+        }
+        else{
+            scoreHolder.addSoftConstraintMatch(kcontext,-10);
+        }
 end
 
 rule "Shift out of boundary full day"
@@ -59,6 +64,16 @@ salience 22
             scoreHolder.addSoftConstraintMatch(kcontext,-10);
         }
 end
+
+rule "Number of Task Per shift"
+salience 21
+
+    when
+        Shift($num:numberOfTasks && $num> 20)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
+end
+
 
 rule "Driving Time"
 salience 22
@@ -99,5 +114,13 @@ salience 22
     when
         Task(isShiftBreak()  && !isBreakInWindow())
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-1);
+        scoreHolder.addMediumConstraintMatch(kcontext,-1);
+end
+
+rule "Same road side tasks perference" // need to add check for one lane road
+salience 22
+    when
+        Task(prevTaskOrShift instanceof Task  && getFullStreetName().equals(((Task)prevTaskOrShift).getFullStreetName()) && !areHouseNumberSameLane((Task)prevTaskOrShift))
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-4);
 end

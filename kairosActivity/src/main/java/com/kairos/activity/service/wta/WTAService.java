@@ -391,16 +391,18 @@ public class WTAService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
 
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
+
 
         if (oldWta.getExpertise().getId() != wtadto.getExpertiseId()) {
             logger.info("Expertise cant be changed :", wtadto.getId());
             exceptionService.actionNotPermittedException("message.expertise.update");
         }
-        BeanUtils.copyProperties(oldWta, newWta, "id");
+        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+        newWta.setRuleTemplateIds(null);
         if (wtadto.getEndDateMillis() != null) {
             oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
         }
+        oldWta.setId(null);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         if (wtadto.getRuleTemplates().size() > 0) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
@@ -409,7 +411,6 @@ public class WTAService extends MongoBaseService {
             newWta.setRuleTemplateIds(ruleTemplatesIds);
         }
         save(oldWta);
-        newWta.setParentWTA(oldWta.getId());
         newWta.setDisabled(false);
         newWta.setParentWTA(oldWta.getId());
         save(newWta);

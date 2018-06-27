@@ -22,7 +22,7 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepos
 
     OrganizationalSecurityMeasure findByid(BigInteger id);
 
-    @Query("{deleted:false,organizationId:1,countryId:?0}")
+    @Query("{deleted:false,organizationId:?1,countryId:?0}")
     List<OrganizationalSecurityMeasure> findAllOrganizationalSecurityMeasures(Long countryId, Long organizationId);
 
     @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")

@@ -42,7 +42,7 @@ public class DailyTimeBankEntryServiceTest {
         Long startMillis = new Date().getTime();
 
         //timeBankService.setTimeBankCalculationService(new TimeBankCalculationService());
-        List<CalculatedTimeBankByDateDTO> timeBanks = timeBankService.getTimeBankFromCurrentDateByUEP(145l);
+        List<CalculatedTimeBankByDateDTO> timeBanks =null;// timeBankService.getTimeBankFromCurrentDateByUEP(145l);
         timeBanks.forEach(ct->{
             logger.info("date "+ct.getDate()+" - "+ct.getTimeBankMin());
         });

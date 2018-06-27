@@ -11,9 +11,12 @@ public class PhaseTemplateValue {
     private short staffValue;
     private short managementValue;
     private boolean disabled=true;
+    //TODO byme Pradeep
     private int optionalFrequency;
     private boolean optional;
     private int sequence;
+    private boolean staffCanBeIgnore;
+    private boolean managementCanBeIgnore;
 
     public int getOptionalFrequency() {
         return optionalFrequency;
@@ -40,7 +43,7 @@ public class PhaseTemplateValue {
         //Default Constructor
     }
 
-    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, int optionalFrequency, boolean optional) {
+    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, int optionalFrequency, boolean optional,boolean staffCanBeIgnore,boolean managementCanBeIgnore) {
         this.phaseId = phaseId;
         this.phaseName = phaseName;
         this.staffValue = staffValue;
@@ -48,6 +51,8 @@ public class PhaseTemplateValue {
         this.disabled = disabled;
         this.optionalFrequency = optionalFrequency;
         this.optional = optional;
+        this.staffCanBeIgnore=staffCanBeIgnore;
+        this.managementCanBeIgnore=managementCanBeIgnore;
     }
 
     public String getPhaseName() {
@@ -96,6 +101,22 @@ public class PhaseTemplateValue {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    public boolean isStaffCanBeIgnore() {
+        return staffCanBeIgnore;
+    }
+
+    public void setStaffCanBeIgnore(boolean staffCanBeIgnore) {
+        this.staffCanBeIgnore = staffCanBeIgnore;
+    }
+
+    public boolean isManagementCanBeIgnore() {
+        return managementCanBeIgnore;
+    }
+
+    public void setManagementCanBeIgnore(boolean managementCanBeIgnore) {
+        this.managementCanBeIgnore = managementCanBeIgnore;
     }
 
     @Override
