@@ -46,7 +46,7 @@ public class SolverConfigController {
     @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("update solver config")
     public ResponseEntity<Map<String, Object>> updateSolverConfig(@PathVariable BigInteger solverConfigId, @PathVariable Long unitId, @RequestBody SolverConfigDTO solverConfigDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED, true, solverConfigService.updateSolverConfig(solverConfigId,solverConfigDTO));
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED, true, solverConfigService.updateSolverConfig(unitId,solverConfigId,solverConfigDTO));
     }
 
     @PostMapping(value = "/defaultConfig")

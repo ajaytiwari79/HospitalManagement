@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.planning.vrpPlanning;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ShiftDTO {
 
     private String id;
+    private String name;
     private Long staffId;
     private EmployeeDTO employee;
     private LocalDate localDate;
@@ -25,6 +27,7 @@ public class ShiftDTO {
     private List<TaskDTO> tasks;
     private String color;
 
+
     public ShiftDTO(String id, EmployeeDTO employee, LocalDate localDate, Date startTime, Date endTime) {
         this.id = id;
         this.employee = employee;
@@ -32,6 +35,15 @@ public class ShiftDTO {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     public String getColor() {
         return color;

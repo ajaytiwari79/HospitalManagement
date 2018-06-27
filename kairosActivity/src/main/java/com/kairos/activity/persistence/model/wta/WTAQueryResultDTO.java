@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author pradeep
  * @date - 13/4/18
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTAQueryResultDTO {
 

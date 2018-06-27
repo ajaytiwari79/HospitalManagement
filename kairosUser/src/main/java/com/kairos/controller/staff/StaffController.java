@@ -675,4 +675,14 @@ public class StaffController {
 
 
 
+    @GetMapping(value = "/get_Staff_By_Unit")
+    @ApiOperation("get staff by unit")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUnit(unitId));
+    }
+
+
+
+
 }

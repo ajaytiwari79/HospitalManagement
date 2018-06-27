@@ -487,7 +487,7 @@ public class WTAService extends MongoBaseService {
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w, WTAResponseDTO.class);
             WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
             List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-            if (wtaResponseDTO.getRuleTemplates().size() > 0) {
+            if (wtaResponseDTO.getRuleTemplates()!=null && !wtaResponseDTO.getRuleTemplates().isEmpty()) {
                 ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
                 save(ruleTemplates);
                 List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
