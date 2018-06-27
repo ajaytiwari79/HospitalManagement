@@ -12,11 +12,6 @@ import java.util.Set;
 
 @Repository
 public interface IndividualShiftTemplateMongoRepository extends MongoBaseRepository<IndividualShiftTemplate,BigInteger> {
-//    List<IndividualShiftTemplateDTO> findAllByUnitId(Long unitId);
-//
-//    IndividualShiftTemplate findByIdAndUnitIdAndDeletedFalse(BigInteger id, Long unitId);
-//
-//    List<IndividualShiftTemplateDTO> getAllShiftTemplatesByStaffId(Long unitId, Long staffId);
 
       List<IndividualShiftTemplateDTO> findAllByIdInAndDeletedFalse(Set<BigInteger> shiftDayTemplateIds);
 
