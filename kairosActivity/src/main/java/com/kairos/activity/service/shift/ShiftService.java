@@ -1117,13 +1117,15 @@ public class ShiftService extends MongoBaseService {
         return activities;
     }
 
-    public boolean createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO){
+    public List<ShiftQueryResult> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO){
         ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftDTO.getShiftTemplateId());
         List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
+       List<ShiftQueryResult> shifts=new ArrayList<>();
         individualShiftTemplate.forEach(shiftTemplate1 ->{
             ShiftDTO shiftDTO1=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,shiftDTO.getStaffId(),shiftDTO.getUnitPositionId(),shiftDTO.getStartLocalDate(),shiftDTO.getEndLocalDate(),shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
-            createShift(unitId,shiftDTO1,"Organization",false);
+            List<ShiftQueryResult> shiftResponse= createShift(unitId,shiftDTO1,"Organization",false);
+            shifts.add(shiftResponse.get(0));
         });
-        return true;
+        return shifts;
     }
 }

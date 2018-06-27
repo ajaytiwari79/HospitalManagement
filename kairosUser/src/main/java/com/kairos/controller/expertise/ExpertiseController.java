@@ -135,9 +135,9 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
-    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> addPlannedTimeInExpertise(@PathVariable Long unitId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addPlannedTimeInExpertise(unitId, expertiseEmploymentTypeDTO));
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> addPlannedTimeInExpertise(@PathVariable Long countryId,@PathVariable Long expertiseId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addPlannedTimeInExpertise(expertiseId, expertiseEmploymentTypeDTO));
     }
 
     @ApiOperation(value = "get planned time for employment type and expertise ")
@@ -154,8 +154,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseEmploymentTypeDTO));
+    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long expertiseId,@RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseId,expertiseEmploymentTypeDTO));
     }
 
 }
