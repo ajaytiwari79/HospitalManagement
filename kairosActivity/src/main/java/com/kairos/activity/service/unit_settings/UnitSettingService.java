@@ -1,9 +1,7 @@
 package com.kairos.activity.service.unit_settings;
 
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.activity.persistence.model.unit_settings.UnitSetting;
@@ -79,12 +77,15 @@ public class UnitSettingService extends MongoBaseService {
         return unitSettingsDTO;
     }
 
-    public boolean createDefaultOpenShiftPhaseSettings(Long unitId){
+    public boolean createDefaultOpenShiftPhaseSettings(Long unitId,List<Phase> phases){
+        if (!Optional.ofNullable(phases).isPresent()){
+            phases=ObjectMapperUtils.copyProperties(phaseService.getPhasesByUnit(unitId),Phase.class);
+        }
         List<UnitSettingDTO> openShiftPhaseSettings=unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         if(openShiftPhaseSettings.size()>0){
             exceptionService.actionNotPermittedException("openShift.already.exist",unitId);
         }
-        List<PhaseDTO> phases=phaseService.getPhasesByUnit(unitId);
+
         if(Optional.ofNullable(phases).isPresent()) {
             List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
             phases.forEach(phase -> {

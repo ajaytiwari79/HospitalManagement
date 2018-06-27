@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.staff;
 
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import java.util.Map;
 public class StaffEmploymentWrapper {
     private List<EmploymentType> employmentTypes= new ArrayList<>();
     private List<Map> staffList = new ArrayList<>();
+    private Long loggedInStaffId;
 
     public StaffEmploymentWrapper() {
         // DC
@@ -28,5 +29,13 @@ public class StaffEmploymentWrapper {
 
     public void setStaffList(List<Map> staffList) {
         this.staffList = staffList;
+    }
+
+    public Long getLoggedInStaffId() {
+        return loggedInStaffId;
+    }
+
+    public void setLoggedInStaffId(Long loggedInStaffId) {
+        this.loggedInStaffId = loggedInStaffId;
     }
 }

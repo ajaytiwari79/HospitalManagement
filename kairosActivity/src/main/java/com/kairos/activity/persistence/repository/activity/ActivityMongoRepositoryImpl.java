@@ -263,18 +263,31 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public Activity findByNameAndDateAndCountryId(String name, Long countryId, Date date) {
-        Query query = new Query(Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date), Criteria.where("GeneralActivityTab.endDate").exists(false)));
+
+
+    public Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId, LocalDate startDate,LocalDate endDate) {
+        Criteria criteria = Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId);
+        if(endDate==null) {
+            Criteria startDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.startDate").gte(startDate),Criteria.where("generalActivityTab.startDate").lte(startDate));
+            Criteria endDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+            criteria.andOperator(startDateCriteria,endDateCriteria);
+        }else {
+            criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+        }
+        Query query = new Query(criteria);
         return (Activity) mongoTemplate.findOne(query, Activity.class);
     }
 
-    public Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId, Date date) {
-        Query query = new Query(Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date), Criteria.where("GeneralActivityTab.endDate").exists(false)));
-        return (Activity) mongoTemplate.findOne(query, Activity.class);
-    }
-
-    public Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId, Date date) {
-        Query query = new Query(Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("unitId").is(unitId).and("GeneralActivityTab.startDate").lte(date).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(date), Criteria.where("GeneralActivityTab.endDate").exists(false)));
+    public Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId,LocalDate startDate,LocalDate endDate) {
+        Criteria criteria = Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("unitId").is(unitId);
+        if(endDate==null) {
+            Criteria startDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.startDate").gte(startDate),Criteria.where("generalActivityTab.startDate").lte(startDate));
+            Criteria endDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+            criteria.andOperator(startDateCriteria,endDateCriteria);
+        }else {
+            criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+        }
+        Query query = new Query(criteria);
         return (Activity) mongoTemplate.findOne(query, Activity.class);
     }
 
@@ -299,13 +312,31 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return activityIds;//new HashSet<Long>(result.getMappedResults());
     }
 
-    public Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate) {
-        Query query = new Query(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("generalActivityTab.startDate").lte(startDate).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(startDate), Criteria.where("GeneralActivityTab.endDate").exists(false)).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
+    public Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate,LocalDate endDate) {
+        Criteria criteria = Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("countryId").is(countryId);
+        if(endDate==null) {
+            Criteria startDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.startDate").gte(startDate),Criteria.where("generalActivityTab.startDate").lte(startDate));
+            Criteria endDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+           criteria.andOperator(startDateCriteria,endDateCriteria);
+        }else {
+            criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+        }
+        Query query = new Query(criteria);
         Activity activity = mongoTemplate.findOne(query, Activity.class);
         return activity;
     }
-    public Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate) {
-        Query query = new Query(Criteria.where("countryId").is(unitId).and("deleted").is(false).and("generalActivityTab.startDate").lte(startDate).orOperator(Criteria.where("GeneralActivityTab.endDate").gte(startDate), Criteria.where("GeneralActivityTab.endDate").exists(false)).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
+
+
+    public Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate,LocalDate endDate) {
+        Criteria criteria = Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false).and("unitId").is(unitId);
+        if(endDate==null) {
+            Criteria startDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.startDate").gte(startDate),Criteria.where("generalActivityTab.startDate").lte(startDate));
+            Criteria endDateCriteria = new Criteria().orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+            criteria.andOperator(startDateCriteria,endDateCriteria);
+        }else {
+            criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false),Criteria.where("generalActivityTab.endDate").gte(startDate));
+        }
+        Query query = new Query(criteria);
         Activity activity = mongoTemplate.findOne(query, Activity.class);
         return activity;
     }

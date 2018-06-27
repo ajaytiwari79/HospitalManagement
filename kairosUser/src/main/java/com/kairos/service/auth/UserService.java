@@ -403,7 +403,8 @@ public class UserService extends UserBaseService {
     public UnitWiseStaffPermissionsDTO getPermission(Long organizationId){
         long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
-        if(accessPageService.isHubMember(currentUserId)){
+        permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
+        if(permissionData.isHub()){
             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
             HashMap<String, Object> unitPermissionMap = new HashMap<>();
@@ -411,7 +412,6 @@ public class UserService extends UserBaseService {
                 permission.setActive(permission.isRead() || permission.isWrite());
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
-            permissionData.setHub(true);
             permissionData.setHubPermissions(unitPermissionMap);
             
         } else {
@@ -422,7 +422,6 @@ public class UserService extends UserBaseService {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
                         prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class)));
             }
-            permissionData.setHub(true);
             permissionData.setOrganizationPermissions(unitPermission);
         }
         return permissionData;

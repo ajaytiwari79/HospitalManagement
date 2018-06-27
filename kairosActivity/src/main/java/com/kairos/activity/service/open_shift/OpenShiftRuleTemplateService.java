@@ -116,7 +116,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
 
     public OpenShiftRuleTemplateAndPriorityGroupWrapper getRuleTemplateAndPriorityGroupByIdAtUnit(BigInteger ruleTemplateId, long countryId) {
         OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO=  openShiftRuleTemplateRepository.getByIdAndUnitIdAndDeletedFalse(ruleTemplateId,countryId);
-        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndDeletedFalse(countryId,ruleTemplateId);
+        List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndOrderIdIsNullAndDeletedFalse(countryId,ruleTemplateId);
         return new OpenShiftRuleTemplateAndPriorityGroupWrapper(openShiftRuleTemplateDTO,priorityGroupDTOS);
     }
 

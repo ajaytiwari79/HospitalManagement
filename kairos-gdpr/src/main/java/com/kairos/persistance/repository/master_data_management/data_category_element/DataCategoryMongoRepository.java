@@ -15,14 +15,14 @@ public interface DataCategoryMongoRepository extends MongoRepository<DataCategor
 
     DataCategory findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    DataCategory findByIdAndNonDeleted(Long countryId,BigInteger id);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
+    DataCategory findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,name:?1}")
-    DataCategory findByCountryIdAndName(Long countryId,String name);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
+    DataCategory findByCountryIdAndName(Long countryId,Long organizationId,String name);
 
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<DataCategory> findDataCategoryByIds(Long countryId, Set<BigInteger> ids);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
+    List<DataCategory> findDataCategoryByIds(Long countryId,Long organizationId,Set<BigInteger> ids);
 
 
 }

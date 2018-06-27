@@ -1,10 +1,9 @@
 package com.kairos.activity.response.dto;
 
-import com.kairos.activity.client.dto.DayType;
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
-import com.kairos.activity.client.dto.Phase.PhaseWeeklyDTO;
-import com.kairos.activity.persistence.model.activity.Activity;
-import com.kairos.activity.response.dto.activity.ActivityTagDTO;
+
+import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.response.dto.web.phase.PhaseDTO;
+import com.kairos.response.dto.web.phase.PhaseWeeklyDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 
 import java.util.ArrayList;

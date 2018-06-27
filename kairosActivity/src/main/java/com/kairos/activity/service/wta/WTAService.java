@@ -18,6 +18,7 @@ import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.integration.PlannerSyncService;
+import com.kairos.activity.service.solver_config.SolverConfigService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -74,7 +75,7 @@ public class WTAService extends MongoBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     private OrganizationRestClient organizationRestClient;
-
+    @Inject private SolverConfigService solverConfigService;
     @Autowired
     private ExceptionService exceptionService;
 
@@ -390,16 +391,18 @@ public class WTAService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
 
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
+
 
         if (oldWta.getExpertise().getId() != wtadto.getExpertiseId()) {
             logger.info("Expertise cant be changed :", wtadto.getId());
             exceptionService.actionNotPermittedException("message.expertise.update");
         }
-        BeanUtils.copyProperties(oldWta, newWta, "id");
+        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+        newWta.setRuleTemplateIds(null);
         if (wtadto.getEndDateMillis() != null) {
             oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
         }
+        oldWta.setId(null);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         if (wtadto.getRuleTemplates().size() > 0) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
@@ -408,7 +411,6 @@ public class WTAService extends MongoBaseService {
             newWta.setRuleTemplateIds(ruleTemplatesIds);
         }
         save(oldWta);
-        newWta.setParentWTA(oldWta.getId());
         newWta.setDisabled(false);
         newWta.setParentWTA(oldWta.getId());
         save(newWta);
@@ -503,6 +505,7 @@ public class WTAService extends MongoBaseService {
         });
         if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);
+            solverConfigService.createDefaultConfig(organisationId);
         }
         return true;
     }

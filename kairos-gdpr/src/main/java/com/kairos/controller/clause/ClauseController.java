@@ -48,55 +48,90 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping("/add")
-    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDTO clauseDto) throws RepositoryException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, clauseDto));
+    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @PathVariable Long organizationId, @Validated @RequestBody ClauseDTO clauseDto) throws RepositoryException {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, organizationId, clauseDto));
     }
 
     @ApiOperation("get clause by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId, id));
+    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null  or empty");
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId, organizationId, id));
+
 
     }
 
 
     @ApiOperation("delete clause by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteClause(@PathVariable BigInteger id) {
-        if (id != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(id));
-        } else
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null or empty");
+    public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(id));
 
     }
 
     @ApiOperation("update clause description")
     @PutMapping("/update/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto) throws RepositoryException {
+    public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto) throws RepositoryException {
 
         if (clauseId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clauseId cannot be null or empty");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId, clauseId, clauseDto));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId, organizationId, clauseId, clauseDto));
 
     }
 
 
     @ApiOperation("get clause by list")
     @PostMapping("/clauses")
-    public ResponseEntity<Object> getClauseList(@PathVariable Long countryId, @RequestBody Set<BigInteger> clausesids) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(countryId, clausesids));
+    public ResponseEntity<Object> getClauseList(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestBody Set<BigInteger> clausesids) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseList(countryId, organizationId, clausesids));
     }
 
     @ApiOperation("get All clauses")
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllClauses() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses());
+    public ResponseEntity<Object> getAllClauses(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses(countryId, organizationId));
     }
 
 

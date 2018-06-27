@@ -159,8 +159,8 @@ public class ShiftWtaInfoService {
         for (int i=0;i<50;i++){
             PlanningShift shift = new PlanningShift();
             shift.setId(UUID.randomUUID().toString());
-            shift.setStartDateTime(new DateTime().minusHours(hour+5).toDate());
-            shift.setEndDateTime(new DateTime().minusHours(hour).toDate());
+            shift.setStartTime(new DateTime().minusHours(hour+5).toDate());
+            shift.setEndTime(new DateTime().minusHours(hour).toDate());
             hour +=6;
             shifts.add(shift);
         }

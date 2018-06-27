@@ -3,7 +3,7 @@ package com.kairos.activity.service.task_type;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.kairos.activity.client.*;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.constants.AppConstants;
@@ -1138,11 +1138,12 @@ public class TaskTypeService extends MongoBaseService {
             for(TaskType taskType : taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId,id,true)){
                 selectedTaskTypes.add(taskType.getBasicTaskTypeInfo());
             }*/
-            if(parent == null){
+           /* if(parent == null){
                 visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
-            } else {
-                visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,parent.getId(),true));
-            }
+            } else {*/
+           //Todo why we use parent id when we don't set organisatio id on creating taskType @yasir
+                visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
+            //}
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,id,true));
         } else if(TEAM.equalsIgnoreCase(type)){
             //OrganizationDTO unit = organizationGraphRepository.getOrganizationByTeamId(id);

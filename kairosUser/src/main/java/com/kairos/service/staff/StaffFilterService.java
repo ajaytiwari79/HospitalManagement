@@ -3,7 +3,7 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.activity.enums.FilterType;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
@@ -83,7 +83,7 @@ public class StaffFilterService extends UserBaseService {
         return queryResults;
     }
 
-    public List<FilterSelectionQueryResult> getFilterDetailsByFilterType(com.kairos.persistence.model.enums.FilterType filterType, Long countryId, Long unitId) {
+    public List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
             case EMPLOYMENT_TYPE: {
@@ -218,8 +218,8 @@ public class StaffFilterService extends UserBaseService {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    public Map<com.kairos.persistence.model.enums.FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters) {
-        Map<com.kairos.persistence.model.enums.FilterType, List<String>> mapOfFilters = new HashMap<>();
+    public Map<FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters) {
+        Map<FilterType, List<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         filters.forEach(filterSelection -> {
@@ -243,13 +243,14 @@ public class StaffFilterService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.staff.filter.setting.notfound");
 
         }
-
         Organization organization = organizationService.fetchParentOrganization(unitId);
+        Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
         staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
         staffEmploymentWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(), !allStaffRequired,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
+        staffEmploymentWrapper.setLoggedInStaffId(loggedInStaffId);
         return staffEmploymentWrapper;
 
     }

@@ -26,9 +26,9 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
-    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormat> storageFormats) {
+    public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
+
         Map<String, List<StorageFormat>> result = new HashMap<>();
-        List<StorageFormat> existing = new ArrayList<>();
         Set<String> names = new HashSet<>();
         List<StorageFormat> newStorageFormats = new ArrayList<>();
         if (storageFormats.size() != 0) {
@@ -38,7 +38,7 @@ public class StorageFormatService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, names);
+            List<StorageFormat> existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
             existing.forEach(item -> names.remove(item.getName()));
             if (names.size() != 0) {
                 for (String name : names) {
@@ -46,6 +46,7 @@ public class StorageFormatService extends MongoBaseService {
                     StorageFormat newStorageFormat = new StorageFormat();
                     newStorageFormat.setName(name);
                     newStorageFormat.setCountryId(countryId);
+                    newStorageFormat.setOrganizationId(organizationId);
                     newStorageFormats.add(newStorageFormat);
 
                 }
@@ -63,14 +64,14 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public List<StorageFormat> getAllStorageFormat() {
-        return storageFormatMongoRepository.findAllStorageFormats(UserContext.getCountryId());
+    public List<StorageFormat> getAllStorageFormat(Long countryId, Long organizationId) {
+        return storageFormatMongoRepository.findAllStorageFormats(countryId, organizationId);
     }
 
 
-    public StorageFormat getStorageFormat(Long countryId, BigInteger id) {
+    public StorageFormat getStorageFormat(Long countryId, Long organizationId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -80,9 +81,9 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(BigInteger id) {
+    public Boolean deleteStorageFormat(Long countryId, Long organizationId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByid(id);
+        StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -94,10 +95,10 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat updateStorageFormat(BigInteger id, StorageFormat storageFormat) {
+    public StorageFormat updateStorageFormat(Long countryId, Long organizationId, BigInteger id, StorageFormat storageFormat) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(UserContext.getCountryId(), storageFormat.getName());
-        if (Optional.ofNullable(exist).isPresent() ) {
+        StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, organizationId, storageFormat.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
             }
@@ -111,11 +112,11 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public StorageFormat getStorageFormatByName(Long countryId, String name) {
+    public StorageFormat getStorageFormatByName(Long countryId, Long organizationId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, name);
+            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

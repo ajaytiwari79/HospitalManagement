@@ -13,7 +13,7 @@ public class UnitWiseStaffPermissionsDTO {
         // default constructor
     }
 
-    public Boolean getHub() {
+    public Boolean isHub() {
         return hub;
     }
 

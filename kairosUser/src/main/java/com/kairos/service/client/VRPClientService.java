@@ -38,7 +38,7 @@ public class VRPClientService  extends UserBaseService {
 
 
 
-    private double getValue(Cell cell){
+    private Double getValue(Cell cell){
         Double value;
         if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
             value =  cell.getNumericCellValue();
@@ -52,14 +52,14 @@ public class VRPClientService  extends UserBaseService {
     private Object[] getVrpClientByRows(List<Row> rows,Organization organization){
         List<VRPClient> vrpClients = new ArrayList<>();
         List<VRPTaskDTO> vrpTasks = new ArrayList<>();
-        List<Integer> clientIntallationNo = vrpClientGraphRepository.getAllClientInstalltionNo(organization.getId());
+        List<Long> clientIntallationNo = vrpClientGraphRepository.getAllClientInstalltionNo(organization.getId());
         for (int i = 2;i<rows.size();i++){
             Row row = rows.get(i);
             VRPClient client = new VRPClient();
             client.setFirstName("Client "+(i-1));
-            client.setInstallationNumber((int) getValue(row.getCell(5)));
+            client.setInstallationNumber( getValue(row.getCell(5)).longValue());
             client.setLatitude(getValue(row.getCell(14)));
-            client.setLongitude(getValue(row.getCell(14)));
+            client.setLongitude(getValue(row.getCell(15)));
             client.setBlock(row.getCell(9).getStringCellValue());
             client.setCity(row.getCell(13).getStringCellValue());
             client.setDuration((int) row.getCell(0).getNumericCellValue());
@@ -69,9 +69,10 @@ public class VRPClientService  extends UserBaseService {
             client.setStreetName(row.getCell(7).getStringCellValue());
             client.setOrganization(organization);
             VRPTaskDTO vrpTaskDTO = new VRPTaskDTO();
-            vrpTaskDTO.setAddress(new TaskAddress(client.getZipCode(),client.getCity(),client.getStreetName(),""+client.getHouseNumber(),client.getLatitude().toString(),client.getLatitude().toString(),client.getBlock(),client.getFloorNumber()));
+            vrpTaskDTO.setAddress(new TaskAddress(client.getZipCode(),client.getCity(),client.getStreetName(),""+client.getHouseNumber(),client.getLongitude().toString(),client.getLatitude().toString(),client.getBlock(),client.getFloorNumber()));
             vrpTaskDTO.setInstallationNumber(client.getInstallationNumber());
             vrpTaskDTO.setSkill(row.getCell(16).getStringCellValue());
+            vrpTaskDTO.setDuration((int) row.getCell(0).getNumericCellValue());
             vrpTasks.add(vrpTaskDTO);
             vrpClients.add(client);
         }
@@ -90,10 +91,11 @@ public class VRPClientService  extends UserBaseService {
             request.put("streetName",vrpClient.getStreetName());
             request.put("postalCode",""+vrpClient.getZipCode());
             request.put("countryCode","DK");
-            Map response = new HashMap();//tomTomRestClient.getfromTomtom(request);
+            /*Map response = tomTomRestClient.getfromTomtom(request);
             if(response!=null){
                 vrpClientList.add(vrpClient);
-            }
+            }*/
+            vrpClientList.add(vrpClient);
 
         });
         save(vrpClientList);
@@ -104,7 +106,7 @@ public class VRPClientService  extends UserBaseService {
 
     public void createTask(List<VRPTaskDTO> vrpTaskDTOS,Long unitId){
         List<VRPClient> vrpClients = vrpClientGraphRepository.getAllClient(unitId);
-        Map<Integer,VRPClient> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNumber(), c->c));
+        Map<Long,VRPClient> clientIdAndInstallationNo = vrpClients.stream().collect(Collectors.toMap(c->c.getInstallationNumber(), c->c));
         for (VRPTaskDTO taskDTO : vrpTaskDTOS) {
             VRPClient vrpClient = clientIdAndInstallationNo.get(taskDTO.getInstallationNumber());
             taskDTO.setCitizenId(vrpClient.getId());

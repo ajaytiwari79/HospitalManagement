@@ -15,25 +15,20 @@ import java.util.Set;
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 
-    @Query("{deleted:false,countryId:?0,title:?1}")
-    Clause findByTitleAndCountry(Long countryId,String title);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,title:?2}")
+    Clause findByTitleAndCountry(Long countryId,Long organizationId,String title);
 
     Clause findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,_id:?1}")
-    Clause findByIdAndNonDeleted(Long countryId,BigInteger id);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
+    Clause findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,title:?1}")
-    Clause findClauseByNameAndCountryId(Long countryId,String title);
+    @Query("{deleted:false,countryId:?0,organizationId:?1}")
+    List<ClauseResponseDTO>  findAllClause(Long countryId,Long organizationId);
 
-    @Query("{deleted:false,countryId:?0}")
-    List<ClauseResponseDTO>  findAllClause(Long countryId);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
+    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, Set<BigInteger> ids);
 
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<Clause>  getClauseListByIds(Long countryId, Set<BigInteger> ids);
-
-    @Query("{accountType:?0}")
-    List<Clause> getClauseByAccountType(String accountType);
 
 
 }

@@ -1,14 +1,10 @@
 package com.kairos.persistence.model.organization;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import org.neo4j.ogm.annotation.EndNode;
-import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.EMPLOYMENT_TYPE_SETTINGS;
 

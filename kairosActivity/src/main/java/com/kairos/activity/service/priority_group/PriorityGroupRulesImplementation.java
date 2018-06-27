@@ -20,7 +20,7 @@ public class PriorityGroupRulesImplementation {
     public PriorityGroupRulesImplementation() {
 
     }
-
+// TODO refactor this method to createRulesList
     private List<PriorityGroupRuleFilter> getRulesList(PriorityGroupDTO priorityGroupDTO,PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) {
 
         List<PriorityGroupRuleFilter> priorityGroupRules = new ArrayList<>();
@@ -65,6 +65,7 @@ public class PriorityGroupRulesImplementation {
 
 
     public void executeRules(PriorityGroupDTO priorityGroupDTO, PriorityGroupRuleDataDTO priorityGroupRuleDataDTO, ImpactWeight impactWeight) {
+
         List<PriorityGroupRuleFilter> priorityGroupRules = getRulesList(priorityGroupDTO,priorityGroupRuleDataDTO);
         Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap = priorityGroupRuleDataDTO.getOpenShiftStaffMap();
         for(PriorityGroupRuleFilter priorityGroupRule : priorityGroupRules) {

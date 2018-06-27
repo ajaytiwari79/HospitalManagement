@@ -3,6 +3,11 @@ package com.kairos.activity.persistence.enums.counter;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 public enum CounterSize {
     SIZE_1X1(1,1);
 

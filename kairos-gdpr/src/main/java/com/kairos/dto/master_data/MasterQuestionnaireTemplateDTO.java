@@ -43,7 +43,7 @@ public class MasterQuestionnaireTemplateDTO {
     }
 
     public String getTemplateType() {
-        return templateType;
+        return templateType.trim();
     }
 
     public void setTemplateType(String templateType) {
