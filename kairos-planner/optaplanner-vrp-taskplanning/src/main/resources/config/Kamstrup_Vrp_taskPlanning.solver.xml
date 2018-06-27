@@ -27,6 +27,7 @@
     </constructionHeuristic>
     <localSearch>
     <unionMoveSelector>
+        <selectedCountLimit>5000</selectedCountLimit>
         <changeMoveSelector></changeMoveSelector>
              <!--<selectedCountLimit>1000</selectedCountLimit>-->
         <swapMoveSelector></swapMoveSelector>
@@ -65,6 +66,6 @@
     </localSearch>
 
     <termination>
-        <secondsSpentLimit>60</secondsSpentLimit>
+        <secondsSpentLimit>6000</secondsSpentLimit>
     </termination>
 </solver>

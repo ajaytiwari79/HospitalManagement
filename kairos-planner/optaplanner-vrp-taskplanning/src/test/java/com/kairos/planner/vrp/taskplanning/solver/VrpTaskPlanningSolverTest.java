@@ -1,9 +1,12 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
+import com.google.common.reflect.Reflection;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import org.junit.Test;
+import org.mvel2.util.ReflectionUtil;
+import org.reflections.ReflectionUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,7 +20,7 @@ public class VrpTaskPlanningSolverTest {
 
     @Test
     public void solve() throws IOException {
-        boolean readFromSolution=true;
+        boolean readFromSolution=false;
         if(readFromSolution){
             //solution -3 drive.xml
             new VrpTaskPlanningSolver().solve("src/main/resources/solution.xml",false);
