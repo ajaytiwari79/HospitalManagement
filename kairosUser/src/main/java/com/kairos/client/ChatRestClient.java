@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,12 @@ public class ChatRestClient {
 
     @Inject
     private OrganizationService organizationService;
+    private static String matrixServerUrl;
+
+    @Value("${chat.matrix.url}")
+    public static void setMatrixServerUrl(String matrixServerUrl) {
+        ChatRestClient.matrixServerUrl = matrixServerUrl;
+    }
 
     /**
      * @param staffChatDetails
@@ -46,7 +53,7 @@ public class ChatRestClient {
             HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            "http://dev.kairosplanning.com:8008/_matrix/client/r0/register?kind=user",
+                            matrixServerUrl,
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 
