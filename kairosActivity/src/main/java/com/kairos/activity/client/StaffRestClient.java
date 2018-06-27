@@ -176,6 +176,31 @@ public class StaffRestClient {
 
     }
 
+
+    public List<StaffDTO> getStaffListByUnit() {
+
+        final String baseUrl = getBaseUrl(true);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<List<StaffDTO>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/staff/get_Staff_By_Unit",
+                            HttpMethod.GET, null, typeReference);
+            RestTemplateResponseEnvelope<List<StaffDTO>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+    }
+
     /**
      * @return
      * @auther Jasgeet
