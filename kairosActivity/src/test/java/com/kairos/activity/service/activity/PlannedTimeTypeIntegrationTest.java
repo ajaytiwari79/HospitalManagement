@@ -39,7 +39,7 @@ public class PlannedTimeTypeIntegrationTest {
     private TestRestTemplate testRestTemplate;
     @Inject
     private ExceptionService exceptionService;
-    static Long createdId;
+    static BigInteger createdId;
 
     @Test
     public void case1_createPlannedTimeType() throws Exception{

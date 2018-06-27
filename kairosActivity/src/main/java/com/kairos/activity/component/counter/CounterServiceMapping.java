@@ -1,8 +1,7 @@
-package com.kairos.activity.constants;
+package com.kairos.activity.component.counter;
 
-import com.kairos.activity.persistence.enums.counter.CounterType;
+import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.service.counter.CounterService;
-import com.kairos.activity.service.counter.XCounterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,19 +11,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/*
+ * @author: mohit.shakya@oodlestechnologies.com
+ * @dated: Jun/26/2018
+ */
+
 @Component
-public class CounterStore {
+public class CounterServiceMapping {
     @Inject
-    XCounterService xCounterService;
-    private final static Logger logger = LoggerFactory.getLogger(CounterStore.class);
+    private final static Logger logger = LoggerFactory.getLogger(CounterServiceMapping.class);
     private Map counters = null;
-    private CounterStore(){
+    private CounterServiceMapping(){
     }
 
     private void prepareStore(){
         if(counters != null) return;
         counters = new HashMap<CounterType, CounterService>();
-        counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, xCounterService);
+       // counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, xCounterService);
     }
 
     public CounterService getService(CounterType counterType){

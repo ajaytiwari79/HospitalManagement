@@ -2,7 +2,8 @@ package com.kairos.activity.response.dto.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 
@@ -44,7 +45,7 @@ public class ActivityTabsWrapper {
     private List<TimeTypeDTO> timeTypes;
     private  LocationActivityTab locationActivityTab;
     private PermissionsActivityTab permissionsActivityTab;
-
+    private List<EmploymentTypeDTO> employmentTypes;
 
     public List<TimeTypeDTO> getTimeTypes() {
         return timeTypes;
@@ -98,9 +99,10 @@ public class ActivityTabsWrapper {
         this.rulesTab = rulesTab;
     }
 
-    public ActivityTabsWrapper(RulesActivityTab rulesTab, List<DayType> dayTypes) {
+    public ActivityTabsWrapper(RulesActivityTab rulesTab, List<DayType> dayTypes,List<EmploymentTypeDTO> employmentTypes) {
         this.rulesTab = rulesTab;
         this.dayTypes = dayTypes;
+        this.employmentTypes=employmentTypes;
     }
 
     public ActivityTabsWrapper(BalanceSettingsActivityTab balanceSettingsTab) {
@@ -295,5 +297,13 @@ public class ActivityTabsWrapper {
     }
     public ActivityTabsWrapper(PermissionsActivityTab permissionsActivityTab) {
         this.permissionsActivityTab = permissionsActivityTab;
+    }
+
+    public List<EmploymentTypeDTO> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 }

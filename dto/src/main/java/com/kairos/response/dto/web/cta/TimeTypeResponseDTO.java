@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.cta;
 public class TimeTypeResponseDTO {
     private Long id;
     private String name;
+    private  String label;
 
     public TimeTypeResponseDTO() {
         //default constructor
@@ -27,5 +28,13 @@ public class TimeTypeResponseDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }
