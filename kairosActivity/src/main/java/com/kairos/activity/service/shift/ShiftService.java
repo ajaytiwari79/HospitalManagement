@@ -203,9 +203,9 @@ public class ShiftService extends MongoBaseService {
         ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
 
         Phase phase = phaseService.getPhaseCurrentByUnit(shiftDTO.getUnitId(), shiftDTO.getStartDate());
-        shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
+       // shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
+        //validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
 
         Shift mainShift = buildShift(shiftWithActivityDTO);
         mainShift.setMainShift(true);
@@ -1118,7 +1118,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public List<ShiftQueryResult> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO){
-        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftDTO.getShiftTemplateId());
+        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
         List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
        List<ShiftQueryResult> shifts=new ArrayList<>();
         individualShiftTemplate.forEach(shiftTemplate1 ->{

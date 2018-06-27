@@ -35,7 +35,6 @@ public class ShiftTemplateService extends MongoBaseService {
         Set<BigInteger> individualShiftTemplateIds=new HashSet<>();
         individualShiftTemplates.forEach(individualShiftTemplate -> {individualShiftTemplateIds.add(individualShiftTemplate.getId());});
         ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
-        shiftTemplate.getIndividualShiftTemplateIds().addAll(individualShiftTemplateIds);
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
        //Preparing DTO Object to return
