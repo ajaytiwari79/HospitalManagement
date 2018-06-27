@@ -1,4 +1,4 @@
-package com.kairos.config.mongoEnv_config;
+package com.kairos.config.mongoEnv;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

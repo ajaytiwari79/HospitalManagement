@@ -70,5 +70,14 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
         return result.getMappedResults();
     }
 
+    public List<ActivityConfiguration> findAllPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId) {
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("presencePlannedTime.phaseId").is(phaseId));
+        return mongoTemplate.find(query, ActivityConfiguration.class);
+    }
+
+    public List<ActivityConfiguration> findAllAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId) {
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("absencePlannedTime.phaseId").is(phaseId));
+        return mongoTemplate.find(query, ActivityConfiguration.class);
+    }
 }
 

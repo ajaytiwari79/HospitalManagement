@@ -192,12 +192,12 @@ public class AssetTypeService extends MongoBaseService {
 
 
     public Boolean deleteAssetType(Long countryId, Long organizationId, BigInteger id) {
-        AssetType exist = assetTypeMongoRepository.findByid(id);
+        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         }
         exist.setDeleted(true);
-        if (exist.getSubAssetTypes().size() != 0) {
+        if (Optional.ofNullable(exist.getSubAssetTypes()).isPresent()) {
             List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, organizationId, exist.getSubAssetTypes());
             assetTypeMongoRepository.deleteAll(subAssetTypes);
         }

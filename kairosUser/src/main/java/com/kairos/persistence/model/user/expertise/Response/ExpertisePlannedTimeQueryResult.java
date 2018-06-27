@@ -7,12 +7,12 @@ import java.math.BigInteger;
 import java.util.List;
 
 @QueryResult
-public class ExpertisePlannedTimeQR {
+public class ExpertisePlannedTimeQueryResult {
     public BigInteger includedPlannedTime;
     public BigInteger excludedPlannedTime;
     public List<EmploymentType> employmentTypes;
 
-    public ExpertisePlannedTimeQR() {
+    public ExpertisePlannedTimeQueryResult() {
         //
     }
 

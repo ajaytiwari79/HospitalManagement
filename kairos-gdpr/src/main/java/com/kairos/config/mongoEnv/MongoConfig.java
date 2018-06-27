@@ -1,14 +1,11 @@
-package com.kairos.config.mongoEnv_config;
+package com.kairos.config.mongoEnv;
 
 import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

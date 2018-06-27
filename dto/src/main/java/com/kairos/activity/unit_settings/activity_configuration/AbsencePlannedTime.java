@@ -49,4 +49,11 @@ public class AbsencePlannedTime {
         this.plannedTimeId = plannedTimeId;
         this.exception = exception;
     }
+
+    public AbsencePlannedTime(BigInteger phaseId, BigInteger timeTypeId, BigInteger plannedTimeId, boolean exception) {
+        this.phaseId = phaseId;
+        this.timeTypeId = timeTypeId;
+        this.plannedTimeId = plannedTimeId;
+        this.exception = exception;
+    }
 }

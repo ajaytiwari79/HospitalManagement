@@ -48,9 +48,7 @@ public class ShiftWithActivityDTO {
     private ShiftWithActivityDTO subShift;
     private ShiftState shiftState;
     private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
-    //TODO need to fetch dynamically @Vipul
-    private BigInteger plannedTypeId =new BigInteger("3");
-
+    private BigInteger plannedTypeId ;
 
     public ShiftState getShiftState() {
         return shiftState;

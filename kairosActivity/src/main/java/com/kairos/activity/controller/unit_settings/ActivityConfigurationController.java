@@ -32,11 +32,20 @@ public class ActivityConfigurationController {
     }
 
     @ApiOperation("Update absence Activity Configuration ")
-    @PutMapping(value = "/{activityConfigurationId}/absence")
+    @PutMapping(value = "/absence/{activityConfigurationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId ,@RequestBody AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId,activityConfigurationId, absencePlannedTime));
+    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId, @RequestBody AbsencePlannedTime absencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId, activityConfigurationId, absencePlannedTime));
     }
+
+
+    @ApiOperation("create exception absence Activity Configuration ")
+    @PutMapping(value = "/absence")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createAbsenceExceptionActivityConfiguration(@PathVariable Long unitId, @RequestBody AbsencePlannedTime absencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.createAbsenceExceptionActivityConfiguration(unitId, absencePlannedTime));
+    }
+
 
     @ApiOperation("CREATE Activity Configuration ")
     @PostMapping
