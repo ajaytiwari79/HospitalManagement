@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.day_type;
 
-import com.kairos.persistence.model.user.country.Day;
+import com.kairos.enums.Day;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

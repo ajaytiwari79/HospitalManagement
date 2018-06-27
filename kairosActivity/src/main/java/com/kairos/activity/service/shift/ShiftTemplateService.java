@@ -30,10 +30,6 @@ public class ShiftTemplateService extends MongoBaseService {
 
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO){
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOs =shiftTemplateDTO.getShiftList();
-        individualShiftTemplateDTOs.forEach(individualShiftTemplateDTO -> {
-            individualShiftTemplateDTO.setStartTime(DateUtils.asLocalTime(individualShiftTemplateDTO.getStart()));
-            individualShiftTemplateDTO.setEndTime(DateUtils.asLocalTime(individualShiftTemplateDTO.getEnd()));
-        });
         List<IndividualShiftTemplate> individualShiftTemplates =ObjectMapperUtils.copyProperties(individualShiftTemplateDTOs,IndividualShiftTemplate.class);
         save(individualShiftTemplates);
         Set<BigInteger> individualShiftTemplateIds=new HashSet<>();

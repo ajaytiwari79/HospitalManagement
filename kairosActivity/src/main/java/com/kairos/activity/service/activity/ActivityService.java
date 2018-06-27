@@ -22,6 +22,7 @@ import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMo
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
 import com.kairos.activity.response.dto.activity.*;
+import com.kairos.activity.response.dto.activity.PermissionsActivityTabDTO;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;

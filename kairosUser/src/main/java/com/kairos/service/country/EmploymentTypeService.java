@@ -244,7 +244,7 @@ public class EmploymentTypeService extends UserBaseService {
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
         List<com.kairos.response.dto.web.cta.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyProperties(employmentTypes, com.kairos.response.dto.web.cta.EmploymentTypeDTO.class);
         List<DayType>  dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<com.kairos.response.dto.web.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyProperties(dayTypes,DayTypesDTO.class);
+        List<com.kairos.response.dto.web.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyProperties(dayTypes,com.kairos.response.dto.web.day_type.DayType.class);
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
         return  dayTypeEmploymentTypeWrapper;
     }
