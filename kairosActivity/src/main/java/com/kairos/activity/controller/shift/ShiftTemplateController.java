@@ -32,7 +32,7 @@ public class ShiftTemplateController {
     }
 
     @ApiOperation("Get Shift Templates by UnitId")
-    @GetMapping(value = "/shift_templates")
+    @GetMapping(value = "/shift_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftTemplatesByUnitId( @PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.getAllShiftTemplates(unitId));
