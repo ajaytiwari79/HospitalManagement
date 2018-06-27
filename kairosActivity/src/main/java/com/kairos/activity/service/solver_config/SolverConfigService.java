@@ -51,7 +51,7 @@ public class SolverConfigService extends MongoBaseService {
     }
 
 
-    public SolverConfigDTO updateSolverConfig(BigInteger solverConfigId, SolverConfigDTO solverConfigDTO) {
+    public SolverConfigDTO updateSolverConfig(Long unitId,BigInteger solverConfigId, SolverConfigDTO solverConfigDTO) {
         /*Boolean exists = solverConfigRepository.existsSolverConfigByNameAndUnitIdAndSolverConfigId(unitId,solverConfigDTO.getName(),solverConfigDTO.getId());
         if(exists){
             exceptionService.duplicateDataException("message.solverConfig.exists",solverConfigDTO.getName());
@@ -69,7 +69,16 @@ public class SolverConfigService extends MongoBaseService {
 
     public SolverConfigConstraintWrapper getAllVRPSolverConfig(Long unitId) {
         List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
+        Map<BigInteger,ConstraintDTO> constraintDTOMap = constraints.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         List<SolverConfigDTO> solverConfigs = solverConfigRepository.getAllByUnitId(unitId);
+        solverConfigs.forEach(s->{
+            s.getConstraints().forEach(c->{
+                ConstraintDTO constraintDTO = constraintDTOMap.get(c.getId());
+                c.setCategory(constraintDTO.getCategory());
+                c.setName(constraintDTO.getName());
+                c.setDescription(constraintDTO.getDescription());
+            });
+        });
         List<DefaultContraintsDTO> defaultContraints = constraints.stream().collect(Collectors.groupingBy(ConstraintDTO::getCategory,Collectors.toList())).entrySet().stream().map(c->new DefaultContraintsDTO(c.getKey().toValue(),c.getValue())).collect(Collectors.toList());
         return new SolverConfigConstraintWrapper(defaultContraints, solverConfigs);
     }
@@ -77,6 +86,10 @@ public class SolverConfigService extends MongoBaseService {
 
 
     public void createDefaultConfig(Long unitId) {
+        List<ConstraintDTO> constraintDTOS = constraintRepository.getAllVRPPlanningConstraints(unitId,PlanningType.VRPPLANNING);
+        if(!constraintDTOS.isEmpty()){
+            exceptionService.duplicateDataException("message.constraints.exists");
+        }
         List<Constraint> constraints = new ArrayList<>(40);
         constraints.add(new Constraint("Start in Time window 1", "Longest tasks starts in first time interval", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId));
         constraints.add(new Constraint("First Task in Time window 1 or 2", "Longest tasks should start at first in any interval", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId));

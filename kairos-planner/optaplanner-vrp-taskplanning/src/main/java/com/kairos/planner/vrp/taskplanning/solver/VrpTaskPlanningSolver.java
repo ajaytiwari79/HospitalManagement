@@ -34,8 +34,8 @@ public class VrpTaskPlanningSolver {
 
 
     public VrpTaskPlanningSolver(List<File> drlFileList){
-        solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
-        //solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+        //solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
         solver = solverFactory.buildSolver();
     }
 

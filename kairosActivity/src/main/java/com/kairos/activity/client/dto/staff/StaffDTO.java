@@ -1,6 +1,7 @@
 package com.kairos.activity.client.dto.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.persistence.model.enums.Gender;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -15,7 +16,9 @@ import java.util.Set;
 /**
  * Created by oodles on 3/2/17.
  */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffDTO {
    private Long id;
     private String firstName;
