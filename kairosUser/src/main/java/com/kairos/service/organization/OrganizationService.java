@@ -373,7 +373,7 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 //        accessGroupService.createDefaultAccessGroups(organization);
@@ -487,7 +487,7 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 
@@ -496,7 +496,7 @@ public class OrganizationService extends UserBaseService {
                 getOrganizationCategory(orgDetails.getUnion(), orgDetails.isKairosHub()).toString(), orgDetails.getUnitManager().getAccessGroupId())){
             exceptionService.actionNotPermittedException("error.access.group.invalid", orgDetails.getUnitManager().getAccessGroupId());
         }
-        accessGroupService.createDefaultAccessGroups(organization);
+        countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         long creationDate = DateUtil.getCurrentDate().getTime();
@@ -610,11 +610,11 @@ public class OrganizationService extends UserBaseService {
             Organization gdprUnit;
             if (gdprUnitId == null) {
                 AccessGroup accessGroup = accessGroupRepository.getOrganizationAccessGroupByName(organizationId,
-                        organizationRequestWrapper.getWorkCenterUnit().getUnitManager().getAccessGroupName(), AccessGroupRole.MANAGEMENT.toString());
+                        organizationRequestWrapper.getGdprUnit().getUnitManager().getAccessGroupName(), AccessGroupRole.MANAGEMENT.toString());
                 if(Optional.ofNullable(accessGroup).isPresent()){
-                    organizationRequestWrapper.getWorkCenterUnit().getUnitManager().setAccessGroupId(accessGroup.getId());
+                    organizationRequestWrapper.getGdprUnit().getUnitManager().setAccessGroupId(accessGroup.getId());
                 } else {
-                    organizationRequestWrapper.getWorkCenterUnit().getUnitManager().setAccessGroupId(null);
+                    organizationRequestWrapper.getGdprUnit().getUnitManager().setAccessGroupId(null);
                 }
                 Map<String, Object> gdprUnitMap = createNewUnit(organizationRequestWrapper.getGdprUnit(), organizationId, false, true);
                 gdprUnitId = Long.parseLong(gdprUnitMap.get("id") + "");
@@ -962,7 +962,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationDTO.getSubTypeId(), unit.getId(), country.getId());
+        workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationDTO.getSubTypeId(), unit.getId(), country.getId());
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
 
         Map<String, Object> response = new HashMap<>();

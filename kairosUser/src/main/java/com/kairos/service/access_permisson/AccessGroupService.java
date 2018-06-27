@@ -754,15 +754,8 @@ public class AccessGroupService extends UserBaseService {
     }
 
     // Method to fetch list of access group by Organization category ( Hub, Organization and Union)
-    public Map<String, List<AccessGroupQueryResult>> getOrganizationAccessGroupsForUnitCreation(Long organizationId) {
-        Map<String, List<AccessGroupQueryResult>> accessGroupForParentOrganizationCreation = new HashMap<>();
-        accessGroupForParentOrganizationCreation.put("hub",
-                accessGroupRepository.getOrganizationAccessGroupByOrgCategoryAndRole(organizationId, OrganizationCategory.HUB.toString(), AccessGroupRole.MANAGEMENT.toString()));
-        accessGroupForParentOrganizationCreation.put("organization",
-                accessGroupRepository.getOrganizationAccessGroupByOrgCategoryAndRole(organizationId, OrganizationCategory.ORGANIZATION.toString(), AccessGroupRole.MANAGEMENT.toString()));
-        accessGroupForParentOrganizationCreation.put("union",
-                accessGroupRepository.getOrganizationAccessGroupByOrgCategoryAndRole(organizationId, OrganizationCategory.UNION.toString(), AccessGroupRole.MANAGEMENT.toString()));
-        return accessGroupForParentOrganizationCreation;
+    public List<AccessGroupQueryResult> getOrganizationAccessGroupsForUnitCreation(Long organizationId) {
+        return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, AccessGroupRole.MANAGEMENT.toString());
     }
 
     public UserAccessRoleDTO checkIfUserHasAccessByRoleInUnit(Long unitId) {
