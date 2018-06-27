@@ -68,9 +68,9 @@ public class TImeBankCalculationServiceTest {
     @Test
     public void calculateTimeBank(){
         when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId())));
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(1225l);
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = null;//timeBankService.getCostTimeAgreement(1225l);
         DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        timeBankCalculationService.calculateDailyTimebank(interval, unitPositionWithCtaDetailsDTO,shifts, dailyTimeBankEntry);
+        timeBankCalculationService.calculateDailyTimebank(interval, null,shifts, dailyTimeBankEntry);
         Assert.assertEquals(dailyTimeBankEntry.getTotalTimeBankMin(),1130);
         Assert.assertEquals(dailyTimeBankEntry.getScheduledMin(),1020);
         Assert.assertEquals(dailyTimeBankEntry.getContractualMin(),300);
