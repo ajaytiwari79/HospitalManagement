@@ -4,8 +4,6 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistance.model.account_type.AccountType;
-import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -89,17 +87,18 @@ public class TemplateTypeService extends MongoBaseService {
     public TemplateType updateTemplateName(BigInteger id,Long countryId,TemplateType templateType) {
 
         TemplateType exists = templateTypeRepository.findByIdAndNameDeleted(templateType.getTemplateName());
-        if (Optional.ofNullable(exists).isPresent()&&!id.equals(exists.getId())) {
+        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
             throw  new DuplicateDataException("template name exist for  "+templateType.getTemplateName());
         }
         exists=templateTypeRepository.findByIdAndNonDeleted(id);
         exists.setTemplateName(templateType.getTemplateName());
+        save(exists);
         return exists;
 
     }
 
     /**
-     * @description this method is used for delete template by id.
+     * @description this method is used for delete template type by id.
      * @author vikash patwal
      * @param id
      * @throws DataNotFoundByIdException
