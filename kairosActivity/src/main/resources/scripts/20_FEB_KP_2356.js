@@ -1,1 +1,0 @@
- db.activities.updateMany({notesActivityTab: { $exists: false }},{$set:{"notesActivityTab":{}}})

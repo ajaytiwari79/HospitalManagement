@@ -1,1 +1,0 @@
-db.activities.updateMany({"locationActivityTab":{$exists:false}},{$set:{locationActivityTab:{"canBeStartAt":[],canBeEndAt:[]}}})

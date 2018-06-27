@@ -1,3 +1,0 @@
-match(n:UnitPosition) detach delete n;
-match(n:WorkingTimeAgreement) detach delete n;
-match(n:WTABaseRuleTemplate) detach delete n;
