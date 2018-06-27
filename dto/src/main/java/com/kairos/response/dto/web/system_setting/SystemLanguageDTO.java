@@ -5,17 +5,18 @@ public class SystemLanguageDTO {
     private Long id;
     private String name;
     private String code;
-    private boolean inactive;
+    private boolean active;
     private boolean defaultLanguage;
 
     public SystemLanguageDTO(){
         // default constructor
     }
 
-    public SystemLanguageDTO(String name, String code, boolean inactive, boolean defaultLanguage){
+    public SystemLanguageDTO(String name, String code, boolean active, boolean defaultLanguage){
         this.name = name;
         this.code = code;
-        this.inactive = inactive;
+//        this.inactive = inactive;
+        this.active = active;
         this.defaultLanguage =defaultLanguage;
     }
 
@@ -43,12 +44,20 @@ public class SystemLanguageDTO {
         this.code = code;
     }
 
-    public boolean isInactive() {
+    /*public boolean isInactive() {
         return inactive;
     }
 
     public void setInactive(boolean inactive) {
         this.inactive = inactive;
+    }*/
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean isDefaultLanguage() {

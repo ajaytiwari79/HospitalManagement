@@ -61,7 +61,7 @@ public class SystemLanguageService extends UserBaseService {
 
         // if defaultLanguage is false then ask to set default
         if( !systemLanguageDTO.isDefaultLanguage() ||  ((systemLanguageDTO.isDefaultLanguage()
-                && systemLanguageDTO.isInactive()) && !systemLanguageGraphRepository.isDefaultSystemLanguageExistsExceptId(systemLanguageId)) ){
+                && !systemLanguageDTO.isActive()) && !systemLanguageGraphRepository.isDefaultSystemLanguageExistsExceptId(systemLanguageId)) ){
             exceptionService.invalidRequestException("message.system.language.must.default");
         }
 

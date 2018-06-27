@@ -12,6 +12,7 @@ import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.util.DateUtil;
@@ -40,6 +41,9 @@ public class UnionService {
     private RegionGraphRepository regionGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private AccessGroupService accessGroupService;
+
     public UnionQueryWrapper getAllUnionOfCountry(Long countryId) {
         UnionQueryWrapper unionQueryWrapper = new UnionQueryWrapper();
 
@@ -49,6 +53,7 @@ public class UnionService {
         organizationCreationData.setZipCodes(zipCodes);
         organizationCreationData.setCompanyTypes(CompanyType.getListOfCompanyType());
         organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
+        organizationCreationData.setAccessGroups(accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
         List<Map<String, Object>> orgData = new ArrayList<>();
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();

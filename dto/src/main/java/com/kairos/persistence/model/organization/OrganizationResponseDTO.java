@@ -3,6 +3,7 @@ package com.kairos.persistence.model.organization;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.persistence.model.user.client.ContactAddressDTO;
+import com.kairos.user.organization.UnitManagerDTO;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class OrganizationResponseDTO {
     private Integer costCenterId;
     private CompanyUnitType companyUnitType;
     private boolean boardingCompleted;
+    private UnitManagerDTO unitManager;
 
 
     public Long getId() {
@@ -210,5 +212,13 @@ public class OrganizationResponseDTO {
 
     public void setBoardingCompleted(boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
+    }
+
+    public UnitManagerDTO getUnitManager() {
+        return unitManager;
+    }
+
+    public void setUnitManager(UnitManagerDTO unitManager) {
+        this.unitManager = unitManager;
     }
 }
