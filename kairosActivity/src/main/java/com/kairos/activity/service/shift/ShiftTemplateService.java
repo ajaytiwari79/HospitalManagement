@@ -66,8 +66,8 @@ public class ShiftTemplateService extends MongoBaseService {
     }
 
     public boolean deleteShiftTemplate(BigInteger shiftTemplateId){
-        Optional<ShiftTemplate> shiftTemplate=shiftTemplateRepository.findById(shiftTemplateId);
-        if(!shiftTemplate.isPresent() || shiftTemplate.get().isDeleted()){
+        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftTemplateId);
+        if(!Optional.ofNullable(shiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent",shiftTemplateId);
         }
         //Need to verify that individual shifts should also be deleted or not / mapping
@@ -75,8 +75,8 @@ public class ShiftTemplateService extends MongoBaseService {
 //        individualShiftTemplates.forEach(individualShiftTemplate -> {
 //            individualShiftTemplate.setDeleted(true);});
 //        save(individualShiftTemplates);
-        shiftTemplate.get().setDeleted(true);
-        save(shiftTemplate.get());
+        shiftTemplate.setDeleted(true);
+        save(shiftTemplate);
         return true;
 
     }
