@@ -39,7 +39,6 @@ public class TemplateTypeController {
      * @author vikash patwal
      * @param countryId
      * @param templateData
-     * @throws
      * @return list
      */
     @ApiOperation(value = "create new Template type")
@@ -52,11 +51,10 @@ public class TemplateTypeController {
     }
 
     /**
-     * @description get template by name
+     * @description this method is used get template by name for updation purpose.
      * @author vikash patwal
      * @param countryId
      * @param templateName
-     * @throws DataNotExists
      * @return TemplateType
      */
     @ApiOperation(value="Get template by name")
@@ -69,12 +67,11 @@ public class TemplateTypeController {
     }
 
     /**
-     * @description update template by id
+     * @description this template is used for update template type by id.
      * @author vikash patwal
      * @param id
      * @param countryId
      * @param templateType
-     * @throws DuplicateDataException
      * @return TemplateType
      */
     @ApiOperation(value="update template")
@@ -91,11 +88,10 @@ public class TemplateTypeController {
     }
 
     /**
-     * @description template by id
+     * @description this template is used for delete template by id.
      * @author vikash patwal
      * @param countryId
      * @param id
-     * @throws DataNotFoundByIdException
      * @returne Boolean
      */
     @ApiOperation(value="delete template by id")
