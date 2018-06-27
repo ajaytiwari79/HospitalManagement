@@ -5,11 +5,6 @@ import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.SkillRestClient;
 import com.kairos.activity.client.StaffRestClient;
-import com.kairos.response.dto.web.day_type.DayType;
-import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
-import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
-import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
@@ -27,6 +22,7 @@ import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMo
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
 import com.kairos.activity.response.dto.activity.*;
+import com.kairos.activity.response.dto.activity.PermissionsActivityTabDTO;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
@@ -35,6 +31,7 @@ import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.shift.ShiftService;
+import com.kairos.activity.service.shift.ShiftTemplateService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
@@ -43,11 +40,16 @@ import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.ActivityWithTimeTypeDTO;
+import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
+import com.kairos.response.dto.web.day_type.DayType;
+import com.kairos.response.dto.web.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.phase.PhaseWeeklyDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -118,7 +120,9 @@ public class ActivityService extends MongoBaseService {
     private StaffRestClient staffRestClient;
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
+    @Inject private ShiftTemplateService shiftTemplateService;
     @Inject private GenericIntegrationService genericIntegrationService;
+
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -712,17 +716,10 @@ public class ActivityService extends MongoBaseService {
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeek = date.get(weekOfWeekBasedYear);
         int currentDayOfWeek = date.getDayOfWeek().getValue();
-        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO();
-        phaseActivityDTO.setDayTypes(dayTypes);
-        // getting all phases by countryId as NO unit phase is configured
-
-//        List<PhaseDTO> phaseDTOs = phaseService.getPhasesByCountryId(countryId);
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
 
         // Set access Role of staff
-        phaseActivityDTO.setStaffAccessRole(staffRestClient.getAccessOfCurrentLoggedInStaff());
-
-        phaseActivityDTO.setApplicablePhases(phaseDTOs);
+        UserAccessRoleDTO userAccessRoleDTO= staffRestClient.getAccessOfCurrentLoggedInStaff();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
@@ -760,9 +757,10 @@ public class ActivityService extends MongoBaseService {
             }
         }
 
-        phaseActivityDTO.setActivities(activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId));
+        List<ActivityWithCompositeDTO> activities=activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
 
-        phaseActivityDTO.setPhases(phaseWeeklyDTOS);
+        List<ShiftTemplateDTO> shiftTemplates =shiftTemplateService.getAllShiftTemplates(unitId);
+        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities,phaseWeeklyDTOS,dayTypes,userAccessRoleDTO,shiftTemplates,phaseDTOs);
         return phaseActivityDTO;
     }
 

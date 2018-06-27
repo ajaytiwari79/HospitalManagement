@@ -705,8 +705,8 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
-    public Boolean addPlannedTimeInExpertise(Long unitId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseEmploymentTypeDTO.getExpertiseId());
+    public Boolean addPlannedTimeInExpertise(Long expertiseId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
         }
@@ -723,12 +723,12 @@ public class ExpertiseService extends UserBaseService {
         return expertiseEmploymentTypeRelationships;
     }
 
-    public Boolean updatePlannedTimeInExpertise(ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseEmploymentTypeDTO.getExpertiseId());
+    public Boolean updatePlannedTimeInExpertise(Long expertiseId,ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!expertise.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseEmploymentTypeDTO.getExpertiseId());
+            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
         }
-        expertiseEmploymentTypeRelationshipGraphRepository.removeAllPreviousEmploymentType(expertiseEmploymentTypeDTO.getExpertiseId());
+        expertiseEmploymentTypeRelationshipGraphRepository.removeAllPreviousEmploymentType(expertiseId);
         linkPlannedTimeTypeWithExpertise(expertiseEmploymentTypeDTO, expertise.get());
         return true;
     }
@@ -745,13 +745,12 @@ public class ExpertiseService extends UserBaseService {
         expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
     }
 
-    public Map<String, Object> getPlannedTimeAndEmploymentType(Long unitId) {
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        List<EmploymentTypeQueryResult> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByOrganization(unitId, false);
+    public Map<String, Object> getPlannedTimeAndEmploymentType(Long countryId) {
+        List<EmploymentTypeQueryResult> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId, false);
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
         List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyPropertiesOfListByMapper
-                (priorityGroupRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
+                (priorityGroupRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
 
         countryDetail.put("employmentTypes", employmentTypes);
         countryDetail.put("presenceTypes", presenceTypes);

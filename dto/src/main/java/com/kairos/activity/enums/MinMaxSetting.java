@@ -7,5 +7,4 @@ package com.kairos.activity.enums;
 
 public enum MinMaxSetting {
     MAXIMUM,MINIMUM
-
 }

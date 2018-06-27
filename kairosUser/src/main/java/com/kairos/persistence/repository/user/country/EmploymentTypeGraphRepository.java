@@ -77,9 +77,9 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} return toString(id(employmentType)) as id, employmentType.name as value")
     List<FilterSelectionQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
 
-    @Query("MATCH (n:Organization) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
-            "WHERE id(n)={0} AND et.deleted={1} return id(et) as id,et.name as name")
-    List<EmploymentTypeQueryResult> getEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);
+    @Query("MATCH  (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+            "WHERE id(c)={0} AND et.deleted={1} return id(et) as id,et.name as name")
+    List<EmploymentTypeQueryResult> getEmploymentTypeByCountry(Long countryId, Boolean isDeleted);
 
 
 }

@@ -11,22 +11,26 @@ import com.kairos.activity.persistence.model.break_settings.BreakSettings;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.shift.IndividualShiftTemplate;
+import com.kairos.activity.persistence.model.shift.ShiftTemplate;
+import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.activity.persistence.model.wta.StaffWTACounter;
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
-import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.activity.persistence.model.unit_settings.PhaseSettings;
-import com.kairos.activity.persistence.model.wta.StaffWTACounter;
-import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.activity.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
 import com.kairos.activity.persistence.query_result.DateWiseShiftResponse;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.activity.persistence.repository.shift.IndividualShiftTemplateMongoRepository;
+import com.kairos.activity.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.persistence.repository.time_bank.TimeBankMongoRepository;
 import com.kairos.activity.persistence.repository.unit_settings.ActivityConfigurationRepository;
@@ -144,10 +148,12 @@ public class ShiftService extends MongoBaseService {
     private PhaseSettingsRepository phaseSettingsRepository;
     @Inject
     private LocaleService localeService;
-    @Inject
-    private GenericIntegrationService genericIntegrationService;
+    @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject private ShiftTemplateRepository shiftTemplateRepository;
+    @Inject private IndividualShiftTemplateMongoRepository individualShiftTemplateMongoRepository;
     @Inject
     private ActivityConfigurationRepository activityConfigurationRepository;
+
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
@@ -197,9 +203,9 @@ public class ShiftService extends MongoBaseService {
         ShiftWithActivityDTO shiftWithActivityDTO = shiftDTO.buildResponse(activity);
 
         Phase phase = phaseService.getPhaseCurrentByUnit(shiftDTO.getUnitId(), shiftDTO.getStartDate());
-        shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
+       // shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
+        //validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
 
         Shift mainShift = buildShift(shiftWithActivityDTO);
         mainShift.setMainShift(true);
@@ -1111,4 +1117,15 @@ public class ShiftService extends MongoBaseService {
         return activities;
     }
 
+    public List<ShiftQueryResult> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO){
+        ShiftTemplate shiftTemplate=shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
+        List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
+       List<ShiftQueryResult> shifts=new ArrayList<>();
+        individualShiftTemplate.forEach(shiftTemplate1 ->{
+            ShiftDTO shiftDTO1=new ShiftDTO(shiftTemplate1.getActivityId(),unitId,shiftDTO.getStaffId(),shiftDTO.getUnitPositionId(),shiftDTO.getStartLocalDate(),shiftDTO.getEndLocalDate(),shiftTemplate1.getStartTime(),shiftTemplate1.getEndTime());
+            List<ShiftQueryResult> shiftResponse= createShift(unitId,shiftDTO1,"Organization",false);
+            shifts.add(shiftResponse.get(0));
+        });
+        return shifts;
+    }
 }

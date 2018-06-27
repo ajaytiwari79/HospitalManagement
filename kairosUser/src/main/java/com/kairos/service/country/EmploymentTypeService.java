@@ -5,9 +5,9 @@ import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.DayType;
-import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
@@ -243,8 +243,9 @@ public class EmploymentTypeService extends UserBaseService {
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
         List<com.kairos.response.dto.web.cta.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyProperties(employmentTypes, com.kairos.response.dto.web.cta.EmploymentTypeDTO.class);
         List<DayType>  dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<com.kairos.response.dto.web.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyProperties(dayTypes, com.kairos.response.dto.web.day_type.DayType.class);
-        return new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
+        List<com.kairos.response.dto.web.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyProperties(dayTypes,com.kairos.response.dto.web.day_type.DayType.class);
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
+        return  dayTypeEmploymentTypeWrapper;
     }
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypesAtUnit(Long unitId, boolean isDeleted) {
