@@ -38,7 +38,7 @@ public class AttendanceSettingService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    public Duration getAttendanceSetting(Long unitId, Long staffId) {
+    public Duration getAttendanceSetting() {
 //    LocalDate currentDate= DateUtils.getCurrentLocalDate();
 //    Duration attendanceDuration=new Duration();
 //    AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
@@ -82,13 +82,7 @@ public class AttendanceSettingService extends MongoBaseService {
                          duration = getattendanceSetting.getAttendanceDuration();
                         if (duration.getCheckOut() == null) {
                             Date checkOut = DateUtils.getDateByLocalDateAndLocalTime(DateUtils.getCurrentLocalDate(), attendanceDuration.getTo());
-                            Date shiftCheckOut=DateUtils.getDate(shiftQueryResults.getEndDate());
-                            if(checkOut.before(shiftCheckOut)||checkOut.equals(shiftCheckOut)){
                                 duration.setCheckOut(checkOut);
-                            } else{
-                                exceptionService.actionNotPermittedException("your shift is over you forget to check out");
-                            }
-
                         }
                     } else {
                         Date checkOut = DateUtils.getDateByLocalDateAndLocalTime(DateUtils.getCurrentLocalDate(), attendanceDuration.getTo());

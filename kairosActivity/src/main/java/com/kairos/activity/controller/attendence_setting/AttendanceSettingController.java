@@ -22,10 +22,10 @@ public class AttendanceSettingController {
    @Inject
    private AttendanceSettingService attendanceSettingService;
 
-//   @GetMapping(value ="/attendance_setting")
-//   public ResponseEntity<Map<String, Object>> getAttendanceSettings( @PathVariable Long staffId) {
-//       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.getAttendanceSetting(staffId));
-//   }
+   @GetMapping(value ="/attendance_setting")
+   public ResponseEntity<Map<String, Object>> getAttendanceSettings( ) {
+       return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.getAttendanceSetting());
+   }
 
    @PostMapping(value = "/attendance_setting")
     public ResponseEntity<Map<String,Object>> updateAttendanceSetting( @RequestBody AttendanceDuration attendanceDuration){
