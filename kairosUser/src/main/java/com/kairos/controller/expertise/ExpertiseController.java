@@ -148,13 +148,13 @@ public class ExpertiseController {
 
     @ApiOperation(value = "All planned time and employment type")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/planned_time/default_data", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getPlannedTimeAndEmploymentType(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeAndEmploymentType(unitId));
+    public ResponseEntity<Map<String, Object>> getPlannedTimeAndEmploymentType(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getPlannedTimeAndEmploymentType(countryId));
     }
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long unitId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseEmploymentTypeDTO));
     }
 
