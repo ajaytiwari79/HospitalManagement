@@ -53,7 +53,8 @@ public class WTABaseRuleTemplateDTO{
     protected RuleTemplateCategoryDTO ruleTemplateCategory;
     protected WTATemplateType wtaTemplateType;
 
-
+    protected Integer staffCanBeIgnoreCounter;
+    protected Integer managementCanBeIgnoreCounter;
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -146,5 +147,19 @@ public class WTABaseRuleTemplateDTO{
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
+    public Integer getStaffCanBeIgnoreCounter() {
+        return staffCanBeIgnoreCounter;
+    }
 
+    public void setStaffCanBeIgnoreCounter(Integer staffCanBeIgnoreCounter) {
+        this.staffCanBeIgnoreCounter = staffCanBeIgnoreCounter;
+    }
+
+    public Integer getManagementCanBeIgnoreCounter() {
+        return managementCanBeIgnoreCounter;
+    }
+
+    public void setManagementCanBeIgnoreCounter(Integer managementCanBeIgnoreCounter) {
+        this.managementCanBeIgnoreCounter = managementCanBeIgnoreCounter;
+    }
 }
