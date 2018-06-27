@@ -12,6 +12,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskTypeSettingMongo
 import com.kairos.activity.response.dto.TaskTypeSettingDTO;
 import com.kairos.activity.response.dto.task.VRPTaskDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.service.task_type.TaskTypeService;
 import com.kairos.activity.util.DateUtils;
@@ -51,6 +52,7 @@ public class VRPPlanningService extends MongoBaseService{
     @Inject private PlannerRestClient plannerRestClient;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private PhaseMongoRepository phaseMongoRepository;
+    @Inject private ExceptionService exceptionService;
 
     public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
         SolverConfigDTO solverConfigDTO = solverConfigRepository.getOneById(solverConfigId);
@@ -80,9 +82,16 @@ public class VRPPlanningService extends MongoBaseService{
 
     public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,solverConfigId);
+
         VrpTaskPlanningDTO vrpTaskPlanningDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VrpTaskPlanningDTO.class);
+        if(vrpTaskPlanningDTO==null || vrpTaskPlanningDTO.getTasks().isEmpty()){
+            exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
+        }
         List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
         taskDTOS = getTasks(unitId,taskDTOS);
+        if(taskDTOS.isEmpty()){
+            exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
+        }
         List<TaskDTO> drivingTimeList = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
         drivingTimeList.forEach(t->{
             t.setStartTime(Date.from(t.getPlannedStartTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
@@ -146,9 +155,7 @@ public class VRPPlanningService extends MongoBaseService{
         Map<Long,EmployeeDTO> employeeDTOMap = employeeList.stream().collect(Collectors.toMap(k->new Long(k.getId()),v->v));
         List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
         shifts.forEach(s->{
-            s.setStartTime(s.getStartDate());
-            s.setEndTime(s.getEndDate());
-            s.setLocalDate(DateUtils.asLocalDate(s.getStartDate()));
+            s.setLocalDate(DateUtils.asLocalDate(new Date(s.getStartTime())));
             s.setEmployee(employeeDTOMap.get(s.getStaffId()));
         });
         return shifts;

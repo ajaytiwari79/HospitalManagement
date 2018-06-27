@@ -26,8 +26,7 @@ public class ShiftDTO {
     private Date endTime;
     private List<TaskDTO> tasks;
     private String color;
-    private Date startDate;
-    private Date endDate;
+
 
     public ShiftDTO(String id, EmployeeDTO employee, LocalDate localDate, Date startTime, Date endTime) {
         this.id = id;
@@ -45,21 +44,6 @@ public class ShiftDTO {
         this.name = name;
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
 
     public String getColor() {
         return color;

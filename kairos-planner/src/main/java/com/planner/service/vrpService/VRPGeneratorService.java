@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -105,7 +106,7 @@ public class VRPGeneratorService {
         Map<String,Employee> employeeMap = employees.stream().collect(Collectors.toMap(k->k.getId(), v->v));
         shiftDTOS.forEach(s->{
             for (int i=4;i<=8;i++) {
-                shifts.add(new Shift(s.getId(), employeeMap.get(s.getEmployee().getId()),s.getLocalDate(), DateUtils.dateToLocalDateTime(s.getStartDate()), DateUtils.dateToLocalDateTime(s.getEndDate())));
+                shifts.add(new Shift(s.getId(), employeeMap.get(s.getEmployee().getId()),s.getLocalDate(), DateUtils.dateToLocalDateTime(new Date(s.getStartTime())), DateUtils.dateToLocalDateTime(new Date(s.getEndTime()))));
             }
         });
         return new Object[]{shifts,employeeDTOSet};
