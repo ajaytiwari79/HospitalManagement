@@ -258,12 +258,7 @@ public class AccessPageService extends UserBaseService {
 
     public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long userId){
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(userId, AppConstants.AG_COUNTRY_ADMIN);
-
-        if(isCountryAdmin){
-            return getPermissionForHubMember();
-        } else {
-            return null;
-        }
+        return (isCountryAdmin) ? getPermissionForHubMember() : null;
     }
 
     public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long parentOrganizationId,Organization newUnit,Long userId){

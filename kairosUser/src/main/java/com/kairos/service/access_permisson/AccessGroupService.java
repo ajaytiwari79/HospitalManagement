@@ -650,7 +650,7 @@ public class AccessGroupService extends UserBaseService {
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
     }
 
-    public List<AccessGroupsByCategoryDTO> getCountryAccessGroupsOfAllcategories(Long countryId) {
+    public List<AccessGroupsByCategoryDTO> getCountryAccessGroupsOfAllCategories(Long countryId) {
 
         List<AccessGroupsByCategoryDTO> accessGroupsData = new ArrayList<>();
         accessGroupsData.add( new AccessGroupsByCategoryDTO(OrganizationCategory.HUB,

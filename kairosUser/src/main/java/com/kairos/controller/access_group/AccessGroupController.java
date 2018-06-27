@@ -172,7 +172,7 @@ public class AccessGroupController {
     @RequestMapping(value = COUNTRY_URL + "/access_group" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryAccessGroupsOfAllcategories(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsOfAllcategories(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsOfAllCategories(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.GET)
