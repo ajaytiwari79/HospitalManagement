@@ -2,7 +2,7 @@ package com.planner.util.wta;
 
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.LocationPair;
 import com.kairos.planner.vrp.taskplanning.model.LocationPairDifference;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;

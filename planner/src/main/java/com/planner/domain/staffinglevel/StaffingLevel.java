@@ -1,8 +1,8 @@
 package com.planner.domain.staffinglevel;
 
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.persistence.model.staffing_level.StaffingLevelInterval;
+import com.kairos.persistence.model.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.planner.domain.MongoBaseEntity;
 import com.planner.domain.common.BaseEntity;
 ////import org.springframework.data.cassandra.core.mapping.Table;

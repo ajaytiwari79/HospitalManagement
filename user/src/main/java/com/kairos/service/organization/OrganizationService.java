@@ -1,7 +1,7 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.PlannedTimeTypeRestClient;

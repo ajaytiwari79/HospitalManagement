@@ -1,7 +1,7 @@
 package com.kairos.activity.client.dto.staff;
 
 import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.dto.shift.StaffUnitPositionDetails;
 import com.kairos.response.dto.web.UserDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;

@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
+import com.kairos.dto.staffing_level.StaffingLevelDto;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.StaffService;

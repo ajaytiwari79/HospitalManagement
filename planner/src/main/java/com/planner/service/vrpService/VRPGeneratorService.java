@@ -1,6 +1,6 @@
 package com.planner.service.vrpService;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 

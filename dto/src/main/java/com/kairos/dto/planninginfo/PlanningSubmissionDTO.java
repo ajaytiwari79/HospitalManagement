@@ -1,6 +1,6 @@
 package com.kairos.dto.planninginfo;
 
-import com.kairos.activity.util.DateUtils;
+import com.kairos.util.DateUtils;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

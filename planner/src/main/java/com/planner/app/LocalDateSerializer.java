@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.time.LocalDate;
 
-import static com.kairos.activity.util.ObjectMapperUtils.FORMATTER;
+import static com.kairos.util.ObjectMapperUtils.FORMATTER;
 
 public class LocalDateSerializer extends JsonSerializer<LocalDate> {
 

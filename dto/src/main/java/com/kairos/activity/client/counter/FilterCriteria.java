@@ -1,6 +1,6 @@
 package com.kairos.activity.client.counter;
 
-import com.kairos.activity.enums.FilterType;
+import com.kairos.enums.FilterType;
 
 import java.util.List;
 

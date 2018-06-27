@@ -2,8 +2,8 @@ package com.planner.service.tomtomService;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.util.ObjectMapperUtils;
-import com.kairos.activity.util.ObjectUtils;
+import com.kairos.util.ObjectMapperUtils;
+import com.kairos.util.ObjectUtils;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.planner.domain.location.LocationDistance;
 import com.planner.domain.tomtomResponse.Matrix;

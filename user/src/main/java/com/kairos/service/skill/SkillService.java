@@ -1,6 +1,6 @@
 package com.kairos.service.skill;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;

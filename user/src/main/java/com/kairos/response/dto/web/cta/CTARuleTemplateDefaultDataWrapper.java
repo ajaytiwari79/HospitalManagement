@@ -10,7 +10,7 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     private List<DayTypeDTO> dayTypes=new ArrayList<>();
     private List<PhaseResponseDTO> phases=new ArrayList<>();
-    private List<com.kairos.activity.response.dto.activity.TimeTypeDTO> timeTypes=new ArrayList<>();
+    private List<com.kairos.dto.activity.TimeTypeDTO> timeTypes=new ArrayList<>();
     private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
     private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
     private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
@@ -54,11 +54,11 @@ public class CTARuleTemplateDefaultDataWrapper {
         this.phases = phases;
     }
 
-    public List<com.kairos.activity.response.dto.activity.TimeTypeDTO> getTimeTypes() {
+    public List<com.kairos.dto.activity.TimeTypeDTO> getTimeTypes() {
         return timeTypes;
     }
 
-    public void setTimeTypes(List<com.kairos.activity.response.dto.activity.TimeTypeDTO> timeTypes) {
+    public void setTimeTypes(List<com.kairos.dto.activity.TimeTypeDTO> timeTypes) {
         this.timeTypes = timeTypes;
     }
 

@@ -2,8 +2,8 @@ package com.planner.service.shiftPlanningService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
+import com.kairos.persistence.model.staffing_level.StaffingLevelActivity;
+import com.kairos.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.planning.utils.JodaTimeConverter;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;

@@ -1,11 +1,11 @@
 package com.kairos.activity.task_type;
 
-import com.kairos.activity.KairosActivityApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.persistence.model.task_type.TaskTypeResource;
-import com.kairos.activity.response.dto.TaskTypeDTO;
-import com.kairos.activity.response.dto.task_type.TaskTypeCopyDTO;
-import com.kairos.activity.response.dto.task_type.TaskTypeResourceDTO;
+import com.kairos.KairosActivityApplication;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.persistence.model.task_type.TaskTypeResource;
+import com.kairos.dto.TaskTypeDTO;
+import com.kairos.dto.task_type.TaskTypeCopyDTO;
+import com.kairos.dto.task_type.TaskTypeResourceDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

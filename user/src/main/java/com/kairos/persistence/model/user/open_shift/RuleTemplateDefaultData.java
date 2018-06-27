@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.open_shift;
 
-import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.activity.response.dto.activity.TimeTypeDTO;
+import com.kairos.dto.ActivityDTO;
+import com.kairos.dto.activity.TimeTypeDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;

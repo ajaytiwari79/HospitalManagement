@@ -1,8 +1,8 @@
 package com.kairos.service.client;
 
-import com.kairos.activity.response.dto.task.VRPTaskDTO;
-import com.kairos.activity.util.ObjectMapperUtils;
-import com.kairos.activity.util.ObjectUtils;
+import com.kairos.dto.task.VRPTaskDTO;
+import com.kairos.util.ObjectMapperUtils;
+import com.kairos.util.ObjectUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.client.TomTomRestClient;
 import com.kairos.client.dto.TaskAddress;

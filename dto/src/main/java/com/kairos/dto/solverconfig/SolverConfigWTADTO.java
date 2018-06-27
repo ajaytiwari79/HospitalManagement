@@ -1,6 +1,6 @@
 package com.kairos.dto.solverconfig;
 
-import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.persistence.enums.WTATemplateType;
 
 import java.math.BigInteger;
 import java.util.List;

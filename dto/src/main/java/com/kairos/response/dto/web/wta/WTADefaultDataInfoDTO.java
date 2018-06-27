@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web.wta;
 
-import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.activity.response.dto.activity.TimeTypeDTO;
+import com.kairos.dto.ActivityDTO;
+import com.kairos.dto.activity.TimeTypeDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.presence_type.PresenceTypeDTO;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
-import com.kairos.activity.response.dto.ActivityDTO;
+import com.kairos.dto.ActivityDTO;
 import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;

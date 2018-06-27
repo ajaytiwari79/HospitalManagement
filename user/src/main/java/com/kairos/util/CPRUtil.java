@@ -1,6 +1,6 @@
 package com.kairos.util;
 
-import com.kairos.activity.util.DateUtils;
+import com.kairos.util.DateUtils;
 import com.kairos.persistence.model.enums.Gender;
 
 import java.time.LocalDate;

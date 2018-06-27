@@ -1,6 +1,6 @@
 package com.kairos.response.dto.pay_out;
 
-import com.kairos.activity.util.TimeInterval;
+import com.kairos.util.TimeInterval;
 
 public class CTAIntervalDTO {
 

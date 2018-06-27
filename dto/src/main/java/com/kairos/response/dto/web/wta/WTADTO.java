@@ -2,7 +2,7 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 
 import java.math.BigInteger;
 import java.util.List;

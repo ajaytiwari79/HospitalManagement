@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.persistence.model.user.staff.StaffUnitPositionQueryResult;
 import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
 import com.kairos.response.dto.web.StaffDTO;

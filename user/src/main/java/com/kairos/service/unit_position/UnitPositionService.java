@@ -3,10 +3,10 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
-import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.dto.shift.StaffUnitPositionDetails;
+import com.kairos.util.DateUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.TimeBankRestClient;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
@@ -83,7 +83,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.kairos.activity.util.DateUtils.ONLY_DATE;
+import static com.kairos.util.DateUtils.ONLY_DATE;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -750,7 +750,7 @@ public class UnitPositionService extends UserBaseService {
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         StaffUnitPositionDetails unitPositionWithCtaDetailsDTO = new StaffUnitPositionDetails();
-        unitPositionWithCtaDetailsDTO.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.activity.response.dto.shift.Expertise.class));
+        unitPositionWithCtaDetailsDTO.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.shift.Expertise.class));
 //        unitPositionWithCtaDetailsDTO.setStaffId(unitPosition.getStaff().getId());
         unitPositionWithCtaDetailsDTO.setId(unitPosition.getId());
         unitPositionWithCtaDetailsDTO.setCountryId(countryId);
@@ -766,7 +766,7 @@ public class UnitPositionService extends UserBaseService {
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
-        com.kairos.activity.response.dto.shift.EmploymentType employmentType=new com.kairos.activity.response.dto.shift.EmploymentType();
+        com.kairos.dto.shift.EmploymentType employmentType=new com.kairos.dto.shift.EmploymentType();
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(),employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
         return unitPositionWithCtaDetailsDTO;
@@ -778,8 +778,8 @@ public class UnitPositionService extends UserBaseService {
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
 
         StaffUnitPositionDetails unitPositionDetails = new StaffUnitPositionDetails();
-        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.activity.response.dto.shift.Expertise.class));
-        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.activity.response.dto.shift.EmploymentType.class));
+        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.shift.Expertise.class));
+        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.dto.shift.EmploymentType.class));
 
         unitPositionDetails.setId(unitPosition.getId());
         unitPositionDetails.setCountryId(countryId);

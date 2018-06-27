@@ -1,6 +1,6 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import org.junit.Test;

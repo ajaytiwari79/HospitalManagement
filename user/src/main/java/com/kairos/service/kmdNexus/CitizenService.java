@@ -1,6 +1,6 @@
 package com.kairos.service.kmdNexus;
 
-import com.kairos.activity.util.DateUtils;
+import com.kairos.util.DateUtils;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.constants.AppConstants;

@@ -1,6 +1,6 @@
 package com.kairos.client;
 
-import com.kairos.activity.response.dto.task.VRPTaskDTO;
+import com.kairos.dto.task.VRPTaskDTO;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.EscalatedTasksWrapper;

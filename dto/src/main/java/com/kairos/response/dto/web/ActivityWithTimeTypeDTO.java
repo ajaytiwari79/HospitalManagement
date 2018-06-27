@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.activity.response.dto.activity.TimeTypeDTO;
+import com.kairos.dto.ActivityDTO;
+import com.kairos.dto.activity.TimeTypeDTO;
 import com.kairos.response.dto.web.open_shift.OpenShiftIntervalDTO;
 
 

@@ -1,6 +1,6 @@
 package com.kairos.client.priority_group;
 
-import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;

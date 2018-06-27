@@ -2,7 +2,7 @@ package com.kairos.response.dto.web.planning.vrpPlanning;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.response.dto.TaskTypeSettingDTO;
+import com.kairos.dto.TaskTypeSettingDTO;
 
 import java.util.Set;
 

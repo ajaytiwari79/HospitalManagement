@@ -3,7 +3,7 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.activity.enums.FilterType;
+import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;

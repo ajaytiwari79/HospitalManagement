@@ -1,6 +1,6 @@
 package com.kairos.service.organizationMetadata;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;

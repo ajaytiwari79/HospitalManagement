@@ -2,9 +2,9 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
-import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
-import com.kairos.activity.util.DateTimeInterval;
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.dto.shift.StaffUnitPositionDetails;
+import com.kairos.util.DateTimeInterval;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.ChatRestClient;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;

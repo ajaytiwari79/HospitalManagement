@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web.wta;
 
-import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.AgeRange;
+import com.kairos.persistence.enums.WTATemplateType;
+import com.kairos.persistence.model.wta.templates.AgeRange;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

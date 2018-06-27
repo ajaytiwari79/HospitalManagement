@@ -1,6 +1,6 @@
 package com.kairos.service.country;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;

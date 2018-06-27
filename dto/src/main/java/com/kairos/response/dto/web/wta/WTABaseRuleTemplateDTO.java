@@ -3,8 +3,8 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
+import com.kairos.persistence.enums.WTATemplateType;
+import com.kairos.persistence.model.wta.templates.PhaseTemplateValue;
 
 import java.math.BigInteger;
 import java.util.List;

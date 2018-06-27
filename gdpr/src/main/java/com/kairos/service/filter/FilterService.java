@@ -1,6 +1,6 @@
 package com.kairos.service.filter;
 
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelectionDTO;

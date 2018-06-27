@@ -1,9 +1,9 @@
 package com.planner.service.staffinglevel;
 
-import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
-import com.kairos.activity.util.DateUtils;
+import com.kairos.dto.staffing_level.PresenceStaffingLevelDto;
+import com.kairos.dto.staffing_level.StaffingLevelDTO;
+import com.kairos.dto.staffing_level.StaffingLevelDto;
+import com.kairos.util.DateUtils;
 import com.planner.domain.staffinglevel.StaffingLevel;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;

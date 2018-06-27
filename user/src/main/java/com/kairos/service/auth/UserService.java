@@ -1,7 +1,7 @@
 package com.kairos.service.auth;
 
-import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.util.DateUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;

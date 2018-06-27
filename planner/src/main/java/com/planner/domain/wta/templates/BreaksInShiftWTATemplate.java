@@ -2,8 +2,8 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.BreakTemplateValue;
+import com.kairos.persistence.enums.WTATemplateType;
+import com.kairos.persistence.model.wta.templates.BreakTemplateValue;
 import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.math.BigInteger;

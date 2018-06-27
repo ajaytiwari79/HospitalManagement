@@ -1,6 +1,6 @@
 package com.kairos.activity.client.counter;
 
-import com.kairos.activity.enums.CounterType;
+import com.kairos.enums.CounterType;
 
 import java.math.BigInteger;
 

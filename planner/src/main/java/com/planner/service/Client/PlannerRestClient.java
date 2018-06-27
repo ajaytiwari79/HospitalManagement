@@ -1,7 +1,7 @@
 package com.planner.service.Client;
 
-import com.kairos.activity.enums.IntegrationOperation;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.dto.staffing_level.StaffingLevelDTO;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
 import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;

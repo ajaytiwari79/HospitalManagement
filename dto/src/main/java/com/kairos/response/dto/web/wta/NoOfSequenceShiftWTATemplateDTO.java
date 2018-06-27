@@ -2,8 +2,8 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.enums.PartOfDay;
-import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.persistence.enums.PartOfDay;
+import com.kairos.persistence.enums.WTATemplateType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,6 +1,6 @@
 package com.kairos.client.planner;
 
-import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.staff.Staff;
 import com.kairos.response.dto.web.UnitPositionWtaDTO;

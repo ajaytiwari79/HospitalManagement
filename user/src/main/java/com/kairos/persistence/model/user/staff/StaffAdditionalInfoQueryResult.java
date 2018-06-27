@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
-import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.dto.shift.StaffUnitPositionDetails;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -24,7 +24,7 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private com.kairos.activity.response.dto.shift.StaffUnitPositionDetails unitPosition;
+    private com.kairos.dto.shift.StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
