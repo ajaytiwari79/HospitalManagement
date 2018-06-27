@@ -1,7 +1,6 @@
 package com.kairos.activity.controller.organization;
 
 import com.kairos.activity.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
-import com.kairos.activity.persistence.model.activity.tabs.PermissionsActivityTabDTO;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.SkillActivityDTO;

@@ -73,7 +73,7 @@ public class SystemLanguageServiceIntegrationTest {
     public void addSystemLanguage() {
 
         String baseUrl=getBaseUrl(organizationId,null, null);
-        SystemLanguageDTO systemLanguageDTO = new SystemLanguageDTO(nameOfSystemLanguage, "en", false, true);
+        SystemLanguageDTO systemLanguageDTO = new SystemLanguageDTO(nameOfSystemLanguage, "en", true, true);
         logger.info("System Language name : "+systemLanguageDTO.getName());
         HttpEntity<SystemLanguageDTO> requestBodyData = new HttpEntity<>(systemLanguageDTO);
 
@@ -103,7 +103,7 @@ public class SystemLanguageServiceIntegrationTest {
             SystemLanguage systemLanguage = systemLanguageService.getSystemLanguageByName(nameOfSystemLanguage);
             createdSystemLanguageId = systemLanguage.getId();
         }
-        SystemLanguageDTO systemLanguageDTO = new SystemLanguageDTO(nameOfSystemLanguage, "en", false, true);
+        SystemLanguageDTO systemLanguageDTO = new SystemLanguageDTO(nameOfSystemLanguage, "en", true, true);
 
 
         HttpEntity<SystemLanguageDTO> requestBodyData = new HttpEntity<>(systemLanguageDTO);

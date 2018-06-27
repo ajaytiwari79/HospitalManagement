@@ -1,10 +1,8 @@
 package com.kairos.persistence.model.user.staff;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
@@ -12,13 +10,9 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.util.CPRUtil;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -61,7 +55,7 @@ public class Staff extends UserBaseEntity {
     private Long inactiveFrom;
     long organizationId;
     private long visitourId;
-    private String cprNumber;
+//    private String cprNumber;
     private String visitourTeamId;
     private Language language;
 
@@ -121,7 +115,7 @@ public class Staff extends UserBaseEntity {
         this.familyName = familyName;
         this.currentStatus = currentStatus;
         this.inactiveFrom = inactiveFrom;
-        this.cprNumber = cprNumber;
+//        this.cprNumber = cprNumber;
     }
 
     public ContactAddress getContactAddress() {
@@ -322,13 +316,13 @@ public class Staff extends UserBaseEntity {
         this.organizationId = organizationId;
     }
 
-    public String getCprNumber() {
+    /*public String getCprNumber() {
         return cprNumber;
     }
 
     public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
-    }
+    }*/
 
     public EngineerType getEngineerType() {
         return engineerType;

@@ -62,6 +62,7 @@ public class ShiftDTO {
     private LocalTime endTime;
     Long allowedBreakDurationInMinute;
     private List<ShiftDTO> subShifts = new ArrayList<>();
+    private BigInteger templateId;
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activityId = activityId;
@@ -332,4 +333,11 @@ public class ShiftDTO {
         this.parentOpenShiftId = parentOpenShiftId;
     }
 
+    public BigInteger getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(BigInteger templateId) {
+        this.templateId = templateId;
+    }
 }

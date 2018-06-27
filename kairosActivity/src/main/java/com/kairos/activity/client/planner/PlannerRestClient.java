@@ -29,7 +29,6 @@ public class PlannerRestClient {
 
     public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation,Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
-
         try {
             String url=baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);

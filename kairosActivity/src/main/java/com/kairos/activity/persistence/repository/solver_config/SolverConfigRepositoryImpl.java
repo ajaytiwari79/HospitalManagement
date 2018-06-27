@@ -29,7 +29,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
-    public SolverConfigDTO getoneById(BigInteger solverConfigId) {
+    public SolverConfigDTO getOneById(BigInteger solverConfigId) {
         Aggregation agg = Aggregation.newAggregation(
                 match(Criteria.where("id").is(solverConfigId).and("deleted").is(false)),
                 lookup("constraint","constraints._id","_id","constraints")
@@ -38,7 +38,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
     }
 
-    @Override
+    /*@Override
     public List<SolverConfigDTO> getAllByUnitId(Long unitId) {
         Aggregation agg = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
@@ -46,7 +46,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         );
         AggregationResults< SolverConfigDTO > result =mongoTemplate.aggregate(agg,SolverConfig.class,SolverConfigDTO.class);
         return result.getMappedResults();
-    }
+    }*/
 
     public Boolean existsSolverConfigByNameAndUnitId(Long unitId, String name) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));

@@ -298,6 +298,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {deleted:false}) WHERE id(o)={0} AND ag.role={1} return ag LIMIT 1")
     AccessGroup getAccessGroupOfOrganizationByRole(Long orgId, String role);
 
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} AND id(ag)={2} \n" +
+            "RETURN COUNT(ag)>0")
+    boolean isCountryAccessGroupExistsByOrgCategory(Long countryId, String orgCategory, Long accessGroupId);
+
+    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup) WHERE id(o)={0} AND id(ag)={1} return COUNT(ag)>0")
+    boolean isAccessGroupOfOrganizationExists(long organizationId, Long accessGroupId);
+
     @Query("Match(org:Organization) where id(org) in {0} Match(ag:AccessGroup) where id(ag)={1} \n" +
      "merge(org)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag)")
     void createAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
@@ -313,6 +320,19 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) WHERE id(unit)={1} \n" +
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) WHERE ag.role={2} return count(ag) > 0")
     Boolean getStaffAccessRoles(Long parentOrgId, Long unitId, String role,Long staffId);
+
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} AND ag.role={2}\n" +
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role")
+    List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategoryAndRole(Long countryId, String orgCategory, String role);
+
+    @Query("MATCH (org:Organization)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag:AccessGroup{deleted:false}) WHERE id(org)={0} AND ag.role={1}\n" +
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role")
+    List<AccessGroupQueryResult> getOrganizationAccessGroupByRole(Long organizationId,  String role);
+
+    @Query("MATCH (org:Organization)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag:AccessGroup{deleted:false}) WHERE id(org)={0} AND ag.name={1} AND ag.role={2}\n" +
+            "RETURN ag")
+    AccessGroup getOrganizationAccessGroupByName(Long organizationId, String name, String role);
+
 
 }
 

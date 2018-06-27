@@ -5,6 +5,7 @@ import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.response.dto.web.phase.PhaseDTO;
 import com.kairos.response.dto.web.phase.PhaseWeeklyDTO;
 import com.kairos.response.dto.web.access_group.UserAccessRoleDTO;
+import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +18,20 @@ public class PhaseActivityDTO {
     private List<PhaseWeeklyDTO> phases;
     private List<DayType> dayTypes= new ArrayList<>();
     private UserAccessRoleDTO staffAccessRole;
+    private List<ShiftTemplateDTO> shiftTemplates;
 
     public PhaseActivityDTO() {
         //Default Constructor
+    }
+
+    public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
+                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases) {
+        this.activities = activities;
+        this.phases = phases;
+        this.dayTypes = dayTypes;
+        this.staffAccessRole = staffAccessRole;
+        this.shiftTemplates = shiftTemplates;
+        this.applicablePhases = applicablePhases;
     }
 
     private List<PhaseDTO> applicablePhases;
@@ -63,5 +75,14 @@ public class PhaseActivityDTO {
 
     public void setStaffAccessRole(UserAccessRoleDTO staffAccessRole) {
         this.staffAccessRole = staffAccessRole;
+    }
+
+
+    public List<ShiftTemplateDTO> getShiftTemplates() {
+        return shiftTemplates;
+    }
+
+    public void setShiftTemplates(List<ShiftTemplateDTO> shiftTemplates) {
+        this.shiftTemplates = shiftTemplates;
     }
 }
