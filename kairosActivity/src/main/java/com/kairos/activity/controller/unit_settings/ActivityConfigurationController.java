@@ -40,7 +40,7 @@ public class ActivityConfigurationController {
 
 
     @ApiOperation("create exception absence Activity Configuration ")
-    @PutMapping(value = "/absence")
+    @PostMapping(value = "/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createAbsenceExceptionActivityConfiguration(@PathVariable Long unitId, @RequestBody AbsencePlannedTime absencePlannedTime) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.createAbsenceExceptionActivityConfiguration(unitId, absencePlannedTime));
