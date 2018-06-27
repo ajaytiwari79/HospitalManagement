@@ -49,7 +49,7 @@ public class ShiftTemplateController {
     @ApiOperation("delete a Shift Template")
     @DeleteMapping(value = "/shift_template/{shiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteShift(@PathVariable BigInteger shiftTemplateId) {
+    public ResponseEntity<Map<String, Object>> deleteShiftTemplate(@PathVariable BigInteger shiftTemplateId) {
         shiftTemplateService.deleteShiftTemplate(shiftTemplateId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
