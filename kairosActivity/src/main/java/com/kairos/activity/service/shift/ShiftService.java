@@ -241,18 +241,18 @@ public class ShiftService extends MongoBaseService {
     }
 
     private BigInteger getAbsencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
-        List<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         BigInteger plannedTimeId = null;
-        for (ActivityConfiguration act : activityConfiguration) {
-            if (!Optional.ofNullable(act.getAbsencePlannedTime()).isPresent()) {
+        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
+            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
             }
 
-            if (act.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(act.getAbsencePlannedTime().getTimeTypeId())) {
-                plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
+            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
+                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
                 break;
             } else {
-                plannedTimeId = act.getAbsencePlannedTime().getPlannedTimeId();
+                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
             }
         }
         // checking weather this is allowed to staff or not
