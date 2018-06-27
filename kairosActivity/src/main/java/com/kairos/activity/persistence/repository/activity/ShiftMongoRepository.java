@@ -3,6 +3,7 @@ package com.kairos.activity.persistence.repository.activity;
 
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.web.planning.vrpPlanning.ShiftDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
@@ -43,5 +44,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{'deleted':false,'staffId':?0, 'isMainShift':true, 'activityId':?1, '$or':[{'startDate':{$gte:?2,$lte:?3}},{'endDate':{$gte:?2,$lte:?3}}]}")
     List<ShiftQueryResult> findAllShiftsByActivityIdAndBetweenDuration(Long staffId,BigInteger activityId,Date startDate, Date endDate);
 
+    @Query("{deleted:false,staffId:{$in:?0}, isMainShift:true,startDate:{$gte:?1,$lte:?2}}")
+    List<ShiftDTO> findAllShiftsByStaffIds(List<Long> staffIds,Date startDate,Date endDate);
 
 }

@@ -4,10 +4,9 @@ package com.kairos.activity.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.enums.shift.ShiftState;
-import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -59,8 +58,10 @@ public class Shift extends MongoBaseEntity {
 
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
+    private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
     public Shift() {
+        //dc
     }
 
 
@@ -69,7 +70,6 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.unitPositionId = unitPositionId;
     }
-
 
 
     public List<BigInteger> getBrokenRuleTemplateIds() {
@@ -196,7 +196,7 @@ public class Shift extends MongoBaseEntity {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
-    public int getMinutes(){
+    public int getMinutes() {
         return getInterval().getMinutes();
     }
 
@@ -224,8 +224,8 @@ public class Shift extends MongoBaseEntity {
         return isMainShift;
     }
 
-    public DateTimeInterval getDateTimeInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.getEndDate().getTime());
+    public DateTimeInterval getDateTimeInterval() {
+        return new DateTimeInterval(this.startDate.getTime(), this.getEndDate().getTime());
     }
 
     public void setMainShift(boolean mainShift) {
@@ -323,7 +323,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
     public Long getUnitPositionId() {
         return unitPositionId;
     }
@@ -364,6 +363,14 @@ public class Shift extends MongoBaseEntity {
         this.copiedFromShiftId = copiedFromShiftId;
     }
 
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
+    }
+
     public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, ShiftState shiftState, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.name = name;
         this.startDate = startDate;
@@ -383,7 +390,10 @@ public class Shift extends MongoBaseEntity {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
     }
-    public DateTimeInterval getInterval(){
-        return new DateTimeInterval(this.startDate.getTime(),this.endDate.getTime());
+
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
+
+
 }

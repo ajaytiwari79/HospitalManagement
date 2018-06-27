@@ -37,68 +37,90 @@ public class AccountTypeController {
 
     @ApiOperation(value = "create new account type")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
-        if (countryId != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
+    public ResponseEntity<Object> createAccountType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody AccountType accountType) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_GATEWAY, false, "country id can not be null");
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, organizationId, accountType));
     }
 
     @ApiOperation(value = "account type by name")
     @GetMapping("/{name}")
-    public ResponseEntity<Object> getAccount(@PathVariable Long countryId, @PathVariable String name) {
+    public ResponseEntity<Object> getAccountTypeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String name) {
         if (StringUtils.isBlank(name)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountByName(countryId, name));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountByName(countryId, organizationId, name));
 
     }
 
     @ApiOperation(value = "all account type ")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<Object> getAllAccounts(@PathVariable Long countryId) {
-        if (countryId==null)
-        {
+    public ResponseEntity<Object> getAllAccountTypes(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccountType(countryId, organizationId));
 
     }
 
-    @ApiOperation(value = "account type by name")
+    @ApiOperation(value = "account type by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getAccountType(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getAccountTypeById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountTypeById(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountTypeById(countryId, organizationId, id));
 
     }
 
 
-    @ApiOperation(value = "update account type ")
+    @ApiOperation(value = "update account type name")
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Object> updateAccountName(@PathVariable BigInteger id, @PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
+    public ResponseEntity<Object> updateAccountTypeName(@PathVariable BigInteger id, @PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody AccountType accountType) {
         if (id == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.updateAccountName(countryId, id, accountType));
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.updateAccountTypeName(countryId, organizationId, id, accountType));
     }
 
 
-    @ApiOperation(value = "update account type ")
+    @ApiOperation(value = "delete account type by id ")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteAccountType(@PathVariable Long countryId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteAccountTypeById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
-        } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.deleteAccountType(id));
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.deleteAccountTypeById(countryId, organizationId, id));
 
     }
 

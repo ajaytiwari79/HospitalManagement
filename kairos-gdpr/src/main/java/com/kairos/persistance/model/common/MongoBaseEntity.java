@@ -21,7 +21,9 @@ public abstract class MongoBaseEntity {
     @LastModifiedDate
     protected Date updatedAt;
     @JsonIgnore
-    protected boolean deleted ;
+    protected boolean deleted;
+
+    protected Long organizationId;
 
     public BigInteger getId() {
         return id;
@@ -29,6 +31,12 @@ public abstract class MongoBaseEntity {
 
     public void setId(BigInteger id) {
         this.id = id;
+    }
+
+    public Long getOrganizationId() { return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId;
     }
 
     public Date getCreatedAt() {

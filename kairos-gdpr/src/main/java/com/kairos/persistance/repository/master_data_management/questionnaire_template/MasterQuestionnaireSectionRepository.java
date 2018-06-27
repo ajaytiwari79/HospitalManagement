@@ -14,14 +14,14 @@ import java.util.Set;
 public interface MasterQuestionnaireSectionRepository extends MongoRepository<MasterQuestionnaireSection, BigInteger> ,CustomMasterQuestionSectionRepository {
 
 
-    @Query("{deleted:false,countryId:?0,title:?1}")
-    MasterQuestionnaireSection findMasterQuestionByTitleAndCountryId(Long countryId, String name);
+    @Query("{deleted:false,countryId:?0,organizationId:?1,title:?2}")
+    MasterQuestionnaireSection findMasterQuestionByTitleAndCountryId(Long countryId,Long organizationId,String name);
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
-    MasterQuestionnaireSection findByIdAndNonDeleted(Long countryId, BigInteger id);
+    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
+    MasterQuestionnaireSection findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<MasterQuestionnaireSection> getQuestionnniareSectionListByIds(Long countryId, List<BigInteger> ids);
+    @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
+    List<MasterQuestionnaireSection> getQuestionnniareSectionListByIds(Long countryId,Long organizationId,List<BigInteger> ids);
 
     MasterQuestionnaireSection findByid(BigInteger id);
 

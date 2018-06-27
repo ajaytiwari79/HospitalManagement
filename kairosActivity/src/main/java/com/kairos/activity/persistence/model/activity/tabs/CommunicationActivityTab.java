@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Created by vipul on 24/8/17.
  */
 public class CommunicationActivityTab implements Serializable{
-
     private boolean allowCommunicationReminder;
     private String timeUnit;
     private long timeLength;

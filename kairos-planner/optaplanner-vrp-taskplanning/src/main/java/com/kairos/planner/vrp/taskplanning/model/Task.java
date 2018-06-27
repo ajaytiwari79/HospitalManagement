@@ -217,9 +217,6 @@ public class Task extends TaskOrShift{
     }
     //for rules only
     public int getDrivingTimeSeconds(){
-        /*if(!false){
-            return 0;
-        }*/
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
         }
@@ -227,9 +224,6 @@ public class Task extends TaskOrShift{
         Task prevTask=getPreviousValidTask((Task)prevTaskOrShift);
         if(prevTask==null) return 0;
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
-        if(lpd==null){
-            int i=0;
-        }
         return lpd.getTime();
     }
 
@@ -316,7 +310,24 @@ public class Task extends TaskOrShift{
         if(plannedStartTime==null) return true;
         int mins=plannedStartTime.get(ChronoField.MINUTE_OF_DAY);
         //in between 1100 to 1330
-        return mins >=660 && mins<=810;
+        return mins >=660 && mins<=750;
+    }
+    //0 means 1st task
+    public int getOrder(){
+        int i=0;
+        Task temp=this;
+        while(temp.prevTaskOrShift instanceof Task){
+            temp= (Task) temp.prevTaskOrShift;
+            i++;
+        }
+        return  i;
+    }
+
+    public String getFullStreetName(){
+        return city+streetName;
+    }
+    public boolean areHouseNumberSameLane(Task task){
+        return this.houseNo %2 ==task.getHouseNo()%2;
     }
 
 }

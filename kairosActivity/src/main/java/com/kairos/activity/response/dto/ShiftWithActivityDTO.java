@@ -48,7 +48,7 @@ public class ShiftWithActivityDTO {
     private ShiftWithActivityDTO subShift;
     private ShiftState shiftState;
     private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
-
+    private BigInteger plannedTypeId ;
 
     public ShiftState getShiftState() {
         return shiftState;
@@ -267,4 +267,11 @@ public class ShiftWithActivityDTO {
         return new Interval(startDate.getTime(),endDate.getTime());
     }
 
+    public BigInteger getPlannedTypeId() {
+        return plannedTypeId;
+    }
+
+    public void setPlannedTypeId(BigInteger plannedTypeId) {
+        this.plannedTypeId = plannedTypeId;
+    }
 }

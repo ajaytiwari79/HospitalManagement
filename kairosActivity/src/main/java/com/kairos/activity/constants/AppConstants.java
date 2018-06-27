@@ -264,4 +264,7 @@ public class AppConstants {
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String DECLINE="DECLINE";
     public static final String ASSIGN_OR_NOTIFY="ASSIGN_OR_NOTIFY";
+    public static final String NORMAL_TIME="Normal Time";
+    public static final String EXTRA_TIME="Extra Time";
+    public static final String OVER_TIME="Overtime";
 }

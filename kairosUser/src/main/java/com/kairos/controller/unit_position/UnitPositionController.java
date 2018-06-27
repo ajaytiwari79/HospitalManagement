@@ -1,7 +1,6 @@
 package com.kairos.controller.unit_position;
 
 
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.response.dto.web.wta.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
@@ -16,14 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -113,8 +110,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "get unit_position's Id By Staff and expertise")
     @GetMapping(value = "/staff/{staffId}/expertise/{expertiseId}/unitPositionId")
-    public ResponseEntity<Map<String, Object>> getUnitPositionIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId, @PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId));
+    public ResponseEntity<Map<String, Object>> getUnitPositionIdByStaffAndExpertise(@PathVariable Long unitId, @PathVariable Long staffId,@RequestParam(value = "dateInMillis") Long dateInMillis, @PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionIdByStaffAndExpertise(unitId, staffId,dateInMillis, expertiseId));
     }
 
     @ApiOperation(value = "get unit positions based on expertise and staff list")
