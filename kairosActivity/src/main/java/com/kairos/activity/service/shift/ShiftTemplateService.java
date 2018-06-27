@@ -60,7 +60,7 @@ public class ShiftTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(shiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
         }
-        shiftTemplate.setName(shiftTemplateDTO.getName());
+        BeanUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList");
         save(shiftTemplate);
         return shiftTemplateDTO;
     }
@@ -117,4 +117,5 @@ public class ShiftTemplateService extends MongoBaseService {
         save(shiftTemplate);
         return true;
     }
+
 }

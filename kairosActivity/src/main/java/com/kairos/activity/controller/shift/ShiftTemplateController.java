@@ -75,6 +75,4 @@ public class ShiftTemplateController {
     public ResponseEntity<Map<String, Object>> deleteIndividualShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @PathVariable BigInteger individualShiftTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.deleteIndividualShiftTemplate(shiftTemplateId, individualShiftTemplateId));
     }
-
-
 }
