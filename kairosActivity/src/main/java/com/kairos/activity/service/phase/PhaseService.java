@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by vipul on 25/9/17.
@@ -173,6 +174,11 @@ public class PhaseService extends MongoBaseService {
         return phases;
     }
 
+    public List<PhaseDTO> getActualPhasesByOrganizationId(Long orgId) {
+        List<PhaseDTO> phases = phaseMongoRepository.getActualPhasesByUnit(orgId);
+        return phases;
+    }
+
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
@@ -252,20 +258,30 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        phase.setDescription(phaseDTO.getDescription());
-        phase.setDurationType(phaseDTO.getDurationType());
-        phase.setDuration(phaseDTO.getDuration());
+        if(phase.getPhaseType().equals(PhaseType.ACTUAL)){
+            phase.setStatus(Phase.PhaseStatus.getListByValue(phaseDTO.getStatus()));
+        } else {
+            phase.setDescription(phaseDTO.getDescription());
+            phase.setDurationType(phaseDTO.getDurationType());
+            phase.setDuration(phaseDTO.getDuration());
+        }
+
         save(phase);
         return phase;
     }
 
     private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
 
-        phase.setDuration(phaseDTO.getDuration());
-        phase.setDurationType(phaseDTO.getDurationType());
-        phase.setName(phase.getName());
-        phase.setSequence(phase.getSequence());
-        phase.setDescription(phaseDTO.getDescription());
+        if(phase.getPhaseType().equals(PhaseType.PLANNING)){
+            phase.setDuration(phaseDTO.getDuration());
+            phase.setDurationType(phaseDTO.getDurationType());
+            phase.setName(phase.getName());
+            phase.setSequence(phase.getSequence());
+            phase.setDescription(phaseDTO.getDescription());
+        } else {
+            phase.setStatus(Phase.PhaseStatus.getListByValue(phaseDTO.getStatus()));
+        }
+
     }
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
@@ -288,6 +304,11 @@ public class PhaseService extends MongoBaseService {
         return phaseDTO;
     }
 
+    public List<String> getAllApplicablePhaseStatus(){
+        return Stream.of(Phase.PhaseStatus.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+    }
     /*private ArrayList getDefaultPhases(long unitId) {
         ArrayList<Phase> phases = new ArrayList();
         return phases;

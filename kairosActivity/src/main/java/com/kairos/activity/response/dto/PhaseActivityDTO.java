@@ -23,6 +23,7 @@ public class PhaseActivityDTO {
     }
 
     private List<PhaseDTO> applicablePhases;
+    private List<PhaseDTO> actualPhases;
 
 
     public List<ActivityWithCompositeDTO> getActivities() {
@@ -63,5 +64,13 @@ public class PhaseActivityDTO {
 
     public void setStaffAccessRole(UserAccessRoleDTO staffAccessRole) {
         this.staffAccessRole = staffAccessRole;
+    }
+
+    public List<PhaseDTO> getActualPhases() {
+        return actualPhases;
+    }
+
+    public void setActualPhases(List<PhaseDTO> actualPhases) {
+        this.actualPhases = actualPhases;
     }
 }

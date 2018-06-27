@@ -723,6 +723,7 @@ public class ActivityService extends MongoBaseService {
         phaseActivityDTO.setStaffAccessRole(staffRestClient.getAccessOfCurrentLoggedInStaff());
 
         phaseActivityDTO.setApplicablePhases(phaseDTOs);
+        phaseActivityDTO.setActualPhases(phaseService.getActualPhasesByOrganizationId(unitId));
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
