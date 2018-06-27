@@ -714,12 +714,12 @@ public class ExpertiseService extends UserBaseService {
         return true;
     }
 
-    public List<ExpertisePlannedTimeQR> getPlannedTimeInExpertise(Long expertiseId) {
+    public List<ExpertisePlannedTimeQueryResult> getPlannedTimeInExpertise(Long expertiseId) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
         }
-        List<ExpertisePlannedTimeQR> expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
+        List<ExpertisePlannedTimeQueryResult> expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
         return expertiseEmploymentTypeRelationships;
     }
 

@@ -116,6 +116,16 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     }
 
+    public BigInteger createAbsenceExceptionActivityConfiguration(Long unitId, AbsencePlannedTime absencePlannedTime) {
+        if (!Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("error.timetype.unselected");
+        }
+        ActivityConfiguration activityConfiguration = new ActivityConfiguration(unitId, new AbsencePlannedTime(absencePlannedTime.getPhaseId(), absencePlannedTime.getTimeTypeId(), absencePlannedTime.getPlannedTimeId(), true));
+        save(activityConfiguration);
+        return activityConfiguration.getId();
+
+    }
+
     public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
         List<ActivityConfigurationDTO> activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
         return activityConfigurations;
