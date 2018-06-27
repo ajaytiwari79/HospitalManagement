@@ -1,0 +1,179 @@
+package com.kairos.planning.rules;
+    dialect "java"
+//import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScoreHolder;
+import com.kairos.planning.domain.*;
+import com.kairos.planning.utils.TaskPlanningUtility;
+global BendableLongScoreHolder scoreHolder;
+
+//Impossible  constraints
+rule "Skill requirements"
+salience 20
+    when
+        Task( (missingSkillCount > 0 && $missingSkillCount : missingSkillCount))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,0,  - 10);
+end
+/*rule "tasksChain for time"
+salience 20
+    when
+       $task:Task (!isTaskChainOrdered())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,1,-5);
+end
+*/
+rule "Multi man tasks"
+salience 20
+    when
+        $task1: Task ( $id:id &&employee!=null &&  $employeeId:employee.getId())
+        Task (isMultiManTask() && employee!=null && relatedTaskId.equals($id) && (employee.getId().equals($employeeId) || !startTime.equals($task1.startTime)))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,2,-2);
+end
+
+
+
+rule "Employees use same vehicle same time"
+salience 20
+    when
+        $employee: Employee ($id:id && vehicle!=null && $vehicle:vehicle)
+        Employee (vehicle!=null && vehicle==$vehicle && id!=$id&& workIntervalOverlapsWithSameVehicle($employee))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,3,- 1);
+end
+
+//Hard constraints
+
+
+
+rule "Employee availability"
+salience 10
+    when
+        //$task:Task(employee!=null &&  employee.getVehicle()!=null&& !canAssignedEmployeeWork())
+        not(
+        Task(employee!=null  &&  employee.getVehicle()!=null && $employee:employee && $taskInterval:getIntervalIncludingArrivalAndWaiting())
+        &&
+        $av:AvailabilityRequest(employee==$employee && containsInterval($taskInterval))
+        )
+    then
+        //if($task.getEmployee().getAvailableMinutes()>0l){
+            //scoreHolder.addHardConstraintMatch(kcontext,4,  - $task.getMinutesExceedingAvailability());
+            scoreHolder.addHardConstraintMatch(kcontext,1,  - 1);
+            //TaskPlanningUtility.checker($task,$employee,$taskInterval,kcontext);
+           // TaskPlanningUtility.checker(kcontext);
+        //}else{
+         //   scoreHolder.addHardConstraintMatch(kcontext,4,  - 6);
+        //}
+end
+rule "Employee Reach Back"
+salience 10
+    when
+        //$task:Task(employee!=null &&  employee.getVehicle()!=null&& !canAssignedEmployeeReachBack())
+        $task:Task(employee!=null &&  employee.getVehicle()!=null && isLastTaskOfRoute() && $employee:employee && $taskInterval:getReachBackUnitInterval())
+          not
+        AvailabilityRequest(employee==$employee && containsInterval($taskInterval))
+
+
+    then
+      // if($task.getEmployee().getAvailableMinutes()>0l){
+          // scoreHolder.addHardConstraintMatch(kcontext,4,  - $task.getMinutesExceedingAvailabilityForReachingUnit());
+           scoreHolder.addHardConstraintMatch(kcontext,4,  -1);
+       //}else{
+          // scoreHolder.addHardConstraintMatch(kcontext,4,  - 6);
+       //}
+end
+
+rule "task timings in sla boundries"
+salience 5
+    when
+        //$task: Task (previousTaskOrEmployee instanceof Task  && $nextTask:previousTaskOrEmployee && !$task.isPlannedInPossibleInterval())
+        Task (employee!=null && !isPlannedInPossibleInterval())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,5,-2);
+end
+
+rule "employee Un-assigned"
+salience 5
+    when
+        Task(employee==null)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,7,  - 1);
+end
+
+rule "Employee Un-assigned"
+salience 5
+    when
+        Task(employee!=null && employee.getVehicle()==null)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,8,  - 1);
+end
+
+
+
+
+//Soft constraints
+rule "task planned in extended interval"
+salience 20
+    when
+        $task: Task (previousTaskOrEmployee instanceof Task  && $nextTask:previousTaskOrEmployee && $task.isPlannedInExtendedInterval())
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,0,-10);
+end
+
+rule "waitingTime"
+salience 3
+    when
+        $task : Task(previousTaskOrEmployee != null)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,2,- $task.getWaitingMinutes());
+        //scoreHolder.addSoftConstraintMatch(kcontext,2,- 1);
+end
+
+
+rule "distanceToPreviousTaskLocation"
+salience 3
+    when
+        $task : Task(previousTaskOrEmployee != null, $distanceFromPreviousTaskOrEmployee : distanceFromPreviousTaskOrEmployee)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,3,- $distanceFromPreviousTaskOrEmployee);
+end
+/*
+//This is just for phase 1 CH so no same employees are assigned to one vehicle
+rule "Employees use same vehicle"
+salience 3
+    when
+        $employee: Employee ($id:id && vehicle!=null && $vehicle:vehicle)
+        Employee (vehicle!=null && vehicle==$vehicle && id!=$id)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,4,- 1);
+end
+
+rule "AllVehicleUsage"
+salience 1
+    when
+    Task ($vehicle : vehicle)
+    accumulate(
+            $task : Task(
+                vehicle == $vehicle);
+            $totalVehicleUsed : count($task);
+            $totalVehicleUsed == 0
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,2, -1);
+end
+*/
+//Insert logicals
+/*
+rule "Insert shifts"
+salience 1
+when
+   // $employee:Employee(getWorkMinutes()>300)
+    $employee:Employee(getWorkMinutes()>0)
+    not AvailabilityRequest(employee==$employee)
+ then
+    //TaskPlanningUtility.check(drools,insertLogical(TaskPlanningUtility.createBreak($employee)));
+    //TaskPlanningUtility.checkA(drools,insertLogical(new AvailabilityRequest($employee,$employee.getWorkInterval())));
+    insertLogical(new AvailabilityRequest($employee,$employee.getWorkInterval()));
+ end
+ */
+ 

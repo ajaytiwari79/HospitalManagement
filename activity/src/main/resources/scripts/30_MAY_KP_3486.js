@@ -1,0 +1,1 @@
+db.activities.updateMany({permissionsActivityTab: { $exists: false }},{$set:{"permissionsActivityTab":{}}})
