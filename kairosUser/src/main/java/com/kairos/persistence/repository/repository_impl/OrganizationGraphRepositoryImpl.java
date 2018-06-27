@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.persistence.model.enums.FilterType;
+import com.kairos.activity.enums.FilterType;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import com.kairos.response.dto.web.client.ClientFilterDTO;
 import org.apache.commons.lang.StringUtils;
@@ -128,7 +128,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                 "age:round ((timestamp()-user.dateOfBirth) / (365*24*60*60*1000)),"+
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId,"+
                 "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
-                "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) } as staff ORDER BY staff.id\n";
+                "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) ,access_token:staff.access_token,user_id:staff.user_id } as staff ORDER BY staff.id\n";
 
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
     }

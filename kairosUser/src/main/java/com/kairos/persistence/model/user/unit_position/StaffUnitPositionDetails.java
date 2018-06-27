@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -16,7 +16,6 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.time.DayOfWeek;
-import java.time.ZoneId;
 
 import java.util.List;
 

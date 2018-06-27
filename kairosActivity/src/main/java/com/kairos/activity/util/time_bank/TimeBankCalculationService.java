@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.activity.client.StaffRestClient;
 import com.kairos.activity.client.dto.TimeBankRestClient;
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
-import com.kairos.activity.client.dto.staff.UnitPositionDTO;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.TimeCalaculationType;
 import com.kairos.activity.enums.TimeTypes;
@@ -13,35 +11,22 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
-import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.activity.response.dto.ShiftWithActivityDTO;
-import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
-import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.activity.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
+import com.kairos.activity.response.dto.ShiftWithActivityDTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
-import com.kairos.activity.response.dto.time_bank.*;
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.client.dto.time_bank.*;
-import com.kairos.client.dto.time_bank.CTAIntervalDTO;
-import com.kairos.client.dto.time_bank.CalculatedTimeBankByDateDTO;
-import com.kairos.client.dto.time_bank.ScheduleTimeByTimeTypeDTO;
-import com.kairos.client.dto.time_bank.TimeBankCTADistributionDTO;
-import com.kairos.client.dto.time_bank.TimeBankDTO;
-import com.kairos.client.dto.time_bank.TimeBankIntervalDTO;
-import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.user.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
-import static java.time.temporal.ChronoUnit.MINUTES;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -54,6 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.kairos.activity.constants.AppConstants.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 
 /*
@@ -720,7 +706,8 @@ public class TimeBankCalculationService {
             timeBankIntervalDTO.setTotalTimeBankMin(0);//dailyTimeBankEntries.stream().mapToInt(t->t.getTotalTimeBankMin()).sum());
             //timeBankIntervalDTO.setTimeBankDistributions(getBlankTimeBankDistribution(dailyTimeBankEntries, null));
             List<TimeBankCTADistribution> timeBankCTADistributions = dailyTimeBankEntries.stream().flatMap(tb -> tb.getTimeBankCTADistributionList().stream()).collect(Collectors.toList());
-            timeBankCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaRuleTemplateId(), Collectors.summarizingInt(tb -> tb.getMinutes())));
+            timeBankCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaRuleTemplateId(),
+                    Collectors.summarizingInt(tb -> tb.getMinutes())));
             timeBankIntervalDTOS.add(timeBankIntervalDTO);
         });
 

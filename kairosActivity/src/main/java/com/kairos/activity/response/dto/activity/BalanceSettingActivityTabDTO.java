@@ -14,26 +14,16 @@ public class BalanceSettingActivityTabDTO {
 
     private Long activityId;
     private Integer addTimeTo;
-    private String addDayTo;
     private BigInteger timeTypeId;
-    private BigInteger presenceTypeId;
     private boolean onCallTimePresent;
     private Boolean negativeDayBalancePresent;
 
 
     public BalanceSettingsActivityTab buildBalanceSettingsActivityTab() {
-        BalanceSettingsActivityTab balanceSettingsActivityTab = new BalanceSettingsActivityTab(addTimeTo, addDayTo, timeTypeId,presenceTypeId, onCallTimePresent, negativeDayBalancePresent);
-        balanceSettingsActivityTab.setPresenceTypeId(presenceTypeId);
+        BalanceSettingsActivityTab balanceSettingsActivityTab = new BalanceSettingsActivityTab(addTimeTo, timeTypeId, onCallTimePresent, negativeDayBalancePresent);
         return balanceSettingsActivityTab;
     }
 
-    public BigInteger getPresenceTypeId() {
-        return presenceTypeId;
-    }
-
-    public void setPresenceTypeId(BigInteger presenceTypeId) {
-        this.presenceTypeId = presenceTypeId;
-    }
 
     public Long getActivityId() {
         return activityId;
@@ -65,14 +55,6 @@ public class BalanceSettingActivityTabDTO {
 
     public void setAddTimeTo(Integer addTimeTo) {
         this.addTimeTo = addTimeTo;
-    }
-
-    public String getAddDayTo() {
-        return addDayTo;
-    }
-
-    public void setAddDayTo(String addDayTo) {
-        this.addDayTo = addDayTo;
     }
 
     public BigInteger getTimeTypeId() {

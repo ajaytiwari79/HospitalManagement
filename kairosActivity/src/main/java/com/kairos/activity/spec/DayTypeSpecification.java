@@ -1,14 +1,14 @@
 package com.kairos.activity.spec;
 
-import com.kairos.activity.client.dto.DayType;
+import com.kairos.response.dto.web.day_type.DayType;
 import com.kairos.activity.persistence.model.activity.Activity;
-import com.kairos.activity.persistence.model.staffing_level.Day;
+import com.kairos.enums.Day;
 import com.kairos.activity.service.exception.ExceptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
-import static com.kairos.activity.persistence.model.staffing_level.Day.*;
+import static com.kairos.enums.Day.*;
 
 /**
  * Created by oodles on 30/11/17.

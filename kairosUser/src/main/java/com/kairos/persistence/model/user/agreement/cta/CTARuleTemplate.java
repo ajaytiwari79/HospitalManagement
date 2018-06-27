@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;

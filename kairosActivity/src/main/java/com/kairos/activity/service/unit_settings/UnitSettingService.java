@@ -1,9 +1,7 @@
 package com.kairos.activity.service.unit_settings;
 
 
-import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.constants.AppConstants;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.activity.persistence.model.unit_settings.UnitSetting;

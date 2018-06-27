@@ -666,6 +666,14 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessRolesOfStaffByUserId(unitId));
     }
 
+    @RequestMapping(value = "/chat_server/register", method = RequestMethod.GET)
+    @ApiOperation("register staffs to chat server")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerAllStaffsToChatServer() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.registerAllStaffsToChatServer());
+    }
+
+
 
     @GetMapping(value = "/get_Staff_By_Unit")
     @ApiOperation("get staff by unit")

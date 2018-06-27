@@ -8,6 +8,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.activity.enums.TimeTypes;
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.PlannedTimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
@@ -15,8 +16,9 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
+
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -493,7 +495,7 @@ public class CountryService extends UserBaseService {
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
          List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
-         List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
+         List<PhaseResponseDTO> phases = phaseRestClient.getPhases(countryId);
          List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
 
          //wrap data into wrapper class

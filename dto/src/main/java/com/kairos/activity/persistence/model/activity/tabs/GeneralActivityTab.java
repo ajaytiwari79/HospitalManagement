@@ -33,11 +33,8 @@ public class GeneralActivityTab implements Serializable {
     private String ultraShortName;
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean overRuleCtaWta;
 
     private List<TagDTO> tags = new ArrayList<>();
-    private String payrollType;
-    private String payrollSystem;
 
     public GeneralActivityTab() {
     }
@@ -76,7 +73,7 @@ public class GeneralActivityTab implements Serializable {
 
 
     public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String textColor, String description,
-                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,boolean overRuleCtaWta, String payrollSystem, String payrollType,LocalDate startDate,LocalDate endDate) {
+                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName, LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.code = code;
         this.printoutSymbol = printoutSymbol;
@@ -91,10 +88,6 @@ public class GeneralActivityTab implements Serializable {
         this.originalIconName = originalIconName;
         this.modifiedIconName = modifiedIconName;
         this.ultraShortName=ultraShortName;
-
-        this.overRuleCtaWta=overRuleCtaWta;
-        this.payrollSystem = payrollSystem;
-        this.payrollType = payrollType;
         this.startDate=startDate;
         this.endDate=endDate;
     }
@@ -216,30 +209,6 @@ public class GeneralActivityTab implements Serializable {
 
     public void setUltraShortName(String ultraShortName) {
         this.ultraShortName = ultraShortName;
-    }
-
-    public boolean isOverRuleCtaWta() {
-        return overRuleCtaWta;
-    }
-
-    public void setOverRuleCtaWta(boolean overRuleCtaWta) {
-        this.overRuleCtaWta = overRuleCtaWta;
-    }
-
-    public String getPayrollType() {
-        return payrollType;
-    }
-
-    public void setPayrollType(String payrollType) {
-        this.payrollType = payrollType;
-    }
-
-    public String getPayrollSystem() {
-        return payrollSystem;
-    }
-
-    public void setPayrollSystem(String payrollSystem) {
-        this.payrollSystem = payrollSystem;
     }
 
     public LocalDate getStartDate() {
