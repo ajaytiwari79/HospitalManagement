@@ -175,18 +175,18 @@ public class StaffRestClient {
     }
 
 
-    public List<StaffDTO> getStaffListByUnit() {
+    public List<com.kairos.user.staff.staff.StaffDTO> getStaffListByUnit() {
 
         final String baseUrl = getBaseUrl(true);
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<List<StaffDTO>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/staff/get_Staff_By_Unit",
                             HttpMethod.GET, null, typeReference);
-            RestTemplateResponseEnvelope<List<StaffDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

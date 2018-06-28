@@ -163,7 +163,7 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
     private Object[] getShiftAndEmployees(){
-        List<StaffDTO> staffs = staffRestClient.getStaffListByUnit();
+        List<com.kairos.user.staff.staff.StaffDTO> staffs = staffRestClient.getStaffListByUnit();
         List<Long> staffIds = staffs.stream().map(st->st.getId()).collect(toList());
         List<TaskTypeSettingDTO> taskTypeSettingDTOS = taskTypeSettingMongoRepository.findByStaffIds(staffIds);
         Map<Long,List<TaskTypeSettingDTO>> staffSettingMap = taskTypeSettingDTOS.stream().collect(Collectors.groupingBy(t->t.getStaffId(),toList()));
