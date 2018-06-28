@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageFormat;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +27,9 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
+    @Inject
+    private ComparisonUtils  comparisonUtils;
+
     public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
 
         Map<String, List<StorageFormat>> result = new HashMap<>();
@@ -39,7 +43,13 @@ public class StorageFormatService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<StorageFormat> existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(storageFormat -> {
+                    existingNames.add(storageFormat.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
             if (names.size() != 0) {
                 for (String name : names) {
 

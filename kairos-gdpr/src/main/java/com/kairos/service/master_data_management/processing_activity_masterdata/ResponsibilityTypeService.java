@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ResponsibilityType;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public class ResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
 
@@ -41,7 +44,14 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
             }
             List<ResponsibilityType> existing = responsibilityTypeMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(responsibilityType -> {
+                    existingNames.add(responsibilityType.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
+
             if (names.size() != 0) {
                 for (String name : names) {
 

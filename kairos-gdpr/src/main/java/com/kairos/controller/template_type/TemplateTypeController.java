@@ -1,10 +1,8 @@
 package com.kairos.controller.template_type;
-import com.kairos.custom_exception.DataNotExists;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.validate_list.ValidateDTOList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +41,7 @@ public class TemplateTypeController {
      */
     @ApiOperation(value = "create new Template type")
     @PostMapping("/createTemplate")
-    public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId,@Valid  @RequestBody ValidateListOfRequestBody<TemplateType> templateData) {
+    public ResponseEntity<Object> createTemplateType(@PathVariable Long countryId,@Valid  @RequestBody ValidateDTOList<TemplateType> templateData) {
         if (templateData.getRequestBody().size()>0) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.createTemplateType(countryId,templateData.getRequestBody()));
         }

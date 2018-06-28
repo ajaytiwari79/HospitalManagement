@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSource;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSourceMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +27,9 @@ public class DataSourceService extends MongoBaseService {
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
 
     public Map<String, List<DataSource>> createDataSource(Long countryId,Long organizationId,List<DataSource> dataSources) {
         Map<String, List<DataSource>> result = new HashMap<>();
@@ -41,8 +45,13 @@ public class DataSourceService extends MongoBaseService {
             }
 
             List<DataSource> existing = dataSourceMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
-
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(dataSource -> {
+                    existingNames.add(dataSource.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
             if (names.size()!=0) {
                 for (String name : names) {
 

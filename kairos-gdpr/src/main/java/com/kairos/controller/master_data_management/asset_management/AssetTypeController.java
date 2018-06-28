@@ -5,7 +5,7 @@ import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 import com.kairos.service.master_data_management.asset_management.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.validate_list.ValidateDTOList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class AssetTypeController {
 
     @ApiOperation("add AssetType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> assetTypes) {
+    public ResponseEntity<Object> createAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateDTOList<AssetType> assetTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {

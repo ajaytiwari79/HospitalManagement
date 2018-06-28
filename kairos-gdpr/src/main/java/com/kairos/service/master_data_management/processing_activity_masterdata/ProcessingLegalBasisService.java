@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ProcessingLegalBasisMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     @Inject
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
     public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long countryId,Long organizationId,List<ProcessingLegalBasis> legalBases) {
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
@@ -40,8 +43,13 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
             }
             List<ProcessingLegalBasis> existing = legalBasisMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
-
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(legalBasis -> {
+                    existingNames.add(legalBasis.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
             if (names.size() != 0) {
                 for (String name : names) {
 

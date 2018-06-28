@@ -9,6 +9,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingProvider;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingProviderMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class HostingProviderService extends MongoBaseService {
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
     public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
         Map<String, List<HostingProvider>> result = new HashMap<>();
 
@@ -41,7 +45,14 @@ public class HostingProviderService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<HostingProvider> existing  = hostingProviderMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(hostingProvider -> {
+                    existingNames.add(hostingProvider.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
+
             if (names.size()!=0) {
                 for (String name : names) {
 

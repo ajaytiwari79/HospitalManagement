@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +28,10 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
+
     public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, Long organizationId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
 
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
@@ -40,8 +45,13 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
-
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(technicalSecurityMeasure -> {
+                    existingNames.add(technicalSecurityMeasure.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
             if (names.size() != 0) {
                 for (String name : names) {
                     TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure();

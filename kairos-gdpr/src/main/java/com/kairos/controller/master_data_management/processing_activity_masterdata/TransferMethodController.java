@@ -4,7 +4,7 @@ package com.kairos.controller.master_data_management.processing_activity_masterd
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.TransferMethod;
 import com.kairos.service.master_data_management.processing_activity_masterdata.TransferMethodService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.validate_list.ValidateDTOList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class TransferMethodController {
 
     @ApiOperation("add transfer Method ")
     @PostMapping("/add")
-    public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<TransferMethod> transferMethods) {
+    public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateDTOList<TransferMethod> transferMethods) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {

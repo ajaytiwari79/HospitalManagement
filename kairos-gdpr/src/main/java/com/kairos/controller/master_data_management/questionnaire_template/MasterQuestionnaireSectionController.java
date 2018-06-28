@@ -3,7 +3,7 @@ package com.kairos.controller.master_data_management.questionnaire_template;
 import com.kairos.dto.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.service.master_data_management.questionnaire_template.MasterQuestionnaireSectionService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.validate_list.ValidateDTOList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class MasterQuestionnaireSectionController {
      */
     @PostMapping("/{templateId}/section")
     @ApiOperation(value = "create and add questionniare section to questionnaire template ")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateDTOList<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
@@ -48,7 +48,7 @@ public class MasterQuestionnaireSectionController {
 
     @PutMapping("/{templateId}/section/update")
     @ApiOperation(value = "update list of Questionniare section and deleted section if deleted property is true")
-    public ResponseEntity updateQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
+    public ResponseEntity updateQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateDTOList<MasterQuestionnaireSectionDTO> questionniareSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {

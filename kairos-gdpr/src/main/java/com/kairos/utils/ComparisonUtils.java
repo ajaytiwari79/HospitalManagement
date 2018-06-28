@@ -1,37 +1,39 @@
 package com.kairos.utils;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
-import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import java.util.*;
 
 @Component
 public class ComparisonUtils {
 
+    public Set<String> checkForExistingObjectAndRemoveFromList (Set<String> namesList,Set<String> existingNames){
 
-    public void checkOrgTypeAndService(Set<Long> ids, List<OrganizationTypeAndServiceBasicDTO> orgTypesAndServices) {
+        Assert.notEmpty(existingNames,"Entity must Not be Empty");
+        Assert.notEmpty(namesList,"Entity must Not be Empty");
+       Map<String,String> existingNamesMapData=new HashMap<>();
 
-        Set<Long> orgTypeAndServiceIds = new HashSet<>();
-        if (ids.size() != orgTypesAndServices.size()) {
-            for (OrganizationTypeAndServiceBasicDTO result : orgTypesAndServices) {
-                orgTypeAndServiceIds.add(result.getId());
-            }
-            Set<Long> differences = difference(ids, orgTypeAndServiceIds);
-            throw new DataNotFoundByIdException("data for id " + differences.iterator().next() + "not exist");
-        }
+       if (existingNames.size()==0)
+       {
+           return namesList;
+       }
+       existingNames.forEach(s -> {
 
+           existingNamesMapData.put(s.toLowerCase(),s);
 
+       });
+       Set<String> newNamesList=new HashSet<>();
+       namesList.forEach(name->{
+           if (!Optional.ofNullable(existingNamesMapData.get(name.toLowerCase())).isPresent())
+           {
+               newNamesList.add(name);
+           }
+       });
+       return newNamesList;
     }
 
 
 
-    public Set<Long> difference(final Set<Long> set1, final Set<Long> set2) {
-        final Set<Long> larger = set1.size() > set2.size() ? set1 : set2;
-        final Set<Long> smaller = larger.equals(set1) ? set2 : set1;
-        return larger.stream().filter(n -> !smaller.contains(n)).collect(Collectors.toSet());
-    }
+
 }

@@ -3,7 +3,7 @@ package com.kairos.utils.validate_list;
 import javax.validation.Valid;
 import java.util.List;
 
-public class ValidateListOfRequestBody<T> {
+public class ValidateDTOList<T> {
 
 
     @Valid
@@ -17,10 +17,10 @@ public class ValidateListOfRequestBody<T> {
         this.requestBody = requestBody;
     }
 
-    public ValidateListOfRequestBody( List<T> requestBody) {
+    public ValidateDTOList(List<T> requestBody) {
         this.requestBody = requestBody;
     }
 
-    public ValidateListOfRequestBody() {
+    public ValidateDTOList() {
     }
 }

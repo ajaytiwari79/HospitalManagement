@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.TransferMethod;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.TransferMethodMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ public class TransferMethodService extends MongoBaseService {
     @Inject
     private TransferMethodMongoRepository transferMethodDestinationRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
     public Map<String, List<TransferMethod>> createTransferMethod(Long countryId,Long organizationId,List<TransferMethod> transferMethods) {
 
@@ -41,7 +44,15 @@ public class TransferMethodService extends MongoBaseService {
 
             }
             List<TransferMethod> existing = transferMethodDestinationRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
+
+            if (existing.size() != 0) {
+                Set<String> existingNames = new HashSet<>();
+                existing.forEach(transferMethod -> {
+                    existingNames.add(transferMethod.getName());
+                });
+                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
+            }
+
             if (names.size()!=0) {
                 for (String name : names) {
                     TransferMethod newTransferMethod = new TransferMethod();
