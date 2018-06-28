@@ -1,4 +1,4 @@
-package com.kairos.wrapper.task;
+package com.kairos.activity.task;
 
 import java.util.Date;
 

@@ -3,7 +3,7 @@ package com.kairos.service.priority_group;
 import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.activity.web.ShiftCountDTO;
+import com.kairos.activity.shift.ShiftCountDTO;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;

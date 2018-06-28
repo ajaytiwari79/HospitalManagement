@@ -3,8 +3,10 @@ package com.kairos.user.staff;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.client.dto.Skill;
+import com.kairos.enums.Gender;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +47,9 @@ public class StaffDTO {
     private String profilePic;
     private Set<Skill> skillSet;
     private Long unitEmploymentPositionId;
+    private Gender gender;
+    private boolean pregnant;
+    private LocalDate dateOfBirth;
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
@@ -242,4 +247,27 @@ public class StaffDTO {
         this.inactiveFrom = inactiveFrom;
     }
 
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
 }

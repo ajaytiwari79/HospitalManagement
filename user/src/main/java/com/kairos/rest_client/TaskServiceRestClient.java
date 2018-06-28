@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.web.EscalatedTasksWrapper;
+import com.kairos.activity.task.EscalatedTasksWrapper;
 import com.kairos.activity.web.StaffAssignedTasksWrapper;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;

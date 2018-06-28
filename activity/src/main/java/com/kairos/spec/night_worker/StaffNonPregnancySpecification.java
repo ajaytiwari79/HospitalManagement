@@ -1,9 +1,9 @@
 package com.kairos.spec.night_worker;
 
 
-import com.kairos.spec.AbstractActivitySpecification;
 import com.kairos.enums.Gender;
-import com.kairos.activity.web.StaffDTO;
+import com.kairos.spec.AbstractActivitySpecification;
+import com.kairos.user.staff.StaffDTO;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.kairos.user.staff.staff;
 
-import com.kairos.activity.web.StaffDTO;
 
+import com.kairos.user.staff.StaffDTO;
 import java.util.ArrayList;
 import java.util.List;
 

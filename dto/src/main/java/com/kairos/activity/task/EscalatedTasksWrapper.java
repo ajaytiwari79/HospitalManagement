@@ -1,12 +1,7 @@
-package com.kairos.wrapper;
-
-import com.kairos.activity.task.EscalateTaskWrapper;
+package com.kairos.activity.task;
 
 import java.util.List;
 
-/**
- * Created by prabjot on 6/8/17.
- */
 public class EscalatedTasksWrapper {
 
     private long id; // citizen id

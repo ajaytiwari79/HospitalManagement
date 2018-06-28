@@ -1,7 +1,7 @@
 package com.kairos.spec.night_worker;
 
 import com.kairos.spec.AbstractActivitySpecification;
-import com.kairos.activity.web.StaffDTO;
+import com.kairos.user.staff.StaffDTO;
 
 import java.time.LocalDate;
 import java.time.Period;
