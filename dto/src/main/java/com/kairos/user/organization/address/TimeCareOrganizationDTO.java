@@ -1,6 +1,8 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization.address;
 
 
+import com.kairos.user.organization.AbsenceTypes;
+import com.kairos.user.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.staff.staff.Staff;
 
 /**

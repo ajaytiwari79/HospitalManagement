@@ -1,7 +1,7 @@
 package com.kairos.spec;
 
 
-import com.kairos.activity.staff.StaffAdditionalInfoDTO;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.phase.Phase;

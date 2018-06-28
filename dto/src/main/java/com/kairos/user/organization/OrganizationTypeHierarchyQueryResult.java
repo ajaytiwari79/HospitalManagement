@@ -1,4 +1,4 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,6 +1,7 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 import com.kairos.activity.address.ContactAddressDTO;
+import com.kairos.user.organization.address.ZipCode;
 
 /**
  * Created by prabjot on 3/3/17.

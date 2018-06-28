@@ -3,7 +3,7 @@ package com.kairos.service.wta;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
 import com.kairos.activity.wta.templates.RuleTemplateCategory;

@@ -1,8 +1,8 @@
 package com.kairos.activity.client;
 
 import com.kairos.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
-import com.kairos.activity.organization.OrganizationDTO;
-import com.kairos.activity.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;

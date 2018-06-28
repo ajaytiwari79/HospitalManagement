@@ -1,6 +1,6 @@
 package com.kairos.activity.client;
 
-import com.kairos.activity.staff.StaffAdditionalInfoDTO;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.client.dto.ClientStaffInfoDTO;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.dto.staff.StaffDTO;

@@ -1,6 +1,6 @@
 package com.kairos.activity.client;
 
-import com.kairos.activity.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.persistence.model.country.CountryDTO;

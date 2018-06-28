@@ -2,7 +2,7 @@ package com.kairos.service.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.task.*;
 import com.kairos.activity.client.*;
 import com.kairos.activity.client.dto.client.Client;

@@ -1,4 +1,4 @@
-package com.kairos.activity.staff;
+package com.kairos.user.user.staff;
 
 import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
 import com.kairos.activity.shift.StaffUnitPositionDetails;

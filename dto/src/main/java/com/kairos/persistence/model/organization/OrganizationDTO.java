@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.organization.CompanyType;
-import com.kairos.activity.organization.CompanyUnitType;
+import com.kairos.user.organization.CompanyType;
+import com.kairos.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
 import org.hibernate.validator.constraints.NotEmpty;
 

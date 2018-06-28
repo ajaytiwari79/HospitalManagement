@@ -1,6 +1,6 @@
 package com.kairos.service.requestComponent;
 
-import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.response.RequestComponent;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.StaffRestClient;

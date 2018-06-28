@@ -1,4 +1,4 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

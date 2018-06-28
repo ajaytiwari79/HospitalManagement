@@ -1,6 +1,6 @@
 package com.kairos.activity.client.dto;
 
-import com.kairos.activity.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
 
 import java.util.ArrayList;
 import java.util.List;

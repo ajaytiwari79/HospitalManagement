@@ -1,4 +1,4 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 /**
  * Created by oodles on 16/12/16.

@@ -2,7 +2,7 @@ package com.kairos.service.time_bank;
 
 
 import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.staff.StaffAdditionalInfoDTO;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.time_bank.CalculatedTimeBankByDateDTO;
 import com.kairos.activity.time_bank.TimeBankDTO;
 import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;

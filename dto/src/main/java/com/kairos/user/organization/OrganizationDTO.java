@@ -1,6 +1,7 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.user.organization.address.AddressDTO;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.activity.web.OrganizationTypeDTO;
 

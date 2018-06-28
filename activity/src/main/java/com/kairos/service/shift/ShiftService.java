@@ -2,7 +2,7 @@ package com.kairos.service.shift;
 
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.activity.shift.*;
-import com.kairos.activity.staff.StaffAdditionalInfoDTO;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;

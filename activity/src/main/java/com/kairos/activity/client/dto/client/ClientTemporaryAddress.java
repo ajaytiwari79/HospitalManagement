@@ -1,7 +1,7 @@
 package com.kairos.activity.client.dto.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.organization.ZipCode;
+import com.kairos.user.organization.address.ZipCode;
 
 import javax.validation.constraints.NotNull;
 

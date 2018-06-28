@@ -1,4 +1,4 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

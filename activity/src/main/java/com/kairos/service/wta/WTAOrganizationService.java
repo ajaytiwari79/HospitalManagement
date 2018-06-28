@@ -1,7 +1,7 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.wta.WTADTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.activity.wta.templates.WTABaseRuleTemplate;

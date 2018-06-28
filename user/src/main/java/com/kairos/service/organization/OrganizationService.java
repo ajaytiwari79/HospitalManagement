@@ -256,10 +256,10 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findOne(id);
     }
 
-    public com.kairos.activity.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
+    public com.kairos.user.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
         Organization organization = organizationGraphRepository.findOne(id);
         Country country = organizationGraphRepository.getCountry(organization.getId());
-        com.kairos.activity.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.activity.organization.OrganizationDTO.class);
+        com.kairos.user.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.user.organization.OrganizationDTO.class);
         organizationDTO.setCountryId(country.getId());
         return organizationDTO;
     }

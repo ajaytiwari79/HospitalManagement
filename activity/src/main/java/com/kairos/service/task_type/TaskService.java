@@ -2,9 +2,9 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.staff.StaffAdditionalInfoDTO;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.task.AbsencePlanningStatus;
 import com.kairos.activity.task.TaskDTO;
 import com.kairos.activity.client.*;

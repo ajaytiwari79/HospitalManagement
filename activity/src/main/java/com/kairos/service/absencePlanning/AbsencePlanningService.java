@@ -1,6 +1,6 @@
 package com.kairos.service.absencePlanning;
 
-import com.kairos.activity.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.task.AbsencePlanningStatus;
 import com.kairos.activity.task.TaskDTO;
 import com.kairos.activity.task_type.TaskTypeDTO;

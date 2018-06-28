@@ -3,7 +3,7 @@ package com.kairos.persistence.model.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.kairos.activity.organization.CompanyType;
+import com.kairos.user.organization.CompanyType;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

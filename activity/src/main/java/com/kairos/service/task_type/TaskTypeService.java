@@ -2,8 +2,8 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.kairos.activity.organization.OrganizationDTO;
-import com.kairos.activity.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.activity.tag.TagDTO;
 import com.kairos.activity.task_type.*;
 import com.kairos.activity.client.*;

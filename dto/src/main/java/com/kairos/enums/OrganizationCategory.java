@@ -1,7 +1,7 @@
 package com.kairos.enums;
 
 
-import com.kairos.activity.organization.OrganizationCategoryDTO;
+import com.kairos.user.organization.OrganizationCategoryDTO;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

@@ -1,4 +1,4 @@
-package com.kairos.activity.organization;
+package com.kairos.user.organization;
 
 /**
  * Created by prerna on 26/2/18.
