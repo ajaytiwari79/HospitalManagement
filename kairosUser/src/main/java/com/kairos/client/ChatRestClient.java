@@ -28,10 +28,11 @@ public class ChatRestClient {
     @Qualifier("schedulerRestTemplate")
     RestTemplate restTemplate;
     @Value("${chat.matrix.url}")
-    private static String matrixChatServerUrl;
+    private  String matrixChatServerUrl;
 
     @Inject
     private OrganizationService organizationService;
+
 
     /**
      * @param staffChatDetails

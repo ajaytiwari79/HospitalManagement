@@ -99,7 +99,6 @@ public class OrganizationActivityService extends MongoBaseService {
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
-        ActivityDTO activityDetail = null;
         Activity activityCopied;
         if (checked) {
             Activity activity = activityMongoRepository.findOne(activityId);
@@ -126,7 +125,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
         }
         save(activityCopied);
-        return activityDetail;
+        return activityCopied.retrieveBasicDetails();
     }
 
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {

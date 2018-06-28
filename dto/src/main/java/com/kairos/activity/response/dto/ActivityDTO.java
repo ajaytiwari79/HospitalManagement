@@ -139,7 +139,13 @@ public class ActivityDTO {
         this.categoryName = categoryName;
     }
 
+    public PermissionsActivityTab getPermissionsActivityTab() {
+        return permissionsActivityTab;
+    }
 
+    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
+    }
 
     public List<BigInteger> getTags() {
         List<BigInteger> tags = new ArrayList<>();
