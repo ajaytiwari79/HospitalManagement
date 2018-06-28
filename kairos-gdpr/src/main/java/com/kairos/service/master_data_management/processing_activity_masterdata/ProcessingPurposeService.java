@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingLegalBasis;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ProcessingPurposeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -45,7 +46,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing =  processingPurposeMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
+            List<ProcessingPurpose> existing =  findByNamesList(countryId,organizationId,names,ProcessingPurpose.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(processingPurpose -> {

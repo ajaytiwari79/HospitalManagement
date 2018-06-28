@@ -33,7 +33,6 @@ public class TransferMethodService extends MongoBaseService {
     public Map<String, List<TransferMethod>> createTransferMethod(Long countryId,Long organizationId,List<TransferMethod> transferMethods) {
 
         Map<String, List<TransferMethod>> result = new HashMap<>();
-        List<TransferMethod> newTransferMethods = new ArrayList<>();
         Set<String> names = new HashSet<>();
         if (transferMethods.size() != 0) {
             for (TransferMethod transferMethod : transferMethods) {
@@ -43,7 +42,7 @@ public class TransferMethodService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<TransferMethod> existing = transferMethodDestinationRepository.findByCountryAndNameList(countryId,organizationId,names);
+            List<TransferMethod> existing = findByNamesList(countryId,organizationId,names,TransferMethod.class);
 
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
@@ -52,7 +51,7 @@ public class TransferMethodService extends MongoBaseService {
                 });
                 names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
             }
-
+            List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (names.size()!=0) {
                 for (String name : names) {
                     TransferMethod newTransferMethod = new TransferMethod();

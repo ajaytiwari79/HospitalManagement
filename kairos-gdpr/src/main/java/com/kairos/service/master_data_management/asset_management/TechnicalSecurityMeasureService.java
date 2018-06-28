@@ -44,7 +44,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
+            List<TechnicalSecurityMeasure> existing =  findByNamesList(countryId,organizationId,names,TechnicalSecurityMeasure.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(technicalSecurityMeasure -> {

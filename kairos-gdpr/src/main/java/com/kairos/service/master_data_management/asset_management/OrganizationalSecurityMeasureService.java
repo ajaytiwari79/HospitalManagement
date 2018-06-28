@@ -42,7 +42,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
+            List<OrganizationalSecurityMeasure> existing = findByNamesList(countryId,organizationId,names,OrganizationalSecurityMeasure.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(organizationalSecurityMeasure -> {

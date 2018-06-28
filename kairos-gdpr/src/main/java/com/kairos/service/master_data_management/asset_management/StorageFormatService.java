@@ -42,7 +42,7 @@ public class StorageFormatService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<StorageFormat> existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
+            List<StorageFormat> existing =  findByNamesList(countryId,organizationId,names,StorageFormat.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(storageFormat -> {

@@ -45,7 +45,7 @@ public class DestinationService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<Destination> existing = destinationMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
+            List<Destination> existing = findByNamesList(countryId,organizationId,names,Destination.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(destination -> {

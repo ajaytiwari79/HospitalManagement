@@ -33,7 +33,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
 
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-        List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
+
         Set<String> names = new HashSet<>();
         if (rsponsibilityTypes.size() != 0) {
             for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
@@ -43,7 +43,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing = responsibilityTypeMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
+            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,names,ResponsibilityType.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(responsibilityType -> {
@@ -51,7 +51,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
                 });
                 names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
             }
-
+            List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
             if (names.size() != 0) {
                 for (String name : names) {
 

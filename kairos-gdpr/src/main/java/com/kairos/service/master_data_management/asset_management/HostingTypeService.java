@@ -42,7 +42,7 @@ public class HostingTypeService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            existing = hostingTypeMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
+            existing =  findByNamesList(countryId,organizationId,names,HostingType.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(hostingType -> {

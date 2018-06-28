@@ -32,9 +32,8 @@ public class DataSourceService extends MongoBaseService {
 
 
     public Map<String, List<DataSource>> createDataSource(Long countryId,Long organizationId,List<DataSource> dataSources) {
-        Map<String, List<DataSource>> result = new HashMap<>();
 
-        List<DataSource> newDataSources = new ArrayList<>();
+        Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> names = new HashSet<>();
         if (dataSources.size() != 0) {
             for (DataSource dataSource : dataSources) {
@@ -43,15 +42,15 @@ public class DataSourceService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-
-            List<DataSource> existing = dataSourceMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
+            List<DataSource> existing = findByNamesList(countryId,organizationId,names,DataSource.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
-                existing.forEach(dataSource -> {
+                existing.forEach(dataSource ->  {
                     existingNames.add(dataSource.getName());
                 });
                 names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
             }
+            List<DataSource> newDataSources = new ArrayList<>();
             if (names.size()!=0) {
                 for (String name : names) {
 

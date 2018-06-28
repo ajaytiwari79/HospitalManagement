@@ -44,7 +44,7 @@ public class HostingProviderService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingProvider> existing  = hostingProviderMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
+            List<HostingProvider> existing  = findByNamesList(countryId,organizationId,names,HostingProvider.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(hostingProvider -> {

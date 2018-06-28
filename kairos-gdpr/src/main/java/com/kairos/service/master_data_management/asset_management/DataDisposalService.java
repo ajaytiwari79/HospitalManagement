@@ -43,8 +43,7 @@ public class DataDisposalService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            List<DataDisposal> existing = dataDisposalMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            if (existing.size() != 0) {
+            List<DataDisposal> existing =  findByNamesList(countryId,organizationId,names,DataDisposal.class);            if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(dataDisposal -> {
                     existingNames.add(dataDisposal.getName());

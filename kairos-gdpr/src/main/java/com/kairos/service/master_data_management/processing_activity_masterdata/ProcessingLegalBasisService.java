@@ -42,7 +42,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingLegalBasis> existing = legalBasisMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
+            List<ProcessingLegalBasis> existing =  findByNamesList(countryId,organizationId,names,ProcessingLegalBasis.class);
             if (existing.size() != 0) {
                 Set<String> existingNames = new HashSet<>();
                 existing.forEach(legalBasis -> {
