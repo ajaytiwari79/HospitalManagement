@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by vipul on 25/9/17.
@@ -28,9 +27,12 @@ public class ChatRestClient {
     @Autowired
     @Qualifier("schedulerRestTemplate")
     RestTemplate restTemplate;
+    @Value("${chat.matrix.url}")
+    private  String matrixChatServerUrl;
 
     @Inject
     private OrganizationService organizationService;
+
 
     /**
      * @param staffChatDetails
@@ -40,13 +42,12 @@ public class ChatRestClient {
      */
     public StaffChatDetails registerUser(StaffChatDetails staffChatDetails) {
         StaffChatDetails staffChatDetails1 = new StaffChatDetails();
-
         try {
 
             HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            "http://dev.kairosplanning.com:8008/_matrix/client/r0/register?kind=user",
+                            matrixChatServerUrl,
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 

@@ -142,4 +142,11 @@ public class ShiftController {
                                                                             @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftOfStaffByExpertiseId(unitId, staffId, startDate, endDate, expertiseId));
     }
+
+    @ApiOperation("create shift using template")
+    @PostMapping(value = "shift/from_shift_template")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftDTO));
+    }
 }

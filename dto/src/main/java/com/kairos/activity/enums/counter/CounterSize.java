@@ -1,4 +1,4 @@
-package com.kairos.activity.persistence.enums.counter;
+package com.kairos.activity.enums.counter;
 
 import java.util.HashMap;
 import java.util.Map;

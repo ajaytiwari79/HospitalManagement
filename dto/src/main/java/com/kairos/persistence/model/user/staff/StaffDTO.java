@@ -127,11 +127,11 @@ public class StaffDTO {
         this.employedSince = employedSince;
     }
 
-    public long getInactiveFrom() {
+    public Long getInactiveFrom() {
         return inactiveFrom;
     }
 
-    public void setInactiveFrom(long inactiveFrom) {
+    public void setInactiveFrom(Long inactiveFrom) {
         this.inactiveFrom = inactiveFrom;
     }
 

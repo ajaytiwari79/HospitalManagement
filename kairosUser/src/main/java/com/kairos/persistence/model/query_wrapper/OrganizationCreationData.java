@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.user.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.user.country.BusinessType;
 import com.kairos.persistence.model.user.country.CompanyCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -26,6 +27,7 @@ public class OrganizationCreationData {
     private List<CompanyCategory> companyCategories;
     private List<HashMap<String,String>> companyTypes;
     private List<HashMap<String,String>> companyUnitTypes;
+    Map<String, List<AccessGroupQueryResult>> accessGroups;
 
     public List<Level> getLevels() {
         return levels;
@@ -90,5 +92,13 @@ public class OrganizationCreationData {
 
     public void setCompanyUnitTypes(List<HashMap<String, String>> companyUnitTypes) {
         this.companyUnitTypes = companyUnitTypes;
+    }
+
+    public Map<String, List<AccessGroupQueryResult>> getAccessGroups() {
+        return accessGroups;
+    }
+
+    public void setAccessGroups(Map<String, List<AccessGroupQueryResult>> accessGroups) {
+        this.accessGroups = accessGroups;
     }
 }

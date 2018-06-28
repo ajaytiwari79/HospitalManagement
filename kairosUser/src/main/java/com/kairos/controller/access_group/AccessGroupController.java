@@ -168,6 +168,13 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroups(countryId, organizationCategory));
     }
 
+    @ApiOperation("Get country Access Groups with category")
+    @RequestMapping(value = COUNTRY_URL + "/access_group" , method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupsOfAllcategories(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsOfAllCategories(countryId));
+    }
+
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessPageHierarchyForCountry(@PathVariable long accessGroupId, @PathVariable Long countryId) {
@@ -214,6 +221,13 @@ public class AccessGroupController {
     public ResponseEntity<Map<String, Object>> checkIfUserHasAccessByRoleInUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId));
 
+    }
+
+    @ApiOperation("Get country Access Groups for hub and organization")
+    @RequestMapping(value = COUNTRY_URL + "/access_group/hub_and_organization" , method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupsForOrganizationCreation(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
     }
 
 }

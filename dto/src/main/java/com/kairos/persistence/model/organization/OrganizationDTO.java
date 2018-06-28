@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.user.organization.UnitManagerDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -53,6 +54,9 @@ public class OrganizationDTO {
     private Long levelId;
     private  Boolean union;
     private boolean boardingCompleted;
+
+    // properties to create unit manager
+    private UnitManagerDTO unitManager;
 
 
     public Long getId() {
@@ -301,5 +305,13 @@ public class OrganizationDTO {
 
     public void setPreKairos(boolean preKairos) {
         this.preKairos = preKairos;
+    }
+
+    public UnitManagerDTO getUnitManager() {
+        return unitManager;
+    }
+
+    public void setUnitManager(UnitManagerDTO unitManager) {
+        this.unitManager = unitManager;
     }
 }
