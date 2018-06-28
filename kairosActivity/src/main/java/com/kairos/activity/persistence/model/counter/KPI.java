@@ -17,6 +17,13 @@ public class KPI extends Counter {
     private BaseChart chart;
     private CounterSize size;
 
+    public KPI(String title, ChartType chartType, BaseChart chart, CounterSize size){
+        this.title = title;
+        this.chartType = chartType;
+        this.chart = chart;
+        this.size = size;
+    }
+
     public String getTitle() {
         return title;
     }
