@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 
-public interface UnitAndParentOrganizationAndCountryIdsMongoRepository extends MongoBaseRepository<UnitAndParentOrganizationAndCountryIds, BigInteger>, CustomPhaseMongoRepository {
+public interface UnitAndParentOrganizationAndCountryIdsMongoRepository extends MongoBaseRepository<UnitAndParentOrganizationAndCountryIds, BigInteger> {
 
-    @Query(value = "{ unitId:?0}")
+    @Query(value = "{unitId:?0}")
     UnitAndParentOrganizationAndCountryIds findByUnitId(Long unitId);
 }

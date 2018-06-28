@@ -20,7 +20,7 @@ public class UnitDataService extends MongoBaseService {
     private GenericIntegrationService genericIntegrationService;
 
     @Inject
-    private UnitAndParentOrganizationAndCountryIdsMongoRepository unitDataRepository;
+    private UnitAndParentOrganizationAndCountryIdsMongoRepository unitAndParentOrganizationAndCountryIdsMongoRepository;
 
 
     public void addParentOrganizationAndCountryIdForUnit(Long unitId, Long parentOrganizationId, Long countryId){
@@ -40,12 +40,12 @@ public class UnitDataService extends MongoBaseService {
     }
 
     public Long getParentOrganizationId(Long unitId){
-        UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = unitDataRepository.findByUnitId(unitId);
+        UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = unitAndParentOrganizationAndCountryIdsMongoRepository.findByUnitId(unitId);
         return unitAndParentOrganizationAndCountryIds.getParentOrganizationId();
     }
 
     public Long getCountryId(Long unitId){
-        UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = unitDataRepository.findByUnitId(unitId);
+        UnitAndParentOrganizationAndCountryIds unitAndParentOrganizationAndCountryIds = unitAndParentOrganizationAndCountryIdsMongoRepository.findByUnitId(unitId);
         return unitAndParentOrganizationAndCountryIds.getCountryId();
     }
 }
