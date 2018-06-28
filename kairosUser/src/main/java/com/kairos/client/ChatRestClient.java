@@ -16,7 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import static com.kairos.constants.AppConstants.MATRIX_CHAT_SERVER_URL;
 
 /**
  * Created by vipul on 25/9/17.

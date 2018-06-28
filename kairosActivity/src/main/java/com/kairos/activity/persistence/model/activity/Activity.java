@@ -330,9 +330,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.permissionsActivityTab = permissionsActivityTab;
     }
 
-
-
-
     public ActivityDTO retrieveBasicDetails() {
         return new ActivityDTO(id,name,parentId,permissionsActivityTab);
 
