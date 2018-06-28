@@ -1,0 +1,72 @@
+package com.kairos.persistence.model.country.reason_code;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.ReasonCodeType;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
+/**
+ * Created by pavan on 23/3/18.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@QueryResult
+public class ReasonCodeResponseDTO {
+    private Long id;
+    private String name;
+    private String code;
+    private String description;
+    private ReasonCodeType reasonCodeType;
+
+    public ReasonCodeResponseDTO() {
+        //Default Constructor
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ReasonCodeType getReasonCodeType() {
+        return reasonCodeType;
+    }
+
+    public void setReasonCodeType(ReasonCodeType reasonCodeType) {
+        this.reasonCodeType = reasonCodeType;
+    }
+
+    public ReasonCodeResponseDTO(Long id, String name, String code, String description, ReasonCodeType reasonCodeType) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.reasonCodeType = reasonCodeType;
+    }
+}
