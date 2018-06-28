@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by vipul on 19/9/17.
@@ -27,6 +28,7 @@ public class PhaseDTO {
     private BigInteger parentCountryPhaseId;
     private int durationInDays;
     private PhaseType phaseType;
+    private List<String> status;
 
 
     public Long getOrganizationId() {
@@ -117,6 +119,14 @@ public class PhaseDTO {
 
     public void setPhaseType(PhaseType phaseType) {
         this.phaseType = phaseType;
+    }
+
+    public List<String> getStatus() {
+        return status;
+    }
+
+    public void setStatus(List<String> status) {
+        this.status = status;
     }
 
     public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {

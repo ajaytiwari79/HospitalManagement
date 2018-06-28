@@ -19,24 +19,24 @@ public class PhaseActivityDTO {
     private List<DayType> dayTypes= new ArrayList<>();
     private UserAccessRoleDTO staffAccessRole;
     private List<ShiftTemplateDTO> shiftTemplates;
+    private List<PhaseDTO> applicablePhases;
+    private List<PhaseDTO> actualPhases;
 
     public PhaseActivityDTO() {
         //Default Constructor
     }
 
     public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
-                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases) {
+                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases) {
         this.activities = activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
         this.staffAccessRole = staffAccessRole;
         this.shiftTemplates = shiftTemplates;
         this.applicablePhases = applicablePhases;
+        this.actualPhases = actualPhases;
     }
-
-    private List<PhaseDTO> applicablePhases;
-
-
+    
     public List<ActivityWithCompositeDTO> getActivities() {
         return activities;
     }
@@ -77,6 +77,13 @@ public class PhaseActivityDTO {
         this.staffAccessRole = staffAccessRole;
     }
 
+    public List<PhaseDTO> getActualPhases() {
+        return actualPhases;
+    }
+
+    public void setActualPhases(List<PhaseDTO> actualPhases) {
+        this.actualPhases = actualPhases;
+    }
 
     public List<ShiftTemplateDTO> getShiftTemplates() {
         return shiftTemplates;
