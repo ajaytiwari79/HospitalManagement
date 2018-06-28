@@ -49,9 +49,9 @@ public class CountryPhaseController {
     }
 
     @ApiOperation(value = "get All  Phase status")
-    @GetMapping(value = COUNTRY_URL+"/phase/status")
+    @GetMapping(value = "/phase/status")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllPhasesStatus(@PathVariable Long countryId) {
+    public ResponseEntity<Map<String, Object>> getAllPhasesStatus() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getAllApplicablePhaseStatus());
     }
 

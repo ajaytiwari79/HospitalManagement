@@ -258,29 +258,23 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        if(phase.getPhaseType().equals(PhaseType.ACTUAL)){
-            phase.setStatus(Phase.PhaseStatus.getListByValue(phaseDTO.getStatus()));
-        } else {
+        if(phase.getPhaseType().equals(PhaseType.PLANNING)){
             phase.setDescription(phaseDTO.getDescription());
             phase.setDurationType(phaseDTO.getDurationType());
             phase.setDuration(phaseDTO.getDuration());
         }
-
+        phase.setStatus(Phase.PhaseStatus.getListByValue(phaseDTO.getStatus()));
         save(phase);
         return phase;
     }
 
     private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
 
-        if(phase.getPhaseType().equals(PhaseType.PLANNING)){
-            phase.setDuration(phaseDTO.getDuration());
-            phase.setDurationType(phaseDTO.getDurationType());
-            phase.setName(phase.getName());
-            phase.setSequence(phase.getSequence());
-            phase.setDescription(phaseDTO.getDescription());
-        } else {
-            phase.setStatus(Phase.PhaseStatus.getListByValue(phaseDTO.getStatus()));
-        }
+        phase.setDuration(phaseDTO.getDuration());
+        phase.setDurationType(phaseDTO.getDurationType());
+        phase.setName(phase.getName());
+        phase.setSequence(phase.getSequence());
+        phase.setDescription(phaseDTO.getDescription());
 
     }
 
@@ -299,8 +293,10 @@ public class PhaseService extends MongoBaseService {
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
-        preparePhase(oldPhase, phaseDTO);
-        save(oldPhase);
+        if(oldPhase.getPhaseType().equals(PhaseType.PLANNING)){
+            preparePhase(oldPhase, phaseDTO);
+            save(oldPhase);
+        }
         return phaseDTO;
     }
 
