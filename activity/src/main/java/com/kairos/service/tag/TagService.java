@@ -1,14 +1,14 @@
 package com.kairos.service.tag;
 
-import com.kairos.rest_client.CountryRestClient;
-import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.controller.staffing_level.StaffingLevelController;
-import com.kairos.enums.tags.MasterDataTypeEnum;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.activity.tag.TagDTO;
+import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.tag.TagDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

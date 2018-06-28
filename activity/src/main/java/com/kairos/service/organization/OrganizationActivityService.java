@@ -123,7 +123,13 @@ public class OrganizationActivityService extends MongoBaseService {
 
         }
         save(activityCopied);
-        return activityCopied.retrieveBasicDetails();
+        return retrieveBasicDetails(activityCopied);
+    }
+    public ActivityDTO retrieveBasicDetails(Activity activity) {
+        ActivityDTO activityDTO=new ActivityDTO(activity.getId(),activity.getName(),activity.getParentId());
+        ObjectMapperUtils.copyProperties(activity,activityDTO);
+        return activityDTO;
+
     }
 
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {

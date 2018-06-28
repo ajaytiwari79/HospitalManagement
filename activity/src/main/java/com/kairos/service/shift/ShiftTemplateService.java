@@ -1,7 +1,6 @@
 package com.kairos.service.shift;
 
 import com.google.inject.Inject;
-import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateMongoRepository;

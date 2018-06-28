@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.access_permission;
 
-import com.kairos.persistence.model.enums.OrganizationCategory;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 
 import java.util.List;
 

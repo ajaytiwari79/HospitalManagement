@@ -1,9 +1,9 @@
 package com.kairos.controller.tag;
 
 import com.kairos.controller.staffing_level.StaffingLevelController;
-import com.kairos.enums.tags.MasterDataTypeEnum;
-import com.kairos.activity.tag.TagDTO;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.service.tag.TagService;
+import com.kairos.user.country.tag.TagDTO;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prerna on 20/11/17.

@@ -2,13 +2,11 @@ package com.kairos.controller.organization;
 
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.web.OrganizationExternalIdsDTO;
-import com.kairos.user.organization.*;
-import com.kairos.user.staff.client.ClientFilterDTO;
 import com.kairos.persistence.model.client.ClientStaffDTO;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OpeningHours;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationGeneral;
+import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
@@ -23,7 +21,6 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
-import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.resources.ResourceService;
 import com.kairos.service.skill.SkillCategoryService;
@@ -31,6 +28,11 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.service.unit_position.UnitPositionService;
+import com.kairos.user.country.time_slot.TimeSlotDTO;
+import com.kairos.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
+import com.kairos.user.organization.*;
+import com.kairos.user.staff.client.ClientFilterDTO;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
@@ -691,7 +693,7 @@ public class OrganizationController {
     @RequestMapping(value = "unit/{unitId}/unit_manager", method = RequestMethod.POST)
     @ApiOperation("create unit manager")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createUnitManager(@PathVariable long unitId, @Validated @RequestBody UnitManagerDTO unitManagerDTO) {
+    public ResponseEntity<Map<String, Object>> createUnitManager(@PathVariable long unitId, @Validated @RequestBody com.kairos.persistence.model.organization.UnitManagerDTO unitManagerDTO) {
         Map response = staffService.createUnitManager(unitId, unitManagerDTO);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.CONFLICT, true,

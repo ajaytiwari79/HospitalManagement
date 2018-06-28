@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -23,6 +23,7 @@ import com.kairos.user.access_group.CountryAccessGroupDTO;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.access_permission.AccessPermissionDTO;
+import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
@@ -30,10 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 

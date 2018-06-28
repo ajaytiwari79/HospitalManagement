@@ -3,7 +3,6 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -328,10 +327,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.permissionsActivityTab = permissionsActivityTab;
     }
 
-    public ActivityDTO retrieveBasicDetails() {
-        return new ActivityDTO(id,name,parentId,permissionsActivityTab);
-
-    }
 
     public String getExternalId() {
         return externalId;
