@@ -1,7 +1,7 @@
 package com.kairos.user.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.web.Self;
+
 
 /**
  * Created by oodles on 19/4/17.

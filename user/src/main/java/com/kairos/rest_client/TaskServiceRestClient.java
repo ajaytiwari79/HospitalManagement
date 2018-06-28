@@ -1,13 +1,13 @@
 package com.kairos.rest_client;
 
-import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.activity.web.EscalatedTasksWrapper;
+import com.kairos.activity.web.StaffAssignedTasksWrapper;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.web.EscalatedTasksWrapper;
-import com.kairos.activity.web.KMDShift;
-import com.kairos.wrapper.ResponseEnvelope;
-import com.kairos.activity.web.StaffAssignedTasksWrapper;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.staff.KMDShift;
+import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

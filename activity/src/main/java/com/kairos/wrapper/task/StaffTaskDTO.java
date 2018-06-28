@@ -1,8 +1,8 @@
-package com.kairos.activity.task;
+package com.kairos.wrapper.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.Gender;
-import com.kairos.activity.web.TaskWrapper;
+import com.kairos.wrapper.TaskWrapper;
 
 import java.util.List;
 

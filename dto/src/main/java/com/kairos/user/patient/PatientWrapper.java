@@ -1,10 +1,7 @@
 package com.kairos.user.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.web.CurrentAddress;
-import com.kairos.activity.web.PatientIdentifier;
-import com.kairos.activity.web.PatientLinks;
-import com.kairos.activity.web.PatientState;
+import com.kairos.user.staff.CurrentAddress;
 
 /**
  * Created by oodles on 19/4/17.
