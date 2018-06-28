@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by vipul on 25/9/17.
@@ -29,6 +31,7 @@ public class Phase extends MongoBaseEntity {
     private Long countryId;
     private BigInteger parentCountryPhaseId;
     private PhaseType phaseType;
+    private List<PhaseStatus> status;
 
     public Phase() {
         //default constructor
@@ -106,7 +109,15 @@ public class Phase extends MongoBaseEntity {
         this.phaseType = phaseType;
     }
 
-    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType) {
+    public List<PhaseStatus> getStatus() {
+        return status;
+    }
+
+    public void setStatus(List<PhaseStatus> status) {
+        this.status = status;
+    }
+
+    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status) {
         this.name = name;
         this.description = description;
         this.duration = duration;
@@ -116,6 +127,7 @@ public class Phase extends MongoBaseEntity {
         this.organizationId = organizationId;
         this.parentCountryPhaseId = parentCountryPhaseId;
         this.phaseType = phaseType;
+        this.status = PhaseStatus.getListByValue(status);
     }
 
     @Override
@@ -162,4 +174,26 @@ public class Phase extends MongoBaseEntity {
                 ", countryId=" + countryId +
                 '}';
     }
+
+    public enum PhaseStatus {
+
+        FIXED, LOCKED, APPROVED, PUBLISHED, PENDING, REQUESTED, VALIDATED, REJECTED;
+
+        public String value;
+
+        public static PhaseStatus getByValue(String value) {
+            for (PhaseStatus status : PhaseStatus.values()) {
+                if (status.value.equals(value)) {
+                    return status;
+                }
+            }
+            return null;
+        }
+
+        public static List<PhaseStatus> getListByValue(List<String> values) {
+            return values.stream().map(PhaseStatus::valueOf)
+                    .collect(Collectors.toList());
+        }
+    }
+
 }

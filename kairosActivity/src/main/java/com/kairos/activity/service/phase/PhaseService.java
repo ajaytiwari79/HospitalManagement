@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by vipul on 25/9/17.
@@ -46,7 +47,7 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
             Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType());
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
 
             phases.add(phase);
         }
@@ -151,7 +152,7 @@ public class PhaseService extends MongoBaseService {
 
     public Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
         Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
-                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType());
+                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
         return phase;
     }
 
@@ -170,6 +171,11 @@ public class PhaseService extends MongoBaseService {
 
     public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId) {
         List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId);
+        return phases;
+    }
+
+    public List<PhaseDTO> getActualPhasesByOrganizationId(Long orgId) {
+        List<PhaseDTO> phases = phaseMongoRepository.getActualPhasesByUnit(orgId);
         return phases;
     }
 
@@ -252,9 +258,12 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        phase.setDescription(phaseDTO.getDescription());
-        phase.setDurationType(phaseDTO.getDurationType());
-        phase.setDuration(phaseDTO.getDuration());
+        if(phase.getPhaseType().equals(PhaseType.PLANNING)){
+            phase.setDescription(phaseDTO.getDescription());
+            phase.setDurationType(phaseDTO.getDurationType());
+            phase.setDuration(phaseDTO.getDuration());
+        }
+        phase.setStatus(Phase.PhaseStatus.getListByValue(phaseDTO.getStatus()));
         save(phase);
         return phase;
     }
@@ -266,6 +275,7 @@ public class PhaseService extends MongoBaseService {
         phase.setName(phase.getName());
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
+
     }
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
@@ -283,11 +293,18 @@ public class PhaseService extends MongoBaseService {
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
-        preparePhase(oldPhase, phaseDTO);
-        save(oldPhase);
+        if(oldPhase.getPhaseType().equals(PhaseType.PLANNING)){
+            preparePhase(oldPhase, phaseDTO);
+            save(oldPhase);
+        }
         return phaseDTO;
     }
 
+    public List<String> getAllApplicablePhaseStatus(){
+        return Stream.of(Phase.PhaseStatus.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+    }
     /*private ArrayList getDefaultPhases(long unitId) {
         ArrayList<Phase> phases = new ArrayList();
         return phases;

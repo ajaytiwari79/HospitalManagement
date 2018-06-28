@@ -718,6 +718,7 @@ public class ActivityService extends MongoBaseService {
         List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
 
         // Set access Role of staff
+
         UserAccessRoleDTO userAccessRoleDTO= staffRestClient.getAccessOfCurrentLoggedInStaff();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
@@ -759,7 +760,7 @@ public class ActivityService extends MongoBaseService {
         List<ActivityWithCompositeDTO> activities=activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
 
         List<ShiftTemplateDTO> shiftTemplates =shiftTemplateService.getAllShiftTemplates(unitId);
-        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities,phaseWeeklyDTOS,dayTypes,userAccessRoleDTO,shiftTemplates,phaseDTOs);
+        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities,phaseWeeklyDTOS,dayTypes,userAccessRoleDTO,shiftTemplates,phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId));
         return phaseActivityDTO;
     }
 

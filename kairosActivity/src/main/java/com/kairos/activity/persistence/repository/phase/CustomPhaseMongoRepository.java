@@ -18,6 +18,7 @@ public interface CustomPhaseMongoRepository {
 
      List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction);
      List<PhaseDTO> getApplicablePlanningPhasesByUnit(Long unitId);
+     List<PhaseDTO> getActualPhasesByUnit(Long unitId);
      List<PhaseResponseDTO> getAllPlanningPhasesByUnit(Long unitId);
      List<OrganizationPhaseDTO> getPhasesGroupByOrganization();
      Boolean checkPhaseByName(BigInteger phaseId, String name);

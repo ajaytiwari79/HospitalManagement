@@ -58,6 +58,12 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
         return result.getMappedResults();
     }
 
+    public List<PhaseDTO> getActualPhasesByUnit(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("organizationId").is(unitId).and("phaseType").is(PhaseType.ACTUAL)));
+        AggregationResults<PhaseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseDTO.class);
+        return result.getMappedResults();
+    }
+
     public List<PhaseResponseDTO> getAllPlanningPhasesByUnit(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("organizationId").is(unitId).and("duration").gt(0).and("phaseType").is(PhaseType.PLANNING)));
         AggregationResults<PhaseResponseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, PhaseResponseDTO.class);
