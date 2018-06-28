@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.wta;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 

@@ -3,7 +3,7 @@ package com.kairos.persistence.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

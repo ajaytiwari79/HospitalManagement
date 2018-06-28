@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staff;
-import com.kairos.persistence.model.enums.Gender;
-import com.kairos.persistence.model.enums.StaffStatusEnum;
+
+import com.kairos.enums.Gender;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
 import org.hibernate.validator.constraints.NotEmpty;
 

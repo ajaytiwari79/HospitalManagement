@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.FixedValueType;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.country.Currency;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;

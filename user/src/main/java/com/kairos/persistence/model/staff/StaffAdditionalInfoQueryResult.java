@@ -1,8 +1,9 @@
 package com.kairos.persistence.model.staff;
 
-import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.user.access_group.UserAccessRoleDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.ZoneId;
@@ -23,12 +24,12 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private com.kairos.dto.shift.StaffUnitPositionDetails unitPosition;
+    private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
-    private List<com.kairos.client.dto.TimeSlotWrapper> timeSlotSets;
+    private List<TimeSlotWrapper> timeSlotSets;
     private UserAccessRoleDTO user;
     private UserAccessRoleDTO userAccessRoleDTO;
 
@@ -41,11 +42,11 @@ public class StaffAdditionalInfoQueryResult {
         this.user = user;
     }
 
-    public List<com.kairos.client.dto.TimeSlotWrapper> getTimeSlotSets() {
+    public List<TimeSlotWrapper> getTimeSlotSets() {
         return timeSlotSets;
     }
 
-    public void setTimeSlotSets(List<com.kairos.client.dto.TimeSlotWrapper> timeSlotSets) {
+    public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
         this.timeSlotSets = timeSlotSets;
     }
 

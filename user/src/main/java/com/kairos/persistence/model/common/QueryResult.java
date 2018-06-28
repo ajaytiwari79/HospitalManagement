@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.OrganizationLevel;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 
 /**
  * Created by prabjot on 14/11/16.

@@ -1,8 +1,8 @@
 package com.kairos.controller.client;
 
-import com.kairos.persistence.model.client.VRPClientDTO;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.vrp.VRPClientDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

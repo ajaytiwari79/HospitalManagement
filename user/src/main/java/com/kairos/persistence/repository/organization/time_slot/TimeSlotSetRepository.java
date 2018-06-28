@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.organization.time_slot;
 
-import com.kairos.persistence.model.enums.TimeSlotType;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

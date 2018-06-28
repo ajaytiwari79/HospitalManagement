@@ -1,19 +1,16 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.util.DateUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.common.QueryResult;
-import com.kairos.persistence.model.enums.EmploymentStatus;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.country.ReasonCode;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -33,6 +30,7 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
+import com.kairos.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,9 +43,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.kairos.constants.AppConstants.FORWARD_SLASH;
-import static com.kairos.constants.AppConstants.TEAM;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.*;
 
 
 /**

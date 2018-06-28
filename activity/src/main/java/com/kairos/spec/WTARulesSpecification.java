@@ -1,8 +1,8 @@
 package com.kairos.spec;
 
 
-import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.wrapper.RuleTemplateSpecificInfo;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

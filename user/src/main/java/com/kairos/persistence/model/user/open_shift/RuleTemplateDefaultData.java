@@ -1,11 +1,11 @@
 package com.kairos.persistence.model.user.open_shift;
 
-import com.kairos.dto.ActivityDTO;
-import com.kairos.dto.activity.TimeTypeDTO;
-import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.experties.ExpertiseResponseDTO;
-import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.persistence.model.user.skill.Skill;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.kairos.controller.staffing_level;
 
-import com.kairos.activity.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.constants.ApiConstants;

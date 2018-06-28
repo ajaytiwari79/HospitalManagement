@@ -16,6 +16,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.model.country.day_type.DayType;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;

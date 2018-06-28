@@ -1,19 +1,16 @@
 package com.kairos.service.organization;
 
-import com.kairos.client.dto.organization.CompanyType;
-import com.kairos.client.dto.organization.CompanyUnitType;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryWrapper;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
-import com.kairos.persistence.model.organization.union.UnionWrapper;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.user.organization.CompanyType;
+import com.kairos.user.organization.CompanyUnitType;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;

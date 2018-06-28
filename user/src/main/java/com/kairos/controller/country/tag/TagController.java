@@ -1,6 +1,6 @@
 package com.kairos.controller.country.tag;
 
-import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.tag.ShowCountryTagSetting;
 import com.kairos.persistence.model.country.tag.TagDTO;
 import com.kairos.service.country.tag.TagService;
@@ -15,12 +15,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prerna on 10/11/17.

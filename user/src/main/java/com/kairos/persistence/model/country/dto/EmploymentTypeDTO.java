@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.country.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.enums.EmploymentCategory;
+import com.kairos.enums.EmploymentCategory;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

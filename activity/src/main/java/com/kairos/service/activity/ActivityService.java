@@ -14,7 +14,7 @@ import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.phase.PhaseWeeklyDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.tag.TagDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;

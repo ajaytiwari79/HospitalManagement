@@ -1,11 +1,11 @@
 package com.kairos.controller.auth;
 
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.auth.OrganizationSelectionDTO;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.activity.web.FirstTimePasswordUpdateDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
+import com.kairos.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.userContext.UserContext;
 import com.twilio.sdk.TwilioRestException;

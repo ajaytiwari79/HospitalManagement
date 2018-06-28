@@ -4,7 +4,7 @@ import com.kairos.activity.task_type.TaskTypeSettingDTO;
 import com.kairos.activity.web.StaffDTO;
 import com.kairos.client.StaffRestClient;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.planner.PlannerRestClient;
+import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 import com.kairos.persistence.model.solver_config.SolverConfig;

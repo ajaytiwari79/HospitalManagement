@@ -1,13 +1,11 @@
 package com.kairos.service;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.util.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.client.MongoCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;

@@ -3,15 +3,11 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.shift.StaffUnitPositionDetails;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.client.TimeBankRestClient;
-import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.activity.time_bank.CTAIntervalDTO;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.activity.wta.WTADTO;
+import com.kairos.activity.wta.WTAResponseDTO;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.CTAListQueryResult;
 import com.kairos.persistence.model.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.persistence.model.agreement.cta.CompensationTableInterval;
@@ -23,16 +19,15 @@ import com.kairos.persistence.model.country.Function;
 import com.kairos.persistence.model.country.FunctionDTO;
 import com.kairos.persistence.model.country.ReasonCode;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.staff.unit_position.UnitPositionDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.user.unit_position.PositionCtaWtaQueryResult;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -53,10 +48,8 @@ import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepositor
 import com.kairos.persistence.repository.user.unit_position.UnitPositionEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.wrapper.PositionWrapper;
-import com.kairos.activity.web.UnitPositionDTO;
-import com.kairos.activity.wta.WTADTO;
-import com.kairos.activity.wta.WTAResponseDTO;
+import com.kairos.rest_client.TimeBankRestClient;
+import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -66,6 +59,9 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
+import com.kairos.util.DateUtils;
+import com.kairos.util.ObjectMapperUtils;
+import com.kairos.wrapper.PositionWrapper;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -744,13 +740,13 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
+    public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
 
-        com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        StaffUnitPositionDetails unitPositionWithCtaDetailsDTO = new StaffUnitPositionDetails();
-        unitPositionWithCtaDetailsDTO.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.shift.Expertise.class));
+        com.kairos.activity.shift.StaffUnitPositionDetails unitPositionWithCtaDetailsDTO = new com.kairos.activity.shift.StaffUnitPositionDetails();
+        unitPositionWithCtaDetailsDTO.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.activity.shift.Expertise.class));
 //        unitPositionWithCtaDetailsDTO.setStaffId(unitPosition.getStaff().getId());
         unitPositionWithCtaDetailsDTO.setId(unitPosition.getId());
         unitPositionWithCtaDetailsDTO.setCountryId(countryId);
@@ -766,20 +762,20 @@ public class UnitPositionService extends UserBaseService {
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
-        com.kairos.dto.shift.EmploymentType employmentType=new com.kairos.dto.shift.EmploymentType();
+        com.kairos.activity.shift.EmploymentType employmentType=new com.kairos.activity.shift.EmploymentType();
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(),employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
         return unitPositionWithCtaDetailsDTO;
     }
 
-    public StaffUnitPositionDetails getUnitPositionWithCTA(Long unitPositionId, Organization organization, Long countryId) {
+    public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionWithCTA(Long unitPositionId, Organization organization, Long countryId) {
 
-        com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
 
-        StaffUnitPositionDetails unitPositionDetails = new StaffUnitPositionDetails();
-        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.shift.Expertise.class));
-        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.dto.shift.EmploymentType.class));
+        com.kairos.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.activity.shift.StaffUnitPositionDetails();
+        unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.activity.shift.Expertise.class));
+        unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.activity.shift.EmploymentType.class));
 
         unitPositionDetails.setId(unitPosition.getId());
         unitPositionDetails.setCountryId(countryId);

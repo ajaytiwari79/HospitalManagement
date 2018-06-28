@@ -1,18 +1,18 @@
 package com.kairos.service.client;
 
-import com.kairos.vrp.task.VRPTaskDTO;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.ObjectUtils;
-import com.kairos.client.TaskServiceRestClient;
-import com.kairos.client.TomTomRestClient;
-import com.kairos.client.dto.TaskAddress;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.client.VRPClient;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
-import com.kairos.persistence.model.client.VRPClientDTO;
+import com.kairos.rest_client.TaskServiceRestClient;
+import com.kairos.rest_client.TomTomRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.excel.ExcelService;
+import com.kairos.util.ObjectMapperUtils;
+import com.kairos.util.ObjectUtils;
+import com.kairos.vrp.TaskAddress;
+import com.kairos.vrp.VRPClientDTO;
+import com.kairos.vrp.task.VRPTaskDTO;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;

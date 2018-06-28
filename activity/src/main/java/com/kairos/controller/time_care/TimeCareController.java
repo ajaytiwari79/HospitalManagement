@@ -1,6 +1,6 @@
 package com.kairos.controller.time_care;
 
-import com.kairos.activity.staffing_level.TimeCareStaffingLevelDTO;
+import com.kairos.persistence.model.staffing_level.TimeCareStaffingLevelDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.staffing_level;
 
-import com.kairos.activity.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

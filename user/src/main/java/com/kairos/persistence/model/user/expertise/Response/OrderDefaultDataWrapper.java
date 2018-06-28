@@ -1,13 +1,13 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
-import com.kairos.dto.ActivityDTO;
-import com.kairos.persistence.model.country.FunctionDTO;
-import com.kairos.persistence.model.country.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.staff.StaffPersonalDetailDTO;
+import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.open_shift.OrderResponseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
+import com.kairos.persistence.model.country.FunctionDTO;
+import com.kairos.persistence.model.country.ReasonCodeResponseDTO;
+import com.kairos.persistence.model.staff.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.skill.Skill;
 
 import java.util.List;
 

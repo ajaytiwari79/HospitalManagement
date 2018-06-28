@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.user_personalized_settings;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.AbsenceViewSettings;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.AbsenceViewSettings;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**

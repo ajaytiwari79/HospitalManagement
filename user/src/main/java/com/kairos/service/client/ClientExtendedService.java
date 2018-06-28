@@ -1,13 +1,12 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.enums.Gender;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.country.CitizenStatus;
 import com.kairos.persistence.model.country.RelationType;
+import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;

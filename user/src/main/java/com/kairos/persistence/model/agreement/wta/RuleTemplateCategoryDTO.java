@@ -2,13 +2,12 @@ package com.kairos.persistence.model.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.agreement.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.kairos.controller.unit_position;
 
 
-import com.kairos.activity.web.UnitPositionDTO;
 import com.kairos.activity.wta.WTADTO;
+import com.kairos.persistence.model.staff.unit_position.UnitPositionDTO;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

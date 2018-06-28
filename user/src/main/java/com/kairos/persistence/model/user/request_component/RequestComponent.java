@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.request_component;
+
+import com.kairos.enums.RequestType;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.RequestType;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**

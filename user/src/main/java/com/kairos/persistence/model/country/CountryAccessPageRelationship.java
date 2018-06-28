@@ -1,15 +1,11 @@
 package com.kairos.persistence.model.country;
 
+import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.constants.RelationshipConstants;
-import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.persistence.model.access_permission.AccessPage;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by prerna on 27/2/18.

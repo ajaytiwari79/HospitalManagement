@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.agreement.cta.cta_response;
 
-import com.kairos.persistence.model.enums.FixedValueType;
+import com.kairos.enums.FixedValueType;
 import com.kairos.persistence.model.country.Currency;
 
 public class FixedValueDTO {

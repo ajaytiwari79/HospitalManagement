@@ -1,8 +1,9 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.persistence.model.enums.TimeSlotType;
+import com.kairos.enums.TimeSlotType;
+import com.kairos.persistence.model.country.time_slot.TimeSlotDTO;
+import com.kairos.persistence.model.country.time_slot.TimeSlotSetDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -11,11 +12,10 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepository;
-import com.kairos.activity.web.organization.time_slot.TimeSlotDTO;
-import com.kairos.activity.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
+import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -87,7 +87,7 @@ public class TimeSlotService extends UserBaseService {
         return timeSlotSet;
     }
 
-    public TimeSlotDTO createTimeSlot(Long timeSlotSetId,TimeSlotDTO timeSlotDTO){
+    public TimeSlotDTO createTimeSlot(Long timeSlotSetId, TimeSlotDTO timeSlotDTO){
         TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
         if(!Optional.ofNullable(timeSlotSet).isPresent()){
             exceptionService.dataNotFoundByIdException("message.timeslot.id.notfound");

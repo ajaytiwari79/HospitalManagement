@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.access_permission;
 
-import com.kairos.persistence.model.enums.OrganizationCategory;
+import com.kairos.enums.OrganizationCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;

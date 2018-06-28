@@ -3,7 +3,6 @@ package com.kairos.service.client;
 import com.kairos.activity.web.ContactPersonDTO;
 import com.kairos.activity.web.EscalateTaskWrapper;
 import com.kairos.activity.web.EscalatedTasksWrapper;
-import com.kairos.client.*;
 import com.kairos.client.dto.ClientExceptionDTO;
 import com.kairos.client.dto.OrganizationClientWrapper;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
@@ -44,6 +43,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.rest_client.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;

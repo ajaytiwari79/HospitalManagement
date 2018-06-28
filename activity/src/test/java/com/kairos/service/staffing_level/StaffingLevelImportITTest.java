@@ -1,6 +1,6 @@
 package com.kairos.service.staffing_level;
 
-import com.kairos.activity.staffing_level.StaffingLevel;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.Duration;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;

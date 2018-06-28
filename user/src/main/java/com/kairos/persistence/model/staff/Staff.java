@@ -1,24 +1,18 @@
 package com.kairos.persistence.model.staff;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.Gender;
-import com.kairos.persistence.model.enums.StaffStatusEnum;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.util.CPRUtil;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;

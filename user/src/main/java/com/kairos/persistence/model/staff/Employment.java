@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.config.neo4j.converter.LocalDateConverter;
+import com.kairos.enums.EmploymentStatus;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.country.ReasonCode;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_REASON_CODE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_PERMISSIONS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by prabjot on 3/12/16.

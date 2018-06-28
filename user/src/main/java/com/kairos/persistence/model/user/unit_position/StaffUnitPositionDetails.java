@@ -4,19 +4,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.country.experties.AppliedFunctionDTO;
+import com.kairos.persistence.model.staff.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.staff.Staff;
-import com.kairos.activity.web.AppliedFunctionDTO;
-import com.kairos.activity.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
-import java.time.ZoneId;
 import java.time.DayOfWeek;
-
+import java.time.ZoneId;
 import java.util.List;
 
 /**

@@ -1,13 +1,13 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.client.dto.organization.OrganizationCategoryDTO;
-import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -15,22 +15,25 @@ import com.kairos.persistence.repository.user.access_permission.AccessPageReposi
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.user.access_group.CountryAccessGroupDTO;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.persistence.model.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.user.access_group.CountryAccessGroupDTO;
+import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 
 
 /**

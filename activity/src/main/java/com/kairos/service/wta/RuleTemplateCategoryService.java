@@ -2,9 +2,9 @@ package com.kairos.service.wta;
 
 import com.kairos.client.CountryRestClient;
 import com.kairos.client.OrganizationRestClient;
-import com.kairos.activity.wta.templates.RuleTemplateCategory;
-import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
-import com.kairos.activity.wta.templates.WTABuilderService;
+import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;

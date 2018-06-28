@@ -1,19 +1,17 @@
 package com.kairos.controller.wta;
 
-import com.kairos.activity.wta.templates.WTABuilderService;
+import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.service.wta.RuleTemplateService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.activity.wta.RuleTemplateCategoryDTO;
 import com.kairos.activity.wta.WTABaseRuleTemplateDTO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;

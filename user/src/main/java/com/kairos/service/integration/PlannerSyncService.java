@@ -1,17 +1,15 @@
 package com.kairos.service.integration;
 
 
-import com.kairos.client.WorkingTimeAgreementRestClient;
-import com.kairos.client.planner.PlannerRestClient;
+import com.kairos.activity.wta.UnitPositionWtaDTO;
+import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-
-
+import com.kairos.persistence.model.staff.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
-import com.kairos.activity.web.UnitPositionWtaDTO;
-import com.kairos.persistence.model.staff.staff.Staff;
-import com.kairos.activity.wta.WTAResponseDTO;
+import com.kairos.rest_client.WorkingTimeAgreementRestClient;
+import com.kairos.rest_client.planner.PlannerRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +76,7 @@ public class PlannerSyncService {
     }*/
 
 
-    private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType,Long unitId,WTAResponseDTO wtaResponseDTO) {
+    private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType, Long unitId, WTAResponseDTO wtaResponseDTO) {
         if(wtaResponseDTO==null){
             wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getWorkingTimeAgreementId());
         }

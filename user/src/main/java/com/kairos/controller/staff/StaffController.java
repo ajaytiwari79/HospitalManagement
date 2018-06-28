@@ -1,14 +1,10 @@
 package com.kairos.controller.staff;
 
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.auth.User;
-import com.kairos.user.employment.EmploymentDTO;
-import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.staff.*;
-
-import com.kairos.activity.web.PasswordUpdateDTO;
-import com.kairos.activity.open_shift.priority_group.StaffIncludeFilter;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
@@ -19,6 +15,8 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffAddressService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.unit_position.UnitPositionService;
+import com.kairos.user.employment.EmploymentDTO;
+import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

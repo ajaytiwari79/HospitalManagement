@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.staff;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
 import com.kairos.util.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
