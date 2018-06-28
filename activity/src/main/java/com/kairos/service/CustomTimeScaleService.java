@@ -1,7 +1,7 @@
 package com.kairos.service;
 
-import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.ClientStaffInfoDTO;
+import com.kairos.client.StaffRestClient;
+import com.kairos.client.dto.ClientStaffInfoDTO;
 import com.kairos.persistence.model.CustomTimeScale;
 import com.kairos.persistence.repository.CustomTimeScaleRepository;
 import org.slf4j.Logger;

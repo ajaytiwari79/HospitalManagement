@@ -1,8 +1,8 @@
 package com.kairos.service.task_type;
 
-import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.RepetitionType;
-import com.kairos.activity.client.dto.Shifts;
+import com.kairos.client.OrganizationRestClient;
+import com.kairos.client.dto.RepetitionType;
+import com.kairos.client.dto.Shifts;
 import com.kairos.persistence.model.client.ClientFilterDTO;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;

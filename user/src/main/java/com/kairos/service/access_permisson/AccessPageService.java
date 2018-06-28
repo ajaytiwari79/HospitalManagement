@@ -1,7 +1,7 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.client.dto.organization.OrganizationCategoryDTO;
+import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.enums.OrganizationCategory;

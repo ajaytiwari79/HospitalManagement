@@ -1,6 +1,6 @@
 package com.kairos.service.unit_settings;
 
-import com.kairos.activity.client.OrganizationRestClient;
+import com.kairos.client.OrganizationRestClient;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;

@@ -2,8 +2,8 @@ package com.kairos.service.requestComponent;
 
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.response.RequestComponent;
-import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.StaffRestClient;
+import com.kairos.client.OrganizationRestClient;
+import com.kairos.client.StaffRestClient;
 import com.kairos.enums.RequestType;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity_stream.NotificationService;

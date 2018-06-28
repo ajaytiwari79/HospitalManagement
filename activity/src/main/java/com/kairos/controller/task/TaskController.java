@@ -2,7 +2,7 @@ package com.kairos.controller.task;
 
 import com.kairos.activity.task.BulDeleteTaskDTO;
 import com.kairos.activity.task.TaskActiveUpdationDTO;
-import com.kairos.activity.client.dto.staff.KMDShift;
+import com.kairos.user.staff.KMDShift;
 import com.kairos.constants.ApiConstants;
 import com.kairos.service.kmdNexus.AuthService;
 import com.kairos.service.planner.PlannerService;

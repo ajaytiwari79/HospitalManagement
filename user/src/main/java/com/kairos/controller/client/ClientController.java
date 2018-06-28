@@ -1,7 +1,7 @@
 package com.kairos.controller.client;
 
-import com.kairos.activity.client.dto.ClientExceptionDTO;
-import com.kairos.activity.client.dto.TaskDemandRequestWrapper;
+import com.kairos.client.dto.ClientExceptionDTO;
+import com.kairos.client.dto.TaskDemandRequestWrapper;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.client.*;

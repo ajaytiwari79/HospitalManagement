@@ -1,7 +1,7 @@
 package com.kairos.service.country.pay_level;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;

@@ -1,7 +1,7 @@
 package com.kairos.cta;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 
 import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.organization.Organization;

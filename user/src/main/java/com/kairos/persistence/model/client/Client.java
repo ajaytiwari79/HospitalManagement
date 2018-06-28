@@ -1,26 +1,27 @@
 package com.kairos.persistence.model.client;
 
-import java.time.Period;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.CitizenHealthStatus;
-import com.kairos.persistence.model.enums.ClientEnum;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.CitizenHealthStatus;
+import com.kairos.enums.ClientEnum;
+import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.CitizenStatus;
+import com.kairos.persistence.model.staff.Staff;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.persistence.model.staff.Staff;
+import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
-import java.time.LocalDate;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import com.kairos.util.CPRUtil;
+
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
+import static com.kairos.enums.CitizenHealthStatus.ALIVE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-import static com.kairos.persistence.model.enums.CitizenHealthStatus.ALIVE;
 
 
 /**

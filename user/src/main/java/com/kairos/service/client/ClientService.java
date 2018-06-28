@@ -1,9 +1,16 @@
 package com.kairos.service.client;
 
-import com.kairos.activity.client.*;
-import com.kairos.activity.client.dto.*;
+import com.kairos.activity.web.ContactPersonDTO;
+import com.kairos.activity.web.EscalateTaskWrapper;
+import com.kairos.activity.web.EscalatedTasksWrapper;
+import com.kairos.client.*;
+import com.kairos.client.dto.ClientExceptionDTO;
+import com.kairos.client.dto.OrganizationClientWrapper;
+import com.kairos.client.dto.TaskDemandRequestWrapper;
+import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
+import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
@@ -13,16 +20,18 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.language.LanguageLevel;
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.staff.Staff;
 import com.kairos.persistence.model.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.StaffClientData;
 import com.kairos.persistence.model.staff.StaffPersonalDetailDTO;
-import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.model.user.language.Language;
+import com.kairos.persistence.model.user.language.LanguageLevel;
+import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.repository_impl.OrganizationGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -35,11 +44,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.activity.web.*;
-import com.kairos.persistence.model.client.ClientExceptionTypesDTO;
-import com.kairos.persistence.model.client.ClientFilterDTO;
-import com.kairos.persistence.model.client.ClientPersonalCalenderPrerequisiteDTO;
-import com.kairos.persistence.model.client.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
@@ -50,12 +54,12 @@ import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
+import com.kairos.vrp.TaskAddress;
 import com.kairos.wrapper.ContactPersonTabDataDTO;
+import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.joda.time.DateTime;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
@@ -69,8 +73,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
-import static com.kairos.persistence.model.enums.CitizenHealthStatus.DECEASED;
-import static com.kairos.persistence.model.enums.CitizenHealthStatus.TERMINATED;
+import static com.kairos.enums.CitizenHealthStatus.DECEASED;
+import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
 import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**

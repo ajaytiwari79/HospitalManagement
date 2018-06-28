@@ -1,7 +1,7 @@
 package com.kairos.service.tag;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.tag.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.activity.tag.TagDTO;

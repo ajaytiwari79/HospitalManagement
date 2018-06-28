@@ -1,8 +1,8 @@
 package com.kairos.service.fls_visitour.schedule;
 
-import com.kairos.activity.client.ClientRestClient;
-import com.kairos.activity.client.IntegrationRestClient;
-import com.kairos.activity.client.dto.client.Client;
+import com.kairos.client.ClientRestClient;
+import com.kairos.client.IntegrationRestClient;
+import com.kairos.user.client.Client;
 import com.kairos.persistence.model.task.SkillExpertise;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskStatus;

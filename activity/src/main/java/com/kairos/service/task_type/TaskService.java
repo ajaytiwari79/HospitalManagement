@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.user.staff.*;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.task.AbsencePlanningStatus;
 import com.kairos.activity.task.TaskDTO;
-import com.kairos.activity.client.*;
-import com.kairos.activity.client.dto.client.Client;
-import com.kairos.activity.client.dto.staff.*;
+import com.kairos.client.*;
+import com.kairos.user.client.Client;
+
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.Day;

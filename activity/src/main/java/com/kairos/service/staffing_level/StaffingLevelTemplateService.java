@@ -3,7 +3,7 @@ package com.kairos.service.staffing_level;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelTemplate;
 import com.kairos.activity.staffing_level.StaffingLevelTemplateDTO;
-import com.kairos.activity.client.OrganizationRestClient;
+import com.kairos.client.OrganizationRestClient;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.day_type.DayType;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;

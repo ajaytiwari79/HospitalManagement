@@ -1,7 +1,7 @@
 package com.kairos.service.pay_table;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.pay_table.OrganizationLevelPayTableDTO;

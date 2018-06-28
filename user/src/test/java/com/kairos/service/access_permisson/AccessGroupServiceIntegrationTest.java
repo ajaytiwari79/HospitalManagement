@@ -1,8 +1,8 @@
 package com.kairos.service.access_permisson;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.client.dto.organization.OrganizationCategoryDTO;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.enums.OrganizationCategory;

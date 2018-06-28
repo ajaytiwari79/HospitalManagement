@@ -1,12 +1,12 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
+import com.kairos.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.shift.StaffUnitPositionDetails;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.client.ChatRestClient;
-import com.kairos.activity.client.TaskServiceRestClient;
+import com.kairos.client.ChatRestClient;
+import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.enums.Gender;
@@ -1638,7 +1638,7 @@ public class StaffService extends UserBaseService {
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionWithCTA(unitPositionId, organization, countryId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
-        staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.activity.client.dto.TimeSlotWrapper.class));
+        staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.client.dto.TimeSlotWrapper.class));
         staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
 
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);

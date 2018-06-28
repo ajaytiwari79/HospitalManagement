@@ -4,7 +4,7 @@ import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.activity.open_shift.OpenShiftWrapper;
 import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.client.GenericIntegrationService;
+import com.kairos.client.GenericIntegrationService;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.enums.open_shift.OpenShiftAction;
 import com.kairos.persistence.model.open_shift.OpenShift;

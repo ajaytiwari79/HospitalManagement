@@ -1,22 +1,14 @@
 package com.kairos.service.unit_employment_position;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.config.OrderTest;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.staff.Staff;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.activity.web.UnitPositionDTO;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.position_code.PositionCodeServiceIntegrationTest;
 import com.kairos.service.staff.EmploymentService;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +16,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.inject.Inject;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.util.DateUtil.ONLY_DATE;
-import static org.junit.Assert.*;
 
 /**
  * Created by vipul on 27/2/18.

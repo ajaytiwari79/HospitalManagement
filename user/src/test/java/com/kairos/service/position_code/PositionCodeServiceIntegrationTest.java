@@ -1,7 +1,7 @@
 package com.kairos.service.position_code;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.position_code.PositionCode;
@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import static com.kairos.util.DateUtil.ONLY_DATE;
 

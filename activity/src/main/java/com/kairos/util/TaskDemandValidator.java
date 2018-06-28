@@ -1,7 +1,7 @@
 package com.kairos.util;
 
-import com.kairos.activity.client.dto.TimeSlot;
-import com.kairos.activity.client.dto.client.Client;
+import com.kairos.client.dto.TimeSlot;
+import com.kairos.user.client.Client;
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.persistence.model.task_type.TaskType;
 import org.slf4j.Logger;

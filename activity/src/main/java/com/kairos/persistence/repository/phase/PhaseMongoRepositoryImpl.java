@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.phase;
 
 
-import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
+import com.kairos.client.dto.organization.OrganizationPhaseDTO;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.agreement.cta.cta_response.PhaseResponseDTO;

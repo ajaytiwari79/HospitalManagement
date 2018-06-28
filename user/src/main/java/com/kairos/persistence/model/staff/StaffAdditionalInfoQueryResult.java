@@ -28,7 +28,7 @@ public class StaffAdditionalInfoQueryResult {
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
-    private List<com.kairos.activity.client.dto.TimeSlotWrapper> timeSlotSets;
+    private List<com.kairos.client.dto.TimeSlotWrapper> timeSlotSets;
     private UserAccessRoleDTO user;
     private UserAccessRoleDTO userAccessRoleDTO;
 
@@ -41,11 +41,11 @@ public class StaffAdditionalInfoQueryResult {
         this.user = user;
     }
 
-    public List<com.kairos.activity.client.dto.TimeSlotWrapper> getTimeSlotSets() {
+    public List<com.kairos.client.dto.TimeSlotWrapper> getTimeSlotSets() {
         return timeSlotSets;
     }
 
-    public void setTimeSlotSets(List<com.kairos.activity.client.dto.TimeSlotWrapper> timeSlotSets) {
+    public void setTimeSlotSets(List<com.kairos.client.dto.TimeSlotWrapper> timeSlotSets) {
         this.timeSlotSets = timeSlotSets;
     }
 

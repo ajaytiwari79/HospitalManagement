@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.country.ReasonCode;
 import com.kairos.persistence.model.country.ReasonCodeResponseDTO;
 import com.kairos.wrapper.ReasonCodeDTO;

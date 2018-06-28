@@ -1,5 +1,5 @@
 package com.kairos.persistence.model.task_demand;
-import com.kairos.activity.client.dto.client.Client;
+import com.kairos.user.client.Client;
 import com.kairos.persistence.model.task_type.TaskType;
 
 import java.util.HashMap;

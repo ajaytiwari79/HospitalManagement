@@ -1,6 +1,6 @@
 package com.kairos.util;
-import com.kairos.activity.client.dto.client.Client;
-import com.kairos.activity.client.dto.country.CountryHolidayCalender;
+import com.kairos.user.client.Client;
+import com.kairos.client.dto.country.CountryHolidayCalender;
 import com.kairos.persistence.model.task.TaskAddress;
 import java.util.List;
 import java.util.Map;

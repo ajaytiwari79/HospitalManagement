@@ -1,9 +1,9 @@
 package com.kairos.service.activity;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.client.OrganizationRestClient;
+import com.kairos.client.OrganizationRestClient;
 
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;

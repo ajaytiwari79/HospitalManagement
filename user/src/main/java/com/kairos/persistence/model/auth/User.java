@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.Gender;
+import com.kairos.enums.Gender;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
@@ -20,9 +20,7 @@ import java.time.Period;
 import java.util.Date;
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ADMINS_COUNTRY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PERSONALIZED_SETTINGS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PROFILE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**

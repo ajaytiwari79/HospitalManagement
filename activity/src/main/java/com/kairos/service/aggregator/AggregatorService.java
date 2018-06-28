@@ -1,17 +1,17 @@
 package com.kairos.service.aggregator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.client.ClientRestClient;
-import com.kairos.activity.client.IntegrationRestClient;
-import com.kairos.activity.client.SchedulerRestClient;
-import com.kairos.activity.client.dto.client.Client;
-import com.kairos.activity.client.dto.client.ClientExceptionCountWrapper;
-import com.kairos.activity.client.dto.client.ClientOrganizationIds;
+import com.kairos.client.ClientRestClient;
+import com.kairos.client.IntegrationRestClient;
+import com.kairos.client.SchedulerRestClient;
+import com.kairos.user.client.Client;
+import com.kairos.user.client.ClientExceptionCountWrapper;
+import com.kairos.user.client.ClientOrganizationIds;
 import com.kairos.persistence.model.client.ClientAggregatorDTO;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
-import com.kairos.persistence.model.client_exception.ClientExceptionCount;
+import com.kairos.activity.client_exception.ClientExceptionCount;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.UnhandledTaskCount;
 import com.kairos.persistence.model.task_demand.TaskDemand;

@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.client.dto.organization.OrganizationEmploymentTypeDTO;
+import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;

@@ -1,8 +1,8 @@
 package com.kairos.service.integration;
 
 
-import com.kairos.activity.client.WorkingTimeAgreementRestClient;
-import com.kairos.activity.client.planner.PlannerRestClient;
+import com.kairos.client.WorkingTimeAgreementRestClient;
+import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 

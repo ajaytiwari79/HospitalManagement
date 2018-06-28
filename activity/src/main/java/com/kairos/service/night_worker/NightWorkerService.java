@@ -1,6 +1,6 @@
 package com.kairos.service.night_worker;
 
-import com.kairos.activity.client.StaffRestClient;
+import com.kairos.client.StaffRestClient;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.QuestionAnswerPair;

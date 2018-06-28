@@ -1,8 +1,8 @@
 package com.kairos.service.phase;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.client.OrganizationRestClient;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.OrganizationRestClient;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.util.DateUtils;

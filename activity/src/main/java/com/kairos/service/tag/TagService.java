@@ -1,7 +1,7 @@
 package com.kairos.service.tag;
 
-import com.kairos.activity.client.CountryRestClient;
-import com.kairos.activity.client.OrganizationRestClient;
+import com.kairos.client.CountryRestClient;
+import com.kairos.client.OrganizationRestClient;
 import com.kairos.controller.staffing_level.StaffingLevelController;
 import com.kairos.enums.tags.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;

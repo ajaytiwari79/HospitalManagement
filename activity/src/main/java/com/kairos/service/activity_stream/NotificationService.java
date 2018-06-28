@@ -1,8 +1,8 @@
 package com.kairos.service.activity_stream;
 
 import com.kairos.activity.response.RequestComponent;
-import com.kairos.activity.client.StaffRestClient;
-import com.kairos.activity.client.dto.ClientStaffInfoDTO;
+import com.kairos.client.StaffRestClient;
+import com.kairos.client.dto.ClientStaffInfoDTO;
 import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.activity_stream.NotificationMongoRepository;

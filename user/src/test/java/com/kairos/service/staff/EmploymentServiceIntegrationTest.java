@@ -1,11 +1,9 @@
 package com.kairos.service.staff;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.activity.web.UnitPositionDTO;
-import com.kairos.service.unit_employment_position.UnitPositionServiceIntegrationTest;
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -23,8 +21,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by vipul on 6/3/18.

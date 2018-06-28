@@ -1,8 +1,8 @@
 package com.kairos.service.skill;
 
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.client.SkillServiceTemplateClient;
-import com.kairos.activity.client.TaskDemandRestClient;
+import com.kairos.client.SkillServiceTemplateClient;
+import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;

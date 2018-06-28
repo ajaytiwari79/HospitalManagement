@@ -1,6 +1,6 @@
 package com.kairos.service.activity;
 
-import com.kairos.activity.client.CountryRestClient;
+import com.kairos.client.CountryRestClient;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.service.MongoBaseService;
