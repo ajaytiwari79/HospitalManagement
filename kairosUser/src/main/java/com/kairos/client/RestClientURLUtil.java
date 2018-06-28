@@ -11,6 +11,7 @@ public class RestClientURLUtil {
 
     private static  String userServiceUrl;
     private static  String plannerServiceUrl;
+
     @Value("${gateway.plannerservice.url}")
     public void setPlannerServiceUrl(String plannerServiceUrl) {
         RestClientURLUtil.plannerServiceUrl = plannerServiceUrl;
@@ -19,6 +20,8 @@ public class RestClientURLUtil {
     public  void setUserServiceUrl(String userServiceUrl) {
         RestClientURLUtil.userServiceUrl = userServiceUrl;
     }
+
+
 
     public final static String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){

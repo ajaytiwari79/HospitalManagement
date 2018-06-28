@@ -2064,7 +2064,7 @@ public class StaffService extends UserBaseService {
     private void addStaffInChatServer(Staff staff) {
         Map<String, String> auth = new HashMap<>();
         auth.put("type", "m.login.dummy");
-        auth.put("session", staff.getId().toString());
+        auth.put("session", staff.getEmail());
         StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName() + "@kairos");
         StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
         staff.setAccess_token(chatDetails.getAccess_token());
