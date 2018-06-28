@@ -11,11 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by vipul on 25/9/17.
@@ -27,36 +30,37 @@ public class ChatRestClient {
     @Autowired
     @Qualifier("schedulerRestTemplate")
     RestTemplate restTemplate;
-    @Value("${chat.matrix.url}")
-    private  String matrixChatServerUrl;
 
     @Inject
     private OrganizationService organizationService;
 
 
     /**
-     * @param staffChatDetails
      * @return
      * @auther Vipul Pandey
      * used to register staff to chat server
      */
-    public StaffChatDetails registerUser(StaffChatDetails staffChatDetails) {
-        StaffChatDetails staffChatDetails1 = new StaffChatDetails();
+    public StaffChatDetails registerUser() {
+        Map<String, String> auth = new HashMap();
+        auth.put("type", "m.login.dummy");
+        auth.put("session", "EERT345");
+        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, "arvind10", "arvind@kairos");
         try {
 
-            HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
+            HttpEntity requestEntity = new HttpEntity(staffChatDetails);
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            matrixChatServerUrl,
+                            "http://localhost/_matrix/client/r0/register?kind=user", //URL coming from property file
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 
             StaffChatDetails response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-                BeanUtils.copyProperties(response,staffChatDetails1);
-                return staffChatDetails1;
-            } else {
-                return null;
+                BeanUtils.copyProperties(response,staffChatDetails);
+                System.out.println(restExchange.toString());
             }
         } catch (HttpClientErrorException e) {
 
@@ -65,6 +69,7 @@ public class ChatRestClient {
             throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
 
         }
+        return staffChatDetails;
     }
 
 
