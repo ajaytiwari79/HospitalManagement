@@ -1,7 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -31,7 +29,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
 
        final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if(pathVariables==null){
+            if(pathVariables==null){
             throw new InvalidRequestException("Url or Parameter is not correct");
         }
         String orgIdString=pathVariables.get("organizationId");
