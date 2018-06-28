@@ -2,10 +2,7 @@ package com.kairos.activity.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.activity.persistence.model.activity.tabs.SkillActivityTab;
-import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
+import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 
 import java.math.BigInteger;
@@ -39,6 +36,7 @@ public class ActivityDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger parentId;
+    private PermissionsActivityTab permissionsActivityTab;
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
@@ -141,7 +139,13 @@ public class ActivityDTO {
         this.categoryName = categoryName;
     }
 
+    public PermissionsActivityTab getPermissionsActivityTab() {
+        return permissionsActivityTab;
+    }
 
+    public void setPermissionsActivityTab(PermissionsActivityTab permissionsActivityTab) {
+        this.permissionsActivityTab = permissionsActivityTab;
+    }
 
     public List<BigInteger> getTags() {
         List<BigInteger> tags = new ArrayList<>();
@@ -244,10 +248,11 @@ public class ActivityDTO {
         this.tags = tags;
     }
 
-    public ActivityDTO(BigInteger id, String name,BigInteger parentId) {
+    public ActivityDTO(BigInteger id, String name,BigInteger parentId,PermissionsActivityTab permissionsActivityTab) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
+        this.permissionsActivityTab=permissionsActivityTab;
     }
 }
 

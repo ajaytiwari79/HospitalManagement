@@ -16,8 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by vipul on 25/9/17.
@@ -29,15 +27,12 @@ public class ChatRestClient {
     @Autowired
     @Qualifier("schedulerRestTemplate")
     RestTemplate restTemplate;
+    @Value("${chat.matrix.url}")
+    private  String matrixChatServerUrl;
 
     @Inject
     private OrganizationService organizationService;
-    private static String matrixServerUrl;
 
-    @Value("${chat.matrix.url}")
-    public static void setMatrixServerUrl(String matrixServerUrl) {
-        ChatRestClient.matrixServerUrl = matrixServerUrl;
-    }
 
     /**
      * @param staffChatDetails
@@ -47,13 +42,12 @@ public class ChatRestClient {
      */
     public StaffChatDetails registerUser(StaffChatDetails staffChatDetails) {
         StaffChatDetails staffChatDetails1 = new StaffChatDetails();
-
         try {
 
             HttpEntity<StaffChatDetails> requestEntity = new HttpEntity<>(staffChatDetails);
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            matrixServerUrl,
+                            matrixChatServerUrl,
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 

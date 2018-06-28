@@ -331,7 +331,8 @@ public class Activity extends MongoBaseEntity implements Serializable {
     }
 
     public ActivityDTO retrieveBasicDetails() {
-        return new ActivityDTO(id,name,parentId);
+        return new ActivityDTO(id,name,parentId,permissionsActivityTab);
+
     }
 
     public String getExternalId() {

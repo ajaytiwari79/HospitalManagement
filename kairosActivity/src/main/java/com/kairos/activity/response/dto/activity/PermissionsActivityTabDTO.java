@@ -1,7 +1,11 @@
 package com.kairos.activity.response.dto.activity;
 
+
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigInteger;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PermissionsActivityTabDTO {
     private BigInteger activityId;
     private boolean eligibleForCopy;
