@@ -667,7 +667,7 @@ public class StaffController {
     }
 
 
-    @RequestMapping(value = "/get_staff_ids/user/{userId}", method = RequestMethod.GET)
+    @GetMapping(value = "/get_staff_ids/user/{userId}")
     @ApiOperation("get staff ids by userid")
     ResponseEntity<Map<String, Object>> getStaffIdsByUserId(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsByUserId(userId));

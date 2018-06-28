@@ -15,12 +15,11 @@ public class AttendanceSetting extends MongoBaseEntity{
     public AttendanceSetting() {
     }
 
-    public AttendanceSetting(Long unitId, Long staffId,Long userId) {
+    public AttendanceSetting(Long unitId, Long staffId,Long userId,AttendanceDuration attendanceDuration) {
         this.staffId = staffId;
         this.unitId = unitId;
         this.userId=userId;
-
-
+        this.attendanceDuration=attendanceDuration;
     }
     public Long getStaffId() {
         return staffId;

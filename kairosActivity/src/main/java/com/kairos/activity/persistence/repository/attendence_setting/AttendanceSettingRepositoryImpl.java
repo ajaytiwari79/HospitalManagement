@@ -20,7 +20,7 @@ public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingR
     @Autowired
     private MongoTemplate mongoTemplate;
 
-   public List<AttendanceSetting> findMaxAttendanceCheckIn(Long userId,Date date){
+   public AttendanceSetting findMaxAttendanceCheckIn(Long userId,Date date){
        Aggregation aggregation = Aggregation.newAggregation(
                match(Criteria.where("userId").is(userId).and("createdAt").gte(date)),
                sort(Sort.Direction.DESC,"attendanceDuration.from"),
@@ -28,7 +28,7 @@ public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingR
        );
 
        AggregationResults<AttendanceSetting> result = mongoTemplate.aggregate(aggregation, AttendanceSetting.class, AttendanceSetting.class);
-       return result.getMappedResults();
+       return result.getMappedResults().get(0);
    }
 
     }

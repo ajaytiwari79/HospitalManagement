@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CustomAttendanceSettingRepository {
 
-    List<AttendanceSetting> findMaxAttendanceCheckIn(Long userId,Date date);
+    AttendanceSetting findMaxAttendanceCheckIn(Long userId,Date date);
 }

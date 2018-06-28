@@ -16,8 +16,4 @@ public interface AttendanceSettingRepository extends MongoBaseRepository<Attenda
 
     @Query(value ="{'attendanceDuration.checkIn':?2,unitId:?0,staffId:?1,deleted:false}" )
     AttendanceSetting findByUnitIdAndStaffIdAndDate(Long unitId, Long staffId, Date date);
-
-    @Query(value = "{userId:?0,createdAt:{$gte:?1}}")
-    AttendanceSetting findMaxAttendanceCheckIn1(Long userId, Date date);
-
 }

@@ -3,11 +3,15 @@ package com.kairos.persistence.model.user.staff;
 import com.kairos.response.dto.web.organization.OrganizationIdAndNameResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.ZoneId;
+
 @QueryResult
 public class StaffUnitWrapper {
     private Long staffId;
     private Long unitId;
     private String unitName;
+    private String timeZone;
+
 
     public Long getStaffId() {
         return staffId;
@@ -31,5 +35,13 @@ public class StaffUnitWrapper {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 }

@@ -13,7 +13,12 @@ public class AttendanceDuration {
     private LocalDateTime from;
     private LocalDateTime to;
 
+    public AttendanceDuration() {
+    }
 
+    public AttendanceDuration(LocalDateTime from) {
+        this.from = from;
+    }
     public LocalDateTime getFrom() {
         return from;
     }

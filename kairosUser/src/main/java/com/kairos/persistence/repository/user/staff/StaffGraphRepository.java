@@ -381,7 +381,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
-            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName ")
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone")
     List<StaffUnitWrapper> getStaffByUserId(Long id);
 
     @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
