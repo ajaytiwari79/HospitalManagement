@@ -1,7 +1,6 @@
 
 package com.kairos.service.planner.vrpPlanning;
 
-import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.activity.task_type.TaskTypeSettingDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.solver_config.SolverConfigStatus;
@@ -98,7 +97,7 @@ public class VRPPlanningService extends MongoBaseService{
             t.setStartTime(Date.from(t.getPlannedStartTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
             t.setEndTime(Date.from(t.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
         });
-        List<ShiftDTO> shiftDTOS = vrpTaskPlanningDTO.getShifts().stream().filter(s-> DateUtils.asLocalDate(new Date(s.getStartTime())).equals(date)).collect(toList());
+        List<com.kairos.vrp.vrpPlanning.ShiftDTO> shiftDTOS = vrpTaskPlanningDTO.getShifts().stream().filter(s-> DateUtils.asLocalDate(new Date(s.getStartTime())).equals(date)).collect(toList());
         vrpTaskPlanningDTO.setShifts(shiftDTOS);
         vrpTaskPlanningDTO.setDrivingTimeList(drivingTimeList);
         vrpTaskPlanningDTO.setTasks(taskDTOS);
@@ -128,12 +127,12 @@ public class VRPPlanningService extends MongoBaseService{
         return tasks;
     }
 
-
+// TODO FIX PRADEEP
     public VrpTaskPlanningDTO getVRPTaskPlanningDTO(Long unitId,SolverConfigDTO solverConfigDTO){
         List<TaskDTO> taskDTOS = getTaskForPlanning(unitId);
         Object[] objects = getShiftAndEmployees();
         List<EmployeeDTO> employeeDTOS = (List<EmployeeDTO>)objects[0];
-        List<ShiftDTO> shiftDTOS = getShifts(employeeDTOS,(List<Long>)objects[1]);
+        List<com.kairos.vrp.vrpPlanning.ShiftDTO> shiftDTOS = getShifts(employeeDTOS,(List<Long>)objects[1]);
         return new VrpTaskPlanningDTO(solverConfigDTO,shiftDTOS,null,taskDTOS,null,null);
     }
 
@@ -149,16 +148,17 @@ public class VRPPlanningService extends MongoBaseService{
         return taskDTOS;
     }
 
-    private List<ShiftDTO> getShifts(List<EmployeeDTO> employeeList,List<Long> staffIds){
+    private List<com.kairos.vrp.vrpPlanning.ShiftDTO> getShifts(List<EmployeeDTO> employeeList,List<Long> staffIds){
         ZonedDateTime zonedDateTime = ZonedDateTime.now();
         Date startDate = DateUtils.getDateByZonedDateTime(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS));
         Date endDate = DateUtils.getDateByZonedDateTime(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusWeeks(1).truncatedTo(ChronoUnit.DAYS));
         Map<Long,EmployeeDTO> employeeDTOMap = employeeList.stream().collect(Collectors.toMap(k->new Long(k.getId()),v->v));
-        List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
-        shifts.forEach(s->{
-            s.setLocalDate(DateUtils.asLocalDate(new Date(s.getStartTime())));
-            s.setEmployee(employeeDTOMap.get(s.getStaffId()));
-        });
+        List<com.kairos.vrp.vrpPlanning.ShiftDTO> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
+
+        //  shifts.forEach(s->{
+      //      s.setLocalDate(DateUtils.asLocalDate(new Date(s.getStartTime())));
+       //     s.setEmployee(employeeDTOMap.get(s.getStaffId()));
+      //  });
         return shifts;
     }
 
