@@ -1,6 +1,6 @@
 package com.kairos.service.agreement.cta;
 
-import com.kairos.client.activity_types.ActivityTypesRestClient;
+import com.kairos.activity.client.activity_types.ActivityTypesRestClient;
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.organization.Organization;

@@ -1,7 +1,7 @@
 package com.kairos.controller.requestComponent;
 
-import com.kairos.activity.dto.RequestComponent;
-import com.kairos.activity.dto.RequestType;
+import com.kairos.activity.response.RequestComponent;
+import com.kairos.enums.RequestType;
 import com.kairos.service.requestComponent.RequestComponentService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

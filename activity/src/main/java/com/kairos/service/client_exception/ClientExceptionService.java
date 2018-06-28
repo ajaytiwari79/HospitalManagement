@@ -1,10 +1,11 @@
 package com.kairos.service.client_exception;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.client.ClientRestClient;
-import com.kairos.client.IntegrationRestClient;
-import com.kairos.client.dto.client.Client;
-import com.kairos.client.dto.client.ClientExceptionCountWrapper;
-import com.kairos.client.dto.client.ClientTemporaryAddress;
+import com.kairos.activity.client.ClientRestClient;
+import com.kairos.activity.client.IntegrationRestClient;
+import com.kairos.activity.client.dto.client.Client;
+import com.kairos.activity.client.dto.client.ClientExceptionCountWrapper;
+import com.kairos.activity.client.dto.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
@@ -20,7 +21,6 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
-import com.kairos.activity.dto.TaskGanttDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.aggregator.AggregatorService;
 import com.kairos.service.exception.ExceptionService;
@@ -33,6 +33,7 @@ import com.kairos.spec.TaskLocationSpecification;
 import com.kairos.spec.TaskSpecification;
 import com.kairos.util.DateUtils;
 import com.kairos.util.functional_interface.PerformCalculation;
+import com.kairos.wrapper.task.TaskGanttDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.joda.time.DateTime;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -52,6 +54,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.*;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;

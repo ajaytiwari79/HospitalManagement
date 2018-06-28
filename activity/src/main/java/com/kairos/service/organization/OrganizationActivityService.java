@@ -1,29 +1,28 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.dto.activity.ActivityTabsWrapper;
-import com.kairos.activity.dto.activity.ActivityTagDTO;
-import com.kairos.activity.dto.activity.ActivityWithSelectedDTO;
-import com.kairos.activity.dto.activity.GeneralActivityTabDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.client.GenericIntegrationService;
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.persistence.model.country.day_type.DayType;
-import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
-import com.kairos.service.unit_settings.UnitSettingService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.persistence.model.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
+import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-
+import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.activity.client.GenericIntegrationService;
+import com.kairos.activity.client.OrganizationRestClient;
+import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.country.day_type.DayType;
+import com.kairos.persistence.model.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.activity.dto.ActivityWithUnitIdDTO;
+import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
@@ -35,12 +34,12 @@ import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
-import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.service.unit_settings.UnitSettingService;
+import com.kairos.util.ObjectMapperUtils;
+import com.kairos.wrapper.activity.ActivityTabsWrapper;
+import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
+import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -197,7 +196,8 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
-        GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
+        GeneralActivityTab generalTab = new GeneralActivityTab();
+        ObjectMapperUtils.copyProperties(generalDTO,generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }

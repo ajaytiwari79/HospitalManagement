@@ -1,7 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.activity.web.UnitPositionDTO;
 import com.kairos.service.unit_employment_position.UnitPositionServiceIntegrationTest;

@@ -1,5 +1,6 @@
 package com.kairos.controller.absencePlanning;
-import com.kairos.activity.dto.TaskDTO;
+
+import com.kairos.activity.task.TaskDTO;
 import com.kairos.service.absencePlanning.AbsencePlanningService;
 import com.kairos.service.mail.MailService;
 import com.kairos.util.response.ResponseHandler;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+
 import static com.kairos.constants.ApiConstants.API_ABSENCE_PLANNING_URL;
 
 

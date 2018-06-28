@@ -1,33 +1,34 @@
 package com.kairos.service.staffing_level;
 
-import com.kairos.activity.dto.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.client.StaffRestClient;
-import com.kairos.persistence.model.country.day_type.DayType;
-import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
+
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.activity.staffing_level.*;
+import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
+import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.activity.client.OrganizationRestClient;
+import com.kairos.activity.client.StaffRestClient;
+import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
-import com.kairos.activity.staffing_level.*;
+import com.kairos.persistence.model.country.day_type.DayType;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.activity.dto.activity.ActivityCategoryListDTO;
-import com.kairos.activity.dto.activity.ActivityTagDTO;
-import com.kairos.dto.staffing_level.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.event.ShiftNotificationEvent;
-import com.kairos.util.timeCareShift.Transstatus;
-import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.util.serviceutil.StaffingLevelUtil;
+import com.kairos.util.timeCareShift.Transstatus;
+import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -795,7 +796,7 @@ public class StaffingLevelService extends MongoBaseService {
      * @param unitId
      * @param absenceStaffingLevelDtos
      */
-    public List<AbsenceStaffingLevelDto> updateAbsenceStaffingLevel( Long unitId
+    public List<AbsenceStaffingLevelDto> updateAbsenceStaffingLevel(Long unitId
             , List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos) {
         logger.info("updating staffing level organizationId  {} ,{}", unitId);
         List<StaffingLevel> staffingLevels = new ArrayList<StaffingLevel>();

@@ -1,5 +1,5 @@
 package com.kairos.service.control_panel;
-import com.kairos.client.dto.ControlPanelDTO;
+import com.kairos.activity.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;

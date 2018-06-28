@@ -3,7 +3,7 @@ package com.kairos.service.country;
 
 
 import com.kairos.dto.activity.TimeTypeDTO;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.util.List;
 
-import static com.kairos.client.RestClientURLUtil.getBaseUrl;
+import static com.kairos.activity.client.RestClientURLUtil.getBaseUrl;
 
 /**
  * Created by vipul on 17/10/17.

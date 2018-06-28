@@ -1,12 +1,13 @@
 package com.kairos.service.aggregator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.client.ClientRestClient;
-import com.kairos.client.IntegrationRestClient;
-import com.kairos.client.SchedulerRestClient;
-import com.kairos.client.dto.client.Client;
-import com.kairos.client.dto.client.ClientExceptionCountWrapper;
-import com.kairos.client.dto.client.ClientOrganizationIds;
+import com.kairos.activity.client.ClientRestClient;
+import com.kairos.activity.client.IntegrationRestClient;
+import com.kairos.activity.client.SchedulerRestClient;
+import com.kairos.activity.client.dto.client.Client;
+import com.kairos.activity.client.dto.client.ClientExceptionCountWrapper;
+import com.kairos.activity.client.dto.client.ClientOrganizationIds;
+import com.kairos.persistence.model.client.ClientAggregatorDTO;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
@@ -20,7 +21,6 @@ import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRe
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
-import com.kairos.activity.dto.ClientAggregatorDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.client_exception.ClientExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;

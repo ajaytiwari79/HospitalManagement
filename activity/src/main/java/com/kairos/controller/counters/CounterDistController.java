@@ -1,10 +1,10 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.client.counter.CounterDistDTO;
+import com.kairos.activity.counter.CounterDistDTO;
+import com.kairos.activity.counter.ModuleCounterGroupingDTO;
+import com.kairos.activity.counter.RoleCounterDTO;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
-import com.kairos.activity.client.counter.ModuleCounterGroupingDTO;
-import com.kairos.activity.client.counter.RoleCounterDTO;
 import com.kairos.service.counter.CounterManagementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

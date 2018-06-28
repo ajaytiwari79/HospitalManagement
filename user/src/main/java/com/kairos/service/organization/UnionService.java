@@ -1,7 +1,7 @@
 package com.kairos.service.organization;
 
-import com.kairos.client.dto.organization.CompanyType;
-import com.kairos.client.dto.organization.CompanyUnitType;
+import com.kairos.activity.client.dto.organization.CompanyType;
+import com.kairos.activity.client.dto.organization.CompanyUnitType;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;

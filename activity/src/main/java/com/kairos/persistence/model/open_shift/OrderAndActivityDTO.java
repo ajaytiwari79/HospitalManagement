@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.open_shift;
 
-import com.kairos.dto.ActivityDTO;
+
+import com.kairos.activity.activity.ActivityDTO;
 
 import java.util.List;
 

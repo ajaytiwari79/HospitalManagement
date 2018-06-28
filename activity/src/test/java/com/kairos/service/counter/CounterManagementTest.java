@@ -1,6 +1,6 @@
 package com.kairos.service.counter;
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.ModuleCounter;

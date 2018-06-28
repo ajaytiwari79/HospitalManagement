@@ -2,7 +2,7 @@ package com.kairos.service.integration;
 
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.client.priority_group.PriorityGroupRestClient;
+import com.kairos.activity.client.priority_group.PriorityGroupRestClient;
 import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.activity.web.ActivityWithTimeTypeDTO;

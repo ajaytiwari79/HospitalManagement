@@ -1,6 +1,6 @@
 package com.kairos.service.night_worker;
 
-import com.kairos.client.StaffRestClient;
+import com.kairos.activity.client.StaffRestClient;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;

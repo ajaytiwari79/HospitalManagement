@@ -1,7 +1,7 @@
 package com.kairos.service.client;
 
-import com.kairos.client.*;
-import com.kairos.client.dto.*;
+import com.kairos.activity.client.*;
+import com.kairos.activity.client.dto.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;

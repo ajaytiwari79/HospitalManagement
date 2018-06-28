@@ -1,9 +1,9 @@
 package com.kairos.service.phase;
 
-import com.kairos.client.CountryRestClient;
-import com.kairos.client.OrganizationRestClient;
+import com.kairos.activity.client.CountryRestClient;
+import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.organization.OrganizationDTO;
-import com.kairos.client.dto.organization.OrganizationPhaseDTO;
+import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.service.MongoBaseService;

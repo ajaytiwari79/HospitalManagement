@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.client.counter.*;
+
+import com.kairos.activity.counter.*;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;

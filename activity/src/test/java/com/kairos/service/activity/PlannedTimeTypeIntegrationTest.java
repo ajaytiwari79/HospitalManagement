@@ -1,7 +1,7 @@
 package com.kairos.service.activity;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import org.junit.Assert;

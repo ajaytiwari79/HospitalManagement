@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.client.counter.CounterOrderDTO;
-import com.kairos.activity.client.counter.ModuleCounterGroupingDTO;
-import com.kairos.activity.client.counter.RefCounterDefDTO;
-import com.kairos.activity.client.counter.RoleCounterDTO;
+import com.kairos.activity.counter.CounterOrderDTO;
+import com.kairos.activity.counter.ModuleCounterGroupingDTO;
+import com.kairos.activity.counter.RefCounterDefDTO;
+import com.kairos.activity.counter.RoleCounterDTO;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;

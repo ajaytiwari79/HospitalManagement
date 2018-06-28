@@ -1,8 +1,8 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.client.CountryRestClient;
-import com.kairos.client.OrganizationRestClient;
+import com.kairos.activity.client.CountryRestClient;
+import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.organization.OrganizationDTO;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;

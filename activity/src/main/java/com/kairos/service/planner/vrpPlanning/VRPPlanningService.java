@@ -1,28 +1,28 @@
 package com.kairos.service.planner.vrpPlanning;
 
-import com.kairos.client.StaffRestClient;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.planner.PlannerRestClient;
+import com.kairos.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.activity.web.StaffDTO;
+import com.kairos.activity.client.StaffRestClient;
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.solver_config.SolverConfigStatus;
 import com.kairos.persistence.model.solver_config.SolverConfig;
+import com.kairos.persistence.model.staff.staff.UnitStaffResponseDTO;
 import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
-import com.kairos.dto.TaskTypeSettingDTO;
-import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.ObjectUtils;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
-import com.kairos.enums.solver_config.SolverConfigStatus;
-import com.kairos.activity.web.StaffDTO;
+import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.vrp.vrpPlanning.EmployeeDTO;
 import com.kairos.vrp.vrpPlanning.ShiftDTO;
 import com.kairos.vrp.vrpPlanning.TaskDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.kairos.persistence.model.staff.staff.UnitStaffResponseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -34,7 +34,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.toSet;
 
 /**
  * @author pradeep

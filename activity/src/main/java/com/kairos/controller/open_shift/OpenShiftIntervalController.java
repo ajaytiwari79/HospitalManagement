@@ -1,6 +1,5 @@
 package com.kairos.controller.open_shift;
 
-import com.kairos.dto.ActivityDTO;
 import com.kairos.service.open_shift.OpenShiftIntervalService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;

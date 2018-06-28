@@ -1,7 +1,7 @@
 package com.kairos.service.kmdNexus;
 
-import com.kairos.client.TaskDemandRestClient;
-import com.kairos.client.TaskServiceRestClient;
+import com.kairos.activity.client.TaskDemandRestClient;
+import com.kairos.activity.client.TaskServiceRestClient;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;

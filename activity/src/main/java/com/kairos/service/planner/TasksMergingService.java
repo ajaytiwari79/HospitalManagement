@@ -1,7 +1,7 @@
 package com.kairos.service.planner;
 
-import com.kairos.client.ClientRestClient;
-import com.kairos.client.IntegrationRestClient;
+import com.kairos.activity.client.ClientRestClient;
+import com.kairos.activity.client.IntegrationRestClient;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;

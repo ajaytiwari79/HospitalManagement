@@ -1,6 +1,6 @@
 package com.kairos.controller.country;
 
-import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
+import com.kairos.activity.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.dto.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.util.response.ResponseHandler;

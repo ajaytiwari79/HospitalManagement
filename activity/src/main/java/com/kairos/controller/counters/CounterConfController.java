@@ -1,7 +1,7 @@
 package com.kairos.controller.counters;
 
+import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.persistence.model.counter.Counter;
-import com.kairos.activity.client.counter.FilterCriteria;
 import com.kairos.service.counter.CounterConfService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;

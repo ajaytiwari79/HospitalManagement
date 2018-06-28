@@ -1,7 +1,7 @@
 package com.kairos.service.wta;
 
-import com.kairos.client.CountryRestClient;
-import com.kairos.client.OrganizationRestClient;
+import com.kairos.activity.client.CountryRestClient;
+import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.wta.templates.WTABuilderService;

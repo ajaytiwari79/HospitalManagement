@@ -1,14 +1,15 @@
 package com.kairos.controller.task;
-import com.kairos.client.dto.staff.KMDShift;
-import com.kairos.activity.dto.BulDeleteTaskDTO;
-import com.kairos.activity.dto.TaskActiveUpdationDTO;
-import com.kairos.vrp.task.VRPTaskDTO;
+
+import com.kairos.activity.task.BulDeleteTaskDTO;
+import com.kairos.activity.task.TaskActiveUpdationDTO;
+import com.kairos.activity.client.dto.staff.KMDShift;
+import com.kairos.constants.ApiConstants;
 import com.kairos.service.kmdNexus.AuthService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.constants.ApiConstants;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.vrp.task.VRPTaskDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

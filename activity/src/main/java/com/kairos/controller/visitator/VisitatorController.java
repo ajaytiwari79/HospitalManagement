@@ -1,7 +1,8 @@
 package com.kairos.controller.visitator;
-import com.kairos.activity.dto.TaskDemandDTO;
+
 import com.kairos.service.visitator.VisitatorService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.wrapper.task.TaskDemandDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 /**

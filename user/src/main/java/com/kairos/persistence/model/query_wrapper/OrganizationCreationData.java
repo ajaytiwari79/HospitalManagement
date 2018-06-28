@@ -2,7 +2,7 @@ package com.kairos.persistence.model.query_wrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.activity.client.dto.organization.CompanyType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.country.BusinessType;
 import com.kairos.persistence.model.country.CompanyCategory;

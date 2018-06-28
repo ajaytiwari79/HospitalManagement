@@ -1,11 +1,10 @@
 package com.kairos.controller.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.kairos.activity.task.BulkUpdateTaskDTO;
+import com.kairos.activity.task.TaskDTO;
+import com.kairos.activity.task.TaskRestrictionDto;
 import com.kairos.enums.CitizenHealthStatus;
-import com.kairos.activity.dto.BulkUpdateTaskDTO;
-import com.kairos.activity.dto.TaskDTO;
-import com.kairos.activity.dto.TaskRestrictionDto;
-import com.kairos.activity.dto.TaskUpdateDTO;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
@@ -14,6 +13,7 @@ import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.visitator.VisitatorService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.wrapper.task.TaskUpdateDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;

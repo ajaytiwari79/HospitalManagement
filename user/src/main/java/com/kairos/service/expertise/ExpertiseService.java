@@ -4,7 +4,7 @@ package com.kairos.service.expertise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.client.priority_group.PriorityGroupRestClient;
+import com.kairos.activity.client.priority_group.PriorityGroupRestClient;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.persistence.model.common.TimeSlot;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;

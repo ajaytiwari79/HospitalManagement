@@ -1,14 +1,14 @@
 package com.kairos.controller.activity;
 
 
+import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.activity_tabs.*;
-import com.kairos.activity.dto.SkillActivityDTO;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.activity.activity.activity_tabs.LocationActivityTabDTO;
+import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.wrapper.activity.RulesActivityTabDTO;
+import com.kairos.wrapper.activity.SkillActivityDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -348,7 +348,7 @@ public class ActivityController {
     @ApiOperation("copy Activity")
     @PostMapping(value = "/activity/{activityId}/copy_activity")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long countryId, @PathVariable BigInteger activityId, @RequestBody  ActivityDTO activity) {
+    public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long countryId, @PathVariable BigInteger activityId, @RequestBody ActivityDTO activity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.copyActivityDetails(countryId, activityId, activity));
     }
 

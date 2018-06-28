@@ -1,8 +1,9 @@
 package com.kairos.controller.staffing_level;
-import com.kairos.constants.ApiConstants;
+
 import com.kairos.activity.staffing_level.StaffingLevel;
-import com.kairos.dto.staffing_level.AbsenceStaffingLevelDto;
-import com.kairos.dto.staffing_level.PresenceStaffingLevelDto;
+import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
+import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.constants.ApiConstants;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.util.Message;
 import com.kairos.util.response.ResponseHandler;
@@ -25,6 +26,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 @RestController

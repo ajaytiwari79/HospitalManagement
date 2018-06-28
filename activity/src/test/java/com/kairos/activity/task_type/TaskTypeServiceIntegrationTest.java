@@ -1,7 +1,7 @@
 package com.kairos.activity.task_type;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.task_type.TaskTypeResource;
 import com.kairos.dto.TaskTypeDTO;
 import org.junit.Assert;

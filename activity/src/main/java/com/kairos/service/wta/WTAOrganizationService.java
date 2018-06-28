@@ -6,7 +6,7 @@ import com.kairos.activity.wta.WTADTO;
 import com.kairos.activity.wta.WTAResponseDTO;
 import com.kairos.activity.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.wta.templates.WTABuilderService;
-import com.kairos.client.OrganizationRestClient;
+import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;

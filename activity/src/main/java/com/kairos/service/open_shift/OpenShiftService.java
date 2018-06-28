@@ -1,7 +1,12 @@
 package com.kairos.service.open_shift;
 
-import com.kairos.client.GenericIntegrationService;
+import com.kairos.activity.open_shift.OpenShiftResponseDTO;
+import com.kairos.activity.open_shift.OpenShiftWrapper;
+import com.kairos.activity.shift.ShiftDTO;
+import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.activity.client.GenericIntegrationService;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.enums.open_shift.OpenShiftAction;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftActivityWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
@@ -10,8 +15,6 @@ import com.kairos.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.dto.shift.StaffUnitPositionDetails;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.mail.MailService;
@@ -22,9 +25,6 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
-import com.kairos.enums.open_shift.OpenShiftAction;
-import com.kairos.activity.open_shift.OpenShiftResponseDTO;
-import com.kairos.activity.open_shift.OpenShiftWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -36,9 +36,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.activity.open_shift.ShiftAssignmentCriteria.*;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION_MESSAGE;
-import static com.kairos.activity.open_shift.ShiftAssignmentCriteria.*;
 
 @Service
 @Transactional

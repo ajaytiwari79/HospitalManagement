@@ -1,8 +1,8 @@
 package com.kairos.service.counter;
 
+import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
-import com.kairos.activity.client.counter.FilterCriteria;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
