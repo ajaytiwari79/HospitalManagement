@@ -3,6 +3,7 @@ package com.kairos.activity.controller.counters;
 
 import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.enums.counter.ChartType;
+import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
 import com.kairos.activity.persistence.model.counter.KPI;
 import com.kairos.activity.persistence.model.counter.chart.BaseChart;
@@ -32,6 +33,7 @@ public class CounterDataController {
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getCounterInitialData(@RequestParam String moduleId) {
+        //TODO: TO BE MODIFIED, CURRENTLY MOCK ONLY
         /*
     return map keys( List<BigInteger> order, metaData )
     { block1, block2, block3 }
@@ -45,42 +47,30 @@ public class CounterDataController {
 
         //CounterType.TOTAL_KM_DRIVEN_PER_DAY
         baseChart = new SingleNumberChart(12, RepresentationUnit.DECIMAL, "Km");
-        kpi = new KPI();
+        kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_DAY.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
         kpi.setId(BigInteger.valueOf(1));
-        kpi.setChart(baseChart);
         kpi.setType(CounterType.TOTAL_KM_DRIVEN_PER_DAY);
-        kpi.setTitle(kpi.getType().getName());
-        kpi.setChartType(ChartType.NUMBER_ONLY);
         kpiList.add(kpi);
 
         //CounterType.TASK_UNPLANNED
         baseChart = new GaugeChart(0, 100, 32, null, null, RepresentationUnit.NUMBER, "Task");
-        kpi = new KPI();
+        kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.GAUGE, baseChart, CounterSize.SIZE_1X1);
         kpi.setId(BigInteger.valueOf(2));
         kpi.setType(CounterType.TASK_UNPLANNED);
-        kpi.setTitle(kpi.getType().getName());
-        kpi.setChart(baseChart);
-        kpi.setChartType(ChartType.GAUGE);
         kpiList.add(kpi);
 
         //CounterType.TASK_UNPLANNED_HOURS
         baseChart = new GaugeChart(0, 240, 30.3, null, null, RepresentationUnit.DECIMAL, "Hour");
-        kpi = new KPI();
+        kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), ChartType.GAUGE, baseChart, CounterSize.SIZE_1X1);
         kpi.setId(BigInteger.valueOf(3));
         kpi.setType(CounterType.TASK_UNPLANNED_HOURS);
-        kpi.setTitle(kpi.getType().getName());
-        kpi.setChart(baseChart);
-        kpi.setChartType(ChartType.GAUGE);
         kpiList.add(kpi);
 
         //CounterType.TASKS_PER_STAFF
         baseChart = new SingleNumberChart(12, RepresentationUnit.NUMBER, "Task");
-        kpi = new KPI();
+        kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
         kpi.setId(BigInteger.valueOf(4));
         kpi.setType(CounterType.TASKS_PER_STAFF);
-        kpi.setTitle(kpi.getType().getName());
-        kpi.setChart(baseChart);
-        kpi.setChartType(ChartType.NUMBER_ONLY);
         kpiList.add(kpi);
 
 
@@ -89,6 +79,7 @@ public class CounterDataController {
 
     @GetMapping("/getMetaData")
     public ResponseEntity<Map<String, Object>> getMetaData(@RequestParam String moduleId){
+        //TODO: TO BE MODIFIED CURRENTLY MOCK ONLY
         Map<String, Object> respData = new HashMap<>();
         Map<String, BigInteger> tabData = new HashMap<>();
         tabData.put("tab1", BigInteger.valueOf(1));
