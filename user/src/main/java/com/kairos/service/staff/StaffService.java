@@ -1649,12 +1649,8 @@ public class StaffService extends UserBaseService {
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
         //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-<<<<<<< HEAD:kairosUser/src/main/java/com/kairos/service/staff/StaffService.java
-
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult,StaffAdditionalInfoDTO.class);
-=======
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
->>>>>>> KP-3748:user/src/main/java/com/kairos/service/staff/StaffService.java
+
         // StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         com.kairos.activity.shift.StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionWithCTA(unitPositionId, organization, countryId);

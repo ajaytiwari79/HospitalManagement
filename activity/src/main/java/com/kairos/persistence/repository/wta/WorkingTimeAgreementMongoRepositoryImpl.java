@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 /**
  * @author pradeep

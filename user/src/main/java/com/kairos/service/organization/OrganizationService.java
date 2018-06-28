@@ -11,55 +11,30 @@ import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.constants.AppConstants;
-<<<<<<< HEAD:kairosUser/src/main/java/com/kairos/service/organization/OrganizationService.java
-import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.dto.planninginfo.PlannerSyncResponseDTO;
-=======
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.organization.*;
-import com.kairos.user.staff.client.ContactAddressDTO;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.common.BusinessType;
 import com.kairos.persistence.model.country.common.CompanyCategory;
 import com.kairos.persistence.model.country.common.ContractType;
 import com.kairos.persistence.model.country.common.OrganizationMappingDTO;
-import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
->>>>>>> KP-3748:user/src/main/java/com/kairos/service/organization/OrganizationService.java
 import com.kairos.persistence.model.enums.ReasonCodeType;
+import com.kairos.persistence.model.organization.AbsenceTypes;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
-<<<<<<< HEAD:kairosUser/src/main/java/com/kairos/service/organization/OrganizationService.java
-import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
-import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactAddressDTO;
-import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.country.DayType;
-import com.kairos.persistence.model.user.country.FunctionDTO;
-import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
-=======
-import com.kairos.wrapper.organization.OrganizationStaffWrapper;
-import com.kairos.wrapper.organization.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
->>>>>>> KP-3748:user/src/main/java/com/kairos/service/organization/OrganizationService.java
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderDefaultDataWrapper;
@@ -69,12 +44,6 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-<<<<<<< HEAD:kairosUser/src/main/java/com/kairos/service/organization/OrganizationService.java
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffCreationDTO;
-import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
-=======
->>>>>>> KP-3748:user/src/main/java/com/kairos/service/organization/OrganizationService.java
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -114,7 +83,16 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.user.access_permission.AccessGroupRole;
+import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.user.country.time_slot.TimeSlotDTO;
+import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
+import com.kairos.user.organization.*;
 import com.kairos.user.organization.UnitManagerDTO;
+import com.kairos.user.staff.client.ContactAddressDTO;
+import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
@@ -123,6 +101,8 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
+import com.kairos.wrapper.organization.OrganizationStaffWrapper;
+import com.kairos.wrapper.organization.StaffUnitPositionWrapper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -335,7 +315,7 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
-    public void createUnitManager(Long organizationId, OrganizationDTO  orgDetails){
+    public void createUnitManager(Long organizationId, OrganizationBasicDTO  orgDetails){
 
         StaffCreationDTO staffCreationPOJOData = new StaffCreationDTO(orgDetails.getUnitManager().getFirstName(),orgDetails.getUnitManager().getLastName(),
                 orgDetails.getUnitManager().getCprNumber(),
@@ -445,7 +425,7 @@ public class OrganizationService extends UserBaseService {
 
         if (organizationRequestWrapper.getWorkCenterUnit() != null) {
             // Set accessGroupId as of parent organization's
-            OrganizationDTO workCenterUnitDTO = organizationRequestWrapper.getWorkCenterUnit();
+            OrganizationBasicDTO workCenterUnitDTO = organizationRequestWrapper.getWorkCenterUnit();
             workCenterUnitDTO.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(workCenterUnitDTO.getUnitManager().getAccessGroupId()));
             Map<String, Object> workCenterUnitMap = createNewUnit(workCenterUnitDTO, organization.getId(), true, false);
             Long workCenterUnitId = Long.parseLong(workCenterUnitMap.get("id") + "");
@@ -466,7 +446,7 @@ public class OrganizationService extends UserBaseService {
         }
 
         if (organizationRequestWrapper.getGdprUnit() != null) {
-            OrganizationDTO gdprUnitDTO = organizationRequestWrapper.getGdprUnit();
+            OrganizationBasicDTO gdprUnitDTO = organizationRequestWrapper.getGdprUnit();
             // Set accessGroupId as of parent organization's
             gdprUnitDTO.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(gdprUnitDTO.getUnitManager().getAccessGroupId()));
             Map<String, Object> gdprUnitMap = createNewUnit(gdprUnitDTO, organization.getId(), false, true);
@@ -541,29 +521,6 @@ public class OrganizationService extends UserBaseService {
 
         return organizationResponseWrapper;
     }
-
-    /*List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
-        List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
-        for (WTAAndExpertiseQueryResult allWtaExpertiseQueryResult : allWtaExpertiseQueryResults) {
-            allWtaExpertiseQueryResult.getWorkingTimeAgreement().setExpertises(allWtaExpertiseQueryResult.getExpertise());
-            workingTimeAgreements.add(allWtaExpertiseQueryResult.getWorkingTimeAgreement());
-        }
-        return workingTimeAgreements;
-    }*/
-
-
-    /*private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
-        allWta.forEach(workingTimeAgreement -> {
-            WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
-            wtaService.copyWta(workingTimeAgreement, newWtaObject);
-            newWtaObject.setDisabled(false);
-            newWtaObject.setCountryParentWTA(workingTimeAgreement);
-            List<WTABaseRuleTemplate> ruleTemplateWithCategory = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
-            newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
-            WTAList.add(newWtaObject);
-        });
-
-    }*/
 
     public Map<String, OrganizationResponseDTO> updateParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long organizationId, long countryId) {
         Map<String, OrganizationResponseDTO> organizationResponseDTOs = new HashMap<>();
@@ -986,7 +943,7 @@ public class OrganizationService extends UserBaseService {
         response.put("permissions", accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
         // Create Employment for Unit Manager
         // Check if user exists or Create User
-        createUnitManager(unit.getId(), organizationDTO);
+        createUnitManager(unit.getId(), organizationBasicDTO);
         return response;
 
     }

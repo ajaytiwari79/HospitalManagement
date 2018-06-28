@@ -8,18 +8,9 @@ import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
-<<<<<<< HEAD:kairosUser/src/main/java/com/kairos/persistence/model/user/staff/Staff.java
-import com.kairos.persistence.model.enums.StaffStatusEnum;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.country.EngineerType;
-=======
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffSettings;
->>>>>>> KP-3748:user/src/main/java/com/kairos/persistence/model/staff/personal_details/Staff.java
 import com.kairos.persistence.model.user.language.Language;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;

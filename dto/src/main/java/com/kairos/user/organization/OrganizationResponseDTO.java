@@ -1,7 +1,7 @@
 package com.kairos.user.organization;
 
 
-import com.kairos.activity.address.ContactAddressDTO;
+import com.kairos.user.staff.client.ContactAddressDTO;
 
 import java.util.List;
 

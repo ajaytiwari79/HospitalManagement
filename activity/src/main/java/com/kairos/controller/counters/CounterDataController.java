@@ -1,22 +1,24 @@
 package com.kairos.controller.counters;
 
 
-import com.kairos.activity.enums.CounterType;
 import com.kairos.activity.enums.counter.ChartType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
-import com.kairos.activity.persistence.model.counter.KPI;
-import com.kairos.activity.persistence.model.counter.chart.BaseChart;
-import com.kairos.activity.persistence.model.counter.chart.GaugeChart;
-import com.kairos.activity.persistence.model.counter.chart.SingleNumberChart;
-import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.enums.CounterType;
+import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.chart.BaseChart;
+import com.kairos.persistence.model.counter.chart.GaugeChart;
+import com.kairos.persistence.model.counter.chart.SingleNumberChart;
+import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
