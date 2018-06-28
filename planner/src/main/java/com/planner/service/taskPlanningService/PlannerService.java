@@ -107,12 +107,13 @@ public class PlannerService {
 
 
     private String getObjectOutputStream(TaskPlanningSolution taskPlanningSolution){
-        try {
+        /*try {
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(""));
             outputStream.writeObject(taskPlanningSolution);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
         return null;
     }
 

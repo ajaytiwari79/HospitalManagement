@@ -1,8 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.dto.staffing_level.PresenceStaffingLevelDto;
-import com.kairos.dto.staffing_level.StaffingLevelDTO;
-import com.kairos.dto.staffing_level.StaffingLevelDto;
+import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staffinglevel.StaffingLevelService;
 import io.swagger.annotations.ApiOperation;

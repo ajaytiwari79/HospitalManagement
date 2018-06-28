@@ -1,9 +1,9 @@
 package com.kairos.service.country;
 
-import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
+import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.user.country.basic_details.Day;
 import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;

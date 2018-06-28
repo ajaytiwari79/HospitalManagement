@@ -127,7 +127,7 @@ public class CountryController {
     private FunctionService functionService;
 
     // Country
-    @RequestMapping(value = "/basic_details", method = RequestMethod.POST)
+    @RequestMapping(value = "/country", method = RequestMethod.POST)
     @ApiOperation("Create a new Country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createCountry(@Validated @RequestBody Country country) {
@@ -137,7 +137,7 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
-    @RequestMapping(value = "/basic_details", method = RequestMethod.PUT)
+    @RequestMapping(value = "/country", method = RequestMethod.PUT)
     @ApiOperation("Create a new Country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateCountry(@Validated @RequestBody Country country) {
@@ -151,7 +151,7 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
-    @RequestMapping(value = "/basic_details", method = RequestMethod.GET)
+    @RequestMapping(value = "/country", method = RequestMethod.GET)
     @ApiOperation("Find all Countries")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllCountry(@PathVariable Long organizationId) {
@@ -163,7 +163,7 @@ public class CountryController {
     }
 
     @RequestMapping(value = COUNTRY_URL, method = RequestMethod.GET)
-    @ApiOperation("Get basic_details  by id")
+    @ApiOperation("Get country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountry(@PathVariable Long countryId) {
         if (countryId != null) {
@@ -176,7 +176,7 @@ public class CountryController {
     }
 
     @RequestMapping(value = "/countryId/{countryId}", method = RequestMethod.GET)
-    @ApiOperation("Get basic_details  by id")
+    @ApiOperation("Get country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryById(@PathVariable Long countryId) {
         if (countryId != null) {
@@ -186,7 +186,7 @@ public class CountryController {
     }
 
     @RequestMapping(value = COUNTRY_URL, method = RequestMethod.DELETE)
-    @ApiOperation("Delete basic_details  by id")
+    @ApiOperation("Delete country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteCountry(@PathVariable Long countryId) {
         if (countryId != null) {
@@ -690,14 +690,14 @@ public class CountryController {
     }
 
     @RequestMapping(value = COUNTRY_URL + "/currency", method = RequestMethod.GET)
-    @ApiOperation("get currencies by basic_details id")
+    @ApiOperation("get currencies by country id")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCurrencies(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, currencyService.getCurrencies(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/currency", method = RequestMethod.PUT)
-    @ApiOperation("update currency by basic_details id")
+    @ApiOperation("update currency by country id")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateCurrency(@RequestBody @Validated Currency currency) {
         HashMap<String, Object> updatedCurrency = currencyService.updateCurrency(currency);
@@ -1016,8 +1016,8 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId, orgTypeId, selectedDate));
     }
 
-    @RequestMapping(value = "/basic_details/organizaton_service/{organizationServiceId}", method = RequestMethod.GET)
-    @ApiOperation("get basic_details by organization service")
+    @RequestMapping(value = "/country/organizaton_service/{organizationServiceId}", method = RequestMethod.GET)
+    @ApiOperation("get country by organization service")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryByOrganizationService(@PathVariable long organizationServiceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryByOrganizationService(organizationServiceId));
@@ -1030,7 +1030,7 @@ public class CountryController {
      * <p>
      * this url will be called by using rest template
      */
-    @RequestMapping(value = "/basic_details/{countryId}/task_type/skills", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/task_type/skills", method = RequestMethod.GET)
     @ApiOperation("get skills by organization")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getSkillsForTaskType(@PathVariable long countryId) {
@@ -1038,56 +1038,56 @@ public class CountryController {
     }
 
     @RequestMapping(value = COUNTRY_URL + "/level", method = RequestMethod.POST)
-    @ApiOperation("Add level in basic_details")
+    @ApiOperation("Add level in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addLevel(@PathVariable long countryId, @RequestBody Level level) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addLevel(countryId, level));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/level/{levelId}", method = RequestMethod.PUT)
-    @ApiOperation("Update level in basic_details")
+    @ApiOperation("Update level in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateLevel(@PathVariable long countryId, @PathVariable long levelId, @RequestBody Level level) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateLevel(countryId, levelId, level));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/level/{levelId}", method = RequestMethod.DELETE)
-    @ApiOperation("Delete level in basic_details")
+    @ApiOperation("Delete level in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteLevel(@PathVariable long countryId, @PathVariable long levelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteLevel(countryId, levelId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/level", method = RequestMethod.GET)
-    @ApiOperation("get levels in basic_details")
+    @ApiOperation("get levels in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getLevels(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getLevels(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.POST)
-    @ApiOperation("Add relation types in basic_details")
+    @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addRelationType(@PathVariable Long countryId, @RequestBody RelationType relationType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addRelationType(countryId, relationType));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/relationType/{relationTypeId}", method = RequestMethod.DELETE)
-    @ApiOperation("Add relation types in basic_details")
+    @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteRelationType(@PathVariable Long countryId, @PathVariable Long relationTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteRelationType(countryId, relationTypeId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.GET)
-    @ApiOperation("Add relation types in basic_details")
+    @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getRelationTypes(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getRelationTypes(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicle", method = RequestMethod.POST)
-    @ApiOperation("Add vehicle in basic_details")
+    @ApiOperation("Add vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
     public ResponseEntity<Map<String, Object>> addVehicle(@PathVariable Long countryId, @Valid @RequestBody Vehicle vehicle) {
@@ -1095,21 +1095,21 @@ public class CountryController {
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.DELETE)
-    @ApiOperation("Delete vehicle from basic_details")
+    @ApiOperation("Delete vehicle from country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteVehicle(countryId, vehicleId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicleList", method = RequestMethod.GET)
-    @ApiOperation("Get resources of basic_details")
+    @ApiOperation("Get resources of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getVehicleList(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllVehicleListWithFeatures(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.PUT)
-    @ApiOperation("Update vehicle in basic_details")
+    @ApiOperation("Update vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
     public ResponseEntity<Map<String, Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId, @Valid @RequestBody Vehicle vehicle) {
@@ -1122,8 +1122,8 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/cta_response/default-data", method = RequestMethod.GET)
-    @ApiOperation("get default data for cta_response rule template")
+    @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
+    @ApiOperation("get default data for cta rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId, null));
     }

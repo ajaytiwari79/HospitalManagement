@@ -1,6 +1,6 @@
 package com.planner.domain.wta.templates;
 
-import com.kairos.persistence.enums.WTATemplateType;
+import com.kairos.enums.WTATemplateType;
 import com.kairos.activity.wta.templates.AgeRange;
 import com.planner.domain.wta.WTABaseRuleTemplate;
 

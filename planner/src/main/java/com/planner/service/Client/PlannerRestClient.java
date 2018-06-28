@@ -1,8 +1,6 @@
 package com.planner.service.Client;
 
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.dto.staffing_level.StaffingLevelDTO;
-import com.kairos.client.dto.activity.ActivityNoTabsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

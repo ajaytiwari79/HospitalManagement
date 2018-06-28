@@ -21,7 +21,7 @@ public class PlanningPeriodDTO {
     private Long unitId = -1L;
     private int duration;
     private DurationType durationType;
-    private int recurringNumber;
+    private int recurringNumber; // TODO HARISH rename
     private String currentPhase;
     private String nextPhase;
     private LocalDate requestToPuzzleDate;

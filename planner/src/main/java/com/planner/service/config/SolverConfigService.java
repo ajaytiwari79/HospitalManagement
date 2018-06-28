@@ -1,6 +1,6 @@
 package com.planner.service.config;
 
-import com.kairos.persistence.enums.WTATemplateType;
+import com.kairos.enums.WTATemplateType;
 import com.kairos.planner.solverconfig.SolverConfigWTADTO;
 import com.planner.commonUtil.StaticField;
 import com.planner.domain.solverconfig.SolverConfig;

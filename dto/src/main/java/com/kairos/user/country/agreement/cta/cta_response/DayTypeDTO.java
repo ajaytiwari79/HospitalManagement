@@ -1,6 +1,6 @@
 package com.kairos.user.country.agreement.cta.cta_response;
 
-import com.kairos.user.country.basic_details.Day;
+import com.kairos.enums.Day;
 
 import java.util.ArrayList;
 import java.util.List;
