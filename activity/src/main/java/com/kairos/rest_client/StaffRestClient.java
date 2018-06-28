@@ -2,7 +2,7 @@ package com.kairos.rest_client;
 
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.staff.ClientStaffInfoDTO;
-import com.kairos.user.staff.staff.StaffDTO;
+import com.kairos.user.staff.StaffDTO;
 import com.kairos.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import org.slf4j.Logger;
