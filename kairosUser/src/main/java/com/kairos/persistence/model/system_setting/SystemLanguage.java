@@ -8,17 +8,18 @@ public class SystemLanguage extends UserBaseEntity {
 
     private String name;
     private String code;
-    private boolean inactive;
+    private boolean active;
     private boolean defaultLanguage;
 
     public SystemLanguage(){
         // default constructor
     }
 
-    public SystemLanguage(String name, String code, boolean defaultLanguage){
+    public SystemLanguage(String name, String code, boolean defaultLanguage, boolean active){
         this.name = name;
         this.code = code;
         this.defaultLanguage = defaultLanguage;
+        this.active = active;
     }
 
     public String getName() {
@@ -37,12 +38,12 @@ public class SystemLanguage extends UserBaseEntity {
         this.code = code;
     }
 
-    public boolean isInactive() {
-        return inactive;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setInactive(boolean inactive) {
-        this.inactive = inactive;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean isDefaultLanguage() {

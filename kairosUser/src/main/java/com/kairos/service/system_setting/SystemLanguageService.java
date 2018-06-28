@@ -41,7 +41,7 @@ public class SystemLanguageService extends UserBaseService {
             exceptionService.invalidRequestException("message.system.language.must.default");
         }
 
-        SystemLanguage systemLanguage = new SystemLanguage(systemLanguageDTO.getName(), systemLanguageDTO.getCode(), systemLanguageDTO.isDefaultLanguage());
+        SystemLanguage systemLanguage = new SystemLanguage(systemLanguageDTO.getName(), systemLanguageDTO.getCode(), systemLanguageDTO.isDefaultLanguage(), true);
         save(systemLanguage);
         systemLanguageDTO.setId(systemLanguage.getId());
         return systemLanguageDTO;
@@ -100,7 +100,7 @@ public class SystemLanguageService extends UserBaseService {
         }
 
         SystemLanguage  systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
-        if(!Optional.ofNullable(systemLanguage).isPresent() || systemLanguage.isInactive()) {
+        if(!Optional.ofNullable(systemLanguage).isPresent() || !systemLanguage.isActive()) {
             exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
         }
 
