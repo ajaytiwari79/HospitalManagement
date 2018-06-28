@@ -90,7 +90,7 @@ public class TimeTypeRestClientIntegrationTest {
     public final String getBaseUrl(Long organizationId, Long countryId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         } else if (organizationId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();

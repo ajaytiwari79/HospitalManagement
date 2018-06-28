@@ -1,7 +1,7 @@
 package com.kairos.service.agreement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.persistence.model.agreement.UpdateRuleTemplateCategoryDTO;
+import com.kairos.user.country.agreement.UpdateRuleTemplateCategoryDTO;
 import com.kairos.persistence.model.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.agreement.wta.RuleTemplateCategoryDTO;
@@ -45,7 +45,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * used to save a new Rule template in a country
+     * used to save a new Rule template in a basic_details
      * Created by vipul on 2/8/17.
      * params countryId and rule template category via name and desc
      */

@@ -23,7 +23,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
 
    @Query("MATCH (p:`CTARuleTemplate`)-[:`HAS_RULE_TEMPLATES`]-(m0:`RuleTemplateCategory`) " +
            "WHERE NOT(p.`deleted` = true ) AND ID(m0) IN {0} "+
-           "MATCH (p)-[:HAS_CTA_RULE_TEMPLATE]-(country:Country) WHERE id(country)={1} "+
+           "MATCH (p)-[:HAS_CTA_RULE_TEMPLATE]-(basic_details:Country) WHERE id(basic_details)={1} "+
            " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`)"+
            " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`)"+
            " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`)"+
@@ -78,7 +78,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
     @Query("MATCH (ctaRT:CTARuleTemplate)-[r:"+HAS_EMPLOYMENT_TYPE+"]-(et:EmploymentType) WHERE id(ctaRT)={0} DELETE r ")
     void detachAllEmploymentTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
 
-    @Query("MATCH (ctaRT:CTARuleTemplate),(country:Country) WHERE id(country)={0} AND id(ctaRT)={1} CREATE UNIQUE (country)-[r:"+HAS_CTA_RULE_TEMPLATE+"]->(ctaRT) ")
+    @Query("MATCH (ctaRT:CTARuleTemplate),(basic_details:Country) WHERE id(basic_details)={0} AND id(ctaRT)={1} CREATE UNIQUE (basic_details)-[r:"+HAS_CTA_RULE_TEMPLATE+"]->(ctaRT) ")
     void addCTARuleTemplateInCountry(Long countryId, Long ctaRuleTemplateId);
 
 }

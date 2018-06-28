@@ -4,7 +4,7 @@ package com.kairos.persistence.model.client;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.Gender;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;

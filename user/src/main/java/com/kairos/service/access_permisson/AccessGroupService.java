@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.persistence.model.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.Staff;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -21,6 +21,8 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.user.access_group.CountryAccessGroupDTO;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
@@ -223,7 +225,7 @@ public class AccessGroupService extends UserBaseService {
 
 
     public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
-        // Check if access group is of country
+        // Check if access group is of basic_details
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
@@ -284,7 +286,7 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
-        // Check if access group is of country
+        // Check if access group is of basic_details
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {

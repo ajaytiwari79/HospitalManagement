@@ -1,8 +1,8 @@
 package com.kairos.activity.unit_settings.activity_configuration;
 
 
-import com.kairos.persistence.model.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.persistence.model.agreement.cta.cta_response.TimeTypeResponseDTO;
+import com.kairos.user.country.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 
 import java.util.ArrayList;

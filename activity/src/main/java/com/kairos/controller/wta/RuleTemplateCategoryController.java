@@ -1,10 +1,9 @@
 package com.kairos.controller.wta;
 
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.util.response.ResponseHandler;
-
-import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.activity.wta.RuleTemplateCategoryDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,8 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 
 /**

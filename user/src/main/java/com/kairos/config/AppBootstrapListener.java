@@ -182,7 +182,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
                 AccessPage accessPage = new AccessPage(countryPage, environment.getProperty(countryPage));
                 countryPages.add(accessPage);
             }
-            AccessPage country = new AccessPage("country-settings", environment.getProperty("countrySettings"));
+            AccessPage country = new AccessPage("basic_details-settings", environment.getProperty("countrySettings"));
             country.setModule(true);
             country.setSubPages(countryPages);
 

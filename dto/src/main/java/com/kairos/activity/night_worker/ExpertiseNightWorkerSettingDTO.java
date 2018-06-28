@@ -1,6 +1,6 @@
 package com.kairos.activity.night_worker;
 
-import com.kairos.persistence.model.country.time_slot.TimeSlot;
+import com.kairos.user.country.time_slot.TimeSlot;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 

@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.task_type;
 
 import com.kairos.activity.task_type.TaskTypeResponseDTO;
-import com.kairos.persistence.model.client.ClientFilterDTO;
+import com.kairos.user.staff.client.ClientFilterDTO;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;
 

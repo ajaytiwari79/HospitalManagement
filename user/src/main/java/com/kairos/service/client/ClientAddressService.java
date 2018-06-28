@@ -1,7 +1,7 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.country.HousingType;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -125,7 +125,7 @@ public class ClientAddressService extends UserBaseService {
         response.put("temporaryAddress", temporaryAddressList);
 
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        logger.info("country id----------> " + countryId);
+        logger.info("basic_details id----------> " + countryId);
         if (countryId != null) {
             response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         } else {

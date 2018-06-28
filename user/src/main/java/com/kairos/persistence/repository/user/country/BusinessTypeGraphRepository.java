@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.country;
-import com.kairos.persistence.model.country.BusinessType;
+import com.kairos.persistence.model.country.common.BusinessType;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -24,6 +24,6 @@ public interface BusinessTypeGraphRepository extends Neo4jBaseRepository<Busines
     @Query("MATCH (c:Country)-[:BELONGS_TO]-(bt:BusinessType {isEnabled:true}) where id(c)={0} return {id:id(bt), name:bt.name, description:bt.description } as result")
     List<Map<String,Object>> findBusinesTypes(long countryId);
 
-    @Query("MATCH (country:Country)-[:BELONGS_TO]-(businessType:BusinessType {isEnabled:true}) where id(country)={0} return businessType")
+    @Query("MATCH (basic_details:Country)-[:BELONGS_TO]-(businessType:BusinessType {isEnabled:true}) where id(basic_details)={0} return businessType")
     List<BusinessType> findBusinesTypesByCountry(long countryId);
 }

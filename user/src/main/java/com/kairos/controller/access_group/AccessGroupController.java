@@ -2,9 +2,9 @@ package com.kairos.controller.access_group;
 
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessGroupPermissionDTO;
-import com.kairos.persistence.model.access_permission.AccessPermissionDTO;
-import com.kairos.persistence.model.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.user.access_permission.AccessPermissionDTO;
+import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.user.access_group.CountryAccessGroupDTO;
 import com.kairos.util.response.ResponseHandler;
@@ -154,14 +154,14 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.deleteCountryAccessGroup(accessGroupId));
     }
 
-    @ApiOperation("Get organization category with count of Access Groups of country")
+    @ApiOperation("Get organization category with count of Access Groups of basic_details")
     @RequestMapping(value = COUNTRY_URL + "/organization_category" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getListOfOrgCategoryWithCountryAccessGroupCount(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getListOfOrgCategoryWithCountryAccessGroupCount(countryId));
     }
 
-    @ApiOperation("Get country Access Groups")
+    @ApiOperation("Get basic_details Access Groups")
     @RequestMapping(value = COUNTRY_URL + "/access_group/organization_category/{organizationCategory}" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryAccessGroups(@PathVariable Long countryId, @PathVariable OrganizationCategory organizationCategory) {

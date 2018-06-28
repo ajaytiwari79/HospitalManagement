@@ -2,7 +2,7 @@ package com.kairos.controller.client;
 
 import com.kairos.client.dto.ClientExceptionDTO;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.staff.StaffClientData;

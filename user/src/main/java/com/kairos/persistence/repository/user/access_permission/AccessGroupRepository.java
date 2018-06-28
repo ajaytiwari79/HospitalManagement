@@ -4,7 +4,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessGroupCountQueryResult;
 import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.staff.Staff;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

@@ -2,11 +2,11 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.persistence.model.country.day_type.DayType;
-import com.kairos.persistence.model.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.user.country.day_type.DayType;
 
 import java.math.BigInteger;
 import java.util.List;

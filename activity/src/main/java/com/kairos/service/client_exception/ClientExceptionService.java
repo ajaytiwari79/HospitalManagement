@@ -1,8 +1,8 @@
 package com.kairos.service.client_exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.client.ClientRestClient;
-import com.kairos.client.IntegrationRestClient;
+import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.user.client.Client;
 import com.kairos.user.client.ClientExceptionCountWrapper;
 import com.kairos.user.client.ClientTemporaryAddress;

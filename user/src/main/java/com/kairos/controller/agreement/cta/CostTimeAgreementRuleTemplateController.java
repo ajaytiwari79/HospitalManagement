@@ -27,7 +27,7 @@ public class CostTimeAgreementRuleTemplateController {
      * @param countryId
      * @return
      */
-    @RequestMapping(value = "/country/{countryId}/cta_response/rule-templates", method = RequestMethod.GET)
+    @RequestMapping(value = "/basic_details/{countryId}/cta_response/rule-templates", method = RequestMethod.GET)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> getAllCTARuleTemplate(@PathVariable Long countryId ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId));
@@ -35,7 +35,7 @@ public class CostTimeAgreementRuleTemplateController {
 
     //
     //TODO
-   /* @RequestMapping(value = "/country/{countryId}/cta_response/rule-templates", method = RequestMethod.POST)
+   /* @RequestMapping(value = "/basic_details/{countryId}/cta_response/rule-templates", method = RequestMethod.POST)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable Long countryId ) {
         costTimeAgreementService.createDefaultCtaRuleTemplate(countryId);
@@ -47,7 +47,7 @@ public class CostTimeAgreementRuleTemplateController {
      * @param countryId
      * @return
      */
-    @RequestMapping(value = "/country/{countryId}/cta_response/rule-template/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/basic_details/{countryId}/cta_response/rule-template/{id}", method = RequestMethod.PUT)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
             ,@RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO,@PathVariable Long id ) throws ExecutionException, InterruptedException {

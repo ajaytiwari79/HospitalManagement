@@ -2,8 +2,10 @@ package com.kairos.persistence.model.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDayTypeDTO;
-import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.user.country.agreement.cta.CalculationFor;
+import com.kairos.user.country.agreement.cta.cta_response.CTARuleTemplateDayTypeDTO;
+import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

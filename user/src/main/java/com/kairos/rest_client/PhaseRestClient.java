@@ -2,7 +2,7 @@ package com.kairos.rest_client;
 
 import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +108,7 @@ public class PhaseRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/"+countryId+"/phase/all",
+                            baseUrl + "/basic_details/"+countryId+"/phase/all",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

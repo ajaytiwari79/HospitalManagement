@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.persistence.model.country.dto.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.common.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
@@ -65,16 +65,16 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
             "WHERE id(n)={0} AND et.deleted={1} return et")
     List<EmploymentType> getAllEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);
 
-    @Query("MATCH (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return employmentType LIMIT 1")
+    @Query("MATCH (basic_details:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) where id(basic_details)={0} AND employmentType.deleted={1} return employmentType LIMIT 1")
     EmploymentType getOneEmploymentTypeByCountryId(Long countryId, Boolean isDeleted);
 
-    @Query("MATCH (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND employmentType.name=~{1} AND id(employmentType) <> {2} " +
+    @Query("MATCH (basic_details:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType{deleted:false}) where id(basic_details)={0} AND employmentType.name=~{1} AND id(employmentType) <> {2} " +
             "with count(employmentType) as employmentTypeCount return CASE when employmentTypeCount>0 THEN  true ELSE false END as response")
     boolean findByNameExcludingCurrent(Long countryId, String name, Long employmentTypeId);
 
 
     // Get Employment Type data for filters by countryId
-    @Query("MATCH (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} return toString(id(employmentType)) as id, employmentType.name as value")
+    @Query("MATCH (basic_details:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType{deleted:false}) where id(basic_details)={0} return toString(id(employmentType)) as id, employmentType.name as value")
     List<FilterSelectionQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
 
     @Query("MATCH (n:Organization) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +

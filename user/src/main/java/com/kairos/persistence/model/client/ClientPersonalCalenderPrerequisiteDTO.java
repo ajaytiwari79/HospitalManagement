@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.client;
 
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.user.staff.client.ClientExceptionTypesDTO;
 
 import java.util.List;
 import java.util.Map;

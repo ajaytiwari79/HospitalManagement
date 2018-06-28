@@ -1,8 +1,8 @@
 package com.kairos.service.phase;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.util.DateUtils;
@@ -155,7 +155,7 @@ public class PhaseServiceTest {
             return baseUrl;
         } else if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             ;
             return baseUrl;
         } else if (organizationId != null) {

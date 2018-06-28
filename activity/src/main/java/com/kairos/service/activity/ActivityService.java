@@ -3,26 +3,16 @@ package com.kairos.service.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.*;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
-import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.phase.PhaseWeeklyDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.tag.TagDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.client.GenericIntegrationService;
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.client.SkillRestClient;
-import com.kairos.client.StaffRestClient;
-import com.kairos.client.dto.skill.Skill;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.ActivityStateEnum;
@@ -31,6 +21,7 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
@@ -38,15 +29,22 @@ import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.SkillRestClient;
+import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.persistence.model.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.persistence.model.country.day_type.DayType;
-import com.kairos.persistence.model.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.user.country.day_type.DayType;
+import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.user.organization.skill.Skill;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.timeCareShift.GetAllActivitiesResponse;
@@ -56,6 +54,8 @@ import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.RulesActivityTabDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
+import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -208,10 +208,6 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    /*public List<ActivityDTO> findAllActivityByCountry(long countryId) {
-        return activityMongoRepository.findAllActivityByCountry(countryId);
-    }*/
-
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByCountry(countryId);
@@ -265,7 +261,7 @@ public class ActivityService extends MongoBaseService {
 
 
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
-        //check category is available in country
+        //check category is available in basic_details
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException("message.activity.enddate.greaterthan.startdate");
         }

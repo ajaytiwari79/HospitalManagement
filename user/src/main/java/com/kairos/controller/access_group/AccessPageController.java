@@ -1,7 +1,7 @@
 package com.kairos.controller.access_group;
 
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
-import com.kairos.persistence.model.access_permission.AccessPageStatusDTO;
+import com.kairos.user.access_permission.AccessPageStatusDTO;
 import com.kairos.persistence.model.access_permission.Tab;
 import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -41,12 +41,12 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessPage(tabId,accessPageDTO));
     }
 
-    @RequestMapping(value="/country/{countryId}/tab",method = RequestMethod.GET)
+    @RequestMapping(value="/basic_details/{countryId}/tab",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getMainTabs(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabs(countryId));
     }
 
-    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
+    @RequestMapping(value = "/basic_details/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId, @PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId, countryId));
     }
@@ -57,7 +57,7 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getActive(),tabId));
     }
 
-    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/access_status",method = RequestMethod.PUT)
+    @RequestMapping(value = "/basic_details/{countryId}/tab/{tabId}/access_status",method = RequestMethod.PUT)
     public ResponseEntity<Map<String,Object>> updateAccessStatusOfTab(@PathVariable Long tabId,@PathVariable Long countryId,
                                                                 @Valid @RequestBody OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessForOrganizationCategory(countryId, tabId, orgCategoryTabAccessDTO));

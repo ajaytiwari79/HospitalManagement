@@ -1,6 +1,6 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.client.GenericIntegrationService;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.persistence.model.priority_group.*;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;

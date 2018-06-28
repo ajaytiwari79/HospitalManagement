@@ -2,12 +2,9 @@ package com.kairos.persistence.repository.wta;
 
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.activity.wta.WTAResponseDTO;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author pradeep

@@ -3,8 +3,8 @@ package com.kairos.wrapper.phase;
 
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.phase.PhaseWeeklyDTO;
-import com.kairos.persistence.model.country.day_type.DayType;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.country.day_type.DayType;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 import java.util.ArrayList;

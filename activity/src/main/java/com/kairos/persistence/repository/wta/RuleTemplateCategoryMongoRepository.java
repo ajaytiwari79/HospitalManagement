@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.wta;
 
 
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
+import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.activity.wta.RuleTemplateCategoryTagDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

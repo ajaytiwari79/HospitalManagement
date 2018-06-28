@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.unit_position;
 
 
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.staff.EmploymentUnitPositionQueryResult;
+import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;

@@ -3,7 +3,7 @@ package com.kairos.service.pay_table;
 
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.FunctionDTO;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.pay_table.*;
@@ -19,6 +19,8 @@ import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGrap
 import com.kairos.persistence.model.country.pay_table.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.pay_table.PayTableDTO;
+import com.kairos.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Days;

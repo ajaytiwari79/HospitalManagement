@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.tag.TagDTO;
 import com.kairos.activity.web.OrganizationTypeDTO;
-import com.kairos.persistence.model.country.experties.ExpertiseResponseDTO;
-import com.kairos.persistence.model.country.tag.TagDTO;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.user.country.experties.ExpertiseResponseDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

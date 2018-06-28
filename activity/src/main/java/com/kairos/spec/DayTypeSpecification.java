@@ -1,9 +1,9 @@
 package com.kairos.spec;
 
-import com.kairos.persistence.model.country.day_type.DayType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.enums.Day;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.day_type.DayType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

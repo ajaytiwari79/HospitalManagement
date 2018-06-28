@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
 
-    @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0}  WITH cta_response\n" +
+    @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(basic_details:Country) WHERE id(basic_details)= {0}  WITH cta_response\n" +
             "optional match(cta_response)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta_response,expertise\n" +
             "optional match (cta_response)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta_response,expertise,orgType\n" +
             "optional match(cta_response)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta_response,expertise,orgType,orgSubType\n" +
@@ -85,7 +85,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
     List<CTAListQueryResult> findCTAByUnitId(Long unitId);
 
-    @Query("MATCH (cta_response:CostTimeAgreement)-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND id(cta_response) = {1} AND cta_response.deleted={2} return cta_response")
+    @Query("MATCH (cta_response:CostTimeAgreement)-[:`BELONGS_TO`]-(basic_details:Country) WHERE id(basic_details)= {0} AND id(cta_response) = {1} AND cta_response.deleted={2} return cta_response")
     CostTimeAgreement findCTAByCountryAndIdAndDeleted(Long countryId, Long ctaId, Boolean deleted);
 
     @Query("match(ost:OrganizationType) where  id(ost) in {0} \n" +
@@ -101,7 +101,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
         "Match (organization)-[r:HAS_CTA]->(cta_response:CostTimeAgreement) DELETE r")
     void detachAllCTAFromOrganization(Long orgId);
 
-    @Query("Match (cta_response:CostTimeAgreement)-[r:"+BELONGS_TO+"]-(country:Country) WHERE id(cta_response) = {0}\n" +
+    @Query("Match (cta_response:CostTimeAgreement)-[r:"+BELONGS_TO+"]-(basic_details:Country) WHERE id(cta_response) = {0}\n" +
             "RETURN CASE WHEN r IS NULL THEN false ELSE true END")
     Boolean isCTALinkedWithCountry(Long ctaId);
 
@@ -115,10 +115,10 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "WHERE id(countryCta)={0} return orgCta")
     List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(Long countryCTAId);
 
-    @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND  lower(cta_response.name)=lower({1}) RETURN CASE WHEN COUNT(cta_response)>0 THEN true ELSE false END")
+    @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(basic_details:Country) WHERE id(basic_details)= {0} AND  lower(cta_response.name)=lower({1}) RETURN CASE WHEN COUNT(cta_response)>0 THEN true ELSE false END")
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
 
-    @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND  lower(cta_response.name)=lower({1}) AND NOT id(cta_response)={2} RETURN CASE WHEN COUNT(cta_response)>0 THEN true ELSE false END")
+    @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(basic_details:Country) WHERE id(basic_details)= {0} AND  lower(cta_response.name)=lower({1}) AND NOT id(cta_response)={2} RETURN CASE WHEN COUNT(cta_response)>0 THEN true ELSE false END")
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, Long ctaId);
 
     @Query("MATCH (cta_response:CostTimeAgreement{deleted:false})<-[:`HAS_CTA`]-(org:Organization) WHERE id(org)= {0} AND  lower(cta_response.name)=lower({1}) AND NOT id(cta_response)={2} RETURN CASE WHEN COUNT(cta_response)>0 THEN true ELSE false END")
@@ -128,7 +128,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("MATCH (countryCta:CostTimeAgreement),(orgCta:CostTimeAgreement) WHERE id(countryCta)={0} AND id(orgCta)={1} CREATE UNIQUE (orgCta)-[r:"+HAS_PARENT_COUNTRY_CTA+"]->(countryCta) ")
     void linkParentCountryCTAToOrganization(Long countryCtaId, Long orgCtaId);
 
-    @Query("MATCH (cta_response:CostTimeAgreement)-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND lower(cta_response.name)=lower({1}) return cta_response")
+    @Query("MATCH (cta_response:CostTimeAgreement)-[:`BELONGS_TO`]-(basic_details:Country) WHERE id(basic_details)= {0} AND lower(cta_response.name)=lower({1}) return cta_response")
     CostTimeAgreement getCTAIdByCountryAndName(Long countryId, String ctaName);
 
 
@@ -214,7 +214,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     Long getOrgSubTypeOfCTA(Long ctaId);
 
     @Query("match(cta_response:CostTimeAgreement{deleted:false})-[:"+ BELONGS_TO_ORG_SUB_TYPE+"]->(ost) WHERE id(ost) IN {0} \n" +
-            "MATCH(cta_response)-[:BELONGS_TO]-(country:Country) where id(country)={1} return cta_response")
+            "MATCH(cta_response)-[:BELONGS_TO]-(basic_details:Country) where id(basic_details)={1} return cta_response")
     List<CostTimeAgreement> getCTAsByOrganiationSubTypeIdsIn(List<Long> organizationSubTypeIds, long countryId);
 
     @Query("MATCH(unitCta:CostTimeAgreement),(organization:Organization) WHERE id(unitCta)={0} AND id(organization)={1} CREATE UNIQUE (organization)-[r:" + HAS_CTA + "]->(unitCta)")

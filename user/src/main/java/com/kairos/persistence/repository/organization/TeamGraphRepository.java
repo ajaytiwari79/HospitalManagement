@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.organization;
-import com.kairos.persistence.model.organization.OrganizationService;
-import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.staff.Staff;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -23,7 +23,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH (group:Group)-[:HAS_TEAM]->(team:Team) where id(group)={0} with team\n" +
             "optional match (team)-[:TEAM_HAS_LOCATION]->(contactAddress:ContactAddress) with contactAddress,team\n" +
             "optional Match (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with zipCode,contactAddress,team\n" +
-            "return collect({id:id(team),name:team.name,visitourId:team.visitourId,contactAddress:case when contactAddress is null then [] else {id:id(contactAddress),city:contactAddress.city,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber,houseNumber:contactAddress.houseNumber,province:contactAddress.province,country:contactAddress.country,regionName:contactAddress.regionName,\n" +
+            "return collect({id:id(team),name:team.name,visitourId:team.visitourId,contactAddress:case when contactAddress is null then [] else {id:id(contactAddress),city:contactAddress.city,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber,houseNumber:contactAddress.houseNumber,province:contactAddress.province,basic_details:contactAddress.basic_details,regionName:contactAddress.regionName,\n" +
             "municipalityName:contactAddress.municipalityName} end}) as teams")
     List<Map<String,Object>> getTeams(long groupId);
 
@@ -82,7 +82,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "Match (team)-[:"+TEAM_HAS_LOCATION+"]->(contactAddress:ContactAddress) with contactAddress\n" +
             "optional match (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with zipCode,contactAddress\n" +
             "optional match (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with zipCode,contactAddress,municipality\n" +
-            " return {id:id(contactAddress),houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,street1:contactAddress.street1,zipCodeId:id(zipCode),city:contactAddress.city,municipalityName:contactAddress.municipalityName,regionName:contactAddress.regionName,province:contactAddress.province,country:contactAddress.country,latitude:contactAddress.latitude,longitude:contactAddress.longitude,streetUrl:contactAddress.streetUrl,municipalityId:id(municipality)} as data")
+            " return {id:id(contactAddress),houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,street1:contactAddress.street1,zipCodeId:id(zipCode),city:contactAddress.city,municipalityName:contactAddress.municipalityName,regionName:contactAddress.regionName,province:contactAddress.province,basic_details:contactAddress.basic_details,latitude:contactAddress.latitude,longitude:contactAddress.longitude,streetUrl:contactAddress.streetUrl,municipalityId:id(municipality)} as data")
     Map<String,Object> getContactAddressOfTeam(long teamId);
 
     /*@Query("Match (team:Team) where id(team)={0}\n" +
@@ -195,7 +195,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     List<Map<String, Object>> getAssignedSkillsOfStaffByTeam(long unitId, List<Long> staffId);
 
     @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} with organization  Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
-            "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
+            "Match (region)-[:"+BELONGS_TO+"]->(basic_details:Country) return id(basic_details)")
     Long getCountryByTeamId(Long teamId);
 
     @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} return id(organization)")

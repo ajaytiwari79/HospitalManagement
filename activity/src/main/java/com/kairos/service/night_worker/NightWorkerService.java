@@ -1,6 +1,9 @@
 package com.kairos.service.night_worker;
 
-import com.kairos.client.StaffRestClient;
+import com.kairos.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.activity.night_worker.QuestionAnswerDTO;
+import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.activity.web.StaffDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.QuestionAnswerPair;
@@ -9,18 +12,15 @@ import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.night_worker.StaffQuestionnaireMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
+import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.spec.Specification;
 import com.kairos.spec.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.spec.night_worker.StaffNonPregnancySpecification;
+import com.kairos.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.web.StaffDTO;
-import com.kairos.activity.night_worker.NightWorkerGeneralResponseDTO;
-import com.kairos.activity.night_worker.QuestionAnswerDTO;
-import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
-import com.kairos.persistence.model.staff.staff.UnitStaffResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

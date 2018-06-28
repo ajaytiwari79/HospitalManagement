@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.persistence.model.country.dto.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.common.EmploymentTypeDTO;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Date;
 
 /**
  * Created by prerna on 7/11/17.
@@ -134,7 +132,7 @@ public class EmploymentTypeIntegrationTest {
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
         if(organizationId!=null &&countryId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         }else if(organizationId!=null &&unitId!=null){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)

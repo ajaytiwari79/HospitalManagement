@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.wta;
 
 
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.activity.wta.RuleTemplateCategoryDTO;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;

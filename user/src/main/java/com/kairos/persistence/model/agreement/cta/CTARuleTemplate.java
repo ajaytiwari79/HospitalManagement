@@ -2,6 +2,8 @@ package com.kairos.persistence.model.agreement.cta;
 
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.user.country.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.user.country.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;

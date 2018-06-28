@@ -1,6 +1,6 @@
 package com.kairos.controller.organization;
 
-import com.kairos.persistence.model.organization.PaymentSettingsDTO;
+import com.kairos.user.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.service.organizationMetadata.OrganizationMetadataService;
 import com.kairos.util.response.ResponseHandler;

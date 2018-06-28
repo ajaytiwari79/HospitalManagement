@@ -1,7 +1,7 @@
 package com.kairos.activity.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.patient.PatientStateLink;
+import com.kairos.user.patient.PatientStateLink;
 
 /**
  * Created by oodles on 12/5/17.

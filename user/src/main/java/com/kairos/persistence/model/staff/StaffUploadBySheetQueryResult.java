@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.staff;
 
+import com.kairos.persistence.model.staff.personal_details.Staff;
+
 import java.util.ArrayList;
 import java.util.List;
 

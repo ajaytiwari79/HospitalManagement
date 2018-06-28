@@ -2,8 +2,12 @@ package com.kairos.controller.staff;
 
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionDTO;
+import com.kairos.persistence.model.staff.employment.StaffEmploymentDetail;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.VRPClientService;
@@ -16,6 +20,9 @@ import com.kairos.service.staff.StaffAddressService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.employment.EmploymentDTO;
+import com.kairos.user.staff.staff.StaffCreationDTO;
+import com.kairos.user.staff.staff.StaffDTO;
+import com.kairos.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.response.ResponseHandler;
@@ -443,7 +450,7 @@ public class StaffController {
     }
 
     @RequestMapping(value = "/country_admin", method = RequestMethod.POST)
-    @ApiOperation("create country admin")
+    @ApiOperation("create basic_details admin")
     public ResponseEntity<Map<String, Object>> createCountryAdmin(@RequestBody User user) {
         User admin = staffService.createCountryAdmin(user);
         if (admin == null) {

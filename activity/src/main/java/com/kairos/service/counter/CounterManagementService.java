@@ -88,7 +88,7 @@ public class CounterManagementService extends MongoBaseService{
         return counterTypeIdMap;
     }
 
-    //configuration for modulewise counters cofigurable at country level
+    //configuration for modulewise counters cofigurable at basic_details level
 
     public List<ModuleCounterGroupingDTO> getModuleCountersForCountry(BigInteger countryId){
         return counterRepository.getModuleCounterDTOsForCountry(countryId);

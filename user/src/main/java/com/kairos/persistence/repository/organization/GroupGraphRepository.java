@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.skill.Skill;
 import org.springframework.data.neo4j.annotation.Query;

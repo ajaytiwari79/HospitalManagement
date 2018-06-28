@@ -1,11 +1,11 @@
 package com.kairos.service.country;
 
-import com.kairos.persistence.model.country.CompanyCategory;
+import com.kairos.persistence.model.country.common.CompanyCategory;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.dto.CompanyCategoryResponseDTO;
+import com.kairos.persistence.model.organization.company.CompanyCategoryResponseDTO;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.model.organization.company_category.CompanyCategoryDTO;
+import com.kairos.user.organization.company_category.CompanyCategoryDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;

@@ -56,7 +56,7 @@ public class SystemLanguageServiceIntegrationTest {
     @Before
     public void setUp() throws Exception {
 
-        // Fetch country
+        // Fetch basic_details
         Country country = countryService.getCountryByName("Denmark");
         countryId = country == null ? null : country.getId();
 
@@ -194,7 +194,7 @@ public class SystemLanguageServiceIntegrationTest {
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
         if(organizationId!=null && countryId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         } else if(organizationId!=null && unitId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)

@@ -1,10 +1,10 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.client.UserRestClient;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.persistence.model.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.rest_client.UserRestClient;
+import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

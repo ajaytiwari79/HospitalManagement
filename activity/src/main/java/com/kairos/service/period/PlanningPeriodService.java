@@ -1,6 +1,6 @@
 package com.kairos.service.period;
 
-import com.kairos.client.OrganizationRestClient;
+import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;

@@ -1,6 +1,7 @@
 package com.kairos.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.user.patient.PatientResourceList;
 
 import java.util.Date;
 import java.util.List;

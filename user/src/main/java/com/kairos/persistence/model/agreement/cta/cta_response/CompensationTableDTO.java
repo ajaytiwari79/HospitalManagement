@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.agreement.cta.cta_response;
 
-import com.kairos.persistence.model.agreement.cta.CompensationMeasurementType;
+import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 
 import java.util.ArrayList;
 import java.util.List;

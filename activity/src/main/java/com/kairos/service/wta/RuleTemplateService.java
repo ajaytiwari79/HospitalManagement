@@ -1,28 +1,31 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.client.CountryRestClient;
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.persistence.model.wta.templates.WTABuilderService;
-import com.kairos.persistence.model.wta.templates.template_types.*;
-import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
+import com.kairos.activity.wta.rule_template_category.RuleTemplateWrapper;
+import com.kairos.activity.wta.templates.AgeRange;
+import com.kairos.activity.wta.templates.BreakTemplateValue;
+import com.kairos.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.PartOfDay;
+import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.activity.wta.templates.*;
+import com.kairos.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
+import com.kairos.rest_client.CountryRestClient;
+import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
+import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.util.userContext.CurrentUserDetails;
 import com.kairos.util.userContext.UserContext;
-
-import com.kairos.persistence.model.country.CountryDTO;
-import com.kairos.persistence.model.agreement.RuleTemplateWrapper;
-import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.activity.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,7 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 
 /**

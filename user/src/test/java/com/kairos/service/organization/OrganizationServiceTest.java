@@ -55,7 +55,7 @@ public class OrganizationServiceTest {
         String baseUrl=getBaseUrl(71L,null);
         HttpEntity<ParentOrganizationDTO> entity = new HttpEntity<>(parentOrganizationDTO);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/country/53/parent_organization",
+                baseUrl+"/basic_details/53/parent_organization",
                 HttpMethod.POST, entity, String.class);
         Assert.assertEquals(HttpStatus.CREATED,response.getStatusCode());
 

@@ -1,9 +1,9 @@
 package com.kairos.wrapper;
 
 import com.kairos.persistence.model.client.ClientMinimumDTO;
-import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
-import com.kairos.persistence.model.staff.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 
 import java.util.List;
 

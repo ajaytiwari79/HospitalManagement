@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.country.Function;
-import com.kairos.persistence.model.country.ReasonCode;
+import com.kairos.persistence.model.country.functions.Function;
+import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.staff.Staff;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 

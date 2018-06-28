@@ -382,7 +382,7 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.initialOptaplannerSync(organisationId, unitId));
     }
 
-    @ApiOperation("Get all activity based on country")
+    @ApiOperation("Get all activity based on basic_details")
     @GetMapping(value = "/activities_with_time_types")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long countryId) {

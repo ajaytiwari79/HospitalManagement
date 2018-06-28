@@ -2,8 +2,9 @@ package com.kairos.persistence.model.agreement.cta.cta_response;
 
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.persistence.model.agreement.cta.CalculateValueIfPlanned;
-import com.kairos.persistence.model.country.FunctionDTO;
+import com.kairos.user.country.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.user.country.agreement.cta.cta_response.*;
 
 import java.util.ArrayList;
 import java.util.List;

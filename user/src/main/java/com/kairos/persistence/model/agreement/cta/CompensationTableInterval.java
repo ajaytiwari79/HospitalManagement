@@ -2,6 +2,7 @@ package com.kairos.persistence.model.agreement.cta;
 
 import com.kairos.config.neo4j.converter.LocalTimeStringConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;

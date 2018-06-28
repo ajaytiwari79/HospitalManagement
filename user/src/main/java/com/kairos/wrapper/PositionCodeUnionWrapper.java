@@ -1,6 +1,6 @@
 package com.kairos.wrapper;
 
-import com.kairos.persistence.model.country.ReasonCodeResponseDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;

@@ -1,7 +1,7 @@
 package com.kairos.service.tag;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.tag.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.activity.tag.TagDTO;
@@ -213,7 +213,7 @@ public class TagServiceIntegrationTest {
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
         if(organizationId!=null && countryId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         } else if(organizationId!=null && unitId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)

@@ -183,7 +183,7 @@ public class RequestedTask {
 			Address address;
 			if(task1.containsKey("address")){
 				Map<String, Object> resdatas = (Map)task1.get("address");
-				address = new Address((String)resdatas.get("street"),"",(String)resdatas.get("country"),(String)resdatas.get("houseNumber"),(Integer)resdatas.get("zip"),(String)resdatas.get("city"));
+				address = new Address((String)resdatas.get("street"),"",(String)resdatas.get("basic_details"),(String)resdatas.get("houseNumber"),(Integer)resdatas.get("zip"),(String)resdatas.get("city"));
 			}
 			else address = null;
 				Citizen citizen = new Citizen((Long)task1.get("citizenId"),"",address);

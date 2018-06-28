@@ -1,8 +1,8 @@
 package com.kairos.rest_client.activity_types;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.agreement.cta.cta_response.ActivityCategoryDTO;
-import com.kairos.persistence.model.agreement.cta.cta_response.ActivityTypeDTO;
+import com.kairos.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
+import com.kairos.user.country.agreement.cta.cta_response.ActivityTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityTypeDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityTypeDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/activity/cta_wta_setting",
+                            baseUrl + "/basic_details/{countryId}/activity/cta_wta_setting",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
@@ -65,7 +65,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/activity/activity_categories",
+                            baseUrl + "/basic_details/{countryId}/activity/activity_categories",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
@@ -124,7 +124,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<Long,HashMap<Long,Long>>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<HashMap<Long,HashMap<Long,Long>>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/unit_activity?parentActivityIds="+activityIdsQueryString+"&unitIds="+unitIdsQueryString,
+                            baseUrl + "/basic_details/{countryId}/unit_activity?parentActivityIds="+activityIdsQueryString+"&unitIds="+unitIdsQueryString,
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

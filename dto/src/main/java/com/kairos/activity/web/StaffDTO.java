@@ -2,7 +2,7 @@ package com.kairos.activity.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.Gender;
-import com.kairos.persistence.model.country.skill.SkillDTO;
+import com.kairos.user.country.skill.SkillDTO;
 
 import java.time.LocalDate;
 import java.util.Set;

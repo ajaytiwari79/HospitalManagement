@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.user.country.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.user.country.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 

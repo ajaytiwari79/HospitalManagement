@@ -10,19 +10,19 @@ import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationService;
-import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.persistence.model.staff.Staff;
-import com.kairos.persistence.model.staff.StaffAdditionalInfoQueryResult;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.StaffClientData;
-import com.kairos.persistence.model.staff.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -50,6 +50,9 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.user.staff.client.ClientExceptionTypesDTO;
+import com.kairos.user.staff.client.ClientFilterDTO;
+import com.kairos.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
@@ -1625,7 +1628,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId,long parentOrganizationId) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId, long parentOrganizationId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){

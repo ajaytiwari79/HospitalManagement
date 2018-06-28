@@ -1,6 +1,6 @@
 package com.kairos.activity.web;
 
-import com.kairos.persistence.model.patient.PatientWrapper;
+import com.kairos.user.patient.PatientWrapper;
 
 import java.util.List;
 

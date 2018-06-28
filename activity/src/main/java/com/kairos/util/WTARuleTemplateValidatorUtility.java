@@ -7,15 +7,15 @@ package com.kairos.util;
 
 
 import com.kairos.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.enums.Day;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
-import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.persistence.model.country.Day;
-import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -101,7 +101,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
 
-    public static List<Integer> getValidDays(List<DayTypeDTO> dayTypeDTOS,List<Long> dayTypeIds){
+    public static List<Integer> getValidDays(List<DayTypeDTO> dayTypeDTOS, List<Long> dayTypeIds){
         Set<Integer> dayOfWeeks = new HashSet<>();
         dayTypeDTOS.forEach(dayTypeDTO -> {
             dayTypeIds.forEach(dayTypeId->{
@@ -130,7 +130,7 @@ public class WTARuleTemplateValidatorUtility {
         return false;
     }*/
 
-    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, List<TimeSlotWrapper> timeSlotWrappers,ShiftWithActivityDTO shift){
+    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, List<TimeSlotWrapper> timeSlotWrappers, ShiftWithActivityDTO shift){
         TimeInterval timeInterval = null;
         for (PartOfDay partOfDay:partOfDays) {
             for (TimeSlotWrapper timeSlotWrapper : timeSlotWrappers) {

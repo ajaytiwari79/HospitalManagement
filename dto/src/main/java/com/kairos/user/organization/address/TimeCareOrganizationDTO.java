@@ -3,7 +3,7 @@ package com.kairos.user.organization.address;
 
 import com.kairos.user.organization.AbsenceTypes;
 import com.kairos.user.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.staff.staff.Staff;
+import com.kairos.user.staff.staff.Staff;
 
 /**
  * Created by prabjot on 30/8/17.

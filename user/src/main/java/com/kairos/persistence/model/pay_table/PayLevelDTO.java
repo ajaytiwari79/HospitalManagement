@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.pay_table;
 
+import com.kairos.user.country.pay_table.FutureDate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;

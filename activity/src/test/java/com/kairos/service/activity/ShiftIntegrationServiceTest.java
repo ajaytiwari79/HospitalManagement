@@ -1,9 +1,9 @@
 package com.kairos.service.activity;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.OrganizationRestClient;
+import com.kairos.rest_client.OrganizationRestClient;
 
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -173,7 +173,7 @@ public class ShiftIntegrationServiceTest {
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         } else if (organizationId != null && unitId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)

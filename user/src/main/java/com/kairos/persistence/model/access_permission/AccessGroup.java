@@ -2,13 +2,13 @@ package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.user.access_permission.AccessGroupRole;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 /**
  * Created by prabjot on 9/27/16.

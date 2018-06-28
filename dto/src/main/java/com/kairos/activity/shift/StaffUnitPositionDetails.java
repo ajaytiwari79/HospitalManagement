@@ -2,9 +2,9 @@ package com.kairos.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
-import com.kairos.activity.wta.WTAResponseDTO;
-import com.kairos.persistence.model.country.experties.AppliedFunctionDTO;
-import com.kairos.persistence.model.staff.staff.Staff;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.user.country.experties.AppliedFunctionDTO;
+import com.kairos.user.staff.staff.Staff;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

@@ -2,8 +2,8 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.country.ReasonCode;
-import com.kairos.persistence.model.country.ReasonCodeResponseDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.wrapper.ReasonCodeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
@@ -108,7 +108,7 @@ public class ReasonCodeServiceTest {
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         } else if (organizationId != null && unitId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)

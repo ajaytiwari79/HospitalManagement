@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;

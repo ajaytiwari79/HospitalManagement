@@ -1,7 +1,7 @@
 package com.kairos.activity.web;
 
-import com.kairos.persistence.model.patient.PatientStateLink;
-import com.kairos.persistence.model.patient.PatientStateType;
+import com.kairos.user.patient.PatientStateLink;
+import com.kairos.user.patient.PatientStateType;
 
 /**
  * Created by oodles on 19/4/17.

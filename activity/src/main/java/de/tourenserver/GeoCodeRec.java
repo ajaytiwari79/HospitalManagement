@@ -84,7 +84,7 @@ public class GeoCodeRec {
     protected int gs;
 
     /**
-     * Gets the value of the country property.
+     * Gets the value of the basic_details property.
      * 
      * @return
      *     possible object is
@@ -96,7 +96,7 @@ public class GeoCodeRec {
     }
 
     /**
-     * Sets the value of the country property.
+     * Sets the value of the basic_details property.
      * 
      * @param value
      *     allowed object is

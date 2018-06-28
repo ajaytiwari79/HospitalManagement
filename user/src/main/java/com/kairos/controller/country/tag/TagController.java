@@ -1,8 +1,8 @@
 package com.kairos.controller.country.tag;
 
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.country.tag.ShowCountryTagSetting;
-import com.kairos.persistence.model.country.tag.TagDTO;
+import com.kairos.user.country.tag.ShowCountryTagSetting;
+import com.kairos.user.country.tag.TagDTO;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

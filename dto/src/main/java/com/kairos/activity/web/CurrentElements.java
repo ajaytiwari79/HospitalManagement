@@ -1,7 +1,7 @@
 package com.kairos.activity.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.client.CitizenSupplier;
+import com.kairos.user.staff.client.CitizenSupplier;
 
 import java.util.Date;
 

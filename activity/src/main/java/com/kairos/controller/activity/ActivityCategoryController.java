@@ -25,13 +25,13 @@ public class ActivityCategoryController {
     @Inject private ActivityCategoryService activityCategoryService;
 
 //    @ApiOperation("Update Activity Category")
-//    @PutMapping(value = "/country/{countryId}/activityCategory/{activityCategoryId}")
+//    @PutMapping(value = "/basic_details/{countryId}/activityCategory/{activityCategoryId}")
 //    ResponseEntity<Map<String, Object>> updateActivityCategory(@PathVariable Long countryId, @PathVariable BigInteger activityCategoryId, @RequestParam("name") String name) {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.updateActivityCategory(countryId, activityCategoryId,name));
 //    }
 
 //    @ApiOperation("Delete Activity Category")
-//    @DeleteMapping(value = "/country/{countryId}/activityCategory/{activityCategoryId}")
+//    @DeleteMapping(value = "/basic_details/{countryId}/activityCategory/{activityCategoryId}")
 //    ResponseEntity<Map<String, Object>> deleteActivityCategory(@PathVariable Long countryId, @PathVariable BigInteger activityCategoryId) {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityCategoryService.deleteActivityCategory(countryId, activityCategoryId));
 //    }

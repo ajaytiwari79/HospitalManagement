@@ -2,11 +2,16 @@ package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.StaffRelationship;
-import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
+import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
+import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
+import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.wrapper.organization.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientStaffRelation;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.staff.*;

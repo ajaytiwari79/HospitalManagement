@@ -1,6 +1,6 @@
 package com.kairos.activity.web;
 
-import com.kairos.persistence.model.country.AvailableCountries;
+import com.kairos.user.country.basic_details.AvailableCountries;
 
 /**
  * Created by oodles on 19/4/17.

@@ -1,7 +1,7 @@
 package com.kairos.service.planner;
 
-import com.kairos.client.ClientRestClient;
-import com.kairos.client.IntegrationRestClient;
+import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
@@ -13,7 +13,7 @@ import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.util.DateUtils;
-import com.kairos.util.TaskDemandVisitWrapper;
+import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import org.bson.Document;
 import org.slf4j.Logger;

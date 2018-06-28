@@ -1,12 +1,12 @@
 package com.kairos.service.activity;
 
-import com.kairos.client.CountryRestClient;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
+import com.kairos.rest_client.CountryRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.persistence.model.country.CountryDTO;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
+import com.kairos.user.country.basic_details.CountryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
     public void verifyCountry(Long countryId) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Country not found by Id while creating Planned Time type in country" + countryId);
+            logger.error("Country not found by Id while creating Planned Time type in basic_details" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
@@ -46,7 +46,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         verifyCountry(countryId);
         PlannedTimeType plannedTimeType = plannedTimeTypeRepository.findByNameAndDeletedAndCountryId("(?i)" + presenceTypeDTO.getName(), false, countryId);
         if (Optional.ofNullable(plannedTimeType).isPresent()) {
-            logger.error("Planned Time type already exist in country By Name " + presenceTypeDTO.getName());
+            logger.error("Planned Time type already exist in basic_details By Name " + presenceTypeDTO.getName());
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist", presenceTypeDTO.getName());
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);

@@ -2,7 +2,7 @@ package com.kairos.service.staff;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.enums.Gender;
-import com.kairos.persistence.model.staff.Staff;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffCreationDTO;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.service.exception.ExceptionService;

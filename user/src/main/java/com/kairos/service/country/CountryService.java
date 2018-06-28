@@ -9,12 +9,14 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.wta.WTADefaultDataInfoDTO;
+import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.*;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.country.time_slot.TimeSlotDTO;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
+import com.kairos.user.country.time_slot.TimeSlotDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
@@ -35,6 +37,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.user.country.agreement.cta.cta_response.*;
 import com.kairos.util.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -340,7 +343,7 @@ public class CountryService extends UserBaseService {
     public Level addLevel(long countryId, Level level) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            logger.debug("Finding country by id::" + countryId);
+            logger.debug("Finding basic_details by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
@@ -381,7 +384,7 @@ public class CountryService extends UserBaseService {
     public RelationType addRelationType(Long countryId, RelationType relationType) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            logger.debug("Finding country by id::" + countryId);
+            logger.debug("Finding basic_details by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
@@ -416,7 +419,7 @@ public class CountryService extends UserBaseService {
         Country country = (Optional.ofNullable(countryId).isPresent()) ? countryGraphRepository.findOne(countryId) :
                 null;
         if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Finding country by id::" + countryId);
+            logger.error("Finding basic_details by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
@@ -427,18 +430,18 @@ public class CountryService extends UserBaseService {
 
     public List<Vehicle> getVehicleList(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
-            logger.error("Finding country by id::" + countryId);
+            logger.error("Finding basic_details by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notNull");
-            //throw new DataNotFoundByIdException("Incorrect country id");
+            //throw new DataNotFoundByIdException("Incorrect basic_details id");
         }
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
 
     public List<VehicleQueryResult> getAllVehicleListWithFeatures(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
-            logger.error("Finding country by id::" + countryId);
+            logger.error("Finding basic_details by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notNull");
-            //throw new DataNotFoundByIdException("Incorrect country id");
+            //throw new DataNotFoundByIdException("Incorrect basic_details id");
         }
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }

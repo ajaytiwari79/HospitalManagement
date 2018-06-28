@@ -3,7 +3,7 @@ package com.kairos.service.integration;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.rest_client.priority_group.PriorityGroupRestClient;
 import com.kairos.util.ObjectMapperUtils;

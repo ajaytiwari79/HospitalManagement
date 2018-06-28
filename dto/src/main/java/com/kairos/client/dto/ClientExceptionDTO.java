@@ -1,6 +1,6 @@
 package com.kairos.client.dto;
 
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 
 import java.util.ArrayList;
 import java.util.List;

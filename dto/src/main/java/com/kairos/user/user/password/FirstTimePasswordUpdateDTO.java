@@ -12,26 +12,26 @@ import java.util.Arrays;
 public class FirstTimePasswordUpdateDTO {
 
     @Size(min = 6)
-    private char[] password1;
+    private char[] password;
     @Size(min = 6)
-    private char[] password2;
+    private char[] repeatPassword;
     @Email
     String email;
 
-    public char[] getPassword1() {
-        return password1;
+    public char[] getPassword() {
+        return password;
     }
 
-    public void setPassword1(char[] password1) {
-        this.password1 = password1;
+    public void setPassword(char[] password) {
+        this.password = password;
     }
 
-    public char[] getPassword2() {
-        return password2;
+    public char[] getRepeatPassword() {
+        return repeatPassword;
     }
 
-    public void setPassword2(char[] password2) {
-        this.password2 = password2;
+    public void setRepeatPassword(char[] repeatPassword) {
+        this.repeatPassword = repeatPassword;
     }
 
     public String getEmail() {
@@ -44,6 +44,6 @@ public class FirstTimePasswordUpdateDTO {
 
     @AssertTrue(message="The password fields mush match")
     private boolean isValid() {
-        return Arrays.equals(this.password1,this.password2);
+        return Arrays.equals(this.password,this.repeatPassword);
     }
 }

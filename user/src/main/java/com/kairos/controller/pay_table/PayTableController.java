@@ -1,8 +1,8 @@
 package com.kairos.controller.pay_table;
 
 import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
-import com.kairos.persistence.model.country.pay_table.PayTableUpdateDTO;
-import com.kairos.persistence.model.country.pay_table.PayTableDTO;
+import com.kairos.user.country.pay_table.PayTableUpdateDTO;
+import com.kairos.user.country.pay_table.PayTableDTO;
 import com.kairos.service.pay_table.PayTableService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -44,13 +44,13 @@ public class PayTableController {
     }
 
 
-    // to create a new pay table in country
+    // to create a new pay table in basic_details
     @RequestMapping(value = "/pay_table", method = POST)
     public ResponseEntity<Map<String, Object>> createPayTable(@PathVariable Long countryId, @Validated @RequestBody PayTableDTO payTableDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payTableService.createPayTable(countryId, payTableDTO));
     }
 
-    // to update a the above created pay table in country
+    // to update a the above created pay table in basic_details
     @RequestMapping(value = "/pay_table/{payTableId}", method = PUT)
     public ResponseEntity<Map<String, Object>> updatePayTable(@PathVariable Long countryId, @PathVariable Long payTableId,
                                                               @Validated @RequestBody PayTableUpdateDTO payTableDTO) {

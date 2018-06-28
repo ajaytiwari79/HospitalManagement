@@ -1,21 +1,16 @@
 package com.kairos.controller.user;
 
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.staff.StaffEmploymentDetail;
-import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettingsDto;
+import com.kairos.user.user.user_personalized_settings.UserPersonalizedSettingsDto;
 import com.kairos.service.UserPersonalizedSettingsService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;

@@ -1,7 +1,7 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ClientOrganizationRelation;

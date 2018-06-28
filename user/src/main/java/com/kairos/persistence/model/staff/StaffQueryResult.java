@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff;
 
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**

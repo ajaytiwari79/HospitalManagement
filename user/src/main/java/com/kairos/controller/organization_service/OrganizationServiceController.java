@@ -1,6 +1,6 @@
 package com.kairos.controller.organization_service;
 
-import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

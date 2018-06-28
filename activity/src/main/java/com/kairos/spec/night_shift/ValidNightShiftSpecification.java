@@ -1,16 +1,18 @@
 package com.kairos.spec.night_shift;
 
-import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.spec.AbstractActivitySpecification;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
-import com.kairos.persistence.model.country.time_slot.TimeSlot;
-import com.kairos.enums.DurationType;
 import com.kairos.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
+import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.enums.DurationType;
+import com.kairos.spec.AbstractActivitySpecification;
+import com.kairos.user.country.time_slot.TimeSlot;
+import com.kairos.util.DateTimeInterval;
+import com.kairos.util.DateUtils;
 
 import javax.management.timer.Timer;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class ValidNightShiftSpecification extends AbstractActivitySpecification<ShiftAndExpertiseNightWorkerSettingDTO> {

@@ -1,17 +1,15 @@
 package com.kairos.service.priority_group;
 
+import com.kairos.activity.open_shift.FibonacciCounter;
+import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.service.priority_group.priority_group_rules.*;
+import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
+import org.springframework.stereotype.Component;
+
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
-import com.kairos.service.priority_group.priority_group_rules.*;
-import com.kairos.persistence.model.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.activity.open_shift.FibonacciCounter;
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
-import org.springframework.stereotype.Component;
-
-import static java.util.stream.Collectors.groupingBy;
 
 @Component
 public class PriorityGroupRulesImplementation {
@@ -81,7 +79,7 @@ public class PriorityGroupRulesImplementation {
         priorityGroupRuleDataDTO.setOpenShiftStaffMap(openShiftStaffMap);
     }
 
-    public List<StaffUnitPositionQueryResult> applyFibonacci(List<StaffUnitPositionQueryResult> staffsUnitPositions,Map<Long,Integer> assignedOpenShiftMap, ImpactWeight impactWeight) {
+    public List<StaffUnitPositionQueryResult> applyFibonacci(List<StaffUnitPositionQueryResult> staffsUnitPositions, Map<Long,Integer> assignedOpenShiftMap, ImpactWeight impactWeight) {
 
         FibonacciCounterApply fibonacciCounterApply = new FibonacciCounterApply();
         List<FibonacciCounter> fibonacciCounters = fibonacciCounterApply.findBestCandidates(impactWeight,staffsUnitPositions, assignedOpenShiftMap);

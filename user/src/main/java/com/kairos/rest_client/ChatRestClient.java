@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.persistence.model.staff.staff.StaffChatDetails;
+import com.kairos.user.staff.staff.StaffChatDetails;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

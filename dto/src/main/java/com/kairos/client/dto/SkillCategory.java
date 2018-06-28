@@ -12,7 +12,7 @@ import java.util.Map;
  * SkillCategory has relationship with Skill
  */
 public class SkillCategory {
-   // Country country;
+   // Country basic_details;
 
     @NotEmpty(message = "error.SkillCategory.name.notEmpty") @NotNull(message = "error.SkillCategory.name.notnull")
     private String name;
@@ -49,8 +49,8 @@ public class SkillCategory {
         this.name = name;
     }
 
-  //  public void setCountry(Country country) {
-     //   this.country = country;
+  //  public void setCountry(Country basic_details) {
+     //   this.basic_details = basic_details;
    // }
 
     public void setDescription(String description) {
@@ -58,7 +58,7 @@ public class SkillCategory {
     }
 
    // public Country getCountry() {
-      //  return country;
+      //  return basic_details;
    // }
 
     public String getDescription() {

@@ -66,7 +66,7 @@ public class Geocode {
     protected Boolean callSimulation;
 
     /**
-     * Gets the value of the country property.
+     * Gets the value of the basic_details property.
      * 
      * @return
      *     possible object is
@@ -78,7 +78,7 @@ public class Geocode {
     }
 
     /**
-     * Sets the value of the country property.
+     * Sets the value of the basic_details property.
      * 
      * @param value
      *     allowed object is

@@ -1,9 +1,9 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
-import com.kairos.persistence.model.country.experties.AgeRangeDTO;
-import com.kairos.persistence.model.country.experties.ExpertiseEmploymentTypeDTO;
-import com.kairos.persistence.model.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.user.country.experties.AgeRangeDTO;
+import com.kairos.user.country.experties.ExpertiseEmploymentTypeDTO;
+import com.kairos.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.service.locale.LocaleService;

@@ -1,13 +1,11 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
-import com.kairos.persistence.model.country.FunctionDTO;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by vipul on 29/3/18.

@@ -2,10 +2,10 @@ package com.kairos.service.integration;
 
 
 import com.kairos.activity.wta.UnitPositionWtaDTO;
-import com.kairos.activity.wta.WTAResponseDTO;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.staff.staff.Staff;
+import com.kairos.user.staff.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;

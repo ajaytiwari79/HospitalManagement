@@ -2,11 +2,11 @@ package com.kairos.service.visitator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.task_type.TaskTypeDTO;
-import com.kairos.client.ClientRestClient;
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.client.OrganizationServiceRestClient;
-import com.kairos.client.StaffRestClient;
-import com.kairos.client.dto.ClientStaffInfoDTO;
+import com.kairos.rest_client.ClientRestClient;
+import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.OrganizationServiceRestClient;
+import com.kairos.rest_client.StaffRestClient;
+import com.kairos.user.staff.ClientStaffInfoDTO;
 import com.kairos.user.client.Client;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskPackage;

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
+import com.kairos.persistence.model.country.common.EmploymentTypeDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
@@ -56,7 +57,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("Match (c:Country),(o:OrganizationType)  where  c.isEnabled = true AND o.isEnable = true  return {countries: collect( DISTINCT{id:id(c),name:c.name}),types:collect( DISTINCT {id:id(o),name:o.name})} as data")
     List<Map<String,Object>> getCountryAndOrganizationTypes();
 
-    @Query("Match (country:Country{name:{0}}) return country")
+    @Query("Match (basic_details:Country{name:{0}}) return basic_details")
     Country getCountryByName(String name);
 
     @Query("MATCH (c:Country) return c")
@@ -70,14 +71,14 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "RETURN {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)})end,name:ot.name,id:id(ot)} as result ")
     List<Map<String,Object>> getAllOrganizationTypes(Long countryId);
 
-    @Query("Match (country:Country) return {id:id(country),name:country.name} as countries")
+    @Query("Match (basic_details:Country) return {id:id(basic_details),name:basic_details.name} as countries")
     List<Map<String,Object>> getAllCountries();
 
-    @Query("Match (region:Region)-[:BELONGS_TO]->(country:Country) where id(region)={0} return country")
+    @Query("Match (region:Region)-[:BELONGS_TO]->(basic_details:Country) where id(region)={0} return basic_details")
     Country getCountryByRegion(long regionId);
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization  Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
-            "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
+            "Match (region)-[:"+BELONGS_TO+"]->(basic_details:Country) return id(basic_details)")
     Long getCountryIdByUnitId(long unitId);
 
     @Query("MATCH (c:Country{isEnabled:true}) return { id:id(c),name:c.name ,code:c.code,googleCalendarCode:c.googleCalendarCode} as result")
@@ -110,7 +111,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     Country getCountryByOrganizationService(long subServiceId);
 
     @Query("Match (team:Team) where id(team)={0} with team  Match(team)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode)-[:MUNICIPALITY]->(muncipality:Municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region) with region \n" +
-            "Match (region)-[:BELONGS_TO]->(country:Country) return id(country)")
+            "Match (region)-[:BELONGS_TO]->(basic_details:Country) return id(basic_details)")
     Long getCountryOfTeam(long teamId);
 
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
@@ -186,40 +187,40 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<RuleTemplateCategoryDTO> getRuleTemplatesAndCategories (long countryId);*/
 
 
-    @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} return level")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(basic_details)={0} AND id(level)={1} return level")
     Level getLevel(long countryId, long levelId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} return level")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(basic_details)={0} return level")
     List<Level> getLevelsByCountry(long countryId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} return relationType")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(basic_details)={0} return relationType")
     List<RelationType> getRelationTypesByCountry(long countryId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} AND id(relationType)={1} return relationType")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(basic_details)={0} AND id(relationType)={1} return relationType")
     RelationType getRelationType(long countryId, long relationTypeId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} AND id(resources)={1} return resources")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(basic_details)={0} AND id(resources)={1} return resources")
     Vehicle getResources(long countryId, long resourcesId);
 
-    @Query("MATCH (country:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(country)={0}\n" +
+    @Query("MATCH (basic_details:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(basic_details)={0}\n" +
             "OPTIONAL MATCH (res)-[:VEHICLE_HAS_FEATURE]->(feature:Feature{deleted:false}) with  feature,res\n" +
             "return id(res) as id,res.name as name, res.icon as icon, res.description as description, CASE WHEN feature IS NULL THEN [] ELSE collect({id:id(feature) ,name: feature.name, description:feature.description}) END as features")
     List<VehicleQueryResult> getResourcesWithFeaturesByCountry(Long countryId);
 
-    @Query("MATCH (country:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(country)={0} return res")
+    @Query("MATCH (basic_details:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(basic_details)={0} return res")
     List<Vehicle> getResourcesByCountry(Long countryId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND id(employmentType)={1} return employmentType")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(basic_details)={0} AND id(employmentType)={1} return employmentType")
     EmploymentType getEmploymentTypeByCountryAndEmploymentType(long countryId, long employmentTypeId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return employmentType")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(basic_details)={0} AND employmentType.deleted={1} return employmentType")
     List<EmploymentType> getEmploymentTypeByCountry(long countryId, Boolean isDeleted);
 
-    @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level) IN {1} return level")
+    @Query("MATCH (basic_details:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(basic_details)={0} AND id(level) IN {1} return level")
     List<Level> getLevelsByIdsIn(long countryId,List<Long> levelIds);
 
-    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return id(employmentType) as id ,employmentType.name as name")
-    List<com.kairos.persistence.model.country.dto.EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
+    @Query("MATCH (basic_details:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(basic_details)={0} AND employmentType.deleted={1} return id(employmentType) as id ,employmentType.name as name")
+    List<EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
 
     @Query("Match (u:User) WHERE id(u)={0}\n" +
             "MATCH (u)<-[:BELONGS_TO]-(s:Staff)<-[:BELONGS_TO]-(e:Employment)<-[:HAS_EMPLOYMENTS]-(o:Organization)-[:BELONGS_TO]-(c:Country) \n" +

@@ -8,19 +8,24 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.country.CitizenStatus;
+import com.kairos.persistence.model.country.common.CitizenStatus;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
-import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.staff.permission.AccessPermission;
+import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
+import com.kairos.persistence.model.staff.permission.UnitPermission;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
@@ -192,9 +197,9 @@ public class BootDataService {
     private UserBaseRepository userBaseRepository;
 
     private List<Long> skillList;
-    private com.kairos.persistence.model.organization.OrganizationService homeCareService;
+    private OrganizationService homeCareService;
 
-    private com.kairos.persistence.model.organization.OrganizationService medicalCareService;
+    private OrganizationService medicalCareService;
 
     private Country denmark = null;
     private Country germany = null;
@@ -407,19 +412,19 @@ public class BootDataService {
     }
 
     private void createOrganizationServices() {
-        homeCareService = new com.kairos.persistence.model.organization.OrganizationService("Home Care");
+        homeCareService = new OrganizationService("Home Care");
         homeCareService.setOrganizationSubService(Arrays.asList(
-                new com.kairos.persistence.model.organization.OrganizationService("Home Dusting"),
-                new com.kairos.persistence.model.organization.OrganizationService("Home Cooking"),
-                new com.kairos.persistence.model.organization.OrganizationService("Home Maintenance")));
+                new OrganizationService("Home Dusting"),
+                new OrganizationService("Home Cooking"),
+                new OrganizationService("Home Maintenance")));
         homeCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
         homeCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
-        medicalCareService = new com.kairos.persistence.model.organization.OrganizationService("Medical Service");
+        medicalCareService = new OrganizationService("Medical Service");
         medicalCareService.setOrganizationSubService(Arrays.asList(
-                new com.kairos.persistence.model.organization.OrganizationService("Basic Checkup"),
-                new com.kairos.persistence.model.organization.OrganizationService("Disease Diagnose"),
-                new com.kairos.persistence.model.organization.OrganizationService("Medication")));
+                new OrganizationService("Basic Checkup"),
+                new OrganizationService("Disease Diagnose"),
+                new OrganizationService("Medication")));
         medicalCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
         medicalCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -851,7 +856,7 @@ public class BootDataService {
     }
 
     private void createEmployment() {
-        employmentForAdmin = new Employment("working as country admin", adminAsStaff);
+        employmentForAdmin = new Employment("working as basic_details admin", adminAsStaff);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
@@ -1054,7 +1059,7 @@ public class BootDataService {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
-            costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
+            costTimeAgreementService.createDefaultCtaRuleTemplate(basic_details.getId());
         }*/
 
     }

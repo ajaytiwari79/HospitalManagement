@@ -1,5 +1,5 @@
 package com.kairos.service.client;
-import com.kairos.persistence.model.organization.AddressDTO;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -74,7 +74,7 @@ public class AddressVerificationService {
                 "\n Street: " + contactAddress.getStreet1());
 
         Map<String, Object> addressToVerify = new HashMap<>();
-        addressToVerify.put("country", "DK");
+        addressToVerify.put("basic_details", "DK");
         addressToVerify.put("zip", zipCode);
         addressToVerify.put("city", contactAddress.getCity());
         addressToVerify.put("street", contactAddress.getStreet1());
@@ -142,7 +142,7 @@ public class AddressVerificationService {
                 "\n Street: " + contactAddress.getStreet1());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Map<String, Object> addressToVerify = new HashMap<>();
-        addressToVerify.put("country", "DK");
+        addressToVerify.put("basic_details", "DK");
         addressToVerify.put("zip", contactAddress.getZipCodeValue());
         addressToVerify.put("city", contactAddress.getCity());
         addressToVerify.put("street", contactAddress.getStreet1());

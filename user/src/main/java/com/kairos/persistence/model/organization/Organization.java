@@ -12,10 +12,13 @@
     import com.kairos.persistence.model.client.ContactDetail;
     import com.kairos.persistence.model.common.UserBaseEntity;
     import com.kairos.persistence.model.country.*;
+    import com.kairos.persistence.model.country.common.BusinessType;
+    import com.kairos.persistence.model.country.common.CompanyCategory;
+    import com.kairos.persistence.model.country.common.ContractType;
     import com.kairos.persistence.model.country.tag.Tag;
     import com.kairos.persistence.model.organization.group.Group;
     import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-    import com.kairos.persistence.model.staff.Employment;
+    import com.kairos.persistence.model.staff.employment.Employment;
     import com.kairos.persistence.model.user.department.Department;
     import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
     import com.kairos.persistence.model.user.position_code.PositionCode;

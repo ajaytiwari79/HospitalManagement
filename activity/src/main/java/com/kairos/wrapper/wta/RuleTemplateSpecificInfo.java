@@ -1,8 +1,8 @@
 package com.kairos.wrapper.wta;
 
-import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 

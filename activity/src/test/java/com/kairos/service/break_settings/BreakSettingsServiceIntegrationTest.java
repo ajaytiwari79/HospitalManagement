@@ -1,7 +1,7 @@
 package com.kairos.service.break_settings;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.activity.break_settings.BreakSettingsDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -99,7 +99,7 @@ public class BreakSettingsServiceIntegrationTest {
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/country/").append(countryId).toString();
+                    .append("/basic_details/").append(countryId).toString();
             return baseUrl;
         } else if (organizationId != null && unitId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)

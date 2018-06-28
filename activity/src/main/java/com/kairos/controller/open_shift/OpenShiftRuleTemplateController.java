@@ -2,9 +2,8 @@ package com.kairos.controller.open_shift;
 
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
+import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.persistence.model.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;

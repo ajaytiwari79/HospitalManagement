@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.agreement.cta;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.CountryHolidayCalender;
+import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.country.DayType;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;

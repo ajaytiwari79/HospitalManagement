@@ -1,10 +1,9 @@
 package com.kairos.service.priority_group;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.activity.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.activity.web.ShiftCountDTO;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
@@ -15,20 +14,20 @@ import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankMongoRepository;
-import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
+import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
-import com.kairos.activity.web.ShiftCountDTO;
-import com.kairos.persistence.model.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.activity.open_shift.priority_group.StaffIncludeFilter;
-import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 

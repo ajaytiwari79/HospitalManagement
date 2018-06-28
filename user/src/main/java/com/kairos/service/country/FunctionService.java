@@ -1,16 +1,14 @@
 package com.kairos.service.country;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.Function;
+import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
-import com.kairos.persistence.model.country.FunctionDTO;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

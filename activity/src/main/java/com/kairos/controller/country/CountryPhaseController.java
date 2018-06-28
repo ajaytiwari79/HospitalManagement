@@ -28,7 +28,7 @@ public class CountryPhaseController {
     private PhaseService phaseService;
 
 
-    @ApiOperation(value = "Create Phases in country")
+    @ApiOperation(value = "Create Phases in basic_details")
     @PostMapping(value = COUNTRY_URL+"/phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPhase(@PathVariable Long countryId, @RequestBody @Valid PhaseDTO phaseDTO) {
@@ -39,30 +39,30 @@ public class CountryPhaseController {
 
     /**
      * @Author vipul
-     * used to get all phases of country
+     * used to get all phases of basic_details
      */
-    @ApiOperation(value = "get All  Phases in country")
+    @ApiOperation(value = "get All  Phases in basic_details")
     @GetMapping(value = COUNTRY_URL+"/phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPhasesByCountryId(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesWithCategoryByCountryId(countryId));
     }
 
-    @ApiOperation(value = "get All  Phases in country")
+    @ApiOperation(value = "get All  Phases in basic_details")
     @GetMapping(value = COUNTRY_URL+"/phase/all")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPhases(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesByCountryId(countryId));
     }
 
-    @ApiOperation(value = "remove a  Phase in country")
+    @ApiOperation(value = "remove a  Phase in basic_details")
     @DeleteMapping(value = COUNTRY_URL+"/phase/{phaseId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deletePhase(@PathVariable Long countryId,@PathVariable BigInteger phaseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.deletePhase(countryId,phaseId));
     }
 
-    @ApiOperation(value = "update a  Phase in country")
+    @ApiOperation(value = "update a  Phase in basic_details")
     @PutMapping(value = COUNTRY_URL+"/phase/{phaseId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePhases(@PathVariable Long countryId,@PathVariable BigInteger phaseId,@RequestBody @Valid PhaseDTO phaseDTO) {

@@ -1,9 +1,9 @@
 package com.kairos.user.user.staff;
 
-import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
+import com.kairos.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.persistence.model.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import org.joda.time.DateTimeZone;
 
 import java.time.ZoneId;
@@ -24,7 +24,7 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    //These are the all day type of country
+    //These are the all day type of basic_details
     private List<DayTypeDTO> dayTypes;
     private UserAccessRoleDTO user;
     //This is unit TimeZone

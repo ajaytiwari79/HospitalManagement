@@ -1,6 +1,6 @@
 package com.kairos.controller.agreement;
 
-import com.kairos.persistence.model.agreement.UpdateRuleTemplateCategoryDTO;
+import com.kairos.user.country.agreement.UpdateRuleTemplateCategoryDTO;
 import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.service.agreement.RuleTemplateCategoryService;

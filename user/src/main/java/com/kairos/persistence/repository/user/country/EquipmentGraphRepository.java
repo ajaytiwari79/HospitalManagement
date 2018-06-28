@@ -16,28 +16,28 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface EquipmentGraphRepository extends Neo4jBaseRepository<Equipment,Long> {
 
-    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
-            "WHERE equipment.name={0} AND id(country) = {1} AND equipment.deleted={2} \n" +
+    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
+            "WHERE equipment.name={0} AND id(basic_details) = {1} AND equipment.deleted={2} \n" +
             "RETURN CASE WHEN count(equipment)>0 THEN true ELSE false END")
     boolean isEquipmentExistsWithSameName(String name, Long countryId, boolean isDeleted);
 
     @Query("MATCH (c:Country) WHERE id(c)={0} CREATE (c)-[:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment{name:{1}, description:{2}, deleted:false, creationDate:{3}, lastModificationDate:{3}}) return equipment")
     Equipment createEquipment(Long countryId, String equipmentName, String description, Long date);
 
-    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
-            "WHERE id(equipment)={0} AND id(country) = {1} AND equipment.deleted={2} \n" +
+    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
+            "WHERE id(equipment)={0} AND id(basic_details) = {1} AND equipment.deleted={2} \n" +
             "RETURN equipment")
     Equipment getEquipmentById(Long equipmentId, Long countryId, boolean isDeleted);
 
-    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
-            "WHERE id(country)={0} AND equipment.deleted= {1} AND lower(equipment.name) contains lower({2})\n" +
+    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
+            "WHERE id(basic_details)={0} AND equipment.deleted= {1} AND lower(equipment.name) contains lower({2})\n" +
             "WITH equipment\n" +
             "MATCH (equipment)-[:"+EQUIPMENT_HAS_CATEGORY+"]-(equipCat:EquipmentCategory) \n" +
             "return id(equipment) as id, equipment.name as name, equipment.description as description, {id:id(equipCat) , name:equipCat.name, description:equipCat.description} as category")
     List<EquipmentQueryResult> getListOfEquipment(Long countryId , boolean deleted, String searchTextRegex);
 
-    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n"+
-            "WHERE id(country)={0} AND equipment.name = {1} AND equipment.deleted= {2} return equipment")
+    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n"+
+            "WHERE id(basic_details)={0} AND equipment.name = {1} AND equipment.deleted= {2} return equipment")
     Equipment getEquipmentByName(long countryId, String name, boolean deleted);
 
     @Query("MATCH (c:Country),(e:Equipment)\n" +
@@ -54,8 +54,8 @@ public interface EquipmentGraphRepository extends Neo4jBaseRepository<Equipment,
             "return id(equipment) as id, equipment.name as name, equipment.description as description")
     List<EquipmentQueryResult> getResourcesSelectedEquipments(Long organizationId, Long resourceId, boolean deleted);
 
-    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
-            "WHERE id(country)={0} AND equipment.deleted= {1} AND id(equipment) IN {2} return equipment")
+    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
+            "WHERE id(basic_details)={0} AND equipment.deleted= {1} AND id(equipment) IN {2} return equipment")
     List<Equipment> getListOfEquipmentByIds(Long countryId , boolean deleted, List<Long> equipmentIds);
 
     @Query("MATCH (resource:Resource)-[r:"+RESOURCE_HAS_EQUIPMENT+"]->(equipment:Equipment) WHERE id(resource)={0}\n"+

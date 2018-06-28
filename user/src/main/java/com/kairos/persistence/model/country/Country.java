@@ -3,8 +3,9 @@ package com.kairos.persistence.model.country;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
@@ -215,7 +216,7 @@ public class Country extends UserBaseEntity {
         if (ruleTemplateCategory == null)
             throw new NullPointerException("Can't add null ruleTemplateCategory");
         if (ruleTemplateCategory.getCountry() != null)
-            throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
+            throw new IllegalStateException("basic_details is already assigned to ruleTemplateCategory");
         getRuleTemplateCategories().add(ruleTemplateCategory);
         ruleTemplateCategory.setCountry(this);
     }

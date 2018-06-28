@@ -20,7 +20,7 @@ public class TaskDemandValidator {
             return response;
         }
         response.put("status",false);
-        response.put("message","task demand can not generate for this country");
+        response.put("message","task demand can not generate for this basic_details");
         return response;
     }
 

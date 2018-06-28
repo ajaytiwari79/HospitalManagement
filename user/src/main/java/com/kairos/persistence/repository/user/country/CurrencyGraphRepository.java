@@ -13,9 +13,9 @@ import java.util.Map;
 @Repository
 public interface CurrencyGraphRepository extends Neo4jBaseRepository<Currency,Long> {
 
-    @Query("Match (n:Currency{deleted:false})-[:RELATED_TO]->(country:Country) where id(country)={0} return {id:id(n),name:n.name, currencyCode:n.currencyCode } as result")
+    @Query("Match (n:Currency{deleted:false})-[:RELATED_TO]->(basic_details:Country) where id(basic_details)={0} return {id:id(n),name:n.name, currencyCode:n.currencyCode } as result")
     List<Map<String,Object>> getCurrencies(long countryId);
-    @Query("Match (n:Currency{deleted:false})-[:RELATED_TO]->(country:Country) where id(country)={0} return n limit 1")
+    @Query("Match (n:Currency{deleted:false})-[:RELATED_TO]->(basic_details:Country) where id(basic_details)={0} return n limit 1")
     Currency findFirstByCountryIdAndDeletedFalse(Long countryId);
 
 }

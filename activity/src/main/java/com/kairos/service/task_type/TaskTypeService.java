@@ -2,28 +2,28 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.activity.tag.TagDTO;
 import com.kairos.activity.task_type.*;
-import com.kairos.client.*;
-import com.kairos.client.dto.TimeSlot;
-import com.kairos.client.dto.organization.OrganizationLevel;
-import com.kairos.client.dto.skill.Skill;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.task_type.TaskTypeEnum;
-import com.kairos.persistence.model.country.CountryDTO;
-import com.kairos.persistence.model.country.day_type.DayType;
-import com.kairos.persistence.model.country.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.task_type.*;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoRepository;
+import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.country.day_type.DayType;
+import com.kairos.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.user.organization.OrganizationLevel;
+import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.user.organization.TimeSlot;
+import com.kairos.user.organization.skill.Skill;
 import com.kairos.util.DateUtils;
 import com.kairos.util.FileUtil;
 import com.kairos.util.timeCareShift.GetAllActivitiesResponse;
@@ -327,9 +327,9 @@ public class TaskTypeService extends MongoBaseService {
         }
 
         List<Map<String,Object>> organizationTypes = Collections.emptyList();
-        Country country = countryGraphRepository.getCountryByOrganizationService(taskType.getSubServiceId());
-        if(country != null){
-            OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult = organizationTypeGraphRepository.getOrganizationTypeHierarchy(country.getId(),taskType.getOrganizationSubTypes());
+        Country basic_details = countryGraphRepository.getCountryByOrganizationService(taskType.getSubServiceId());
+        if(basic_details != null){
+            OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult = organizationTypeGraphRepository.getOrganizationTypeHierarchy(basic_details.getId(),taskType.getOrganizationSubTypes());
             organizationTypes = organizationTypeHierarchyQueryResult.getOrganizationTypes();
         }*/
         CountryDTO countryDTO = countryRestClient.getCountryByOrganizationService(taskType.getSubServiceId());

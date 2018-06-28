@@ -2,8 +2,8 @@ package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.persistence.model.country.time_slot.TimeSlotDTO;
-import com.kairos.persistence.model.country.time_slot.TimeSlotSetDTO;
+import com.kairos.user.country.time_slot.TimeSlotDTO;
+import com.kairos.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;

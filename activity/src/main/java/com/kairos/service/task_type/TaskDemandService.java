@@ -1,9 +1,5 @@
 package com.kairos.service.task_type;
 
-import com.kairos.client.OrganizationRestClient;
-import com.kairos.client.dto.RepetitionType;
-import com.kairos.client.dto.Shifts;
-import com.kairos.persistence.model.client.ClientFilterDTO;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
 import com.kairos.persistence.model.task_demand.MonthlyFrequency;
@@ -17,8 +13,12 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.task_type.TaskDemandMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
+import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.user.organization.RepetitionType;
+import com.kairos.user.organization.Shifts;
+import com.kairos.user.staff.client.ClientFilterDTO;
 import com.kairos.util.JsonUtils;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;
@@ -141,14 +141,6 @@ public class TaskDemandService extends MongoBaseService {
     public List<TaskDemand> getByTaskTypeIds(List<String> taskTypeIdList) {
         return taskDemandMongoRepository.findByTaskTypeIdIn(taskTypeIdList);
     }
-
-    /*private boolean validate(TaskDemand taskDemand) {
-        Client client = clientGraphRepository.findById(taskDemand.getClientId());
-        TimeSlot timeSlot = timeSlotGraphRepository.findById(taskDemand.getWeekdayTimeSlotId());
-        TaskType taskType = taskTypeMongoRepository.findById(taskDemand.getTaskTypeId());
-        TaskDemandValidator taskDemandValidator = TaskDemandValidator.getInstance();
-        return taskDemandValidator.validate(taskDemand, client, taskType, timeSlot);
-    }*/
 
 
     public List<Long> getListOfClientByTimeSlotId(List<Long> timeSlotIds, Long unitId){

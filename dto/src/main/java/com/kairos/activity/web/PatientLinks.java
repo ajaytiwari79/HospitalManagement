@@ -1,7 +1,7 @@
 package com.kairos.activity.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.client.CitizenOverviewForms;
+import com.kairos.user.staff.client.CitizenOverviewForms;
 
 /**
  * Created by oodles on 19/4/17.

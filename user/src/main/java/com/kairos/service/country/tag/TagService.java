@@ -3,7 +3,7 @@ package com.kairos.service.country.tag;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.country.tag.TagDTO;
+import com.kairos.user.country.tag.TagDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -108,9 +108,9 @@ public class TagService extends UserBaseService {
     }
 
     /*public HashMap<String,Object> getTagsOfSkill(Long countryId, Long skillId, String filterText){
-        Country country = countryGraphRepository.findOne(countryId,0);
-        if (country == null) {
-            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        Country basic_details = countryGraphRepository.findOne(countryId,0);
+        if (basic_details == null) {
+            throw new DataNotFoundByIdException("Incorrect basic_details id " + countryId);
         }
 
         if(filterText == null){
@@ -287,9 +287,9 @@ public class TagService extends UserBaseService {
     }
 
     /*public List<Tag> getCountryTagsOfWTA(long countryId, long wtaId, String filterText){
-        Country country = countryGraphRepository.findOne(countryId,0);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+        Country basic_details = countryGraphRepository.findOne(countryId,0);
+        if (basic_details == null) {
+            exceptionService.dataNotFoundByIdException("message.basic_details.id.notFound",countryId);
 
         }
         return tagGraphRepository.getCountryTagsOfWTAByIdAndDeleted(wtaId, filterText, false);

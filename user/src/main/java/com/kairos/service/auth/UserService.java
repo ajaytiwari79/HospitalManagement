@@ -7,7 +7,7 @@ import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.model.staff.UnitWiseStaffPermissionsDTO;
+import com.kairos.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -369,7 +369,7 @@ public class UserService extends UserBaseService {
            exceptionService.dataNotFoundByIdException("message.user.email.notFound",firstTimePasswordUpdateDTO.getEmail());
 
         }
-        CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getPassword2());
+        CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setPasswordUpdated(true);
         userGraphRepository.save(user);
