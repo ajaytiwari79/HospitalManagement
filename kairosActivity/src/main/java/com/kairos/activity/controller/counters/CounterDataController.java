@@ -77,7 +77,7 @@ public class CounterDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiList);
     }
 
-    @GetMapping("/getMetaData")
+    @GetMapping("/metadata")
     public ResponseEntity<Map<String, Object>> getMetaData(@RequestParam String moduleId){
         //TODO: TO BE MODIFIED CURRENTLY MOCK ONLY
         Map<String, Object> respData = new HashMap<>();
