@@ -10,7 +10,18 @@ import java.util.List;
  * @date: Jun 26th, 2018
  */
 public enum CounterType {
-    RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"), SCHEDULED_HOURS_NET("Scheduled Hours-Net");
+    RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"),
+    SCHEDULED_HOURS_NET("Scheduled Hours-Net"),
+
+    //VRP COUNTER
+    TOTAL_KM_DRIVEN_PER_DAY("Total KM Driven Per Day"),
+    TASK_UNPLANNED("Total tasks unplanned"),
+    TASK_UNPLANNED_HOURS("Total hours of unplanned tasks"),
+    TASKS_PER_STAFF("Tasks per staff"),
+    ROAD_TIME_PERCENT("Road time in percent of working time"),
+    //COMPLETED
+
+    ;
     private String name;
 
     private CounterType(String name){
