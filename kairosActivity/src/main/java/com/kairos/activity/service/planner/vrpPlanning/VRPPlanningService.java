@@ -79,14 +79,18 @@ public class VRPPlanningService extends MongoBaseService{
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
     }
 
-
-    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
+    public VrpTaskPlanningDTO getSolverConfigurationForUnit(Long unitId, BigInteger solverConfigId){
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,solverConfigId);
 
         VrpTaskPlanningDTO vrpTaskPlanningDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VrpTaskPlanningDTO.class);
         if(vrpTaskPlanningDTO==null || vrpTaskPlanningDTO.getTasks().isEmpty()){
             exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
         }
+        return vrpTaskPlanningDTO;
+    }
+
+    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolverConfigurationForUnit(unitId, solverConfigId);
         List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
         taskDTOS = getTasks(unitId,taskDTOS);
         if(taskDTOS.isEmpty()){
