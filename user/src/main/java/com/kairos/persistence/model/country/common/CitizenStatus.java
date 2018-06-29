@@ -85,7 +85,7 @@ public class CitizenStatus extends UserBaseEntity {
         return "CitizenStatus{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", basic_details=" + country +
+                ", country=" + country +
                 ", isEnabled=" + isEnabled +
                 ", id=" + super.getId() +
                 '}';

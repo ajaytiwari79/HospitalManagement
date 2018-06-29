@@ -10,7 +10,7 @@ public class UserContext {
     public static final String ORG_ID         = "org-id";
     public static final String UNIT_ID         = "unit-id";
     public static final String TAB_ID = "tab-id";
-    public static final String COUNTRY_ID  = "basic_details-id";
+    public static final String COUNTRY_ID  = "country-id";
 
 
     private static final ThreadLocal<String> correlationId= new InheritableThreadLocal<String>();
