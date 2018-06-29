@@ -44,7 +44,7 @@ public class SkillController {
     }
 
     @ApiOperation(value = "Get all skills by countryId")
-    @RequestMapping(value = "/basic_details/{countryId}/skills", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/skills", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllSkill(@PathVariable long countryId) {
         List<Map<String, Object>> skills = skillService.getAllSkills(countryId);
@@ -55,7 +55,7 @@ public class SkillController {
     }
 
     @ApiOperation(value = "Get all skills by countryId")
-    @RequestMapping(value = "/basic_details/{countryId}/skills_by_name", method = RequestMethod.POST)
+    @RequestMapping(value = "/country/{countryId}/skills_by_name", method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> getSkillsByName(@RequestBody Set<String> skillsName){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillsByName(skillsName));
     }

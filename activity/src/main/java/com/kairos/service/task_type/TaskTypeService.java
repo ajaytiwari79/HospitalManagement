@@ -15,7 +15,7 @@ import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoReposit
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.country.country.CountryDTO;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.country.tag.TagDTO;
 import com.kairos.user.country.time_slot.TimeSlotWrapper;
@@ -327,9 +327,9 @@ public class TaskTypeService extends MongoBaseService {
         }
 
         List<Map<String,Object>> organizationTypes = Collections.emptyList();
-        Country basic_details = countryGraphRepository.getCountryByOrganizationService(taskType.getSubServiceId());
-        if(basic_details != null){
-            OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult = organizationTypeGraphRepository.getOrganizationTypeHierarchy(basic_details.getId(),taskType.getOrganizationSubTypes());
+        Country country = countryGraphRepository.getCountryByOrganizationService(taskType.getSubServiceId());
+        if(country != null){
+            OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult = organizationTypeGraphRepository.getOrganizationTypeHierarchy(country.getId(),taskType.getOrganizationSubTypes());
             organizationTypes = organizationTypeHierarchyQueryResult.getOrganizationTypes();
         }*/
         CountryDTO countryDTO = countryRestClient.getCountryByOrganizationService(taskType.getSubServiceId());

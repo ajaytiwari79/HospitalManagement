@@ -41,12 +41,12 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessPage(tabId,accessPageDTO));
     }
 
-    @RequestMapping(value="/basic_details/{countryId}/tab",method = RequestMethod.GET)
+    @RequestMapping(value="/country/{countryId}/tab",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getMainTabs(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabs(countryId));
     }
 
-    @RequestMapping(value = "/basic_details/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId, @PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId, countryId));
     }
@@ -57,7 +57,7 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getActive(),tabId));
     }
 
-    @RequestMapping(value = "/basic_details/{countryId}/tab/{tabId}/access_status",method = RequestMethod.PUT)
+    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/access_status",method = RequestMethod.PUT)
     public ResponseEntity<Map<String,Object>> updateAccessStatusOfTab(@PathVariable Long tabId,@PathVariable Long countryId,
                                                                 @Valid @RequestBody OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessForOrganizationCategory(countryId, tabId, orgCategoryTabAccessDTO));

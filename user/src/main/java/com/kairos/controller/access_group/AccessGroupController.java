@@ -154,14 +154,14 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.deleteCountryAccessGroup(accessGroupId));
     }
 
-    @ApiOperation("Get organization category with count of Access Groups of basic_details")
+    @ApiOperation("Get organization category with count of Access Groups of country")
     @RequestMapping(value = COUNTRY_URL + "/organization_category" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getListOfOrgCategoryWithCountryAccessGroupCount(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getListOfOrgCategoryWithCountryAccessGroupCount(countryId));
     }
 
-    @ApiOperation("Get basic_details Access Groups")
+    @ApiOperation("Get country Access Groups")
     @RequestMapping(value = COUNTRY_URL + "/access_group/organization_category/{organizationCategory}" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryAccessGroups(@PathVariable Long countryId, @PathVariable OrganizationCategory organizationCategory) {

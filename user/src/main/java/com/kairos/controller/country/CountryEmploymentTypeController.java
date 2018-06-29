@@ -29,28 +29,28 @@ public class CountryEmploymentTypeController {
     private EmploymentTypeService employmentTypeService;
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.POST)
-    @ApiOperation("Add employment type in basic_details")
+    @ApiOperation("Add employment type in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addEmploymentType(@PathVariable long countryId, @Valid @RequestBody EmploymentTypeDTO employmentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, employmentTypeService.addEmploymentType(countryId, employmentTypeDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.PUT)
-    @ApiOperation("Update employment type in basic_details")
+    @ApiOperation("Update employment type in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId, @Valid @RequestBody EmploymentTypeDTO employmentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateEmploymentType(countryId, employmentTypeId, employmentTypeDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.DELETE)
-    @ApiOperation("Delete employment type of basic_details")
+    @ApiOperation("Delete employment type of country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.deleteEmploymentType(countryId, employmentTypeId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.GET)
-    @ApiOperation("get employment type of basic_details")
+    @ApiOperation("get employment type of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentTypeList (@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeList(countryId, false));
@@ -74,35 +74,35 @@ public class CountryEmploymentTypeController {
     * API to get expertise level region employment Type organizationType for activity type MASTER DATA
     */
     @RequestMapping(value = COUNTRY_URL + "/employment_type_with_organizationType", method = RequestMethod.GET)
-    @ApiOperation("get  expertise level region employment Type organizationType  of basic_details")
+    @ApiOperation("get  expertise level region employment Type organizationType  of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId , @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId,selectedDate));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type_and_expertise", method = RequestMethod.GET)
-    @ApiOperation("get employment type of basic_details")
+    @ApiOperation("get employment type of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseAndEmployment (@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getExpertiseAndEmployment(countryId, false));
     }
 
     @RequestMapping(value = UNIT_URL + "/employment_type_and_expertise", method = RequestMethod.GET)
-    @ApiOperation("get employment type of basic_details")
+    @ApiOperation("get employment type of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseAndEmploymentForUnit (@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getExpertiseAndEmploymentForUnit(unitId, false));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/day_types_and_employment_types", method = RequestMethod.GET)
-    @ApiOperation("get employment type and dayTypes of basic_details")
+    @ApiOperation("get employment type and dayTypes of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayTypesAndEmploymentTypes (@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getDayTypesAndEmploymentTypes(countryId,false));
     }
 
     @RequestMapping(value = UNIT_URL + "/day_types_and_employment_types", method = RequestMethod.GET)
-    @ApiOperation("get employment type and dayTypes of basic_details")
+    @ApiOperation("get employment type and dayTypes of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayTypesAndEmploymentTypesAtUnit (@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getDayTypesAndEmploymentTypesAtUnit(unitId,false));

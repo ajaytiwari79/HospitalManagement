@@ -74,7 +74,7 @@ public class AddressVerificationService {
                 "\n Street: " + contactAddress.getStreet1());
 
         Map<String, Object> addressToVerify = new HashMap<>();
-        addressToVerify.put("basic_details", "DK");
+        addressToVerify.put("country", "DK");
         addressToVerify.put("zip", zipCode);
         addressToVerify.put("city", contactAddress.getCity());
         addressToVerify.put("street", contactAddress.getStreet1());
@@ -142,7 +142,7 @@ public class AddressVerificationService {
                 "\n Street: " + contactAddress.getStreet1());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Map<String, Object> addressToVerify = new HashMap<>();
-        addressToVerify.put("basic_details", "DK");
+        addressToVerify.put("country", "DK");
         addressToVerify.put("zip", contactAddress.getZipCodeValue());
         addressToVerify.put("city", contactAddress.getCity());
         addressToVerify.put("street", contactAddress.getStreet1());

@@ -99,7 +99,7 @@ public class OptaLocationDTO {
     @Override
     public String toString() {
         return "OptaLocationDTO{" +
-                "basic_details='" + country + '\'' +
+                "country='" + country + '\'' +
                 ", zip=" + zip +
                 ", city='" + city + '\'' +
                 ", district='" + district + '\'' +

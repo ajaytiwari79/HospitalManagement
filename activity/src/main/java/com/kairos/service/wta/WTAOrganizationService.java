@@ -1,8 +1,8 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.activity.wta.basic_details.WTADTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTADTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;

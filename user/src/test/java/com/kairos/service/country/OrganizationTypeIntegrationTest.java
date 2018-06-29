@@ -41,7 +41,7 @@ public class OrganizationTypeIntegrationTest {
         OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO("Mytest", levels);
         HttpEntity<OrganizationTypeDTO> entity = new HttpEntity<>(organizationTypeDTO);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/basic_details/4/organization_type",
+                baseUrl+"/country/4/organization_type",
                 HttpMethod.POST, entity, String.class);
         Assert.assertEquals(true,response.getBody().contains(organizationTypeDTO.getName()));
     }
@@ -55,7 +55,7 @@ public class OrganizationTypeIntegrationTest {
         UpdateOrganizationTypeDTO updateOrganizationTypeDTO = new UpdateOrganizationTypeDTO("test3",Arrays.asList(),Arrays.asList(levelToDelete.getId()));
         HttpEntity<UpdateOrganizationTypeDTO> entity = new HttpEntity<>(updateOrganizationTypeDTO);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/basic_details/53/organization_type/86",
+                baseUrl+"/country/53/organization_type/86",
                 HttpMethod.PUT, entity, String.class);
         System.out.println("response " + response);
         Assert.assertEquals(true,response.getBody().contains(updateOrganizationTypeDTO.getName()));
@@ -65,7 +65,7 @@ public class OrganizationTypeIntegrationTest {
     public void getOrgTypesByCountryId(){
         String baseUrl=getBaseUrl(71L,null);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/basic_details/53/organization_type",
+                baseUrl+"/country/53/organization_type",
                 HttpMethod.GET, null, String.class);
         System.out.println(response.getBody());
         Assert.assertNotNull(response.getBody());
