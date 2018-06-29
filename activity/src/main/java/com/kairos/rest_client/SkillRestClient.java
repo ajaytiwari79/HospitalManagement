@@ -58,7 +58,7 @@ public class SkillRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<List<Skill>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/skills_by_name",
+                            baseUrl + "/country/{countryId}/skills_by_name",
                             HttpMethod.POST,
                             entity, typeReference,countryId);
 

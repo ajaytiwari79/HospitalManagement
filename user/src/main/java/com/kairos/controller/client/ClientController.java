@@ -2,16 +2,16 @@ package com.kairos.controller.client;
 
 import com.kairos.client.dto.ClientExceptionDTO;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffClientData;
-import com.kairos.activity.web.ContactPersonDTO;
 import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.mail.MailService;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.staff.ContactPersonDTO;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 

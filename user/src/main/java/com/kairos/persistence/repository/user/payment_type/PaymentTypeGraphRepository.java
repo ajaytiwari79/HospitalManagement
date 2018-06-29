@@ -13,6 +13,6 @@ import java.util.Map;
 @Repository
 public interface PaymentTypeGraphRepository extends Neo4jBaseRepository<PaymentType,Long>{
 
-    @Query("Match (n:PaymentType{isEnabled:true})-[:BELONGS_TO]->(basic_details:Country) where id(basic_details)={0} return {id:id(n),name:n.name,description:n.description} as data")
+    @Query("Match (n:PaymentType{isEnabled:true})-[:BELONGS_TO]->(country:Country) where id(country)={0} return {id:id(n),name:n.name,description:n.description} as data")
     List<Map<String,Object>> getPaymentTypes(long countryId);
 }

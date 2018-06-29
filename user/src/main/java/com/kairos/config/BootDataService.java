@@ -856,7 +856,7 @@ public class BootDataService {
     }
 
     private void createEmployment() {
-        employmentForAdmin = new Employment("working as basic_details admin", adminAsStaff);
+        employmentForAdmin = new Employment("working as country admin", adminAsStaff);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
@@ -1059,7 +1059,7 @@ public class BootDataService {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
-            costTimeAgreementService.createDefaultCtaRuleTemplate(basic_details.getId());
+            costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
         }*/
 
     }

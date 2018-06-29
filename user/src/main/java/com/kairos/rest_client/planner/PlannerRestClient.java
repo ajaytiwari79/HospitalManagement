@@ -1,7 +1,7 @@
 package com.kairos.rest_client.planner;
 
 import com.kairos.activity.wta.UnitPositionWtaDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.user.staff.staff.Staff;

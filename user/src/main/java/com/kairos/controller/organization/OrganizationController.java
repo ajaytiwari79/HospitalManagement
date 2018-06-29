@@ -1,7 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
-import com.kairos.activity.web.OrganizationExternalIdsDTO;
+
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -155,7 +155,7 @@ public class OrganizationController {
                 organizationService.showCountryTagForOrganization(unitId));
     }
 
-    @ApiOperation(value = "Get Organization's basic_details Id")
+    @ApiOperation(value = "Get Organization's country Id")
     @RequestMapping(value = UNIT_URL + "/countryId", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryIdOfOrganization(@PathVariable long unitId) {
@@ -581,7 +581,7 @@ public class OrganizationController {
                 organizationService.getParentOrganization(countryId));
     }
 
-    @RequestMapping(value = "/parent/{orgId}/basic_details/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
+    @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
@@ -1189,7 +1189,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = UNIT_URL + "/dayTypebydate", method = RequestMethod.GET)
-    @ApiOperation("get dayType in basic_details")
+    @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long organizationId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(organizationId, date));
@@ -1375,7 +1375,7 @@ public class OrganizationController {
 
 
     @ApiOperation(value = "Get Default data for Rule Template")
-    @RequestMapping(value = "/basic_details/{countryId}/rule_template/default_data", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/rule_template/default_data", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));

@@ -1,15 +1,11 @@
 package com.kairos.service.client;
 
-import com.kairos.activity.web.CurrentAddress;
-import com.kairos.activity.web.PatientRelative;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.common.CitizenStatus;
-import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.user.patient.PatientWrapper;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -23,6 +19,10 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.region.RegionService;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.patient.PatientRelative;
+import com.kairos.user.patient.PatientWrapper;
+import com.kairos.user.staff.CurrentAddress;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;

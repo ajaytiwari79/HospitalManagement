@@ -49,12 +49,12 @@ public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> 
     Region findRegionByProvinceId(Long id);
 
     @Query("MATCH (zipcode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where id(zipcode)={0}\n" +
-            "Match (municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:BELONGS_TO]->(basic_details:Country) return {id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,basic_details:{id:id(basic_details),name:basic_details.name}}}} as result")
+            "Match (municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:BELONGS_TO]->(country:Country) return {id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}} as result")
     List<Map<String,Object>> getGeographicTreeData(long zipCodeId);
 
     @Query("Match (municipality:Municipality) where id(municipality)={0}\n" +
-            "Match (municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:"+BELONGS_TO+"]->(basic_details:Country) return \n" +
-            "{provinceName:province.name,provinceId:id(province),regionId:id(region),regionName:region.name,countryId:id(basic_details),countryName:basic_details.name} as data")
+            "Match (municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:"+BELONGS_TO+"]->(country:Country) return \n" +
+            "{provinceName:province.name,provinceId:id(province),regionId:id(region),regionName:region.name,countryId:id(country),countryName:country.name} as data")
     Map<String,Object> getGeographicData(long municipalityId);
 
     @Query("match (e:Region{isEnable:true}) where id(e) in {0} \n" +

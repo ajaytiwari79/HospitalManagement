@@ -1,7 +1,7 @@
-package com.kairos.activity.wta.basic_details;
+package com.kairos.activity.wta.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.country.country.CountryDTO;
 import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.OrganizationTypeDTO;

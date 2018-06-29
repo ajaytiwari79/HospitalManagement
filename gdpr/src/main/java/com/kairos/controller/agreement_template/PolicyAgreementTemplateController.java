@@ -67,7 +67,7 @@ public class PolicyAgreementTemplateController {
         }
         else if (countryId==null)
         {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "basic_details id cannot be null or empty");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null or empty");
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId,organizationId,id,policyAgreementTemplateDto));
