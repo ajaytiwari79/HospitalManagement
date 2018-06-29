@@ -1,10 +1,10 @@
-package com.kairos.activity.service.user_service_data;
+package com.kairos.service.user_service_data;
 
-import com.kairos.activity.client.GenericIntegrationService;
-import com.kairos.activity.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
-import com.kairos.activity.persistence.repository.user_service_data.UnitAndParentOrganizationAndCountryIdsMongoRepository;
-import com.kairos.activity.service.MongoBaseService;
+import com.kairos.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
+import com.kairos.persistence.repository.user_service_data.UnitAndParentOrganizationAndCountryIdsMongoRepository;
 import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +29,7 @@ public class UnitDataService extends MongoBaseService {
     }
 
     public boolean addParentOrganizationAndCountryIdForAllUnits(){
-        List<UnitAndParentOrganizationAndCountryDTO>  unitAndParentOrganizationAndCountryData = genericIntegrationService.getParentOrganizationAndCountryOfUnits();
+        List<UnitAndParentOrganizationAndCountryDTO> unitAndParentOrganizationAndCountryData = genericIntegrationService.getParentOrganizationAndCountryOfUnits();
         List<UnitAndParentOrganizationAndCountryIds> unitAndParentOrganizationAndCountryIds = new ArrayList<>();
         unitAndParentOrganizationAndCountryData.forEach(unitDetailsDTO -> {
             unitAndParentOrganizationAndCountryIds.add(new UnitAndParentOrganizationAndCountryIds(unitDetailsDTO.getUnitId(),

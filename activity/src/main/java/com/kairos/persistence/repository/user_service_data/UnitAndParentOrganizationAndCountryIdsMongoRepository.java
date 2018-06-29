@@ -1,8 +1,7 @@
-package com.kairos.activity.persistence.repository.user_service_data;
+package com.kairos.persistence.repository.user_service_data;
 
-import com.kairos.activity.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
-import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.activity.persistence.repository.phase.CustomPhaseMongoRepository;
+import com.kairos.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
+import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
