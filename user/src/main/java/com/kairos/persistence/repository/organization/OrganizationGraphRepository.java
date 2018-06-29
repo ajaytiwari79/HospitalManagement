@@ -246,7 +246,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "Match (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with zipCode,contactAddress,unit " +
             "return collect({id:id(unit),name:unit.name,shortName:unit.shortName,contactAddress:case when contactAddress is null then [] else {id:id(contactAddress),city:contactAddress.city,longitude:contactAddress.longitude,latitude:contactAddress.latitude, " +
             "street1:contactAddress.street1,zipCodeId:id(zipCode),floorNumber:contactAddress.floorNumber, " +
-            "houseNumber:contactAddress.houseNumber,province:contactAddress.province,basic_details:contactAddress.basic_details,regionName:contactAddress.regionName, " +
+            "houseNumber:contactAddress.houseNumber,province:contactAddress.province,country:contactAddress.country,regionName:contactAddress.regionName, " +
             "municipalityName:contactAddress.municipalityName} end}) AS unitList")
     List<Map<String, Object>> getUnits(long organizationId);
 
@@ -315,13 +315,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return collect({unitManager:CASE WHEN unitManager IS NULL THEN null ELSE  {id:id(unitManager), email:unitManager.email, firstName:unitManager.firstName, lastName:unitManager.lastName, cprNumber:unitManager.cprNumber, accessGroupId:id(accessGroup), accessGroupName:accessGroup.name} END, id:id(org),levelId:id(level),companyCategoryId:id(companyCategory),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,workCenterUnit:org.workCenterUnit, gdprUnit:org.gdprUnit,desiredUrl:org.desiredUrl,shortCompanyName:org.shortCompanyName,kairosCompanyId:org.kairosCompanyId,companyType:org.companyType,vatId:org.vatId,costCenter:org.costCenter,costCenterId:org.costCenterId,companyUnitType:org.companyUnitType,contactAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCodeId:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getOrganizationGdprAndWorkCenter(long organizationId);
 
-    @Query("Match (basic_details:Country) where id(basic_details)={0} with basic_details \n" +
-            "MATCH (bt:BusinessType{isEnabled:true})-[:"+BELONGS_TO+"]->(basic_details) with collect(bt) as bt,basic_details \n" +
-            "OPTIONAL MATCH (cc:CompanyCategory{deleted:false})-[:"+BELONGS_TO+"]->(basic_details) with collect(cc) as cc,bt,basic_details \n" +
-            "MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(basic_details) \n" +
+    @Query("Match (country:Country) where id(country)={0} with country \n" +
+            "MATCH (bt:BusinessType{isEnabled:true})-[:"+BELONGS_TO+"]->(country) with collect(bt) as bt,country \n" +
+            "OPTIONAL MATCH (cc:CompanyCategory{deleted:false})-[:"+BELONGS_TO+"]->(country) with collect(cc) as cc,bt,country \n" +
+            "MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country) \n" +
             "Optional Match (ot)-[r:"+HAS_LEVEL+"]->(level:Level{deleted:false}) with ot,bt,cc, case when r is null then [] else collect({id:id(level),name:level.name}) end as levels \n" +
             "OPTIONAL MATCH (ot)-[:"+HAS_SUB_TYPE+"]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt,cc WITH collect(orgTypes) as organizationTypes,bt,cc " +
-            "MATCH (os:OrganizationService{isEnabled:true})<-[:HAS_ORGANIZATION_SERVICES]-(basic_details) \n" +
+            "MATCH (os:OrganizationService{isEnabled:true})<-[:HAS_ORGANIZATION_SERVICES]-(country) \n" +
             "OPTIONAL MATCH (oss)<-[:"+ORGANIZATION_SUB_SERVICE+"]-(os) with {children: case when oss is NULL then [] else collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,organizationTypes,cc WITH collect(orgServices) as serviceTypes,bt,organizationTypes,cc \n" +
             "return organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
@@ -399,8 +399,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "rel.lastModificationDate={2},subRel.isEnabled=false,subRel.lastModificationDate={2} ")
     void removeSkillFromOrganization(long unitId, long skillId, long lastModificationDate);
 
-    @Query("Match (basic_details:Country) where id(basic_details)={0} with basic_details   optional Match (ownershipTypes:OwnershipType{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(ownershipTypes),name:ownershipTypes.name}) as ownerships,basic_details   optional Match (businessTypes:BusinessType{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(businessTypes),name:businessTypes.name}) as businessTypes,ownerships,basic_details   optional Match (industryTypes:IndustryType{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(industryTypes),name:industryTypes.name}) as industryTypes,ownerships,businessTypes,basic_details optional Match (employeeLimits:EmployeeLimit{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(employeeLimits),min:employeeLimits.minimum,max:employeeLimits.maximum}) as employeeLimits,industryTypes,ownerships,businessTypes,basic_details   optional Match (vatTypes:VatType{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(vatTypes),name:vatTypes.name,percentage:vatTypes.percentage}) as vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,basic_details   optional Match (kairosStatus:KairosStatus{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(kairosStatus),name:kairosStatus.name}) as kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,basic_details   optional Match (contractTypes:ContractType{isEnabled:true})-[:BELONGS_TO]->(basic_details) with collect({id:id(contractTypes),name:contractTypes.name}) as contractTypes,kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,basic_details  \n" +
-            "optional Match (basic_details)<-[:BELONGS_TO]-(organizationType:OrganizationType{isEnable:true}) with organizationType,contractTypes,kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes \n" +
+    @Query("Match (country:Country) where id(country)={0} with country   optional Match (ownershipTypes:OwnershipType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(ownershipTypes),name:ownershipTypes.name}) as ownerships,country   optional Match (businessTypes:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(businessTypes),name:businessTypes.name}) as businessTypes,ownerships,country   optional Match (industryTypes:IndustryType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(industryTypes),name:industryTypes.name}) as industryTypes,ownerships,businessTypes,country optional Match (employeeLimits:EmployeeLimit{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(employeeLimits),min:employeeLimits.minimum,max:employeeLimits.maximum}) as employeeLimits,industryTypes,ownerships,businessTypes,country   optional Match (vatTypes:VatType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(vatTypes),name:vatTypes.name,percentage:vatTypes.percentage}) as vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,country   optional Match (kairosStatus:KairosStatus{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(kairosStatus),name:kairosStatus.name}) as kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,country   optional Match (contractTypes:ContractType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(contractTypes),name:contractTypes.name}) as contractTypes,kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,country  \n" +
+            "optional Match (country)<-[:BELONGS_TO]-(organizationType:OrganizationType{isEnable:true}) with organizationType,contractTypes,kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes \n" +
             "optional match (organizationType)-[r:HAS_SUB_TYPE]->(subType:OrganizationType{isEnable:true}) with distinct {id:id(organizationType),name:organizationType.name,children:case when r is null then [] else  collect({id:id(subType),name:subType.name}) end} as organizationTypes,contractTypes,kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes \n" +
             "return {ownershipTypes:case when ownerships[0].id is null then [] else ownerships end,industryTypes:case when industryTypes[0].id is null then [] else industryTypes end,employeeLimits:case when employeeLimits[0].id is null then [] else employeeLimits end,vatTypes:case when vatTypes[0].id is null then [] else vatTypes end,contractTypes:case when contractTypes[0].id is null then [] else contractTypes end,organizationTypes:case when organizationTypes is null then [] else collect(organizationTypes) end,kairosStatusList:case when kairosStatus[0].id is null then [] else kairosStatus end,businessTypes:case when businessTypes[0].id is null then [] else businessTypes end} as data")
     List<Map<String, Object>> getGeneralTabMetaData(long countryId);
@@ -497,7 +497,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "optional match (billingAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,zipCode,billingAddress\n" +
             "optional match (billingAddress)-[:" + PAYMENT_TYPE + "]->(paymentType:PaymentType) with paymentType,zipCode,billingAddress,municipality \n" +
             "OPTIONAL MATCH (billingAddress)-[:" + CURRENCY + "]->(currency:Currency) with currency,paymentType,zipCode,billingAddress,municipality\n" +
-            "return {id:id(billingAddress),houseNumber:billingAddress.houseNumber,floorNumber:billingAddress.floorNumber,street1:billingAddress.street1,zipCodeId:id(zipCode),city:billingAddress.city,municipalityId:id(municipality),regionName:billingAddress.regionName,province:billingAddress.province,basic_details:billingAddress.basic_details,latitude:billingAddress.latitude,longitude:billingAddress.longitude,paymentTypeId:id(paymentType),currencyId:id(currency),streetUrl:billingAddress.streetUrl,billingPerson:billingAddress.contactPersonForBillingAddress} as data")
+            "return {id:id(billingAddress),houseNumber:billingAddress.houseNumber,floorNumber:billingAddress.floorNumber,street1:billingAddress.street1,zipCodeId:id(zipCode),city:billingAddress.city,municipalityId:id(municipality),regionName:billingAddress.regionName,province:billingAddress.province,country:billingAddress.country,latitude:billingAddress.latitude,longitude:billingAddress.longitude,paymentTypeId:id(paymentType),currencyId:id(currency),streetUrl:billingAddress.streetUrl,billingPerson:billingAddress.contactPersonForBillingAddress} as data")
     Map<String, Object> getBillingAddress(long unitId);
 
 
@@ -589,10 +589,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "isEnabled:r.isEnabled,created:r.creationDate,referenceId:id(mss)}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description,referenceId:id(ms)} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getImportedServicesForUnit(long organizationId);
 
-//    @Query("Match (basic_details:Country) where id(basic_details)={0} with basic_details\n" +
-//            "MATCH (bt:BusinessType{isEnabled:true})-[:"+BELONGS_TO+"]->(basic_details) with collect(bt) as bt,basic_details\n" +
-//            "optional Match (basic_details)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) with collect(level) as level,bt,basic_details\n" +
-//            "MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(basic_details) WITH ot,bt,level\n" +
+//    @Query("Match (country:Country) where id(country)={0} with country\n" +
+//            "MATCH (bt:BusinessType{isEnabled:true})-[:"+BELONGS_TO+"]->(country) with collect(bt) as bt,country\n" +
+//            "optional Match (country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) with collect(level) as level,bt,country\n" +
+//            "MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country) WITH ot,bt,level\n" +
 //            "OPTIONAL MATCH (ot)-[:"+HAS_SUB_TYPE+"]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot)} as orgTypes,bt,level\n" +
 //            "return collect(orgTypes) as organizationTypes,bt as businessTypes,level as levels")
 //    OrganizationCreationData getOrganizationCreationData(long countryId);countryId
@@ -617,7 +617,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (c:Client{imported:true})-[r:GET_SERVICE_FROM]->(o:Organization) where id(o)= {0}  case when c is NULL then false else true ")
     Boolean isOrganizationHasExternalReference(Long organizationId);
 
-    @Query("MATCH (basic_details:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0}  return id(basic_details) ")
+    @Query("MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
     @Query("match(organization:Organization) where not exists (organization.phaseGenerated) OR organization.phaseGenerated=false\n" +
@@ -669,7 +669,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
     List<Map<String, Object>> getClientsOfOrganizationExcludeDeadWithFilterParametersAndLatLng(Long organizationId, String serverImageUrl, String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> latLngIds);
 
-    @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (basic_details:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+    @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
             "return id(et) as id, et.name as name, et.description as description, \n" +
             "et.allowedForContactPerson as allowedForContactPerson, et.allowedForShiftPlan as allowedForShiftPlan, et.allowedForFlexPool as allowedForFlexPool,et.paymentFrequency as paymentFrequency, " +
@@ -706,9 +706,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return organizationService")
     OrganizationService getServiceOfSubService(Long subServiceId);
 
-    @Query("MATCH (organization:Organization) - [r:BELONGS_TO] -> (basic_details:Country)\n" +
+    @Query("MATCH (organization:Organization) - [r:BELONGS_TO] -> (country:Country)\n" +
             "WHERE id(organization)={0}\n" +
-            "return basic_details")
+            "return country")
     Country getCountry(Long organizationId);
 
     @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
@@ -772,7 +772,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (union:Organization{union:true,isEnable:true}) where id (union) IN {0}  return union")
     List<Organization> findUnionsByIdsIn(List<Long> unionIds);
 
-    @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(basic_details:Country)  where id(basic_details)={0} return id(union) as id, union.name as name")
+    @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  where id(country)={0} return id(union) as id, union.name as name")
     List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
 
     @Query("MATCH (org:Organization) where org.desiredUrl={0}\n" +

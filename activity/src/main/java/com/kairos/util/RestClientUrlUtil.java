@@ -47,7 +47,7 @@ public class RestClientUrlUtil {
 
     public static final String getBaseUrl(Long id,boolean hasUnitInUrl, Long parentOrganizationId){
         StringBuilder sb = new StringBuilder(userServiceUrl+"organization/").append(parentOrganizationId);
-            String baseUrl= hasUnitInUrl? sb.append("/unit/").append(id).toString() : sb.append("/basic_details/").append(id).toString();
+            String baseUrl= hasUnitInUrl? sb.append("/unit/").append(id).toString() : sb.append("/country/").append(id).toString();
             return baseUrl;
     }
 

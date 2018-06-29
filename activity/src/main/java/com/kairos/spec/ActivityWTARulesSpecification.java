@@ -1,6 +1,6 @@
 package com.kairos.spec;
 
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.phase.Phase;

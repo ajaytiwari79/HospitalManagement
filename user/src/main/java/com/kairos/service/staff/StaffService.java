@@ -962,7 +962,7 @@ public class StaffService extends UserBaseService {
             organization = organizations.get(0);
         }
         if (organization != null) {
-            Employment employment = new Employment("working as basic_details admin", adminAsStaff);
+            Employment employment = new Employment("working as country admin", adminAsStaff);
             organization.getEmployments().add(employment);
             organizationGraphRepository.save(organization);
 

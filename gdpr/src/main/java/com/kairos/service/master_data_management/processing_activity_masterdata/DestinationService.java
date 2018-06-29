@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.Destination;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DestinationMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,24 +28,28 @@ public class DestinationService extends MongoBaseService {
     private DestinationMongoRepository destinationMongoRepository;
 
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
+
     public Map<String, List<Destination>> createDestination(Long countryId, Long organizationId, List<Destination> destinations) {
 
         Map<String, List<Destination>> result = new HashMap<>();
-        List<Destination> newDestinations = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> destinationNames = new HashSet<>();
         if (destinations.size() != 0) {
             for (Destination destination : destinations) {
                 if (!StringUtils.isBlank(destination.getName())) {
-                    names.add(destination.getName());
+                    destinationNames.add(destination.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<Destination> existing = destinationMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
+            List<Destination> existing = findByNamesList(countryId,organizationId,destinationNames,Destination.class);
+            destinationNames = comparisonUtils.getNameListForMetadata(existing, destinationNames);
 
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<Destination> newDestinations = new ArrayList<>();
+            if (destinationNames.size() != 0) {
+                for (String name : destinationNames) {
 
                     Destination newDestination = new Destination();
                     newDestination.setName(name);

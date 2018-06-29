@@ -216,7 +216,7 @@ public class Country extends UserBaseEntity {
         if (ruleTemplateCategory == null)
             throw new NullPointerException("Can't add null ruleTemplateCategory");
         if (ruleTemplateCategory.getCountry() != null)
-            throw new IllegalStateException("basic_details is already assigned to ruleTemplateCategory");
+            throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
         getRuleTemplateCategories().add(ruleTemplateCategory);
         ruleTemplateCategory.setCountry(this);
     }

@@ -1,6 +1,6 @@
 package com.kairos.service.wta;
 
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateAndCategoryDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
@@ -15,7 +15,7 @@ import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.country.country.CountryDTO;
 import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateCategoryService.class);
 
     /**
-     * used to save a new Rule template in a basic_details
+     * used to save a new Rule template in a country
      * Created by vipul on 2/8/17.
      * params countryId and rule template category via name and desc
      */

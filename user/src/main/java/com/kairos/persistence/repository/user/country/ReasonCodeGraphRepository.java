@@ -19,19 +19,19 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.COUNT
 @Repository
 public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCode, Long> {
 
-    @Query("MATCH (basic_details:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(basic_details)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
             "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
     List<ReasonCodeResponseDTO> findReasonCodesByCountry(long countryId, ReasonCodeType reasonCodeType);
 
-    @Query("MATCH (basic_details:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(basic_details)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
             "with count(reasonCode) as reasonCodeCount return CASE when reasonCodeCount>0 THEN  true ELSE false END as response ")
     boolean findByNameExcludingCurrent(Long countryId, Long reasonCodeId, String name, ReasonCodeType reasonCodeType);
 
-    @Query("MATCH (basic_details:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(basic_details)={0} AND id(reasonCode)= {1} return reasonCode")
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode)= {1} return reasonCode")
     ReasonCode findByCountryAndReasonCode(long countryId, long reasonCodeId);
 
 
-    @Query("MATCH (organization:Organization)-[:" + COUNTRY + "]->(basic_details:Country)<-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND reasonCode.reasonCodeType={1}" +
+    @Query("MATCH (organization:Organization)-[:" + COUNTRY + "]->(country:Country)<-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND reasonCode.reasonCodeType={1}" +
             " return id(reasonCode) as id, reasonCode.name as name, reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
     List<ReasonCodeResponseDTO> findReasonCodesByOrganizationAndReasonCodeType(Long organizationId, ReasonCodeType reasonCodeType);
 }

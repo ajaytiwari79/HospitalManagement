@@ -1,4 +1,4 @@
-package com.kairos.user.country.basic_details;
+package com.kairos.user.country.country;
 
 /**
  * Created by oodles on 19/4/17.

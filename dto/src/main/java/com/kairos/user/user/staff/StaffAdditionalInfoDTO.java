@@ -24,7 +24,7 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    //These are the all day type of basic_details
+    //These are the all day type of country
     private List<DayTypeDTO> dayTypes;
     private UserAccessRoleDTO user;
     //This is unit TimeZone

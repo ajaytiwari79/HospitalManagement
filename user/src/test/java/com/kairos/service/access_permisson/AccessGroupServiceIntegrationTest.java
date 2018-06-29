@@ -72,7 +72,7 @@ public class AccessGroupServiceIntegrationTest {
     @Before
     public void setUp() throws Exception {
 
-        // Fetch basic_details
+        // Fetch country
         Country country = countryService.getCountryByName("Denmark");
         countryId = country == null ? null : country.getId();
 
@@ -319,7 +319,7 @@ public class AccessGroupServiceIntegrationTest {
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
         if(organizationId!=null && countryId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)
-                    .append("/basic_details/").append(countryId).toString();
+                    .append("/country/").append(countryId).toString();
             return baseUrl;
         } else if(organizationId!=null && unitId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)

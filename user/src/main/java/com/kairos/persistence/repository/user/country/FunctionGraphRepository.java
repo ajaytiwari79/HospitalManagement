@@ -17,21 +17,21 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, Long> {
 
-    @Query("MATCH (basic_details:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(basic_details)={0} " +
+    @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} " +
             "OPTIONAL MATCH(function)-[:HAS_ORGANIZATION_LEVEL]->(level:Level) " +
             "OPTIONAL MATCH(function)-[:HAS_UNION]->(union:Organization{union:true}) " +
-            "with basic_details,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   return id(function) as id,function.name as name,function.description as description," +
+            "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   return id(function) as id,function.name as name,function.description as description," +
             "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels,function.icon as icon")
     List<FunctionDTO> findFunctionsByCountry(long countryId);
 
-    @Query("MATCH (basic_details:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(basic_details)={0} return id(function) as id,function.name as name")
+    @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} return id(function) as id,function.name as name")
     List<FunctionDTO> findFunctionsIdAndNameByCountry(long countryId);
 
 
     @Query("MATCH (c:Country)-[:BELONGS_TO]-(fun:Function{deleted:false}) where id(c)={0} AND LOWER(fun.name)=LOWER({1}) return fun")
     Function findByNameIgnoreCase(Long countryId, String name);
 
-    @Query("MATCH (basic_details:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(basic_details)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) return function")
+    @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) return function")
     Function findByNameExcludingCurrent(Long countryId, Long functionId, String name);
 
     @Query("MATCH(function:Function{deleted:false}) where id(function) IN {0} return function")

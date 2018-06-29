@@ -59,10 +59,10 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     @Query("MATCH (skill)-[:HAS_CATEGORY]->(skillCategory:SkillCategory) return {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,parentId:id(skillCategory)})} AS skillList")
     List<Map<String,Object>> getAllSkills();
 
-    @Query("MATCH (skill:Skill)-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:BELONGS_TO]-(basic_details:Country) where id(basic_details) = {0} return {skills: case when skill is NULL then [] else collect({id:id(skill),name:skill.name,description:skill.description}) END,id:id(skillCategory),name:skillCategory.name,description:skillCategory.description} AS result")
+    @Query("MATCH (skill:Skill)-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:BELONGS_TO]-(country:Country) where id(country) = {0} return {skills: case when skill is NULL then [] else collect({id:id(skill),name:skill.name,description:skill.description}) END,id:id(skillCategory),name:skillCategory.name,description:skillCategory.description} AS result")
     List<Map<String,Object>> getSkillsByCountryId(long countryId);
 
-    @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true})-[:BELONGS_TO]->(basic_details:Country) where id(basic_details)={0} return {id:id(skillCategory),name:skillCategory.name,skills:collect({id:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
+    @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true})-[:BELONGS_TO]->(country:Country) where id(country)={0} return {id:id(skillCategory),name:skillCategory.name,skills:collect({id:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
     List<Map<String,Object>> getSkillsByCountryForTaskType(long countryId);
 
     @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true}) return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
@@ -93,6 +93,6 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
     List<Skill> findByExternalIdInAndIsEnabledTrue(List<String> timecareIds);
 
-    @Query("MATCH (skill:Skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:"+BELONGS_TO+"]->(basic_details:Country) where id(basic_details)={0} return skill")
+    @Query("MATCH (skill:Skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:"+BELONGS_TO+"]->(country:Country) where id(country)={0} return skill")
     List<Skill> findAllSkillsByCountryId(long countryId);
 }
