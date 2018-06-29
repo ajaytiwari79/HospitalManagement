@@ -82,7 +82,7 @@ public class ClauseService extends MongoBaseService {
         newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, organizationId, clauseDto.getAccountTypes()));
         newclause.setTags(tagList);
         try {
-            newclause = save(newclause);
+            newclause =clauseRepository.save(newclause);
             jackrabbitService.addClauseNodeToJackrabbit(newclause.getId(), newclause);
             return newclause;
         } catch (Exception e) {
