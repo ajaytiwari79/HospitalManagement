@@ -28,7 +28,7 @@ public class AttendanceSettingController {
     }
 
     @PostMapping(value = "/attendance_setting")
-    public ResponseEntity<Map<String,Object>> updateAttendanceSetting( @PathVariable Long unitId,@RequestParam("checkIn") boolean checkIn){
+    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@RequestParam("unitId") Long unitId,@RequestParam("checkIn") boolean checkIn){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,checkIn));
     }
 
