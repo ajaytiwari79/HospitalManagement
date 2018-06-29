@@ -3,6 +3,7 @@ package com.kairos.rest_client;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;

@@ -1,13 +1,14 @@
 package com.kairos.persistence.model.attendence_setting;
 
-import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.response.dto.web.attendance.AttendanceDuration;
 
 
 import java.time.LocalDate;
 
 
-public class AttendanceSetting extends MongoBaseEntity{
+public class AttendanceSetting extends MongoBaseEntity {
     private Long staffId;
     private Long unitId;
     private Long userId;

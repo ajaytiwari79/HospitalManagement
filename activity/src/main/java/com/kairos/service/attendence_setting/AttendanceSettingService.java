@@ -1,18 +1,18 @@
 package com.kairos.service.attendence_setting;
 
-import com.kairos.activity.client.GenericIntegrationService;
-import com.kairos.activity.util.userContext.UserContext;
+import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
+import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.response.dto.web.attendance.AttendanceDuration;
-import com.kairos.activity.persistence.model.attendence_setting.AttendanceSetting;
-import com.kairos.activity.persistence.repository.attendence_setting.AttendanceSettingRepository;
-import com.kairos.activity.service.MongoBaseService;
-import com.kairos.activity.service.exception.ExceptionService;
-import com.kairos.activity.service.shift.ShiftService;
-import com.kairos.activity.shift.ShiftQueryResult;
+
 import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.attendance.AttendanceDTO;
 import com.kairos.response.dto.web.attendance.UnitIdAndNameDTO;
 import com.kairos.response.dto.web.staff.StaffResultDTO;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftService;
+import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

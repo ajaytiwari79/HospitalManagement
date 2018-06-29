@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.attendence_setting;
 
-import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.persistence.model.attendence_setting.AttendanceSetting;
-import com.kairos.activity.response.dto.ShiftWithActivityDTO;
+import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,7 +18,7 @@ public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingR
     @Autowired
     private MongoTemplate mongoTemplate;
 
-   public AttendanceSetting findMaxAttendanceCheckIn(Long userId,Date date){
+   public AttendanceSetting findMaxAttendanceCheckIn(Long userId, Date date){
        Aggregation aggregation = Aggregation.newAggregation(
                match(Criteria.where("userId").is(userId).and("createdAt").gte(date)),
                sort(Sort.Direction.DESC,"attendanceDuration.from"),
