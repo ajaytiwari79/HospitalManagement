@@ -44,13 +44,13 @@ public class PayTableController {
     }
 
 
-    // to create a new pay table in basic_details
+    // to create a new pay table in country
     @RequestMapping(value = "/pay_table", method = POST)
     public ResponseEntity<Map<String, Object>> createPayTable(@PathVariable Long countryId, @Validated @RequestBody PayTableDTO payTableDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payTableService.createPayTable(countryId, payTableDTO));
     }
 
-    // to update a the above created pay table in basic_details
+    // to update a the above created pay table in country
     @RequestMapping(value = "/pay_table/{payTableId}", method = PUT)
     public ResponseEntity<Map<String, Object>> updatePayTable(@PathVariable Long countryId, @PathVariable Long payTableId,
                                                               @Validated @RequestBody PayTableUpdateDTO payTableDTO) {

@@ -35,7 +35,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
             "OPTIONAL MATCH (ca)-[:TYPE_OF_HOUSING]->(hs:HousingType) " +
             "RETURN {  " +
             "  id:id(ca),  " +
-            "  basic_details:ca.basic_details,  " +
+            "  country:ca.country,  " +
             "  endDate:ca.endDate,  " +
             "  city:ca.city, " +
             "  regionName:ca.regionName, " +
@@ -95,7 +95,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
             "zipCode:ca.zipCode, " +
             "state:ca.state, " +
             "area:ca.area, " +
-            "basic_details:ca.basic_details, " +
+            "country:ca.country, " +
             "longitude:ca.longitude, " +
             "latitude:ca.latitude " +
             "}) as RelativeList ")
@@ -237,7 +237,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
             "Match (c)-[:HAS_RELATION_OF]->(clientRelationType:ClientRelationType) with clientRelationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Match (nextToKin)<-[:RELATION_WITH_NEXT_TO_KIN]-(clientRelationType)-[:RELATION_TYPE]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(basic_details:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,basic_details:{id:id(basic_details),name:basic_details.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "return id(nextToKin) as id, id(relationType) as relationTypeId,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,{municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
             ",latitude:homeAddress.latitude,municipalities:result} as homeAddress")
     List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
@@ -247,7 +247,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
             "optional Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
             "optional Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "optional Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(basic_details:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,basic_details:{id:id(basic_details),name:basic_details.name}}}}) as result, municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "return id(nextToKin) as id, nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.gender as gender,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,case when homeAddress is not null then {municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
             ",latitude:homeAddress.latitude,municipalities:result} else null end as homeAddress")
     NextToKinQueryResult getNextToKinByCprNumber(String cprNumber,String imageUrl);

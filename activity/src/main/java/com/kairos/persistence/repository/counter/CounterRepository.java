@@ -43,13 +43,13 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
-    //get ModuleWiseCounters List by basic_details
+    //get ModuleWiseCounters List by country
     public List<ModuleCounter> getModuleCountersForCountry(BigInteger countryId) {
         Query query = new Query(Criteria.where("countryId").is(countryId));
         return mongoTemplate.find(query, ModuleCounter.class);
     }
 
-    //get modulewise countersIds for a basic_details
+    //get modulewise countersIds for a country
     public List<ModuleCounterGroupingDTO> getModuleCounterDTOsForCountry(BigInteger countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("countryId").is(countryId)),

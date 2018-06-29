@@ -80,7 +80,7 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
 
 /*created by bobby
 * */
-    //TODO add basic_details check for result
+    //TODO add country check for result
     @Query(" MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o) In {0} " +
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +
             " RETURN {children: case when os  is NULL then [] else collect({id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")

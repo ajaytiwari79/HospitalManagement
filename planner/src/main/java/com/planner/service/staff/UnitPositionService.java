@@ -1,7 +1,7 @@
 package com.planner.service.staff;
 
 import com.kairos.activity.wta.UnitPositionWtaDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.planner.domain.staff.UnitPosition;
 import com.planner.domain.wta.WTABaseRuleTemplate;
 import com.planner.domain.wta.templates.WorkingTimeAgreement;

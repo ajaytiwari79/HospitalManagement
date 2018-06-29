@@ -608,7 +608,7 @@ public class CallInfoRec {
     }
 
     /**
-     * Gets the value of the basic_details property.
+     * Gets the value of the country property.
      * 
      * @return
      *     possible object is
@@ -620,7 +620,7 @@ public class CallInfoRec {
     }
 
     /**
-     * Sets the value of the basic_details property.
+     * Sets the value of the country property.
      * 
      * @param value
      *     allowed object is

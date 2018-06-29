@@ -306,7 +306,7 @@ public class RegionService extends UserBaseService {
                     if (region == null) {
                         logger.info("Unique Region found: " + regionCodeCell.getStringCellValue());
                         region = new Region();
-                        region.setCountry(basic_details);
+                        region.setCountry(country);
                         region.setName(regionNameCell.getStringCellValue().trim());
                         region.setCode(regionCodeCell.getStringCellValue());
                         regionLastCode.add(regionCodeCell.getStringCellValue());

@@ -450,7 +450,7 @@ public class StaffController {
     }
 
     @RequestMapping(value = "/country_admin", method = RequestMethod.POST)
-    @ApiOperation("create basic_details admin")
+    @ApiOperation("create country admin")
     public ResponseEntity<Map<String, Object>> createCountryAdmin(@RequestBody User user) {
         User admin = staffService.createCountryAdmin(user);
         if (admin == null) {

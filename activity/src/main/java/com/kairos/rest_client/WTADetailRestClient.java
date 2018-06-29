@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.activity.wta.country.WTABasicDetailsDTO;
+import com.kairos.activity.wta.country.WTADefaultDataInfoDTO;
 import com.kairos.util.RestClientUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class WTADetailRestClient {
 
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(false)).append("/basic_details/").append(countryId).append("/getWtaTemplateDefaultDataInfo");
+        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(false)).append("/country/").append(countryId).append("/getWtaTemplateDefaultDataInfo");
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
             };

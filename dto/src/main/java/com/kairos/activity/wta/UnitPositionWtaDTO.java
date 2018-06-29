@@ -1,7 +1,7 @@
 package com.kairos.activity.wta;
 
 
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 
 public class UnitPositionWtaDTO {
