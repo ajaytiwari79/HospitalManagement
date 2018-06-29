@@ -33,7 +33,7 @@ public class StaffDTO {
     @NotNull(message = "error.StaffDTO.teamId.notnull")
     private Long teamId;
 
-
+    private String primaryEmailAddress;
     public Long getId() {
         return id;
     }
@@ -173,6 +173,14 @@ public class StaffDTO {
 
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public String getPrimaryEmailAddress() {
+        return primaryEmailAddress;
+    }
+
+    public void setPrimaryEmailAddress(String primaryEmailAddress) {
+        this.primaryEmailAddress = primaryEmailAddress;
     }
 
     public StaffDTO() {
