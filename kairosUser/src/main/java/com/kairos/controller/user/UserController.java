@@ -31,8 +31,7 @@ public class UserController {
     @Inject
     UserService userService;
 
-    @Inject
-    StaffService staffService;
+
    /* @Inject
     TaskReportService taskReportService;*/
     /**
