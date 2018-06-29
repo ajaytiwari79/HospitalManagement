@@ -42,11 +42,11 @@ public class AttendanceSettingService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public AttendanceDTO getAttendanceSetting() {
-    AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(),DateUtils.asDate(LocalDate.now().minusDays(1)));
-    return new AttendanceDTO(attendanceSetting.getAttendanceDuration());
+        AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
+        return new AttendanceDTO(attendanceSetting.getAttendanceDuration());
     }
 
-    public AttendanceDTO updateAttendanceSetting(Long unitId,boolean checkIn) {
+    public AttendanceDTO updateAttendanceSetting(Long unitId, boolean checkIn) {
         AttendanceDTO attendanceDTO = null;
         AttendanceSetting attendanceSetting = null;
         Long userId = Long.valueOf(UserContext.getUserDetails().getId());
@@ -54,41 +54,41 @@ public class AttendanceSettingService extends MongoBaseService {
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException("message.user.staff.notfound");
         }
-
         StaffResultDTO staffId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
         if (staffId == null) {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }
+        //todo
 //        LocalDateTime chechInDateAndTime= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
 //        LocalDateTime currentDate=DateUtils.getTimezonedCurrentDate(chechInDateAndTime);
-       // ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
+        // ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
 //        if (!Optional.ofNullable(shiftQueryResults).isPresent() && unitId == null) {
 //            List<UnitIdAndNameDTO> unitIdAndName = staffAndOrganizationIds.stream().map(s -> new UnitIdAndNameDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
 //            attendanceDTO = new AttendanceDTO(unitIdAndName);
 //        } else {
 //
-            attendanceSetting = (checkIn == true) ? checkInSetting(unitId, staffId) : checkOutSetting(staffId);
-            attendanceDTO = new AttendanceDTO(attendanceSetting.getAttendanceDuration());
-            save(attendanceSetting);
+        attendanceSetting = (checkIn == true) ? checkInSetting(unitId, staffId) : checkOutSetting(staffId);
+        attendanceDTO = new AttendanceDTO(attendanceSetting.getAttendanceDuration());
+        save(attendanceSetting);
         return attendanceDTO;
     }
 
-    private AttendanceSetting checkInSetting(Long unitId,StaffResultDTO staffId ) {
+    private AttendanceSetting checkInSetting(Long unitId, StaffResultDTO staffId) {
         AttendanceSetting attendanceSetting;
-                  LocalDateTime chechInDate= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
-                AttendanceDuration attendanceDuration = new AttendanceDuration(chechInDate);
-                attendanceSetting = new AttendanceSetting(unitId, staffId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
-                return attendanceSetting;
-        }
+        LocalDateTime chechInDate = DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
+        AttendanceDuration attendanceDuration = new AttendanceDuration(chechInDate);
+        attendanceSetting = new AttendanceSetting(unitId, staffId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
+        return attendanceSetting;
+    }
 
-    private AttendanceSetting checkOutSetting(StaffResultDTO staffId){
+    private AttendanceSetting checkOutSetting(StaffResultDTO staffId) {
         AttendanceDuration duration = null;
         AttendanceSetting attendanceSetting;
         attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
             duration = attendanceSetting.getAttendanceDuration();
             if (duration.getTo() == null) {
-                LocalDateTime chechOutDate= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
+                LocalDateTime chechOutDate = DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
                 duration.setTo(chechOutDate);
             }
         }
