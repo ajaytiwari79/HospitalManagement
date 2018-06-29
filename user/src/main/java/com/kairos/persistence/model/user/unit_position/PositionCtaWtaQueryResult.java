@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

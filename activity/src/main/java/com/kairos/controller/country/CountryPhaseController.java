@@ -28,7 +28,7 @@ public class CountryPhaseController {
     private PhaseService phaseService;
 
 
-    @ApiOperation(value = "Create Phases in basic_details")
+    @ApiOperation(value = "Create Phases in country")
     @PostMapping(value = COUNTRY_URL+"/phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPhase(@PathVariable Long countryId, @RequestBody @Valid PhaseDTO phaseDTO) {
@@ -39,9 +39,9 @@ public class CountryPhaseController {
 
     /**
      * @Author vipul
-     * used to get all phases of basic_details
+     * used to get all phases of country
      */
-    @ApiOperation(value = "get All  Phases in basic_details")
+    @ApiOperation(value = "get All  Phases in country")
     @GetMapping(value = COUNTRY_URL+"/phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPhasesByCountryId(@PathVariable Long countryId) {
@@ -63,14 +63,14 @@ public class CountryPhaseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesByCountryId(countryId));
     }
 
-    @ApiOperation(value = "remove a  Phase in basic_details")
+    @ApiOperation(value = "remove a  Phase in country")
     @DeleteMapping(value = COUNTRY_URL+"/phase/{phaseId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deletePhase(@PathVariable Long countryId,@PathVariable BigInteger phaseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.deletePhase(countryId,phaseId));
     }
 
-    @ApiOperation(value = "update a  Phase in basic_details")
+    @ApiOperation(value = "update a  Phase in country")
     @PutMapping(value = COUNTRY_URL+"/phase/{phaseId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePhases(@PathVariable Long countryId,@PathVariable BigInteger phaseId,@RequestBody @Valid PhaseDTO phaseDTO) {

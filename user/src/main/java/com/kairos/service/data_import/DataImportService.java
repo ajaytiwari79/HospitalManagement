@@ -53,11 +53,11 @@ public class DataImportService {
         logger.info("Data importing from excel file,file size::" + multipartFile.getSize());
 
         List<Country> countries = countryGraphRepository.findByName("Denmark");
-        Country basic_details = null;
+        Country country = null;
         if(countries.isEmpty()){
             return;
         }
-        basic_details = countries.get(0);
+        country = countries.get(0);
 
 
         try {
@@ -192,7 +192,7 @@ public class DataImportService {
                     if (cell.getColumnIndex() == 3) {
                         organizationService = new com.kairos.user.domain.domains.organization_service.OrganizationService();
                         organizationService.setName(cell.getStringCellValue());
-                        organizationService = organizationServiceService.createOrganizationService(basic_details.getId(), organizationService);
+                        organizationService = organizationServiceService.createOrganizationService(country.getId(), organizationService);
                         name = cell.getStringCellValue();
                     }
 
@@ -203,7 +203,7 @@ public class DataImportService {
                     //organization sub service
                     if (cell.getColumnIndex() == 11) {
                         if (organizationService == null) {
-                            organizationService = organizationServiceRepository.checkDuplicateService(basic_details.getId(), name);
+                            organizationService = organizationServiceRepository.checkDuplicateService(country.getId(), name);
                         }
                         subService = new com.kairos.user.domain.domains.organization_service.OrganizationService();
                         subService.setName(cell.getStringCellValue());

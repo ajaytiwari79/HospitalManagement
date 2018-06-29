@@ -34,7 +34,7 @@ public class GenericIntegrationService {
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmployment(Long countryId) {
-        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/basic_details/" + countryId + "/employment_type_and_expertise", null), PriorityGroupDefaultData.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/" + countryId + "/employment_type_and_expertise", null), PriorityGroupDefaultData.class);
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmploymentForUnit(Long unitId) {
@@ -60,7 +60,7 @@ public class GenericIntegrationService {
     }
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypes(Long countryId) {
-        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/basic_details/" + countryId + "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/" + countryId + "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
     }
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypesAtUnit(Long unitId) {

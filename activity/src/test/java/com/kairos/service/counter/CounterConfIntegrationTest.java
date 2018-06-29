@@ -53,7 +53,7 @@ public class CounterConfIntegrationTest {
     public final String getBaseUrl(Long organizationId, Long countryId) throws Exception{
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/basic_details/").append(countryId).append("/counters/conf").toString();
+                    .append("/country/").append(countryId).append("/counters/conf").toString();
             return baseUrl;
         } else {
             exceptionService.unsupportedOperationException("message.organization.id.notnull");

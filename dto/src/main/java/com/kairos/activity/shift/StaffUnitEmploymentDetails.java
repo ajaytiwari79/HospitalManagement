@@ -1,7 +1,7 @@
 package com.kairos.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 
 /**
  * Created by vipul on 29/1/18.

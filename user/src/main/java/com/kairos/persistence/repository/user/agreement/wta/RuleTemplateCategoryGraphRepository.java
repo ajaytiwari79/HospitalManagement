@@ -94,7 +94,7 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
             "optional match(wta)-[r:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplateDTO)  detach DELETE r")
     void detachPreviousRuleTemplates(Long wtaId);*/
 
-    @Query("match(basic_details:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE_CATEGORY + "]-(ruleTemplateCategory:RuleTemplateCategory{deleted:false}) Where id(basic_details)={0} AND ruleTemplateCategory.ruleTemplateCategoryType={1} AND ruleTemplateCategory.name=~{2} AND id(ruleTemplateCategory) <> {3} \n" +
+    @Query("match(country:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE_CATEGORY + "]-(ruleTemplateCategory:RuleTemplateCategory{deleted:false}) Where id(country)={0} AND ruleTemplateCategory.ruleTemplateCategoryType={1} AND ruleTemplateCategory.name=~{2} AND id(ruleTemplateCategory) <> {3} \n" +
             "with COUNT(ruleTemplateCategory) as ruleTemplateCategoryCount return CASE WHEN ruleTemplateCategoryCount>0 THEN  true ELSE false END as response")
     boolean findByNameExcludingCurrent(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType, String name,long templateCategoryId);
 }

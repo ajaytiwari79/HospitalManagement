@@ -334,7 +334,7 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithBalanceSettings(unitId));
     }
 
-    @ApiOperation("Get all activity based on basic_details")
+    @ApiOperation("Get all activity based on country")
     @GetMapping(value = "/activities_with_time_types")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long unitId, @RequestParam Long countryId) {

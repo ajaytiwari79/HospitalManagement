@@ -90,7 +90,7 @@ public class PlannedTimeTypeIntegrationTest {
     public final String getBaseUrl(Long organizationId, Long countryId) throws Exception{
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/basic_details/").append(countryId).append("/plannedTimeType").toString();
+                    .append("/country/").append(countryId).append("/plannedTimeType").toString();
             return baseUrl;
         } else if (organizationId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/plannedTimeType").toString();

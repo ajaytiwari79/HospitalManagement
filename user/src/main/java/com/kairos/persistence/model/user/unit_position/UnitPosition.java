@@ -32,7 +32,7 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_CTA)
     private CostTimeAgreement cta;
 
-  //  @Relationship(type = HAS_WTA)
+    //  @Relationship(type = HAS_WTA)
     private BigInteger workingTimeAgreementId;
 
     @Relationship(type = HAS_POSITION_CODE)
@@ -51,7 +51,7 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_REASON_CODE)
     private ReasonCode reasonCode;
 
-    @Relationship(type =HAS_SENIORITY_LEVEL )
+    @Relationship(type = HAS_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;
 
     @Relationship(type = HAS_FUNCTION)
@@ -69,6 +69,10 @@ public class UnitPosition extends UserBaseEntity {
 
     private Double salary;
     private Long timeCareExternalId;
+    private boolean history;
+    private boolean editable;
+    @Relationship(type = PARENT_UNIT_POSITION)
+    private UnitPosition parentUnitPosition;
 
     public UnitPosition() {
     }
@@ -242,6 +246,30 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setFunctions(List<Function> functions) {
         this.functions = functions;
+    }
+
+    public boolean isHistory() {
+        return history;
+    }
+
+    public void setHistory(boolean history) {
+        this.history = history;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public UnitPosition getParentUnitPosition() {
+        return parentUnitPosition;
+    }
+
+    public void setParentUnitPosition(UnitPosition parentUnitPosition) {
+        this.parentUnitPosition = parentUnitPosition;
     }
 
     public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {

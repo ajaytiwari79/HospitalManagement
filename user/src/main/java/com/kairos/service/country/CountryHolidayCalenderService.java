@@ -189,7 +189,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
             for(int i=0;i<datesArray.length();i++){
                 dateItem = datesArray.getJSONObject(i);
                 countryHolidayCalender = countryHolidayCalenderGraphRepository.getExistingHoliday(dateItem.getString("id"),country.getId());
-                logger.info("basic_details holiday calendar is "+countryHolidayCalender);
+                logger.info("country holiday calendar is "+countryHolidayCalender);
                 if(countryHolidayCalender == null && DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")) > DateUtil.getCurrentDate().getTime()) {
                     countryHolidayCalender = new CountryHolidayCalender();
                     countryHolidayCalender.setHolidayDate(DateUtil.getIsoDateInLong(dateItem.getJSONObject("start").getString("date")));

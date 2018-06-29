@@ -93,7 +93,7 @@ public class TaskConverterService {
         callMetaData.put("teamID", task.getTeamId());
 
 
-        callMetaData.put("basic_details", task.getAddress().getCountry());
+        callMetaData.put("country", task.getAddress().getCountry());
         callMetaData.put("zip", task.getAddress().getZip().toString());
         callMetaData.put("city", task.getAddress().getCity());
         callMetaData.put("street", task.getAddress().getStreet());

@@ -46,7 +46,7 @@ public class PlanningPeriodSettingsServiceTest {
             return baseUrl;
         } else if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/basic_details/").append(countryId).toString();
+                    .append("/country/").append(countryId).toString();
             return baseUrl;
         } else if (organizationId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();

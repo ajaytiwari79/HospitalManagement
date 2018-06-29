@@ -1,8 +1,8 @@
 package com.kairos.rest_client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.wta.basic_details.WTADTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTADTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -157,7 +157,7 @@ public class WorkingTimeAgreementRestClient {
     }
 
     public Boolean makeDefaultDateForOrganization(List<Long> subTypeIds, Long unitId, Long countryId){
-        String baseUrl = getBaseUrl(false)+"/basic_details/"+countryId;
+        String baseUrl = getBaseUrl(false)+"/country/"+countryId;
         try {
             HttpEntity<List<Long>> request = new HttpEntity<>(subTypeIds);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};

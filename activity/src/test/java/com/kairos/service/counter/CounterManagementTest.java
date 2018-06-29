@@ -35,7 +35,7 @@ public class CounterManagementTest extends MongoBaseService {
 
     @Test
     public void testRestClient(){
-        String url = "http://xyz.example.com/kairos/user/api/v1/organization/349/basic_details/4/tab";
+        String url = "http://xyz.example.com/kairos/user/api/v1/organization/349/country/4/tab";
         url = "http://xyz.example.com/kairos/user/api/v1/organization/349/unit/349/access_group";
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {

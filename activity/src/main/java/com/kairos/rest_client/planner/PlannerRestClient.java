@@ -2,7 +2,7 @@ package com.kairos.rest_client.planner;
 
 import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
 import com.kairos.activity.staffing_level.StaffingLevelDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
