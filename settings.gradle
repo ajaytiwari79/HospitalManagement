@@ -17,14 +17,14 @@ include 'services:webservice'
 
 rootProject.name = 'kairos-user'
 include 'dto'
-include 'kairosUser'
-include 'kairosActivity'
-include 'kairos-planner'
-include "kairos-planner:optaplanner-shiftplanning"
-include "kairos-planner:optaplanner-taskplanning"
-include "kairos-planner:optaplanner-vrp-taskplanning"
-include "kairos-planner:responseWrapper"
-include 'kairos-gdpr'
-include 'kairos-planner:optaplanner-vrp-taskplanning'
-findProject(':kairos-planner:optaplanner-vrp-taskplanning')?.name = 'optaplanner-vrp-taskplanning'
+include 'user'
+include 'activity'
+include 'planner'
+include "planner:optaplanner-shiftplanning"
+include "planner:optaplanner-taskplanning"
+include "planner:optaplanner-vrp-taskplanning"
+include "planner:responseWrapper"
+include 'gdpr'
+include 'planner:optaplanner-vrp-taskplanning'
+findProject(':planner:optaplanner-vrp-taskplanning')?.name = 'optaplanner-vrp-taskplanning'
 
