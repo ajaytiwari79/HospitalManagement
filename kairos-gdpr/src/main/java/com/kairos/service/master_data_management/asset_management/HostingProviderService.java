@@ -33,28 +33,21 @@ public class HostingProviderService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
     public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
-        Map<String, List<HostingProvider>> result = new HashMap<>();
 
-        List<HostingProvider> newhostingProviders = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Map<String, List<HostingProvider>> result = new HashMap<>();
+        Set<String> hostingProviderNames = new HashSet<>();
         if (hostingProviders.size() != 0) {
             for (HostingProvider hostingProvider : hostingProviders) {
                 if (!StringUtils.isBlank(hostingProvider.getName())) {
-                    names.add(hostingProvider.getName());
+                    hostingProviderNames.add(hostingProvider.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingProvider> existing  = findByNamesList(countryId,organizationId,names,HostingProvider.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(hostingProvider -> {
-                    existingNames.add(hostingProvider.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-
-            if (names.size()!=0) {
-                for (String name : names) {
+            List<HostingProvider> existing  = findByNamesList(countryId,organizationId,hostingProviderNames,HostingProvider.class);
+            hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
+            List<HostingProvider> newhostingProviders = new ArrayList<>();
+            if (hostingProviderNames.size()!=0) {
+                for (String name : hostingProviderNames) {
 
                     HostingProvider newHostingProvider = new HostingProvider();
                     newHostingProvider.setName(name);

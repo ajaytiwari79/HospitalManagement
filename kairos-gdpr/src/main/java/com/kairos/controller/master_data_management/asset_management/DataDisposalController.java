@@ -36,7 +36,7 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateDTOList<DataDisposal> dataDisposals) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateDTOList<DataDisposal> dataDisposals) throws Exception {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {

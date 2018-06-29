@@ -35,26 +35,21 @@ public class DestinationService extends MongoBaseService {
     public Map<String, List<Destination>> createDestination(Long countryId, Long organizationId, List<Destination> destinations) {
 
         Map<String, List<Destination>> result = new HashMap<>();
-        List<Destination> newDestinations = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> destinationNames = new HashSet<>();
         if (destinations.size() != 0) {
             for (Destination destination : destinations) {
                 if (!StringUtils.isBlank(destination.getName())) {
-                    names.add(destination.getName());
+                    destinationNames.add(destination.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<Destination> existing = findByNamesList(countryId,organizationId,names,Destination.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(destination -> {
-                    existingNames.add(destination.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<Destination> existing = findByNamesList(countryId,organizationId,destinationNames,Destination.class);
+            destinationNames = comparisonUtils.getNameListForMetadata(existing, destinationNames);
+
+            List<Destination> newDestinations = new ArrayList<>();
+            if (destinationNames.size() != 0) {
+                for (String name : destinationNames) {
 
                     Destination newDestination = new Destination();
                     newDestination.setName(name);

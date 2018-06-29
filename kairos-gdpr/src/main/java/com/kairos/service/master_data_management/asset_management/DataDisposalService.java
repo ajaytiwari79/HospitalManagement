@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.repository.master_data_management.asset_management.DataDisposalMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -30,28 +32,23 @@ public class DataDisposalService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
-    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, Long organizationId, List<DataDisposal> dataDisposals) {
+    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, Long organizationId, List<DataDisposal> dataDisposals) throws Exception{
 
         Map<String, List<DataDisposal>> result = new HashMap<>();
-        List<DataDisposal> newDataDisposals = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> dataDisposalsNames = new HashSet<>();
         if (dataDisposals.size() != 0) {
             for (DataDisposal dataDisposal : dataDisposals) {
                 if (!StringUtils.isBlank(dataDisposal.getName())) {
-                    names.add(dataDisposal.getName());
+                    dataDisposalsNames.add(dataDisposal.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            List<DataDisposal> existing =  findByNamesList(countryId,organizationId,names,DataDisposal.class);            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(dataDisposal -> {
-                    existingNames.add(dataDisposal.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<DataDisposal> existing =  findByNamesList(countryId,organizationId,dataDisposalsNames,DataDisposal.class);
+            dataDisposalsNames = comparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
+            List<DataDisposal> newDataDisposals = new ArrayList<>();
+            if (dataDisposalsNames.size() != 0) {
+                for (String name : dataDisposalsNames) {
 
                     DataDisposal newDataDisposal = new DataDisposal();
                     newDataDisposal.setName(name);
@@ -71,6 +68,7 @@ public class DataDisposalService extends MongoBaseService {
 
 
     }
+
 
     public List<DataDisposal> getAllDataDisposal(Long countryId, Long organizationId) {
         return dataDisposalMongoRepository.findAllDataDisposals(countryId, organizationId);

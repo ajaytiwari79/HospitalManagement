@@ -34,25 +34,20 @@ public class DataSourceService extends MongoBaseService {
     public Map<String, List<DataSource>> createDataSource(Long countryId,Long organizationId,List<DataSource> dataSources) {
 
         Map<String, List<DataSource>> result = new HashMap<>();
-        Set<String> names = new HashSet<>();
+        Set<String> dataSourceNames = new HashSet<>();
         if (dataSources.size() != 0) {
             for (DataSource dataSource : dataSources) {
                 if (!StringUtils.isBlank(dataSource.getName())) {
-                    names.add(dataSource.getName());
+                    dataSourceNames.add(dataSource.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<DataSource> existing = findByNamesList(countryId,organizationId,names,DataSource.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(dataSource ->  {
-                    existingNames.add(dataSource.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
+            List<DataSource> existing = findByNamesList(countryId,organizationId,dataSourceNames,DataSource.class);
+            dataSourceNames = comparisonUtils.getNameListForMetadata(existing, dataSourceNames);
+
             List<DataSource> newDataSources = new ArrayList<>();
-            if (names.size()!=0) {
-                for (String name : names) {
+            if (dataSourceNames.size()!=0) {
+                for (String name : dataSourceNames) {
 
                     DataSource newDataSource = new DataSource();
                     newDataSource.setName(name);

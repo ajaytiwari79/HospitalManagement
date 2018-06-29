@@ -33,27 +33,21 @@ public class ResponsibilityTypeService extends MongoBaseService {
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
 
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-
-        Set<String> names = new HashSet<>();
+        Set<String> rsponsibilityTypesNames = new HashSet<>();
         if (rsponsibilityTypes.size() != 0) {
             for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    names.add(responsibilityType.getName());
+                    rsponsibilityTypesNames.add(responsibilityType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,names,ResponsibilityType.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(responsibilityType -> {
-                    existingNames.add(responsibilityType.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
+            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,rsponsibilityTypesNames,ResponsibilityType.class);
+            rsponsibilityTypesNames = comparisonUtils.getNameListForMetadata(existing, rsponsibilityTypesNames);
+
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
-            if (names.size() != 0) {
-                for (String name : names) {
+            if (rsponsibilityTypesNames.size() != 0) {
+                for (String name : rsponsibilityTypesNames) {
 
                     ResponsibilityType newResponsibilityType = new ResponsibilityType();
                     newResponsibilityType.setName(name);

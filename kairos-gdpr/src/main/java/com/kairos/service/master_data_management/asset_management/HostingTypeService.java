@@ -31,27 +31,21 @@ public class HostingTypeService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
     public Map<String, List<HostingType>> createHostingType(Long countryId,Long organizationId,List<HostingType> hostingTypes) {
+
         Map<String, List<HostingType>> result = new HashMap<>();
-        List<HostingType> existing = new ArrayList<>();
-        Set<String> names=new HashSet<>();
-        List<HostingType> newHostingTypes = new ArrayList<>();
+        Set<String> hostingTypeNames=new HashSet<>();
         if (hostingTypes.size() != 0) {
             for (HostingType hostingType : hostingTypes) {
                 if (!StringUtils.isBlank(hostingType.getName())) {
-                    names.add(hostingType.getName());
+                    hostingTypeNames.add(hostingType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            existing =  findByNamesList(countryId,organizationId,names,HostingType.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(hostingType -> {
-                    existingNames.add(hostingType.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size()!=0) {
-                for (String name : names) {
+            List<HostingType> existing =  findByNamesList(countryId,organizationId,hostingTypeNames,HostingType.class);
+            hostingTypeNames = comparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
+            List<HostingType> newHostingTypes = new ArrayList<>();
+            if (hostingTypeNames.size()!=0) {
+                for (String name : hostingTypeNames) {
 
                     HostingType newHostingType = new HostingType();
                     newHostingType.setName(name);

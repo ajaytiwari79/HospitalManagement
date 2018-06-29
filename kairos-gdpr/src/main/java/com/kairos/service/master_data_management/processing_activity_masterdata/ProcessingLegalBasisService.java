@@ -31,27 +31,23 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
     public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long countryId,Long organizationId,List<ProcessingLegalBasis> legalBases) {
+
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
-        Set<String> names = new HashSet<>();
-        List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
+        Set<String> legalBasisNames = new HashSet<>();
         if (legalBases.size() != 0) {
             for (ProcessingLegalBasis legalBasis : legalBases) {
                 if (!StringUtils.isBlank(legalBasis.getName())) {
-                    names.add(legalBasis.getName());
+                    legalBasisNames.add(legalBasis.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingLegalBasis> existing =  findByNamesList(countryId,organizationId,names,ProcessingLegalBasis.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(legalBasis -> {
-                    existingNames.add(legalBasis.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<ProcessingLegalBasis> existing =  findByNamesList(countryId,organizationId,legalBasisNames,ProcessingLegalBasis.class);
+            legalBasisNames = comparisonUtils.getNameListForMetadata(existing, legalBasisNames);
+
+            List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
+            if (legalBasisNames.size() != 0) {
+                for (String name : legalBasisNames) {
 
                     ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis();
                     newProcessingLegalBasis.setName(name);

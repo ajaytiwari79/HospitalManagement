@@ -36,26 +36,21 @@ public class ProcessingPurposeService extends MongoBaseService {
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId,Long organizationId,List<ProcessingPurpose> processingPurposes) {
 
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
-        List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> processingPurposesNames = new HashSet<>();
         if (processingPurposes.size() != 0) {
             for (ProcessingPurpose processingPurpose : processingPurposes) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
-                    names.add(processingPurpose.getName());
+                    processingPurposesNames.add(processingPurpose.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing =  findByNamesList(countryId,organizationId,names,ProcessingPurpose.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(processingPurpose -> {
-                    existingNames.add(processingPurpose.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<ProcessingPurpose> existing =  findByNamesList(countryId,organizationId,processingPurposesNames,ProcessingPurpose.class);
+            processingPurposesNames = comparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
+
+            List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
+            if (processingPurposesNames.size() != 0) {
+                for (String name : processingPurposesNames) {
 
                     ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
                     newProcessingPurpose.setName(name);

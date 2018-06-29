@@ -35,26 +35,22 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorPartys) {
+
         Map<String, List<AccessorParty>> result = new HashMap<>();
-        Set<String> names = new HashSet<>();
+        Set<String> accessorPartyNames = new HashSet<>();
         if (accessorPartys.size() != 0) {
             for (AccessorParty accessorParty : accessorPartys) {
                 if (!StringUtils.isBlank(accessorParty.getName())) {
-                    names.add(accessorParty.getName());
+                    accessorPartyNames.add(accessorParty.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<AccessorParty> existing = findByNamesList(countryId, organizationId, names, AccessorParty.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(accessorParty -> {
-                    existingNames.add(accessorParty.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
+            List<AccessorParty> existing = findByNamesList(countryId, organizationId, accessorPartyNames, AccessorParty.class);
+            accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
+
             List<AccessorParty> newAccessorPartys = new ArrayList<>();
-            if (names.size() != 0) {
-                for (String name : names) {
+            if (accessorPartyNames.size() != 0) {
+                for (String name : accessorPartyNames) {
                     AccessorParty newAccessorParty = new AccessorParty();
                     newAccessorParty.setName(name);
                     newAccessorParty.setCountryId(countryId);

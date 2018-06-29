@@ -35,25 +35,20 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, Long organizationId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
 
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
-        List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> techSecurityMeasureNames = new HashSet<>();
         if (techSecurityMeasures.size() != 0) {
             for (TechnicalSecurityMeasure technicalSecurityMeasure : techSecurityMeasures) {
                 if (!StringUtils.isBlank(technicalSecurityMeasure.getName())) {
-                    names.add(technicalSecurityMeasure.getName());
+                    techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<TechnicalSecurityMeasure> existing =  findByNamesList(countryId,organizationId,names,TechnicalSecurityMeasure.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(technicalSecurityMeasure -> {
-                    existingNames.add(technicalSecurityMeasure.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<TechnicalSecurityMeasure> existing =  findByNamesList(countryId,organizationId,techSecurityMeasureNames,TechnicalSecurityMeasure.class);
+            techSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
+
+            List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
+            if (techSecurityMeasureNames.size() != 0) {
+                for (String name : techSecurityMeasureNames) {
                     TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure();
                     newTechnicalSecurityMeasure.setName(name);
                     newTechnicalSecurityMeasure.setCountryId(countryId);

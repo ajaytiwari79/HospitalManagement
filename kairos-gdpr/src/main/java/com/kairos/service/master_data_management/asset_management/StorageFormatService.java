@@ -33,25 +33,20 @@ public class StorageFormatService extends MongoBaseService {
     public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
 
         Map<String, List<StorageFormat>> result = new HashMap<>();
-        Set<String> names = new HashSet<>();
-        List<StorageFormat> newStorageFormats = new ArrayList<>();
+        Set<String> storageFormatNames = new HashSet<>();
         if (storageFormats.size() != 0) {
             for (StorageFormat storageFormat : storageFormats) {
                 if (!StringUtils.isBlank(storageFormat.getName())) {
-                    names.add(storageFormat.getName());
+                    storageFormatNames.add(storageFormat.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<StorageFormat> existing =  findByNamesList(countryId,organizationId,names,StorageFormat.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(storageFormat -> {
-                    existingNames.add(storageFormat.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<StorageFormat> existing =  findByNamesList(countryId,organizationId,storageFormatNames,StorageFormat.class);
+            storageFormatNames = comparisonUtils.getNameListForMetadata(existing, storageFormatNames);
+
+            List<StorageFormat> newStorageFormats = new ArrayList<>();
+            if (storageFormatNames.size() != 0) {
+                for (String name : storageFormatNames) {
 
                     StorageFormat newStorageFormat = new StorageFormat();
                     newStorageFormat.setName(name);

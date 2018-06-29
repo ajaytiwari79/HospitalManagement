@@ -31,27 +31,22 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, Long organizationId, List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+
         Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
-        List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> orgSecurityMeasureNames = new HashSet<>();
         if (orgSecurityMeasures.size() != 0) {
             for (OrganizationalSecurityMeasure securityMeasure : orgSecurityMeasures) {
                 if (!StringUtils.isBlank(securityMeasure.getName())) {
-                    names.add(securityMeasure.getName());
+                    orgSecurityMeasureNames.add(securityMeasure.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            List<OrganizationalSecurityMeasure> existing = findByNamesList(countryId,organizationId,names,OrganizationalSecurityMeasure.class);
-            if (existing.size() != 0) {
-                Set<String> existingNames = new HashSet<>();
-                existing.forEach(organizationalSecurityMeasure -> {
-                    existingNames.add(organizationalSecurityMeasure.getName());
-                });
-                names = comparisonUtils.checkForExistingObjectAndRemoveFromList(names, existingNames);
-            }
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<OrganizationalSecurityMeasure> existing = findByNamesList(countryId,organizationId,orgSecurityMeasureNames,OrganizationalSecurityMeasure.class);
+            orgSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
+            List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
+            if (orgSecurityMeasureNames.size() != 0) {
+                for (String name : orgSecurityMeasureNames) {
 
                     OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure();
                     newOrganizationalSecurityMeasure.setName(name);
