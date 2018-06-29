@@ -5,8 +5,7 @@ import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.activity.web.OrganizationExternalIdsDTO;
-import com.kairos.activity.web.OrganizationTypeDTO;
+
 import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;

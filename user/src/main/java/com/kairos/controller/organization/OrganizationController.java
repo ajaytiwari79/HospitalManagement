@@ -1,7 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
-import com.kairos.activity.web.OrganizationExternalIdsDTO;
+
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;

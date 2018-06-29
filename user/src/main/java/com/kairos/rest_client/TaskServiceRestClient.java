@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.activity.task.EscalatedTasksWrapper;
-import com.kairos.activity.web.StaffAssignedTasksWrapper;
+import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
@@ -242,7 +242,7 @@ public class TaskServiceRestClient {
      * @param date
      * @return
      */
-    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long staffId,String date) {
+    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long staffId, String date) {
 
 
         final String baseUrl = getBaseUrl(true);
