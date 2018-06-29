@@ -79,7 +79,7 @@ public class ClauseService extends MongoBaseService {
         newclause.setOrganizationServices(clauseDto.getOrganizationServices());
         newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
         newclause.setOrganizationId(organizationId);
-        newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, organizationId, clauseDto.getAccountTypes()));
+        newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
         newclause.setTags(tagList);
         try {
             newclause =clauseRepository.save(newclause);
@@ -113,7 +113,7 @@ public class ClauseService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-        exists.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId, organizationId, clauseDto.getAccountTypes()));
+        exists.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId,  clauseDto.getAccountTypes()));
         try {
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());

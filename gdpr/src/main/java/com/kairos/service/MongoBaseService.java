@@ -1,5 +1,6 @@
 package com.kairos.service;
 
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.utils.DateUtils;
@@ -10,13 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.mongodb.core.query.Collation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
+
+import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
+import static com.kairos.constants.AppConstant.COUNTRY_ID;
 
 /**
  * Created by Pankaj on 12/4/17.
@@ -161,6 +166,36 @@ public class MongoBaseService {
             return null;
         }
     }
+
+
+
+    public <T extends MongoBaseEntity> List<T> findByNamesList(Long countryId, Long organizationId, Set<String> namesList, Class entity){
+
+
+
+        Assert.notNull(entity, "Entity must not be null!");
+        Assert.notEmpty(namesList, "Entity must not be Empty!");
+        Assert.notNull(countryId,"countryId must not be null");
+        Assert.notNull(organizationId,"organization Id must not be Null");
+
+        /*
+        *collection name get collection name
+        * */
+        String collectionName = entity.getClass().getSimpleName();
+
+        if (namesList.size()==0)
+        {
+            throw new InvalidRequestException("list cannt be empty");
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").in(namesList).and(ORGANIZATION_ID).is(organizationId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.find(query, entity);
+
+    }
+
 
 
 }

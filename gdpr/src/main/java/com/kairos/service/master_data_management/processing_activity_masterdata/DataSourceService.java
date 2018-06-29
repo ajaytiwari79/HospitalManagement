@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.DataSource;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.DataSourceMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,25 +27,27 @@ public class DataSourceService extends MongoBaseService {
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
 
     public Map<String, List<DataSource>> createDataSource(Long countryId,Long organizationId,List<DataSource> dataSources) {
-        Map<String, List<DataSource>> result = new HashMap<>();
 
-        List<DataSource> newDataSources = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Map<String, List<DataSource>> result = new HashMap<>();
+        Set<String> dataSourceNames = new HashSet<>();
         if (dataSources.size() != 0) {
             for (DataSource dataSource : dataSources) {
                 if (!StringUtils.isBlank(dataSource.getName())) {
-                    names.add(dataSource.getName());
+                    dataSourceNames.add(dataSource.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
+            List<DataSource> existing = findByNamesList(countryId,organizationId,dataSourceNames,DataSource.class);
+            dataSourceNames = comparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
-            List<DataSource> existing = dataSourceMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
-
-            if (names.size()!=0) {
-                for (String name : names) {
+            List<DataSource> newDataSources = new ArrayList<>();
+            if (dataSourceNames.size()!=0) {
+                for (String name : dataSourceNames) {
 
                     DataSource newDataSource = new DataSource();
                     newDataSource.setName(name);

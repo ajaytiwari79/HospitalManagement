@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,23 +28,27 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
+
     public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, Long organizationId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
 
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
-        List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> techSecurityMeasureNames = new HashSet<>();
         if (techSecurityMeasures.size() != 0) {
             for (TechnicalSecurityMeasure technicalSecurityMeasure : techSecurityMeasures) {
                 if (!StringUtils.isBlank(technicalSecurityMeasure.getName())) {
-                    names.add(technicalSecurityMeasure.getName());
+                    techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<TechnicalSecurityMeasure> existing = technicalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
+            List<TechnicalSecurityMeasure> existing =  findByNamesList(countryId,organizationId,techSecurityMeasureNames,TechnicalSecurityMeasure.class);
+            techSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
+            if (techSecurityMeasureNames.size() != 0) {
+                for (String name : techSecurityMeasureNames) {
                     TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure();
                     newTechnicalSecurityMeasure.setName(name);
                     newTechnicalSecurityMeasure.setCountryId(countryId);
