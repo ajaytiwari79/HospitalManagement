@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.user.country.basic_details.CountryDTO;
+import com.kairos.user.country.country.CountryDTO;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.user.organization.TimeSlot;
@@ -179,7 +179,7 @@ public class CountryRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service to check if basic_details exists" + e.getMessage());
+            throw new RuntimeException("exception occurred in user micro service to check if country exists" + e.getMessage());
         }
 
     }

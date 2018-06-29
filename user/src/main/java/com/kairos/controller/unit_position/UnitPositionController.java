@@ -1,7 +1,7 @@
 package com.kairos.controller.unit_position;
 
 
-import com.kairos.activity.wta.basic_details.WTADTO;
+import com.kairos.activity.wta.country.WTADTO;
 import com.kairos.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;

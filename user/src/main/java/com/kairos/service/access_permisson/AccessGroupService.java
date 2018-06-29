@@ -265,7 +265,7 @@ public class AccessGroupService extends UserBaseService {
 
 
     public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
-        // Check if access group is of basic_details
+        // Check if access group is of country
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
@@ -326,7 +326,7 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
-        // Check if access group is of basic_details
+        // Check if access group is of country
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {

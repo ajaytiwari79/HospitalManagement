@@ -28,7 +28,7 @@ public interface ZipCodeGraphRepository extends Neo4jBaseRepository<ZipCode,Long
     @Query("MATCH (m:Municipality{isEnable:true})-[:MUNICIPALITY]-(zc:ZipCode) where id(zc)={0} return m")
     List<Municipality> findMunicipByZipCode(long zipCodeId);
 
-    @Query("Match (zipCode:ZipCode{isEnable:true})-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:"+BELONGS_TO+"]->(basic_details:Country) where id(basic_details)={0} return DISTINCT { id:id(zipCode),name:zipCode.name ,zipCode:zipCode.zipCode} as result")
+    @Query("Match (zipCode:ZipCode{isEnable:true})-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:"+BELONGS_TO+"]->(country:Country) where id(country)={0} return DISTINCT { id:id(zipCode),name:zipCode.name ,zipCode:zipCode.zipCode} as result")
     List<Map<String,Object>> getAllZipCodeByCountryId(Long countryId);
 
 

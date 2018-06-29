@@ -141,7 +141,7 @@ public class PhaseService extends MongoBaseService {
     public Phase createPhaseInCountry(Long countryId, PhaseDTO phaseDTO) {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
-            logger.info("Phase already exist by sequence in basic_details" + phaseDTO.getCountryId());
+            logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
             exceptionService.dataNotFoundByIdException("message.country.phase.sequence", phaseDTO.getCountryId());
         }
         Phase phase = buildPhaseForCountry(phaseDTO);
@@ -182,7 +182,7 @@ public class PhaseService extends MongoBaseService {
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            logger.info("Phase not found in basic_details " + phaseId);
+            logger.info("Phase not found in country " + phaseId);
             exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
         }
         phase.setDeleted(true);
@@ -243,14 +243,14 @@ public class PhaseService extends MongoBaseService {
     public Phase updatePhases(Long countryId, BigInteger phaseId, PhaseDTO phaseDTO) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            logger.info("Phase not found in basic_details " + phaseId);
+            logger.info("Phase not found in country " + phaseId);
             exceptionService.dataNotFoundByIdException("message.country.phase.notfound", phaseId);
 
         }
         if (phase.getSequence() != phaseDTO.getSequence()) {
             long phaseInUse = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
             if (phaseInUse > 0) {
-                logger.info("Phase already exist by sequence in basic_details" + phaseDTO.getCountryId());
+                logger.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
                 exceptionService.duplicateDataException("message.country.phase.sequence", phaseDTO.getCountryId());
             }
         }
@@ -349,7 +349,7 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }*/
 
-    // called once when  new basic_details is registered
+    // called once when  new country is registered
     /*public void createDefaultPhasesInCountry(Long countryId) {
 //        boolean exists = countryRestClient.isCountryExists(countryId);
 //        if (!exists) {

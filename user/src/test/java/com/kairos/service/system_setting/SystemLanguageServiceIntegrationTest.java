@@ -56,7 +56,7 @@ public class SystemLanguageServiceIntegrationTest {
     @Before
     public void setUp() throws Exception {
 
-        // Fetch basic_details
+        // Fetch country
         Country country = countryService.getCountryByName("Denmark");
         countryId = country == null ? null : country.getId();
 

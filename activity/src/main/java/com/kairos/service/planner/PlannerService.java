@@ -44,7 +44,7 @@ import com.kairos.service.task_type.TaskService;
 import com.kairos.spec.TaskDaySpecification;
 import com.kairos.spec.TaskSpecification;
 import com.kairos.user.client.Client;
-import com.kairos.user.country.basic_details.CountryHolidayCalender;
+import com.kairos.user.country.country.CountryHolidayCalender;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.user.organization.skill.Skill;

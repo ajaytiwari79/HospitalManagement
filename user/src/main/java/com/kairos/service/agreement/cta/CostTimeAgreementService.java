@@ -464,12 +464,12 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public List<CTAListQueryResult> loadAllCTAByCountry(Long countryId) {
-//        Country basic_details = countryGraphRepository.findOne(countryId);
+//        Country country = countryGraphRepository.findOne(countryId);
         return  collectiveTimeAgreementGraphRepository.findCTAByCountryId(countryId);
     }
 
     public List<CTAListQueryResult> loadAllCTAByUnit(Long unitId) {
-//        Country basic_details = countryGraphRepository.findOne(countryId);
+//        Country country = countryGraphRepository.findOne(countryId);
         return  collectiveTimeAgreementGraphRepository.findCTAByUnitId(unitId);
     }
 
@@ -588,7 +588,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
-        logger.info("saving CostTimeAgreement basic_details {}",countryId);
+        logger.info("saving CostTimeAgreement country {}",countryId);
         if( collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName())){
             exceptionService.duplicateDataException("message.cta.name.alreadyExist",collectiveTimeAgreementDTO.getName() );
 

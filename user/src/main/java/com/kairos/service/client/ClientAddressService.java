@@ -125,7 +125,7 @@ public class ClientAddressService extends UserBaseService {
         response.put("temporaryAddress", temporaryAddressList);
 
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        logger.info("basic_details id----------> " + countryId);
+        logger.info("country id----------> " + countryId);
         if (countryId != null) {
             response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         } else {

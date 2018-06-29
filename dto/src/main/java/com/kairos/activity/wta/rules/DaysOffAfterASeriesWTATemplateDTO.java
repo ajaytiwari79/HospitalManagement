@@ -3,7 +3,7 @@ package com.kairos.activity.wta.rules;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
 import com.kairos.enums.WTATemplateType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

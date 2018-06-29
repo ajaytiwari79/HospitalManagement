@@ -155,7 +155,7 @@ public class OrganizationController {
                 organizationService.showCountryTagForOrganization(unitId));
     }
 
-    @ApiOperation(value = "Get Organization's basic_details Id")
+    @ApiOperation(value = "Get Organization's country Id")
     @RequestMapping(value = UNIT_URL + "/countryId", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryIdOfOrganization(@PathVariable long unitId) {
@@ -1189,7 +1189,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = UNIT_URL + "/dayTypebydate", method = RequestMethod.GET)
-    @ApiOperation("get dayType in basic_details")
+    @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long organizationId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(organizationId, date));

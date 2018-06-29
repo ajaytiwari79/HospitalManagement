@@ -694,7 +694,7 @@ public class OrganizationRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service to get check for show basic_details tags" + e.getMessage());
+            throw new RuntimeException("exception occurred in user micro service to get check for show country tags" + e.getMessage());
         }
 
     }
