@@ -8,9 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -27,9 +25,7 @@ import java.util.Map;
 public class ChatRestClient {
     private static final Logger logger = LoggerFactory.getLogger(ChatRestClient.class);
 
-    @Autowired
-    @Qualifier("schedulerRestTemplate")
-    RestTemplate restTemplate;
+
 
     @Inject
     private OrganizationService organizationService;
@@ -40,15 +36,11 @@ public class ChatRestClient {
      * @auther Vipul Pandey
      * used to register staff to chat server
      */
-    public StaffChatDetails registerUser() {
-        Map<String, String> auth = new HashMap();
-        auth.put("type", "m.login.dummy");
-        auth.put("session", "EERT345");
-        StaffChatDetails staffChatDetails = new StaffChatDetails(auth, "arvind10", "arvind@kairos");
+    public StaffChatDetails registerUser(StaffChatDetails staffChatDetails) {
         try {
-
-            HttpEntity requestEntity = new HttpEntity(staffChatDetails);
-
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity requestEntity = new HttpEntity(staffChatDetails,headers);
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             ResponseEntity<StaffChatDetails> restExchange =
