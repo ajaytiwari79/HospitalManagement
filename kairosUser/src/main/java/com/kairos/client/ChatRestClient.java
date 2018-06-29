@@ -55,11 +55,8 @@ public class ChatRestClient {
                 System.out.println(restExchange.toString());
             }
         } catch (HttpClientErrorException e) {
-
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
-
         }
         return staffChatDetails;
     }
