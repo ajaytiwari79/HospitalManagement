@@ -580,4 +580,10 @@ public class DateUtils {
         return LocalTime.MIN.plus(Duration.ofMinutes(durationInMinute));
     }
 
+    public static LocalDateTime getTimezonedCurrentDateTime(String timezone) {
+        return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDateTime();
+    }
+    public static LocalDateTime getTimezonedCurrentDate(LocalDateTime dateTime) {
+        return  LocalDateTime.of(dateTime.getYear(),dateTime.getMonth(),dateTime.getDayOfMonth(),dateTime.getHour(),dateTime.getMinute());
+    }
 }

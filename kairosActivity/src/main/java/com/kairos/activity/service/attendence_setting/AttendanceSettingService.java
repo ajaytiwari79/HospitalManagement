@@ -55,48 +55,62 @@ public class AttendanceSettingService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.user.staff.notfound");
         }
 
-        List<Long> staffIds = staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
-        ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
-        if (!Optional.ofNullable(shiftQueryResults).isPresent() && unitId == null) {
-            List<UnitIdAndNameDTO> unitIdAndName = staffAndOrganizationIds.stream().map(s -> new UnitIdAndNameDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
-            attendanceDTO = new AttendanceDTO(unitIdAndName);
-        } else {
-            attendanceSetting = (checkIn == true) ? checkInSetting(unitId, staffAndOrganizationIds, shiftQueryResults) : checkOutSetting();
+        StaffResultDTO staffId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
+        if (staffId == null) {
+            exceptionService.actionNotPermittedException("message.staff.notfound");
+        }
+//        LocalDateTime chechInDateAndTime= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
+//        LocalDateTime currentDate=DateUtils.getTimezonedCurrentDate(chechInDateAndTime);
+       // ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
+//        if (!Optional.ofNullable(shiftQueryResults).isPresent() && unitId == null) {
+//            List<UnitIdAndNameDTO> unitIdAndName = staffAndOrganizationIds.stream().map(s -> new UnitIdAndNameDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
+//            attendanceDTO = new AttendanceDTO(unitIdAndName);
+//        } else {
+//
+            attendanceSetting = (checkIn == true) ? checkInSetting(unitId, staffId) : checkOutSetting(staffId);
             attendanceDTO = new AttendanceDTO(attendanceSetting.getAttendanceDuration());
             save(attendanceSetting);
-        }
         return attendanceDTO;
     }
 
-    private AttendanceSetting checkInSetting(Long unitId,List<StaffResultDTO> staffAndOrganizationIds ,ShiftQueryResult shiftQueryResults) {
+    private AttendanceSetting checkInSetting(Long unitId,StaffResultDTO staffId ) {
         AttendanceSetting attendanceSetting;
-            if (unitId != null) {
-                StaffResultDTO staffId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
-                if (staffId == null) {
-                    exceptionService.actionNotPermittedException("message.staff.notfound");
-                }
-                ZonedDateTime currentDateByZoinId=ZonedDateTime.now(ZoneId.of(staffId.getTimeZone()));
-                AttendanceDuration attendanceDuration = new AttendanceDuration(LocalDateTime.now());
+                  LocalDateTime chechInDate= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
+                AttendanceDuration attendanceDuration = new AttendanceDuration(chechInDate);
                 attendanceSetting = new AttendanceSetting(unitId, staffId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
-            } else {
-                AttendanceDuration attendanceDuration = new AttendanceDuration(LocalDateTime.now());
-                attendanceSetting = new AttendanceSetting(shiftQueryResults.getUnitId(), shiftQueryResults.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
-            }
-        return attendanceSetting;
+                return attendanceSetting;
         }
 
-    private AttendanceSetting checkOutSetting(){
+    private AttendanceSetting checkOutSetting(StaffResultDTO staffId){
         AttendanceDuration duration = null;
         AttendanceSetting attendanceSetting;
         attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
             duration = attendanceSetting.getAttendanceDuration();
             if (duration.getTo() == null) {
-                duration.setTo(LocalDateTime.now());
+                LocalDateTime chechOutDate= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
+                duration.setTo(chechOutDate);
             }
         }
         return attendanceSetting;
     }
+//TODO
+//    private AttendanceSetting checkInSetting(Long unitId,List<StaffResultDTO> staffAndOrganizationIds ,ShiftQueryResult shiftQueryResults) {
+//        AttendanceSetting attendanceSetting;
+//        if (unitId != null) {
+//            StaffResultDTO staffId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
+//            if (staffId == null) {
+//                exceptionService.actionNotPermittedException("message.staff.notfound");
+//            }
+//            LocalDateTime chechInDateAndTime= DateUtils.getTimezonedCurrentDateTime(staffId.getTimeZone());
+//            AttendanceDuration attendanceDuration = new AttendanceDuration(LocalDateTime.now());
+//            attendanceSetting = new AttendanceSetting(unitId, staffId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
+//        } else {
+//            AttendanceDuration attendanceDuration = new AttendanceDuration(LocalDateTime.now());
+//            attendanceSetting = new AttendanceSetting(shiftQueryResults.getUnitId(), shiftQueryResults.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
+//        }
+//        return attendanceSetting;
+//    }
 
 }
 
