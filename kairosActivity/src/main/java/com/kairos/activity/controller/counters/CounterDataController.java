@@ -35,7 +35,7 @@ public class CounterDataController {
     CounterDataService counterDataService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getCounterInitialData(@RequestParam BigInteger solverConfig, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getCounterInitialData(@RequestParam BigInteger solverConfigId, @PathVariable Long unitId) {
         //TODO: TO BE MODIFIED, CURRENTLY MOCK ONLY
         /*
     return map keys( List<BigInteger> order, metaData )
@@ -49,19 +49,12 @@ public class CounterDataController {
         ArrayList<KPI> kpiList = new ArrayList<>();
 
         //CounterType.TOTAL_KM_DRIVEN_PER_DAY
-        baseChart = new SingleNumberChart(12, RepresentationUnit.DECIMAL, "Km");
-        kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_DAY.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setId(BigInteger.valueOf(1));
-        kpi.setType(CounterType.TOTAL_KM_DRIVEN_PER_DAY);
-        kpiList.add(kpi);
-
-        //CounterType.TASKS_PER_STAFF
-        baseChart = new SingleNumberChart(12, RepresentationUnit.NUMBER, "Task");
-        kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setId(BigInteger.valueOf(4));
-        kpi.setType(CounterType.TASKS_PER_STAFF);
-        kpiList.add(kpi);
-        kpiList.addAll(counterDataService.getCountersData(unitId, solverConfig));
+//        baseChart = new SingleNumberChart(12, RepresentationUnit.DECIMAL, "Km");
+//        kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_DAY.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
+//        kpi.setId(BigInteger.valueOf(1));
+//        kpi.setType(CounterType.TOTAL_KM_DRIVEN_PER_DAY);
+//        kpiList.add(kpi);
+        kpiList.addAll(counterDataService.getCountersData(unitId, solverConfigId));
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiList);
     }
