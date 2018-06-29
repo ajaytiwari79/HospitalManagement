@@ -1,17 +1,17 @@
 package com.kairos.service.organization;
 
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.activity.web.OrganizationTypeDTO;
-import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
-import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.util.DateUtil;
+import com.kairos.util.ObjectMapperUtils;
+import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
+import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
