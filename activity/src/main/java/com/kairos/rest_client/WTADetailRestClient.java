@@ -54,7 +54,7 @@ public class WTADetailRestClient {
 
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(false)).append("/basic_details/").append(countryId).append("/getWtaTemplateDefaultDataInfo");
+        StringBuffer baseUrl = new StringBuffer(RestClientUrlUtil.getBaseUrl(false)).append("/country/").append(countryId).append("/getWtaTemplateDefaultDataInfo");
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
             };

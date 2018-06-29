@@ -35,7 +35,7 @@ public class RestClientURLUtil {
             String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(id).isPresent()?id:UserContext.getUnitId())).toString();
             return baseUrl;
         }else{
-            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/basic_details/").append(id).toString();
+            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/country/").append(id).toString();
             return baseUrl;
         }
     }

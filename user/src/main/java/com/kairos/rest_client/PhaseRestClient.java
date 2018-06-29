@@ -108,7 +108,7 @@ public class PhaseRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/"+countryId+"/phase/all",
+                            baseUrl + "/country/"+countryId+"/phase/all",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

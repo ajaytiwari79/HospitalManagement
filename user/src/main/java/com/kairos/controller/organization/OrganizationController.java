@@ -581,7 +581,7 @@ public class OrganizationController {
                 organizationService.getParentOrganization(countryId));
     }
 
-    @RequestMapping(value = "/parent/{orgId}/basic_details/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
+    @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
@@ -1375,7 +1375,7 @@ public class OrganizationController {
 
 
     @ApiOperation(value = "Get Default data for Rule Template")
-    @RequestMapping(value = "/basic_details/{countryId}/rule_template/default_data", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/rule_template/default_data", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));

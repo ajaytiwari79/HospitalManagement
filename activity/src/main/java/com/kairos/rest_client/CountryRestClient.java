@@ -38,7 +38,7 @@ public class CountryRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<Object>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/contractType",
+                            baseUrl + "/country/{countryId}/contractType",
                             HttpMethod.GET,
                             null, typeReference, countryId);
 
@@ -64,7 +64,7 @@ public class CountryRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<CountryDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/organizaton_service/{organizationServiceId}",
+                            baseUrl + "/country/organizaton_service/{organizationServiceId}",
                             HttpMethod.GET,
                             null, typeReference, organizationServiceId);
 
@@ -116,7 +116,7 @@ public class CountryRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<List<Map<String,Object>>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/task_type/skills",
+                            baseUrl + "/country/{countryId}/task_type/skills",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
@@ -142,7 +142,7 @@ public class CountryRestClient {
             HttpEntity<Set> request = new HttpEntity<>(organizationSubTypes);
             ResponseEntity<RestTemplateResponseEnvelope<OrganizationTypeHierarchyQueryResult>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/organization_types/hierarchy",
+                            baseUrl + "/country/{countryId}/organization_types/hierarchy",
                             HttpMethod.POST,
                             request, typeReference,countryId);
             RestTemplateResponseEnvelope<OrganizationTypeHierarchyQueryResult> response = restExchange.getBody();
@@ -165,7 +165,7 @@ public class CountryRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}",
+                            baseUrl + "/country/{countryId}",
                             HttpMethod.GET,
                             null, typeReference, countryId);
 
@@ -215,7 +215,7 @@ public class CountryRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<List<TimeSlot>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/time_slots",
+                            baseUrl + "/country/{countryId}/time_slots",
                             HttpMethod.GET,
                             null, typeReference,countryId);
             RestTemplateResponseEnvelope<List<TimeSlot>> response = restExchange.getBody();
