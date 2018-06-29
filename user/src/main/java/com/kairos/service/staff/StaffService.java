@@ -2,8 +2,8 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.activity.web.StaffAssignedTasksWrapper;
-import com.kairos.activity.web.StaffTaskDTO;
+import com.kairos.activity.task.StaffAssignedTasksWrapper;
+import com.kairos.activity.task.StaffTaskDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.Gender;
@@ -78,6 +78,7 @@ import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
+import com.kairos.user.staff.StaffWithSkillDTO;
 import com.kairos.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.user.staff.staff.StaffChatDetails;
 import com.kairos.user.staff.staff.StaffCreationDTO;
@@ -1847,12 +1848,12 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<com.kairos.activity.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
+    public List<StaffWithSkillDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
         List<Staff> staffs = staffGraphRepository.getStaffByExperties(unitId, expertiesIds);
         List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s -> s.getId()).collect(Collectors.toList()));
-        List<com.kairos.activity.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
+        List<StaffWithSkillDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
-            com.kairos.activity.web.StaffDTO staffDTO = new com.kairos.activity.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
+            StaffWithSkillDTO staffDTO = new StaffWithSkillDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
             EmploymentUnitPositionDTO employmentUnitPositionDTO = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), true);
             List<UnitPositionQueryResult> unitPositions = employmentUnitPositionDTO.getUnitPositions();
             expertiesIds.forEach(expertiseId -> {

@@ -1,12 +1,10 @@
-package com.kairos.user.organization;
+package com.kairos.user.visitation;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.user.organization.Shifts;
 
 import java.util.List;
 
-/**
- * Created by oodles on 26/4/17.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RepetitionType {
 
