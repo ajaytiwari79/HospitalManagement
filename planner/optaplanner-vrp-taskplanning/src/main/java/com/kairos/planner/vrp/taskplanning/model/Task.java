@@ -239,6 +239,13 @@ public class Task extends TaskOrShift{
             return VrpPlanningUtil.getPreviousValidTask(this);
     }
 
+    public Task getPreviousTask() {
+        if(this.getPrevTaskOrShift() instanceof Task){
+            return (Task) this.getPrevTaskOrShift();
+        }
+        return null;
+    }
+
     public int getDrivingTime(){
         int mins=(int)Math.ceil(getDrivingTimeSeconds()/60d);
         return mins;

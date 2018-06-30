@@ -14,4 +14,3 @@ salience 22
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end
-
