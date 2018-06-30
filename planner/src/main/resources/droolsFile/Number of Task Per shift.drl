@@ -14,3 +14,5 @@ salience 21
     then
         scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
 end
+
+

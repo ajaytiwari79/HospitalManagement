@@ -18,10 +18,20 @@ salience 20
 end
 
 
-rule "Same road side tasks perference" // need to add check for one lane road
+/*
+rule "Same road side tasks perference"
 salience 22
     when
-        Task(prevTaskOrShift instanceof Task  && getFullStreetName().equals(((Task)prevTaskOrShift).getFullStreetName()) && !areHouseNumberSameLane((Task)prevTaskOrShift))
+        Task(!shiftBreak && $pt:getPreviousValidTask() && $pt!=null &&  !isOnOneWayStreet() && getFullStreetName().equals($pt.getFullStreetName()) && !areHouseNumberSameLane($pt))
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-4);
+end
+*/
+
+rule "tasks location right side preference"
+salience 22
+    when
+        Task(!shiftBreak && $pt:getPreviousValidTask() ,$pt!=null, !isOnOneWayStreet() && !isTaskLocationOnRightSide($pt))
     then
         scoreHolder.addSoftConstraintMatch(kcontext,-4);
 end

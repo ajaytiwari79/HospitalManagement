@@ -19,6 +19,34 @@ public class Constraint extends MongoBaseEntity {
     private ConstraintCategory category;
     private PlanningType planningType;
     private Long unitId;
+    private boolean constraintValueRequired;
+    private boolean penalityValueRequired;
+    private boolean disabled;
+
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean isConstraintValueRequired() {
+        return constraintValueRequired;
+    }
+
+    public void setConstraintValueRequired(boolean constraintValueRequired) {
+        this.constraintValueRequired = constraintValueRequired;
+    }
+
+    public boolean isPenalityValueRequired() {
+        return penalityValueRequired;
+    }
+
+    public void setPenalityValueRequired(boolean penalityValueRequired) {
+        this.penalityValueRequired = penalityValueRequired;
+    }
 
     public PlanningType getPlanningType() {
         return planningType;
@@ -39,12 +67,15 @@ public class Constraint extends MongoBaseEntity {
     public Constraint() {
     }
 
-    public Constraint(String name, String description, ConstraintCategory category,PlanningType planningType,Long unitId) {
+    public Constraint(String name, String description, ConstraintCategory category,PlanningType planningType,Long unitId,boolean constraintValueRequired,boolean penalityValueRequired,boolean disabled) {
         this.name = name;
         this.description = description;
         this.category = category;
         this.planningType = planningType;
         this.unitId = unitId;
+        this.constraintValueRequired = constraintValueRequired;
+        this.penalityValueRequired=penalityValueRequired;
+        this.disabled = disabled;
     }
 
     public String getName() {

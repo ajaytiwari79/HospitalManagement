@@ -7,12 +7,11 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 global HardMediumSoftLongScoreHolder scoreHolder;
 
 
-rule "Consecutive tasks if same skillSet"
+//breaks rules
+rule "Full day shifts must have breaks"
 salience 22
     when
-        $t1:Task(prevTaskOrShift!=null && !shiftBreak)
-        $t2:Task(prevTaskOrShift!=null && !shiftBreak && !id.equals($t1.id) && hasSameSkillset($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
+        Shift(isFullWorkDay()  && $brks:numberOfBreaks, $brks!=1)
     then
-        scoreHolder.addMediumConstraintMatch(kcontext,-1);
+        scoreHolder.addHardConstraintMatch(kcontext,$brks==0?-1:-$brks);
 end
-

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class VrpTaskPlanningSolver {
     public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
     public static String defaultDrl = "optaplanner-vrp-taskplanning/src/main/resources/drl/vrp_task_rules.drl";
+    public static String config_on_request = "optaplanner-vrp-taskplanning/src/main/resources/config/configuration_for_request.xml";
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     Solver<VrpTaskPlanningSolution> solver;
     SolverFactory<VrpTaskPlanningSolution> solverFactory;
@@ -35,7 +36,7 @@ public class VrpTaskPlanningSolver {
 
 
     public VrpTaskPlanningSolver(List<File> drlFileList){
-        solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
+        solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
         }
@@ -160,6 +161,7 @@ public class VrpTaskPlanningSolver {
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
+            t.setLocationsRouteMatrix(problem.getLocationsRouteMatrix());
         });
         VrpTaskPlanningSolution solution=null;
         try {
@@ -167,8 +169,8 @@ public class VrpTaskPlanningSolver {
             DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 
             director.setWorkingSolution(solution);
-//            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
-            return new Object[]{solution};
+            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            return new Object[]{solution,indictmentMap};
         }catch (Exception e){
             //e.printStackTrace();
             throw  e;

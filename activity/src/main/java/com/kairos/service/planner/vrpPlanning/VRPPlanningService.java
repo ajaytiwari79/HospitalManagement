@@ -2,13 +2,16 @@ package com.kairos.service.planner.vrpPlanning;
 
 import com.kairos.activity.task_type.TaskTypeSettingDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.solver_config.SolverConfig;
 import com.kairos.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.solver_config.ConstraintRepository;
 import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
+import com.kairos.planner.solverconfig.ConstraintDTO;
 import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.StaffRestClient;
@@ -55,10 +58,19 @@ public class VRPPlanningService extends MongoBaseService{
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private PhaseMongoRepository phaseMongoRepository;
     @Inject private ExceptionService exceptionService;
+    @Inject private ConstraintRepository constraintRepository;
 
     public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
         //createShift();
         SolverConfigDTO solverConfigDTO = solverConfigRepository.getOneById(solverConfigId);
+        List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
+        Map<BigInteger,ConstraintDTO> constraintDTOMap = constraints.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        solverConfigDTO.getConstraints().forEach(c->{
+            ConstraintDTO constraintDTO = constraintDTOMap.get(c.getId());
+            c.setCategory(constraintDTO.getCategory());
+            c.setName(constraintDTO.getName());
+            c.setDescription(constraintDTO.getDescription());
+        });
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,solverConfigDTO);
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);

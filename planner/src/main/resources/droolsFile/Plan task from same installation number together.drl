@@ -7,10 +7,11 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 global HardMediumSoftLongScoreHolder scoreHolder;
 
 
-rule "Break window"
+rule "Consecutive tasks if same skillSet"
 salience 22
     when
-        Task(isShiftBreak()  && !isBreakInWindow())
+        $t1:Task(prevTaskOrShift!=null && !shiftBreak)
+        $t2:Task(prevTaskOrShift!=null && !shiftBreak && !id.equals($t1.id) && hasSameSkillset($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end

@@ -6,12 +6,12 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 
 global HardMediumSoftLongScoreHolder scoreHolder;
 
-rule "Shift out of boundary half day"
+rule "Shift out of boundary"
 salience 21
 
     when
-        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes)
-        $ot: Integer(intValue>0) from ($minutes-330)
+        Shift( $minutes:totalPlannedMinutes,$min:totalTime)//isHalfWorkDay() &&
+        $ot: Integer(intValue>0) from ($minutes-$min)
     then
         if($ot>60){
             scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
@@ -21,6 +21,7 @@ salience 21
         }
 end
 
+/*
 rule "Shift out of boundary full day"
 salience 22
     when
@@ -34,3 +35,4 @@ salience 22
             scoreHolder.addSoftConstraintMatch(kcontext,-10);
         }
 end
+*/
