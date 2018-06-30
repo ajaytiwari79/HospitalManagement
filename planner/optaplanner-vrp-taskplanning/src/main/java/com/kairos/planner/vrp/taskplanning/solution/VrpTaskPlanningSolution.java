@@ -1,9 +1,6 @@
 package com.kairos.planner.vrp.taskplanning.solution;
 
-import com.kairos.planner.vrp.taskplanning.model.Employee;
-import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
-import com.kairos.planner.vrp.taskplanning.model.Shift;
-import com.kairos.planner.vrp.taskplanning.model.Task;
+import com.kairos.planner.vrp.taskplanning.model.*;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -30,6 +27,8 @@ public class VrpTaskPlanningSolution {
     private List<Task> tasks;
     @ProblemFactProperty
     private LocationsDistanceMatrix locationsDistanceMatrix;
+    @ProblemFactProperty
+    private LocationsRouteMatrix locationsRouteMatrix;
     @PlanningScore
     private HardMediumSoftLongScore hardMediumSoftScore;
 
@@ -99,5 +98,13 @@ public class VrpTaskPlanningSolution {
 
     public void setLocationsDistanceMatrix(LocationsDistanceMatrix locationsDistanceMatrix) {
         this.locationsDistanceMatrix = locationsDistanceMatrix;
+    }
+
+    public LocationsRouteMatrix getLocationsRouteMatrix() {
+        return locationsRouteMatrix;
+    }
+
+    public void setLocationsRouteMatrix(LocationsRouteMatrix locationsRouteMatrix) {
+        this.locationsRouteMatrix = locationsRouteMatrix;
     }
 }

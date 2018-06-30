@@ -18,8 +18,25 @@ public class TaskTypeSettingDTO {
     private String taskTypeName;
     private Long clientId;
     private int duration;
+    private TaskTypeDTO taskType;
 
+    public TaskTypeSettingDTO(BigInteger taskTypeId, String taskTypeName, Long clientId, int duration) {
+        this.taskTypeId = taskTypeId;
+        this.taskTypeName = taskTypeName;
+        this.clientId = clientId;
+        this.duration = duration;
+    }
 
+    public TaskTypeSettingDTO() {
+    }
+
+    public TaskTypeDTO getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskTypeDTO taskType) {
+        this.taskType = taskType;
+    }
 
     public int getDuration() {
         return duration;

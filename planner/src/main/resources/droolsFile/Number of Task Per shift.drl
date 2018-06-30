@@ -1,0 +1,16 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+rule "Number of Task Per shift"
+salience 21
+
+    when
+        Shift($num:numberOfTasks && $num> 20)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-($num-20));
+end

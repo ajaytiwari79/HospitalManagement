@@ -1,0 +1,16 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+
+rule "Break window"
+salience 22
+    when
+        Task(isShiftBreak()  && !isBreakInWindow())
+    then
+        scoreHolder.addMediumConstraintMatch(kcontext,-1);
+end

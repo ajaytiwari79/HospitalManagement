@@ -1,6 +1,5 @@
 package com.planner.domain.solverconfig;
 
-
 import com.kairos.enums.WTATemplateType;
 import com.planner.domain.MongoBaseEntity;
 

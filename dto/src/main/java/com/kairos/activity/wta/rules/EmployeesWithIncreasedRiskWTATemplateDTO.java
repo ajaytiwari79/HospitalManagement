@@ -1,6 +1,6 @@
 package com.kairos.activity.wta.rules;
 
-import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.WTATemplateType;
 
 public class EmployeesWithIncreasedRiskWTATemplateDTO extends WTABaseRuleTemplateDTO {
