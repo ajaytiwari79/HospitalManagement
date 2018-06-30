@@ -42,6 +42,11 @@ public class ImportController {
         tomTomService.getLocationData();
         return ResponseHandler.generateResponse("import Data sucessFully", HttpStatus.ACCEPTED);
     }
+    @RequestMapping(value = "/getRouteMatrix", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> loadRouteMatrix(@PathVariable Long unitId) {
+        tomTomService.loadRouteMatrix();
+        return ResponseHandler.generateResponse("import Data sucessFully", HttpStatus.ACCEPTED);
+    }
 
 
 }

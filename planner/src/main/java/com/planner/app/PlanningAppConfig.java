@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.planner.appConfig.UserContextInterceptor;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,8 +33,12 @@ import java.time.LocalDate;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableMongoRepositories(basePackages ={"com.planner.repository"})
 public class PlanningAppConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
+
     public static void main(String[] args) {
         //ch.qos.logback.classic.turbo.TurboFilter tf=null;
+        logger.info("just a test info log");
         SpringApplication.run(PlanningAppConfig.class, args);
     }
 
