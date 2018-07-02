@@ -43,6 +43,7 @@ import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,7 +131,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
     public ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO=new ActivityDTO(activity.getId(),activity.getName(),activity.getParentId());
-        ObjectMapperUtils.copyProperties(activity,activityDTO);
+        BeanUtils.copyProperties(activity,activityDTO);
         return activityDTO;
 
     }
