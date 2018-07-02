@@ -383,7 +383,7 @@ public class UserService extends UserBaseService {
     public UserOrganizationsDTO getLoggedInUserOrganizations() {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), currentUser.getSystemLanguage().getId());
+                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), currentUser.getUserLanguage().getId());
         return userOrganizationsDTO;
     }
 
@@ -653,10 +653,10 @@ public class UserService extends UserBaseService {
         return true;
     }
 
-    public boolean updateSystemLanguageOfUser(Long systemLanguageId){
+    public boolean updateSystemLanguageOfUser(Long userLanguageId){
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
-        currentUser.setSystemLanguage(systemLanguage);
+        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
+        currentUser.setUserLanguage(systemLanguage);
         save(currentUser);
         return true;
     }

@@ -79,8 +79,8 @@ public class User extends UserBaseEntity {
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
-    @Relationship(type= HAS_SYSTEM_LANGUAGE)
-    private SystemLanguage systemLanguage;
+    @Relationship(type= USER_LANGUAGE)
+    private SystemLanguage userLanguage;
 
     public int getOtp() {
         return otp;
@@ -470,11 +470,11 @@ public class User extends UserBaseEntity {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public SystemLanguage getSystemLanguage() {
-        return systemLanguage;
+    public SystemLanguage getUserLanguage() {
+        return userLanguage;
     }
 
-    public void setSystemLanguage(SystemLanguage systemLanguage) {
-        this.systemLanguage = systemLanguage;
+    public void setUserLanguage(SystemLanguage userLanguage) {
+        this.userLanguage = userLanguage;
     }
 }

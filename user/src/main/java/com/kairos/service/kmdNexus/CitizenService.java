@@ -8,6 +8,7 @@ import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
@@ -24,6 +25,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.user.organization.KMDTimeSlotListDTO;
 import com.kairos.user.patient.CurrentElements;
 import com.kairos.user.patient.PatientGrant;
@@ -112,6 +114,8 @@ public class CitizenService {
 
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private SystemLanguageService systemLanguageService;
     /**
      * This method is used to import Citizen from KMD Nexus.
      * @return
@@ -517,7 +521,11 @@ public class CitizenService {
 
 
         User user =  userGraphRepository.findByKmdExternalId(payload.getId());
-        if(user == null) user = new User();
+        if(user == null) {
+            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
+            user = new User();
+            user.setUserLanguage(systemLanguage);
+        }
         user.setEmail(staff.getEmail());
         user.setFirstName(staff.getFirstName());
         user.setLastName(staff.getLastName());

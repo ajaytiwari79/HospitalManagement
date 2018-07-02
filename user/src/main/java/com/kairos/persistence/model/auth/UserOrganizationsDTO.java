@@ -18,17 +18,17 @@ public class UserOrganizationsDTO {
 
     private Long lastSelectedParentOrgId;
 
-    private Long systemLangugaeId;
+    private Long userLangugaeId;
 
     public UserOrganizationsDTO(){
         // default constructor
     }
 
-    public UserOrganizationsDTO(List<OrganizationWrapper> organizations, Long lastSelectedChildOrgId, Long lastSelectedParentOrgId, Long systemLangugaeId){
+    public UserOrganizationsDTO(List<OrganizationWrapper> organizations, Long lastSelectedChildOrgId, Long lastSelectedParentOrgId, Long userLangugaeId){
         this.organizations = organizations;
         this.lastSelectedChildOrgId = lastSelectedChildOrgId;
         this.lastSelectedParentOrgId = lastSelectedParentOrgId;
-        this.systemLangugaeId = systemLangugaeId;
+        this.userLangugaeId = userLangugaeId;
     }
 
     public List<OrganizationWrapper> getOrganizations() {
@@ -55,11 +55,11 @@ public class UserOrganizationsDTO {
         this.lastSelectedParentOrgId = lastSelectedParentOrgId;
     }
 
-    public Long getSystemLangugaeId() {
-        return systemLangugaeId;
+    public Long getUserLangugaeId() {
+        return userLangugaeId;
     }
 
-    public void setSystemLangugaeId(Long systemLangugaeId) {
-        this.systemLangugaeId = systemLangugaeId;
+    public void setUserLangugaeId(Long userLangugaeId) {
+        this.userLangugaeId = userLangugaeId;
     }
 }
