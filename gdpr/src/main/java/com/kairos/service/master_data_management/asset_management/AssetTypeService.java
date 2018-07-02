@@ -33,7 +33,7 @@ public class AssetTypeService extends MongoBaseService {
 
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
-
+/*
     //Todo  if requirement is to create single asset with multiple sub asset then remove this method
     public Map<String, List<AssetType>> createAssetType(Long countryId, Long organizationId, List<AssetType> assetTypes) {
         Map<String, List<AssetType>> result = new HashMap<>();
@@ -73,14 +73,14 @@ public class AssetTypeService extends MongoBaseService {
         result.put("new", assetTypeList);
         return result;
 
-    }
+    }*/
 
 
     //Todo if requiremenet is to create single Asset type with multiple Sub asset use this
     public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, Long organizationId, AssetTypeDTO assetTypeDto) {
 
 
-        AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName().toLowerCase());
+        AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
@@ -94,7 +94,6 @@ public class AssetTypeService extends MongoBaseService {
         assetType.setName(assetTypeDto.getName());
         assetType.setCountryId(countryId);
         assetType.setOrganizationId(organizationId);
-        assetType.setNameInLowerCase(assetTypeDto.getName().toLowerCase());
         try {
             assetType = save(assetType);
         } catch (Exception e) {
@@ -119,7 +118,6 @@ public class AssetTypeService extends MongoBaseService {
             assetType.setName(subAssetTypeDto.getName());
             assetType.setSubAsset(true);
             assetType.setOrganizationId(organizationId);
-            assetType.setNameInLowerCase(subAssetTypeDto.getName().toLowerCase());
             subAssetTypes.add(assetType);
         }
         Map<String, Object> result = new HashMap<>();
@@ -156,10 +154,9 @@ public class AssetTypeService extends MongoBaseService {
         subAssetTypesList.forEach(subAssetType -> {
 
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            subAssetType.setNameInLowerCase(subAssetTypeDto.getName());
             subAssetType.setSubAsset(true);
-            subAssetType.setNameInLowerCase(subAssetTypeDto.getName().toLowerCase());
             subAssetType.setCountryId(countryId);
+            subAssetType.setOrganizationId(organizationId);
         });
         Map<String, Object> result = new HashMap<>();
         try {
@@ -205,7 +202,7 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    public AssetType updateAssetType(Long countryId, Long organizationId, BigInteger id, AssetType assetType) {
+   /* public AssetType updateAssetType(Long countryId, Long organizationId, BigInteger id, AssetType assetType) {
         AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetType.getName().toLowerCase());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
@@ -219,13 +216,12 @@ public class AssetTypeService extends MongoBaseService {
 
         }
     }
-
+*/
 
     //Todo add this method if requirement is to update Sub Asset and create new Sub Assets and Add to Asset
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
-        AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName().toLowerCase());
+        AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName());
         if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
-
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
 

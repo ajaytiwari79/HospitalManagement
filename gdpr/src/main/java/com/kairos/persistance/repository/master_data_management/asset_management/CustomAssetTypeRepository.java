@@ -5,9 +5,9 @@ import com.kairos.persistance.model.master_data_management.asset_management.Asse
 import java.util.List;
 import java.util.Set;
 
-public interface CustomStorageTypeRepository {
+public interface CustomAssetTypeRepository {
 
-    List<AssetType> getAllStorageListByNamesAndCountryList(Long countryId,String name);
+    AssetType findByName(Long countryId,Long organizationId,String name);
 
 
 }
