@@ -1,22 +1,23 @@
 package com.kairos.service.attendence_setting;
 
 import com.kairos.activity.shift.ShiftQueryResult;
+
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.response.dto.web.attendance.AttendanceDuration;
-import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.attendance.AttendanceDTO;
+import com.kairos.response.dto.web.attendance.AttendanceDurationDTO;
 import com.kairos.response.dto.web.attendance.UnitIdAndNameDTO;
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.util.DateUtils;
 import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class AttendanceSettingService extends MongoBaseService {
         if (!Optional.ofNullable(attendanceSetting).isPresent()) {
             exceptionService.actionNotPermittedException("message.attendance.notexists");
         }
-        return new AttendanceDTO(attendanceSetting.getAttendanceDuration());
+        return new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
     }
 
     public AttendanceDTO updateAttendanceSetting(Long unitId, boolean checkIn) {
@@ -56,7 +57,7 @@ public class AttendanceSettingService extends MongoBaseService {
         attendanceSetting = (checkIn == true) ? checkInAttendanceSetting(unitId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
         if(Optional.ofNullable(attendanceSetting).isPresent()) {
             save(attendanceSetting);
-            attendanceDTO = new AttendanceDTO(attendanceSetting.getAttendanceDuration());
+            attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
         } else {
             List<UnitIdAndNameDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new UnitIdAndNameDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
             attendanceDTO = new AttendanceDTO(unitIdAndNames);
@@ -103,6 +104,18 @@ public class AttendanceSettingService extends MongoBaseService {
         }
         return attendanceSetting;
     }
+
+
+    private AttendanceDurationDTO getAttendanceDTOObject(AttendanceDuration attendanceDuration){
+        AttendanceDurationDTO attendanceDurationDTO=new AttendanceDurationDTO();
+        attendanceDurationDTO.setClockInDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.getFrom()));
+        attendanceDurationDTO.setClockInTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.getFrom()));
+       if(attendanceDuration.getTo()!=null) {
+           attendanceDurationDTO.setClockOutDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.getTo()));
+           attendanceDurationDTO.setClockOutTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.getTo()));
+       }
+       return  attendanceDurationDTO;
+        }
 }
 
 

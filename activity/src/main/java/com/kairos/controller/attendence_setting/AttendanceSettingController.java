@@ -13,10 +13,11 @@ import java.util.Map;
 
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
-@Api(value = API_ORGANIZATION_UNIT_URL )
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(value = API_ORGANIZATION_URL )
 public class AttendanceSettingController {
 
     @Inject

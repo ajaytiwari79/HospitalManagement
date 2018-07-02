@@ -52,7 +52,7 @@ public class GenericIntegrationService {
     }
 
     public List<StaffUnitPositionDetails> getStaffIdAndUnitPositionId(Long unitId, List<Long> staffIds, Long expertiseId) {
-        List<StaffUnitPositionDetails> staffData = ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/expertise/{expertiseId}/staff_and_unit_positions", null, expertiseId), StaffUnitPositionDetails.class);
+        List<StaffUnitPositionDetails> staffData = ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true,IntegrationOperation.CREATE, "/expertise/{expertiseId}/staff_and_unit_positions", null, expertiseId), StaffUnitPositionDetails.class);
         return staffData;
     }
 
@@ -65,11 +65,11 @@ public class GenericIntegrationService {
     }
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypesAtUnit(Long unitId) {
-        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true,IntegrationOperation.GET, "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
     }
 
     public List<StaffResultDTO> getStaffIdsByUserId(Long userId){
-        List<StaffResultDTO> staffResultDTOS=genericRestClient.publish(null,userId,true,IntegrationOperation.GET,"/staff/get_staff_ids/user/{userId}",null,userId);
+        List<StaffResultDTO> staffResultDTOS=genericRestClient.publish(null,null,false,IntegrationOperation.GET,"/user/"+userId+"/staffs",null,userId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffResultDTOS,StaffResultDTO.class);
 
     }

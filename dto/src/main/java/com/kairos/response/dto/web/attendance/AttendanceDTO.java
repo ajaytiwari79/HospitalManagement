@@ -4,13 +4,13 @@ import java.util.List;
 
 public class AttendanceDTO {
 
-    private AttendanceDuration duration;
+    private AttendanceDurationDTO duration;
     private List<UnitIdAndNameDTO> organizationIdAndNameResults;
 
     public AttendanceDTO() {
     }
 
-    public AttendanceDTO(AttendanceDuration duration) {
+    public AttendanceDTO(AttendanceDurationDTO duration) {
         this.duration = duration;
     }
 
@@ -18,12 +18,6 @@ public class AttendanceDTO {
         this.organizationIdAndNameResults = organizationIdAndNameResults;
     }
 
-    public AttendanceDuration getDuration() {
-        return duration;
-    }
-    public void setDuration(AttendanceDuration duration) {
-        this.duration = duration;
-    }
 
     public List<UnitIdAndNameDTO> getOrganizationIdAndNameResults() {
         return organizationIdAndNameResults;
@@ -31,5 +25,13 @@ public class AttendanceDTO {
 
     public void setOrganizationIdAndNameResults(List<UnitIdAndNameDTO> organizationIdAndNameResults) {
         this.organizationIdAndNameResults = organizationIdAndNameResults;
+    }
+
+    public AttendanceDurationDTO getDuration() {
+        return duration;
+    }
+
+    public void setDuration(AttendanceDurationDTO duration) {
+        this.duration = duration;
     }
 }
