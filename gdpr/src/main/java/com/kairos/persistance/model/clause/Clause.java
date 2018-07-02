@@ -7,6 +7,10 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.JaversBaseEntity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.ShallowReference;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
@@ -15,20 +19,33 @@ import java.util.List;
 
 
 @Document(collection = "clause")
+@TypeName("clause")
 public class Clause extends JaversBaseEntity {
 
     @NotNullOrEmpty
     private String title;
     @NotNull
+    @DiffIgnore
     private List<ClauseTag> tags = new ArrayList<>();
     @NotNull
     private String description;
 
+    @DiffIgnore
     private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    @DiffIgnore
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    @DiffIgnore
     private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+    @DiffIgnore
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
+    @DiffIgnore
     private List<AccountType> accountTypes;
+
+    private Boolean isDefault = true;
+
+    public Boolean getDefault() { return isDefault; }
+
+    public void setDefault(Boolean aDefault) { isDefault = aDefault; }
 
     public String getTitle() {
         return title;

@@ -13,8 +13,13 @@ import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
+import com.kairos.service.javers.JaversCommonService;
 import com.kairos.utils.ComparisonUtils;
 import org.bson.types.ObjectId;
+import org.javers.core.Javers;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.SnapshotType;
+import org.javers.repository.jql.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +66,12 @@ public class ClauseService extends JaversBaseService {
     @Inject
     private ClauseTagMongoRepository clauseTagMongoRepository;
 
+    @Inject
+    private Javers javers;
+
+    @Inject
+    private JaversCommonService javersCommonService;
+
 
     public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) throws RepositoryException {
 
@@ -103,7 +114,7 @@ public class ClauseService extends JaversBaseService {
     public Clause updateClause(Long countryId, Long organizationId, ObjectId clauseId, ClauseDTO clauseDto) throws RepositoryException {
 
         Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
-        if (Optional.ofNullable(exists).isPresent() && !clauseId.equals(exists.getId())) {
+        if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId) ) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
         exists = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
@@ -111,7 +122,7 @@ public class ClauseService extends JaversBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-        exists.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId,  clauseDto.getAccountTypes()));
+        exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId,  clauseDto.getAccountTypes()));
         try {
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -121,14 +132,13 @@ public class ClauseService extends JaversBaseService {
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
            // jackrabbitService.clauseVersioning(clauseId, exists);
-            exists = save(exists);
+            exists = clauseRepository.save(exists);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
         return exists;
-
     }
 
 
@@ -170,6 +180,18 @@ public class ClauseService extends JaversBaseService {
     public List<String> getAllClauseVersion(BigInteger id) throws RepositoryException {
         return jackrabbitService.getClauseVersions(id);
 
+    }
+
+
+
+    public List<Map<String,Object>> getClauseVersions(String clauseId)
+    {
+
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(clauseId, Clause.class);
+        Optional<CdoSnapshot> latestSnapshot = javers.getLatestSnapshot(clauseId,Clause.class);
+        List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
+        changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
+        return javersCommonService.getHistoryOfVersions(changes);
     }
 
 

@@ -63,7 +63,6 @@ public class AccountTypeService extends JaversBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "account type ", ids.iterator().next());
         }
         return accountTypes;
-
     }
 
 

@@ -48,12 +48,6 @@ public class JaversMongoConfig {
         return JaversBuilder.javers()
                 .registerValueTypeAdapter(new ObjectIdTypeAdapter())
                 .registerJaversRepository(javersMongoRepository)
-                /* .withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
-                 .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
-                 .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
-                 .withPrettyPrint(javersProperties.isPrettyPrint())
-                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
-                 .withPackagesToScan(javersProperties.getPackagesToScan())*/
                 .build();
 
     }
