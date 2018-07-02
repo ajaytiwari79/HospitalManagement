@@ -325,7 +325,7 @@ public class UnitPositionService extends UserBaseService {
         return false;
     }
 
-    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId, String type) {
+    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId, String type, Boolean saveAsDraft) {
 
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(unitPositionDTO.getStaffId());
@@ -345,19 +345,29 @@ public class UnitPositionService extends UserBaseService {
 
         validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(unitPositionId);
-        EmploymentQueryResult employmentQueryResult = null;
-        UnitPositionQueryResult unitPositionQueryResult = null;
-        if (oldUnitPosition.isPublished() && calculativeValueChanged(oldUnitPosition, unitPositionDTO, unitPositionEmploymentTypeRelationShip)) {
-            // old unit position is published so need to create a new unit position
+        EmploymentQueryResult employmentQueryResult;
+        UnitPositionQueryResult unitPositionQueryResult;
+        Boolean calculativeValueChanged = calculativeValueChanged(oldUnitPosition, unitPositionDTO, unitPositionEmploymentTypeRelationShip);
+        /**
+         *  Old unit position is published and calculative values is changes and both options save and  published is selected
+         *  Old unit position is published so need to create a new unit position
+         **/
+        if (oldUnitPosition.isPublished() && calculativeValueChanged && !saveAsDraft) {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
-            oldUnitPosition.setEditable(false);
-            oldUnitPosition.setHistory(true);
+            oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
+            save(unitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
+        }else  if (oldUnitPosition.isPublished() && !calculativeValueChanged) {
+            // TODO make functions to update non calc value changed
+            save(oldUnitPosition);
+            unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
             // update in current copy
-
             preparePosition(oldUnitPosition, unitPositionDTO, unitPositionEmploymentTypeRelationShip);
+            if (!saveAsDraft) {
+                oldUnitPosition.setPublished(true);
+            }
             save(oldUnitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
 
