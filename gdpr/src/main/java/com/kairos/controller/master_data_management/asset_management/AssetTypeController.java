@@ -61,7 +61,7 @@ public class AssetTypeController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetType(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, organizationId, id));
 
     }
 

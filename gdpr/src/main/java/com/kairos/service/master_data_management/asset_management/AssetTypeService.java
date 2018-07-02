@@ -7,6 +7,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
 import com.kairos.persistance.repository.master_data_management.asset_management.AssetTypeMongoRepository;
+import com.kairos.response.dto.master_data.AssetTypeResponseDto;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.lang3.StringUtils;
@@ -90,6 +91,7 @@ public class AssetTypeService extends MongoBaseService {
         if (assetTypeDto.getSubAssetTypes().size() != 0) {
             subAssetTypes = createNewSubAssetTypesList(countryId, organizationId, assetTypeDto.getSubAssetTypes());
             assetType.setSubAssetTypes((List<BigInteger>) subAssetTypes.get(IDS_LIST));
+            assetType.setSubAsset(true);
         }
         assetType.setName(assetTypeDto.getName());
         assetType.setCountryId(countryId);
@@ -116,7 +118,6 @@ public class AssetTypeService extends MongoBaseService {
             AssetType assetType = new AssetType();
             assetType.setCountryId(countryId);
             assetType.setName(subAssetTypeDto.getName());
-            assetType.setSubAsset(true);
             assetType.setOrganizationId(organizationId);
             subAssetTypes.add(assetType);
         }
@@ -171,19 +172,14 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    public List<AssetType> getAllAssetType(Long countryId, Long organizationId) {
-        return assetTypeMongoRepository.findAllAssetTypes(countryId, organizationId);
+    public List<AssetTypeResponseDto> getAllAssetType(Long countryId, Long organizationId) {
+        return assetTypeMongoRepository.getAllAssetTypesWithSubAssetTypes(countryId, organizationId);
     }
 
 
-    public AssetType getAssetType(Long countryId, Long organizationId, BigInteger id) {
+    public AssetTypeResponseDto getAssetTypeById(Long countryId, Long organizationId, BigInteger id) {
+        return assetTypeMongoRepository.getAssetTypesWithSubAssetTypes(countryId, organizationId, id);
 
-        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            return exist;
-        }
     }
 
 
@@ -225,7 +221,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
 
-        exist = assetTypeMongoRepository.findByid(id);
+        exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         exist.setName(assetTypeDto.getName());
         List<AssetTypeDTO> newSubAssetTypesList = new ArrayList<>();
         List<AssetTypeDTO> updateExistingSubAssetTypes = new ArrayList<>();
