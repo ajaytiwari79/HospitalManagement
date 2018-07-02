@@ -1,22 +1,13 @@
 package com.planner.service.taskPlanningService;
 
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.planner.planninginfo.PlanningSubmissionDTO;
 import com.kairos.planner.planninginfo.PlanningSubmissonResponseDTO;
 import com.kairos.planner.solverconfig.SolverConfigDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-
-import com.kairos.planner.vrp.taskplanning.model.*;
-import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.planning.solution.TaskPlanningSolution;
-
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.planner.constants.AppConstants;
-import com.planner.domain.staff.PlanningShift;
 import com.planner.domain.taskPlanning.PlanningProblem;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.enums.PlanningStatus;
@@ -32,20 +23,16 @@ import com.planner.service.shiftPlanningService.ShiftPlanningService;
 import com.planner.service.tomtomService.TomTomService;
 import com.planner.service.vrpService.VRPGeneratorService;
 import com.planner.util.wta.FileIOUtil;
-import org.optaplanner.core.api.score.constraint.Indictment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
