@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -191,8 +192,12 @@ public class Phase extends MongoBaseEntity {
         }
 
         public static List<PhaseStatus> getListByValue(List<String> values) {
-            return values.stream().map(PhaseStatus::valueOf)
-                    .collect(Collectors.toList());
+            if(Optional.ofNullable(values).isPresent()){
+                return values.stream().map(PhaseStatus::valueOf)
+                        .collect(Collectors.toList());
+            }
+            return null;
+
         }
     }
 
