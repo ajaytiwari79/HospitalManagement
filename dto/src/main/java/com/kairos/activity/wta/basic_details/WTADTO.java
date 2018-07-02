@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.country;
+package com.kairos.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

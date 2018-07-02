@@ -2,7 +2,7 @@ package com.kairos.service.integration;
 
 
 import com.kairos.activity.wta.UnitPositionWtaDTO;
-import com.kairos.activity.wta.country.WTAResponseDTO;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.user.staff.staff.Staff;

@@ -6,6 +6,6 @@ package com.kairos.activity.enums.counter;
  */
 
 public enum ChartType {
-    NUMBER_ONLY, GAUGE
+    NUMBER_ONLY, GAUGE, PIE
     ;
 }

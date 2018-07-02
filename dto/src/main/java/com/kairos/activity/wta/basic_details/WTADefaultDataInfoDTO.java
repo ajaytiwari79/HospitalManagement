@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.country;
+package com.kairos.activity.wta.basic_details;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;

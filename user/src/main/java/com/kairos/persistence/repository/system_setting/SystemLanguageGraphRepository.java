@@ -18,6 +18,9 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
     @Query("Match (language:SystemLanguage{deleted:false}) return language")
     List<SystemLanguage> getListOfSystemLanguage();
 
+    @Query("Match (language:SystemLanguage{deleted:false}) WHERE language.active={0} return language")
+    List<SystemLanguage> getListOfSystemLanguageByActiveStatus(Boolean active);
+
     @Query("Match (language:SystemLanguage{defaultLanguage:true,deleted:false})\n" +
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
     boolean isDefaultSystemLanguageExists();
@@ -30,9 +33,15 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
     boolean isSystemLanguageSetInAnyCountry(Long syatemLanguageId);
 
+    @Query("Match (c:Country)-[:"+ HAS_SYSTEM_LANGUAGE +"]-(language:SystemLanguage) WHERE id(c)={0} return language")
+    SystemLanguage getSystemLanguageOfCountry(Long syatemLanguageId);
+
 
     @Query("Match (language:SystemLanguage{deleted:false}) WHERE lower(language.name)=lower({0})\n" +
             "RETURN language")
     SystemLanguage findSystemLanguageByName(String name);
+
+    @Query("Match (language:SystemLanguage{deleted:false}) SET language.defaultLanguage={0}")
+    void setDefaultStatusForAllLangugae(boolean defaultStatus);
 
 }
