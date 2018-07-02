@@ -1,12 +1,16 @@
 package com.kairos.response.dto.web.attendance;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AttendanceDurationDTO {
     private LocalDate clockInDate;
     private LocalDate clockOutDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime clockInTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime clockOutTime;
 
     public AttendanceDurationDTO() {
