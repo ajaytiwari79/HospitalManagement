@@ -45,14 +45,15 @@ public class CounterDataService {
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolverConfigurationForUnit(unitId, solverConfigId);
         List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
-
         List<BigInteger> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> BigInteger.valueOf(Long.parseLong(task.getShiftId()))).collect(toList());
         List<Shift> shifts = shiftService.getAllShiftByIds(shiftIds);
+
         ArrayList<KPI> kpiList = new ArrayList<>();
         kpiList.add(getTaskUnplannedKPI(vrpTaskPlanningDTO, tasks));
         kpiList.add(getTaskUnplannedHoursKPI(vrpTaskPlanningDTO));
         kpiList.add(getTasksPerStaff(vrpTaskPlanningDTO, tasks));
         kpiList.add(getTotalTaskTimeVsWorkingTime(vrpTaskPlanningDTO, shifts));
+        kpiList.add(getRoadTimePercentKPI(vrpTaskPlanningDTO, shifts));
         return kpiList;
     }
 
@@ -141,12 +142,22 @@ public class CounterDataService {
 
     private KPI prepareRoadTimePercentKPI(double roadTimePercent){
         BaseChart baseChart = new SingleNumberChart(roadTimePercent, RepresentationUnit.PERCENT, "Hours");
-        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.TOTAL_TASK_TIME_PERCENT);
+        KPI kpi = new KPI(CounterType.ROAD_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
+        kpi.setType(CounterType.ROAD_TIME_PERCENT);
         return kpi;
     }
 
-    //KPI:
+    //KPI: Total km driven per day and staff
+    public KPI getCompletedTaskWithinTimeWindowKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
+        Map<String, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(shift-> shift.getId().toString(), shift-> shift));
+        List<Long> completedTaskInstallNumber= new ArrayList<>();
+        List<Long> totalTaskInstallNumberIds = new ArrayList<>();
+        //vrpTaskPlanningDTO.getTasks().stream()
+        return prepareCompletedTaskWithinTimeWindow();
+    }
+    private KPI prepareCompletedTaskWithinTimeWindow(){
+        return null;
+    }
 
 
     //TODO: scope in future, for collecting counters metadata separatly
