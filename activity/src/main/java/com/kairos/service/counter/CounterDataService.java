@@ -9,11 +9,11 @@ import com.kairos.activity.enums.counter.ChartType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
 import com.kairos.enums.CounterType;
+import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.chart.BaseChart;
-import com.kairos.persistence.model.counter.chart.PieChart;
-import com.kairos.persistence.model.counter.chart.PieDataUnit;
+import com.kairos.persistence.model.counter.chart.*;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.vrp.vrpPlanning.TaskDTO;
@@ -39,16 +39,20 @@ public class CounterDataService {
     VRPPlanningService vrpPlanningService;
     @Inject
     TaskService taskService;
+    @Inject
+    ShiftService shiftService;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolverConfigurationForUnit(unitId, solverConfigId);
-        List<Long> escalatedInstallationNumber = vrpTaskPlanningDTO.getEscalatedTaskList().parallelStream().map(task -> task.getInstallationNumber()).collect(toList());
         List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
 
+        List<BigInteger> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> BigInteger.valueOf(Long.parseLong(task.getShiftId()))).collect(toList());
+        List<Shift> shifts = shiftService.getAllShiftByIds(shiftIds);
         ArrayList<KPI> kpiList = new ArrayList<>();
         kpiList.add(getTaskUnplannedKPI(vrpTaskPlanningDTO, tasks));
         kpiList.add(getTaskUnplannedHoursKPI(vrpTaskPlanningDTO));
         kpiList.add(getTasksPerStaff(vrpTaskPlanningDTO, tasks));
+        kpiList.add(getTotalTaskTimeVsWorkingTime(vrpTaskPlanningDTO, shifts));
         return kpiList;
     }
 
@@ -102,7 +106,7 @@ public class CounterDataService {
         return prepareTasksPerStaffKPI(staffTaskCountMap);
     }
 
-    public KPI prepareTasksPerStaffKPI(Map<String, Long> staffTaskData){
+    private KPI prepareTasksPerStaffKPI(Map<String, Long> staffTaskData){
         BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Tasks", new ArrayList());
         staffTaskData.forEach((staffName, taskCount) -> {
             ((PieChart) baseChart).getDataList().add(new PieDataUnit(String.valueOf(staffName), String.valueOf(taskCount)));
@@ -112,7 +116,38 @@ public class CounterDataService {
         return kpi;
     }
 
-    //
+    //getting total working time
+    //excluding break times and driving time for totalTaskTime
+    public KPI getTotalTaskTimeVsWorkingTime(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
+        double workingTime = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60*60);
+        double totalTaskTime = vrpTaskPlanningDTO.getTasks().parallelStream().filter(task -> !task.isBreakTime()).mapToLong(task -> task.getDuration()).sum()/(1000*60*60);
+        return prepareTaskTimeVsWorkingTime(workingTime, totalTaskTime);
+    }
+
+    private KPI prepareTaskTimeVsWorkingTime(double workingTime, double totalTaskTime){
+        BaseChart baseChart = new SingleNumberChart(totalTaskTime*100/workingTime, RepresentationUnit.PERCENT, "Hours");
+        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
+        kpi.setType(CounterType.TOTAL_TASK_TIME_PERCENT);
+        return kpi;
+    }
+
+    //KPI: ROAD_TIME_PERCENT
+    public KPI getRoadTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
+        double workingTimeMinutes = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60);
+        double totalRoadTimeMinutes=vrpTaskPlanningDTO.getTasks().stream().filter(task -> !task.isBreakTime()).mapToLong(task -> task.getDrivingTime()).sum();
+        double roadTimePercent = totalRoadTimeMinutes*100/workingTimeMinutes;
+        return prepareRoadTimePercentKPI(roadTimePercent);
+    }
+
+    private KPI prepareRoadTimePercentKPI(double roadTimePercent){
+        BaseChart baseChart = new SingleNumberChart(roadTimePercent, RepresentationUnit.PERCENT, "Hours");
+        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
+        kpi.setType(CounterType.TOTAL_TASK_TIME_PERCENT);
+        return kpi;
+    }
+
+    //KPI:
+
 
     //TODO: scope in future, for collecting counters metadata separatly
     public void getCounterMetadataForVRP(){

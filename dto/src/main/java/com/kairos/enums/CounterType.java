@@ -19,6 +19,7 @@ public enum CounterType {
     TASK_UNPLANNED_HOURS("Total hours of unplanned tasks"),
     TASKS_PER_STAFF("Tasks per staff"),
     ROAD_TIME_PERCENT("Road time in percent of working time"),
+    TOTAL_TASK_TIME_PERCENT("Total task time in percent of working time")
     //COMPLETED
 
     ;

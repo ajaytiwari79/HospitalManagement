@@ -1148,4 +1148,8 @@ public class ShiftService extends MongoBaseService {
         shiftWithActivityDTO.setShiftState(ShiftState.UNPUBLISHED);
         return shiftWithActivityDTO;
     }
+
+    public List<Shift> getAllShiftByIds(List<BigInteger> shiftIds){
+        return shiftMongoRepository.findAllByIds(shiftIds);
+    }
 }
