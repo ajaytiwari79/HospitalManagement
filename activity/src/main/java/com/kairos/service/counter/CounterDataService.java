@@ -15,6 +15,7 @@ import com.kairos.persistence.model.counter.chart.*;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
+import com.kairos.util.DateTimeInterval;
 import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.vrp.vrpPlanning.TaskDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
@@ -147,15 +148,34 @@ public class CounterDataService {
         return kpi;
     }
 
-    //KPI: Total km driven per day and staff
-    public KPI getCompletedTaskWithinTimeWindowKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
+    //KPI: Total tasks Completed
+    public KPI getCompletedTaskWithinTimeWindowKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts, List<VRPTaskDTO> tasks){
         Map<String, Shift> shiftMap = shifts.stream().collect(Collectors.toMap(shift-> shift.getId().toString(), shift-> shift));
-        List<Long> completedTaskInstallNumber= new ArrayList<>();
-        List<Long> totalTaskInstallNumberIds = new ArrayList<>();
-        //vrpTaskPlanningDTO.getTasks().stream()
-        return prepareCompletedTaskWithinTimeWindow();
+        Map<Long, List<VRPTaskDTO>> installationNumberTaskMap =tasks.stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber, toList()));
+        List<VRPTaskDTO> completedTasks= new ArrayList<>();
+        vrpTaskPlanningDTO.getTasks().forEach(task -> {
+            Shift shift = shiftMap.get(task.getShiftId());
+            DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
+            if(dateTimeInterval.containsInterval(new DateTimeInterval(task.getStartTime(), task.getEndTime())) && installationNumberTaskMap.get(task.getInstallationNumber())!=null){
+                completedTasks.addAll(installationNumberTaskMap.get(task.getInstallationNumber()));
+            }
+        });
+        return prepareCompletedTaskWithinTimeWindow(completedTasks.size());
     }
-    private KPI prepareCompletedTaskWithinTimeWindow(){
+    private KPI prepareCompletedTaskWithinTimeWindow(long completedTasksCount){
+        BaseChart baseChart = new SingleNumberChart(completedTasksCount, RepresentationUnit.NUMBER, "Tasks");
+        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHING_TIME.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
+        kpi.setType(CounterType.TASKS_COMPLETED_WITHING_TIME);
+        return kpi;
+    }
+
+    //KPI:Percent of breaks
+    
+    public KPI getYelloTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
+        return prepareYellowTimePercentKPI();
+    }
+
+    private KPI prepareYellowTimePercentKPI(){
         return null;
     }
 
