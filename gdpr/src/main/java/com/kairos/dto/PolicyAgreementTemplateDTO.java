@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -42,12 +43,11 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty(message = "Account Type cannot be empty")
-    private Set<BigInteger> accountTypes;
+    private Set<ObjectId> accountTypes;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<AgreementSection> agreementSections;
 
-    private Long countryId;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     public List<AgreementSection> getAgreementSections() {
@@ -106,20 +106,12 @@ public class PolicyAgreementTemplateDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountTypes() {
+    public Set<ObjectId> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
+    public void setAccountTypes(Set<ObjectId> accountTypes) {
         this.accountTypes = accountTypes;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public PolicyAgreementTemplateDTO() {

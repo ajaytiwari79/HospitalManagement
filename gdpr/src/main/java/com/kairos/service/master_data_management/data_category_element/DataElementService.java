@@ -4,7 +4,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataElementMognoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

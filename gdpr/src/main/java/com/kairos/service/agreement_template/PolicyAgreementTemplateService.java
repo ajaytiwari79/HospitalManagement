@@ -11,12 +11,13 @@ import com.kairos.persistance.repository.agreement_template.PolicyAgreementTempl
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
 import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDTO;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
-            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
+            Set<ObjectId> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
             Map<String, Object> sections = new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
 
@@ -143,7 +144,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
             Map<String, Object> sections = new HashMap<>();
-            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
+            Set<ObjectId> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {

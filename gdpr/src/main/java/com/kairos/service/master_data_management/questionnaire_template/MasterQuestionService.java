@@ -4,7 +4,7 @@ import com.kairos.dto.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data_management.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoClientException;
 import org.slf4j.Logger;

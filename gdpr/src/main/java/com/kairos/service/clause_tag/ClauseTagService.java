@@ -1,29 +1,26 @@
 package com.kairos.service.clause_tag;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.service.MongoBaseService;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.service.common.JaversBaseService;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ClauseTagService extends MongoBaseService {
+public class ClauseTagService extends JaversBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseTagService.class);
 
@@ -56,7 +53,7 @@ public class ClauseTagService extends MongoBaseService {
     }
 
 
-    public ClauseTag getClauseTagById(Long countryId, Long organizationId, BigInteger id) {
+    public ClauseTag getClauseTagById(Long countryId, Long organizationId, ObjectId id) {
 
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -68,7 +65,7 @@ public class ClauseTagService extends MongoBaseService {
     }
 
 
-    public Boolean deleteClauseTagById(Long countryId, Long organizationId, BigInteger id) {
+    public Boolean deleteClauseTagById(Long countryId, Long organizationId, ObjectId id) {
 
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -82,7 +79,7 @@ public class ClauseTagService extends MongoBaseService {
     }
 
 
-    public ClauseTag updateClauseTag(Long countryId,Long organizationId,BigInteger id, String clauseTag) {
+    public ClauseTag updateClauseTag(Long countryId,Long organizationId,ObjectId id, String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
         }
@@ -100,7 +97,7 @@ public class ClauseTagService extends MongoBaseService {
     public List<ClauseTag> addClauseTagAndGetClauseTagList(Long countryId, Long organizationId, List<ClauseTagDTO> tagList) {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
-        List<BigInteger> existClauseTagIds = new ArrayList<>();
+        List<ObjectId> existClauseTagIds = new ArrayList<>();
         List<String> clauseTagsName = new ArrayList<>();
         for (ClauseTagDTO tagDto : tagList) {
 
@@ -124,7 +121,7 @@ public class ClauseTagService extends MongoBaseService {
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = save(clauseTagList);
+            clauseTagList = clauseTagMongoRepository.saveAll(save(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;

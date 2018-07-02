@@ -4,6 +4,7 @@ package com.kairos.persistance.model.clause;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
+import com.kairos.persistance.model.common.JaversBaseEntity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,7 +15,7 @@ import java.util.List;
 
 
 @Document(collection = "clause")
-public class Clause extends MongoBaseEntity {
+public class Clause extends JaversBaseEntity {
 
     @NotNullOrEmpty
     private String title;
@@ -28,16 +29,6 @@ public class Clause extends MongoBaseEntity {
     private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
     private List<AccountType> accountTypes;
-
-    private Long countryId;
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 
     public String getTitle() {
         return title;
@@ -102,11 +93,13 @@ public class Clause extends MongoBaseEntity {
     public void setAccountTypes(List<AccountType> accountTypes) {
         this.accountTypes = accountTypes;
     }
-    public Clause(Long countryId,String title,String description) {
-        this.countryId=countryId;
-        this.title=title;
-        this.description=description;
+
+    public Clause(Long countryId, String title, String description) {
+        this.countryId = countryId;
+        this.title = title;
+        this.description = description;
     }
+
     public Clause() {
     }
 }

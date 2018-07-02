@@ -6,6 +6,7 @@ import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class ClauseTagController {
 
     @ApiOperation("get clauseTag by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable ObjectId id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } if (countryId == null) {
@@ -73,7 +74,7 @@ public class ClauseTagController {
 
     @ApiOperation("delete clauseTag  by id")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable ObjectId id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } if (countryId == null) {
@@ -88,7 +89,7 @@ public class ClauseTagController {
 
     @ApiOperation("update clauseTag by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestParam  String clauseTag) {
+    public ResponseEntity<Object> updateClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable ObjectId id, @RequestParam  String clauseTag) {
 
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

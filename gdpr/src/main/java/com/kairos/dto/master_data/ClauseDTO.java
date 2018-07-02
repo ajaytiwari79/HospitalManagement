@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -20,7 +21,7 @@ public class ClauseDTO {
 
 
     @NotNullOrEmpty(message = "Title cannot be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @Valid
@@ -33,26 +34,26 @@ public class ClauseDTO {
     @Valid
     @NotNull(message = "Organization  Type  can't be  null")
     @NotEmpty(message = "Organization  Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
 
     @Valid
     @NotNull(message = "Organization Sub Type  can't be  null")
     @NotEmpty(message = "Organization Sub Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationSubTypes;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
 
     @Valid
     @NotNull(message = "Service Type  can't be  null")
     @NotEmpty(message = "Service  Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationServices;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
 
     @Valid
     @NotNull(message = "Service Sub Type  can't be  null")
     @NotEmpty(message = "Service Sub Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationSubServices;
+    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty
-    private Set<BigInteger> accountTypes;
+    private Set<ObjectId> accountTypes;
 
 
     public String getTitle() {
@@ -111,11 +112,11 @@ public class ClauseDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountTypes() {
+    public Set<ObjectId> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
+    public void setAccountTypes(Set<ObjectId> accountTypes) {
         this.accountTypes = accountTypes;
     }
 }

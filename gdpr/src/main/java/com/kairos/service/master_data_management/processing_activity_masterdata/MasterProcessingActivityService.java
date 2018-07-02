@@ -6,9 +6,8 @@ import com.kairos.persistance.model.master_data_management.processing_activity_m
 import com.kairos.dto.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.userContext.UserContext;
 import com.mongodb.MongoClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

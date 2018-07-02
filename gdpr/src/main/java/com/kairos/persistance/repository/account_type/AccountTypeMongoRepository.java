@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.account_type;
 
 import com.kairos.persistance.model.account_type.AccountType;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,16 +11,16 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,BigInteger> {
+public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,ObjectId> {
 
    @Query("{deleted:false,countryId:?0,_id:?1}")
-   AccountType findByIdAndNonDeleted(Long countryId,BigInteger id);
+   AccountType findByIdAndNonDeleted(Long countryId,ObjectId id);
 
    @Query("{deleted:false,countryId:?0}")
    List<AccountType> getAllAccountType(Long countryId);
 
    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-   List<AccountType> getAccountTypeList(Long countryId,Set<BigInteger> ids);
+   List<AccountType> getAccountTypeList(Long countryId,Set<ObjectId> ids);
 
    AccountType findByid(BigInteger id);
 

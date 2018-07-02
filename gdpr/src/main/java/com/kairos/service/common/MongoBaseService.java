@@ -1,4 +1,4 @@
-package com.kairos.service;
+package com.kairos.service.common;
 
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.common.MongoBaseEntity;

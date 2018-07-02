@@ -6,28 +6,27 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.JaversBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class AccountTypeService extends MongoBaseService {
+public class AccountTypeService extends JaversBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeService.class);
 
     @Inject
     private AccountTypeMongoRepository accountTypeRepository;
 
-    @Inject
+     @Inject
     private ExceptionService exceptionService;
 
 
@@ -53,10 +52,10 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountTypeList(Long countryId, Set<BigInteger> ids) {
+    public List<AccountType> getAccountTypeList(Long countryId, Set<ObjectId> ids) {
         List<AccountType> accountTypes = accountTypeRepository.getAccountTypeList(countryId, ids);
         if (accountTypes.size() != ids.size()) {
-            Set<BigInteger> accounTypeIds = new HashSet<>();
+            Set<String> accounTypeIds = new HashSet<>();
             accountTypes.forEach(accountType -> {
                 accounTypeIds.add(accountType.getId());
             });
@@ -73,7 +72,7 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public AccountType getAccountTypeById(Long countryId, BigInteger id) {
+    public AccountType getAccountTypeById(Long countryId, ObjectId id) {
 
         AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
@@ -83,7 +82,7 @@ public class AccountTypeService extends MongoBaseService {
 
     }
 
-    public AccountType updateAccountTypeName(Long countryId,  BigInteger id, AccountType accountType) {
+    public AccountType updateAccountTypeName(Long countryId,  ObjectId id, AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByName(countryId, accountType.getName());
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
@@ -96,7 +95,7 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAccountTypeById(Long countryId, BigInteger id) {
+    public Boolean deleteAccountTypeById(Long countryId, ObjectId id) {
         AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("Account type exist for id " + id);

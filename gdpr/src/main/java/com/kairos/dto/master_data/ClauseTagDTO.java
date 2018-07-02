@@ -2,6 +2,7 @@ package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.bson.types.ObjectId;
 
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
@@ -9,17 +10,17 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseTagDTO {
 
-    private BigInteger id;
+    private ObjectId id;
 
     @NotNullOrEmpty(message = "Tag  can't be Empty")
     @Pattern(message = "numberic and Special character are not allowed in tag",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    public BigInteger getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
