@@ -9,8 +9,9 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-public interface ShiftTemplateRepository extends MongoBaseRepository<ShiftTemplate,BigInteger> {
-    List<ShiftTemplate> findAllByUnitIdAndCreatedByAndDeletedFalse(Long unitId, Long userId);
+public interface ShiftTemplateRepository extends MongoBaseRepository<ShiftTemplate,BigInteger>,CustomShitTemplateRepository {
+
+    List<ShiftTemplate> findAllByUnitIdAndCreatedByAndDeletedFalse(Long unitId, Long createdBy);
     @Query("{deleted:false,id:?0}")
     ShiftTemplate findOneById(BigInteger id);
 }

@@ -219,8 +219,8 @@ public class ShiftService extends MongoBaseService {
         save(mainShift);
         ShiftQueryResult shiftQueryResult = mainShift.getShiftQueryResult();
         shiftQueryResult.setSubShifts(shiftQueryResults);
-        timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
-        payOutService.savePayOut(mainShift.getUnitPositionId(), mainShift);
+//        timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
+//        payOutService.savePayOut(mainShift.getUnitPositionId(), mainShift);
 
 
         //anil m2 notify event for updating staffing level
@@ -1120,8 +1120,15 @@ public class ShiftService extends MongoBaseService {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
         List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
         List<ShiftQueryResult> shifts = new ArrayList<>();
-        individualShiftTemplate.forEach(shiftTemplate1 -> {
-            ShiftDTO shiftDTO1 = new ShiftDTO(shiftTemplate1.getActivityId(), unitId, shiftDTO.getStaffId(), shiftDTO.getUnitPositionId(), shiftDTO.getStartLocalDate(), shiftDTO.getEndLocalDate(), shiftTemplate1.getStartTime(), shiftTemplate1.getEndTime());
+        individualShiftTemplate.forEach(individualShiftTemplate1 -> {
+            List<ShiftDTO> subShifts=null;
+            if(individualShiftTemplate1.getSubShiftIds().size()>0){
+                List<IndividualShiftTemplate> individualSubShiftTemplates=individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(individualShiftTemplate1.getSubShiftIds());
+                subShifts=ObjectMapperUtils.copyProperties(individualSubShiftTemplates,ShiftDTO.class);
+                subShifts.forEach(shiftDTO1 -> {shiftDTO1.setId(null);});
+            }
+            ShiftDTO shiftDTO1 = new ShiftDTO(individualShiftTemplate1.getActivityId(), unitId, shiftDTO.getStaffId(), shiftDTO.getUnitPositionId(), shiftDTO.getStartLocalDate(), shiftDTO.getEndLocalDate(), individualShiftTemplate1.getStartTime(), individualShiftTemplate1.getEndTime());
+            shiftDTO1.setSubShifts(subShifts);
             List<ShiftQueryResult> shiftResponse = createShift(unitId, shiftDTO1, "Organization", false);
             shifts.add(shiftResponse.get(0));
         });

@@ -23,6 +23,8 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
 
 
 
+
+
     public String getName() {
         return name;
     }

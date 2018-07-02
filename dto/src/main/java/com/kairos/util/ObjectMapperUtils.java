@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -151,6 +152,19 @@ public class ObjectMapperUtils {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
+    }
+
+    public static <T,E extends Object> List<E> copyPropertiesUsingIgnoreProperties(List<T> objects1,Class className,String ...strings) {
+        List<E> objects = new ArrayList<>();
+        for (int i = 0; i < objects1.size(); i++) {
+            try {
+                E e = (E) className.newInstance();
+                BeanUtils.copyProperties(e,objects1.get(i),strings);
+                objects.add(e);
+            } catch (IllegalAccessException  |InstantiationException e) {
+            }
+        }
+        return objects;
     }
 
 
