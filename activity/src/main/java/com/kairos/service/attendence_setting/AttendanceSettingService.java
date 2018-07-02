@@ -30,7 +30,7 @@ public class AttendanceSettingService extends MongoBaseService {
     private AttendanceSettingRepository attendanceSettingRepository;
 
     @Inject
-    private GenericIntegrationService restClient;
+    private GenericIntegrationService genericIntegrationService;
 
     @Inject
     private ShiftService shiftService;
@@ -50,7 +50,7 @@ public class AttendanceSettingService extends MongoBaseService {
         AttendanceDTO attendanceDTO = null;
         AttendanceSetting attendanceSetting = null;
         Long userId = Long.valueOf(UserContext.getUserDetails().getId());
-        List<StaffResultDTO> staffAndOrganizationIds = restClient.getStaffIdsByUserId(userId);
+        List<StaffResultDTO> staffAndOrganizationIds = genericIntegrationService.getStaffIdsByUserId(userId);
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }

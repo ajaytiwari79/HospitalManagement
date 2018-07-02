@@ -2085,7 +2085,7 @@ public class StaffService extends UserBaseService {
     }
 
     public List<StaffResultDTO> getStaffIdsByUserId(Long UserId){
-        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffEmploymentByUserId(UserId);
+        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserId(UserId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers,StaffResultDTO.class);
     }
 

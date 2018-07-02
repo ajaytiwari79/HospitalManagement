@@ -501,5 +501,5 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
             "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone")
-    List<StaffTimezoneQueryResult> getStaffEmploymentByUserId(Long id);
+    List<StaffTimezoneQueryResult> getStaffAndUnitTimezoneByUserId(Long id);
 }

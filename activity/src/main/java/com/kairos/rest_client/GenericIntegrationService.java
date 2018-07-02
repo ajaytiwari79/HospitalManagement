@@ -69,7 +69,7 @@ public class GenericIntegrationService {
     }
 
     public List<StaffResultDTO> getStaffIdsByUserId(Long userId){
-        List<StaffResultDTO> staffResultDTOS=genericRestClient.publish(null,null,false,IntegrationOperation.GET,"/user/"+userId+"/staffs",null,userId);
+        List<StaffResultDTO> staffResultDTOS=genericRestClient.publish(null,null,false,IntegrationOperation.GET,"/user/{userId}/staffs",null,userId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffResultDTOS,StaffResultDTO.class);
 
     }
