@@ -1,6 +1,7 @@
 package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.open_shift.DurationField;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.activity.tabs.RulesActivityTab;
 
@@ -33,6 +34,11 @@ public class RulesActivityTabDTO {
     private Integer shortestTime;
     private Integer longestTime;
     private boolean eligibleForCopy;
+
+    private DurationField plannedTimeInAdvance;
+    private boolean approvalRequired;
+    private DurationField approvalTimeInAdvance;
+    private boolean approvalPercentageRequired;
 
 
     public boolean isEligibleForStaffingLevel() {
@@ -67,7 +73,7 @@ public class RulesActivityTabDTO {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy);
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalRequired,approvalTimeInAdvance,approvalPercentageRequired);
 
 
         return rulesActivityTab;
@@ -203,4 +209,36 @@ public class RulesActivityTabDTO {
     public void setEligibleForCopy(boolean eligibleForCopy) {
         this.eligibleForCopy = eligibleForCopy;
         }
+
+    public DurationField getPlannedTimeInAdvance() {
+        return plannedTimeInAdvance;
+    }
+
+    public void setPlannedTimeInAdvance(DurationField plannedTimeInAdvance) {
+        this.plannedTimeInAdvance = plannedTimeInAdvance;
+    }
+
+    public boolean isApprovalRequired() {
+        return approvalRequired;
+    }
+
+    public void setApprovalRequired(boolean approvalRequired) {
+        this.approvalRequired = approvalRequired;
+    }
+
+    public DurationField getApprovalTimeInAdvance() {
+        return approvalTimeInAdvance;
+    }
+
+    public void setApprovalTimeInAdvance(DurationField approvalTimeInAdvance) {
+        this.approvalTimeInAdvance = approvalTimeInAdvance;
+    }
+
+    public boolean isApprovalPercentageRequired() {
+        return approvalPercentageRequired;
+    }
+
+    public void setApprovalPercentageRequired(boolean approvalPercentageRequired) {
+        this.approvalPercentageRequired = approvalPercentageRequired;
+    }
 }

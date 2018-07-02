@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.activity.open_shift.DurationField;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,10 @@ public class RulesActivityTab implements Serializable{
     private Integer shortestTime;
     private Integer longestTime;
     private boolean eligibleForCopy;
+    private DurationField plannedTimeInAdvance;
+    private boolean approvalRequired;
+    private DurationField approvalTimeInAdvance;
+    private boolean approvalPercentageRequired;
 
 
     public boolean isEligibleForStaffingLevel() {
@@ -83,7 +89,7 @@ public class RulesActivityTab implements Serializable{
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
 
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy) {
+    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,boolean approvalRequired,DurationField approvalTimeInAdvance,boolean approvalPercentageRequired) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -103,6 +109,11 @@ public class RulesActivityTab implements Serializable{
         this.shortestTime = shortestTime;
         this.longestTime = longestTime;
         this.eligibleForCopy=eligibleForCopy;
+        this.plannedTimeInAdvance=plannedTimeInAdvance;
+        this.approvalRequired=approvalRequired;
+        this.approvalTimeInAdvance=approvalTimeInAdvance;
+        this.approvalPercentageRequired=approvalPercentageRequired;
+
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -225,4 +236,36 @@ public class RulesActivityTab implements Serializable{
     public void setEligibleForCopy(boolean eligibleForCopy) {
         this.eligibleForCopy = eligibleForCopy;
         }
+
+    public DurationField getPlannedTimeInAdvance() {
+        return plannedTimeInAdvance;
+    }
+
+    public void setPlannedTimeInAdvance(DurationField plannedTimeInAdvance) {
+        this.plannedTimeInAdvance = plannedTimeInAdvance;
+    }
+
+    public boolean isApprovalRequired() {
+        return approvalRequired;
+    }
+
+    public void setApprovalRequired(boolean approvalRequired) {
+        this.approvalRequired = approvalRequired;
+    }
+
+    public DurationField getApprovalTimeInAdvance() {
+        return approvalTimeInAdvance;
+    }
+
+    public void setApprovalTimeInAdvance(DurationField approvalTimeInAdvance) {
+        this.approvalTimeInAdvance = approvalTimeInAdvance;
+    }
+
+    public boolean isApprovalPercentageRequired() {
+        return approvalPercentageRequired;
+    }
+
+    public void setApprovalPercentageRequired(boolean approvalPercentageRequired) {
+        this.approvalPercentageRequired = approvalPercentageRequired;
+    }
 }
