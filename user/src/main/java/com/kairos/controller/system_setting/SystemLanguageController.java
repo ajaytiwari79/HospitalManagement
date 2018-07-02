@@ -8,10 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -27,39 +24,46 @@ public class SystemLanguageController {
     @Inject
     private SystemLanguageService systemLanguageService;
 
-    @RequestMapping(value = "/system_language", method = RequestMethod.POST)
+    @PostMapping(value = "/system_language")
     @ApiOperation("To add System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addSystemLanguage(@RequestBody SystemLanguageDTO systemLanguageDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.addSystemLanguage(systemLanguageDTO));
     }
 
-    @RequestMapping(value = "/system_language/{systemLanguageId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/system_language/{systemLanguageId}")
     @ApiOperation("To update System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateSystemLanguage(@RequestBody SystemLanguageDTO systemLanguageDTO, @PathVariable Long systemLanguageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateSystemLanguage(systemLanguageId,systemLanguageDTO));
     }
 
-    @RequestMapping(value = "/system_language", method = RequestMethod.GET)
+    @GetMapping(value = "/system_language")
     @ApiOperation("To fetch System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getSystemLanguage() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.getListOfSystemLanguage());
+    public ResponseEntity<Map<String, Object>> getSystemLanguage(@RequestParam(value = "active",required=false) Boolean active) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.getListOfSystemLanguage(active));
     }
 
-    @RequestMapping(value = "/system_language/{systemLanguageId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/system_language/{systemLanguageId}")
     @ApiOperation("To delete System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteSystemLanguage(@PathVariable Long systemLanguageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.deleteSystemLanguage(systemLanguageId));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/system_language/{systemLanguageId}", method = RequestMethod.PUT)
+    @PutMapping(value = COUNTRY_URL + "/system_language/{systemLanguageId}")
     @ApiOperation("To update System Language of Country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateSystemLanguageOfCountry(@PathVariable Long countryId, @PathVariable Long systemLanguageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateSystemLanguageOfCountry(countryId, systemLanguageId));
+    }
+
+    @GetMapping(value = COUNTRY_URL + "/system_language" )
+    @ApiOperation("To get System Language of Country")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getSystemLanguageOfCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.getSystemLanguageOfCountry(countryId));
     }
 
 

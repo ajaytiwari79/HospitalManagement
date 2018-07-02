@@ -17,6 +17,7 @@ import java.util.List;
 public interface SolverConfigRepository extends MongoBaseRepository<SolverConfig,BigInteger>, CustomSolverConfigRepository{
 
 
+
     @Query("{unitId:?0,deleted:false}")
     List<SolverConfigDTO> getAllByUnitId(Long unitId);
 

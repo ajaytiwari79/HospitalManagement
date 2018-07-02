@@ -2,7 +2,7 @@ package com.kairos.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
-import com.kairos.activity.wta.country.WTAResponseDTO;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.user.country.experties.AppliedFunctionDTO;
 import com.kairos.user.staff.staff.Staff;
 

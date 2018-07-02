@@ -1,37 +1,81 @@
 package com.kairos.utils;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import javax.inject.Inject;
+import java.lang.reflect.Method;
+import java.util.*;
 
 @Component
 public class ComparisonUtils {
 
 
-    public void checkOrgTypeAndService(Set<Long> ids, List<OrganizationTypeAndServiceBasicDTO> orgTypesAndServices) {
+    @Inject
+    private MongoTemplate mongoTemplate;
 
-        Set<Long> orgTypeAndServiceIds = new HashSet<>();
-        if (ids.size() != orgTypesAndServices.size()) {
-            for (OrganizationTypeAndServiceBasicDTO result : orgTypesAndServices) {
-                orgTypeAndServiceIds.add(result.getId());
-            }
-            Set<Long> differences = difference(ids, orgTypeAndServiceIds);
-            throw new DataNotFoundByIdException("data for id " + differences.iterator().next() + "not exist");
+    public Set<String> checkForExistingObjectAndRemoveFromList(Set<String> namesList, Set<String> existingNames) {
+
+        Assert.notEmpty(existingNames, "Entity must Not be Empty");
+        Assert.notEmpty(namesList, "Entity must Not be Empty");
+        Map<String, String> existingNamesMapData = new HashMap<>();
+
+        if (existingNames.size() == 0) {
+            return namesList;
         }
+        existingNames.forEach(s -> {
 
+            existingNamesMapData.put(s.toLowerCase(), s);
 
+        });
+        Set<String> newNamesList = new HashSet<>();
+        namesList.forEach(name -> {
+            if (!Optional.ofNullable(existingNamesMapData.get(name.toLowerCase())).isPresent()) {
+                newNamesList.add(name);
+            }
+        });
+        return newNamesList;
     }
 
 
+    public <T> Set<String> getNameListForMetadata(List<T> existingObject, Set<String> namesList) {
 
-    public Set<Long> difference(final Set<Long> set1, final Set<Long> set2) {
-        final Set<Long> larger = set1.size() > set2.size() ? set1 : set2;
-        final Set<Long> smaller = larger.equals(set1) ? set2 : set1;
-        return larger.stream().filter(n -> !smaller.contains(n)).collect(Collectors.toSet());
+        if (existingObject.size() == 0) {
+            return namesList;
+        } else {
+            Map<String, String> existingNamesMapData = new HashMap<>();
+            List<String> existingNames = new ArrayList<>();
+
+            Assert.notEmpty(existingObject, "Entity must Not be Empty");
+            Assert.notEmpty(namesList, "Entity must Not be Empty");
+
+            try {
+                Class c = Class.forName(existingObject.get(0).getClass().getName());
+                String methodName = "getName";
+
+                Method getNameMethod = c.getMethod(methodName);
+                for (T object : existingObject) {
+                    existingNames.add((String) getNameMethod.invoke(object));
+                }
+            }
+             catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            existingNames.forEach(s -> {
+                existingNamesMapData.put(s.toLowerCase(), s);
+
+            });
+            Set<String> newNamesList = new HashSet<>();
+            namesList.forEach(name -> {
+                if (!Optional.ofNullable(existingNamesMapData.get(name.toLowerCase())).isPresent()) {
+                    newNamesList.add(name);
+                }
+            });
+            return newNamesList;
+        }
     }
+
 }

@@ -1,6 +1,5 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
-import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
@@ -86,9 +85,9 @@ public class ShiftEndTimeListener implements VariableListener<TaskOrShift> {
     }
 
     private void updateShiftStartEndTime(Shift shift, LocalDateTime lastTaskEndTime, ScoreDirector scoreDirector) {
-        scoreDirector.beforeVariableChanged(shift,"endTime");
-        shift.setEndTime(lastTaskEndTime);
-        scoreDirector.afterVariableChanged(shift,"endTime");
+        scoreDirector.beforeVariableChanged(shift,"plannedEndTime");
+        shift.setPlannedEndTime(lastTaskEndTime);
+        scoreDirector.afterVariableChanged(shift,"plannedEndTime");
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data_management.asset_management.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,23 +27,26 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     @Inject
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, Long organizationId, List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
+
         Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();
-        List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> orgSecurityMeasureNames = new HashSet<>();
         if (orgSecurityMeasures.size() != 0) {
             for (OrganizationalSecurityMeasure securityMeasure : orgSecurityMeasures) {
                 if (!StringUtils.isBlank(securityMeasure.getName())) {
-                    names.add(securityMeasure.getName());
+                    orgSecurityMeasureNames.add(securityMeasure.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            List<OrganizationalSecurityMeasure> existing = organizationalSecurityMeasureMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<OrganizationalSecurityMeasure> existing = findByNamesList(countryId,organizationId,orgSecurityMeasureNames,OrganizationalSecurityMeasure.class);
+            orgSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
+            List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
+            if (orgSecurityMeasureNames.size() != 0) {
+                for (String name : orgSecurityMeasureNames) {
 
                     OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure();
                     newOrganizationalSecurityMeasure.setName(name);
