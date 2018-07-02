@@ -46,7 +46,7 @@ public class PlanningAppConfig {
 
     public static void main(String[] args) {
         //ch.qos.logback.classic.turbo.TurboFilter tf=null;
-        logger.info("drool files path "+new File(AppConstants.DROOL_BASE_FILE).exists());
+        logger.info("drool files path "+new File(AppConstants.DROOL_FILES_PATH).exists());
 
         SpringApplication.run(PlanningAppConfig.class, args);
     }
