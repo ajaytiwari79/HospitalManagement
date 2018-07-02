@@ -1083,7 +1083,7 @@ public class StaffService extends UserBaseService {
         }
 
         // Set default language of User
-        Long countryId = organizationGraphRepository.getCountryId(parent.getId());
+        Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId );
         SystemLanguage  systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
         staff = createStaffObject(parent, unit, payload);
