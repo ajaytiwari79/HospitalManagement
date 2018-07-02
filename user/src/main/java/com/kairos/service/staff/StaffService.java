@@ -961,7 +961,7 @@ public class StaffService extends UserBaseService {
             organization = organizations.get(0);
         }
         if (organization != null) {
-            Employment employment = new Employment("working as basic_details admin", adminAsStaff);
+            Employment employment = new Employment("working as country admin", adminAsStaff);
             organization.getEmployments().add(employment);
             organizationGraphRepository.save(organization);
 
@@ -2073,7 +2073,7 @@ public class StaffService extends UserBaseService {
         auth.put("type", "m.login.dummy");
         auth.put("session", staff.getEmail());
         StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName() + "@kairos");
-        StaffChatDetails chatDetails = chatRestClient.registerUser();
+        StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
         staff.setAccess_token(chatDetails.getAccess_token());
         staff.setUser_id(chatDetails.getUser_id());
     }

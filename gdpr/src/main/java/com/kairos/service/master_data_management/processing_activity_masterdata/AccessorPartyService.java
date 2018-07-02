@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data_management.processing_activity_m
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.AccessorPartyMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,23 +30,27 @@ public class AccessorPartyService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
 
     public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorPartys) {
+
         Map<String, List<AccessorParty>> result = new HashMap<>();
-        List<AccessorParty> newAccessorPartys = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> accessorPartyNames = new HashSet<>();
         if (accessorPartys.size() != 0) {
             for (AccessorParty accessorParty : accessorPartys) {
                 if (!StringUtils.isBlank(accessorParty.getName())) {
-                    names.add(accessorParty.getName());
+                    accessorPartyNames.add(accessorParty.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<AccessorParty> existing = accessorPartyMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
+            List<AccessorParty> existing = findByNamesList(countryId, organizationId, accessorPartyNames, AccessorParty.class);
+            accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<AccessorParty> newAccessorPartys = new ArrayList<>();
+            if (accessorPartyNames.size() != 0) {
+                for (String name : accessorPartyNames) {
                     AccessorParty newAccessorParty = new AccessorParty();
                     newAccessorParty.setName(name);
                     newAccessorParty.setCountryId(countryId);
@@ -65,7 +70,12 @@ public class AccessorPartyService extends MongoBaseService {
 
     public List<AccessorParty> getAllAccessorParty(Long countryId, Long organizationId) {
         return accessorPartyMongoRepository.findAllAccessorPartys(countryId, organizationId);
-
+/*
+         Set<String> strings=new HashSet<>();
+         strings.add("qwert");
+         strings.add("qwertyu");
+         strings.add("qazxsw");
+         return findByNamesList(countryId,organizationId,strings,AccessorParty.class);*/
     }
 
 

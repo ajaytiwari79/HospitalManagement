@@ -38,7 +38,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     @Override
     public MasterProcessingActivity findByName(Long countryId, Long organizationId, String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId).and("isSubProcess").is(false));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, MasterProcessingActivity.class);

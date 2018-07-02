@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.StorageFormat;
 import com.kairos.persistance.repository.master_data_management.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,22 +27,26 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
+    @Inject
+    private ComparisonUtils  comparisonUtils;
+
     public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
 
         Map<String, List<StorageFormat>> result = new HashMap<>();
-        Set<String> names = new HashSet<>();
-        List<StorageFormat> newStorageFormats = new ArrayList<>();
+        Set<String> storageFormatNames = new HashSet<>();
         if (storageFormats.size() != 0) {
             for (StorageFormat storageFormat : storageFormats) {
                 if (!StringUtils.isBlank(storageFormat.getName())) {
-                    names.add(storageFormat.getName());
+                    storageFormatNames.add(storageFormat.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<StorageFormat> existing = storageFormatMongoRepository.findByCountryAndNameList(countryId, organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<StorageFormat> existing =  findByNamesList(countryId,organizationId,storageFormatNames,StorageFormat.class);
+            storageFormatNames = comparisonUtils.getNameListForMetadata(existing, storageFormatNames);
+
+            List<StorageFormat> newStorageFormats = new ArrayList<>();
+            if (storageFormatNames.size() != 0) {
+                for (String name : storageFormatNames) {
 
                     StorageFormat newStorageFormat = new StorageFormat();
                     newStorageFormat.setName(name);

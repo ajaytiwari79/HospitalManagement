@@ -48,7 +48,7 @@ public abstract class RelationshipConstants {
 
 
     public final static String HAS_POSITION_CODE = "HAS_POSITION_CODE";
-    public final static String HAS_UNIT_EMPLOYMENT_POSITION = "HAS_UNIT_EMPLOYMENT_POSITION";
+    public final static String PARENT_UNIT_POSITION = "PARENT_UNIT_POSITION";
     public final static String EMPLOYMENT_TYPE_SETTINGS = "EMPLOYMENT_TYPE_SETTINGS";
 
 
@@ -253,6 +253,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_STAFF_SETTINGS="HAS_STAFF_SETTINGS";
     public final static String HAS_OPEN_SHIFT_SETTINGS="HAS_OPEN_SHIFT_SETTINGS";
     public final static String EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT = "EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT";
+    public final static String HAS_PREFERED_TIME_WINDOW = "HAS_PREFERED_TIME_WINDOW";
 
 // System Langugae
 

@@ -18,6 +18,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "Name cannot be empty")
     private String name;
 
+    @NotNullOrEmpty(message = "template id cannot be empty")
+    private String templateId;
+
     @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
@@ -110,7 +113,15 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplate(Long countryId,String name, String description) {
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
+
+    public PolicyAgreementTemplate(Long countryId, String name, String description) {
         this.name = name;
         this.countryId = countryId;
         this.description = description;

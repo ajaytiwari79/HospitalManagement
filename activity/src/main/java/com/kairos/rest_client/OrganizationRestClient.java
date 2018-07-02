@@ -655,7 +655,7 @@ public class OrganizationRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<List<DayType>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/dayType",
+                            baseUrl + "/country/{countryId}/dayType",
                             HttpMethod.GET,
                             null, typeReference, countryId);
             RestTemplateResponseEnvelope<List<DayType>> response = restExchange.getBody();
@@ -694,7 +694,7 @@ public class OrganizationRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service to get check for show basic_details tags" + e.getMessage());
+            throw new RuntimeException("exception occurred in user micro service to get check for show country tags" + e.getMessage());
         }
 
     }
@@ -800,7 +800,7 @@ public class OrganizationRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeWithTimeTypeDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/basic_details/{countryId}/presenceTypeWithTimeType",
+                            baseUrl + "/country/{countryId}/presenceTypeWithTimeType",
                             HttpMethod.GET, null, typeReference, countryId);
             RestTemplateResponseEnvelope<PresenceTypeWithTimeTypeDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

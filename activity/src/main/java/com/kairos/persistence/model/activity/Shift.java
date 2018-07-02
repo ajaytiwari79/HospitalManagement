@@ -72,6 +72,14 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.activityId = activityId;
+
+    }
+
     public List<BigInteger> getBrokenRuleTemplateIds() {
         return brokenRuleTemplateIds;
     }

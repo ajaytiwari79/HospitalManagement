@@ -87,7 +87,7 @@ public class WTAController {
       * Created by vipul on 12 sept 2017
     */
 
-/*    @ApiOperation(value = "Get all expertise which are not unlinked with this subOrg type of basic_details")
+/*    @ApiOperation(value = "Get all expertise which are not unlinked with this subOrg type of country")
     @GetMapping(value = COUNTRY_URL + "/{organizationSubTypeId}/expertises")
     public ResponseEntity<Map<String, Object>> getAllAvailableExpertise(@PathVariable long organizationSubTypeId, @PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllAvailableExpertise(organizationSubTypeId, countryId));

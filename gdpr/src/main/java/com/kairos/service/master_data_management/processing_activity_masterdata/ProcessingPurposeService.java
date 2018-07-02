@@ -5,9 +5,11 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingLegalBasis;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ProcessingPurposeMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,24 +29,28 @@ public class ProcessingPurposeService extends MongoBaseService {
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
 
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
+
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId,Long organizationId,List<ProcessingPurpose> processingPurposes) {
 
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
-        List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> processingPurposesNames = new HashSet<>();
         if (processingPurposes.size() != 0) {
             for (ProcessingPurpose processingPurpose : processingPurposes) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
-                    names.add(processingPurpose.getName());
+                    processingPurposesNames.add(processingPurpose.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing =  processingPurposeMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
+            List<ProcessingPurpose> existing =  findByNamesList(countryId,organizationId,processingPurposesNames,ProcessingPurpose.class);
+            processingPurposesNames = comparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
+            if (processingPurposesNames.size() != 0) {
+                for (String name : processingPurposesNames) {
 
                     ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
                     newProcessingPurpose.setName(name);

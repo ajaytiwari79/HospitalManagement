@@ -343,7 +343,7 @@ public class CountryService extends UserBaseService {
     public Level addLevel(long countryId, Level level) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            logger.debug("Finding basic_details by id::" + countryId);
+            logger.debug("Finding country by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
@@ -384,7 +384,7 @@ public class CountryService extends UserBaseService {
     public RelationType addRelationType(Long countryId, RelationType relationType) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
-            logger.debug("Finding basic_details by id::" + countryId);
+            logger.debug("Finding country by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
@@ -419,7 +419,7 @@ public class CountryService extends UserBaseService {
         Country country = (Optional.ofNullable(countryId).isPresent()) ? countryGraphRepository.findOne(countryId) :
                 null;
         if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Finding basic_details by id::" + countryId);
+            logger.error("Finding country by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
 
         }
@@ -430,18 +430,18 @@ public class CountryService extends UserBaseService {
 
     public List<Vehicle> getVehicleList(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
-            logger.error("Finding basic_details by id::" + countryId);
+            logger.error("Finding country by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notNull");
-            //throw new DataNotFoundByIdException("Incorrect basic_details id");
+            //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
 
     public List<VehicleQueryResult> getAllVehicleListWithFeatures(Long countryId) {
         if (!Optional.ofNullable(countryId).isPresent()) {
-            logger.error("Finding basic_details by id::" + countryId);
+            logger.error("Finding country by id::" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notNull");
-            //throw new DataNotFoundByIdException("Incorrect basic_details id");
+            //throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }

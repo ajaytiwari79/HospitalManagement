@@ -20,14 +20,14 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     List<Tag> findAll();
 
     // DONE
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
-            "WHERE id(basic_details)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
+            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType")
     List<TagQueryResult> getListOfCountryTags(Long countryId , boolean deleted, String searchTextRegex);
 
     // DONE
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
-            "WHERE id(basic_details)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
+            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType")
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId , boolean deleted, String searchTextRegex, String masterDataType);
 
@@ -36,8 +36,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +
             "UNION\n" +
-            "MATCH (basic_details:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
-            "Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
+            "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
+            "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
             "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n")
     List<TagQueryResult>  getListOfOrganizationTags(Long orgId , boolean deleted, String searchTextRegex);
@@ -47,15 +47,15 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +
             "UNION\n" +
-            "MATCH (basic_details:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
-            "Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
+            "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
+            "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
             "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n")
     List<TagQueryResult>  getListOfOrganizationTagsByMasterDataType(Long orgId , boolean deleted, String searchTextRegex, String masterDataType);
 
     // DONE
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
-            "WHERE id(tag)={1} AND id(basic_details) = {0} AND tag.deleted={2} return tag")
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
+            "WHERE id(tag)={1} AND id(country) = {0} AND tag.deleted={2} return tag")
     Tag getCountryTag(long countryId, long tagId, boolean isDeleted);
 
     // DONE
@@ -64,8 +64,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     Tag getOrganizationTag(long tagId, long orgId,  boolean isDeleted);
 
     // DONE
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag)={0} AND id(basic_details) = {1} \n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(tag)={0} AND id(country) = {1} \n" +
             "SET tag.name={2}, tag.lastModificationDate={3} return tag")
     Tag updateCountryTag(Long tagId, Long countryId, String name, long lastModificationDate);
 
@@ -76,13 +76,13 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     Tag updateOrganizationTag(Long tagId, Long orgId, String name, long lastModificationDate);
 
     // DONE
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag)={0} AND id(basic_details) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(tag)={0} AND id(country) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isCountryTagExistsWithDataType(Long tagId, Long countryId, String masterDataType, boolean isDeleted);
 
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag)={0} AND id(basic_details) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(tag)={0} AND id(country) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN tag")
     Tag getCountryTagByIdAndDataType(Long tagId, Long countryId, String masterDataType, boolean isDeleted);
 
@@ -99,8 +99,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     Tag getOrganizationTagByIdAndDataType(Long tagId, Long orgId, String masterDataType, boolean isDeleted);
 
     // DONE
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE tag.name={0} AND id(basic_details) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE tag.name={0} AND id(country) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isCountryTagExistsWithSameNameAndDataType(String name, Long countryId, String masterDataType, boolean isDeleted);
 
@@ -111,7 +111,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     boolean isOrganizationTagExistsWithSameNameAndDataType(String name, Long orgId, String masterDataType, boolean isDeleted);
 
     // DONE
-    @Query( "Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
+    @Query( "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
             "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag\n")
     List<Tag> getCountryTagsById(List<Long> tagIds, String masterDataType, boolean deleted);
@@ -138,15 +138,15 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
 
 
 
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n"+
-            "WHERE id(basic_details)={0} AND tag.name = {1} AND tag.masterDataType ={2} AND tag.deleted= {3} return tag")
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n"+
+            "WHERE id(country)={0} AND tag.name = {1} AND tag.masterDataType ={2} AND tag.deleted= {3} return tag")
     Tag getCountryTagByNameAndType(long countryId, String name, String masterDataType, boolean deleted);
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag {countryTag:false})\n"+
              "WHERE id(org)={0} AND tag.name = {1} AND tag.masterDataType ={2} AND tag.deleted= {3} return tag")
     Tag getOrganizationTagByName(long orgId, String name, String masterDataType, boolean deleted);
 
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
             "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag")
     List<Tag> getCountryTagsByIdAndMasterDataType(List<Long> tagIds, String masterDataType, boolean deleted);
@@ -161,8 +161,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isOrganizationTagExistsWithSameNameAndDataType(String name, Long orgId, MasterDataTypeEnum masterDataType, boolean isDeleted);
 
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(basic_details)={0} AND tag.masterDataType = {1} AND tag.deleted= {2} return tag")
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(country)={0} AND tag.masterDataType = {1} AND tag.deleted= {2} return tag")
         //collect({id:tag.id, masterDataType:r.masterDataType, name:tag.name}) as data
     List<Tag> getListOfCountryTagsByDataType(Long countryId, MasterDataTypeEnum masterDataType, boolean deleted);
 
@@ -173,7 +173,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
             "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag\n" +
             "UNION\n" +
-            "Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
             "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag\n")
     List<Tag> getTagsById(List<Long> tagIds, String masterDataType, boolean deleted);
@@ -183,8 +183,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
     Tag getListOFOrganizationTag(Long orgId, boolean isDeleted);
 
 
-    @Query("Match (basic_details:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(basic_details)={0} AND tag.deleted= {1} AND tag.masterDataType={2}\n" +
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(country)={0} AND tag.deleted= {1} AND tag.masterDataType={2}\n" +
             "return id(tag) as id, tag.name as name, tag.masterDataType as masterDataType")
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId , boolean deleted, String masterDataType);
 

@@ -36,7 +36,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
     public void verifyCountry(Long countryId) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Country not found by Id while creating Planned Time type in basic_details" + countryId);
+            logger.error("Country not found by Id while creating Planned Time type in country" + countryId);
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
@@ -46,7 +46,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         verifyCountry(countryId);
         PlannedTimeType plannedTimeType = plannedTimeTypeRepository.findByNameAndDeletedAndCountryId("(?i)" + presenceTypeDTO.getName(), false, countryId);
         if (Optional.ofNullable(plannedTimeType).isPresent()) {
-            logger.error("Planned Time type already exist in basic_details By Name " + presenceTypeDTO.getName());
+            logger.error("Planned Time type already exist in country By Name " + presenceTypeDTO.getName());
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist", presenceTypeDTO.getName());
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);

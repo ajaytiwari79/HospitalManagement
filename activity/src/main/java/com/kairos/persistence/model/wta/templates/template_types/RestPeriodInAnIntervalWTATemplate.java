@@ -91,7 +91,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
             shifts.add(infoWrapper.getShift());
             shifts = sortShifts(shifts);
             int maxRestingTime = getMaxRestingTime(shifts);
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), getId());
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
             if (!isValid(minMaxSetting, limitAndCounter[0], maxRestingTime/60)) {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;

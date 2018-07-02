@@ -1,4 +1,4 @@
-package com.kairos.user.country.basic_details;
+package com.kairos.user.country.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.user.country.day_type.DayType;

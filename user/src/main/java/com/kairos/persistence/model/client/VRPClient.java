@@ -5,6 +5,7 @@ import com.kairos.persistence.model.auth.User;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PREFERED_TIME_WINDOW;
 
 /**
  * @author pradeep
@@ -24,8 +25,22 @@ public class VRPClient extends User {
     private int zipCode;
     private String city;
 
+
     @Relationship(type = BELONGS_TO)
     private Organization organization;
+
+    @Relationship(type = HAS_PREFERED_TIME_WINDOW)
+    private PreferedTimeWindow preferedTimeWindow;
+
+
+    public PreferedTimeWindow getPreferedTimeWindow() {
+        return preferedTimeWindow;
+    }
+
+    public void setPreferedTimeWindow(PreferedTimeWindow preferedTimeWindow) {
+        this.preferedTimeWindow = preferedTimeWindow;
+    }
+
 
     public Organization getOrganization() {
         return organization;

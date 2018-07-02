@@ -8,6 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ProcessingLegalBasisMongoRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,24 +27,27 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     @Inject
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
     public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long countryId,Long organizationId,List<ProcessingLegalBasis> legalBases) {
+
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
-        Set<String> names = new HashSet<>();
-        List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
+        Set<String> legalBasisNames = new HashSet<>();
         if (legalBases.size() != 0) {
             for (ProcessingLegalBasis legalBasis : legalBases) {
                 if (!StringUtils.isBlank(legalBasis.getName())) {
-                    names.add(legalBasis.getName());
+                    legalBasisNames.add(legalBasis.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingLegalBasis> existing = legalBasisMongoRepository.findByCountryAndNameList(countryId,organizationId,names);
-            existing.forEach(item -> names.remove(item.getName()));
+            List<ProcessingLegalBasis> existing =  findByNamesList(countryId,organizationId,legalBasisNames,ProcessingLegalBasis.class);
+            legalBasisNames = comparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
+            if (legalBasisNames.size() != 0) {
+                for (String name : legalBasisNames) {
 
                     ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis();
                     newProcessingLegalBasis.setName(name);

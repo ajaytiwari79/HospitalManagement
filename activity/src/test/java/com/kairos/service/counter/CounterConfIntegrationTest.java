@@ -1,12 +1,12 @@
 package com.kairos.service.counter;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.enums.CounterType;
-import com.kairos.persistence.model.counter.Counter;
-import com.kairos.client.counter.FilterCriteria;
-import com.kairos.service.exception.ExceptionService;
+import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.enums.counterType;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.counter.Counter;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +53,7 @@ public class CounterConfIntegrationTest {
     public final String getBaseUrl(Long organizationId, Long countryId) throws Exception{
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
-                    .append("/basic_details/").append(countryId).append("/counters/conf").toString();
+                    .append("/country/").append(countryId).append("/counters/conf").toString();
             return baseUrl;
         } else {
             exceptionService.unsupportedOperationException("message.organization.id.notnull");

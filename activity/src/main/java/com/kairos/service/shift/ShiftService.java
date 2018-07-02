@@ -611,7 +611,7 @@ public class ShiftService extends MongoBaseService {
             staffWTACounter.setCount(infoWrapper.getCounterMap().get(staffWTACounter.getRuleTemplateId()));
             infoWrapper.getCounterMap().remove(staffWTACounter.getRuleTemplateId());
         }
-        List<StaffWTACounter> newStaffWTACounter = infoWrapper.getCounterMap().entrySet().stream().map(s -> new StaffWTACounter(infoWrapper.getPlanningPeriod().getStartLocalDate(), infoWrapper.getPlanningPeriod().getEndLocalDate(), s.getKey(), staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitId(), s.getValue(), infoWrapper.getPhase())).collect(Collectors.toList());
+        List<StaffWTACounter> newStaffWTACounter = infoWrapper.getCounterMap().entrySet().stream().map(s -> new StaffWTACounter(infoWrapper.getPlanningPeriod().getStartLocalDate(), infoWrapper.getPlanningPeriod().getEndLocalDate(), s.getKey(), staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitId(), s.getValue())).collect(Collectors.toList());
         staffWTACounters.addAll(newStaffWTACounter);
         if (!staffWTACounters.isEmpty()) {
             save(staffWTACounters);

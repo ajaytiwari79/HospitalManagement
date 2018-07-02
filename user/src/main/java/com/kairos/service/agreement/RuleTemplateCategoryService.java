@@ -45,7 +45,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * used to save a new Rule template in a basic_details
+     * used to save a new Rule template in a country
      * Created by vipul on 2/8/17.
      * params countryId and rule template category via name and desc
      */

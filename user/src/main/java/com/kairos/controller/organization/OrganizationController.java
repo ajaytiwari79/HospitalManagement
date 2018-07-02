@@ -17,6 +17,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
+import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.language.LanguageService;
@@ -114,6 +115,7 @@ public class OrganizationController {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject private VRPClientService vrpClientService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -155,7 +157,7 @@ public class OrganizationController {
                 organizationService.showCountryTagForOrganization(unitId));
     }
 
-    @ApiOperation(value = "Get Organization's basic_details Id")
+    @ApiOperation(value = "Get Organization's country Id")
     @RequestMapping(value = UNIT_URL + "/countryId", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryIdOfOrganization(@PathVariable long unitId) {
@@ -581,7 +583,7 @@ public class OrganizationController {
                 organizationService.getParentOrganization(countryId));
     }
 
-    @RequestMapping(value = "/parent/{orgId}/basic_details/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
+    @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
@@ -1189,7 +1191,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = UNIT_URL + "/dayTypebydate", method = RequestMethod.GET)
-    @ApiOperation("get dayType in basic_details")
+    @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long organizationId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(organizationId, date));
@@ -1375,7 +1377,7 @@ public class OrganizationController {
 
 
     @ApiOperation(value = "Get Default data for Rule Template")
-    @RequestMapping(value = "/basic_details/{countryId}/rule_template/default_data", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/rule_template/default_data", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataForRuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForRuleTemplate(countryId));
@@ -1407,5 +1409,21 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getParentOrganizationAndCountryIdsOfUnit() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganizationAndCountryIdsOfUnit());
+    }
+
+    @ApiOperation(value = "Create Prefered Time window")
+    @PostMapping(value = "/unit/{unitId}/prefer_time_window")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createPreferedTimeWindow(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                vrpClientService.createPreferedTimeWindow(unitId));
+    }
+
+    @ApiOperation(value = "get Prefered Time window")
+    @GetMapping(value = "/unit/{unitId}/prefer_time_window")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPreferedTimeWindow(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                vrpClientService.getPreferedTimeWindow(unitId));
     }
 }

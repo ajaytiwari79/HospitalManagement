@@ -14,8 +14,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="5">2018-06-23 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="6">2018-06-23 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="5">2018-06-09 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="6">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
       <name>Sachin Verma</name>
       <skillSet id="7">
         <com.kairos.shiftplanning.domain.Skill id="8">
@@ -50,8 +50,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="13">2018-06-23 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="14">2018-06-23 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="13">2018-06-09 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="14">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
       <name>Pradeep Singh</name>
       <skillSet id="15">
         <com.kairos.shiftplanning.domain.Skill id="16">
@@ -86,8 +86,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="21">2018-06-23 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="22">2018-06-23 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="21">2018-06-09 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="22">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
       <name>Arvind Das</name>
       <skillSet id="23">
         <com.kairos.shiftplanning.domain.Skill id="24">
@@ -122,8 +122,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="29">2018-06-23 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="30">2018-06-23 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="29">2018-06-09 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="30">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
       <name>Ulrik</name>
       <skillSet id="31">
         <com.kairos.shiftplanning.domain.Skill id="32">
@@ -158,8 +158,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="37">2018-06-23 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="38">2018-06-23 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="37">2018-06-09 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="38">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
       <name>Ramanuj</name>
       <skillSet id="39">
         <com.kairos.shiftplanning.domain.Skill id="40">
@@ -194,8 +194,8 @@
         <prevConsecutiveNightShift>1</prevConsecutiveNightShift>
         <prevConsecutiveWorkingDay>2</prevConsecutiveWorkingDay>
       </prevShiftsInfo>
-      <prevShiftStart id="45">2018-06-23 04:00:00.0 UTC</prevShiftStart>
-      <prevShiftEnd id="46">2018-06-23 14:00:00.0 UTC</prevShiftEnd>
+      <prevShiftStart id="45">2018-06-09 04:00:00.0 UTC</prevShiftStart>
+      <prevShiftEnd id="46">2018-06-09 14:00:00.0 UTC</prevShiftEnd>
       <name>Dravid</name>
       <skillSet id="47">
         <com.kairos.shiftplanning.domain.Skill id="48">
@@ -222,7 +222,7 @@
   </weekDates>
   <shifts id="53">
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="54">
-      <id>6ac7ca7e-a2b4-48ee-a1ea-c9c0bc25d64b</id>
+      <id>91b6da4f-fe1e-4c6b-9754-49c065e54adc</id>
       <employee reference="3"/>
       <breaks id="55"/>
       <activityLineIntervals id="56"/>
@@ -231,7 +231,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="58">
-      <id>d948e9c9-732f-4bdc-8e2b-a1a5e3d063d2</id>
+      <id>8ef44dad-4abd-4b15-9405-15125cc74f36</id>
       <employee reference="11"/>
       <breaks id="59"/>
       <activityLineIntervals id="60"/>
@@ -240,7 +240,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="62">
-      <id>30cef206-6902-47ae-ba9d-21b780b7636f</id>
+      <id>0e79770f-5bc1-4a2e-8f3a-203a71a03996</id>
       <employee reference="19"/>
       <breaks id="63"/>
       <activityLineIntervals id="64"/>
@@ -249,7 +249,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="66">
-      <id>71a25762-6f7a-41a5-9e04-282701e96394</id>
+      <id>3f94ff55-f70f-4a4c-a936-51c8cdeb01e2</id>
       <employee reference="27"/>
       <breaks id="67"/>
       <activityLineIntervals id="68"/>
@@ -258,7 +258,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="70">
-      <id>182198dd-c8ce-40f3-86ec-2a397d91e0e0</id>
+      <id>ef14abe7-095d-4c54-b5a4-e22bb1fc1fc9</id>
       <employee reference="35"/>
       <breaks id="71"/>
       <activityLineIntervals id="72"/>
@@ -267,7 +267,7 @@
       <isCreatedByStaff>false</isCreatedByStaff>
     </com.kairos.shiftplanning.domain.ShiftRequestPhase>
     <com.kairos.shiftplanning.domain.ShiftRequestPhase id="74">
-      <id>78b744a4-2a3b-4f85-b7a3-17544774f26d</id>
+      <id>e79d4e23-9b68-438b-aa97-2842bdb302cc</id>
       <employee reference="43"/>
       <breaks id="75"/>
       <activityLineIntervals id="76"/>
@@ -278,7 +278,7 @@
   </shifts>
   <activities id="78">
     <com.kairos.shiftplanning.domain.Activity id="79">
-      <id>7d819026-0844-4129-8098-759f07d49919</id>
+      <id>55b7296e-9aab-4ea8-8b6b-6f23fa07e53a</id>
       <skills id="80">
         <com.kairos.shiftplanning.domain.Skill id="81">
           <id>102l</id>
@@ -323,14 +323,14 @@
         </minimumLengthofActivity>
       </activityConstraints>
       <timeType id="89">
-        <id>83c867ef-e5bc-408e-bec9-b86a5a68f2c9</id>
+        <id>1210aead-679a-441f-bef1-2df9dec12b3b</id>
         <name>presence</name>
       </timeType>
       <order>1</order>
       <rank>10</rank>
     </com.kairos.shiftplanning.domain.Activity>
     <com.kairos.shiftplanning.domain.Activity id="90">
-      <id>bb5a9ab6-10ea-4ebd-8c2d-11ceeccafef2</id>
+      <id>e8fa500a-a0fa-4769-9abc-8021a1a93890</id>
       <skills id="91">
         <com.kairos.shiftplanning.domain.Skill id="92">
           <id>111l</id>
@@ -379,7 +379,7 @@
       <rank>9</rank>
     </com.kairos.shiftplanning.domain.Activity>
     <com.kairos.shiftplanning.domain.Activity id="100">
-      <id>cdce4ce8-0bef-40dc-9b4a-bc1d26b23473</id>
+      <id>c6731594-5329-4c1b-ab2b-7d82e166cb54</id>
       <skills id="101">
         <com.kairos.shiftplanning.domain.Skill id="102">
           <id>111l</id>
@@ -424,14 +424,14 @@
         </minimumLengthofActivity>
       </activityConstraints>
       <timeType id="110">
-        <id>4d4d4372-171d-408d-a74b-4e2c8725e315</id>
+        <id>7c75525e-fd5f-4ee0-8e03-eafaa998e7f0</id>
         <name>absence</name>
       </timeType>
       <order>3</order>
       <rank>2</rank>
     </com.kairos.shiftplanning.domain.Activity>
     <com.kairos.shiftplanning.domain.Activity id="111">
-      <id>9ea27d24-5e49-49f2-bc4f-be0f2a921fbe</id>
+      <id>2ee7899f-2d3b-4406-b6c5-a6739b30d477</id>
       <skills id="112">
         <com.kairos.shiftplanning.domain.Skill id="113">
           <id>111l</id>
@@ -482,7 +482,7 @@
   </activities>
   <activityLineIntervals id="121">
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="122">
-      <id>10327</id>
+      <id>10001</id>
       <start id="123">2017-12-11 11:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -490,7 +490,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="124">
-      <id>10328</id>
+      <id>10002</id>
       <start id="125">2017-12-11 11:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -498,7 +498,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="126">
-      <id>10329</id>
+      <id>10003</id>
       <start id="127">2017-12-11 12:00:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -506,7 +506,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="128">
-      <id>10330</id>
+      <id>10004</id>
       <start id="129">2017-12-11 12:15:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -514,7 +514,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="130">
-      <id>10331</id>
+      <id>10005</id>
       <start id="131">2017-12-11 12:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -522,7 +522,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="132">
-      <id>10332</id>
+      <id>10006</id>
       <start id="133">2017-12-11 12:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -530,7 +530,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="134">
-      <id>10333</id>
+      <id>10007</id>
       <start id="135">2017-12-11 11:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -538,7 +538,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="136">
-      <id>10334</id>
+      <id>10008</id>
       <start id="137">2017-12-11 11:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -546,7 +546,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="138">
-      <id>10335</id>
+      <id>10009</id>
       <start id="139">2017-12-11 12:00:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -554,7 +554,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="140">
-      <id>10336</id>
+      <id>10010</id>
       <start id="141">2017-12-11 12:15:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -562,7 +562,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="142">
-      <id>10337</id>
+      <id>10011</id>
       <start id="143">2017-12-11 12:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -570,7 +570,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="144">
-      <id>10338</id>
+      <id>10012</id>
       <start id="145">2017-12-11 12:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="79"/>
@@ -578,7 +578,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="146">
-      <id>10339</id>
+      <id>10013</id>
       <start id="147">2017-12-11 11:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="79"/>
@@ -586,7 +586,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="148">
-      <id>10340</id>
+      <id>10014</id>
       <start id="149">2017-12-11 11:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="79"/>
@@ -594,7 +594,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="150">
-      <id>10341</id>
+      <id>10015</id>
       <start id="151">2017-12-11 12:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="79"/>
@@ -602,7 +602,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="152">
-      <id>10342</id>
+      <id>10016</id>
       <start id="153">2017-12-11 12:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="79"/>
@@ -610,7 +610,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="154">
-      <id>10343</id>
+      <id>10017</id>
       <start id="155">2017-12-11 12:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="79"/>
@@ -618,7 +618,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="156">
-      <id>10344</id>
+      <id>10018</id>
       <start id="157">2017-12-11 12:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="79"/>
@@ -626,7 +626,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="158">
-      <id>10345</id>
+      <id>10019</id>
       <start id="159">2017-12-11 11:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -634,7 +634,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="160">
-      <id>10346</id>
+      <id>10020</id>
       <start id="161">2017-12-11 11:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -642,7 +642,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="162">
-      <id>10347</id>
+      <id>10021</id>
       <start id="163">2017-12-11 12:00:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -650,7 +650,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="164">
-      <id>10348</id>
+      <id>10022</id>
       <start id="165">2017-12-11 12:15:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -658,7 +658,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="166">
-      <id>10349</id>
+      <id>10023</id>
       <start id="167">2017-12-11 12:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -666,7 +666,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="168">
-      <id>10350</id>
+      <id>10024</id>
       <start id="169">2017-12-11 12:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -674,7 +674,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="170">
-      <id>10351</id>
+      <id>10025</id>
       <start id="171">2017-12-11 11:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -682,7 +682,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="172">
-      <id>10352</id>
+      <id>10026</id>
       <start id="173">2017-12-11 11:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -690,7 +690,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="174">
-      <id>10353</id>
+      <id>10027</id>
       <start id="175">2017-12-11 12:00:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -698,7 +698,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="176">
-      <id>10354</id>
+      <id>10028</id>
       <start id="177">2017-12-11 12:15:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -706,7 +706,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="178">
-      <id>10355</id>
+      <id>10029</id>
       <start id="179">2017-12-11 12:30:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -714,7 +714,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="180">
-      <id>10356</id>
+      <id>10030</id>
       <start id="181">2017-12-11 12:45:00.0 UTC</start>
       <required>true</required>
       <activity reference="90"/>
@@ -722,7 +722,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="182">
-      <id>10357</id>
+      <id>10031</id>
       <start id="183">2017-12-11 11:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="90"/>
@@ -730,7 +730,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="184">
-      <id>10358</id>
+      <id>10032</id>
       <start id="185">2017-12-11 11:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="90"/>
@@ -738,7 +738,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="186">
-      <id>10359</id>
+      <id>10033</id>
       <start id="187">2017-12-11 12:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="90"/>
@@ -746,7 +746,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="188">
-      <id>10360</id>
+      <id>10034</id>
       <start id="189">2017-12-11 12:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="90"/>
@@ -754,7 +754,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="190">
-      <id>10361</id>
+      <id>10035</id>
       <start id="191">2017-12-11 12:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="90"/>
@@ -762,7 +762,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="192">
-      <id>10362</id>
+      <id>10036</id>
       <start id="193">2017-12-11 12:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="90"/>
@@ -770,7 +770,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="194">
-      <id>20726</id>
+      <id>20074</id>
       <start id="195">2017-12-11 00:00:00.0 UTC</start>
       <required>true</required>
       <activity reference="100"/>
@@ -778,7 +778,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="196">
-      <id>20728</id>
+      <id>20076</id>
       <start id="197">2017-12-11 00:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="100"/>
@@ -786,7 +786,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="198">
-      <id>10365</id>
+      <id>10039</id>
       <start id="199">2017-12-11 00:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -794,7 +794,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="200">
-      <id>10366</id>
+      <id>10040</id>
       <start id="201">2017-12-11 00:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -802,7 +802,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="202">
-      <id>10367</id>
+      <id>10041</id>
       <start id="203">2017-12-11 00:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -810,7 +810,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="204">
-      <id>10368</id>
+      <id>10042</id>
       <start id="205">2017-12-11 00:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -818,7 +818,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="206">
-      <id>10369</id>
+      <id>10043</id>
       <start id="207">2017-12-11 01:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -826,7 +826,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="208">
-      <id>10370</id>
+      <id>10044</id>
       <start id="209">2017-12-11 01:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -834,7 +834,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="210">
-      <id>10371</id>
+      <id>10045</id>
       <start id="211">2017-12-11 01:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -842,7 +842,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="212">
-      <id>10372</id>
+      <id>10046</id>
       <start id="213">2017-12-11 01:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -850,7 +850,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="214">
-      <id>10373</id>
+      <id>10047</id>
       <start id="215">2017-12-11 02:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -858,7 +858,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="216">
-      <id>10374</id>
+      <id>10048</id>
       <start id="217">2017-12-11 02:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -866,7 +866,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="218">
-      <id>10375</id>
+      <id>10049</id>
       <start id="219">2017-12-11 02:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -874,7 +874,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="220">
-      <id>10376</id>
+      <id>10050</id>
       <start id="221">2017-12-11 02:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -882,7 +882,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="222">
-      <id>10377</id>
+      <id>10051</id>
       <start id="223">2017-12-11 03:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -890,7 +890,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="224">
-      <id>10378</id>
+      <id>10052</id>
       <start id="225">2017-12-11 03:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -898,7 +898,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="226">
-      <id>10379</id>
+      <id>10053</id>
       <start id="227">2017-12-11 03:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -906,7 +906,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="228">
-      <id>10380</id>
+      <id>10054</id>
       <start id="229">2017-12-11 03:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -914,7 +914,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="230">
-      <id>10381</id>
+      <id>10055</id>
       <start id="231">2017-12-11 04:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -922,7 +922,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="232">
-      <id>10382</id>
+      <id>10056</id>
       <start id="233">2017-12-11 04:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -930,7 +930,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="234">
-      <id>10383</id>
+      <id>10057</id>
       <start id="235">2017-12-11 04:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -938,7 +938,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="236">
-      <id>10384</id>
+      <id>10058</id>
       <start id="237">2017-12-11 04:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -946,7 +946,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="238">
-      <id>10385</id>
+      <id>10059</id>
       <start id="239">2017-12-11 05:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -954,7 +954,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="240">
-      <id>10386</id>
+      <id>10060</id>
       <start id="241">2017-12-11 05:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -962,7 +962,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="242">
-      <id>10387</id>
+      <id>10061</id>
       <start id="243">2017-12-11 05:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -970,7 +970,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="244">
-      <id>10388</id>
+      <id>10062</id>
       <start id="245">2017-12-11 05:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -978,7 +978,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="246">
-      <id>10389</id>
+      <id>10063</id>
       <start id="247">2017-12-11 06:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -986,7 +986,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="248">
-      <id>10390</id>
+      <id>10064</id>
       <start id="249">2017-12-11 06:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -994,7 +994,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="250">
-      <id>10391</id>
+      <id>10065</id>
       <start id="251">2017-12-11 06:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1002,7 +1002,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="252">
-      <id>10392</id>
+      <id>10066</id>
       <start id="253">2017-12-11 06:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1010,7 +1010,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="254">
-      <id>10393</id>
+      <id>10067</id>
       <start id="255">2017-12-11 07:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1018,7 +1018,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="256">
-      <id>10394</id>
+      <id>10068</id>
       <start id="257">2017-12-11 07:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1026,7 +1026,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="258">
-      <id>10395</id>
+      <id>10069</id>
       <start id="259">2017-12-11 07:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1034,7 +1034,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="260">
-      <id>10396</id>
+      <id>10070</id>
       <start id="261">2017-12-11 07:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1042,7 +1042,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="262">
-      <id>10397</id>
+      <id>10071</id>
       <start id="263">2017-12-11 08:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1050,7 +1050,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="264">
-      <id>10398</id>
+      <id>10072</id>
       <start id="265">2017-12-11 08:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1058,7 +1058,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="266">
-      <id>10399</id>
+      <id>10073</id>
       <start id="267">2017-12-11 08:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1066,7 +1066,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="268">
-      <id>10400</id>
+      <id>10074</id>
       <start id="269">2017-12-11 08:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1074,7 +1074,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="270">
-      <id>10401</id>
+      <id>10075</id>
       <start id="271">2017-12-11 09:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1082,7 +1082,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="272">
-      <id>10402</id>
+      <id>10076</id>
       <start id="273">2017-12-11 09:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1090,7 +1090,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="274">
-      <id>10403</id>
+      <id>10077</id>
       <start id="275">2017-12-11 09:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1098,7 +1098,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="276">
-      <id>10404</id>
+      <id>10078</id>
       <start id="277">2017-12-11 09:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1106,7 +1106,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="278">
-      <id>10405</id>
+      <id>10079</id>
       <start id="279">2017-12-11 10:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1114,7 +1114,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="280">
-      <id>10406</id>
+      <id>10080</id>
       <start id="281">2017-12-11 10:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1122,7 +1122,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="282">
-      <id>10407</id>
+      <id>10081</id>
       <start id="283">2017-12-11 10:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1130,7 +1130,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="284">
-      <id>10408</id>
+      <id>10082</id>
       <start id="285">2017-12-11 10:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1138,7 +1138,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="286">
-      <id>10409</id>
+      <id>10083</id>
       <start id="287">2017-12-11 11:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1146,7 +1146,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="288">
-      <id>10410</id>
+      <id>10084</id>
       <start id="289">2017-12-11 11:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1154,7 +1154,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="290">
-      <id>10411</id>
+      <id>10085</id>
       <start id="291">2017-12-11 11:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1162,7 +1162,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="292">
-      <id>10412</id>
+      <id>10086</id>
       <start id="293">2017-12-11 11:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1170,7 +1170,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="294">
-      <id>10413</id>
+      <id>10087</id>
       <start id="295">2017-12-11 12:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1178,7 +1178,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="296">
-      <id>10414</id>
+      <id>10088</id>
       <start id="297">2017-12-11 12:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1186,7 +1186,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="298">
-      <id>10415</id>
+      <id>10089</id>
       <start id="299">2017-12-11 12:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1194,7 +1194,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="300">
-      <id>10416</id>
+      <id>10090</id>
       <start id="301">2017-12-11 12:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1202,7 +1202,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="302">
-      <id>10417</id>
+      <id>10091</id>
       <start id="303">2017-12-11 13:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1210,7 +1210,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="304">
-      <id>10418</id>
+      <id>10092</id>
       <start id="305">2017-12-11 13:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1218,7 +1218,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="306">
-      <id>10419</id>
+      <id>10093</id>
       <start id="307">2017-12-11 13:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1226,7 +1226,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="308">
-      <id>10420</id>
+      <id>10094</id>
       <start id="309">2017-12-11 13:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1234,7 +1234,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="310">
-      <id>10421</id>
+      <id>10095</id>
       <start id="311">2017-12-11 14:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1242,7 +1242,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="312">
-      <id>10422</id>
+      <id>10096</id>
       <start id="313">2017-12-11 14:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1250,7 +1250,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="314">
-      <id>10423</id>
+      <id>10097</id>
       <start id="315">2017-12-11 14:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1258,7 +1258,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="316">
-      <id>10424</id>
+      <id>10098</id>
       <start id="317">2017-12-11 14:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1266,7 +1266,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="318">
-      <id>10425</id>
+      <id>10099</id>
       <start id="319">2017-12-11 15:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1274,7 +1274,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="320">
-      <id>10426</id>
+      <id>10100</id>
       <start id="321">2017-12-11 15:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1282,7 +1282,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="322">
-      <id>10427</id>
+      <id>10101</id>
       <start id="323">2017-12-11 15:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1290,7 +1290,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="324">
-      <id>10428</id>
+      <id>10102</id>
       <start id="325">2017-12-11 15:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1298,7 +1298,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="326">
-      <id>10429</id>
+      <id>10103</id>
       <start id="327">2017-12-11 16:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1306,7 +1306,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="328">
-      <id>10430</id>
+      <id>10104</id>
       <start id="329">2017-12-11 16:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1314,7 +1314,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="330">
-      <id>10431</id>
+      <id>10105</id>
       <start id="331">2017-12-11 16:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1322,7 +1322,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="332">
-      <id>10432</id>
+      <id>10106</id>
       <start id="333">2017-12-11 16:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1330,7 +1330,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="334">
-      <id>10433</id>
+      <id>10107</id>
       <start id="335">2017-12-11 17:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1338,7 +1338,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="336">
-      <id>10434</id>
+      <id>10108</id>
       <start id="337">2017-12-11 17:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1346,7 +1346,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="338">
-      <id>10435</id>
+      <id>10109</id>
       <start id="339">2017-12-11 17:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1354,7 +1354,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="340">
-      <id>10436</id>
+      <id>10110</id>
       <start id="341">2017-12-11 17:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1362,7 +1362,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="342">
-      <id>10437</id>
+      <id>10111</id>
       <start id="343">2017-12-11 18:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1370,7 +1370,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="344">
-      <id>10438</id>
+      <id>10112</id>
       <start id="345">2017-12-11 18:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1378,7 +1378,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="346">
-      <id>10439</id>
+      <id>10113</id>
       <start id="347">2017-12-11 18:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1386,7 +1386,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="348">
-      <id>10440</id>
+      <id>10114</id>
       <start id="349">2017-12-11 18:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1394,7 +1394,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="350">
-      <id>10441</id>
+      <id>10115</id>
       <start id="351">2017-12-11 19:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1402,7 +1402,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="352">
-      <id>10442</id>
+      <id>10116</id>
       <start id="353">2017-12-11 19:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1410,7 +1410,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="354">
-      <id>10443</id>
+      <id>10117</id>
       <start id="355">2017-12-11 19:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1418,7 +1418,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="356">
-      <id>10444</id>
+      <id>10118</id>
       <start id="357">2017-12-11 19:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1426,7 +1426,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="358">
-      <id>10445</id>
+      <id>10119</id>
       <start id="359">2017-12-11 20:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1434,7 +1434,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="360">
-      <id>10446</id>
+      <id>10120</id>
       <start id="361">2017-12-11 20:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1442,7 +1442,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="362">
-      <id>10447</id>
+      <id>10121</id>
       <start id="363">2017-12-11 20:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1450,7 +1450,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="364">
-      <id>10448</id>
+      <id>10122</id>
       <start id="365">2017-12-11 20:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1458,7 +1458,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="366">
-      <id>10449</id>
+      <id>10123</id>
       <start id="367">2017-12-11 21:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1466,7 +1466,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="368">
-      <id>10450</id>
+      <id>10124</id>
       <start id="369">2017-12-11 21:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1474,7 +1474,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="370">
-      <id>10451</id>
+      <id>10125</id>
       <start id="371">2017-12-11 21:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1482,7 +1482,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="372">
-      <id>10452</id>
+      <id>10126</id>
       <start id="373">2017-12-11 21:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1490,7 +1490,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="374">
-      <id>10453</id>
+      <id>10127</id>
       <start id="375">2017-12-11 22:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1498,7 +1498,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="376">
-      <id>10454</id>
+      <id>10128</id>
       <start id="377">2017-12-11 22:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1506,7 +1506,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="378">
-      <id>10455</id>
+      <id>10129</id>
       <start id="379">2017-12-11 22:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1514,7 +1514,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="380">
-      <id>10456</id>
+      <id>10130</id>
       <start id="381">2017-12-11 22:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1522,7 +1522,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="382">
-      <id>10457</id>
+      <id>10131</id>
       <start id="383">2017-12-11 23:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1530,7 +1530,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="384">
-      <id>10458</id>
+      <id>10132</id>
       <start id="385">2017-12-11 23:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1538,7 +1538,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="386">
-      <id>10459</id>
+      <id>10133</id>
       <start id="387">2017-12-11 23:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1546,7 +1546,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="388">
-      <id>10460</id>
+      <id>10134</id>
       <start id="389">2017-12-11 23:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1554,7 +1554,7 @@
       <staffNo>0</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="390">
-      <id>10461</id>
+      <id>10135</id>
       <start id="391">2017-12-11 00:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1562,7 +1562,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="392">
-      <id>10462</id>
+      <id>10136</id>
       <start id="393">2017-12-11 00:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1570,7 +1570,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="394">
-      <id>10463</id>
+      <id>10137</id>
       <start id="395">2017-12-11 00:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1578,7 +1578,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="396">
-      <id>10464</id>
+      <id>10138</id>
       <start id="397">2017-12-11 00:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1586,7 +1586,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="398">
-      <id>10465</id>
+      <id>10139</id>
       <start id="399">2017-12-11 01:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1594,7 +1594,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="400">
-      <id>10466</id>
+      <id>10140</id>
       <start id="401">2017-12-11 01:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1602,7 +1602,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="402">
-      <id>10467</id>
+      <id>10141</id>
       <start id="403">2017-12-11 01:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1610,7 +1610,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="404">
-      <id>10468</id>
+      <id>10142</id>
       <start id="405">2017-12-11 01:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1618,7 +1618,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="406">
-      <id>10469</id>
+      <id>10143</id>
       <start id="407">2017-12-11 02:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1626,7 +1626,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="408">
-      <id>10470</id>
+      <id>10144</id>
       <start id="409">2017-12-11 02:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1634,7 +1634,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="410">
-      <id>10471</id>
+      <id>10145</id>
       <start id="411">2017-12-11 02:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1642,7 +1642,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="412">
-      <id>10472</id>
+      <id>10146</id>
       <start id="413">2017-12-11 02:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1650,7 +1650,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="414">
-      <id>10473</id>
+      <id>10147</id>
       <start id="415">2017-12-11 03:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1658,7 +1658,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="416">
-      <id>10474</id>
+      <id>10148</id>
       <start id="417">2017-12-11 03:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1666,7 +1666,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="418">
-      <id>10475</id>
+      <id>10149</id>
       <start id="419">2017-12-11 03:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1674,7 +1674,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="420">
-      <id>10476</id>
+      <id>10150</id>
       <start id="421">2017-12-11 03:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1682,7 +1682,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="422">
-      <id>10477</id>
+      <id>10151</id>
       <start id="423">2017-12-11 04:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1690,7 +1690,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="424">
-      <id>10478</id>
+      <id>10152</id>
       <start id="425">2017-12-11 04:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1698,7 +1698,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="426">
-      <id>10479</id>
+      <id>10153</id>
       <start id="427">2017-12-11 04:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1706,7 +1706,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="428">
-      <id>10480</id>
+      <id>10154</id>
       <start id="429">2017-12-11 04:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1714,7 +1714,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="430">
-      <id>10481</id>
+      <id>10155</id>
       <start id="431">2017-12-11 05:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1722,7 +1722,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="432">
-      <id>10482</id>
+      <id>10156</id>
       <start id="433">2017-12-11 05:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1730,7 +1730,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="434">
-      <id>10483</id>
+      <id>10157</id>
       <start id="435">2017-12-11 05:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1738,7 +1738,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="436">
-      <id>10484</id>
+      <id>10158</id>
       <start id="437">2017-12-11 05:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1746,7 +1746,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="438">
-      <id>10485</id>
+      <id>10159</id>
       <start id="439">2017-12-11 06:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1754,7 +1754,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="440">
-      <id>10486</id>
+      <id>10160</id>
       <start id="441">2017-12-11 06:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1762,7 +1762,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="442">
-      <id>10487</id>
+      <id>10161</id>
       <start id="443">2017-12-11 06:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1770,7 +1770,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="444">
-      <id>10488</id>
+      <id>10162</id>
       <start id="445">2017-12-11 06:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1778,7 +1778,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="446">
-      <id>10489</id>
+      <id>10163</id>
       <start id="447">2017-12-11 07:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1786,7 +1786,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="448">
-      <id>10490</id>
+      <id>10164</id>
       <start id="449">2017-12-11 07:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1794,7 +1794,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="450">
-      <id>10491</id>
+      <id>10165</id>
       <start id="451">2017-12-11 07:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1802,7 +1802,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="452">
-      <id>10492</id>
+      <id>10166</id>
       <start id="453">2017-12-11 07:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1810,7 +1810,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="454">
-      <id>10493</id>
+      <id>10167</id>
       <start id="455">2017-12-11 08:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1818,7 +1818,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="456">
-      <id>10494</id>
+      <id>10168</id>
       <start id="457">2017-12-11 08:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1826,7 +1826,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="458">
-      <id>10495</id>
+      <id>10169</id>
       <start id="459">2017-12-11 08:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1834,7 +1834,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="460">
-      <id>10496</id>
+      <id>10170</id>
       <start id="461">2017-12-11 08:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1842,7 +1842,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="462">
-      <id>10497</id>
+      <id>10171</id>
       <start id="463">2017-12-11 09:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1850,7 +1850,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="464">
-      <id>10498</id>
+      <id>10172</id>
       <start id="465">2017-12-11 09:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1858,7 +1858,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="466">
-      <id>10499</id>
+      <id>10173</id>
       <start id="467">2017-12-11 09:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1866,7 +1866,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="468">
-      <id>10500</id>
+      <id>10174</id>
       <start id="469">2017-12-11 09:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1874,7 +1874,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="470">
-      <id>10501</id>
+      <id>10175</id>
       <start id="471">2017-12-11 10:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1882,7 +1882,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="472">
-      <id>10502</id>
+      <id>10176</id>
       <start id="473">2017-12-11 10:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1890,7 +1890,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="474">
-      <id>10503</id>
+      <id>10177</id>
       <start id="475">2017-12-11 10:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1898,7 +1898,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="476">
-      <id>10504</id>
+      <id>10178</id>
       <start id="477">2017-12-11 10:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1906,7 +1906,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="478">
-      <id>10505</id>
+      <id>10179</id>
       <start id="479">2017-12-11 11:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1914,7 +1914,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="480">
-      <id>10506</id>
+      <id>10180</id>
       <start id="481">2017-12-11 11:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1922,7 +1922,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="482">
-      <id>10507</id>
+      <id>10181</id>
       <start id="483">2017-12-11 11:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1930,7 +1930,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="484">
-      <id>10508</id>
+      <id>10182</id>
       <start id="485">2017-12-11 11:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1938,7 +1938,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="486">
-      <id>10509</id>
+      <id>10183</id>
       <start id="487">2017-12-11 12:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1946,7 +1946,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="488">
-      <id>10510</id>
+      <id>10184</id>
       <start id="489">2017-12-11 12:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1954,7 +1954,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="490">
-      <id>10511</id>
+      <id>10185</id>
       <start id="491">2017-12-11 12:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1962,7 +1962,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="492">
-      <id>10512</id>
+      <id>10186</id>
       <start id="493">2017-12-11 12:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1970,7 +1970,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="494">
-      <id>10513</id>
+      <id>10187</id>
       <start id="495">2017-12-11 13:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1978,7 +1978,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="496">
-      <id>10514</id>
+      <id>10188</id>
       <start id="497">2017-12-11 13:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1986,7 +1986,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="498">
-      <id>10515</id>
+      <id>10189</id>
       <start id="499">2017-12-11 13:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -1994,7 +1994,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="500">
-      <id>10516</id>
+      <id>10190</id>
       <start id="501">2017-12-11 13:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2002,7 +2002,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="502">
-      <id>10517</id>
+      <id>10191</id>
       <start id="503">2017-12-11 14:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2010,7 +2010,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="504">
-      <id>10518</id>
+      <id>10192</id>
       <start id="505">2017-12-11 14:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2018,7 +2018,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="506">
-      <id>10519</id>
+      <id>10193</id>
       <start id="507">2017-12-11 14:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2026,7 +2026,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="508">
-      <id>10520</id>
+      <id>10194</id>
       <start id="509">2017-12-11 14:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2034,7 +2034,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="510">
-      <id>10521</id>
+      <id>10195</id>
       <start id="511">2017-12-11 15:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2042,7 +2042,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="512">
-      <id>10522</id>
+      <id>10196</id>
       <start id="513">2017-12-11 15:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2050,7 +2050,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="514">
-      <id>10523</id>
+      <id>10197</id>
       <start id="515">2017-12-11 15:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2058,7 +2058,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="516">
-      <id>10524</id>
+      <id>10198</id>
       <start id="517">2017-12-11 15:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2066,7 +2066,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="518">
-      <id>10525</id>
+      <id>10199</id>
       <start id="519">2017-12-11 16:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2074,7 +2074,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="520">
-      <id>10526</id>
+      <id>10200</id>
       <start id="521">2017-12-11 16:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2082,7 +2082,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="522">
-      <id>10527</id>
+      <id>10201</id>
       <start id="523">2017-12-11 16:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2090,7 +2090,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="524">
-      <id>10528</id>
+      <id>10202</id>
       <start id="525">2017-12-11 16:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2098,7 +2098,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="526">
-      <id>10529</id>
+      <id>10203</id>
       <start id="527">2017-12-11 17:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2106,7 +2106,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="528">
-      <id>10530</id>
+      <id>10204</id>
       <start id="529">2017-12-11 17:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2114,7 +2114,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="530">
-      <id>10531</id>
+      <id>10205</id>
       <start id="531">2017-12-11 17:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2122,7 +2122,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="532">
-      <id>10532</id>
+      <id>10206</id>
       <start id="533">2017-12-11 17:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2130,7 +2130,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="534">
-      <id>10533</id>
+      <id>10207</id>
       <start id="535">2017-12-11 18:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2138,7 +2138,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="536">
-      <id>10534</id>
+      <id>10208</id>
       <start id="537">2017-12-11 18:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2146,7 +2146,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="538">
-      <id>10535</id>
+      <id>10209</id>
       <start id="539">2017-12-11 18:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2154,7 +2154,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="540">
-      <id>10536</id>
+      <id>10210</id>
       <start id="541">2017-12-11 18:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2162,7 +2162,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="542">
-      <id>10537</id>
+      <id>10211</id>
       <start id="543">2017-12-11 19:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2170,7 +2170,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="544">
-      <id>10538</id>
+      <id>10212</id>
       <start id="545">2017-12-11 19:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2178,7 +2178,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="546">
-      <id>10539</id>
+      <id>10213</id>
       <start id="547">2017-12-11 19:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2186,7 +2186,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="548">
-      <id>10540</id>
+      <id>10214</id>
       <start id="549">2017-12-11 19:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2194,7 +2194,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="550">
-      <id>10541</id>
+      <id>10215</id>
       <start id="551">2017-12-11 20:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2202,7 +2202,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="552">
-      <id>10542</id>
+      <id>10216</id>
       <start id="553">2017-12-11 20:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2210,7 +2210,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="554">
-      <id>10543</id>
+      <id>10217</id>
       <start id="555">2017-12-11 20:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2218,7 +2218,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="556">
-      <id>10544</id>
+      <id>10218</id>
       <start id="557">2017-12-11 20:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2226,7 +2226,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="558">
-      <id>10545</id>
+      <id>10219</id>
       <start id="559">2017-12-11 21:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2234,7 +2234,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="560">
-      <id>10546</id>
+      <id>10220</id>
       <start id="561">2017-12-11 21:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2242,7 +2242,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="562">
-      <id>10547</id>
+      <id>10221</id>
       <start id="563">2017-12-11 21:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2250,7 +2250,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="564">
-      <id>10548</id>
+      <id>10222</id>
       <start id="565">2017-12-11 21:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2258,7 +2258,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="566">
-      <id>10549</id>
+      <id>10223</id>
       <start id="567">2017-12-11 22:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2266,7 +2266,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="568">
-      <id>10550</id>
+      <id>10224</id>
       <start id="569">2017-12-11 22:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2274,7 +2274,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="570">
-      <id>10551</id>
+      <id>10225</id>
       <start id="571">2017-12-11 22:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2282,7 +2282,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="572">
-      <id>10552</id>
+      <id>10226</id>
       <start id="573">2017-12-11 22:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2290,7 +2290,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="574">
-      <id>10553</id>
+      <id>10227</id>
       <start id="575">2017-12-11 23:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2298,7 +2298,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="576">
-      <id>10554</id>
+      <id>10228</id>
       <start id="577">2017-12-11 23:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2306,7 +2306,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="578">
-      <id>10555</id>
+      <id>10229</id>
       <start id="579">2017-12-11 23:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2314,7 +2314,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="580">
-      <id>10556</id>
+      <id>10230</id>
       <start id="581">2017-12-11 23:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2322,7 +2322,7 @@
       <staffNo>1</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="582">
-      <id>10557</id>
+      <id>10231</id>
       <start id="583">2017-12-11 00:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2330,7 +2330,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="584">
-      <id>10558</id>
+      <id>10232</id>
       <start id="585">2017-12-11 00:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2338,7 +2338,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="586">
-      <id>10559</id>
+      <id>10233</id>
       <start id="587">2017-12-11 00:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2346,7 +2346,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="588">
-      <id>10560</id>
+      <id>10234</id>
       <start id="589">2017-12-11 00:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2354,7 +2354,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="590">
-      <id>10561</id>
+      <id>10235</id>
       <start id="591">2017-12-11 01:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2362,7 +2362,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="592">
-      <id>10562</id>
+      <id>10236</id>
       <start id="593">2017-12-11 01:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2370,7 +2370,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="594">
-      <id>10563</id>
+      <id>10237</id>
       <start id="595">2017-12-11 01:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2378,7 +2378,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="596">
-      <id>10564</id>
+      <id>10238</id>
       <start id="597">2017-12-11 01:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2386,7 +2386,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="598">
-      <id>10565</id>
+      <id>10239</id>
       <start id="599">2017-12-11 02:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2394,7 +2394,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="600">
-      <id>10566</id>
+      <id>10240</id>
       <start id="601">2017-12-11 02:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2402,7 +2402,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="602">
-      <id>10567</id>
+      <id>10241</id>
       <start id="603">2017-12-11 02:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2410,7 +2410,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="604">
-      <id>10568</id>
+      <id>10242</id>
       <start id="605">2017-12-11 02:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2418,7 +2418,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="606">
-      <id>10569</id>
+      <id>10243</id>
       <start id="607">2017-12-11 03:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2426,7 +2426,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="608">
-      <id>10570</id>
+      <id>10244</id>
       <start id="609">2017-12-11 03:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2434,7 +2434,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="610">
-      <id>10571</id>
+      <id>10245</id>
       <start id="611">2017-12-11 03:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2442,7 +2442,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="612">
-      <id>10572</id>
+      <id>10246</id>
       <start id="613">2017-12-11 03:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2450,7 +2450,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="614">
-      <id>10573</id>
+      <id>10247</id>
       <start id="615">2017-12-11 04:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2458,7 +2458,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="616">
-      <id>10574</id>
+      <id>10248</id>
       <start id="617">2017-12-11 04:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2466,7 +2466,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="618">
-      <id>10575</id>
+      <id>10249</id>
       <start id="619">2017-12-11 04:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2474,7 +2474,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="620">
-      <id>10576</id>
+      <id>10250</id>
       <start id="621">2017-12-11 04:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2482,7 +2482,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="622">
-      <id>10577</id>
+      <id>10251</id>
       <start id="623">2017-12-11 05:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2490,7 +2490,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="624">
-      <id>10578</id>
+      <id>10252</id>
       <start id="625">2017-12-11 05:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2498,7 +2498,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="626">
-      <id>10579</id>
+      <id>10253</id>
       <start id="627">2017-12-11 05:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2506,7 +2506,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="628">
-      <id>10580</id>
+      <id>10254</id>
       <start id="629">2017-12-11 05:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2514,7 +2514,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="630">
-      <id>10581</id>
+      <id>10255</id>
       <start id="631">2017-12-11 06:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2522,7 +2522,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="632">
-      <id>10582</id>
+      <id>10256</id>
       <start id="633">2017-12-11 06:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2530,7 +2530,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="634">
-      <id>10583</id>
+      <id>10257</id>
       <start id="635">2017-12-11 06:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2538,7 +2538,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="636">
-      <id>10584</id>
+      <id>10258</id>
       <start id="637">2017-12-11 06:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2546,7 +2546,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="638">
-      <id>10585</id>
+      <id>10259</id>
       <start id="639">2017-12-11 07:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2554,7 +2554,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="640">
-      <id>10586</id>
+      <id>10260</id>
       <start id="641">2017-12-11 07:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2562,7 +2562,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="642">
-      <id>10587</id>
+      <id>10261</id>
       <start id="643">2017-12-11 07:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2570,7 +2570,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="644">
-      <id>10588</id>
+      <id>10262</id>
       <start id="645">2017-12-11 07:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2578,7 +2578,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="646">
-      <id>10589</id>
+      <id>10263</id>
       <start id="647">2017-12-11 08:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2586,7 +2586,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="648">
-      <id>10590</id>
+      <id>10264</id>
       <start id="649">2017-12-11 08:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2594,7 +2594,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="650">
-      <id>10591</id>
+      <id>10265</id>
       <start id="651">2017-12-11 08:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2602,7 +2602,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="652">
-      <id>10592</id>
+      <id>10266</id>
       <start id="653">2017-12-11 08:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2610,7 +2610,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="654">
-      <id>10593</id>
+      <id>10267</id>
       <start id="655">2017-12-11 09:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2618,7 +2618,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="656">
-      <id>10594</id>
+      <id>10268</id>
       <start id="657">2017-12-11 09:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2626,7 +2626,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="658">
-      <id>10595</id>
+      <id>10269</id>
       <start id="659">2017-12-11 09:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2634,7 +2634,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="660">
-      <id>10596</id>
+      <id>10270</id>
       <start id="661">2017-12-11 09:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2642,7 +2642,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="662">
-      <id>10597</id>
+      <id>10271</id>
       <start id="663">2017-12-11 10:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2650,7 +2650,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="664">
-      <id>10598</id>
+      <id>10272</id>
       <start id="665">2017-12-11 10:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2658,7 +2658,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="666">
-      <id>10599</id>
+      <id>10273</id>
       <start id="667">2017-12-11 10:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2666,7 +2666,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="668">
-      <id>10600</id>
+      <id>10274</id>
       <start id="669">2017-12-11 10:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2674,7 +2674,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="670">
-      <id>10601</id>
+      <id>10275</id>
       <start id="671">2017-12-11 11:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2682,7 +2682,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="672">
-      <id>10602</id>
+      <id>10276</id>
       <start id="673">2017-12-11 11:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2690,7 +2690,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="674">
-      <id>10603</id>
+      <id>10277</id>
       <start id="675">2017-12-11 11:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2698,7 +2698,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="676">
-      <id>10604</id>
+      <id>10278</id>
       <start id="677">2017-12-11 11:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2706,7 +2706,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="678">
-      <id>10605</id>
+      <id>10279</id>
       <start id="679">2017-12-11 12:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2714,7 +2714,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="680">
-      <id>10606</id>
+      <id>10280</id>
       <start id="681">2017-12-11 12:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2722,7 +2722,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="682">
-      <id>10607</id>
+      <id>10281</id>
       <start id="683">2017-12-11 12:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2730,7 +2730,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="684">
-      <id>10608</id>
+      <id>10282</id>
       <start id="685">2017-12-11 12:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2738,7 +2738,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="686">
-      <id>10609</id>
+      <id>10283</id>
       <start id="687">2017-12-11 13:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2746,7 +2746,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="688">
-      <id>10610</id>
+      <id>10284</id>
       <start id="689">2017-12-11 13:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2754,7 +2754,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="690">
-      <id>10611</id>
+      <id>10285</id>
       <start id="691">2017-12-11 13:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2762,7 +2762,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="692">
-      <id>10612</id>
+      <id>10286</id>
       <start id="693">2017-12-11 13:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2770,7 +2770,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="694">
-      <id>10613</id>
+      <id>10287</id>
       <start id="695">2017-12-11 14:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2778,7 +2778,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="696">
-      <id>10614</id>
+      <id>10288</id>
       <start id="697">2017-12-11 14:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2786,7 +2786,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="698">
-      <id>10615</id>
+      <id>10289</id>
       <start id="699">2017-12-11 14:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2794,7 +2794,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="700">
-      <id>10616</id>
+      <id>10290</id>
       <start id="701">2017-12-11 14:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2802,7 +2802,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="702">
-      <id>10617</id>
+      <id>10291</id>
       <start id="703">2017-12-11 15:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2810,7 +2810,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="704">
-      <id>10618</id>
+      <id>10292</id>
       <start id="705">2017-12-11 15:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2818,7 +2818,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="706">
-      <id>10619</id>
+      <id>10293</id>
       <start id="707">2017-12-11 15:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2826,7 +2826,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="708">
-      <id>10620</id>
+      <id>10294</id>
       <start id="709">2017-12-11 15:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2834,7 +2834,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="710">
-      <id>10621</id>
+      <id>10295</id>
       <start id="711">2017-12-11 16:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2842,7 +2842,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="712">
-      <id>10622</id>
+      <id>10296</id>
       <start id="713">2017-12-11 16:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2850,7 +2850,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="714">
-      <id>10623</id>
+      <id>10297</id>
       <start id="715">2017-12-11 16:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2858,7 +2858,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="716">
-      <id>10624</id>
+      <id>10298</id>
       <start id="717">2017-12-11 16:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2866,7 +2866,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="718">
-      <id>10625</id>
+      <id>10299</id>
       <start id="719">2017-12-11 17:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2874,7 +2874,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="720">
-      <id>10626</id>
+      <id>10300</id>
       <start id="721">2017-12-11 17:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2882,7 +2882,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="722">
-      <id>10627</id>
+      <id>10301</id>
       <start id="723">2017-12-11 17:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2890,7 +2890,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="724">
-      <id>10628</id>
+      <id>10302</id>
       <start id="725">2017-12-11 17:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2898,7 +2898,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="726">
-      <id>10629</id>
+      <id>10303</id>
       <start id="727">2017-12-11 18:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2906,7 +2906,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="728">
-      <id>10630</id>
+      <id>10304</id>
       <start id="729">2017-12-11 18:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2914,7 +2914,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="730">
-      <id>10631</id>
+      <id>10305</id>
       <start id="731">2017-12-11 18:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2922,7 +2922,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="732">
-      <id>10632</id>
+      <id>10306</id>
       <start id="733">2017-12-11 18:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2930,7 +2930,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="734">
-      <id>10633</id>
+      <id>10307</id>
       <start id="735">2017-12-11 19:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2938,7 +2938,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="736">
-      <id>10634</id>
+      <id>10308</id>
       <start id="737">2017-12-11 19:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2946,7 +2946,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="738">
-      <id>10635</id>
+      <id>10309</id>
       <start id="739">2017-12-11 19:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2954,7 +2954,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="740">
-      <id>10636</id>
+      <id>10310</id>
       <start id="741">2017-12-11 19:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2962,7 +2962,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="742">
-      <id>10637</id>
+      <id>10311</id>
       <start id="743">2017-12-11 20:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2970,7 +2970,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="744">
-      <id>10638</id>
+      <id>10312</id>
       <start id="745">2017-12-11 20:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2978,7 +2978,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="746">
-      <id>10639</id>
+      <id>10313</id>
       <start id="747">2017-12-11 20:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2986,7 +2986,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="748">
-      <id>10640</id>
+      <id>10314</id>
       <start id="749">2017-12-11 20:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -2994,7 +2994,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="750">
-      <id>10641</id>
+      <id>10315</id>
       <start id="751">2017-12-11 21:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3002,7 +3002,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="752">
-      <id>10642</id>
+      <id>10316</id>
       <start id="753">2017-12-11 21:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3010,7 +3010,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="754">
-      <id>10643</id>
+      <id>10317</id>
       <start id="755">2017-12-11 21:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3018,7 +3018,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="756">
-      <id>10644</id>
+      <id>10318</id>
       <start id="757">2017-12-11 21:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3026,7 +3026,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="758">
-      <id>10645</id>
+      <id>10319</id>
       <start id="759">2017-12-11 22:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3034,7 +3034,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="760">
-      <id>10646</id>
+      <id>10320</id>
       <start id="761">2017-12-11 22:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3042,7 +3042,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="762">
-      <id>10647</id>
+      <id>10321</id>
       <start id="763">2017-12-11 22:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3050,7 +3050,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="764">
-      <id>10648</id>
+      <id>10322</id>
       <start id="765">2017-12-11 22:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3058,7 +3058,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="766">
-      <id>10649</id>
+      <id>10323</id>
       <start id="767">2017-12-11 23:00:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3066,7 +3066,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="768">
-      <id>10650</id>
+      <id>10324</id>
       <start id="769">2017-12-11 23:15:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3074,7 +3074,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="770">
-      <id>10651</id>
+      <id>10325</id>
       <start id="771">2017-12-11 23:30:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -3082,7 +3082,7 @@
       <staffNo>2</staffNo>
     </com.kairos.shiftplanning.domain.ActivityLineInterval>
     <com.kairos.shiftplanning.domain.ActivityLineInterval id="772">
-      <id>10652</id>
+      <id>10326</id>
       <start id="773">2017-12-11 23:45:00.0 UTC</start>
       <required>false</required>
       <activity reference="111"/>
@@ -4079,8 +4079,19 @@
   </staffingLevelMatrix>
   <activitiesIntervalsGroupedPerDay id="878">
     <entry>
-      <string>12/11/2017_7d819026-0844-4129-8098-759f07d49919_2</string>
+      <string>12/11/2017_e8fa500a-a0fa-4769-9abc-8021a1a93890_0</string>
       <list id="879">
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="158"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="160"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="162"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="164"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="166"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="168"/>
+      </list>
+    </entry>
+    <entry>
+      <string>12/11/2017_55b7296e-9aab-4ea8-8b6b-6f23fa07e53a_2</string>
+      <list id="880">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="146"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="148"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="150"/>
@@ -4090,18 +4101,7 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_7d819026-0844-4129-8098-759f07d49919_1</string>
-      <list id="880">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="134"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="136"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="138"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="140"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="142"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="144"/>
-      </list>
-    </entry>
-    <entry>
-      <string>12/11/2017_7d819026-0844-4129-8098-759f07d49919_0</string>
+      <string>12/11/2017_55b7296e-9aab-4ea8-8b6b-6f23fa07e53a_0</string>
       <list id="881">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="122"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="124"/>
@@ -4112,209 +4112,29 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_9ea27d24-5e49-49f2-bc4f-be0f2a921fbe_1</string>
+      <string>12/11/2017_e8fa500a-a0fa-4769-9abc-8021a1a93890_1</string>
       <list id="882">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="390"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="392"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="394"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="396"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="398"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="400"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="402"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="404"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="406"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="408"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="410"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="412"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="414"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="416"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="418"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="420"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="422"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="424"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="426"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="428"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="430"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="432"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="434"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="436"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="438"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="440"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="442"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="444"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="446"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="448"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="450"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="452"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="454"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="456"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="458"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="460"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="462"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="464"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="466"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="468"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="470"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="472"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="474"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="476"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="478"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="480"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="482"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="484"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="486"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="488"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="490"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="492"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="494"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="496"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="498"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="500"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="502"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="504"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="506"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="508"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="510"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="512"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="514"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="516"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="518"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="520"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="522"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="524"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="526"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="528"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="530"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="532"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="534"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="536"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="538"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="540"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="542"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="544"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="546"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="548"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="550"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="552"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="554"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="556"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="558"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="560"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="562"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="564"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="566"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="568"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="570"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="572"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="574"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="576"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="578"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="580"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="170"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="172"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="174"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="176"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="178"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="180"/>
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_9ea27d24-5e49-49f2-bc4f-be0f2a921fbe_2</string>
+      <string>12/11/2017_55b7296e-9aab-4ea8-8b6b-6f23fa07e53a_1</string>
       <list id="883">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="582"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="584"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="586"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="588"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="590"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="592"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="594"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="596"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="598"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="600"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="602"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="604"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="606"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="608"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="610"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="612"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="614"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="616"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="618"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="620"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="622"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="624"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="626"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="628"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="630"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="632"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="634"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="636"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="638"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="640"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="642"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="644"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="646"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="648"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="650"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="652"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="654"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="656"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="658"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="660"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="662"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="664"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="666"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="668"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="670"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="672"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="674"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="676"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="678"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="680"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="682"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="684"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="686"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="688"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="690"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="692"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="694"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="696"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="698"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="700"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="702"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="704"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="706"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="708"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="710"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="712"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="714"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="716"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="718"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="720"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="722"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="724"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="726"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="728"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="730"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="732"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="734"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="736"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="738"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="740"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="742"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="744"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="746"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="748"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="750"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="752"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="754"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="756"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="758"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="760"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="762"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="764"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="766"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="768"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="770"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="772"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="134"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="136"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="138"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="140"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="142"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="144"/>
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_bb5a9ab6-10ea-4ebd-8c2d-11ceeccafef2_2</string>
+      <string>12/11/2017_e8fa500a-a0fa-4769-9abc-8021a1a93890_2</string>
       <list id="884">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="182"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="184"/>
@@ -4325,24 +4145,19 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_bb5a9ab6-10ea-4ebd-8c2d-11ceeccafef2_1</string>
+      <string>12/11/2017_c6731594-5329-4c1b-ab2b-7d82e166cb54_1</string>
       <list id="885">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="170"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="172"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="174"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="176"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="178"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="180"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="196"/>
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_cdce4ce8-0bef-40dc-9b4a-bc1d26b23473_0</string>
+      <string>12/11/2017_c6731594-5329-4c1b-ab2b-7d82e166cb54_0</string>
       <list id="886">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="194"/>
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_9ea27d24-5e49-49f2-bc4f-be0f2a921fbe_0</string>
+      <string>12/11/2017_2ee7899f-2d3b-4406-b6c5-a6739b30d477_0</string>
       <list id="887">
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="198"/>
         <com.kairos.shiftplanning.domain.ActivityLineInterval reference="200"/>
@@ -4443,20 +4258,205 @@
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_bb5a9ab6-10ea-4ebd-8c2d-11ceeccafef2_0</string>
+      <string>12/11/2017_2ee7899f-2d3b-4406-b6c5-a6739b30d477_1</string>
       <list id="888">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="158"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="160"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="162"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="164"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="166"/>
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="168"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="390"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="392"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="394"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="396"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="398"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="400"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="402"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="404"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="406"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="408"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="410"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="412"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="414"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="416"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="418"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="420"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="422"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="424"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="426"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="428"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="430"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="432"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="434"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="436"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="438"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="440"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="442"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="444"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="446"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="448"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="450"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="452"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="454"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="456"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="458"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="460"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="462"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="464"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="466"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="468"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="470"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="472"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="474"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="476"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="478"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="480"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="482"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="484"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="486"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="488"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="490"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="492"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="494"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="496"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="498"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="500"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="502"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="504"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="506"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="508"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="510"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="512"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="514"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="516"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="518"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="520"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="522"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="524"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="526"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="528"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="530"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="532"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="534"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="536"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="538"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="540"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="542"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="544"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="546"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="548"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="550"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="552"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="554"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="556"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="558"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="560"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="562"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="564"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="566"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="568"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="570"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="572"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="574"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="576"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="578"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="580"/>
       </list>
     </entry>
     <entry>
-      <string>12/11/2017_cdce4ce8-0bef-40dc-9b4a-bc1d26b23473_1</string>
+      <string>12/11/2017_2ee7899f-2d3b-4406-b6c5-a6739b30d477_2</string>
       <list id="889">
-        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="196"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="582"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="584"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="586"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="588"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="590"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="592"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="594"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="596"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="598"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="600"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="602"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="604"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="606"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="608"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="610"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="612"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="614"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="616"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="618"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="620"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="622"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="624"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="626"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="628"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="630"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="632"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="634"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="636"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="638"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="640"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="642"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="644"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="646"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="648"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="650"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="652"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="654"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="656"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="658"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="660"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="662"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="664"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="666"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="668"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="670"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="672"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="674"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="676"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="678"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="680"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="682"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="684"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="686"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="688"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="690"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="692"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="694"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="696"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="698"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="700"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="702"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="704"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="706"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="708"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="710"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="712"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="714"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="716"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="718"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="720"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="722"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="724"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="726"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="728"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="730"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="732"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="734"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="736"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="738"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="740"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="742"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="744"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="746"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="748"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="750"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="752"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="754"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="756"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="758"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="760"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="762"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="764"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="766"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="768"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="770"/>
+        <com.kairos.shiftplanning.domain.ActivityLineInterval reference="772"/>
       </list>
     </entry>
   </activitiesIntervalsGroupedPerDay>

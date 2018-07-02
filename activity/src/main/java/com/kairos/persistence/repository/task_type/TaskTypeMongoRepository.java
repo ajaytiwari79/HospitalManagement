@@ -17,7 +17,7 @@ import java.util.Set;
 public interface TaskTypeMongoRepository extends MongoBaseRepository<TaskType,BigInteger> {
 
     /**
-     * it will return all basic_details task types only
+     * it will return all country task types only
      * @return
      */
     @Override
@@ -46,7 +46,7 @@ public interface TaskTypeMongoRepository extends MongoBaseRepository<TaskType,Bi
 
     TaskType findByOrganizationIdAndRootIdAndSubServiceId(long organizationId, BigInteger rootId, long subServiceId);
 
-    @Query(value = "{organizationId:?0,deleted:false,'subServiceId':{$in:?1}}",fields = "{'title' : 1,'description':1}")
+    @Query(value = "{organizationId:?0,deleted:false,'subServiceId':{$in:?1}}",fields = "{'title' : 1,'description':1,'duration':1}")
     List<TaskTypeDTO> getTaskTypesOfOrganisation(Long organizationId, List<Long> serviceIds);
 
     @Query("{organizationId : ?0,deleted : false,title:{$in:?1}}")
