@@ -18,6 +18,33 @@ public class ConstraintDTO {
     private String name;
     private String description;
     private ConstraintCategory category;
+    private boolean constraintValueRequired;
+    private boolean penalityValueRequired;
+    private boolean disabled;
+
+    public Boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean isConstraintValueRequired() {
+        return constraintValueRequired;
+    }
+
+    public void setConstraintValueRequired(boolean constraintValueRequired) {
+        this.constraintValueRequired = constraintValueRequired;
+    }
+
+    public boolean isPenalityValueRequired() {
+        return penalityValueRequired;
+    }
+
+    public void setPenalityValueRequired(boolean penalityValueRequired) {
+        this.penalityValueRequired = penalityValueRequired;
+    }
 
     public BigInteger getId() {
         return id;

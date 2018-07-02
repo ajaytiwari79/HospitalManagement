@@ -1,11 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
-<<<<<<< HEAD:kairos-planner/optaplanner-vrp-taskplanning/src/test/java/com/kairos/planner/vrp/taskplanning/solver/VrpTaskPlanningSolverTest.java
 import com.google.common.reflect.Reflection;
-import com.kairos.activity.util.ObjectMapperUtils;
-=======
 import com.kairos.util.ObjectMapperUtils;
->>>>>>> KP-3748:planner/optaplanner-vrp-taskplanning/src/test/java/com/kairos/planner/vrp/taskplanning/solver/VrpTaskPlanningSolverTest.java
 import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import org.junit.Test;

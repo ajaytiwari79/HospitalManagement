@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.wta.templates;
 
-import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.template_types.*;

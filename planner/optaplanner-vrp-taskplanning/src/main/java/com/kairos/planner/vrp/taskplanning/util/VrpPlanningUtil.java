@@ -64,4 +64,14 @@ public class VrpPlanningUtil {
             return list.size();
         }
     }
+    public static Task getPreviousValidTask(Task task) {
+        while (task.getPrevTaskOrShift() instanceof Task){
+            Task prevTask = (Task) task.getPrevTaskOrShift();
+            if(!prevTask.isShiftBreak()){
+                return prevTask;
+            }
+            task=prevTask;
+        }
+        return null;
+    }
 }

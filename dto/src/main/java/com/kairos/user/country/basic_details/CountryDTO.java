@@ -1,4 +1,4 @@
-package com.kairos.user.country.country;
+package com.kairos.user.country.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

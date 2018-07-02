@@ -66,6 +66,6 @@
     </localSearch>
 
     <termination>
-        <secondsSpentLimit>6000</secondsSpentLimit>
+        <secondsSpentLimit>300</secondsSpentLimit>
     </termination>
 </solver>
