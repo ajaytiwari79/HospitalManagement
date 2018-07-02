@@ -133,7 +133,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
                 DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
                 List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
                 shifts = getShiftsByInterval(dateTimeInterval, shifts, timeInterval);
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
                 if (!isValid) {
                     if(limitAndCounter[1]!=null) {

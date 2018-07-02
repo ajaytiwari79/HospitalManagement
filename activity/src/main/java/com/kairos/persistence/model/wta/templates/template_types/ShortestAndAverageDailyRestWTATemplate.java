@@ -113,7 +113,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getIntervals(interval);
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
             for (DateTimeInterval dateTimeInterval : intervals) {
                 int totalMin = dateTimeInterval.getMinutes();
                 for (ShiftWithActivityDTO shift : shifts) {
