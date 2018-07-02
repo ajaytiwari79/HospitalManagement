@@ -157,7 +157,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
         } else {
-
+            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
             Map<String, Object> sections = new HashMap<>();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
@@ -174,7 +174,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 throw new DataNotExists("Template Id  Not Null or Empty");
             }
 
-            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
                 if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
