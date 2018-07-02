@@ -7,8 +7,10 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.PolicyAgreementTemplateDTO;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
+import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
 import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.MongoBaseService;
@@ -54,6 +56,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private TemplateTypeMongoRepository templateTypeMongoRepository;
+
     public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organziationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) throws RepositoryException {
 
         String name = policyAgreementTemplateDto.getName();
@@ -66,6 +71,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
             Map<String, Object> sections = new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
+
+            if(policyAgreementTemplateDto.getTemplateId()!=null){
+                TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));
+                if (java.util.Optional.ofNullable(exits).isPresent()) {
+                    policyAgreementTemplate.setTemplateId(policyAgreementTemplateDto.getTemplateId());
+                } else {
+                    throw new DataNotExists("Template Id ->" + exits + " Not exists");
+                }
+            }
+            else {
+                throw new DataNotExists("Template Id  Not Null or Empty");
+            }
 
             if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
@@ -145,6 +162,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections = new HashMap<>();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
+            if(policyAgreementTemplateDto.getTemplateId()!=null){
+                TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));
+                if (java.util.Optional.ofNullable(exits).isPresent()) {
+                    policyAgreementTemplate.setTemplateId(policyAgreementTemplateDto.getTemplateId());
+                } else {
+                    throw new DataNotExists("Template Id ->" + exits + " Not exists");
+                }
+            }
+            else {
+                throw new DataNotExists("Template Id  Not Null or Empty");
+            }
+
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {
                 policyAgreementTemplate.setAccountTypes(accountTypeIds);
@@ -168,6 +197,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     sections = agreementSectionService.createAgreementSections(agreementSection);
                     policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
                 }
+
                 exist.setAccountTypes(accountTypeIds);
                 exist.setName(policyAgreementTemplateDto.getName());
                 exist.setDescription(policyAgreementTemplateDto.getDescription());
