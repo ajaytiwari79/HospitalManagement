@@ -190,7 +190,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta_response",
+                baseUrl + "/cta",
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
@@ -235,7 +235,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta_response/" + createdCtaId,
+                baseUrl + "/cta/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId = response.getBody().getData().getId();
@@ -283,7 +283,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta_response/" + createdCtaId,
+                baseUrl + "/cta/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId = response.getBody().getData().getId();
@@ -339,7 +339,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionQueryResult>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<UnitPositionQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta_response/" + ctaLinkedWithUnitPosition.getId(),
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta/" + ctaLinkedWithUnitPosition.getId(),
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -353,7 +353,7 @@ public class CostTimeAgreementServiceTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<CTAListQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta_response",
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta",
                 HttpMethod.GET, null, resTypeReference);
 
         logger.info("STATUS CODE ---------------------> {}", response.getStatusCode());
