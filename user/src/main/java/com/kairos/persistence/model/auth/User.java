@@ -6,6 +6,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -77,6 +78,9 @@ public class User extends UserBaseEntity {
 
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
+
+    @Relationship(type= HAS_SYSTEM_LANGUAGE)
+    private SystemLanguage systemLanguage;
 
     public int getOtp() {
         return otp;
@@ -464,5 +468,13 @@ public class User extends UserBaseEntity {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public SystemLanguage getSystemLanguage() {
+        return systemLanguage;
+    }
+
+    public void setSystemLanguage(SystemLanguage systemLanguage) {
+        this.systemLanguage = systemLanguage;
     }
 }

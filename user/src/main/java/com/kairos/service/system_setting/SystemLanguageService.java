@@ -128,18 +128,23 @@ public class SystemLanguageService extends UserBaseService {
         return true;
     }
 
-    public SystemLanguageDTO getSystemLanguageOfCountry(Long countryId){
+    public List<SystemLanguageDTO> getSystemLanguageOfCountry(Long countryId){
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
         }
 
+        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.getListOfSystemLanguageByActiveStatus(true), SystemLanguageDTO.class);
+
         SystemLanguage  systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
-        SystemLanguageDTO systemLanguageDTO = null;
-        if(Optional.ofNullable(systemLanguage).isPresent()){
-            systemLanguageDTO = ObjectMapperUtils.copyPropertiesByMapper(systemLanguage, SystemLanguageDTO.class);
-        }
-        return systemLanguageDTO;
+        systemLanguageDTOS.stream().forEach(systemLanguageDTO -> {
+            if(systemLanguageDTO.getId().equals(systemLanguage.getId())){
+                systemLanguageDTO.setDefaultLanguage(true);
+            } else {
+                systemLanguageDTO.setDefaultLanguage(false);
+            }
+        });
+        return systemLanguageDTOS;
     }
 
 
