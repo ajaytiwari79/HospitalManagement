@@ -5,6 +5,7 @@ import com.kairos.activity.task.BulkUpdateTaskDTO;
 import com.kairos.activity.task.TaskDTO;
 import com.kairos.activity.task.TaskRestrictionDto;
 import com.kairos.enums.CitizenHealthStatus;
+import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.service.CustomTimeScaleService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
@@ -309,6 +310,12 @@ public class PlannerController {
     @ApiOperation("submit solver config to planner")
     public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
+    }
+
+    @PostMapping(value = "/resubmit")
+    @ApiOperation("resubmit solver config to planner")
+    public ResponseEntity<Map<String, Object>> resubmitToPlanner(@PathVariable Long unitId,@RequestBody SolverConfigDTO solverConfigDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.resubmitToPlanner(unitId,solverConfigDTO));
     }
 
     @DeleteMapping(value = "/{solverConfigId}")
