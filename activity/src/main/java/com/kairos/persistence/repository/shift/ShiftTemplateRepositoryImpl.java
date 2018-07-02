@@ -26,10 +26,11 @@ public class ShiftTemplateRepositoryImpl implements CustomShitTemplateRepository
                 lookup("individualShiftTemplate", "individualShiftTemplateIds", "_id", "shiftList"),
                 unwind("shiftList"),
                 graphLookup("individualShiftTemplate").startWith("$shiftList.subShiftIds").connectFrom("subShifts").connectTo("_id").as("subShifts"),
-                project("shiftList.id","shiftList.name","shiftList.remarks","shiftList.activityId","shiftList.unitId","shiftList.startTime","shiftList.endTime","shiftList.isMainShift","createdBy","shiftList.subShifts"));
+                project("shiftList.id","shiftList.name","shiftList.remarks","shiftList.activityId","shiftList.unitId","shiftList.startTime","shiftList.endTime","shiftList.isMainShift","createdBy").and("$subShifts").as("shiftList.subShifts"));
 
         AggregationResults<ShiftTemplateDTO> result = mongoTemplate.aggregate(aggregation, ShiftTemplate.class, ShiftTemplateDTO.class);
         return result.getMappedResults();
 
     }
 }
+
