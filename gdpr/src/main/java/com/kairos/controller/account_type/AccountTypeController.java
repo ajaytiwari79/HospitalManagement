@@ -45,21 +45,9 @@ public class AccountTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(countryId, accountType));
     }
 
-   /* @ApiOperation(value = "account type by name")
-    @GetMapping("/{name}")
-    public ResponseEntity<Object> getAccountTypeByName(@PathVariable Long countryId, @PathVariable String name) {
-        if (StringUtils.isBlank(name)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountByName(countryId, name));
-
-    }*/
 
     @ApiOperation(value = "all account type ")
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @GetMapping(value = "/all" )
     public ResponseEntity<Object> getAllAccountTypes(@PathVariable Long countryId) {
         if (countryId == null) {
 
@@ -85,7 +73,7 @@ public class AccountTypeController {
 
 
     @ApiOperation(value = "update account type name")
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
+    @PutMapping(value = "/update/{id}")
     public ResponseEntity<Object> updateAccountTypeName(@PathVariable BigInteger id, @PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -98,7 +86,7 @@ public class AccountTypeController {
 
 
     @ApiOperation(value = "delete account type by id ")
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<Object> deleteAccountTypeById(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
