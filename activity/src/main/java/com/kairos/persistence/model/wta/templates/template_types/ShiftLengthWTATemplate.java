@@ -90,7 +90,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
             if (timeInterval != null) {
                 if (isValidForDay(dayTypeIds, infoWrapper)) {
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0] * 60, infoWrapper.getShift().getMinutes());
                     if (!isValid) {
                         if (limitAndCounter[1] != null) {

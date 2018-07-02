@@ -20,29 +20,20 @@ public class StaffWTACounter extends MongoBaseEntity{
     private Long unitPositionId;
     private Long unitId;
     private int count;
-    private String phaseName;
 
 
-    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId, Long unitPositionId, Long unitId, int count, String phaseName) {
+    public StaffWTACounter(LocalDate startDate, LocalDate endDate, BigInteger ruleTemplateId, Long unitPositionId, Long unitId, int count) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.ruleTemplateId = ruleTemplateId;
         this.unitPositionId = unitPositionId;
         this.unitId = unitId;
         this.count = count;
-        this.phaseName = phaseName;
     }
 
     public StaffWTACounter() {
     }
 
-    public String getPhaseName() {
-        return phaseName;
-    }
-
-    public void setPhaseName(String phaseName) {
-        this.phaseName = phaseName;
-    }
 
     public LocalDate getStartDate() {
         return startDate;
