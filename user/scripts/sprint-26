@@ -1,0 +1,1 @@
+match(u:UnitPosition) set u.published=true;
