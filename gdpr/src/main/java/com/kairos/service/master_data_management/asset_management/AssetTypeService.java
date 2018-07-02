@@ -34,50 +34,7 @@ public class AssetTypeService extends MongoBaseService {
 
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
-/*
-    //Todo  if requirement is to create single asset with multiple sub asset then remove this method
-    public Map<String, List<AssetType>> createAssetType(Long countryId, Long organizationId, List<AssetType> assetTypes) {
-        Map<String, List<AssetType>> result = new HashMap<>();
-        List<AssetType> existing = new ArrayList<>();
-        Set<String> namesInLowercase = new HashSet<>();
-        List<AssetType> newAssetTypes = new ArrayList<>();
-        if (assetTypes.size() != 0) {
-            for (AssetType AssetType : assetTypes) {
-                if (!StringUtils.isBlank(AssetType.getName())) {
-                    namesInLowercase.add(AssetType.getName().trim().toLowerCase());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
-            }
-            existing = assetTypeMongoRepository.findByCountryAndNameList(countryId, organizationId, namesInLowercase);
-            existing.forEach(item -> namesInLowercase.remove(item.getNameInLowerCase()));
-            for (AssetType AssetType : assetTypes)
-                if (namesInLowercase.contains(AssetType.getName().toLowerCase().trim())) {
-                    newAssetTypes.add(AssetType);
 
-                }
-        }
-        List<AssetType> assetTypeList = new ArrayList<>();
-        if (newAssetTypes.size() != 0) {
-            for (AssetType AssetType : newAssetTypes) {
-
-                AssetType newAssetType = new AssetType();
-                newAssetType.setName(AssetType.getName());
-                newAssetType.setNameInLowerCase(AssetType.getName().toLowerCase().trim());
-                newAssetType.setCountryId(countryId);
-                newAssetType.setOrganizationId(organizationId);
-                assetTypeList.add(newAssetType);
-
-            }
-            assetTypeList = save(assetTypeList);
-        }
-        result.put("existing", existing);
-        result.put("new", assetTypeList);
-        return result;
-
-    }*/
-
-
-    //Todo if requiremenet is to create single Asset type with multiple Sub asset use this
     public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, Long organizationId, AssetTypeDTO assetTypeDto) {
 
 
@@ -155,8 +112,8 @@ public class AssetTypeService extends MongoBaseService {
         subAssetTypesList.forEach(subAssetType -> {
 
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            subAssetType.setSubAsset(true);
             subAssetType.setCountryId(countryId);
+            subAssetType.setName(subAssetTypeDto.getName());
             subAssetType.setOrganizationId(organizationId);
         });
         Map<String, Object> result = new HashMap<>();
@@ -198,23 +155,7 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-   /* public AssetType updateAssetType(Long countryId, Long organizationId, BigInteger id, AssetType assetType) {
-        AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetType.getName().toLowerCase());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
-            }
-            throw new DuplicateDataException("data  exist for  " + assetType.getName());
-        } else {
-            exist = assetTypeMongoRepository.findByid(id);
-            exist.setName(assetType.getName());
-            return save(exist);
 
-        }
-    }
-*/
-
-    //Todo add this method if requirement is to update Sub Asset and create new Sub Assets and Add to Asset
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
         AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName());
         if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {

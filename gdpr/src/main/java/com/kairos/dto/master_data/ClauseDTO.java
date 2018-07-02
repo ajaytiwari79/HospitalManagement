@@ -53,7 +53,7 @@ public class ClauseDTO {
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty
-    private Set<ObjectId> accountTypes;
+    private Set<BigInteger> accountTypes;
 
 
     public String getTitle() {
@@ -112,11 +112,11 @@ public class ClauseDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<ObjectId> getAccountTypes() {
+    public Set<BigInteger> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<ObjectId> accountTypes) {
+    public void setAccountTypes(Set<BigInteger> accountTypes) {
         this.accountTypes = accountTypes;
     }
 }

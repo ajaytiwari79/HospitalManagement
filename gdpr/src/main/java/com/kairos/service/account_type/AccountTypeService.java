@@ -7,19 +7,21 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.service.common.JaversBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class AccountTypeService extends JaversBaseService {
+public class AccountTypeService extends MongoBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeService.class);
 
@@ -52,10 +54,10 @@ public class AccountTypeService extends JaversBaseService {
     }
 
 
-    public List<AccountType> getAccountTypeList(Long countryId, Set<ObjectId> ids) {
+    public List<AccountType> getAccountTypeList(Long countryId, Set<BigInteger> ids) {
         List<AccountType> accountTypes = accountTypeRepository.getAccountTypeList(countryId, ids);
         if (accountTypes.size() != ids.size()) {
-            Set<String> accounTypeIds = new HashSet<>();
+            Set<BigInteger> accounTypeIds = new HashSet<>();
             accountTypes.forEach(accountType -> {
                 accounTypeIds.add(accountType.getId());
             });
@@ -71,7 +73,7 @@ public class AccountTypeService extends JaversBaseService {
     }
 
 
-    public AccountType getAccountTypeById(Long countryId, ObjectId id) {
+    public AccountType getAccountTypeById(Long countryId, BigInteger id) {
 
         AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
@@ -81,7 +83,7 @@ public class AccountTypeService extends JaversBaseService {
 
     }
 
-    public AccountType updateAccountTypeName(Long countryId,  ObjectId id, AccountType accountType) {
+    public AccountType updateAccountTypeName(Long countryId,  BigInteger id, AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByName(countryId, accountType.getName());
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
@@ -94,7 +96,7 @@ public class AccountTypeService extends JaversBaseService {
     }
 
 
-    public Boolean deleteAccountTypeById(Long countryId, ObjectId id) {
+    public Boolean deleteAccountTypeById(Long countryId, BigInteger id) {
         AccountType exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("Account type exist for id " + id);

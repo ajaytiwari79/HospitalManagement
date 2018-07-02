@@ -69,7 +69,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
-            Set<ObjectId> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
+            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
             Map<String, Object> sections = new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
 
@@ -161,7 +161,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
             List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
             Map<String, Object> sections = new HashMap<>();
-            Set<ObjectId> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
+            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
             if(policyAgreementTemplateDto.getTemplateId()!=null){
                 TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));

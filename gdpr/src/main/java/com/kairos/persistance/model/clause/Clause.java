@@ -4,23 +4,22 @@ package com.kairos.persistance.model.clause;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.persistance.model.common.JaversBaseEntity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.ShallowReference;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Document(collection = "clause")
 @TypeName("clause")
-public class Clause extends JaversBaseEntity {
+public class Clause extends MongoBaseEntity {
 
     @NotNullOrEmpty
     private String title;
@@ -41,7 +40,39 @@ public class Clause extends JaversBaseEntity {
     @DiffIgnore
     private List<AccountType> accountTypes;
 
+    private Long countryId;
+
     private Boolean isDefault = true;
+
+    private Set<Long> organizations;
+
+    private BigInteger parentClauseId;
+
+    private BigInteger templateType;
+
+    public BigInteger getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(BigInteger templateType) {
+        this.templateType = templateType;
+    }
+
+    public Set<Long> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(Set<Long> organizations) {
+        this.organizations = organizations;
+    }
+
+    public BigInteger getParentClauseId() {
+        return parentClauseId;
+    }
+
+    public void setParentClauseId(BigInteger parentClauseId) {
+        this.parentClauseId = parentClauseId;
+    }
 
     public Boolean getDefault() { return isDefault; }
 

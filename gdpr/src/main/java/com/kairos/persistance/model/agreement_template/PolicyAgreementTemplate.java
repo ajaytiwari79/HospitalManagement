@@ -26,7 +26,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private String description;
 
     @NotNull(message = "Account types cannot be empty ")
-    private Set<ObjectId> accountTypes;
+    private Set<BigInteger> accountTypes;
 
     @NotNull(message = "Sections cannot be emoty")
     private Set<BigInteger> agreementSections;
@@ -122,11 +122,11 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     }
 
-    public Set<ObjectId> getAccountTypes() {
+    public Set<BigInteger> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<ObjectId> accountTypes) {
+    public void setAccountTypes(Set<BigInteger> accountTypes) {
         this.accountTypes = accountTypes;
     }
 

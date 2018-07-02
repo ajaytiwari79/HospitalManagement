@@ -7,6 +7,7 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.JaversBaseService;
+import com.kairos.service.common.MongoBaseService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,17 +16,19 @@ import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ClauseTagService extends JaversBaseService {
+public class ClauseTagService extends MongoBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseTagService.class);
 
     @Inject
     ClauseTagMongoRepository clauseTagMongoRepository;
+
     @Inject
     private
     MessageSource messageSource;
@@ -53,7 +56,7 @@ public class ClauseTagService extends JaversBaseService {
     }
 
 
-    public ClauseTag getClauseTagById(Long countryId, Long organizationId, ObjectId id) {
+    public ClauseTag getClauseTagById(Long countryId, Long organizationId, BigInteger id) {
 
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -65,7 +68,7 @@ public class ClauseTagService extends JaversBaseService {
     }
 
 
-    public Boolean deleteClauseTagById(Long countryId, Long organizationId, ObjectId id) {
+    public Boolean deleteClauseTagById(Long countryId, Long organizationId, BigInteger id) {
 
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -79,7 +82,7 @@ public class ClauseTagService extends JaversBaseService {
     }
 
 
-    public ClauseTag updateClauseTag(Long countryId,Long organizationId,ObjectId id, String clauseTag) {
+    public ClauseTag updateClauseTag(Long countryId,Long organizationId,BigInteger id, String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
         }
@@ -97,7 +100,7 @@ public class ClauseTagService extends JaversBaseService {
     public List<ClauseTag> addClauseTagAndGetClauseTagList(Long countryId, Long organizationId, List<ClauseTagDTO> tagList) {
 
         List<ClauseTag> clauseTagList = new ArrayList<>();
-        List<ObjectId> existClauseTagIds = new ArrayList<>();
+        List<BigInteger> existClauseTagIds = new ArrayList<>();
         List<String> clauseTagsName = new ArrayList<>();
         for (ClauseTagDTO tagDto : tagList) {
 

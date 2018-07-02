@@ -14,8 +14,7 @@ import java.util.Set;
 
 
 @Repository
-@JaversSpringDataAuditable
-public interface ClauseMongoRepository extends MongoRepository<Clause,ObjectId>,CustomClauseRepository{
+public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,title:?2}")
@@ -24,13 +23,13 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,ObjectId>,
     Clause findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
-    Clause findByIdAndNonDeleted(Long countryId,Long organizationId,ObjectId id);
+    Clause findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1}")
     List<ClauseResponseDTO>  findAllClause(Long countryId,Long organizationId);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
-    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, Set<ObjectId> ids);
+    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, Set<BigInteger> ids);
 
 
 

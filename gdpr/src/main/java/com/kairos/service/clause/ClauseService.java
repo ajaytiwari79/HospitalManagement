@@ -102,7 +102,7 @@ public class ClauseService extends JaversBaseService {
 
     }
 
-    public Clause getClause(Long countryId, Long organizationId, ObjectId id) {
+    public Clause getClause(Long countryId, Long organizationId, BigInteger id) {
         Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(clause).isPresent()) {
             throw new DataNotFoundByIdException("message.clause.data.not.found.for " + id);
@@ -111,7 +111,7 @@ public class ClauseService extends JaversBaseService {
     }
 
 
-    public Clause updateClause(Long countryId, Long organizationId, ObjectId clauseId, ClauseDTO clauseDto) throws RepositoryException {
+    public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) throws RepositoryException {
 
         Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
         if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId) ) {
@@ -142,7 +142,7 @@ public class ClauseService extends JaversBaseService {
     }
 
 
-    public List<Clause> getClauseList(Long countryId, Long organizationId, Set<ObjectId> clausesId) {
+    public List<Clause> getClauseList(Long countryId, Long organizationId, Set<BigInteger> clausesId) {
         return clauseRepository.getClauseListByIds(countryId, organizationId, clausesId);
     }
 
@@ -152,7 +152,7 @@ public class ClauseService extends JaversBaseService {
     }
 
 
-    public Boolean deleteClause(Long countryId,Long organizationId,ObjectId id) {
+    public Boolean deleteClause(Long countryId,Long organizationId,BigInteger id) {
 
         Clause clause = clauseRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (Optional.ofNullable(clause).isPresent()) {
@@ -184,7 +184,7 @@ public class ClauseService extends JaversBaseService {
 
 
 
-    public List<Map<String,Object>> getClauseVersions(String clauseId)
+    /*public List<Map<String,Object>> getClauseVersions(String clauseId)
     {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(clauseId, Clause.class);
@@ -192,7 +192,7 @@ public class ClauseService extends JaversBaseService {
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryOfVersions(changes);
-    }
+    }*/
 
 
 }

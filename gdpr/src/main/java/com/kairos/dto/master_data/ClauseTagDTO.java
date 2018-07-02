@@ -10,17 +10,17 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseTagDTO {
 
-    private ObjectId id;
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "Tag  can't be Empty")
     @Pattern(message = "numberic and Special character are not allowed in tag",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    public ObjectId getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

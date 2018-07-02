@@ -71,7 +71,7 @@ public class AccountTypeController {
 
     @ApiOperation(value = "account type by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getAccountTypeById(@PathVariable Long countryId, @PathVariable ObjectId id) {
+    public ResponseEntity<Object> getAccountTypeById(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
@@ -86,7 +86,7 @@ public class AccountTypeController {
 
     @ApiOperation(value = "update account type name")
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Object> updateAccountTypeName(@PathVariable ObjectId id, @PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
+    public ResponseEntity<Object> updateAccountTypeName(@PathVariable BigInteger id, @PathVariable Long countryId, @Valid @RequestBody AccountType accountType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
@@ -99,7 +99,7 @@ public class AccountTypeController {
 
     @ApiOperation(value = "delete account type by id ")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteAccountTypeById(@PathVariable Long countryId, @PathVariable ObjectId id) {
+    public ResponseEntity<Object> deleteAccountTypeById(@PathVariable Long countryId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {

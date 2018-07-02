@@ -4,6 +4,7 @@ package com.kairos.response.dto.master_data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,7 +15,7 @@ public class AssetTypeResponseDto {
 
     private String name;
 
-    private List<AssetTypeResponseDto> subAssetTypes;
+    private List<AssetTypeResponseDto> subAssetTypes=new ArrayList<>();
 
     private Boolean isSubAsset;
 

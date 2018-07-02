@@ -9,10 +9,20 @@ import javax.validation.constraints.NotNull;
 
 
 @Document(collection = "clause_tag")
-public class ClauseTag extends JaversBaseEntity {
+public class ClauseTag extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "Name cannot be  empty")
     private String name;
+
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public String getName() {
         return name;

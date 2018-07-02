@@ -46,7 +46,7 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty(message = "Account Type cannot be empty")
-    private Set<ObjectId> accountTypes;
+    private Set<BigInteger> accountTypes;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<AgreementSection> agreementSections;
@@ -109,11 +109,11 @@ public class PolicyAgreementTemplateDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<ObjectId> getAccountTypes() {
+    public Set<BigInteger> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<ObjectId> accountTypes) {
+    public void setAccountTypes(Set<BigInteger> accountTypes) {
         this.accountTypes = accountTypes;
     }
 

@@ -14,13 +14,13 @@ import java.util.Set;
 public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,ObjectId> {
 
    @Query("{deleted:false,countryId:?0,_id:?1}")
-   AccountType findByIdAndNonDeleted(Long countryId,ObjectId id);
+   AccountType findByIdAndNonDeleted(Long countryId,BigInteger id);
 
    @Query("{deleted:false,countryId:?0}")
    List<AccountType> getAllAccountType(Long countryId);
 
    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-   List<AccountType> getAccountTypeList(Long countryId,Set<ObjectId> ids);
+   List<AccountType> getAccountTypeList(Long countryId,Set<BigInteger> ids);
 
    AccountType findByid(BigInteger id);
 
