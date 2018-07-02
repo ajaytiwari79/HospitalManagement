@@ -33,6 +33,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.unit_settings.UnitSettingService;
+import com.kairos.service.user_service_data.UnitDataService;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.util.ObjectMapperUtils;
@@ -92,8 +93,10 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
 
-    private @Inject
-    ActivityConfigurationService activityConfigurationService;
+    @Inject
+    private ActivityConfigurationService activityConfigurationService;
+    @Inject
+    private UnitDataService unitDataService;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -297,12 +300,12 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityWithTimeTypeDTO;
     }
 
-    public boolean createDefaultDataForOrganization(Long unitId, Long countryId) {
+    public boolean createDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId) {
+        unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
-        activityConfigurationService.createDefaultSettings(countryId,unitId, phases);
         return true;
     }
 

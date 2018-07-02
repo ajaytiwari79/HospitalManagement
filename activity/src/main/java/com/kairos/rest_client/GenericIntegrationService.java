@@ -3,6 +3,7 @@ package com.kairos.rest_client;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
@@ -65,5 +66,9 @@ public class GenericIntegrationService {
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypesAtUnit(Long unitId) {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/day_types_and_employment_types", null), DayTypeEmploymentTypeWrapper.class);
+    }
+
+    public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryOfUnits() {
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/unit/parent_org_and_country", null), UnitAndParentOrganizationAndCountryDTO.class);
     }
 }
