@@ -1,10 +1,8 @@
 package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
-import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -55,6 +53,20 @@ public class ClauseDTO {
     @NotEmpty
     private Set<BigInteger> accountTypes;
 
+
+    @NotNull
+    private BigInteger templateType;
+
+    @NotNull
+    private Set<Long> organnizationList;
+
+    public Set<Long> getOrgannizationList() { return organnizationList; }
+
+    public void setOrgannizationList(Set<Long> organnizationList) { this.organnizationList = organnizationList; }
+
+    public BigInteger getTemplateType() { return templateType; }
+
+    public void setTemplateType(BigInteger templateType) { this.templateType = templateType; }
 
     public String getTitle() {
         return title;

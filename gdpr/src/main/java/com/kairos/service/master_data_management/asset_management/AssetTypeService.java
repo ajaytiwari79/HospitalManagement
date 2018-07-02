@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -173,7 +172,6 @@ public class AssetTypeService extends MongoBaseService {
                 newSubAssetTypesList.add(subAssetTypeDto);
             }
         });
-
         Map<String, Object> updatedSubAssetTypes = new HashMap<>(), newSubAssetTypes = new HashMap<>();
         List<BigInteger> updatedAndNewSubAssetTypeIds = new ArrayList<>();
         if (newSubAssetTypesList.size() != 0) {

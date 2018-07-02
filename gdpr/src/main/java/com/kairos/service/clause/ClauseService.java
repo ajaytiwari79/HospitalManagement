@@ -8,18 +8,12 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.service.common.JaversBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.jackrabbit_service.JackrabbitService;
-import com.kairos.service.javers.JaversCommonService;
+import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ComparisonUtils;
-import org.bson.types.ObjectId;
-import org.javers.core.Javers;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.repository.jql.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +22,13 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.jcr.RepositoryException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.List;
 
 
 @Service
-public class ClauseService extends JaversBaseService {
+public class ClauseService extends MongoBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseService.class);
 
@@ -47,8 +40,6 @@ public class ClauseService extends JaversBaseService {
     @Inject
     private MongoTemplate mongoTemplate;
 
-    @Inject
-    private JackrabbitService jackrabbitService;
 
     @Inject
     private AccountTypeMongoRepository accountTypeMongoRepository;
@@ -67,13 +58,10 @@ public class ClauseService extends JaversBaseService {
     private ClauseTagMongoRepository clauseTagMongoRepository;
 
     @Inject
-    private Javers javers;
-
-    @Inject
-    private JaversCommonService javersCommonService;
+    private TemplateTypeService templateTypeService;
 
 
-    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) throws RepositoryException {
+    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto)  {
 
         if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
@@ -82,6 +70,7 @@ public class ClauseService extends JaversBaseService {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
+        templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
         Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
         newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
         newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -89,10 +78,12 @@ public class ClauseService extends JaversBaseService {
         newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
         newclause.setOrganizationId(organizationId);
         newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        newclause.setOrganizationList(clauseDto.getOrgannizationList());
+        newclause.setTemplateType(clauseDto.getTemplateType());
         newclause.setTags(tagList);
+
         try {
-            newclause =clauseRepository.save(newclause);
-           // jackrabbitService.addClauseNodeToJackrabbit(newclause.getId(), newclause);
+            newclause = save(newclause);
             return newclause;
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -111,10 +102,10 @@ public class ClauseService extends JaversBaseService {
     }
 
 
-    public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) throws RepositoryException {
+    public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
         Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
-        if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId) ) {
+        if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
         exists = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
@@ -122,7 +113,8 @@ public class ClauseService extends JaversBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-        exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId,  clauseDto.getAccountTypes()));
+        exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        templateTypeService.getTemplateByById(clauseDto.getTemplateType(),countryId);
         try {
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -131,8 +123,9 @@ public class ClauseService extends JaversBaseService {
             exists.setTitle(clauseDto.getTitle());
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
-           // jackrabbitService.clauseVersioning(clauseId, exists);
-            exists = clauseRepository.save(exists);
+            exists.setTemplateType(clauseDto.getTemplateType());
+            exists.setOrganizationList(clauseDto.getOrgannizationList());
+            exists = save(exists);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -152,9 +145,9 @@ public class ClauseService extends JaversBaseService {
     }
 
 
-    public Boolean deleteClause(Long countryId,Long organizationId,BigInteger id) {
+    public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {
 
-        Clause clause = clauseRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (Optional.ofNullable(clause).isPresent()) {
             clause.setDeleted(true);
             clauseRepository.save(clause);
@@ -167,10 +160,11 @@ public class ClauseService extends JaversBaseService {
 
 
     public Page<Clause> getClausePagination(int page, int size) {
-      //  return clauseRepository.findAll(new PageRequest(page, size));
+        //  return clauseRepository.findAll(new PageRequest(page, size));
         return null;
     }
 
+/*
 
     public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
         return jackrabbitService.getClauseVersion(id, version);
@@ -181,18 +175,7 @@ public class ClauseService extends JaversBaseService {
         return jackrabbitService.getClauseVersions(id);
 
     }
-
-
-
-    /*public List<Map<String,Object>> getClauseVersions(String clauseId)
-    {
-
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(clauseId, Clause.class);
-        Optional<CdoSnapshot> latestSnapshot = javers.getLatestSnapshot(clauseId,Clause.class);
-        List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
-        changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
-        return javersCommonService.getHistoryOfVersions(changes);
-    }*/
+*/
 
 
 }

@@ -75,6 +75,16 @@ public class TemplateTypeService extends MongoBaseService {
             throw new DataNotExists("Template for template type ->" + templateName + " Not exists");
     }
 
+
+    public TemplateType getTemplateByById(BigInteger templateId,Long countryId) {
+        TemplateType template = templateTypeRepository.findByIdAndNonDeleted(templateId,countryId);
+        if (java.util.Optional.ofNullable(template).isPresent()) {
+            return template;
+        } else
+            throw new DataNotExists("Template for template type ->" + templateId + " Not exists");
+    }
+
+
     /**
      * @description this method is used for update template by id
      * @author vikash patwal

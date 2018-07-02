@@ -6,10 +6,7 @@ import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -18,33 +15,30 @@ import java.util.Set;
 
 
 @Document(collection = "clause")
-@TypeName("clause")
 public class Clause extends MongoBaseEntity {
 
     @NotNullOrEmpty
     private String title;
     @NotNull
-    @DiffIgnore
     private List<ClauseTag> tags = new ArrayList<>();
     @NotNull
     private String description;
 
-    @DiffIgnore
     private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
-    @DiffIgnore
+
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
-    @DiffIgnore
+
     private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
-    @DiffIgnore
+
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
-    @DiffIgnore
+
     private List<AccountType> accountTypes;
 
     private Long countryId;
 
     private Boolean isDefault = true;
 
-    private Set<Long> organizations;
+    private Set<Long> organizationList;
 
     private BigInteger parentClauseId;
 
@@ -54,17 +48,17 @@ public class Clause extends MongoBaseEntity {
         return templateType;
     }
 
+    public Set<Long> getOrganizationList() { return organizationList; }
+
+    public void setOrganizationList(Set<Long> organizationList) { this.organizationList = organizationList; }
+
     public void setTemplateType(BigInteger templateType) {
         this.templateType = templateType;
     }
 
-    public Set<Long> getOrganizations() {
-        return organizations;
-    }
+    public Long getCountryId() { return countryId; }
 
-    public void setOrganizations(Set<Long> organizations) {
-        this.organizations = organizations;
-    }
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
 
     public BigInteger getParentClauseId() {
         return parentClauseId;
