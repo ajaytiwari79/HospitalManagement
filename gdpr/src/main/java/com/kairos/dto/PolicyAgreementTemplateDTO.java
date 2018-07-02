@@ -25,6 +25,9 @@ public class PolicyAgreementTemplateDTO {
     @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
 
+    @Pattern(message = "String and Special characters are not allowed",regexp ="[0-9]+")
+    private String templateId;
+
     @NotNull(message = "Organization Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be empty")
     private List<OrganizationTypeAndServiceBasicDTO>  organizationTypes;
@@ -112,6 +115,14 @@ public class PolicyAgreementTemplateDTO {
 
     public void setAccountTypes(Set<ObjectId> accountTypes) {
         this.accountTypes = accountTypes;
+    }
+
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     public PolicyAgreementTemplateDTO() {
