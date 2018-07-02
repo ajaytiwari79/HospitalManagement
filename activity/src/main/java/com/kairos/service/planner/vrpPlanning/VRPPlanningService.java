@@ -18,6 +18,7 @@ import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.user.staff.staff.StaffDTO;
@@ -59,6 +60,7 @@ public class VRPPlanningService extends MongoBaseService{
     @Inject private PhaseMongoRepository phaseMongoRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private ConstraintRepository constraintRepository;
+    @Inject private SolverConfigService solverConfigService;
 
     public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
         //createShift();
@@ -78,6 +80,21 @@ public class VRPPlanningService extends MongoBaseService{
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
         plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
         return solverConfigDTO;
+    }
+
+    public SolverConfigDTO resubmitToPlanner(Long unitId, SolverConfigDTO solverConfigDTO){
+        SolverConfigDTO newSolverConfigDTO = solverConfigService.createSolverConfigOnReSubmistion(unitId,solverConfigDTO);
+        List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
+        Map<BigInteger,ConstraintDTO> constraintDTOMap = constraints.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        newSolverConfigDTO.getConstraints().forEach(c->{
+            ConstraintDTO constraintDTO = constraintDTOMap.get(c.getId());
+            c.setCategory(constraintDTO.getCategory());
+            c.setName(constraintDTO.getName());
+            c.setDescription(constraintDTO.getDescription());
+        });
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,newSolverConfigDTO);
+        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
+        return newSolverConfigDTO;
     }
 
 
@@ -106,7 +123,7 @@ public class VRPPlanningService extends MongoBaseService{
 
     public SolverConfigDTO stopToPlannerBySolverConfig(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
-        solverConfig.setStatus(SolverConfigStatus.ON_HOLD);
+        solverConfig.setStatus(SolverConfigStatus.READY);
         save(solverConfig);
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
     }

@@ -17,6 +17,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
+import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.language.LanguageService;
@@ -114,6 +115,7 @@ public class OrganizationController {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject private VRPClientService vrpClientService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -1401,5 +1403,23 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getOrganizationSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationSettings(unitId));
     }
+
+    @ApiOperation(value = "Create Prefered Time window")
+    @PostMapping(value = "/unit/{unitId}/prefer_time_window")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createPreferedTimeWindow(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                vrpClientService.createPreferedTimeWindow(unitId));
+    }
+
+    @ApiOperation(value = "get Prefered Time window")
+    @GetMapping(value = "/unit/{unitId}/prefer_time_window")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPreferedTimeWindow(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                vrpClientService.getPreferedTimeWindow(unitId));
+    }
+
+
 
 }
