@@ -52,7 +52,7 @@ public class AttendanceSettingService extends MongoBaseService {
         Long userId = Long.valueOf(UserContext.getUserDetails().getId());
         List<StaffResultDTO> staffAndOrganizationIds = restClient.getStaffIdsByUserId(userId);
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
-            exceptionService.actionNotPermittedException("message.user.staff.notfound");
+            exceptionService.actionNotPermittedException("message.staff.notfound");
         }
         attendanceSetting = (checkIn == true) ? checkInAttendanceSetting(unitId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
         if(Optional.ofNullable(attendanceSetting).isPresent()) {
@@ -68,10 +68,10 @@ public class AttendanceSettingService extends MongoBaseService {
     private AttendanceSetting checkInAttendanceSetting(Long unitId, List<StaffResultDTO> staffAndOrganizationIds) {
         AttendanceSetting attendanceSetting = null;
         StaffResultDTO staffAndOrganizationId;
-        if (unitId != null) {
+        if (Optional.ofNullable(unitId).isPresent()) {
             staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
-            if (staffAndOrganizationId == null) {
-                exceptionService.actionNotPermittedException("message.staff.notfound");
+            if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
+                exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
             }
             AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
             attendanceSetting = new AttendanceSetting(unitId, staffAndOrganizationId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
@@ -93,7 +93,7 @@ public class AttendanceSettingService extends MongoBaseService {
         attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
             duration = attendanceSetting.getAttendanceDuration();
-            if (duration.getTo() == null) {
+            if (!Optional.ofNullable(duration.getTo()).isPresent()) {
                 StaffResultDTO staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(attendanceSetting.getUnitId())).findAny().get();
                 duration.setTo(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
             }else{
@@ -110,7 +110,7 @@ public class AttendanceSettingService extends MongoBaseService {
         AttendanceDurationDTO attendanceDurationDTO=new AttendanceDurationDTO();
         attendanceDurationDTO.setClockInDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.getFrom()));
         attendanceDurationDTO.setClockInTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.getFrom()));
-       if(attendanceDuration.getTo()!=null) {
+       if(Optional.ofNullable(attendanceDuration.getTo()).isPresent()) {
            attendanceDurationDTO.setClockOutDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.getTo()));
            attendanceDurationDTO.setClockOutTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.getTo()));
        }

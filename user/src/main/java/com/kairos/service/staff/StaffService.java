@@ -250,7 +250,7 @@ public class StaffService extends UserBaseService {
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
 
         if (staffToUpdate == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {

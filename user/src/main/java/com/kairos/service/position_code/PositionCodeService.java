@@ -188,7 +188,7 @@ public class PositionCodeService extends UserBaseService {
     public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long id, String type, Long staffId) {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
 

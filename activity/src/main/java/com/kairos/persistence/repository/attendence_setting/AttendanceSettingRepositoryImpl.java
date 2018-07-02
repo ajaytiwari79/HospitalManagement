@@ -26,10 +26,7 @@ public class AttendanceSettingRepositoryImpl implements CustomAttendanceSettingR
        );
 
        AggregationResults<AttendanceSetting> result = mongoTemplate.aggregate(aggregation, AttendanceSetting.class, AttendanceSetting.class);
-       if(result.getMappedResults().isEmpty()){
-           return null;
-       }
-       return result.getMappedResults().get(0);
+       return (result.getMappedResults().isEmpty())?null:result.getMappedResults().get(0);
    }
 
     }
