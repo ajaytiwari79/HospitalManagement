@@ -72,6 +72,7 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
+import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
@@ -258,6 +259,7 @@ public class OrganizationService extends UserBaseService {
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject private VRPClientService vrpClientService;
 
 
     public Organization getOrganizationById(long id) {
@@ -376,7 +378,7 @@ public class OrganizationService extends UserBaseService {
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
         workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
-
+        vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 //        accessGroupService.createDefaultAccessGroups(organization);
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
@@ -490,7 +492,7 @@ public class OrganizationService extends UserBaseService {
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
         workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
-
+        vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
@@ -932,6 +934,7 @@ public class OrganizationService extends UserBaseService {
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
         workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationBasicDTO.getSubTypeId(), unit.getId(), country.getId());
+        vrpClientService.createPreferedTimeWindow(organization.getId());
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
 
         Map<String, Object> response = new HashMap<>();
