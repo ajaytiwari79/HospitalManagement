@@ -169,8 +169,8 @@ public class PhaseService extends MongoBaseService {
         return phasesData;
     }
 
-    public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId) {
-        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId);
+    public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId, Sort.Direction direction) {
+        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
         return phases;
     }
 
