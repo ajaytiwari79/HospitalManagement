@@ -66,7 +66,7 @@ public class StaffAddressService extends UserBaseService {
         Staff staff = staffGraphRepository.findOne(staffId);
 
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
 
         }

@@ -7,7 +7,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.processing_activity.HostingLocation;
 import com.kairos.persistance.repository.processing_activity.HostingLocationMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

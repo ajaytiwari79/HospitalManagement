@@ -11,20 +11,16 @@ import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
-import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
 import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDTO;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.jackrabbit_service.JackrabbitService;
 import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
-import javax.jcr.RepositoryException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -51,15 +47,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
-    private JackrabbitService jackrabbitService;
-
-    @Inject
     private ExceptionService exceptionService;
 
     @Inject
     private TemplateTypeMongoRepository templateTypeMongoRepository;
 
-    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organziationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) throws RepositoryException {
+    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organziationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
 
         String name = policyAgreementTemplateDto.getName();
         if (policyAgreementTemplateRepository.findByName(name) != null) {
@@ -109,7 +102,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 }
                 policyAgreementTemplate.setCountryId(countryId);
                 policyAgreementTemplate = save(policyAgreementTemplate);
-                jackrabbitService.addAgreementTemplateJackrabbit(policyAgreementTemplate.getId(), policyAgreementTemplate, (List<AgreementSectionResponseDTO>) sections.get("section"));
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
@@ -151,7 +143,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) throws RepositoryException {
+    public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
         if (!Optional.ofNullable(exist).isPresent()) {
@@ -200,7 +192,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 exist.setAccountTypes(accountTypeIds);
                 exist.setName(policyAgreementTemplateDto.getName());
                 exist.setDescription(policyAgreementTemplateDto.getDescription());
-                jackrabbitService.agreementTemplateVersioning(id, exist, (List<AgreementSectionResponseDTO>) sections.get("section"));
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
@@ -211,17 +202,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     }
 
-
-    public StringBuffer getPolicyTemplateVersion(BigInteger id, String version) throws RepositoryException {
-        return jackrabbitService.getpolicyTemplateVersion(id, version);
-    }
-
-
-    public List<String> getPolicyTemplateAllVersionList(Long countryId, BigInteger id) throws RepositoryException {
-
-        return jackrabbitService.getPolicyTemplateVersions(id);
-
-    }
 
 
 }

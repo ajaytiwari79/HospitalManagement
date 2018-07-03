@@ -8,7 +8,7 @@ import com.kairos.persistance.model.master_data_management.questionnaire_templat
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionMongoRepository;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireSectionRepository;
 import com.kairos.persistance.repository.master_data_management.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;

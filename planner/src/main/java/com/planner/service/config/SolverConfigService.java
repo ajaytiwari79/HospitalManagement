@@ -1,8 +1,11 @@
 package com.planner.service.config;
 
 import com.kairos.enums.WTATemplateType;
+import com.kairos.planner.solverconfig.ConstraintValueDTO;
+import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.planner.solverconfig.SolverConfigWTADTO;
 import com.planner.commonUtil.StaticField;
+import com.planner.domain.config.Constraint;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
 import com.planner.util.wta.FileIOUtil;
@@ -325,6 +328,39 @@ public class SolverConfigService {
         }
         //solverConfigRepository.saveList(rules);
         return true;*//*
+    }*/
+
+
+   /* public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
+        SolverConfig solverConfig = new SolverConfig();
+        solverConfig.setTerminationSeconds(solverConfigDTO.getTerminationTime());
+        solverConfig.setUnitId(solverConfigDTO.getUnitId());
+        Constraint constraint = new
+        for (ConstraintValueDTO constraintValue : solverConfigDTO.getConstraints()) {
+            switch (constraintValue.getName()){
+                case "Maximize flexitime utilization":
+                    break;
+                case "Minimize driving time":
+                    break;
+                case "Must Be Planned":
+                    break;
+                case "Number of Task Per shift":
+                    break;
+                case "Optimize plan based on Skill":
+                    break;
+                case "Plan inside Time Window":
+                    break;
+                case "Plan task from same installation number together":
+                    break;
+                case "Starts as First task":
+                    break;
+                case "Task from same installation number":
+                    break;
+
+
+            }
+        }
+        return solverConfig;
     }*/
 
 }

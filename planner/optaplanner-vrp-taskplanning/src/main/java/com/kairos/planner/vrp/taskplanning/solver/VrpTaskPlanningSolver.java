@@ -165,6 +165,8 @@ public class VrpTaskPlanningSolver {
         });
         VrpTaskPlanningSolution solution=null;
         try {
+            //TODO put submiss id here
+            log.info("Starting vrp solver on this thread with problem:"+problem.getSolverConfigId());
             solution = solver.solve(problem);
             DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 

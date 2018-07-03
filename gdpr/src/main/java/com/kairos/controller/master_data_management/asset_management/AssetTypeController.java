@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_STORAGE_TYPE_URL;
+import static com.kairos.constants.ApiConstant.API_ASSET_TYPE_URL;
 /*
  *
  *  created by bobby 17/5/2018
@@ -26,8 +26,8 @@ import static com.kairos.constants.ApiConstant.API_STORAGE_TYPE_URL;
 
 
 @RestController
-@RequestMapping(API_STORAGE_TYPE_URL)
-@Api(API_STORAGE_TYPE_URL)
+@RequestMapping(API_ASSET_TYPE_URL)
+@Api(API_ASSET_TYPE_URL)
 public class AssetTypeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeController.class);
@@ -38,13 +38,13 @@ public class AssetTypeController {
 
     @ApiOperation("add AssetType")
     @PostMapping("/add")
-    public ResponseEntity<Object> createAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<AssetType> assetTypes) {
+    public ResponseEntity<Object> createAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody AssetTypeDTO assetTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.createAssetType(countryId, organizationId, assetTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.createAssetTypeAndAddSubAssetTypes(countryId, organizationId, assetTypes));
 
     }
 
@@ -61,7 +61,7 @@ public class AssetTypeController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetType(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, organizationId, id));
 
     }
 
@@ -113,7 +113,7 @@ public class AssetTypeController {
 
     @ApiOperation("update subAsset by id")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody AssetType assetType) {
+    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody AssetTypeDTO assetType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
@@ -124,12 +124,12 @@ public class AssetTypeController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetType(countryId, organizationId, id, assetType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(countryId, organizationId, id, assetType));
 
     }
 
 
-    @ApiOperation("update subAsset by id")
+  /*  @ApiOperation("update subAsset by id")
     @PostMapping("/subAsset/add")
     public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody AssetTypeDTO assetTypeDto) {
         if (countryId == null) {
@@ -138,7 +138,7 @@ public class AssetTypeController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.createAssetTypeAndAddSubAssetTypes(countryId, organizationId, assetTypeDto));
-    }
+    }*/
 
 
 }
