@@ -8,8 +8,8 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.asset_management.HostingProvider;
 import com.kairos.persistance.repository.master_data_management.asset_management.HostingProviderMongoRepository;
-import com.kairos.service.MongoBaseService;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.service.common.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,22 +28,25 @@ public class HostingProviderService extends MongoBaseService {
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
-    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
-        Map<String, List<HostingProvider>> result = new HashMap<>();
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
-        List<HostingProvider> newhostingProviders = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
+
+        Map<String, List<HostingProvider>> result = new HashMap<>();
+        Set<String> hostingProviderNames = new HashSet<>();
         if (hostingProviders.size() != 0) {
             for (HostingProvider hostingProvider : hostingProviders) {
                 if (!StringUtils.isBlank(hostingProvider.getName())) {
-                    names.add(hostingProvider.getName());
+                    hostingProviderNames.add(hostingProvider.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingProvider> existing  = hostingProviderMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
-            if (names.size()!=0) {
-                for (String name : names) {
+            List<HostingProvider> existing  = findByNamesList(countryId,organizationId,hostingProviderNames,HostingProvider.class);
+            hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
+            List<HostingProvider> newhostingProviders = new ArrayList<>();
+            if (hostingProviderNames.size()!=0) {
+                for (String name : hostingProviderNames) {
 
                     HostingProvider newHostingProvider = new HostingProvider();
                     newHostingProvider.setName(name);

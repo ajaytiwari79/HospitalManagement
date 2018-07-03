@@ -25,7 +25,7 @@ public class VRPClientController {
     @Inject
     private VRPClientService vrpClientService;
 
-   @ApiOperation(value = "import Unit Client Excel File")
+    @ApiOperation(value = "import Unit Client Excel File")
     @PostMapping(value = "/importClients")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> importVrpClient(@PathVariable Long unitId, @RequestParam("file") MultipartFile multipartFile) {
@@ -33,7 +33,7 @@ public class VRPClientController {
                 vrpClientService.importClients(unitId,multipartFile));
     }
 
-     @ApiOperation(value = "get All VRPClient by Organization")
+    @ApiOperation(value = "get All VRPClient by Organization")
     @GetMapping(value = "/vrpClient")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getClients(@PathVariable Long unitId) {
@@ -59,11 +59,12 @@ public class VRPClientController {
 
 
     @ApiOperation(value = "update VRPClient by Organization")
-    @PutMapping(value = "/client")
+    @PutMapping(value = "/vrpClient/{clientId}/client_prefered_time_window/{preferedTimeWindowId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateClient(@PathVariable Long unitId, @RequestBody VRPClientDTO vrpClientDTO) {
+    public ResponseEntity<Map<String, Object>> updateClient(@PathVariable Long unitId, @PathVariable Long preferedTimeWindowId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                vrpClientService.updateClient(unitId,vrpClientDTO));
+                vrpClientService.updateClientPreferedTimeWindow(unitId,preferedTimeWindowId));
     }
+
 
 }

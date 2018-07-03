@@ -23,8 +23,6 @@ public class WTABaseRuleTemplate extends MongoBaseEntity {
     protected String lastUpdatedBy;
     protected Long countryId;
     protected WTATemplateType wtaTemplateType;
-    protected Integer staffCanBeIgnoreCounter;
-    protected Integer managementCanBeIgnoreCounter;
     protected List<PhaseTemplateValue> phaseTemplateValues;
 
 
@@ -102,19 +100,4 @@ public class WTABaseRuleTemplate extends MongoBaseEntity {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public Integer getStaffCanBeIgnoreCounter() {
-        return staffCanBeIgnoreCounter;
-    }
-
-    public void setStaffCanBeIgnoreCounter(Integer staffCanBeIgnoreCounter) {
-        this.staffCanBeIgnoreCounter = staffCanBeIgnoreCounter;
-    }
-
-    public Integer getManagementCanBeIgnoreCounter() {
-        return managementCanBeIgnoreCounter;
-    }
-
-    public void setManagementCanBeIgnoreCounter(Integer managementCanBeIgnoreCounter) {
-        this.managementCanBeIgnoreCounter = managementCanBeIgnoreCounter;
-    }
 }

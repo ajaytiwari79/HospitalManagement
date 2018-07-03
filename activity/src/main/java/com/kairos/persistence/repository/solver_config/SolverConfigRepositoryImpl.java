@@ -23,14 +23,13 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.proj
  */
 
 public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository {
-
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
     public SolverConfigDTO getOneById(BigInteger solverConfigId) {
         Aggregation agg = Aggregation.newAggregation(
-                match(Criteria.where("id").is(solverConfigId).and("deleted").is(false)),
-                lookup("constraint","constraints._id","_id","constraints")
+                match(Criteria.where("id").is(solverConfigId).and("deleted").is(false))
+                //lookup("constraint","constraints._id","_id","constraints")
         );
         AggregationResults< SolverConfigDTO > result =mongoTemplate.aggregate(agg,SolverConfig.class,SolverConfigDTO.class);
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);

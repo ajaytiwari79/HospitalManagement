@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 public class VrpTaskPlanningSolver {
     public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
+    public static String defaultDrl = "optaplanner-vrp-taskplanning/src/main/resources/drl/vrp_task_rules.drl";
+    public static String config_on_request = "/opt/kairos/kairos-user/planner/optaplanner-vrp-taskplanning/src/main/resources/config/configuration_for_request.xml";
     private static Logger log= LoggerFactory.getLogger(VrpTaskPlanningSolver.class);
     Solver<VrpTaskPlanningSolution> solver;
     SolverFactory<VrpTaskPlanningSolution> solverFactory;
@@ -34,8 +36,10 @@ public class VrpTaskPlanningSolver {
 
 
     public VrpTaskPlanningSolver(List<File> drlFileList){
-        //solverFactory = SolverFactory.createFromXmlFile(new File("optaplanner-vrp-taskplanning/"+config));
-        solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+        solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
+        if(drlFileList!=null && !drlFileList.isEmpty()){
+            solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+        }
         solver = solverFactory.buildSolver();
     }
 
@@ -55,6 +59,9 @@ public class VrpTaskPlanningSolver {
     }
 
     public void solve(VrpTaskPlanningSolution problem,boolean addBreaks) throws IOException {
+        problem.getTasks().stream().map(t->t.getCity()+"---"+t.getStreetName()).collect(Collectors.toSet()).forEach(b->{
+            log.info("city---street:     "+b);
+        });
         printProblemInfo(problem);
         if(addBreaks)
         addBreaks(problem);
@@ -62,6 +69,7 @@ public class VrpTaskPlanningSolver {
         problem.getTasks().forEach(t->{
             at.addAndGet(t.getDuration());
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
+            t.setLocationsRouteMatrix(problem.getLocationsRouteMatrix());
         });
         //TODO ease efficiency for debugging
         //problem.getEmployees().forEach(e->e.setEfficiency(100));
@@ -70,6 +78,10 @@ public class VrpTaskPlanningSolver {
         LocationPairDifference locationsDifference = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair);
         LocationPairDifference locationsDifference2 = problem.getLocationsDistanceMatrix().getLocationsDifference(locationPair.getReversePair());
 
+
+        //LocationPair locationPair2 = new LocationPair(56.462275d,10.034527d,56.46226953d,10.03495581d);
+        LocationPair locationPair2 = new LocationPair(56.46219053d,10.03474252d,56.46226953d,10.03495581d);
+        Boolean right= problem.getLocationsRouteMatrix().checkIfRightSideArrival(locationPair2);
         VrpTaskPlanningSolution solution=null;
         try {
             solution = solver.solve(problem);
@@ -149,9 +161,12 @@ public class VrpTaskPlanningSolver {
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
+            t.setLocationsRouteMatrix(problem.getLocationsRouteMatrix());
         });
         VrpTaskPlanningSolution solution=null;
         try {
+            //TODO put submiss id here
+            log.info("Starting vrp solver on this thread with problem:"+problem.getSolverConfigId());
             solution = solver.solve(problem);
             DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 

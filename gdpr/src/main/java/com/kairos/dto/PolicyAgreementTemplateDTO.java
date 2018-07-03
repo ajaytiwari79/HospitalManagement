@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,9 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
+
+    @Pattern(message = "String and Special characters are not allowed",regexp ="[0-9]+")
+    private String templateId;
 
     @NotNull(message = "Organization Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be empty")
@@ -47,7 +51,6 @@ public class PolicyAgreementTemplateDTO {
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     private List<AgreementSection> agreementSections;
 
-    private Long countryId;
 
     @NotEmpty(message = "error.message.list.cannot.be.empty")
     public List<AgreementSection> getAgreementSections() {
@@ -114,12 +117,12 @@ public class PolicyAgreementTemplateDTO {
         this.accountTypes = accountTypes;
     }
 
-    public Long getCountryId() {
-        return countryId;
+    public String getTemplateId() {
+        return templateId;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     public PolicyAgreementTemplateDTO() {

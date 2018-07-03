@@ -9,7 +9,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.wta.country.WTADefaultDataInfoDTO;
+import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.*;
 import com.kairos.persistence.model.country.*;

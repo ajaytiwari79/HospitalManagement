@@ -64,9 +64,9 @@ dependencies {
 	compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.2'
 	compile group: 'io.netty', name: 'netty-all', version: '4.1.15.Final'
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
-	compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}"){
+	compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")/*{
 		exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
-	}
+	}*/
 	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
 	compile('org.springframework.cloud:spring-cloud-starter-security')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c

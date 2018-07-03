@@ -46,7 +46,10 @@ subprojects{
         //compile(project(":dto"))
         testCompile group: 'junit', name: 'junit', version: '4.12'
         compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
-        compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.8.3'
+        compile( group: 'commons-beanutils', name: 'commons-beanutils', version: '1.8.3'){
+            exclude group: "commons-logging", module: "commons-logging"
+        }
+
         compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
         compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
     }

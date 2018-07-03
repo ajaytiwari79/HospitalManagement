@@ -3,6 +3,7 @@ package com.kairos.persistence.model.task_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.kairos.activity.task_type.TaskTypeDTO;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.view_handler.json_view_handler.TaskTypeViewHandler;
@@ -366,7 +367,18 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         this.vehicleRequired = vehicleRequired;
     }
 
-
+    public TaskTypeDTO getBasicTaskTypeInfo() {
+        TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
+        taskTypeDTO.setId(this.getId());
+        taskTypeDTO.setDescription(this.description);
+        taskTypeDTO.setDuration(this.duration);
+        taskTypeDTO.setExpiresOn(this.expiresOn);
+        taskTypeDTO.setTags(this.tags);
+        taskTypeDTO.setParentTaskTypeId(this.rootId);
+        taskTypeDTO.setServiceId(this.subServiceId);
+        taskTypeDTO.setTitle(this.title);
+        return taskTypeDTO;
+    }
 
     public void saveAgreementSettings(String union, String agreement, Date startPeriod, Date endPeriod) {
         this.union = union;
@@ -580,12 +592,12 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         Map<String, Object> map = new HashMap<>();
         map.put("duration",this.duration);
         map.put("title", this.title);
-      //  map.put("uniqueName", this.uniqueName);
+        //  map.put("uniqueName", this.uniqueName);
         map.put("colorForGantt", this.colorForGantt);
         map.put("colorForMap", this.colorForMap);
         map.put("shortName", this.shortName);
         map.put("generalDescription", this.generalDescription);
-     //   map.put("uploadPicture", this.uploadPicture);
+        //   map.put("uploadPicture", this.uploadPicture);
         map.put("icon",  this.icon);
         map.put("filePath",  filePath);
         map.put("organizationTypes", this.organizationTypes);
@@ -599,11 +611,11 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
         map.put("sourceTaskTypeTitle", this.sourceTaskTypeTitle);
         map.put("visitourId",this.visitourId);
         map.put("externalId",this.externalId);
-      //  map.put("slaEndDuration",this.slaEndDuration);
-      //  map.put("slaStartDuration", this.slaStartDuration);
-      //  map.put("preProcessingDuration", this.preProcessingDuration);
-      //  map.put("postProcessingDuration", this.postProcessingDuration);
-      //  map.put("setupDuration", this.setupDuration);
+        //  map.put("slaEndDuration",this.slaEndDuration);
+        //  map.put("slaStartDuration", this.slaStartDuration);
+        //  map.put("preProcessingDuration", this.preProcessingDuration);
+        //  map.put("postProcessingDuration", this.postProcessingDuration);
+        //  map.put("setupDuration", this.setupDuration);
         return map;
     }
 
@@ -1531,19 +1543,19 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
 
     @Override
     public TaskType clone() throws CloneNotSupportedException {
-       TaskType taskType = (TaskType) super.clone();
-       taskType.id = null;
-       List<TaskTypeSkill> skills = new ArrayList<>(this.taskTypeSkills.size());
-       this.taskTypeSkills.forEach(taskTypeSkill -> {
-           try {
-               skills.add(taskTypeSkill.clone());
-           } catch (CloneNotSupportedException e) {
-               throw new RuntimeException("Clone not supported for task type");
-           }
-       });
-       taskType.taskTypeSkills = skills;
-       taskType.definations = (this.definations == null)?null:this.definations.clone();
-       return taskType;
+        TaskType taskType = (TaskType) super.clone();
+        taskType.id = null;
+        List<TaskTypeSkill> skills = new ArrayList<>(this.taskTypeSkills.size());
+        this.taskTypeSkills.forEach(taskTypeSkill -> {
+            try {
+                skills.add(taskTypeSkill.clone());
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException("Clone not supported for task type");
+            }
+        });
+        taskType.taskTypeSkills = skills;
+        taskType.definations = (this.definations == null)?null:this.definations.clone();
+        return taskType;
     }
 
     public List<BigInteger> getTags() {

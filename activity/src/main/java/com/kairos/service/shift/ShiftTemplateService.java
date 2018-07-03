@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.google.inject.Inject;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateMongoRepository;
@@ -15,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -22,8 +22,7 @@ import java.util.*;
 @Transactional
 public class ShiftTemplateService extends MongoBaseService {
 
-    @Inject
-    private ShiftTemplateRepository shiftTemplateRepository;
+    @Inject private ShiftTemplateRepository shiftTemplateRepository;
     @Inject private IndividualShiftTemplateMongoRepository individualShiftTemplateMongoRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private ShiftService shiftService;

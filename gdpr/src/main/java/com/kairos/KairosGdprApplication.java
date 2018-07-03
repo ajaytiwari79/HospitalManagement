@@ -82,14 +82,6 @@ public class KairosGdprApplication {
         return template;
 
     }
-    /*@Profile("!local")
-    @Bean(name ="schedulerRestTemplate")
-    public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
-                .messageConverters(mappingJackson2HttpMessageConverter())
-                .build();
-        return template;
-    }*/
 
 
     @Profile("local")
@@ -102,14 +94,6 @@ public class KairosGdprApplication {
                 .build();
         return template;
     }
-   /* @Profile("local")
-    @Bean(name ="schedulerRestTemplate")
-    public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
-                .messageConverters(mappingJackson2HttpMessageConverter())
-                .build();
-        return template;
-    }*/
 
 
 

@@ -136,7 +136,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     List<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities, infoWrapper.getShift());
                     int consecutiveDays = getConsecutiveDays(shiftDates);
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), getId());
+                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     if (!isValid) {
                         if(limitAndCounter[1]!=null) {

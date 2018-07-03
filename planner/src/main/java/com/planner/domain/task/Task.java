@@ -30,7 +30,16 @@ public class Task extends MongoBaseEntity{
     private Date startTime;
     private Date endTime;
     private boolean breakTime;
+    private String shiftId;
+    private int drivingTime;
 
+    public int getDrivingTime() {
+        return drivingTime;
+    }
+
+    public void setDrivingTime(int drivingTime) {
+        this.drivingTime = drivingTime;
+    }
 
     public Task(String id, Long installationNumber, Double latitude, Double longitude, String skill, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city) {
         this.id = id;
@@ -47,6 +56,13 @@ public class Task extends MongoBaseEntity{
         this.city = city;
     }
 
+    public String getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(String shiftId) {
+        this.shiftId = shiftId;
+    }
 
     public boolean isBreakTime() {
         return breakTime;

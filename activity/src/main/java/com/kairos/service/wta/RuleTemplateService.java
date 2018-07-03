@@ -1,7 +1,7 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateWrapper;
@@ -22,7 +22,7 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
-import com.kairos.user.country.country.CountryDTO;
+import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.util.userContext.CurrentUserDetails;
 import com.kairos.util.userContext.UserContext;
@@ -89,10 +89,10 @@ public class RuleTemplateService extends MongoBaseService {
         AgeRange range=new AgeRange(0,0,0);
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        phaseTemplateValues.add(new PhaseTemplateValue(1,"REQUEST",(short) 0,(short)0,true,0,false,false,false));
-        phaseTemplateValues.add(new PhaseTemplateValue(2,"PUZZLE",(short) 0,(short)0,true,0,false,false,false));
-        phaseTemplateValues.add(new PhaseTemplateValue(3,"DRAFT",(short) 0,(short)0,true,0,false,false,false));
-        phaseTemplateValues.add(new PhaseTemplateValue(4,"CONSTRUCTION",(short) 0,(short)0,true,0,false,false,false));
+        phaseTemplateValues.add(new PhaseTemplateValue(1,"REQUEST",(short) 0,(short)0,true,false,false));
+        phaseTemplateValues.add(new PhaseTemplateValue(2,"PUZZLE",(short) 0,(short)0,true,false,false));
+        phaseTemplateValues.add(new PhaseTemplateValue(3,"DRAFT",(short) 0,(short)0,true,false,false));
+        phaseTemplateValues.add(new PhaseTemplateValue(4,"CONSTRUCTION",(short) 0,(short)0,true,false,false));
 
         ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate("Maximum night shift’s length","Maximum night shift’s length",400);
         shiftLengthWTATemplate.setCountryId(countryDTO.getId());

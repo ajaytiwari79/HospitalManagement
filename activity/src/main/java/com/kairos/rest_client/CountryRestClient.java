@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.user.country.country.CountryDTO;
+import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.user.organization.TimeSlot;

@@ -11,16 +11,13 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigInteger>,CustomStorageTypeRepository {
+public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigInteger>,CustomAssetTypeRepository {
 
 
 
 
     @Query("{'countryId':?0,organizationId:?1,_id:?2,deleted:false}")
     AssetType findByIdAndNonDeleted(Long countryId,Long organizationId, BigInteger id);
-
-    @Query("{countryId:?0,organizationId:?1,nameInLowerCase:?2,deleted:false}")
-    AssetType findByName(Long countryId,  Long organizationId,String name);
 
     AssetType findByid(BigInteger id);
 

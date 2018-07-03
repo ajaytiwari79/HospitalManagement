@@ -92,7 +92,7 @@ public interface TaskMongoRepository extends MongoBaseRepository<Task,BigInteger
     @Query(value = "{ 'taskDemandId' : ?0 , 'taskDemandVisitId' : ?1, dateFrom:{$gte:?2,$lte:?3}, 'isDeleted' : false}")
     Task getTaskByDemandIdAndVisitIdAndBetweenDates(String taskDemandId, BigInteger taskDemandVisitId, Date dateFrom, Date dateTo);
 
-
-
+    @Query("{citizenId:?0,taskTypeId:?1}")
+    List<Task> findAllBycitizenIdAndTaskTypeId(Long citizenId,BigInteger taskTypeId);
 
 }
