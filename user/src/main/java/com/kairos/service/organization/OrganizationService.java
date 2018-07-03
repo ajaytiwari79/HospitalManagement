@@ -329,20 +329,7 @@ public class OrganizationService extends UserBaseService {
 
     public boolean validateAccessGroupIdForUnitManager(Long countryId, Long accessGroupId, CompanyType companyType){
 
-        OrganizationCategory organizationCategory ;
-        switch (companyType){
-            case KAIROS_HUB : {
-                organizationCategory = OrganizationCategory.HUB;
-                break;
-            }
-            case UNION: {
-                organizationCategory = OrganizationCategory.UNION;
-                break;
-            }
-            default:{
-                organizationCategory = OrganizationCategory.ORGANIZATION;
-            }
-        }
+        OrganizationCategory organizationCategory = getOrganizationCategory(companyType);
         if( !accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId,organizationCategory.toString(), accessGroupId)){
             exceptionService.actionNotPermittedException("error.access.group.invalid", accessGroupId);
         }
