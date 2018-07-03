@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
@@ -74,6 +74,16 @@ public class TemplateTypeService extends MongoBaseService {
         } else
             throw new DataNotExists("Template for template type ->" + templateName + " Not exists");
     }
+
+
+    public TemplateType getTemplateByById(BigInteger templateId,Long countryId) {
+        TemplateType template = templateTypeRepository.findByIdAndNonDeleted(templateId,countryId);
+        if (java.util.Optional.ofNullable(template).isPresent()) {
+            return template;
+        } else
+            throw new DataNotExists("Template for template type ->" + templateId + " Not exists");
+    }
+
 
     /**
      * @description this method is used for update template by id

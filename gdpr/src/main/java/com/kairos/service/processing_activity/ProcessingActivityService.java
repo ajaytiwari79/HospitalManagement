@@ -3,7 +3,7 @@ package com.kairos.service.processing_activity;
 import com.kairos.persistance.repository.master_data_management.asset_management.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.master_data_management.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistance.repository.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.master_data_management.processing_activity_masterdata.ProcessingPurposeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -8,7 +8,7 @@ import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;

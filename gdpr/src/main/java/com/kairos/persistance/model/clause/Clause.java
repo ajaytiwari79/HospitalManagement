@@ -7,10 +7,11 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Document(collection = "clause")
@@ -24,20 +25,52 @@ public class Clause extends MongoBaseEntity {
     private String description;
 
     private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+
     private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
+
     private List<AccountType> accountTypes;
 
     private Long countryId;
 
-    public Long getCountryId() {
-        return countryId;
+    private Boolean isDefault = true;
+
+    private Set<Long> organizationList;
+
+    private BigInteger parentClauseId;
+
+    private BigInteger templateType;
+
+    public BigInteger getTemplateType() {
+        return templateType;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public Set<Long> getOrganizationList() { return organizationList; }
+
+    public void setOrganizationList(Set<Long> organizationList) { this.organizationList = organizationList; }
+
+    public void setTemplateType(BigInteger templateType) {
+        this.templateType = templateType;
     }
+
+    public Long getCountryId() { return countryId; }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
+
+    public BigInteger getParentClauseId() {
+        return parentClauseId;
+    }
+
+    public void setParentClauseId(BigInteger parentClauseId) {
+        this.parentClauseId = parentClauseId;
+    }
+
+    public Boolean getDefault() { return isDefault; }
+
+    public void setDefault(Boolean aDefault) { isDefault = aDefault; }
 
     public String getTitle() {
         return title;
@@ -102,11 +135,13 @@ public class Clause extends MongoBaseEntity {
     public void setAccountTypes(List<AccountType> accountTypes) {
         this.accountTypes = accountTypes;
     }
-    public Clause(Long countryId,String title,String description) {
-        this.countryId=countryId;
-        this.title=title;
-        this.description=description;
+
+    public Clause(Long countryId, String title, String description) {
+        this.countryId = countryId;
+        this.title = title;
+        this.description = description;
     }
+
     public Clause() {
     }
 }

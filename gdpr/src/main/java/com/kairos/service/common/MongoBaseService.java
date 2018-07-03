@@ -1,4 +1,4 @@
-package com.kairos.service;
+package com.kairos.service.common;
 
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.common.MongoBaseEntity;
@@ -38,27 +38,28 @@ public class MongoBaseService {
     @Inject
     DB database;
 
+
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
-    public <T extends MongoBaseEntity> T save(T entity){
+    public <T extends MongoBaseEntity> T save(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
         /**
-        *  Get class name for sequence class
-        * */
+         *  Get class name for sequence class
+         * */
         String className = entity.getClass().getSimpleName();
 
         /**
          *  Set Id if entity don't have Id
          * */
-        if(entity.getId() == null){
+        if (entity.getId() == null) {
             entity.setId(mongoSequenceRepository.nextSequence(className));
         }
         /**
          *  Set createdAt if entity don't have createdAt
          * */
-        if(entity.getCreatedAt() == null){
+        if (entity.getCreatedAt() == null) {
             entity.setCreatedAt(DateUtils.getDate());
         }
         /**
@@ -69,7 +70,7 @@ public class MongoBaseService {
         return entity;
     }
 
-    public <T extends MongoBaseEntity> List<T> save(List<T> entities){
+    public <T extends MongoBaseEntity> List<T> save(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
@@ -79,7 +80,7 @@ public class MongoBaseService {
          *  Creating BulkWriteOperation object
          * */
 
-        BulkWriteOperation bulkWriteOperation= database.getCollection(collectionName).initializeUnorderedBulkOperation();
+        BulkWriteOperation bulkWriteOperation = database.getCollection(collectionName).initializeUnorderedBulkOperation();
 
         /**
          *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
@@ -91,9 +92,9 @@ public class MongoBaseService {
         /**
          *  Handling bulk write exceptions
          * */
-        try{
+        try {
 
-            for (T entity: entities) {
+            for (T entity : entities) {
                 /**
                  *  Get class name for sequence class
                  * */
@@ -102,7 +103,7 @@ public class MongoBaseService {
                 /**
                  *  Set createdAt if entity don't have createdAt
                  * */
-                if(entity.getCreatedAt() == null){
+                if (entity.getCreatedAt() == null) {
                     entity.setCreatedAt(DateUtils.getDate());
                 }
                 /**
@@ -111,7 +112,7 @@ public class MongoBaseService {
                 entity.setUpdatedAt(DateUtils.getDate());
 
 
-                if(entity.getId() == null){
+                if (entity.getId() == null) {
                     /**
                      *  Set Id if entity don't have Id
                      * */
@@ -120,21 +121,21 @@ public class MongoBaseService {
                     dbObject = new BasicDBObject();
 
                     /*
-                    *  Converting entity object to BasicDBObject
-                    * */
+                     *  Converting entity object to BasicDBObject
+                     * */
                     converter.write(entity, dbObject);
 
                     /*
-                    *  Adding entity (BasicDBObject)
-                    * */
+                     *  Adding entity (BasicDBObject)
+                     * */
                     bulkWriteOperation.insert(dbObject);
-                }else {
+                } else {
 
                     dbObject = new BasicDBObject();
 
                     /*
-                    *  Converting entity object to BasicDBObject
-                    * */
+                     *  Converting entity object to BasicDBObject
+                     * */
                     converter.write(entity, dbObject);
 
                     /**
@@ -160,7 +161,7 @@ public class MongoBaseService {
             bulkWriteOperation.execute();
             return entities;
 
-        } catch(Exception ex){
+        } catch (Exception ex) {
             logger.error("BulkWriteOperation Exception ::  ", ex);
             return null;
         }
