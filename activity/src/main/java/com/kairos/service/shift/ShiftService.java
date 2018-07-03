@@ -1118,9 +1118,9 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftQueryResult> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
-        List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
+        List<IndividualShiftTemplate> individualShiftTemplates = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
         List<ShiftQueryResult> shifts = new ArrayList<>();
-        individualShiftTemplate.forEach(individualShiftTemplate1 -> {
+        individualShiftTemplates.forEach(individualShiftTemplate1 -> {
             List<ShiftDTO> subShifts=null;
             if(individualShiftTemplate1.getSubShiftIds().size()>0){
                 List<IndividualShiftTemplate> individualSubShiftTemplates= individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(individualShiftTemplate1.getSubShiftIds());

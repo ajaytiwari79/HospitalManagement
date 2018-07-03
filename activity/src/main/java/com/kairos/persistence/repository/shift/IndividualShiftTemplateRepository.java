@@ -13,9 +13,7 @@ import java.util.Set;
 @Repository
 public interface IndividualShiftTemplateRepository extends MongoBaseRepository<IndividualShiftTemplate,BigInteger> ,CustomIndividualShiftTemplateRepository {
 
-      List<IndividualShiftTemplateDTO> findAllByIdInAndDeletedFalse(Set<BigInteger> shiftDayTemplateIds);
-
-      List<IndividualShiftTemplate> getAllByIdInAndDeletedFalse(Set<BigInteger> shiftDayTemplateIds);
+      List<IndividualShiftTemplate> getAllByIdInAndDeletedFalse(Set<BigInteger> individualShiftTemplateIds);
 
       @Query("{deleted:false,id:?0}")
       IndividualShiftTemplate findOneById(BigInteger id);
