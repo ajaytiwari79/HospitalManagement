@@ -73,7 +73,7 @@ public class TemplateTypeController {
      * @return TemplateType
      */
     @ApiOperation(value="update template")
-    @RequestMapping(value = "/updateTemplate/{id}", method = RequestMethod.PUT)
+    @PutMapping(value = "/updateTemplate/{id}")
     public ResponseEntity<Object> updateTemplate(@PathVariable BigInteger id,@PathVariable Long countryId, @Valid @RequestBody TemplateType templateType) {
         if (StringUtils.isBlank(templateType.getTemplateName())) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "templateName parameter is null or empty");
@@ -93,7 +93,7 @@ public class TemplateTypeController {
      * @returne Boolean
      */
     @ApiOperation(value="delete template by id")
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<Object> deleteTemplateType(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_GATEWAY, false, "id cannot be null");
@@ -109,7 +109,7 @@ public class TemplateTypeController {
      * @return  List<TemplateType>
      */
     @ApiOperation(value = "All Template Type type ")
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @GetMapping(value = "/all")
     public ResponseEntity<Object> getAllTemplateType(@PathVariable Long countryId) {
         if (countryId != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, templateTypeService.getAllTemplateType(countryId));

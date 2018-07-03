@@ -2,6 +2,7 @@ package com.kairos.controller.user;
 
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.auth.UserService;
+import com.kairos.service.staff.StaffService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
 
 
 /**
@@ -24,19 +26,21 @@ import static com.kairos.constants.ApiConstants.API_V1;
  **/
 
 @RestController
-@RequestMapping(API_V1 + "/user")
-@Api(value = API_V1 + "/user")
+@RequestMapping(API_V1)
+@Api(value = API_V1)
 public class UserController {
     @Inject
     UserService userService;
 
+    @Inject
+    private StaffService staffService;
    /* @Inject
     TaskReportService taskReportService;*/
     /**
      * @return List of Users- All Users in db
      */
     @ApiOperation(value = "Get all Users")
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
     List<User> getAllUsers() {
         return userService.getAllUsers();
     }
@@ -49,7 +53,7 @@ public class UserController {
      * @return User
      */
     @ApiOperation(value = "Get User by Id")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     User getUserById(@PathVariable Long id) {
 
         return userService.getUserById(id);
@@ -63,7 +67,7 @@ public class UserController {
      * @return User
      */
     @ApiOperation(value = "Create a New User")
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
     User addUser(@Validated @RequestBody User user) {
         return userService.createUser(user);
 
@@ -78,7 +82,7 @@ public class UserController {
      * @return User
      */
     @ApiOperation(value = "Update a User by Id")
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user", method = RequestMethod.PUT)
     User updateUser(@RequestBody User user) {
         return userService.updateUser(user);
     }
@@ -90,18 +94,18 @@ public class UserController {
      * @param id
      */
     @ApiOperation(value = "Delete User by Id")
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
     void deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
     }
 
-    @RequestMapping(value = "/{userId}/parent/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{userId}/parent/organizations", method = RequestMethod.GET)
     @ApiOperation("get organizations of user")
     ResponseEntity<Map<String, Object>> getOrganizations(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getOrganizations(userId));
     }
 
-    @RequestMapping(value = "/{userId}/organization/{orgId}/module/{moduleId}/access_permissions", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{userId}/organization/{orgId}/module/{moduleId}/access_permissions", method = RequestMethod.GET)
     @ApiOperation("get organizations of user")
     ResponseEntity<Map<String, Object>> getPermissionForModuleInOrganization(@PathVariable long userId, @PathVariable long orgId, @PathVariable long moduleId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissionForModuleInOrganization(moduleId,orgId, userId));
@@ -110,7 +114,7 @@ public class UserController {
 
     // Temporary to update User's date of birth by CPR Number
     @ApiOperation(value = "Update a User DOB")
-    @RequestMapping(value = "/dob_by_cpr", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user/dob_by_cpr", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateDateOfBirthOfUserByCPRNumber() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateDateOfBirthOfUserByCPRNumber());
     }
@@ -121,5 +125,10 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateSystemLanguageOfUser(languageId));
     }
 
+    @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staffs")
+    @ApiOperation("get staff ids by userid")
+    ResponseEntity<Map<String, Object>> getStaffIdsByUserId(@PathVariable long userId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsByUserId(userId));
+    }
 
 }

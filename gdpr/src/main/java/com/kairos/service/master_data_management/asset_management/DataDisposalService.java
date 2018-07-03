@@ -5,19 +5,16 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.master_data_management.asset_management.DataDisposal;
 import com.kairos.persistance.repository.master_data_management.asset_management.DataDisposalMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
-import com.kairos.utils.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.*;
 

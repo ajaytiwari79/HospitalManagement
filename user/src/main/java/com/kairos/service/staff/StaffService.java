@@ -60,6 +60,7 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.UserBaseService;
@@ -257,7 +258,7 @@ public class StaffService extends UserBaseService {
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
 
         if (staffToUpdate == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
@@ -2104,6 +2105,11 @@ public class StaffService extends UserBaseService {
     public List<StaffDTO> getStaffByUnit(Long unitId){
         List<Staff> staffs = staffGraphRepository.getAllStaffByUnitId(unitId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs,StaffDTO.class);
+    }
+
+    public List<StaffResultDTO> getStaffIdsByUserId(Long UserId){
+        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserId(UserId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers,StaffResultDTO.class);
     }
 
 }

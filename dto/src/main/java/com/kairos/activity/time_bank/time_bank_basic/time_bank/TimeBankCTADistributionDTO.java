@@ -2,7 +2,7 @@ package com.kairos.activity.time_bank.time_bank_basic.time_bank;
 
 public class TimeBankCTADistributionDTO {
 
-    //cta_response ruletemplate based distributions
+    //cta ruletemplate based distributions
     private Long id;
     private String name;
     private int minutes;
