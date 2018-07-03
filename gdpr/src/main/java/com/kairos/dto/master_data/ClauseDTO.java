@@ -53,16 +53,20 @@ public class ClauseDTO {
     @NotEmpty
     private Set<BigInteger> accountTypes;
 
-
     @NotNull
     private BigInteger templateType;
 
     @NotNull
-    private Set<Long> organnizationList;
+    @NotEmpty
+    private List<Long> organnizationList;
 
-    public Set<Long> getOrgannizationList() { return organnizationList; }
+    public List<Long> getOrgannizationList() {
+        return organnizationList;
+    }
 
-    public void setOrgannizationList(Set<Long> organnizationList) { this.organnizationList = organnizationList; }
+    public void setOrgannizationList(List<Long> organnizationList) {
+        this.organnizationList = organnizationList;
+    }
 
     public BigInteger getTemplateType() { return templateType; }
 

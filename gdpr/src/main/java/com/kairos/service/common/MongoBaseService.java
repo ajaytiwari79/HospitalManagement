@@ -27,7 +27,7 @@ import static com.kairos.constants.AppConstant.COUNTRY_ID;
  * Created by Pankaj on 12/4/17.
  */
 @Service
-public class MongoBaseService {
+public class MongoBaseService  {
 
     @Inject
     MongoSequenceRepository mongoSequenceRepository;
@@ -40,6 +40,7 @@ public class MongoBaseService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
+
 
 
     public <T extends MongoBaseEntity> T save(T entity) {
@@ -83,7 +84,7 @@ public class MongoBaseService {
         BulkWriteOperation bulkWriteOperation = database.getCollection(collectionName).initializeUnorderedBulkOperation();
 
         /**
-         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
+         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObjectCode)
          * */
         MongoConverter converter = mongoTemplate.getConverter();
 
@@ -139,7 +140,7 @@ public class MongoBaseService {
                     converter.write(entity, dbObject);
 
                     /**
-                     *  Creating BasicDbObject for find query
+                     *  Creating BasicDbObjectCode for find query
                      * */
                     BasicDBObject query = new BasicDBObject();
 

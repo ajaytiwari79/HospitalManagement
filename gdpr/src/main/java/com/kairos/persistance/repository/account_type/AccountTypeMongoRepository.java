@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,ObjectId> {
+public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,BigInteger> {
 
    @Query("{deleted:false,countryId:?0,_id:?1}")
    AccountType findByIdAndNonDeleted(Long countryId,BigInteger id);

@@ -1,12 +1,15 @@
 package com.kairos.persistance.model.clause;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -14,7 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 
-@Document(collection = "clause")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@TypeName("clause")
 public class Clause extends MongoBaseEntity {
 
     @NotNullOrEmpty
@@ -38,7 +42,7 @@ public class Clause extends MongoBaseEntity {
 
     private Boolean isDefault = true;
 
-    private Set<Long> organizationList;
+    private List<Long> organizationList;
 
     private BigInteger parentClauseId;
 
@@ -48,17 +52,25 @@ public class Clause extends MongoBaseEntity {
         return templateType;
     }
 
-    public Set<Long> getOrganizationList() { return organizationList; }
+    public List<Long> getOrganizationList() {
+        return organizationList;
+    }
 
-    public void setOrganizationList(Set<Long> organizationList) { this.organizationList = organizationList; }
+    public void setOrganizationList(List<Long> organizationList) {
+        this.organizationList = organizationList;
+    }
 
     public void setTemplateType(BigInteger templateType) {
         this.templateType = templateType;
     }
 
-    public Long getCountryId() { return countryId; }
+    public Long getCountryId() {
+        return countryId;
+    }
 
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public BigInteger getParentClauseId() {
         return parentClauseId;
@@ -68,9 +80,13 @@ public class Clause extends MongoBaseEntity {
         this.parentClauseId = parentClauseId;
     }
 
-    public Boolean getDefault() { return isDefault; }
+    public Boolean getDefault() {
+        return isDefault;
+    }
 
-    public void setDefault(Boolean aDefault) { isDefault = aDefault; }
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
+    }
 
     public String getTitle() {
         return title;

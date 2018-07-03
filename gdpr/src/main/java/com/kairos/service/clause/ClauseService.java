@@ -12,8 +12,10 @@ import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ComparisonUtils;
+import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,9 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private TemplateTypeService templateTypeService;
 
+    @Inject
+    private JaversCommonService javersCommonService;
+
 
     public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto)  {
 
@@ -84,7 +89,7 @@ public class ClauseService extends MongoBaseService {
 
         try {
             newclause = save(newclause);
-            return newclause;
+            return javersCommonService.saveToJavers(newclause);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -124,8 +129,9 @@ public class ClauseService extends MongoBaseService {
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
             exists.setTemplateType(clauseDto.getTemplateType());
-            exists.setOrganizationList(clauseDto.getOrgannizationList());
+           exists.setOrganizationList(clauseDto.getOrgannizationList());
             exists = save(exists);
+            javersCommonService.saveToJavers(exists);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -150,7 +156,7 @@ public class ClauseService extends MongoBaseService {
         Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (Optional.ofNullable(clause).isPresent()) {
             clause.setDeleted(true);
-            clauseRepository.save(clause);
+            save(clause);
             return true;
         } else
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + id);
@@ -163,19 +169,6 @@ public class ClauseService extends MongoBaseService {
         //  return clauseRepository.findAll(new PageRequest(page, size));
         return null;
     }
-
-/*
-
-    public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
-        return jackrabbitService.getClauseVersion(id, version);
-
-    }
-
-    public List<String> getAllClauseVersion(BigInteger id) throws RepositoryException {
-        return jackrabbitService.getClauseVersions(id);
-
-    }
-*/
 
 
 }
