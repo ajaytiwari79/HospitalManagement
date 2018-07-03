@@ -70,8 +70,8 @@ public class VRPPlannerService {
         Map<String, Indictment> taskIdAndIndictmentMap = getIndictmentMap(indictmentMap);
         for (Shift shift : shifts) {
             Task nextTask = shift.getNextTask();
-            if (shift.getPlannedEndTime() != null) {
-                planningShifts.add(new PlanningShift(shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
+            if(shift.getPlannedEndTime()!=null) {
+                planningShifts.add(new PlanningShift(shift.getId(),shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
                 int i = 0;
                 while (nextTask != null) {
                     LocalDateTime drivingTimeStart = null;
