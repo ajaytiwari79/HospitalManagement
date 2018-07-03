@@ -48,7 +48,6 @@ public class AccountTypeService extends MongoBaseService {
         newAccount.setCountryId(countryId);
         newAccount= save(newAccount);
         return javersCommonService.saveToJavers(newAccount);
-
     }
 
 

@@ -170,18 +170,5 @@ public class ClauseService extends MongoBaseService {
         return null;
     }
 
-/*
-
-    public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
-        return jackrabbitService.getClauseVersion(id, version);
-
-    }
-
-    public List<String> getAllClauseVersion(BigInteger id) throws RepositoryException {
-        return jackrabbitService.getClauseVersions(id);
-
-    }
-*/
-
 
 }

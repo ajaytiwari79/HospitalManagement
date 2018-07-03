@@ -56,6 +56,8 @@ public class ClauseDTO {
     @NotNull
     private BigInteger templateType;
 
+    @NotNull
+    @NotEmpty
     private List<Long> organnizationList;
 
     public List<Long> getOrgannizationList() {

@@ -1,11 +1,8 @@
 package com.kairos.persistance.model.account_type;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.Pattern;
 
 @Document(collection = "account_type")
 @TypeName("account_type")
