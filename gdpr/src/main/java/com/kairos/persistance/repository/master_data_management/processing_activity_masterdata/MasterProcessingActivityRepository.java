@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
+@JaversSpringDataAuditable
 public interface MasterProcessingActivityRepository extends MongoRepository<MasterProcessingActivity,BigInteger>,CustomMasterProcessingActivity {
 
 

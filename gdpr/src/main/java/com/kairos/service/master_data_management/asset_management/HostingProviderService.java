@@ -56,7 +56,7 @@ public class HostingProviderService extends MongoBaseService {
 
                 }
 
-                newhostingProviders = save(newhostingProviders);
+                newhostingProviders = hostingProviderMongoRepository.saveAll(save(newhostingProviders));
             }
             result.put("existing", existing);
             result.put("new", newhostingProviders);
@@ -90,8 +90,7 @@ public class HostingProviderService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -109,7 +108,7 @@ public class HostingProviderService extends MongoBaseService {
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
-            return save(exist);
+            return hostingProviderMongoRepository.save(save(exist));
 
         }
     }

@@ -48,7 +48,7 @@ public class MasterAssetService extends MongoBaseService {
         newAsset.setCountryId(countryId);
         newAsset.setDescription(masterAssetDto.getDescription());
         newAsset.setOrganizationId(organizationId);
-        return save(newAsset);
+        return masterAssetMongoRepository.save(save(newAsset));
     }
 
 
@@ -74,7 +74,7 @@ public class MasterAssetService extends MongoBaseService {
         exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
         exists.setName(masterAssetDto.getName());
         exists.setDescription(masterAssetDto.getDescription());
-        return save(exists);
+        return masterAssetMongoRepository.save(save(exists));
     }
 
 
@@ -84,7 +84,7 @@ public class MasterAssetService extends MongoBaseService {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
 
         } else
-            masterAssetMongoRepository.delete(exists);
+            delete(exists);
         return true;
 
     }

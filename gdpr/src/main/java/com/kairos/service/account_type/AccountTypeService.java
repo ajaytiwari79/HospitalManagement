@@ -33,10 +33,6 @@ public class AccountTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    @Inject
-    private JaversCommonService javersCommonService;
-
-
     public AccountType createAccountType(Long countryId, AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByName(countryId, accountType.getName());
@@ -46,8 +42,8 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        newAccount= save(newAccount);
-        return javersCommonService.saveToJavers(newAccount);
+        return accountTypeRepository.save( save(newAccount));
+
     }
 
 
@@ -98,8 +94,7 @@ public class AccountTypeService extends MongoBaseService {
         }
         exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         exists.setName(accountType.getName());
-        exists=save(exists);
-        return javersCommonService.saveToJavers(exists);
+        return  accountTypeRepository.save(save(exists));
 
     }
 
@@ -109,8 +104,7 @@ public class AccountTypeService extends MongoBaseService {
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("Account type exist for id " + id);
         }
-        exists.setDeleted(true);
-        save(exists);
+        delete(exists);
         return true;
 
     }

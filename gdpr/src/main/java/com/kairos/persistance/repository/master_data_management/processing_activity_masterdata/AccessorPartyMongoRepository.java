@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.AccessorParty;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 
 @Repository
+@JaversSpringDataAuditable
 public interface AccessorPartyMongoRepository extends MongoRepository<AccessorParty,BigInteger> {
 
 

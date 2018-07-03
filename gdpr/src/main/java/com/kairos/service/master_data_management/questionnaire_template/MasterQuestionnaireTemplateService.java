@@ -58,7 +58,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         questionnaireTemplate.setOrganizationId(organizationId);
         questionnaireTemplate = buildQuestionniareTemplate(templateDto, questionnaireTemplate);
         try {
-            questionnaireTemplate = save(questionnaireTemplate);
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(save(questionnaireTemplate));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());
@@ -113,8 +113,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
         }
-        exist.setDeleted(true);
-        save(exist);
+        delete(exist);
         return true;
     }
 
@@ -131,7 +130,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         exisiting.setDescription(templateDto.getDescription());
         exisiting = buildQuestionniareTemplate(templateDto, exisiting);
         try {
-            exisiting = save(exisiting);
+            exisiting = masterQuestionnaireTemplateMongoRepository.save(save(exisiting));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());

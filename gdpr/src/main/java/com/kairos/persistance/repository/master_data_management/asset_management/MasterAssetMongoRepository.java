@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data_management.asset_managemen
 
 import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
 import com.kairos.response.dto.filter.FilterAttributes;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
+@JaversSpringDataAuditable
 public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,BigInteger> ,CustomMasterAssetRepository{
 
 

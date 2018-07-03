@@ -54,7 +54,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                     newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
-                newOrgSecurityMeasures = save(newOrgSecurityMeasures);
+                newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(save(newOrgSecurityMeasures));
             }
             result.put("existing", existing);
             result.put("new", newOrgSecurityMeasures);
@@ -88,8 +88,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -107,7 +106,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         } else {
             exist = organizationalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(orgSecurityMeasure.getName());
-            return save(exist);
+            return organizationalSecurityMeasureMongoRepository.save(save(exist));
 
         }
     }

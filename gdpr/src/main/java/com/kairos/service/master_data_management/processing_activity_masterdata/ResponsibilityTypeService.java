@@ -56,7 +56,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
                 }
 
-                newResponsibilityTypes = save(newResponsibilityTypes);
+                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(save(newResponsibilityTypes));
 
             }
             result.put("existing", existing);
@@ -91,8 +91,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -111,7 +110,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
         } else {
             exist=responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-            return save(exist);
+            return responsibilityTypeMongoRepository.save(save(exist));
 
         }
     }

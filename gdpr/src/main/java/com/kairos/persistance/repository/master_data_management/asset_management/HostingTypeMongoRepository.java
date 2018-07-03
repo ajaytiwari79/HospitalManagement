@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.asset_management;
 
 import com.kairos.persistance.model.master_data_management.asset_management.HostingType;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -8,6 +9,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
+@JaversSpringDataAuditable
 public interface HostingTypeMongoRepository extends MongoRepository<HostingType,BigInteger> {
 
     @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")

@@ -53,7 +53,7 @@ public class AssetTypeService extends MongoBaseService {
         assetType.setCountryId(countryId);
         assetType.setOrganizationId(organizationId);
         try {
-            assetType = save(assetType);
+            assetType = assetTypeMongoRepository.save(save(assetType));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -80,7 +80,7 @@ public class AssetTypeService extends MongoBaseService {
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
-            subAssetTypes = save(subAssetTypes);
+            subAssetTypes = assetTypeMongoRepository.saveAll(save(subAssetTypes));
             subAssetTypes.forEach(subAssetType -> {
                 subAssetTypesIds.add(subAssetType.getId());
             });
@@ -117,7 +117,7 @@ public class AssetTypeService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subAssetTypesList = save(subAssetTypesList);
+            subAssetTypesList = assetTypeMongoRepository.saveAll(save(subAssetTypesList));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -144,12 +144,11 @@ public class AssetTypeService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         }
-        exist.setDeleted(true);
         if (Optional.ofNullable(exist.getSubAssetTypes()).isPresent()) {
             List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, organizationId, exist.getSubAssetTypes());
             assetTypeMongoRepository.deleteAll(subAssetTypes);
         }
-        save(exist);
+        delete(exist);
         return true;
     }
 
@@ -185,7 +184,7 @@ public class AssetTypeService extends MongoBaseService {
 
         try {
             exist.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            exist = save(exist);
+            exist = assetTypeMongoRepository.save(save(exist));
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));

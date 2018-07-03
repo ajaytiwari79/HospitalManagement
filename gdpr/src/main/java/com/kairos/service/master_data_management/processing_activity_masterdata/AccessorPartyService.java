@@ -56,7 +56,7 @@ public class AccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartys.add(newAccessorParty);
                 }
-                newAccessorPartys = save(newAccessorPartys);
+                newAccessorPartys = accessorPartyMongoRepository.saveAll(save(newAccessorPartys));
             }
             result.put("existing", existing);
             result.put("new", newAccessorPartys);
@@ -96,8 +96,7 @@ public class AccessorPartyService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -115,7 +114,7 @@ public class AccessorPartyService extends MongoBaseService {
         } else {
             exist = accessorPartyMongoRepository.findByid(id);
             exist.setName(accessorParty.getName());
-            return save(exist);
+            return accessorPartyMongoRepository.save(save(exist));
 
         }
     }

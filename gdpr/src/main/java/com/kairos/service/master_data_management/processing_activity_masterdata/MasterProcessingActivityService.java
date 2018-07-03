@@ -53,7 +53,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         masterProcessingActivity.setOrganizationId(organizationId);
         try {
 
-            masterProcessingActivity = save(masterProcessingActivity);
+            masterProcessingActivity = masterProcessingActivityRepository.save(save(masterProcessingActivity));
         } catch (MongoClientException e) {
             masterProcessingActivityRepository.deleteAll((List<MasterProcessingActivity>) subProcessingActivity.get(PROCESSING_ACTIVITIES));
             LOGGER.info(e.getMessage());
@@ -86,7 +86,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         }
 
         checkForDuplicacyByName(countryId, organizationId, checkDuplicateInSubProcess);
-        subProcessingActivityList = save(subProcessingActivityList);
+        subProcessingActivityList = masterProcessingActivityRepository.saveAll(save(subProcessingActivityList));
         List<BigInteger> subProcessingActicitiesIds = new ArrayList<>();
         subProcessingActivityList.forEach(o -> subProcessingActicitiesIds.add(o.getId()));
         Map<String, Object> result = new HashMap<>();
@@ -132,7 +132,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             exists.setDescription(masterProcessingActivityDto.getDescription());
             exists.setName(masterProcessingActivityDto.getName());
             try {
-                exists = save(exists);
+                exists = masterProcessingActivityRepository.save(save(exists));
 
             } catch (MongoClientException e) {
                 LOGGER.info(e.getMessage());
@@ -166,8 +166,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         } else
-            exists.setDeleted(true);
-        save(exists);
+            delete(exists);
         return true;
 
     }

@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data_management.data_category_e
 
 
 import com.kairos.persistance.model.master_data_management.data_category_element.DataCategory;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
+@JaversSpringDataAuditable
 public interface DataCategoryMongoRepository extends MongoRepository<DataCategory,BigInteger> ,CustomDataCategoryRepository{
 
     DataCategory findByid(BigInteger id);

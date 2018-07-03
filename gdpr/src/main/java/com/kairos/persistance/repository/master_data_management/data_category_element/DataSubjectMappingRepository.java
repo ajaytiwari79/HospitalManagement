@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data_management.data_category_e
 
 
 import com.kairos.persistance.model.master_data_management.data_category_element.DataSubjectMapping;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 
 @Repository
+@JaversSpringDataAuditable
 public interface DataSubjectMappingRepository extends MongoRepository<DataSubjectMapping, BigInteger> ,CustomDataSubjectMappingRepository{
 
 

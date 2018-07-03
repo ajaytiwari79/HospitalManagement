@@ -55,7 +55,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-                newTechnicalMeasures = save(newTechnicalMeasures);
+                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(save(newTechnicalMeasures));
             }
             result.put("existing", existing);
             result.put("new", newTechnicalMeasures);
@@ -90,8 +90,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }

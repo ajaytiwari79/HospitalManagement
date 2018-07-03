@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data_management.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ProcessingLegalBasis;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -8,6 +9,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
+@JaversSpringDataAuditable
 public interface ProcessingLegalBasisMongoRepository extends MongoRepository<ProcessingLegalBasis, BigInteger> {
 
 

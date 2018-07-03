@@ -56,7 +56,7 @@ public class StorageFormatService extends MongoBaseService {
                 }
 
 
-                newStorageFormats = save(newStorageFormats);
+                newStorageFormats = storageFormatMongoRepository.saveAll(save(newStorageFormats));
             }
             result.put("existing", existing);
             result.put("new", newStorageFormats);
@@ -91,8 +91,7 @@ public class StorageFormatService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -110,7 +109,7 @@ public class StorageFormatService extends MongoBaseService {
         } else {
             exist = storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
-            return save(exist);
+            return storageFormatMongoRepository.save(save(exist));
 
         }
     }

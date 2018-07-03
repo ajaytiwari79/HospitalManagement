@@ -56,7 +56,7 @@ public class DataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = save(newDataSources);
+                newDataSources = dataSourceMongoRepository.saveAll(save(newDataSources));
             }
             result.put("existing", existing);
             result.put("new", newDataSources);
@@ -90,8 +90,7 @@ public class DataSourceService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -109,7 +108,7 @@ public class DataSourceService extends MongoBaseService {
         } else {
             exist=dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
-            return save(exist);
+            return dataSourceMongoRepository.save(save(exist));
 
         }
     }

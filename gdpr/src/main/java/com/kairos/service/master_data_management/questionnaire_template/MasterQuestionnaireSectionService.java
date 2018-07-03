@@ -66,7 +66,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         Map<String, Object> questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto);
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
         try {
-            questionnaireTemplate = save(questionnaireTemplate);
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(save(questionnaireTemplate));
         } catch (Exception e) {
             masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNIARE_SECTIONS));
             masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
@@ -94,7 +94,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             masterQuestionnaireSections.add(questionnaireSection);
         }
         try {
-            masterQuestionnaireSections = save(masterQuestionnaireSections);
+            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(save(masterQuestionnaireSections));
             masterQuestionnaireSections.forEach(masterQuestionnaireSection -> {
                 questionSectionIds.add(masterQuestionnaireSection.getId());
             });
@@ -128,8 +128,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare section", id);
         }
-        questionnaireSection.setDeleted(true);
-        save(questionnaireSection);
+        delete(questionnaireSection);
         return true;
     }
 
@@ -170,7 +169,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         template.setSections(sectionsIds);
         try {
-            template = save(template);
+            template = masterQuestionnaireTemplateMongoRepository.save(save(template));
         } catch (MongoException e) {
 
             List<MasterQuestionnaireSection> sections = new ArrayList<>();
@@ -219,7 +218,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
 
         try {
-            updateSectionsList = save(updateSectionsList);
+            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(save(updateSectionsList));
 
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());

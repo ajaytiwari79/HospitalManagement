@@ -55,8 +55,8 @@ public class DataSubjectMappingService extends MongoBaseService {
         dataSubjectMapping.setCountryId(countryId);
         dataSubjectMapping.setOrganizationId(organizationId);
         dataSubjectMapping.setDataCategories(dataSubjectMappingDto.getDataCategories());
-        save(dataSubjectMapping);
-        return dataSubjectMapping;
+       return dataSubjectMappingRepository.save( save(dataSubjectMapping));
+
 
     }
 
@@ -66,8 +66,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
-        dataSubjectMapping.setDeleted(true);
-        save(dataSubjectMapping);
+        delete(dataSubjectMapping);
         return true;
 
 
@@ -115,7 +114,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         existing.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
         existing.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
         existing.setDataCategories(dataSubjectMappingDto.getDataCategories());
-        return save(existing);
+        return dataSubjectMappingRepository.save(save(existing));
     }
 
 

@@ -78,8 +78,7 @@ public class ClauseTagService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            exist.setDeleted(true);
-            save(exist);
+           delete(exist);
             return true;
 
         }

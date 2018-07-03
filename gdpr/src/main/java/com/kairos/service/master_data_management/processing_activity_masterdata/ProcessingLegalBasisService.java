@@ -56,7 +56,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = save(newProcessingLegalBasisList);
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(save(newProcessingLegalBasisList));
             }
             result.put("existing", existing);
             result.put("new", newProcessingLegalBasisList);
@@ -89,8 +89,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -109,7 +108,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         } else {
             exist=legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
-            return save(exist);
+            return legalBasisMongoRepository.save(save(exist));
 
         }
     }

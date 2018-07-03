@@ -58,7 +58,7 @@ public class DestinationService extends MongoBaseService {
 
                 }
 
-                newDestinations = save(newDestinations);
+                newDestinations = destinationMongoRepository.saveAll(save(newDestinations));
             }
 
             result.put("existing", existing);
@@ -93,8 +93,7 @@ public class DestinationService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -113,7 +112,7 @@ public class DestinationService extends MongoBaseService {
         } else {
             exist = destinationMongoRepository.findByid(id);
             exist.setName(destination.getName());
-            return save(exist);
+            return destinationMongoRepository.save(save(exist));
 
         }
     }

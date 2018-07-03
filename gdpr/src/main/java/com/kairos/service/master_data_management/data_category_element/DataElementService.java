@@ -59,7 +59,7 @@ public class DataElementService extends MongoBaseService {
             dataElementList.add(newDataElement);
         }
         try {
-            dataElementList = save(dataElementList);
+            dataElementList = dataElementMognoRepository.saveAll(save(dataElementList));
             dataElementList.forEach(dataElement -> {
                 dataElementids.add(dataElement.getId());
             });
@@ -93,7 +93,7 @@ public class DataElementService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element ", id);
         }
-        exist.setDeleted(true);
+        delete(exist);
         return true;
 
     }
@@ -106,7 +106,7 @@ public class DataElementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
         exist.setName(dataElement.getName());
-        return save(exist);
+        return dataElementMognoRepository.save(save(exist));
     }
 
     /**
@@ -175,7 +175,7 @@ public class DataElementService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            dataElementList = save(dataElementList);
+            dataElementList = dataElementMognoRepository.saveAll(save(dataElementList));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

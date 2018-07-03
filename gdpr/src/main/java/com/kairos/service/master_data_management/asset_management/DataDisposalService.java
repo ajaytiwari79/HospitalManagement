@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data_management.asset_management
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class DataDisposalService extends MongoBaseService {
 
                 }
 
-                newDataDisposals = save(newDataDisposals);
+                newDataDisposals =dataDisposalMongoRepository.saveAll(save(newDataDisposals));
             }
             result.put("existing", existing);
             result.put("new", newDataDisposals);
@@ -90,8 +91,7 @@ public class DataDisposalService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -110,7 +110,7 @@ public class DataDisposalService extends MongoBaseService {
         } else {
             exist = dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
-            return save(exist);
+            return dataDisposalMongoRepository.save(save(exist));
 
         }
     }

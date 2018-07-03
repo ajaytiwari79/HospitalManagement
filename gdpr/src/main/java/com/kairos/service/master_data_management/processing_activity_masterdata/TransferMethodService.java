@@ -24,7 +24,7 @@ public class TransferMethodService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodService.class);
 
     @Inject
-    private TransferMethodMongoRepository transferMethodDestinationRepository;
+    private TransferMethodMongoRepository transferMethodRepository;
 
     @Inject
     private ComparisonUtils comparisonUtils;
@@ -54,7 +54,7 @@ public class TransferMethodService extends MongoBaseService {
                     newTransferMethods.add(newTransferMethod);
                 }
 
-                newTransferMethods = save(newTransferMethods);
+                newTransferMethods = transferMethodRepository.saveAll(save(newTransferMethods));
             }
             result.put("existing", existing);
             result.put("new", newTransferMethods);
@@ -66,12 +66,12 @@ public class TransferMethodService extends MongoBaseService {
     }
 
     public List<TransferMethod> getAllTransferMethod(Long countryId, Long organizationId) {
-        return transferMethodDestinationRepository.findAllTransferMethods(countryId, organizationId);
+        return transferMethodRepository.findAllTransferMethods(countryId, organizationId);
     }
 
     public TransferMethod getTransferMethod(Long countryId, Long organizationId, BigInteger id) {
 
-        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        TransferMethod exist = transferMethodRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -82,12 +82,11 @@ public class TransferMethodService extends MongoBaseService {
 
     public Boolean deleteTransferMethod(Long countryId, Long organizationId, BigInteger id) {
 
-        TransferMethod exist = transferMethodDestinationRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        TransferMethod exist = transferMethodRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
         }
     }
@@ -95,16 +94,16 @@ public class TransferMethodService extends MongoBaseService {
 
     public TransferMethod updateTransferMethod(Long countryIdId, Long organizationId, BigInteger id, TransferMethod transferMethod) {
 
-        TransferMethod exist = transferMethodDestinationRepository.findByName(countryIdId, organizationId, transferMethod.getName());
+        TransferMethod exist = transferMethodRepository.findByName(countryIdId, organizationId, transferMethod.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
             }
             throw new DuplicateDataException("data  exist for  " + transferMethod.getName());
         } else {
-            exist = transferMethodDestinationRepository.findByid(id);
+            exist = transferMethodRepository.findByid(id);
             exist.setName(transferMethod.getName());
-            return save(exist);
+            return transferMethodRepository.save(save(exist));
 
         }
     }
@@ -112,7 +111,7 @@ public class TransferMethodService extends MongoBaseService {
 
     public TransferMethod getTransferMethodByName(Long countryId, Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
-            TransferMethod exist = transferMethodDestinationRepository.findByName(countryId, organizationId, name);
+            TransferMethod exist = transferMethodRepository.findByName(countryId, organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

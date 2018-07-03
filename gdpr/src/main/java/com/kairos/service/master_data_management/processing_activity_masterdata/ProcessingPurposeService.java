@@ -57,7 +57,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = save(newProcessingPurposes);
+                newProcessingPurposes = processingPurposeMongoRepository.saveAll(save(newProcessingPurposes));
             }
             result.put("existing", existing);
             result.put("new", newProcessingPurposes);
@@ -91,8 +91,7 @@ public class ProcessingPurposeService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            exist.setDeleted(true);
-            save(exist);
+            delete(exist);
             return true;
 
         }
@@ -111,7 +110,7 @@ public class ProcessingPurposeService extends MongoBaseService {
         } else {
             exist=processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());
-            return save(exist);
+            return processingPurposeMongoRepository.save(save(exist));
 
         }
     }

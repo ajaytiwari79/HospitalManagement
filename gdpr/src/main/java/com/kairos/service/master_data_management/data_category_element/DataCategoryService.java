@@ -57,7 +57,7 @@ public class DataCategoryService extends MongoBaseService {
             newDataCategory.setName(dataCategoryDto.getName());
             newDataCategory.setOrganizationId(organizationId);
             newDataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
-            dataCategory = save(newDataCategory);
+            dataCategory = dataCategoryMongoRepository.save(save(newDataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
             dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
@@ -71,8 +71,7 @@ public class DataCategoryService extends MongoBaseService {
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", id);
         }
-        dataCategory.setDeleted(true);
-        save(dataCategory);
+       delete(dataCategory);
         return true;
 
     }
@@ -132,7 +131,7 @@ public class DataCategoryService extends MongoBaseService {
         try {
             dataCategory.setName(dataCategoryDto.getName());
             dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
-            dataCategory = save(dataCategory);
+            dataCategory = dataCategoryMongoRepository.save(save(dataCategory));
 
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());

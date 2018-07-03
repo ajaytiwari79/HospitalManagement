@@ -49,7 +49,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            masterQuestions = save(masterQuestions);
+            masterQuestions = questionMongoRepository.saveAll(save(masterQuestions));
             masterQuestions.forEach(masterQuestion -> questionSectionIds.add(masterQuestion.getId()));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
@@ -81,8 +81,7 @@ public class MasterQuestionService extends MongoBaseService {
         if (exist == null) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " question ", id);
         }
-        exist.setDeleted(true);
-        save(exist);
+        delete(exist);
         return true;
 
     }
@@ -170,7 +169,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            updatedQuestionsList = save(updatedQuestionsList);
+            updatedQuestionsList = questionMongoRepository.saveAll(save(updatedQuestionsList));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
             throw new MongoClientException(e.getMessage());

@@ -66,7 +66,7 @@ public class ClauseService extends MongoBaseService {
     private JaversCommonService javersCommonService;
 
 
-    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto)  {
+    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) {
 
         if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
@@ -88,8 +88,8 @@ public class ClauseService extends MongoBaseService {
         newclause.setTags(tagList);
 
         try {
-            newclause = save(newclause);
-            return javersCommonService.saveToJavers(newclause);
+            newclause = clauseRepository.save(save(newclause));
+            return newclause;
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -119,7 +119,7 @@ public class ClauseService extends MongoBaseService {
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
         exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        templateTypeService.getTemplateByById(clauseDto.getTemplateType(),countryId);
+        templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
         try {
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -129,9 +129,8 @@ public class ClauseService extends MongoBaseService {
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
             exists.setTemplateType(clauseDto.getTemplateType());
-           exists.setOrganizationList(clauseDto.getOrgannizationList());
-            exists = save(exists);
-            javersCommonService.saveToJavers(exists);
+            exists.setOrganizationList(clauseDto.getOrgannizationList());
+            exists = clauseRepository.save(save(exists));
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -154,14 +153,11 @@ public class ClauseService extends MongoBaseService {
     public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {
 
         Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (Optional.ofNullable(clause).isPresent()) {
-            clause.setDeleted(true);
-            save(clause);
-            return true;
-        } else
+        if (!Optional.ofNullable(clause).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + id);
-        return false;
-
+        }
+        delete(clause);
+        return true;
     }
 
 
