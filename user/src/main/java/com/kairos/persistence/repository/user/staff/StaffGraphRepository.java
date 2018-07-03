@@ -391,6 +391,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} return staff")
     Staff getStaffByUserId(Long userId, Long parentOrganizationId);
 
+    @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
+            "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where user.cprNumber={0} return count(staff)>0")
+    Boolean isStaffExistsByCPRNumber(String cprNumber, Long parentOrganizationId);
+
 
     @Query("match(s:Staff)-[:BELONGS_TO]-(u:Employment)-[:HAS_EMPLOYMENTS]-(o:Organization) where id(o)={1} AND s.externalId={0} return s")
     Staff findStaffByExternalId(Long externalId, Long organizationId);
