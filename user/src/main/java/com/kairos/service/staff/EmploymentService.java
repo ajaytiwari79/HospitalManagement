@@ -117,7 +117,7 @@ public class EmploymentService extends UserBaseService {
 
         if (objectToUpdate == null) {
             logger.info("Staff does not found by id {}", staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
            exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
@@ -177,7 +177,7 @@ public class EmploymentService extends UserBaseService {
         }
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
@@ -647,7 +647,7 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
         Organization unit=null;
@@ -716,7 +716,7 @@ public class EmploymentService extends UserBaseService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
 
