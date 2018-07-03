@@ -348,9 +348,11 @@ public class ActivityService extends MongoBaseService {
         {
             timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
         }
+        if(activity.getGeneralActivityTab().getTextColor()==null&&activity.getGeneralActivityTab().getBackgroundColor()==null){
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
         activity.getGeneralActivityTab().setColorPresent(true);
+        }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
         Long countryId = activity.getCountryId();

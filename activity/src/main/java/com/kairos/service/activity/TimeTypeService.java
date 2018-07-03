@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
@@ -42,6 +39,9 @@ public class TimeTypeService extends MongoBaseService {
                     timeType.setCountryId(countryId);
                     if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                         timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
+                    }else{
+                        timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                        timeType.setTextColor(timeTypeDTO.getTextColor());
                     }
                     timeType = save(timeType);
                     if(timeTypeDTO.getUpperLevelTimeTypeId() != null){
@@ -61,12 +61,16 @@ public class TimeTypeService extends MongoBaseService {
 
     public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
         timeTypeDTOS.forEach(timeTypeDTO -> {
-            TimeType timeType = timeTypeMongoRepository.exists(timeTypeDTO.getLabel(), countryId);
+            TimeType timeType = timeTypeMongoRepository.findTimeTypeById(timeTypeDTO.getId(),timeTypeDTO.getLabel(), countryId);
             if (timeType == null) {
                 timeType = timeTypeMongoRepository.findOne(timeTypeDTO.getId());
                 if (timeType != null) {
                     timeType.setLabel(timeTypeDTO.getLabel());
                     timeType.setDescription(timeTypeDTO.getDescription());
+                    if(!Optional.ofNullable(timeTypeDTO.getUpperLevelTimeTypeId()).isPresent()){
+                        timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                        timeType.setTextColor(timeTypeDTO.getTextColor());
+                    }
                     save(timeType);
                     if(timeType.isLeafNode())
                         activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
