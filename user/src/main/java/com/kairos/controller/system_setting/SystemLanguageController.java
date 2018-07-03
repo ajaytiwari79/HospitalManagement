@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 @Controller
-@RequestMapping(API_ORGANIZATION_URL )
-@Api(value = API_ORGANIZATION_URL )
+@RequestMapping(API_V1 )
+@Api(value = API_V1 )
 public class SystemLanguageController {
 
     @Inject
@@ -52,14 +51,14 @@ public class SystemLanguageController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.deleteSystemLanguage(systemLanguageId));
     }
 
-    @PutMapping(value = COUNTRY_URL + "/system_language/{systemLanguageId}")
+    @PutMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL + "/system_language/{systemLanguageId}")
     @ApiOperation("To update System Language of Country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateSystemLanguageOfCountry(@PathVariable Long countryId, @PathVariable Long systemLanguageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateSystemLanguageOfCountry(countryId, systemLanguageId));
     }
 
-    @GetMapping(value = COUNTRY_URL + "/system_language" )
+    @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL + "/system_language" )
     @ApiOperation("To get System Language of Country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getSystemLanguageOfCountry(@PathVariable Long countryId) {
