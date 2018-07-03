@@ -6,10 +6,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 public class IndividualShiftTemplateDTO {
@@ -26,6 +23,7 @@ public class IndividualShiftTemplateDTO {
     private LocalTime endTime;
     private boolean isMainShift = true;
     private List<IndividualShiftTemplateDTO> subShifts;
+
 
     public IndividualShiftTemplateDTO() {
         //Default Constructor
@@ -116,4 +114,6 @@ public class IndividualShiftTemplateDTO {
     public void setSubShifts(List<IndividualShiftTemplateDTO> subShifts) {
         this.subShifts = subShifts;
     }
+
+
 }

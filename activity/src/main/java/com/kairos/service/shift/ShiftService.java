@@ -28,7 +28,7 @@ import com.kairos.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.persistence.repository.shift.IndividualShiftTemplateMongoRepository;
+import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankMongoRepository;
@@ -147,7 +147,7 @@ public class ShiftService extends MongoBaseService {
     private LocaleService localeService;
     @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private ShiftTemplateRepository shiftTemplateRepository;
-    @Inject private IndividualShiftTemplateMongoRepository individualShiftTemplateMongoRepository;
+    @Inject private IndividualShiftTemplateRepository individualShiftTemplateRepository;
     @Inject
     private ActivityConfigurationRepository activityConfigurationRepository;
 
@@ -1118,12 +1118,12 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftQueryResult> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
-        List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
+        List<IndividualShiftTemplate> individualShiftTemplate = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
         List<ShiftQueryResult> shifts = new ArrayList<>();
         individualShiftTemplate.forEach(individualShiftTemplate1 -> {
             List<ShiftDTO> subShifts=null;
             if(individualShiftTemplate1.getSubShiftIds().size()>0){
-                List<IndividualShiftTemplate> individualSubShiftTemplates=individualShiftTemplateMongoRepository.getAllByIdInAndDeletedFalse(individualShiftTemplate1.getSubShiftIds());
+                List<IndividualShiftTemplate> individualSubShiftTemplates= individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(individualShiftTemplate1.getSubShiftIds());
                 subShifts=ObjectMapperUtils.copyProperties(individualSubShiftTemplates,ShiftDTO.class);
                 subShifts.forEach(shiftDTO1 -> {shiftDTO1.setId(null);});
             }
