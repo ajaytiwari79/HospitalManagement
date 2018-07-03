@@ -342,6 +342,15 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
         }
+        //get parent time type id and hit 2 request
+        TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
+        while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent())
+        {
+            timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
+        }
+        activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
+        activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
+        activity.getGeneralActivityTab().setColorPresent(true);
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
         Long countryId = activity.getCountryId();
