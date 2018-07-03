@@ -4,16 +4,16 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.inject.Inject;
-
 import java.util.HashMap;
 import java.util.List;
 

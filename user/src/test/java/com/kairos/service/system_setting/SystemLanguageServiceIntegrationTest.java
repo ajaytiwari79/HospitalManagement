@@ -4,12 +4,12 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.system_setting.SystemLanguageDTO;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.user.country.system_setting.SystemLanguageDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.inject.Inject;
-
 import java.util.List;
 
 @RunWith(OrderTestRunner.class)
