@@ -24,7 +24,6 @@ public class IndividualShiftTemplateDTO {
     private boolean isMainShift = true;
     private List<IndividualShiftTemplateDTO> subShifts;
 
-
     public IndividualShiftTemplateDTO() {
         //Default Constructor
     }
@@ -114,6 +113,4 @@ public class IndividualShiftTemplateDTO {
     public void setSubShifts(List<IndividualShiftTemplateDTO> subShifts) {
         this.subShifts = subShifts;
     }
-
-
 }
