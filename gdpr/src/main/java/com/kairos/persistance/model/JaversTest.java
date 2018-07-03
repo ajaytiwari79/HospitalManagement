@@ -1,19 +1,36 @@
-package com.kairos.persistance.model.clause_tag;
+package com.kairos.persistance.model;
+
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
+import java.util.List;
 
-@Document(collection = "clause_tag")
-@TypeName("clause_tag")
-public class ClauseTag extends MongoBaseEntity {
+@Document(collection = "test")
+@TypeName("test")
+public class JaversTest extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Name cannot be  empty")
+
+    @NotNull
     private String name;
 
+    @NotNull
     private Long countryId;
+
+
+    private List<Long> fd;
+
+    public List<Long> getFd() {
+        return fd;
+    }
+
+    public void setFd(List<Long> fd) {
+        this.fd = fd;
+    }
 
     public Long getCountryId() {
         return countryId;

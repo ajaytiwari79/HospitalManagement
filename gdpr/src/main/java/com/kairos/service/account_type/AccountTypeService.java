@@ -8,9 +8,12 @@ import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.javers.JaversCommonService;
+import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -26,8 +29,12 @@ public class AccountTypeService extends MongoBaseService {
     @Inject
     private AccountTypeMongoRepository accountTypeRepository;
 
-     @Inject
+    @Inject
     private ExceptionService exceptionService;
+
+
+    @Inject
+    private JaversCommonService javersCommonService;
 
 
     public AccountType createAccountType(Long countryId, AccountType accountType) {
@@ -39,7 +46,9 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        return save(newAccount);
+        newAccount= save(newAccount);
+        return javersCommonService.saveToJavers(newAccount);
+
     }
 
 
@@ -81,7 +90,8 @@ public class AccountTypeService extends MongoBaseService {
 
     }
 
-    public AccountType updateAccountTypeName(Long countryId,  BigInteger id, AccountType accountType) {
+    @JaversAuditable
+    public AccountType updateAccountTypeName(Long countryId, BigInteger id, AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByName(countryId, accountType.getName());
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
@@ -89,7 +99,8 @@ public class AccountTypeService extends MongoBaseService {
         }
         exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         exists.setName(accountType.getName());
-        return exists;
+        exists=save(exists);
+        return javersCommonService.saveToJavers(exists);
 
     }
 
