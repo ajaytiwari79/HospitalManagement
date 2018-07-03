@@ -656,7 +656,7 @@ public class TaskService extends MongoBaseService {
                         getWorkShiftsFromWorkPlaceByIdResult.getEmploymentId()).findFirst();
 
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
-           exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
+            exceptionService.internalError("error.timecare.workplaceid.personid.person-external-employment-id");
         }
         OrganizationStaffWrapper organizationStaffWrapper = organizationRestClient.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
@@ -696,7 +696,7 @@ public class TaskService extends MongoBaseService {
         return shift;
     }
 
-    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId, UnitPositionDTO unitPositionDTO , List<String> skippedShiftsWhileSave) {
+    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId,UnitPositionDTO unitPositionDTO , List<String> skippedShiftsWhileSave) {
         List<String> externalIdsOfShifts = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getId()).
                 collect(Collectors.toList());
         List<String> externalIdsOfActivities = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getActivityId()).
@@ -1618,7 +1618,7 @@ public class TaskService extends MongoBaseService {
     }*/
 
     public Boolean importTask(Long unitId, List<VRPTaskDTO> taskDTOS){
-       // List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
+        // List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
         Set<String> skills = taskDTOS.stream().map(t->t.getSkill()).collect(Collectors.toSet());
         List<TaskType> taskTypes = taskTypeMongoRepository.findByName(unitId,new ArrayList<>(skills));
         Map<String,BigInteger> taskTypeIds = taskTypes.stream().collect(Collectors.toMap(t->t.getTitle(),t->t.getId()));

@@ -5,7 +5,7 @@ import com.kairos.dto.master_data.DataSubjectMappingDTO;
 import com.kairos.persistance.model.master_data_management.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.master_data_management.data_category_element.DataSubjectMappingRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDto;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

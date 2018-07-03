@@ -106,7 +106,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
             shifts = filterShifts(shifts, null, null, activityIds);
             shifts.add(infoWrapper.getShift());
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
             if (!isValid) {
                 throw new InvalidRequestException(getName() + " is Broken");

@@ -30,6 +30,7 @@ import static com.kairos.constants.AppConstants.FULL_WEEK;
 @Transactional
 public class ShiftTemplateService extends MongoBaseService {
 
+
      @Inject
      private ShiftTemplateRepository shiftTemplateRepository;
      @Inject
@@ -40,6 +41,7 @@ public class ShiftTemplateService extends MongoBaseService {
      private ShiftService shiftService;
      @Inject
      private ActivityMongoRepository activityMongoRepository;
+
 
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO){
 

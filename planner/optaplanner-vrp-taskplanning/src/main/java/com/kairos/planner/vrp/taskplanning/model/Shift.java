@@ -8,13 +8,12 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @PlanningEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,9 +24,13 @@ public class Shift extends TaskOrShift{
     private LocalDate localDate;
 
     private LocalDateTime startTime;
+
+
+
+    private LocalDateTime endTime;
     @CustomShadowVariable(variableListenerClass = ShiftEndTimeListener.class,
             sources = @PlanningVariableReference(entityClass = Task.class, variableName = "nextTask"))
-    private LocalDateTime endTime;
+    private LocalDateTime plannedEndTime;
 
 
     public Shift(String id, Employee employee, LocalDate localDate, LocalDateTime startTime, LocalDateTime endTime) {
@@ -66,25 +69,28 @@ public class Shift extends TaskOrShift{
     }
 
     public LocalDateTime getStartTime() {
-        return localDate.atStartOfDay().with(getDefaultShiftStart());
+        return startTime;
     }
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
+    public LocalDateTime getPlannedEndTime() {
+        return plannedEndTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setPlannedEndTime(LocalDateTime plannedEndTime) {
+        this.plannedEndTime = plannedEndTime;
     }
 
-    public static LocalTime getDefaultShiftStart() {
+    /*public static LocalTime getDefaultShiftStart() {
         return LocalTime.of(7, 0);
-    }
+    }*/
 
+    public int getTotalTime(){
+        return (int) ChronoUnit.MINUTES.between(startTime, endTime);
+    }
     public int getNumberOfTasks() {
         int i = 0;
         Task task = getNextTask();
@@ -106,8 +112,8 @@ public class Shift extends TaskOrShift{
     }
 
     public int getTotalPlannedMinutes() {
-        if (endTime == null) return 0;
-        return (int) ChronoUnit.MINUTES.between(getStartTime(), endTime);
+        if (plannedEndTime == null) return 0;
+        return (int) ChronoUnit.MINUTES.between(getStartTime(), plannedEndTime);
     }
 
     public boolean isHalfWorkDay() {
@@ -117,7 +123,13 @@ public class Shift extends TaskOrShift{
     public boolean isFullWorkDay() {
         return localDate.getDayOfWeek().getValue() < 5;
     }
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
     @Override
     public String toString() {
         return "Shift{" + id +
@@ -151,11 +163,11 @@ public class Shift extends TaskOrShift{
         Task temp = getNextTask();
         int duration = 0;
         while (temp != null) {
-            sb.append("[(Drive:" +  temp.getDrivingTime() + ")" + temp.toString() +"planTime:"+temp.getPlannedStartTime()+ "]->");
+            sb.append("[(Drive:" +  temp.getDrivingTime() + ")" + temp.toString() +","+temp.getHouseNo()+","+temp.getStreetName()+","+ Optional.ofNullable(temp.getCity()).orElse("null").replace(" ","")+",planTime:"+temp.getPlannedStartTime()+ "]->");
             duration += temp.getDrivingTime() + temp.getPlannedDuration();
             temp = temp.getNextTask();
         }
-        return "TotalDur(" + duration + "):Drive(" + getChainDrivingTime() + ")(" + getStartTime() + ":" + endTime + ")" + sb.toString();
+        return "TotalDur(" + duration + "):Drive(" + getChainDrivingTime() + ")(" + getStartTime() + ":" + plannedEndTime + ")" + sb.toString();
     }
 
     public String getLocationsString() {

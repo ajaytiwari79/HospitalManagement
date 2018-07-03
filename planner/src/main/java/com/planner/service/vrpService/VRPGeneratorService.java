@@ -1,21 +1,12 @@
 package com.planner.service.vrpService;
 
-<<<<<<< HEAD:kairos-planner/src/main/java/com/planner/service/vrpService/VRPGeneratorService.java
-import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-
-import com.kairos.response.dto.web.planning.vrpPlanning.EmployeeDTO;
-import com.kairos.response.dto.web.planning.vrpPlanning.ShiftDTO;
-import com.kairos.response.dto.web.planning.vrpPlanning.VrpTaskPlanningDTO;
-=======
+import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.planner.vrp.taskplanning.model.*;
-import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-
+import com.kairos.vrp.vrpPlanning.EmployeeDTO;
+import com.kairos.vrp.vrpPlanning.ShiftDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
->>>>>>> KP-3748:planner/src/main/java/com/planner/service/vrpService/VRPGeneratorService.java
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.staffService.EmployeeService;
 import com.planner.service.taskService.TaskService;
@@ -25,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +46,9 @@ public class VRPGeneratorService {
         solution.setShifts(shifts);
         solution.setEmployees(employees);
         solution.setLocationsDistanceMatrix(locationsDistanceMatrix);
+        Map<LocationPair,Boolean> onArriveSideMatrix=tomTomService.getOnArriveSideMatrix();
+        LocationsRouteMatrix locationsRouteMatrix = new LocationsRouteMatrix(onArriveSideMatrix);
+        solution.setLocationsRouteMatrix(locationsRouteMatrix);
         FileIOUtil.writeVrpPlanningXMLToFile(solution,System.getProperty("user.dir")+"/optaplanner-vrp-taskplanning/src/main/resources/problem");
         /*try {
         //String json = ObjectMapperUtils.objectToJsonString(solution);
@@ -85,7 +76,7 @@ public class VRPGeneratorService {
     }
 
     public VrpTaskPlanningSolution getVRPProblemSolution(VrpTaskPlanningDTO vrpTaskPlanningDTO){
-        VrpTaskPlanningSolution solution = new VrpTaskPlanningSolution();
+        VrpTaskPlanningSolution problem = new VrpTaskPlanningSolution();
         List<Matrix> matrix=tomTomService.getMatrix();
         LocationsDistanceMatrix locationsDistanceMatrix= new LocationsDistanceMatrix();
         matrix.forEach(m->{
@@ -99,12 +90,28 @@ public class VRPGeneratorService {
         Object[] objects= getEmployeesAndShifts(vrpTaskPlanningDTO.getShifts());
         List<Shift> shifts = (List<Shift>)objects[0];
         List<Employee> employees = (List<Employee>)objects[1];
-        solution.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
-        solution.setTasks(tasks);
-        solution.setShifts(shifts);
-        solution.setEmployees(employees);
-        solution.setLocationsDistanceMatrix(locationsDistanceMatrix);
-        return solution;
+        problem.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
+        problem.setTasks(tasks);
+        Map<LocationPair,Boolean> onArriveSideMatrix=tomTomService.getOnArriveSideMatrix();
+        LocationsRouteMatrix locationsRouteMatrix = new LocationsRouteMatrix(onArriveSideMatrix);
+        problem.setLocationsRouteMatrix(locationsRouteMatrix);
+        problem.setShifts(shifts);
+        problem.setEmployees(employees);
+        addBreaks(problem);
+        problem.setLocationsDistanceMatrix(locationsDistanceMatrix);
+        return problem;
+    }
+
+
+    private void addBreaks(VrpTaskPlanningSolution problem) {
+        List<Task> breaks=new ArrayList<>();
+        int maxBreaks=problem.getShifts().stream().filter(s->!s.isHalfWorkDay()).collect(Collectors.toList()).size();
+        for (int i = 0; i <maxBreaks ; i++) {
+            breaks.add(new Task(1000000000l+i,30,true));
+        }
+        problem.getTasks().addAll(breaks);
+        Collections.shuffle(problem.getTasks());
+
     }
 
     private Object[] getEmployeesAndShifts(List<ShiftDTO> shiftDTOS){
@@ -113,9 +120,9 @@ public class VRPGeneratorService {
         List<Employee> employees = ObjectMapperUtils.copyPropertiesOfListByMapper(employeeDTOSet,Employee.class);
         Map<String,Employee> employeeMap = employees.stream().collect(Collectors.toMap(k->k.getId(), v->v));
         shiftDTOS.forEach(s->{
-            for (int i=4;i<=8;i++) {
+            //for (int i=4;i<=8;i++) {
                 shifts.add(new Shift(s.getId(), employeeMap.get(s.getEmployee().getId()),s.getLocalDate(), DateUtils.dateToLocalDateTime(new Date(s.getStartTime())), DateUtils.dateToLocalDateTime(new Date(s.getEndTime()))));
-            }
+            //}
         });
         return new Object[]{shifts,employeeDTOSet};
     }

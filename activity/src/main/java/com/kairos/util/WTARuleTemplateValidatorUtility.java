@@ -209,12 +209,12 @@ public class WTARuleTemplateValidatorUtility {
         return dateTimeInterval;
     }
 
-    public static Integer[] getValueByPhase(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues,BigInteger ruleTemplateId){
+    public static Integer[] getValueByPhase(RuleTemplateSpecificInfo infoWrapper, List<PhaseTemplateValue> phaseTemplateValues,WTABaseRuleTemplate ruleTemplate){
         Integer[] limitAndCounter = new Integer[2];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if(infoWrapper.getPhase().equals(phaseTemplateValue.getPhaseName())){
                 limitAndCounter[0] = (int)(infoWrapper.getUser().getStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
-                limitAndCounter[1] = getCounterValue(infoWrapper,phaseTemplateValue,ruleTemplateId);
+                limitAndCounter[1] = getCounterValue(infoWrapper,phaseTemplateValue,ruleTemplate);
                 break;
             }
         }
@@ -230,9 +230,14 @@ public class WTARuleTemplateValidatorUtility {
         return false;
     }
 
-    public static Integer getCounterValue(RuleTemplateSpecificInfo infoWrapper,PhaseTemplateValue phaseTemplateValue,BigInteger ruleTemplateId){
-        Integer counterValue = phaseTemplateValue.isOptional() ? phaseTemplateValue.getOptionalFrequency() : null;
-        return counterValue!=null ? counterValue - infoWrapper.getCounterMap().getOrDefault(ruleTemplateId,0) : null;
+    public static Integer getCounterValue(RuleTemplateSpecificInfo infoWrapper,PhaseTemplateValue phaseTemplateValue,WTABaseRuleTemplate ruleTemplate){
+        Integer counterValue = null;
+        if(infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()){
+            counterValue = ruleTemplate.getStaffCanIgnoreCounter();
+        }if(infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()){
+            counterValue = ruleTemplate.getManagementCanIgnoreCounter();
+        }
+        return counterValue!=null ? counterValue - infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(),0) : null;
 
     }
 

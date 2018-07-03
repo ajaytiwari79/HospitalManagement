@@ -36,12 +36,12 @@ salience 20
         scoreHolder.addSoftConstraintMatch(kcontext,-1);
 end
 
-rule "Shift out of boundary half day"
+rule "Shift out of boundary"
 salience 21
 
     when
-        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes)
-        $ot: Integer(intValue>0) from ($minutes-330)
+        Shift( $minutes:totalPlannedMinutes,$min:totalTime)//isHalfWorkDay() &&
+        $ot: Integer(intValue>0) from ($minutes-$min)
     then
         if($ot>60){
             scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
@@ -50,7 +50,7 @@ salience 21
             scoreHolder.addSoftConstraintMatch(kcontext,-10);
         }
 end
-
+/*
 rule "Shift out of boundary full day"
 salience 22
     when
@@ -64,7 +64,7 @@ salience 22
             scoreHolder.addSoftConstraintMatch(kcontext,-10);
         }
 end
-
+*/
 rule "Number of Task Per shift"
 salience 21
 
@@ -116,11 +116,19 @@ salience 22
     then
         scoreHolder.addMediumConstraintMatch(kcontext,-1);
 end
-
-rule "Same road side tasks perference" // need to add check for one lane road
+/*
+rule "Same road side tasks perference"
 salience 22
     when
-        Task(prevTaskOrShift instanceof Task  && getFullStreetName().equals(((Task)prevTaskOrShift).getFullStreetName()) && !areHouseNumberSameLane((Task)prevTaskOrShift))
+        Task(!shiftBreak && $pt:getPreviousValidTask() && $pt!=null &&  !isOnOneWayStreet() && getFullStreetName().equals($pt.getFullStreetName()) && !areHouseNumberSameLane($pt))
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-4);
+end
+*/
+rule "tasks location right side preference"
+salience 22
+    when
+        Task(!shiftBreak && $pt:getPreviousValidTask() ,$pt!=null, !isOnOneWayStreet() && !isTaskLocationOnRightSide($pt))
     then
         scoreHolder.addSoftConstraintMatch(kcontext,-4);
 end

@@ -176,7 +176,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
             if (intervals.size() > 2) {
                 count = getDayOFF(intervals,dateTimeInterval);
-                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+                Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
                 if (!isValid) {
                     if (limitAndCounter[1] != null) {

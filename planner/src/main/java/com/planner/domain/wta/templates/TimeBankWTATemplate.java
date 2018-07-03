@@ -6,6 +6,7 @@ import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.TimeBankTypeEnum;
 import com.kairos.enums.WTATemplateType;
+
 import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.util.ArrayList;

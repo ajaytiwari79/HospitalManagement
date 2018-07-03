@@ -150,4 +150,9 @@ public class ObjectMapperUtils {
         }
     }
 
+    public  static ObjectMapper getObjectMapper(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
+    }
 }

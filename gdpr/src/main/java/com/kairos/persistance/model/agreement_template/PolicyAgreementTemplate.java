@@ -5,6 +5,7 @@ import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
@@ -17,6 +18,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "Name cannot be empty")
     private String name;
+
+    @NotNullOrEmpty(message = "template id cannot be empty")
+    private String templateId;
 
     @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
@@ -62,13 +66,6 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public Set<BigInteger> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
 
     public Set<BigInteger> getAgreementSections() {
         return agreementSections;
@@ -110,11 +107,27 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplate(Long countryId,String name, String description) {
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
+
+    public PolicyAgreementTemplate(Long countryId, String name, String description) {
         this.name = name;
         this.countryId = countryId;
         this.description = description;
 
+    }
+
+    public Set<BigInteger> getAccountTypes() {
+        return accountTypes;
+    }
+
+    public void setAccountTypes(Set<BigInteger> accountTypes) {
+        this.accountTypes = accountTypes;
     }
 
     public PolicyAgreementTemplate() {

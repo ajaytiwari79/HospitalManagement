@@ -6,16 +6,18 @@ import com.kairos.activity.task_type.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.task_type.TaskTypeEnum;
+import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task_type.*;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
+import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoRepository;
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.country.CountryDTO;
+import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.country.tag.TagDTO;
 import com.kairos.user.country.time_slot.TimeSlotWrapper;
@@ -64,7 +66,7 @@ public class TaskTypeService extends MongoBaseService {
     @Inject
     private EnvConfig envConfig;
     @Autowired
-    private SkillRestClient skillRestClient;
+    private   SkillRestClient skillRestClient;
     @Autowired private OrganizationRestClient organizationRestClient;
 
     @Autowired private CountryRestClient countryRestClient;
@@ -80,6 +82,7 @@ public class TaskTypeService extends MongoBaseService {
     private TagMongoRepository tagMongoRepository;
     @Autowired
     private ExceptionService exceptionService;
+    @Inject private TaskMongoRepository taskMongoRepository;
 
 
 
@@ -88,20 +91,9 @@ public class TaskTypeService extends MongoBaseService {
         TaskType taskType = new TaskType(taskTypeDTO.getTitle(), taskTypeDTO.getDescription(),subServiceId, taskTypeDTO.getExpiresOn(), taskTypeDTO.getDuration());
         taskType.setTags(taskTypeDTO.getTags());
         save(taskType);
-        return getBasicTaskTypeInfo(taskType);
+        return taskType.getBasicTaskTypeInfo();
     }
-    public TaskTypeDTO getBasicTaskTypeInfo(TaskType taskType) {
-        TaskTypeDTO taskTypeDTO = new TaskTypeDTO();
-        taskTypeDTO.setId(taskType.getId());
-        taskTypeDTO.setDescription(taskType.getDescription());
-        taskTypeDTO.setDuration(taskType.getDuration());
-        taskTypeDTO.setExpiresOn(taskType.getExpiresOn());
-        taskTypeDTO.setTags(taskType.getTags());
-        taskTypeDTO.setParentTaskTypeId(taskType.getRootId());
-        taskTypeDTO.setServiceId(taskType.getSubServiceId());
-        taskTypeDTO.setTitle(taskType.getTitle());
-        return taskTypeDTO;
-    }
+
     /*public List<Map<String, Object>> getTaskTypes(Long subServiceId) {
         List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId,0L);
         List<Map<String, Object>> response = new ArrayList<>(taskTypes.size());
@@ -115,7 +107,7 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId,0L);
         List<TaskTypeDTO> response = new ArrayList<>(taskTypes.size());
         for (TaskType taskType : taskTypes) {
-            response.add(getBasicTaskTypeInfo(taskType));
+            response.add(taskType.getBasicTaskTypeInfo());
         }
         return response;
     }
@@ -345,7 +337,7 @@ public class TaskTypeService extends MongoBaseService {
         generalSettings.put("tags",tags);
         response.put("generalSettings", generalSettings);
         response.put("taskTypes", taskTypeMongoRepository.getTaskTypesForCopySettings(taskTypeId));
-       response.put("organizationTypes",organizationTypeHierarchyQueryResult.getOrganizationTypes());
+        response.put("organizationTypes",organizationTypeHierarchyQueryResult.getOrganizationTypes());
         return response;
 
     }
@@ -767,9 +759,10 @@ public class TaskTypeService extends MongoBaseService {
         copyProperties(taskType,copyObj,organizationId,subServiceId);
         save(copyObj);
         copySlaValues(taskType,Arrays.asList(copyObj),organizationId);
-        return getBasicTaskTypeInfo(copyObj);
+        return copyObj.getBasicTaskTypeInfo();
 
     }
+
 
     public TaskType copyProperties(TaskType source, TaskType target,long organizationId,long subServiceId){
         target.setOrganizationId(organizationId);
@@ -782,7 +775,7 @@ public class TaskTypeService extends MongoBaseService {
     public List<TaskTypeDTO> getTaskTypesOfOrganizations(long organizationId, long subService) {
         List<TaskTypeDTO> data = new ArrayList<>();
         for (TaskType taskType : taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId,true)) {
-            data.add(getBasicTaskTypeInfo(taskType));
+            data.add(taskType.getBasicTaskTypeInfo());
         }
         return data;
     }
@@ -853,7 +846,7 @@ public class TaskTypeService extends MongoBaseService {
     public Object linkWithOrganizationTypes(String taskTypeId,Set<Long> organizationSubTypeId, boolean isSelected){
 
         //anil maurya code commented due to wrong implementation
-       TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
         if (isNullOrDeleted(taskType)) {
             return null;
         }
@@ -1118,17 +1111,17 @@ public class TaskTypeService extends MongoBaseService {
         List<TaskTypeResponseDTO> selectedTaskTypes = new ArrayList<>();
         if(ORGANIZATION.equalsIgnoreCase(type)){
             OrganizationDTO organization=organizationRestClient.getOrganization(id);
-           // OrganizationDTO organization = organizationGraphRepository.findOne(id);
+            // OrganizationDTO organization = organizationGraphRepository.findOne(id);
             if (organization == null) {
                 return null;
             }
             OrganizationDTO parent;
             if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-               // parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+                // parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
                 parent = organizationRestClient.getParentOrganizationOfCityLevel(organization.getId());
 
             } else {
-               // parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+                // parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
                 parent = organizationRestClient.getParentOfOrganization(organization.getId());
             }
             /*if(parent == null){
@@ -1147,8 +1140,8 @@ public class TaskTypeService extends MongoBaseService {
            /* if(parent == null){
                 visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
             } else {*/
-           //Todo why we use parent id when we don't set organisatio id on creating taskType @yasir
-                visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
+            //Todo why we use parent id when we don't set organisatio id on creating taskType @yasir
+            visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,0,true));
             //}
             selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId,id,true));
         } else if(TEAM.equalsIgnoreCase(type)){
@@ -1183,7 +1176,7 @@ public class TaskTypeService extends MongoBaseService {
 
         if(ORGANIZATION.equalsIgnoreCase(type)){
             if(isSelected){
-               linkTaskTypesWithOrg(taskTypeId,id,subServiceId);
+                linkTaskTypesWithOrg(taskTypeId,id,subServiceId);
             } else {
                 deleteTaskType(taskTypeId,id,subServiceId);
             }
@@ -1197,7 +1190,7 @@ public class TaskTypeService extends MongoBaseService {
                 save(taskType);
             } else {
                 taskType.setEnabled(false);
-               save(taskType);
+                save(taskType);
             }
         }
         return getTaskTypes(id,subServiceId,type);
@@ -1213,7 +1206,7 @@ public class TaskTypeService extends MongoBaseService {
     public Map<String, Object> getTaskTypeList(List<Long> serviceIds,long orgId){
 
         Map<String, Object> response = new HashMap<>();
-      //  List<TaskType> taskTypes = taskTypeMongoRepository.findBySubServiceIdInAndOrganizationIdAndIsEnabled(serviceIds, orgId, true);
+        //  List<TaskType> taskTypes = taskTypeMongoRepository.findBySubServiceIdInAndOrganizationIdAndIsEnabled(serviceIds, orgId, true);
         List<TaskType> taskTypes = taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(orgId,true);
         List<Map<String, Object>> taskTypeList = new ArrayList<>(taskTypes.size());
         for (TaskType taskType : taskTypes) {
@@ -1287,7 +1280,7 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }*/
 
-    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId, TaskTypeSettingDTO taskTypeSettingDTO){
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
         TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
             taskTypeSetting = new TaskTypeSetting(staffId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());
@@ -1308,6 +1301,13 @@ public class TaskTypeService extends MongoBaseService {
         }
         taskTypeSetting.setDuration(taskTypeSettingDTO.getDuration());
         save(taskTypeSetting);
+        List<Task> tasks = taskMongoRepository.findAllBycitizenIdAndTaskTypeId(clientId,taskTypeSetting.getTaskTypeId());
+        if(!tasks.isEmpty()){
+            tasks.forEach(t->{
+                t.setDuration(taskTypeSettingDTO.getDuration());
+            });
+            save(tasks);
+        }
         taskTypeSettingDTO.setId(taskTypeSetting.getId());
         return taskTypeSettingDTO;
     }
@@ -1326,8 +1326,14 @@ public class TaskTypeService extends MongoBaseService {
 
     public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long clientId){
         List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(clientId);
+        Map<BigInteger,TaskTypeSettingDTO> taskTypeSettingDTOMap = taskTypeSettings.stream().collect(Collectors.toMap(k->k.getTaskTypeId(),v->v));
         List<Long> serviceIds = getServiceIds(organisationId);
         List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId,serviceIds);
+        taskTypes.forEach(t->{
+            if(!taskTypeSettingDTOMap.containsKey(t.getId())){
+                taskTypeSettings.add(new TaskTypeSettingDTO(t.getId(),t.getTitle(),clientId,t.getDuration()));
+            }
+        });
         return new TaskTypeSettingWrapper(taskTypes,taskTypeSettings);
     }
 

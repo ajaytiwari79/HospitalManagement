@@ -7,8 +7,8 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.ResponsibilityType;
 import com.kairos.persistance.repository.master_data_management.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
-import com.kairos.service.MongoBaseService;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.service.common.MongoBaseService;
+import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,24 +26,27 @@ public class ResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
 
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
 
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-        List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
-        Set<String> names = new HashSet<>();
+        Set<String> rsponsibilityTypesNames = new HashSet<>();
         if (rsponsibilityTypes.size() != 0) {
             for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    names.add(responsibilityType.getName());
+                    rsponsibilityTypesNames.add(responsibilityType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing = responsibilityTypeMongoRepository.findByCountryAndNameList(countryId,organizationId, names);
-            existing.forEach(item -> names.remove(item.getName()));
-            if (names.size() != 0) {
-                for (String name : names) {
+            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,rsponsibilityTypesNames,ResponsibilityType.class);
+            rsponsibilityTypesNames = comparisonUtils.getNameListForMetadata(existing, rsponsibilityTypesNames);
+
+            List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
+            if (rsponsibilityTypesNames.size() != 0) {
+                for (String name : rsponsibilityTypesNames) {
 
                     ResponsibilityType newResponsibilityType = new ResponsibilityType();
                     newResponsibilityType.setName(name);
