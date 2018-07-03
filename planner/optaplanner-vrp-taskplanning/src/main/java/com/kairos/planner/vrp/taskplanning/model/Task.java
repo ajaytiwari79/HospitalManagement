@@ -215,8 +215,8 @@ public class Task extends TaskOrShift{
         this.locationsDistanceMatrix = locationsDistanceMatrix;
     }
 
-    public double getPlannedDuration(){
-        return shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
+    public int getPlannedDuration(){
+        return (int)Math.ceil(shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d));
     }
     //for rules only
     public int getDrivingTimeSeconds(){
