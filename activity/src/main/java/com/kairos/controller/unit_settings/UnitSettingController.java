@@ -1,6 +1,7 @@
 package com.kairos.controller.unit_settings;
 
 import com.kairos.service.unit_settings.UnitSettingService;
+import com.kairos.service.user_service_data.UnitDataService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.activity.unit_settings.UnitAgeSettingDTO;
 import com.kairos.activity.unit_settings.UnitSettingDTO;
@@ -24,6 +25,8 @@ public class UnitSettingController {
 
     @Inject
     private UnitSettingService unitSettingService;
+    @Inject
+    private UnitDataService unitDataService;
 
     @ApiOperation(value = "get unit age settings")
     @GetMapping(value = "/age_setting")
@@ -60,5 +63,12 @@ public class UnitSettingController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addDefaultOpenShiftPhaseSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitSettingService.createDefaultOpenShiftPhaseSettings(unitId,null));
+    }
+
+    @ApiOperation(value = "add parent organization id and country id for units")
+    @PostMapping(value = "/parent_org_and_country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addParentOrganizationAndCountryIdForAllUnits() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitDataService.addParentOrganizationAndCountryIdForAllUnits());
     }
 }

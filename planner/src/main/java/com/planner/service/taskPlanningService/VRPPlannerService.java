@@ -74,7 +74,7 @@ public class VRPPlannerService {
                     while (true) {
                         LocalDateTime drivingTimeStart = null;
                         Indictment indictment = taskIdAndIndictmentMap.get(nextTask.getId());
-                        HardMediumSoftLongScore score = ((HardMediumSoftLongScore) indictment.getScoreTotal());
+                        //HardMediumSoftLongScore score = ((HardMediumSoftLongScore) indictment.getScoreTotal());
                         if(nextTask.isShiftBreak()){
                             com.planner.domain.task.Task breakTask = new com.planner.domain.task.Task("dt_"+i+""+ nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, nextTask.getDuration(), nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
                             breakTask.setPlannedStartTime(nextTask.getPlannedStartTime());
@@ -92,9 +92,9 @@ public class VRPPlannerService {
                             drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes((int)nextTask.getPlannedDuration());
                             task.setPlannedEndTime(drivingTimeStart);
                             task.setStaffId(new Long(shift.getEmployee().getId()));
-                            if(score.getHardScore()>0 || score.getMediumScore()>0){
+                            /*if(score.getHardScore()>0 || score.getMediumScore()>0){
                                 excalatedTaskList.add(task);
-                            }
+                            }*/
                             tasks.add(task);
                         }
                         if (nextTask.getNextTask() != null) {

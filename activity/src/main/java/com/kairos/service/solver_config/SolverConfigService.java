@@ -53,6 +53,17 @@ public class SolverConfigService extends MongoBaseService {
         return solverConfigDTO;
     }
 
+    public SolverConfigDTO createSolverConfigOnReSubmistion(Long unitId, SolverConfigDTO solverConfigDTO) {
+        //solverConfigDTO.setName("Copy of "+solverConfigDTO.getName());
+        SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class);
+        solverConfig.setUnitId(unitId);
+        solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
+        save(solverConfig);
+        solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
+        solverConfigDTO.setId(solverConfig.getId());
+        return solverConfigDTO;
+    }
+
 
     public SolverConfigDTO updateSolverConfig(Long unitId,BigInteger solverConfigId, SolverConfigDTO solverConfigDTO) {
         /*Boolean exists = solverConfigRepository.existsSolverConfigByNameAndUnitIdAndSolverConfigId(unitId,solverConfigDTO.getName(),solverConfigDTO.getId());
