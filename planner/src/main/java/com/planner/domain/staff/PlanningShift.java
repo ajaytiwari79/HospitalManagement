@@ -12,6 +12,7 @@ import java.util.Date;
 public class PlanningShift extends MongoBaseEntity {
 
     private String staffId;
+    private String shiftId;
     private Date startTime;
     private Date endTime;
     private ShiftType shiftType;
@@ -19,7 +20,8 @@ public class PlanningShift extends MongoBaseEntity {
     public PlanningShift() {
     }
 
-    public PlanningShift(String staffId, Date startTime, Date endTime) {
+    public PlanningShift(String shiftId,String staffId, Date startTime, Date endTime) {
+        this.shiftId = shiftId;
         this.staffId = staffId;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -63,5 +65,13 @@ public class PlanningShift extends MongoBaseEntity {
 
     public void setShiftType(ShiftType shiftType) {
         this.shiftType = shiftType;
+    }
+
+    public String getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(String shiftId) {
+        this.shiftId = shiftId;
     }
 }

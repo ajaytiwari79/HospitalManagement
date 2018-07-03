@@ -45,7 +45,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,staffId:{$in:?0}, isMainShift:true,startDate:{$gte:?1,$lte:?2}}")
     List<Shift> findAllShiftsByStaffIds(List<Long> staffIds,Date startDate,Date endDate);
 
-    @Query("{deleted:false, id:?0}")
-    List<Shift> findAllByIds(List<BigInteger> shiftIds);
+    @Query("{deleted:false, _id:{'$in':?0}}")
+    List<Shift> findAllByIds(List<String> shiftIds);
 
 }

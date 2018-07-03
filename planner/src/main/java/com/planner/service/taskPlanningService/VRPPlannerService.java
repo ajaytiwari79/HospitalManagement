@@ -68,7 +68,7 @@ public class VRPPlannerService {
         for (Shift shift:shifts){
             Task nextTask = shift.getNextTask();
             if(shift.getPlannedEndTime()!=null) {
-                planningShifts.add(new PlanningShift(shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
+                planningShifts.add(new PlanningShift(shift.getId(),shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
                 int i = 0;
                 if (nextTask != null) {
                     while (true) {

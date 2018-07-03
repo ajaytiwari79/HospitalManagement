@@ -1149,7 +1149,7 @@ public class ShiftService extends MongoBaseService {
         return shiftWithActivityDTO;
     }
 
-    public List<Shift> getAllShiftByIds(List<BigInteger> shiftIds){
+    public List<Shift> getAllShiftByIds(List<String> shiftIds){
         return shiftMongoRepository.findAllByIds(shiftIds);
     }
 }
