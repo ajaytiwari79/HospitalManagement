@@ -58,6 +58,14 @@ public class TimeTypeDTO {
         this.timeTypes = timeTypes;
     }
 
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,String textColor) {
+        this.id = id;
+        this.timeTypes = timeTypes;
+        this.label = label;
+        this.description = description;
+        this.backgroundColor=backgroundColor;
+        this.textColor=textColor;
+    }
     public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description) {
         this.id = id;
         this.timeTypes = timeTypes;
