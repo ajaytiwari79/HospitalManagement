@@ -219,8 +219,8 @@ public class ShiftService extends MongoBaseService {
         save(mainShift);
         ShiftQueryResult shiftQueryResult = mainShift.getShiftQueryResult();
         shiftQueryResult.setSubShifts(shiftQueryResults);
-//        timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
-//        payOutService.savePayOut(mainShift.getUnitPositionId(), mainShift);
+        timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
+        payOutService.savePayOut(mainShift.getUnitPositionId(), mainShift);
 
 
         //anil m2 notify event for updating staffing level

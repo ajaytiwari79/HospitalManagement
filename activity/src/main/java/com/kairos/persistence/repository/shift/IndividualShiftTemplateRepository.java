@@ -20,6 +20,4 @@ public interface IndividualShiftTemplateRepository extends MongoBaseRepository<I
       @Query("{deleted:false,id:?0}")
       IndividualShiftTemplate findOneById(BigInteger id);
 
-
-
 }
