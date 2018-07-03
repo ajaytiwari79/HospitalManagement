@@ -1,7 +1,9 @@
 package com.kairos.service.shift;
 
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
@@ -20,6 +22,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.AppConstants.FULL_DAY;
+import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
+import static com.kairos.constants.AppConstants.FULL_WEEK;
+
 @Service
 @Transactional
 public class ShiftTemplateService extends MongoBaseService {
@@ -32,8 +38,25 @@ public class ShiftTemplateService extends MongoBaseService {
      private ExceptionService exceptionService;
      @Inject
      private ShiftService shiftService;
+     @Inject
+     private ActivityMongoRepository activityMongoRepository;
 
     public ShiftTemplateDTO createShiftTemplate(Long unitId, ShiftTemplateDTO shiftTemplateDTO){
+
+        //Check for activity is absence type or not
+        Set<BigInteger>  activityIds=new HashSet<>();
+        shiftTemplateDTO.getShiftList().forEach(shift->{
+            activityIds.add(shift.getActivityId());
+            activityIds.addAll(shift.getSubShifts().stream().map(s->s.getActivityId()).collect(Collectors.toSet()));
+        });
+        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
+        activities.forEach(activity -> {
+            if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
+                exceptionService.actionNotPermittedException("message.activity.absenceType", activity.getId());
+            }
+        });
+
+        //Check for validating duplicate by name
         boolean alreadyExistsByName=shiftTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(shiftTemplateDTO.getName().trim(),unitId);
         if(alreadyExistsByName){
             exceptionService.duplicateDataException("message.shiftTemplate.exists",shiftTemplateDTO.getName());
