@@ -33,9 +33,8 @@ public class RulesActivityTab implements Serializable{
     private Integer longestTime;
     private boolean eligibleForCopy;
     private DurationField plannedTimeInAdvance;
-    private boolean approvalRequired;
     private DurationField approvalTimeInAdvance;
-    private boolean approvalPercentageRequired;
+    private Float approvalPercentage;
 
 
     public boolean isEligibleForStaffingLevel() {
@@ -89,7 +88,7 @@ public class RulesActivityTab implements Serializable{
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
 
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,boolean approvalRequired,DurationField approvalTimeInAdvance,boolean approvalPercentageRequired) {
+    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -110,9 +109,8 @@ public class RulesActivityTab implements Serializable{
         this.longestTime = longestTime;
         this.eligibleForCopy=eligibleForCopy;
         this.plannedTimeInAdvance=plannedTimeInAdvance;
-        this.approvalRequired=approvalRequired;
         this.approvalTimeInAdvance=approvalTimeInAdvance;
-        this.approvalPercentageRequired=approvalPercentageRequired;
+        this.approvalPercentage=approvalPercentage;
 
     }
 
@@ -245,14 +243,6 @@ public class RulesActivityTab implements Serializable{
         this.plannedTimeInAdvance = plannedTimeInAdvance;
     }
 
-    public boolean isApprovalRequired() {
-        return approvalRequired;
-    }
-
-    public void setApprovalRequired(boolean approvalRequired) {
-        this.approvalRequired = approvalRequired;
-    }
-
     public DurationField getApprovalTimeInAdvance() {
         return approvalTimeInAdvance;
     }
@@ -261,11 +251,11 @@ public class RulesActivityTab implements Serializable{
         this.approvalTimeInAdvance = approvalTimeInAdvance;
     }
 
-    public boolean isApprovalPercentageRequired() {
-        return approvalPercentageRequired;
+    public Float getApprovalPercentage() {
+        return approvalPercentage;
     }
 
-    public void setApprovalPercentageRequired(boolean approvalPercentageRequired) {
-        this.approvalPercentageRequired = approvalPercentageRequired;
+    public void setApprovalPercentage(Float approvalPercentage) {
+        this.approvalPercentage = approvalPercentage;
     }
 }

@@ -36,9 +36,8 @@ public class RulesActivityTabDTO {
     private boolean eligibleForCopy;
 
     private DurationField plannedTimeInAdvance;
-    private boolean approvalRequired;
     private DurationField approvalTimeInAdvance;
-    private boolean approvalPercentageRequired;
+    private Float approvalPercentage;
 
 
     public boolean isEligibleForStaffingLevel() {
@@ -73,7 +72,7 @@ public class RulesActivityTabDTO {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalRequired,approvalTimeInAdvance,approvalPercentageRequired);
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage);
 
 
         return rulesActivityTab;
@@ -218,14 +217,6 @@ public class RulesActivityTabDTO {
         this.plannedTimeInAdvance = plannedTimeInAdvance;
     }
 
-    public boolean isApprovalRequired() {
-        return approvalRequired;
-    }
-
-    public void setApprovalRequired(boolean approvalRequired) {
-        this.approvalRequired = approvalRequired;
-    }
-
     public DurationField getApprovalTimeInAdvance() {
         return approvalTimeInAdvance;
     }
@@ -234,11 +225,11 @@ public class RulesActivityTabDTO {
         this.approvalTimeInAdvance = approvalTimeInAdvance;
     }
 
-    public boolean isApprovalPercentageRequired() {
-        return approvalPercentageRequired;
+    public Float getApprovalPercentage() {
+        return approvalPercentage;
     }
 
-    public void setApprovalPercentageRequired(boolean approvalPercentageRequired) {
-        this.approvalPercentageRequired = approvalPercentageRequired;
+    public void setApprovalPercentage(Float approvalPercentage) {
+        this.approvalPercentage = approvalPercentage;
     }
 }
