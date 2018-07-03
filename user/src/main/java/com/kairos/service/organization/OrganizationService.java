@@ -326,6 +326,26 @@ public class OrganizationService extends UserBaseService {
 
 
     }
+
+    public boolean validateAccessGroupIdForUnitManager(Long countryId, Long accessGroupId, CompanyType companyType){
+
+        OrganizationCategory organizationCategory = OrganizationCategory.ORGANIZATION;
+        switch (companyType){
+            case KAIROS_HUB : {
+                organizationCategory = OrganizationCategory.HUB;
+                break;
+            }
+            case UNION: {
+                organizationCategory = OrganizationCategory.UNION;
+                break;
+            }
+        }
+        if( !accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId,organizationCategory.toString(), accessGroupId)){
+            exceptionService.actionNotPermittedException("error.access.group.invalid", accessGroupId);
+        }
+        return true;
+    }
+
     public Map<String, OrganizationResponseWrapper> createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
 
         Map<String, OrganizationResponseWrapper> organizationResponseMap = new HashMap<>();
@@ -351,10 +371,7 @@ public class OrganizationService extends UserBaseService {
 
         }
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
-        if( !accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId,
-                getOrganizationCategory(orgDetails.getUnion(), orgDetails.isKairosHub()).toString(), orgDetails.getUnitManager().getAccessGroupId())){
-            exceptionService.actionNotPermittedException("error.access.group.invalid", orgDetails.getUnitManager().getAccessGroupId());
-        }
+        validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(),orgDetails.getCompanyType() );
         Organization organization = new Organization();
         organization.setParentOrganization(true);
         organization.setCountry(country);
@@ -496,10 +513,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
-        if( !accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId,
-                getOrganizationCategory(orgDetails.getUnion(), orgDetails.isKairosHub()).toString(), orgDetails.getUnitManager().getAccessGroupId())){
-            exceptionService.actionNotPermittedException("error.access.group.invalid", orgDetails.getUnitManager().getAccessGroupId());
-        }
+        validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(),orgDetails.getCompanyType() );
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
