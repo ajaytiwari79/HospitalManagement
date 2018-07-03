@@ -48,35 +48,6 @@ public class CounterDataController {
         KPI kpi;
         BaseChart baseChart;
         ArrayList<KPI> kpiList = new ArrayList<>();
-/*
-        //CounterType.TOTAL_KM_DRIVEN_PER_DAY
-        baseChart = new SingleNumberChart(12, RepresentationUnit.DECIMAL, "Km");
-        kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_DAY.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setId(BigInteger.valueOf(1));
-        kpi.setType(CounterType.TOTAL_KM_DRIVEN_PER_DAY);
-        kpiList.add(kpi);
-
-        //CounterType.TASK_UNPLANNED
-        baseChart = new GaugeChart(0, 100, 32, null, null, RepresentationUnit.NUMBER, "Task");
-        kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.GAUGE, baseChart, CounterSize.SIZE_1X1);
-        kpi.setId(BigInteger.valueOf(2));
-        kpi.setType(CounterType.TASK_UNPLANNED);
-        kpiList.add(kpi);
-
-        //CounterType.TASK_UNPLANNED_HOURS
-        baseChart = new GaugeChart(0, 240, 30.3, null, null, RepresentationUnit.DECIMAL, "Hour");
-        kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), ChartType.GAUGE, baseChart, CounterSize.SIZE_1X1);
-        kpi.setId(BigInteger.valueOf(3));
-        kpi.setType(CounterType.TASK_UNPLANNED_HOURS);
-        kpiList.add(kpi);
-
-        //CounterType.TASKS_PER_STAFF
-        baseChart = new SingleNumberChart(12, RepresentationUnit.NUMBER, "Task");
-        kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setId(BigInteger.valueOf(4));
-        kpi.setType(CounterType.TASKS_PER_STAFF);
-        kpiList.add(kpi);
-*/
         //TODO: TO COMPLETE
         kpiList.addAll(counterDataService.getCountersData(unitId, solverConfigId));
 

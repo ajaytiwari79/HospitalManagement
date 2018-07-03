@@ -16,9 +16,6 @@ public class Counter extends MongoBaseEntity {
     private CounterType type;
     private List<FilterCriteria> criteriaList;
 
-    public Counter(){
-    }
-
     public Counter(CounterType type){
         this.type = type;
     }

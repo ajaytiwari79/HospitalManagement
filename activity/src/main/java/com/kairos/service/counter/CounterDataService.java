@@ -11,11 +11,13 @@ import com.kairos.activity.enums.counter.RepresentationUnit;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.chart.*;
+import com.kairos.persistence.model.counter.chart.BaseChart;
+import com.kairos.persistence.model.counter.chart.PieChart;
+import com.kairos.persistence.model.counter.chart.PieDataUnit;
+import com.kairos.persistence.model.counter.chart.SingleNumberChart;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.util.DateTimeInterval;
 import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.vrp.vrpPlanning.TaskDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
@@ -30,7 +32,6 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.time.DayOfWeek.TUESDAY;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -75,8 +76,7 @@ public class CounterDataService {
         BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Task", new ArrayList());
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("Planned", String.valueOf(totalTasks-tasksUnplanned)));
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("UnPlanned", String.valueOf(tasksUnplanned)));
-        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.TASK_UNPLANNED);
+        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, null);
         return kpi;
     }
 
@@ -91,9 +91,7 @@ public class CounterDataService {
         BaseChart baseChart = new PieChart(RepresentationUnit.DECIMAL, "Hours", new ArrayList());
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("Planned Task", String.valueOf(plannedMinutes/60.0)));
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("UnPlanned Task", String.valueOf(unplannedMinutes/60.0)));
-        KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.TASK_UNPLANNED_HOURS);
-        return kpi;
+        return new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, null);
     }
 
     //KPI Task Per Staff
@@ -115,9 +113,7 @@ public class CounterDataService {
         staffTaskData.forEach((staffName, taskCount) -> {
             ((PieChart) baseChart).getDataList().add(new PieDataUnit(String.valueOf(staffName), String.valueOf(taskCount)));
         });
-        KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.TASKS_PER_STAFF);
-        return kpi;
+        return new KPI(CounterType.TASKS_PER_STAFF.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, null);
     }
 
     //getting total working time
@@ -130,9 +126,7 @@ public class CounterDataService {
 
     private KPI prepareTaskTimeVsWorkingTime(double workingTime, double totalTaskTime){
         BaseChart baseChart = new SingleNumberChart(totalTaskTime*100/workingTime, RepresentationUnit.PERCENT, "Hours");
-        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.TOTAL_TASK_TIME_PERCENT);
-        return kpi;
+        return new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_TASK_TIME_PERCENT, null);
     }
 
     //KPI: ROAD_TIME_PERCENT
@@ -145,9 +139,7 @@ public class CounterDataService {
 
     private KPI prepareRoadTimePercentKPI(double roadTimePercent){
         BaseChart baseChart = new SingleNumberChart(roadTimePercent, RepresentationUnit.PERCENT, "Hours");
-        KPI kpi = new KPI(CounterType.ROAD_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.ROAD_TIME_PERCENT);
-        return kpi;
+        return new KPI(CounterType.ROAD_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.ROAD_TIME_PERCENT, null);
     }
 
     //KPI: Total tasks Completed
@@ -167,9 +159,7 @@ public class CounterDataService {
 
     private KPI prepareCompletedTaskWithinTimeWindow(long completedTasksCount){
         BaseChart baseChart = new SingleNumberChart(completedTasksCount, RepresentationUnit.NUMBER, "Tasks");
-        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHING_TIME.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.TASKS_COMPLETED_WITHING_TIME);
-        return kpi;
+        return new KPI(CounterType.TASKS_COMPLETED_WITHING_TIME.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_COMPLETED_WITHING_TIME, null);
     }
 
     //KPI:Percent of breaks
@@ -184,9 +174,7 @@ public class CounterDataService {
 
     private KPI preparePercentOfBreaksIn11and13KPI(double validBreakPercentage){
         BaseChart baseChart = new SingleNumberChart(validBreakPercentage, RepresentationUnit.PERCENT, "Breaks");
-        KPI kpi = new KPI(CounterType.VALID_BREAK_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.VALID_BREAK_PERCENT);
-        return kpi;
+        return new KPI(CounterType.VALID_BREAK_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.VALID_BREAK_PERCENT, null);
     }
 
     //KPI:Flexi Time Time Percent
@@ -196,9 +184,7 @@ public class CounterDataService {
 
     private KPI prepareFlexiTimePercentKPI(double flexiTimePercent){
         BaseChart baseChart = new SingleNumberChart(flexiTimePercent, RepresentationUnit.PERCENT, "Breaks");
-        KPI kpi = new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1);
-        kpi.setType(CounterType.FLEXI_TIME_PERCENT);
-        return kpi;
+        return new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, null);
     }
 
 
