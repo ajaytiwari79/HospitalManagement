@@ -6,12 +6,11 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
-import com.kairos.service.MongoBaseService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -27,7 +26,7 @@ public class AccountTypeService extends MongoBaseService {
     @Inject
     private AccountTypeMongoRepository accountTypeRepository;
 
-    @Inject
+     @Inject
     private ExceptionService exceptionService;
 
 
@@ -64,7 +63,6 @@ public class AccountTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "account type ", ids.iterator().next());
         }
         return accountTypes;
-
     }
 
 

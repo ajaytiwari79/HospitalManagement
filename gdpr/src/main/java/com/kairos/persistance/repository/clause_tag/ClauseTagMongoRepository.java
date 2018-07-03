@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.clause_tag;
 
 import com.kairos.persistance.model.clause_tag.ClauseTag;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -1,7 +1,6 @@
 package com.kairos.service.clause;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.master_data.ClauseDTO;
@@ -9,23 +8,20 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
+import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.jackrabbit_service.JackrabbitService;
+import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ComparisonUtils;
-import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.jcr.RepositoryException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.List;
@@ -44,8 +40,6 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private MongoTemplate mongoTemplate;
 
-    @Inject
-    private JackrabbitService jackrabbitService;
 
     @Inject
     private AccountTypeMongoRepository accountTypeMongoRepository;
@@ -63,8 +57,11 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private ClauseTagMongoRepository clauseTagMongoRepository;
 
+    @Inject
+    private TemplateTypeService templateTypeService;
 
-    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) throws RepositoryException {
+
+    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto)  {
 
         if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
@@ -73,6 +70,7 @@ public class ClauseService extends MongoBaseService {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
+        templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
         Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
         newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
         newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -80,10 +78,12 @@ public class ClauseService extends MongoBaseService {
         newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
         newclause.setOrganizationId(organizationId);
         newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        newclause.setOrganizationList(clauseDto.getOrgannizationList());
+        newclause.setTemplateType(clauseDto.getTemplateType());
         newclause.setTags(tagList);
+
         try {
             newclause = save(newclause);
-            jackrabbitService.addClauseNodeToJackrabbit(newclause.getId(), newclause);
             return newclause;
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -102,10 +102,10 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) throws RepositoryException {
+    public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
         Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
-        if (Optional.ofNullable(exists).isPresent() && !clauseId.equals(exists.getId())) {
+        if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
         exists = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
@@ -113,7 +113,8 @@ public class ClauseService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-        exists.setAccountTypes(accountTypeMongoRepository.getAccountTypeList(countryId,  clauseDto.getAccountTypes()));
+        exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        templateTypeService.getTemplateByById(clauseDto.getTemplateType(),countryId);
         try {
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -122,7 +123,8 @@ public class ClauseService extends MongoBaseService {
             exists.setTitle(clauseDto.getTitle());
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
-            jackrabbitService.clauseVersioning(clauseId, exists);
+            exists.setTemplateType(clauseDto.getTemplateType());
+            exists.setOrganizationList(clauseDto.getOrgannizationList());
             exists = save(exists);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -130,7 +132,6 @@ public class ClauseService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
         }
         return exists;
-
     }
 
 
@@ -144,12 +145,12 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Boolean deleteClause(BigInteger id) {
+    public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {
 
-        Clause clause = clauseRepository.findByid(id);
+        Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (Optional.ofNullable(clause).isPresent()) {
             clause.setDeleted(true);
-            save(clause);
+            clauseRepository.save(clause);
             return true;
         } else
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + id);
@@ -159,9 +160,11 @@ public class ClauseService extends MongoBaseService {
 
 
     public Page<Clause> getClausePagination(int page, int size) {
-        return clauseRepository.findAll(new PageRequest(page, size));
+        //  return clauseRepository.findAll(new PageRequest(page, size));
+        return null;
     }
 
+/*
 
     public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
         return jackrabbitService.getClauseVersion(id, version);
@@ -172,6 +175,7 @@ public class ClauseService extends MongoBaseService {
         return jackrabbitService.getClauseVersions(id);
 
     }
+*/
 
 
 }

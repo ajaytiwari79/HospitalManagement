@@ -14,14 +14,12 @@ import java.util.List;
 public class AssetType extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "Name can't be empty or null")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
 
-    private String nameInLowerCase;
-
-    private Boolean isSubAsset=false;
+    private Boolean isSubAsset = false;
 
     private List<BigInteger> subAssetTypes;
 
@@ -41,13 +39,6 @@ public class AssetType extends MongoBaseEntity {
         isSubAsset = subAsset;
     }
 
-    public String getNameInLowerCase() {
-        return nameInLowerCase;
-    }
-
-    public void setNameInLowerCase(String nameInLowerCase) {
-        this.nameInLowerCase = nameInLowerCase;
-    }
 
     public Long getCountryId() {
         return countryId;
@@ -56,6 +47,7 @@ public class AssetType extends MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
+
     public String getName() {
         return name;
     }
