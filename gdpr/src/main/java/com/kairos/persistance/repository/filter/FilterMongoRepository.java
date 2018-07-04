@@ -3,10 +3,13 @@ package com.kairos.persistance.repository.filter;
 import com.kairos.persistance.model.filter.FilterGroup;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
 
+
+@Repository
 public interface FilterMongoRepository extends MongoRepository<FilterGroup, BigInteger>, CustomeFilterMongoRepository {
 
 

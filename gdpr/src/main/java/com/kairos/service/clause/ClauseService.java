@@ -62,8 +62,6 @@ public class ClauseService extends MongoBaseService {
     @Inject
     private TemplateTypeService templateTypeService;
 
-    @Inject
-    private JaversCommonService javersCommonService;
 
 
     public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) {
@@ -74,8 +72,8 @@ public class ClauseService extends MongoBaseService {
         if (clauseDto.getAccountTypes().size() == 0) {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
         }
-        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-        templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
+        List<ClauseTag> tagList=new ArrayList<>();
+        // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
         Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
         newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
         newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
@@ -83,12 +81,13 @@ public class ClauseService extends MongoBaseService {
         newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
         newclause.setOrganizationId(organizationId);
         newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        newclause.setOrganizationList(clauseDto.getOrgannizationList());
-        newclause.setTemplateType(clauseDto.getTemplateType());
-        newclause.setTags(tagList);
+        //newclause.setOrganizationList(clauseDto.getOrgannizationList());
+        // newclause.setTemplateType(clauseDto.getTemplateType());
 
         try {
-            newclause = clauseRepository.save(save(newclause));
+            tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
+            newclause.setTags(tagList);
+            newclause = clauseRepository.save(sequence(newclause));
             return newclause;
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -117,10 +116,11 @@ public class ClauseService extends MongoBaseService {
         if (!Optional.ofNullable(exists).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
-        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
+        List<ClauseTag> tagList =new ArrayList<>();
         exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
+       // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
         try {
+            tagList= clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
             exists.setOrganizationServices(clauseDto.getOrganizationServices());
@@ -128,9 +128,9 @@ public class ClauseService extends MongoBaseService {
             exists.setTitle(clauseDto.getTitle());
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
-            exists.setTemplateType(clauseDto.getTemplateType());
-            exists.setOrganizationList(clauseDto.getOrgannizationList());
-            exists = clauseRepository.save(save(exists));
+           //exists.setTemplateType(clauseDto.getTemplateType());
+           // exists.setOrganizationList(clauseDto.getOrgannizationList());
+            exists = clauseRepository.save(sequence(exists));
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());

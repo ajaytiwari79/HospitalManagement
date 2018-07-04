@@ -45,7 +45,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
-    public <T extends MongoBaseEntity> T save(T entity) {
+    public <T extends MongoBaseEntity> T sequence(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
         /**
@@ -73,7 +73,7 @@ public class MongoBaseService {
         return entity;
     }
 
-    public <T extends MongoBaseEntity> List<T> save(List<T> entities) {
+    public <T extends MongoBaseEntity> List<T> sequence(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
@@ -161,7 +161,7 @@ public class MongoBaseService {
             /**
              * Executing the Operation
              * */
-            // bulkWriteOperation.execute();
+           // bulkWriteOperation.execute();
             return entities;
 
         } catch (Exception ex) {
@@ -203,8 +203,8 @@ public class MongoBaseService {
          *  Get class name for sequence class
          * */
 
-        entity.setDeleted(true);
-        entity.setUpdatedAt(DateUtils.getDate());
+       entity.setDeleted(true);
+       entity.setUpdatedAt(DateUtils.getDate());
         mongoTemplate.save(entity);
         return entity;
     }

@@ -42,7 +42,7 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        return accountTypeRepository.save( save(newAccount));
+        return accountTypeRepository.save( sequence(newAccount));
 
     }
 
@@ -85,7 +85,6 @@ public class AccountTypeService extends MongoBaseService {
 
     }
 
-    @JaversAuditable
     public AccountType updateAccountTypeName(Long countryId, BigInteger id, AccountType accountType) {
 
         AccountType exists = accountTypeRepository.findByName(countryId, accountType.getName());
@@ -94,7 +93,7 @@ public class AccountTypeService extends MongoBaseService {
         }
         exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         exists.setName(accountType.getName());
-        return  accountTypeRepository.save(save(exists));
+        return  accountTypeRepository.save(sequence(exists));
 
     }
 

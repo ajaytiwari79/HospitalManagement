@@ -53,11 +53,8 @@ public class ClauseDTO {
     @NotEmpty
     private Set<BigInteger> accountTypes;
 
-    @NotNull
     private BigInteger templateType;
 
-    @NotNull
-    @NotEmpty
     private List<Long> organnizationList;
 
     public List<Long> getOrgannizationList() {
