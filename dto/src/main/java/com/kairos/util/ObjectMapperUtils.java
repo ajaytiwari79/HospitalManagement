@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -155,4 +156,8 @@ public class ObjectMapperUtils {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
     }
+
+     public static void copyPropertiesUsingBeanUtils(Object source,Object destination,String ...ignoreProperties) {
+              BeanUtils.copyProperties(source,destination,ignoreProperties);
+        }
 }
