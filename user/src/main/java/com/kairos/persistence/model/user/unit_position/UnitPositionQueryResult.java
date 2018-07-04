@@ -40,7 +40,6 @@ public class UnitPositionQueryResult {
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    /*private WorkingTimeAgreement workingTimeAgreement;*/
     private CostTimeAgreement costTimeAgreement;
     private Organization union;
     private Long lastWorkingDateMillis;

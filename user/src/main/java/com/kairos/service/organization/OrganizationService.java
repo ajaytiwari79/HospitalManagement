@@ -5,9 +5,8 @@ import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
-
+import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.activity.wta.country.WTABasicDetailsDTO;
-import com.kairos.activity.wta.country.WTADefaultDataInfoDTO;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.IntegrationOperation;

@@ -125,6 +125,11 @@ public class UnitPositionController {
     public ResponseEntity<Map<String, Object>> getStaffIdAndUnitPositionId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getStaffIdAndUnitPositionId(unitId,expertiseId, staffList));
     }
-
+    @ApiOperation(value = "get all wta version for a staff")
+    @RequestMapping(value = "/staff/{staffId}/wta", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getAllWTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllWTAOfStaff(staffId));
+    }
+//
 
 }
