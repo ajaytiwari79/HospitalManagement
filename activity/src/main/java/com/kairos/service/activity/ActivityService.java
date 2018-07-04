@@ -343,6 +343,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
         }
         //get parent time type id and hit 2 request
+        //todo refector code by harish
         TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
         while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent()) {
             timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
