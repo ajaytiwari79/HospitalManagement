@@ -47,9 +47,8 @@ public class CounterDataService {
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolverConfigurationForUnit(unitId, solverConfigId);
         List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
-//        List<BigInteger> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> BigInteger.valueOf(Long.parseLong(task.getShiftId()))).collect(toList());
-        List<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toList());
-        List<Shift> shifts = shiftService.getAllShiftByIds(shiftIds);
+        Set<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toSet());
+        List<Shift> shifts = shiftService.getAllShiftByIds(new ArrayList<>(shiftIds));
         ArrayList<KPI> kpiList = new ArrayList<>();
         kpiList.add(getTaskUnplannedKPI(vrpTaskPlanningDTO, tasks));
         kpiList.add(getTaskUnplannedHoursKPI(vrpTaskPlanningDTO));
