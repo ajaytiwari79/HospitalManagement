@@ -56,7 +56,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(sequence(newProcessingLegalBasisList));
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(sequenceGenerator(newProcessingLegalBasisList));
             }
             result.put("existing", existing);
             result.put("new", newProcessingLegalBasisList);
@@ -108,7 +108,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         } else {
             exist=legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
-            return legalBasisMongoRepository.save(sequence(exist));
+            return legalBasisMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

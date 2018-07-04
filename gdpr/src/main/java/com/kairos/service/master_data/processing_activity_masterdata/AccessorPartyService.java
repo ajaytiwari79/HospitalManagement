@@ -56,7 +56,7 @@ public class AccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartys.add(newAccessorParty);
                 }
-                newAccessorPartys = accessorPartyMongoRepository.saveAll(sequence(newAccessorPartys));
+                newAccessorPartys = accessorPartyMongoRepository.saveAll(sequenceGenerator(newAccessorPartys));
             }
             result.put("existing", existing);
             result.put("new", newAccessorPartys);
@@ -114,7 +114,7 @@ public class AccessorPartyService extends MongoBaseService {
         } else {
             exist = accessorPartyMongoRepository.findByid(id);
             exist.setName(accessorParty.getName());
-            return accessorPartyMongoRepository.save(sequence(exist));
+            return accessorPartyMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

@@ -50,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
             newClauseTag.setOrganizationId(organizationId);
-            return clauseTagMongoRepository.save(sequence(newClauseTag));
+            return clauseTagMongoRepository.save(sequenceGenerator(newClauseTag));
         }
     }
 
@@ -127,7 +127,7 @@ return exist;
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = clauseTagMongoRepository.saveAll(sequence(clauseTagList));
+            clauseTagList = clauseTagMongoRepository.saveAll(sequenceGenerator(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;

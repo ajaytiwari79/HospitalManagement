@@ -55,7 +55,7 @@ public class DataDisposalService extends MongoBaseService {
 
                 }
 
-                newDataDisposals =dataDisposalMongoRepository.saveAll(sequence(newDataDisposals));
+                newDataDisposals =dataDisposalMongoRepository.saveAll(sequenceGenerator(newDataDisposals));
             }
             result.put("existing", existing);
             result.put("new", newDataDisposals);
@@ -109,7 +109,7 @@ public class DataDisposalService extends MongoBaseService {
         } else {
             exist = dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
-            return dataDisposalMongoRepository.save(sequence(exist));
+            return dataDisposalMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

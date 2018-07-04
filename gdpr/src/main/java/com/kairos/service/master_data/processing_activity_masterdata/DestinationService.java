@@ -58,7 +58,7 @@ public class DestinationService extends MongoBaseService {
 
                 }
 
-                newDestinations = destinationMongoRepository.saveAll(sequence(newDestinations));
+                newDestinations = destinationMongoRepository.saveAll(sequenceGenerator(newDestinations));
             }
 
             result.put("existing", existing);
@@ -112,7 +112,7 @@ public class DestinationService extends MongoBaseService {
         } else {
             exist = destinationMongoRepository.findByid(id);
             exist.setName(destination.getName());
-            return destinationMongoRepository.save(sequence(exist));
+            return destinationMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

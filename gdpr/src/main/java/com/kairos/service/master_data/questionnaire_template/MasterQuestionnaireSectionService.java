@@ -66,7 +66,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         Map<String, Object> questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto);
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequence(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(questionnaireTemplate));
         } catch (Exception e) {
             masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNIARE_SECTIONS));
             masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
@@ -94,7 +94,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             masterQuestionnaireSections.add(questionnaireSection);
         }
         try {
-            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(sequence(masterQuestionnaireSections));
+            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(sequenceGenerator(masterQuestionnaireSections));
             masterQuestionnaireSections.forEach(masterQuestionnaireSection -> {
                 questionSectionIds.add(masterQuestionnaireSection.getId());
             });
@@ -169,7 +169,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         template.setSections(sectionsIds);
         try {
-            template = masterQuestionnaireTemplateMongoRepository.save(sequence(template));
+            template = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(template));
         } catch (MongoException e) {
 
             List<MasterQuestionnaireSection> sections = new ArrayList<>();
@@ -218,7 +218,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
 
         try {
-            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(sequence(updateSectionsList));
+            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(sequenceGenerator(updateSectionsList));
 
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());

@@ -102,7 +102,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
                 }
                 policyAgreementTemplate.setCountryId(countryId);
-                policyAgreementTemplate = sequence(policyAgreementTemplate);
+                policyAgreementTemplate = sequenceGenerator(policyAgreementTemplate);
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
@@ -136,7 +136,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
-            sequence(exist);
+            sequenceGenerator(exist);
             return true;
         }
         throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
@@ -196,7 +196,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
-            return sequence(exist);
+            return sequenceGenerator(exist);
 
         }
 

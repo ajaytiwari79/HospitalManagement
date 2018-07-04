@@ -30,6 +30,16 @@ public class MasterProcessingActivityResponseDTO {
     private List<MasterProcessingActivityResponseDTO> subProcessingActivities;
 
 
+    private Boolean isSubProcess;
+
+    public Boolean getSubProcess() {
+        return isSubProcess;
+    }
+
+    public void setSubProcess(Boolean subProcess) {
+        isSubProcess = subProcess;
+    }
+
     public BigInteger getId() {
         return id;
     }

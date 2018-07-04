@@ -120,4 +120,12 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         this.countryId=countryId;
          }
 
+    public MasterProcessingActivity(String name, String description,  List<OrganizationTypeAndServiceBasicDTO> organizationTypes,  List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes,List<OrganizationTypeAndServiceBasicDTO> organizationServices, List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
+        this.name = name;
+        this.description = description;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationServices = organizationServices;
+        this.organizationSubServices = organizationSubServices;
+    }
 }

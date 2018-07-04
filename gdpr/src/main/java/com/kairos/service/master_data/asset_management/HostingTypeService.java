@@ -55,7 +55,7 @@ public class HostingTypeService extends MongoBaseService {
                 }
 
 
-                newHostingTypes = hostingTypeMongoRepository.saveAll(sequence(newHostingTypes));
+                newHostingTypes = hostingTypeMongoRepository.saveAll(sequenceGenerator(newHostingTypes));
             }
             result.put("existing", existing);
             result.put("new", newHostingTypes);
@@ -108,7 +108,7 @@ public class HostingTypeService extends MongoBaseService {
         } else {
             exist=hostingTypeMongoRepository.findByid(id);
             exist.setName(hostingType.getName());
-            return hostingTypeMongoRepository.save(sequence(exist));
+            return hostingTypeMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

@@ -58,7 +58,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         questionnaireTemplate.setOrganizationId(organizationId);
         questionnaireTemplate = buildQuestionniareTemplate(templateDto, questionnaireTemplate);
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequence(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(questionnaireTemplate));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());
@@ -130,7 +130,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         exisiting.setDescription(templateDto.getDescription());
         exisiting = buildQuestionniareTemplate(templateDto, exisiting);
         try {
-            exisiting = masterQuestionnaireTemplateMongoRepository.save(sequence(exisiting));
+            exisiting = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(exisiting));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());

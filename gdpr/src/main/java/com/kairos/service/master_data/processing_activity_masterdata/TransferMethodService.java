@@ -54,7 +54,7 @@ public class TransferMethodService extends MongoBaseService {
                     newTransferMethods.add(newTransferMethod);
                 }
 
-                newTransferMethods = transferMethodRepository.saveAll(sequence(newTransferMethods));
+                newTransferMethods = transferMethodRepository.saveAll(sequenceGenerator(newTransferMethods));
             }
             result.put("existing", existing);
             result.put("new", newTransferMethods);
@@ -103,7 +103,7 @@ public class TransferMethodService extends MongoBaseService {
         } else {
             exist = transferMethodRepository.findByid(id);
             exist.setName(transferMethod.getName());
-            return transferMethodRepository.save(sequence(exist));
+            return transferMethodRepository.save(sequenceGenerator(exist));
 
         }
     }

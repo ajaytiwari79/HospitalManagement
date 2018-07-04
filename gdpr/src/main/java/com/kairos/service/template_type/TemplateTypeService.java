@@ -53,7 +53,7 @@ public class TemplateTypeService extends MongoBaseService {
                 templateType1.setCountryId(countryId);
                 newDataTemplate.add(templateType1);
             }
-            newDataTemplate = templateTypeRepository.saveAll(sequence(newDataTemplate));
+            newDataTemplate = templateTypeRepository.saveAll(sequenceGenerator(newDataTemplate));
         }
         result.put("existing", existing);
         result.put("new", newDataTemplate);
@@ -103,7 +103,7 @@ public class TemplateTypeService extends MongoBaseService {
         }
         exists = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
         exists.setTemplateName(templateType.getTemplateName());
-        templateTypeRepository.save(sequence(exists));
+        templateTypeRepository.save(sequenceGenerator(exists));
         return exists;
 
     }

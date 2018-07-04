@@ -53,7 +53,7 @@ public class MasterProcessingActivityController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivity(countryId, organizationId, id, processingActivityDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivityAndSubProcessingActivities(countryId, organizationId, id, processingActivityDto));
     }
 
     @ApiOperation(value = "delete MasterProcessingActivity")

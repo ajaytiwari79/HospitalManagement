@@ -57,7 +57,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(sequence(newProcessingPurposes));
+                newProcessingPurposes = processingPurposeMongoRepository.saveAll(sequenceGenerator(newProcessingPurposes));
             }
             result.put("existing", existing);
             result.put("new", newProcessingPurposes);
@@ -110,7 +110,7 @@ public class ProcessingPurposeService extends MongoBaseService {
         } else {
             exist=processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());
-            return processingPurposeMongoRepository.save(sequence(exist));
+            return processingPurposeMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

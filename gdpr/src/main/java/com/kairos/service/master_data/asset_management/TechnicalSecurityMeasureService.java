@@ -55,7 +55,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(sequence(newTechnicalMeasures));
+                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(sequenceGenerator(newTechnicalMeasures));
             }
             result.put("existing", existing);
             result.put("new", newTechnicalMeasures);
@@ -107,7 +107,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         } else {
             exist = technicalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(techSecurityMeasure.getName());
-            return technicalSecurityMeasureMongoRepository.save(sequence(exist));
+            return technicalSecurityMeasureMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

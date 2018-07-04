@@ -59,7 +59,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     public AgreementSection buildAgreementSection(Long countryId, AgreementSection agreementSection) {
-        return sequence(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
+        return sequenceGenerator(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
 
     }
 
@@ -69,7 +69,7 @@ public class AgreementSectionService extends MongoBaseService {
         AgreementSection exist = agreementSectionMongoRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
-            sequence(exist);
+            sequenceGenerator(exist);
             return true;
         }
         throw new DataNotFoundByIdException(" agreement section for id " + id + " not exist");

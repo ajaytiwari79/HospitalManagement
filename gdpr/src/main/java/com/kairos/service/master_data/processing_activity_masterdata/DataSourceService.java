@@ -56,7 +56,7 @@ public class DataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(sequence(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(sequenceGenerator(newDataSources));
             }
             result.put("existing", existing);
             result.put("new", newDataSources);
@@ -108,7 +108,7 @@ public class DataSourceService extends MongoBaseService {
         } else {
             exist=dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(sequence(exist));
+            return dataSourceMongoRepository.save(sequenceGenerator(exist));
 
         }
     }

@@ -45,7 +45,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
-    public <T extends MongoBaseEntity> T sequence(T entity) {
+    public <T extends MongoBaseEntity> T sequenceGenerator(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
         /**
@@ -73,7 +73,7 @@ public class MongoBaseService {
         return entity;
     }
 
-    public <T extends MongoBaseEntity> List<T> sequence(List<T> entities) {
+    public <T extends MongoBaseEntity> List<T> sequenceGenerator(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 

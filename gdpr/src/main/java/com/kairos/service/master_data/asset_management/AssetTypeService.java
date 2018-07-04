@@ -53,7 +53,7 @@ public class AssetTypeService extends MongoBaseService {
         assetType.setCountryId(countryId);
         assetType.setOrganizationId(organizationId);
         try {
-            assetType = assetTypeMongoRepository.save(sequence(assetType));
+            assetType = assetTypeMongoRepository.save(sequenceGenerator(assetType));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -80,7 +80,7 @@ public class AssetTypeService extends MongoBaseService {
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
-            subAssetTypes = assetTypeMongoRepository.saveAll(sequence(subAssetTypes));
+            subAssetTypes = assetTypeMongoRepository.saveAll(sequenceGenerator(subAssetTypes));
             subAssetTypes.forEach(subAssetType -> {
                 subAssetTypesIds.add(subAssetType.getId());
             });
@@ -117,7 +117,7 @@ public class AssetTypeService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subAssetTypesList = assetTypeMongoRepository.saveAll(sequence(subAssetTypesList));
+            subAssetTypesList = assetTypeMongoRepository.saveAll(sequenceGenerator(subAssetTypesList));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -184,7 +184,7 @@ public class AssetTypeService extends MongoBaseService {
 
         try {
             exist.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            exist = assetTypeMongoRepository.save(sequence(exist));
+            exist = assetTypeMongoRepository.save(sequenceGenerator(exist));
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));
