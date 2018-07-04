@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -168,9 +169,25 @@ public class PlanningPeriodService extends MongoBaseService {
 
     }
 
+    public boolean validateStartDateForPeriodCreation(LocalDate startDate, String planningPeriodType){
+        switch (PlanningPeriod.Type.valueOf(planningPeriodType)){
+            // Weekly Planning Period must start on monday
+            case WEEKLY:{
+                return startDate.getDayOfWeek().equals(DayOfWeek.MONDAY);
+            }
+            // Monthly Planning Period must start from first day of month
+            case MONTHLY:{
+                return startDate.equals(startDate.withDayOfMonth(1));
+            }
+            default : return false;
+        }
+    }
+
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
 
-        // TODO Check monday if duration is in week and first day of month if duration is in month
+        // Check monday if duration is in week and first day of month if duration is in month
+        validateStartDateForPeriodCreation(planningPeriodDTO.getStartDate(), planningPeriodDTO.getType());
+
         List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);;
         if(!Optional.ofNullable(phases).isPresent()){
             exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);

@@ -8,6 +8,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by prerna on 6/4/18.
@@ -23,6 +25,8 @@ public class PlanningPeriod extends MongoBaseEntity {
     private BigInteger currentPhaseId;
     private BigInteger nextPhaseId;
     private List<PeriodPhaseFlippingDate> phaseFlippingDate = new ArrayList<>();
+    private Type type;
+
 
     public PlanningPeriod(){
         // default constructor
@@ -92,5 +96,31 @@ public class PlanningPeriod extends MongoBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    public enum Type {
+
+        WEEKLY, MONTHLY;
+
+        public String value;
+
+        public static Type getByValue(String value) {
+            for (Type status : Type.values()) {
+                if (status.value.equals(value)) {
+                    return status;
+                }
+            }
+            return null;
+        }
+
+        public static List<Type> getListByValue(List<String> values) {
+            if(Optional.ofNullable(values).isPresent()){
+                return values.stream().map(Type::valueOf)
+                        .collect(Collectors.toList());
+            }
+            return null;
+
+        }
     }
 }
