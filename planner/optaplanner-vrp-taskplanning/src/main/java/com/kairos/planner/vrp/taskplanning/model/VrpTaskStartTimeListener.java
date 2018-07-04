@@ -82,8 +82,8 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
             updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
             tempTask=tempTask.getNextTask();
             while (tempTask!=null){
-                double duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
-                plannedDateTime=plannedDateTime.plusMinutes((long)duration);
+                int duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
+                plannedDateTime=plannedDateTime.plusMinutes(duration);
                 updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
                 tempTask=tempTask.getNextTask();
             }

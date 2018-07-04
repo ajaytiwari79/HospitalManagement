@@ -1,9 +1,9 @@
 package com.kairos.activity.task_type;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.task_type.TaskTypeResource;
-import com.kairos.dto.TaskTypeDTO;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

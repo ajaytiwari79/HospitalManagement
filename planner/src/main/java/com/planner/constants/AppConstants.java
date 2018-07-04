@@ -7,7 +7,6 @@ package com.planner.constants;
 
 public class AppConstants {
 
-    public static final String DROOL_FILES_PATH = "/opt/kairos/kairos-user/planner/src/main/resources/droolsFile";
     public static final String DROOL_FILE_EXTENTION = ".drl";
     public static final String DROOL_BASE_FILE = "Base_vrp_task_rules";
 

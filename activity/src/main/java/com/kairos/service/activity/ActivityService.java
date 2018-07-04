@@ -60,6 +60,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -341,6 +342,17 @@ public class ActivityService extends MongoBaseService {
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(balanceDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
+        }
+        //TODO optimize below db query by harish
+        TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
+        while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent()) {
+            timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
+        }
+        if(!Optional.ofNullable(activity.getGeneralActivityTab().getTextColor()).isPresent()&&
+           !Optional.ofNullable(activity.getGeneralActivityTab().getBackgroundColor()).isPresent()){
+        activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
+        activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
+        activity.getGeneralActivityTab().setColorPresent(true);
         }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
@@ -725,7 +737,7 @@ public class ActivityService extends MongoBaseService {
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeek = date.get(weekOfWeekBasedYear);
         int currentDayOfWeek = date.getDayOfWeek().getValue();
-        List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
+        List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
 
         // Set access Role of staff
 

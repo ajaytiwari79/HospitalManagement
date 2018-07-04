@@ -17,6 +17,7 @@ import com.kairos.activity.period.PlanningPeriodDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +49,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId){
-        List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId);
+        List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId,Sort.Direction.DESC);
         phases.forEach(phase->{
             switch (phase.getDurationType()){
                 case DAYS:{

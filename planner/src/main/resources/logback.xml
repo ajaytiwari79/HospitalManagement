@@ -28,6 +28,8 @@
         </triggeringPolicy>
     </appender>
     <logger name="com" level="INFO"/>
+    <logger name="com.kairos.planner.vrp.taskplanning" level="DEBUG"/>
+    <logger name="org.optaplanner" level="DEBUG"/>
     <root level="debug">
         <appender-ref ref="stdout"/>
         <appender-ref ref="R"/>

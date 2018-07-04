@@ -1,14 +1,14 @@
 package com.kairos.service.time_bank;
 
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.util.DateUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
@@ -54,6 +54,8 @@ public class TImeBankCalculationServiceTest {
     public void getMockShifts(){
         activity = new Activity(new BalanceSettingsActivityTab(new BigInteger("123")));
         activity.setId(new BigInteger("125"));
+        activity.setName("Activity1");
+        activity.setParentId(new BigInteger("12"));
         DateTime startDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("22/02/2018 00:00:00");
         DateTime endDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("23/02/2018 00:00:00");
         interval = new Interval(startDate,endDate);
@@ -67,7 +69,7 @@ public class TImeBankCalculationServiceTest {
 
     @Test
     public void calculateTimeBank(){
-        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId())));
+        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = null;//timeBankService.getCostTimeAgreement(1225l);
         DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         timeBankCalculationService.calculateDailyTimebank(interval, null,shifts, dailyTimeBankEntry);

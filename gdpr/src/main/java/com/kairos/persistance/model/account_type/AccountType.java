@@ -1,30 +1,23 @@
 package com.kairos.persistance.model.account_type;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.data.mongodb.core.mapping.Document;
-import javax.validation.constraints.Pattern;
-
 
 @Document(collection = "account_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@TypeName("account_type")
 public class AccountType extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Name cannot be empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "special character and numberic data is not allowed")
-    private String name;
+     private String name;
 
-    private Long CountryId;
+    private Long countryId;
 
     public Long getCountryId() {
-        return CountryId;
+        return countryId;
     }
 
     public void setCountryId(Long countryId) {
-        CountryId = countryId;
+        this.countryId = countryId;
     }
 
     public String getName() {

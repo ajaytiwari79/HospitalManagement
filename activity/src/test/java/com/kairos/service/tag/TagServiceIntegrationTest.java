@@ -1,10 +1,10 @@
 package com.kairos.service.tag;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.tag.MasterDataTypeEnum;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
-import com.kairos.activity.tag.TagDTO;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.user.country.tag.TagDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,7 +77,7 @@ public class TagServiceIntegrationTest {
             createdTagId = tag.getId();
         }
         String baseUrl=getBaseUrl(orgId,countryId, null);
-        TagDTO tagDTO = new TagDTO(createdTagId, nameOfTag, masterDataTypeEnum);
+        TagDTO tagDTO = new TagDTO(createdTagId.longValue(), nameOfTag, masterDataTypeEnum);
         HttpEntity<TagDTO> requestBodyData = new HttpEntity<>(tagDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Tag>> resTypeReference =
@@ -159,7 +159,7 @@ public class TagServiceIntegrationTest {
             createdOrgTagId = tag.getId();
         }
         String baseUrl=getBaseUrl(orgId,null, unitId);
-        TagDTO tagDTO = new TagDTO(createdOrgTagId, nameOfTag, masterDataTypeEnum);
+        TagDTO tagDTO = new TagDTO(createdOrgTagId.longValue(), nameOfTag, masterDataTypeEnum);
         HttpEntity<TagDTO> requestBodyData = new HttpEntity<>(tagDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Tag>> resTypeReference =

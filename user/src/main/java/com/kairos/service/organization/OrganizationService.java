@@ -329,17 +329,7 @@ public class OrganizationService extends UserBaseService {
 
     public boolean validateAccessGroupIdForUnitManager(Long countryId, Long accessGroupId, CompanyType companyType){
 
-        OrganizationCategory organizationCategory = OrganizationCategory.ORGANIZATION;
-        switch (companyType){
-            case KAIROS_HUB : {
-                organizationCategory = OrganizationCategory.HUB;
-                break;
-            }
-            case UNION: {
-                organizationCategory = OrganizationCategory.UNION;
-                break;
-            }
-        }
+        OrganizationCategory organizationCategory = getOrganizationCategory(companyType);
         if( !accessGroupRepository.isCountryAccessGroupExistsByOrgCategory(countryId,organizationCategory.toString(), accessGroupId)){
             exceptionService.actionNotPermittedException("error.access.group.invalid", accessGroupId);
         }
@@ -1756,15 +1746,24 @@ public class OrganizationService extends UserBaseService {
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
     }
 
-    public OrganizationCategory getOrganizationCategory(Boolean isUnion, Boolean isKairosHub) {
-        if (isUnion) {
-            return OrganizationCategory.UNION;
-        } else if (isKairosHub) {
-            return OrganizationCategory.HUB;
-        } else {
-            return OrganizationCategory.ORGANIZATION;
+    public OrganizationCategory getOrganizationCategory(CompanyType companyType) {
+        OrganizationCategory organizationCategory ;
+        switch (companyType){
+            case KAIROS_HUB : {
+                organizationCategory = OrganizationCategory.HUB;
+                break;
+            }
+            case UNION: {
+                organizationCategory = OrganizationCategory.UNION;
+                break;
+            }
+            default:{
+                organizationCategory = OrganizationCategory.ORGANIZATION;
+            }
         }
+        return organizationCategory;
     }
+
 
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId) {
         Long countryId = organizationGraphRepository.getCountryId(unitId);
