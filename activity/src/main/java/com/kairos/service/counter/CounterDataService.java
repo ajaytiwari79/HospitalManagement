@@ -129,9 +129,9 @@ public class CounterDataService {
     //getting total working time
     //excluding break times and driving time for totalTaskTime
     public KPI getTotalTaskTimeVsWorkingTime(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
-        double workingTime = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60*60);
-        double totalTaskTime = vrpTaskPlanningDTO.getTasks().parallelStream().mapToLong(task -> task.getDuration()).sum()/(60);
-        return prepareTaskTimeVsWorkingTime(workingTime, totalTaskTime);
+        double workingTimeMinutes = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60);
+        double totalTaskTimeMinutes = vrpTaskPlanningDTO.getTasks().parallelStream().mapToLong(task -> task.getDuration()).sum();
+        return prepareTaskTimeVsWorkingTime(workingTimeMinutes, totalTaskTimeMinutes);
     }
 
     private KPI prepareTaskTimeVsWorkingTime(double workingTime, double totalTaskTime){
@@ -144,7 +144,7 @@ public class CounterDataService {
     //KPI: ROAD_TIME_PERCENT
     public KPI getRoadTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
         double workingTimeMinutes = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60);
-        double totalRoadTimeMinutes=vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> !task.isBreakTime()).mapToLong(task -> task.getDrivingTime()).sum();
+        double totalRoadTimeMinutes=vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> !task.isBreakTime()).mapToLong(task -> task.getDuration()).sum();
         double roadTimePercent = totalRoadTimeMinutes*100/workingTimeMinutes;
         return prepareRoadTimePercentKPI(roadTimePercent);
     }
@@ -173,7 +173,7 @@ public class CounterDataService {
 
     private KPI prepareCompletedTaskWithinTimeWindow(long completedTasksCount){
         BaseChart baseChart = new SingleNumberChart(completedTasksCount, RepresentationUnit.NUMBER, "Tasks");
-        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHING_TIME.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_COMPLETED_WITHING_TIME, null);
+        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHIN_TIME.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_COMPLETED_WITHIN_TIME, null);
         kpi.setId(new BigInteger("6"));
         return kpi;
     }
@@ -184,7 +184,7 @@ public class CounterDataService {
         List<TaskDTO> allBreaks = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> task.isBreakTime()).collect(toList());
         List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY);
         List<TaskDTO> validBreaks = allBreaks.stream().filter(task -> (days.contains(task.getPlannedStartTime().getDayOfWeek()) && task.getPlannedStartTime().getHour() >=11 && task.getPlannedEndTime().getHour() <=13)).collect(toList());
-        double validBreakPercentage = validBreaks.size()*100/(allBreaks.size()*1.0);
+        double validBreakPercentage = validBreaks.size()*100*1.0/(allBreaks.size()*1.0);
         return preparePercentOfBreaksIn11and13KPI(validBreakPercentage);
     }
 
