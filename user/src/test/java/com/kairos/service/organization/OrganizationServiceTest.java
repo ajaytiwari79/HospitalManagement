@@ -1,11 +1,9 @@
 package com.kairos.service.organization;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.organization.OrganizationDTO;
-import com.kairos.persistence.model.organization.ParentOrganizationDTO;
-import com.kairos.activity.web.OrganizationTypeDTO;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.organization.ParentOrganizationDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

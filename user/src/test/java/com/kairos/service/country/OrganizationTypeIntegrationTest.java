@@ -2,7 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.activity.web.OrganizationTypeDTO;
+import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import org.junit.Assert;
 import org.junit.Test;
