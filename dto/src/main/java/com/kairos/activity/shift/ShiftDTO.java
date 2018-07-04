@@ -59,6 +59,7 @@ public class ShiftDTO {
     Long allowedBreakDurationInMinute;
     private List<ShiftDTO> subShifts = new ArrayList<>();
     private BigInteger templateId;
+    private String timeType;
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activityId = activityId;
@@ -318,5 +319,13 @@ public class ShiftDTO {
 
     public void setTemplateId(BigInteger templateId) {
         this.templateId = templateId;
+    }
+
+    public String getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
     }
 }
