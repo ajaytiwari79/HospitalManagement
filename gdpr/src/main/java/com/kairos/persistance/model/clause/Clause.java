@@ -158,6 +158,8 @@ public class Clause extends MongoBaseEntity {
         this.description = description;
     }
 
+
+
     public Clause() {
     }
 }

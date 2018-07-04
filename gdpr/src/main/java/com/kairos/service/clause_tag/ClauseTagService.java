@@ -50,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
             newClauseTag.setOrganizationId(organizationId);
-            return save(newClauseTag);
+            return clauseTagMongoRepository.save(sequenceGenerator(newClauseTag));
         }
     }
 
@@ -78,8 +78,7 @@ public class ClauseTagService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            exist.setDeleted(true);
-            save(exist);
+           delete(exist);
             return true;
 
         }
@@ -93,11 +92,11 @@ public class ClauseTagService extends MongoBaseService {
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            exist.setName(clauseTag);
-            return save(exist);
-
         }
+        clauseTagMongoRepository.save(exist);
+return exist;
+
+
     }
 
     //add tags in clause if tag exist then simply add and create new tag and add
@@ -128,7 +127,7 @@ public class ClauseTagService extends MongoBaseService {
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = clauseTagMongoRepository.saveAll(save(clauseTagList));
+            clauseTagList = clauseTagMongoRepository.saveAll(sequenceGenerator(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;

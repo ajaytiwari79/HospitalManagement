@@ -36,7 +36,7 @@ public class AgreementSectionService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-
+//todo clause versioning and refactor
     public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
 
         List<AgreementSectionResponseDTO> result = new ArrayList<>();
@@ -59,7 +59,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     public AgreementSection buildAgreementSection(Long countryId, AgreementSection agreementSection) {
-        return save(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
+        return sequenceGenerator(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
 
     }
 
@@ -69,7 +69,7 @@ public class AgreementSectionService extends MongoBaseService {
         AgreementSection exist = agreementSectionMongoRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
-            save(exist);
+            sequenceGenerator(exist);
             return true;
         }
         throw new DataNotFoundByIdException(" agreement section for id " + id + " not exist");

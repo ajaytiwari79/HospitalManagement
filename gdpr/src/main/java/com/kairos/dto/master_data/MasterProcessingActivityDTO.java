@@ -8,10 +8,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityDTO {
+
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "Name  can't be Empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
@@ -40,24 +43,21 @@ public class MasterProcessingActivityDTO {
     @Valid
     private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
 
-    private Boolean isSubProcess=false;
-
     private List<MasterProcessingActivityDTO> subProcessingActivities;
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public List<MasterProcessingActivityDTO> getSubProcessingActivities() {
         return subProcessingActivities;
     }
 
-    public Boolean getSubProcess() {
-        return isSubProcess;
-    }
-
-    public void setSubProcess(Boolean subProcess) {
-        isSubProcess = subProcess;
-    }
-
-    public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) {
+   public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) {
         this.subProcessingActivities = subProcessingActivities;
     }
 
