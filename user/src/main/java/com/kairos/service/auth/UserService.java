@@ -7,6 +7,8 @@ import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -71,6 +73,8 @@ public class UserService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private AccessPageService accessPageService;
+    @Inject
+    private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
 
     /**
@@ -378,8 +382,9 @@ public class UserService extends UserBaseService {
 
     public UserOrganizationsDTO getLoggedInUserOrganizations() {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
         UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId());
+        currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
         return userOrganizationsDTO;
     }
 
@@ -646,6 +651,14 @@ public class UserService extends UserBaseService {
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });
         save(users);
+        return true;
+    }
+
+    public boolean updateSystemLanguageOfUser(Long userLanguageId){
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
+        currentUser.setUserLanguage(systemLanguage);
+        save(currentUser);
         return true;
     }
 

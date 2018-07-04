@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.clause;
 
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 
 @Repository
+@JaversSpringDataAuditable
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 

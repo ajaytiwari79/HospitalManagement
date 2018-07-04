@@ -7,6 +7,7 @@ import com.kairos.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
+import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,7 +17,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
 import javax.inject.Inject;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +45,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
-    public <T extends MongoBaseEntity> T save(T entity) {
+    public <T extends MongoBaseEntity> T sequenceGenerator(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
         /**
@@ -66,11 +69,11 @@ public class MongoBaseService {
          *  Set updatedAt time as current time
          * */
         entity.setUpdatedAt(DateUtils.getDate());
-        mongoTemplate.save(entity);
+        //mongoTemplate.save(entity);
         return entity;
     }
 
-    public <T extends MongoBaseEntity> List<T> save(List<T> entities) {
+    public <T extends MongoBaseEntity> List<T> sequenceGenerator(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
@@ -83,7 +86,7 @@ public class MongoBaseService {
         BulkWriteOperation bulkWriteOperation = database.getCollection(collectionName).initializeUnorderedBulkOperation();
 
         /**
-         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
+         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObjectCode)
          * */
         MongoConverter converter = mongoTemplate.getConverter();
 
@@ -139,7 +142,7 @@ public class MongoBaseService {
                     converter.write(entity, dbObject);
 
                     /**
-                     *  Creating BasicDbObject for find query
+                     *  Creating BasicDbObjectCode for find query
                      * */
                     BasicDBObject query = new BasicDBObject();
 
@@ -158,7 +161,7 @@ public class MongoBaseService {
             /**
              * Executing the Operation
              * */
-            bulkWriteOperation.execute();
+           // bulkWriteOperation.execute();
             return entities;
 
         } catch (Exception ex) {
@@ -168,23 +171,20 @@ public class MongoBaseService {
     }
 
 
-
-    public <T extends MongoBaseEntity> List<T> findByNamesList(Long countryId, Long organizationId, Set<String> namesList, Class entity){
-
+    public <T extends MongoBaseEntity> List<T> findByNamesList(Long countryId, Long organizationId, Set<String> namesList, Class entity) {
 
 
         Assert.notNull(entity, "Entity must not be null!");
         Assert.notEmpty(namesList, "Entity must not be Empty!");
-        Assert.notNull(countryId,"countryId must not be null");
-        Assert.notNull(organizationId,"organization Id must not be Null");
+        Assert.notNull(countryId, "countryId must not be null");
+        Assert.notNull(organizationId, "organization Id must not be Null");
 
         /*
-        *collection name get collection name
-        * */
+         *collection name get collection name
+         * */
         String collectionName = entity.getClass().getSimpleName();
 
-        if (namesList.size()==0)
-        {
+        if (namesList.size() == 0) {
             throw new InvalidRequestException("list cannt be empty");
         }
 
@@ -196,6 +196,18 @@ public class MongoBaseService {
 
     }
 
+    public <T extends MongoBaseEntity> T delete(T entity) {
+
+        Assert.notNull(entity, "Entity must not be null!");
+        /**
+         *  Get class name for sequence class
+         * */
+
+       entity.setDeleted(true);
+       entity.setUpdatedAt(DateUtils.getDate());
+        mongoTemplate.save(entity);
+        return entity;
+    }
 
 
 }

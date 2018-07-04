@@ -41,8 +41,8 @@ public class ShiftTemplateController {
     @ApiOperation("update  Shift Template")
     @PutMapping(value = "/shift_template/{shiftTemplateId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShiftTemplate(@PathVariable BigInteger shiftTemplateId,  @RequestBody @Valid ShiftTemplateDTO shiftTemplateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateShiftTemplate(shiftTemplateId, shiftTemplateDTO));
+    public ResponseEntity<Map<String, Object>> updateShiftTemplate(@PathVariable Long unitId,@PathVariable BigInteger shiftTemplateId,  @RequestBody @Valid ShiftTemplateDTO shiftTemplateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.updateShiftTemplate(unitId,shiftTemplateId, shiftTemplateDTO));
     }
 
 

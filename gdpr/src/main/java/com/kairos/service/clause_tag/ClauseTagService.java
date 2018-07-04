@@ -7,6 +7,8 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.javers.JaversCommonService;
+import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -32,6 +34,10 @@ public class ClauseTagService extends MongoBaseService {
     MessageSource messageSource;
 
 
+    @Inject
+    private JaversCommonService javersCommonService;
+
+
     public ClauseTag createClauseTag(Long countryId, Long organizationId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
             throw new InvalidRequestException("requested paran name is null or empty");
@@ -44,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
             newClauseTag.setOrganizationId(organizationId);
-            return save(newClauseTag);
+            return clauseTagMongoRepository.save(sequenceGenerator(newClauseTag));
         }
     }
 
@@ -72,8 +78,7 @@ public class ClauseTagService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            exist.setDeleted(true);
-            save(exist);
+           delete(exist);
             return true;
 
         }
@@ -87,11 +92,11 @@ public class ClauseTagService extends MongoBaseService {
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            exist.setName(clauseTag);
-            return save(exist);
-
         }
+        clauseTagMongoRepository.save(exist);
+return exist;
+
+
     }
 
     //add tags in clause if tag exist then simply add and create new tag and add
@@ -122,7 +127,7 @@ public class ClauseTagService extends MongoBaseService {
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = clauseTagMongoRepository.saveAll(save(clauseTagList));
+            clauseTagList = clauseTagMongoRepository.saveAll(sequenceGenerator(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;

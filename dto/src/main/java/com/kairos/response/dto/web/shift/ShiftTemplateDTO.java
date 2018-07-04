@@ -1,15 +1,19 @@
 package com.kairos.response.dto.web.shift;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
 
 
 public class ShiftTemplateDTO {
     private BigInteger id;
+    @NotBlank
     private String name;
     private List<IndividualShiftTemplateDTO> shiftList;
     private Long createdBy;
     private Long unitId;
+    private Set<BigInteger> individualShiftTemplateIds;
 
     public ShiftTemplateDTO() {
         //Default Constructor
@@ -40,7 +44,7 @@ public class ShiftTemplateDTO {
     }
 
     public List<IndividualShiftTemplateDTO> getShiftList() {
-        return shiftList;
+        return shiftList=Optional.ofNullable(shiftList).orElse(new ArrayList<>());
     }
 
     public void setShiftList(List<IndividualShiftTemplateDTO> shiftList) {
@@ -61,5 +65,13 @@ public class ShiftTemplateDTO {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public Set<BigInteger> getIndividualShiftTemplateIds() {
+        return individualShiftTemplateIds=Optional.ofNullable(individualShiftTemplateIds).orElse(new HashSet<>());
+    }
+
+    public void setIndividualShiftTemplateIds(Set<BigInteger> individualShiftTemplateIds) {
+        this.individualShiftTemplateIds = individualShiftTemplateIds;
     }
 }
