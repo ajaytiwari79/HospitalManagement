@@ -42,7 +42,7 @@ public class VRPPlannerService {
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO) {
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
         List<File> drlFileList = getDrlFileList(vrpTaskPlanningDTO.getSolverConfig());
-        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList);
+        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath());
         Object[] objects = solver.solveProblemOnRequest(solution);
         solution = (VrpTaskPlanningSolution) objects[0];
         Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task, Indictment>) objects[1]);

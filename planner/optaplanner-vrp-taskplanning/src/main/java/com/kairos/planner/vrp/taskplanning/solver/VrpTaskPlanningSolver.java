@@ -35,8 +35,8 @@ public class VrpTaskPlanningSolver {
     }
 
 
-    public VrpTaskPlanningSolver(List<File> drlFileList){
-        solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
+    public VrpTaskPlanningSolver(List<File> drlFileList,String vrpXmlFilePath){
+        solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
         }
