@@ -117,6 +117,15 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriods;
     }
 
+
+    public void migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO){
+        Phase requestPhase = phaseMongoRepository.findBySequenceAndOrganizationIdAndDeletedFalse(1, unitId);
+        List<PlanningPeriodDTO> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByCurrentPhaseId(unitId, requestPhase.getId());
+        requestPlanningPeriods.forEach(planningPeriod -> {
+
+        });
+    }
+
     // To create Planning Period object and to save the list
     public void createPlanningPeriod(Long unitId, LocalDate startDate, List<PlanningPeriod> planningPeriods, List<PhaseDTO> applicablePhases, PlanningPeriodDTO planningPeriodDTO, int recurringNumber){
         //  Calculate END Date

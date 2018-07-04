@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -84,6 +85,13 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         AggregationResults<PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return result.getMappedResults();
     }
+
+    public List<PlanningPeriodDTO> findAllPeriodsOfUnitByCurrentPhaseId(Long unitId, BigInteger currentPhaseId) {
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("currentPhaseId").is(currentPhaseId));
+        query.with(Sort.by(Sort.Direction.DESC,"startDate"));
+        return mongoTemplate.find(query, PlanningPeriodDTO.class);
+    }
+
 
     /*public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate) {
 
