@@ -20,6 +20,7 @@ public class TaskDTO {
     private Long installationNumber;
     private Double latitude;
     private Double longitude;
+    private String shiftId;
     private Set<String> skills;
     private int duration;
     private String streetName;
@@ -27,6 +28,7 @@ public class TaskDTO {
     private String block;
     private int floorNo;
     private int post;
+    private String citizenName;
     private String city;
     private LocalDateTime plannedStartTime;
     private LocalDateTime plannedEndTime;
@@ -34,6 +36,7 @@ public class TaskDTO {
     private Long endTime;
     private String color;
     private boolean breakTime;
+    private int drivingTime;
 
 
     public TaskDTO() {
@@ -52,6 +55,30 @@ public class TaskDTO {
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+    public int getDrivingTime() {
+        return drivingTime;
+    }
+
+    public void setDrivingTime(int drivingTime) {
+        this.drivingTime = drivingTime;
+    }
+
+    public String getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(String shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public String getCitizenName() {
+        return citizenName;
+    }
+
+    public void setCitizenName(String citizenName) {
+        this.citizenName = citizenName;
     }
 
     public boolean isBreakTime() {
