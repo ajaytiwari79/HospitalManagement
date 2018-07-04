@@ -32,6 +32,9 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH (n:User) WHERE n.timeCareExternalId={0}  RETURN n LIMIT 1")
     User findByTimeCareExternalId(String timeCareExternalId);
 
+    @Query("MATCH (n:User) WHERE n.cprNumber={0} AND Not n:Client RETURN n")
+    User findUserByCprNumber(String cprNumber);
+
     List<User> findAll();
 
     User findByOtp(int otp);
