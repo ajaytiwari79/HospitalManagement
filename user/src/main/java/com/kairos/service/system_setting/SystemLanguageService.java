@@ -141,7 +141,7 @@ public class SystemLanguageService extends UserBaseService {
 
         SystemLanguage  systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         systemLanguageDTOS.stream().forEach(systemLanguageDTO -> {
-            if(systemLanguageDTO.getId().equals(systemLanguage.getId())){
+            if(Optional.ofNullable(systemLanguage).isPresent() && systemLanguageDTO.getId().equals(systemLanguage.getId())){
                 systemLanguageDTO.setDefaultLanguage(true);
             } else {
                 systemLanguageDTO.setDefaultLanguage(false);
