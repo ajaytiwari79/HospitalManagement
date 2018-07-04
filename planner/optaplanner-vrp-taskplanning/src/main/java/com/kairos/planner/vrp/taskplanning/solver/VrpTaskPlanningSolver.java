@@ -36,10 +36,12 @@ public class VrpTaskPlanningSolver {
     }
 
 
-    public VrpTaskPlanningSolver(List<File> drlFileList){
-        solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
+    //public VrpTaskPlanningSolver(List<File> drlFileList){
+      //  solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
         //solverFactory = SolverFactory.createFromXmlFile(new File(config));
         //solverFactory = SolverFactory.createFromXmlResource("config/Kamstrup_Vrp_taskPlanning.solver.xml");
+    public VrpTaskPlanningSolver(List<File> drlFileList,String vrpXmlFilePath){
+        solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
         }
@@ -168,11 +170,6 @@ public class VrpTaskPlanningSolver {
     }
 
     public Object[] solveProblemOnRequest(VrpTaskPlanningSolution problem) {
-        /*try {
-            getxStream().toXML(problem,new FileWriter("src/main/resources/problem.xml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());

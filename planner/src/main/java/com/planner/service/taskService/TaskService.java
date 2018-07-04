@@ -31,7 +31,7 @@ public class TaskService {
         List<Task> taskList = taskRepository.findAll();
         List<Task> uniqueTaskList = taskList.stream().filter(ObjectUtils.distinctByKey(task -> task.getInstallationNumber())).collect(toList());
         List<com.kairos.planner.vrp.taskplanning.model.Task> tasks = new ArrayList<>();
-        Map<Long,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getInstallationNumber,summingInt(Task::getDuration)));
+        Map<Long,Integer> intallationandDuration = taskList.stream().collect(groupingBy(Task::getInstallationNumber,summingInt(t->(int)t.getDuration())));
         Map<Long,Set<String>> intallationandSkill = taskList.stream().collect(groupingBy(Task::getInstallationNumber,mapping(Task::getSkill,toSet())));
         Map<Long,Task> taskMap= uniqueTaskList.stream().collect(Collectors.toMap(t->t.getInstallationNumber(), t->t));
         intallationandDuration.entrySet().forEach(t->{

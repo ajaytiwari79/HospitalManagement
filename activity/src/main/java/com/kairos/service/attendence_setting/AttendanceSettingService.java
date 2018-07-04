@@ -1,50 +1,122 @@
 package com.kairos.service.attendence_setting;
 
-import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
-import com.kairos.activity.staffing_level.Duration;
-import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
-import com.kairos.service.MongoBaseService;
-import com.kairos.util.DateUtils;
-import org.springframework.stereotype.Service;
+import com.kairos.activity.shift.ShiftQueryResult;
 
+import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
+import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
+import com.kairos.response.dto.web.attendance.AttendanceDuration;
+import com.kairos.response.dto.web.attendance.AttendanceDTO;
+import com.kairos.response.dto.web.attendance.AttendanceDurationDTO;
+import com.kairos.response.dto.web.attendance.UnitIdAndNameDTO;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
+import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftService;
+import com.kairos.util.DateUtils;
+import com.kairos.util.userContext.UserContext;
+import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
-public class AttendanceSettingService extends MongoBaseService{
+public class AttendanceSettingService extends MongoBaseService {
 
-@Inject
-private AttendanceSettingRepository attendanceSettingRepository;
+    @Inject
+    private AttendanceSettingRepository attendanceSettingRepository;
 
-public Duration getAttendanceSetting(Long unitId, Long staffId) {
-    LocalDate currentDate= DateUtils.getCurrentLocalDate();
-    Duration attendanceDuration=new Duration();
-    AttendanceSetting AttendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
-    if(Optional.ofNullable(AttendanceSetting).isPresent()) {
-     attendanceDuration=AttendanceSetting.getAttendanceDuration().get(AttendanceSetting.getAttendanceDuration().size()-1);
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
+
+    @Inject
+    private ShiftService shiftService;
+
+    @Inject
+    private ExceptionService exceptionService;
+
+    public AttendanceDTO getAttendanceSetting() {
+        AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
+        if (!Optional.ofNullable(attendanceSetting).isPresent()) {
+            exceptionService.actionNotPermittedException("message.attendance.notexists");
+        }
+        return new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
     }
-    return attendanceDuration;
-}
 
-public Duration updateAttendanceSetting(Long unitId, Long staffId, Duration attendanceDuration) {
-    LocalDate currentDate= DateUtils.getCurrentLocalDate();
-    AttendanceSetting attendanceSetting=attendanceSettingRepository.findbyUnitIdAndStaffIdAndDate(unitId,staffId,currentDate);
-    if(Optional.ofNullable(attendanceSetting).isPresent()) {
-        if(attendanceDuration.getTo()!=null){
-            Duration duration=attendanceSetting.getAttendanceDuration().get(attendanceSetting.getAttendanceDuration().size()-1);
-            if (duration.getTo() == null) {
-                duration.setTo(attendanceDuration.getTo());
+    public AttendanceDTO updateAttendanceSetting(Long unitId, boolean checkIn) {
+        AttendanceDTO attendanceDTO = null;
+        AttendanceSetting attendanceSetting = null;
+        Long userId = Long.valueOf(UserContext.getUserDetails().getId());
+        List<StaffResultDTO> staffAndOrganizationIds = genericIntegrationService.getStaffIdsByUserId(userId);
+        if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
+            exceptionService.actionNotPermittedException("message.staff.notfound");
+        }
+        attendanceSetting = (checkIn == true) ? checkInAttendanceSetting(unitId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
+        if(Optional.ofNullable(attendanceSetting).isPresent()) {
+            save(attendanceSetting);
+            attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
+        } else {
+            List<UnitIdAndNameDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new UnitIdAndNameDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
+            attendanceDTO = new AttendanceDTO(unitIdAndNames);
+        }
+        return attendanceDTO;
+    }
+
+    private AttendanceSetting checkInAttendanceSetting(Long unitId, List<StaffResultDTO> staffAndOrganizationIds) {
+        AttendanceSetting attendanceSetting = null;
+        StaffResultDTO staffAndOrganizationId;
+        if (Optional.ofNullable(unitId).isPresent()) {
+            staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
+            if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
+                exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
+            }
+            AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
+            attendanceSetting = new AttendanceSetting(unitId, staffAndOrganizationId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
+        } else {
+            List<Long> staffIds = staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
+            ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
+            if(Optional.ofNullable(shiftQueryResults).isPresent()) {
+                staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(shiftQueryResults.getUnitId())).findAny().get();
+                AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
+                attendanceSetting = new AttendanceSetting(shiftQueryResults.getUnitId(), shiftQueryResults.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
+            }
+        }
+        return attendanceSetting;
+    }
+
+    private AttendanceSetting checkOutAttendanceSetting(List<StaffResultDTO> staffAndOrganizationIds) {
+        AttendanceDuration duration = null;
+        AttendanceSetting attendanceSetting;
+        attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
+        if (Optional.ofNullable(attendanceSetting).isPresent()) {
+            duration = attendanceSetting.getAttendanceDuration();
+            if (!Optional.ofNullable(duration.getTo()).isPresent()) {
+                StaffResultDTO staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(attendanceSetting.getUnitId())).findAny().get();
+                duration.setTo(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
+            }else{
+                exceptionService.actionNotPermittedException("message.checkout.exists");
             }
         }else{
-            attendanceSetting.getAttendanceDuration().add(attendanceDuration);
+            exceptionService.actionNotPermittedException("message.attendance.notexists");
         }
-    }else {
-        attendanceSetting = new AttendanceSetting(unitId, staffId,currentDate);
-        attendanceSetting.getAttendanceDuration().add(attendanceDuration);
+        return attendanceSetting;
     }
-    save(attendanceSetting);
-    return attendanceDuration;
-    }
+
+
+    private AttendanceDurationDTO getAttendanceDTOObject(AttendanceDuration attendanceDuration){
+        AttendanceDurationDTO attendanceDurationDTO=new AttendanceDurationDTO();
+        attendanceDurationDTO.setClockInDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.getFrom()));
+        attendanceDurationDTO.setClockInTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.getFrom()));
+       if(Optional.ofNullable(attendanceDuration.getTo()).isPresent()) {
+           attendanceDurationDTO.setClockOutDate(DateUtils.getLocalDateFromLocalDateTime(attendanceDuration.getTo()));
+           attendanceDurationDTO.setClockOutTime(DateUtils.getLocalTimeFromLocalDateTime(attendanceDuration.getTo()));
+       }
+       return  attendanceDurationDTO;
+        }
 }
+
+
+

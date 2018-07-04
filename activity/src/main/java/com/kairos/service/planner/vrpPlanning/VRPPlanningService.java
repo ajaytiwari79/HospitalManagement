@@ -33,7 +33,9 @@ import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -150,7 +152,7 @@ public class VRPPlanningService extends MongoBaseService{
     public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolverConfigurationForUnit(unitId, solverConfigId);
         List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
-        taskDTOS = getTasks(unitId,taskDTOS);
+        taskDTOS = getTasks(unitId,taskDTOS,vrpTaskPlanningDTO.getEmployees());
         if(taskDTOS.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
         }
@@ -166,22 +168,26 @@ public class VRPPlanningService extends MongoBaseService{
         return vrpTaskPlanningDTO;
     }
 
-    public List<TaskDTO> getTasks(Long unitId,List<TaskDTO> taskDTOS){
+    public List<TaskDTO> getTasks(Long unitId,List<TaskDTO> taskDTOS,List<EmployeeDTO> employeeDTOS){
+        Map<String,EmployeeDTO> employeeDTOMap = employeeDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getInstallationNumber(), v->v));
         Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
         List<TaskDTO> tasks = new ArrayList<>();
         for (Map.Entry<Long, List<VRPTaskDTO>> installationTasks : installationNOtasks.entrySet()) {
             TaskDTO taskDTO = taskMap.get(installationTasks.getKey());
             if(taskDTO!=null){
-                LocalDateTime updatedStartTime = taskDTO.getPlannedStartTime();;
+                LocalDateTime updatedStartTime = taskDTO.getPlannedStartTime();
                 for (VRPTaskDTO vrpTaskDTO : installationTasks.getValue()) {
                     TaskDTO task= new TaskDTO(vrpTaskDTO.getId().toString(),vrpTaskDTO.getInstallationNumber(),new Double(vrpTaskDTO.getAddress().getLatitude()),new Double(vrpTaskDTO.getAddress().getLongitude()),null,vrpTaskDTO.getDuration(),vrpTaskDTO.getAddress().getStreet(),new Integer(vrpTaskDTO.getAddress().getHouseNumber()),vrpTaskDTO.getAddress().getBlock(),vrpTaskDTO.getAddress().getFloorNo(),vrpTaskDTO.getAddress().getZip(),vrpTaskDTO.getAddress().getCity());
                     task.setStaffId(taskDTO.getStaffId());
                     task.setName(vrpTaskDTO.getTaskType().getTitle());
                     task.setStartTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
-                    task.setEndTime(Date.from(updatedStartTime.plusMinutes(vrpTaskDTO.getDuration()).atZone(ZoneId.systemDefault()).toInstant()).getTime());
+                    EmployeeDTO employeeDTO = employeeDTOMap.get(taskDTO.getStaffId().toString());
+                    int taskDuration = (int)Math.ceil(vrpTaskDTO.getDuration()/(employeeDTO.getEfficiency()/100d));
+                    task.setDuration(taskDuration);
+                    updatedStartTime = updatedStartTime.plusMinutes(taskDuration);
+                    task.setEndTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
                     task.setColor(vrpTaskDTO.getTaskType().getColorForGantt());
-                    updatedStartTime = updatedStartTime.plusMinutes(vrpTaskDTO.getDuration());
                     tasks.add(task);
                 }
             }
@@ -189,6 +195,13 @@ public class VRPPlanningService extends MongoBaseService{
         return tasks;
     }
 
+    public int[] getPlannedDuration(int duration,EmployeeDTO employeeDTO){
+        Double taskDuration = duration/(employeeDTO.getEfficiency()/100d);
+        int minutes = (int)Math.floor( taskDuration );
+        BigDecimal bd = new BigDecimal( taskDuration - minutes);
+        bd = bd.setScale(4, RoundingMode.HALF_DOWN);
+        return new int[]{minutes,bd.intValue()};
+    }
 
     public VrpTaskPlanningDTO getVRPTaskPlanningDTO(Long unitId,SolverConfigDTO solverConfigDTO){
         List<TaskDTO> taskDTOS = getTaskForPlanning(unitId);
