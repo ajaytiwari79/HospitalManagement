@@ -1,5 +1,7 @@
 package com.kairos.controller.agreement;
 
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.user.country.agreement.RuleTemplateCategoryCTADTO;
 import com.kairos.user.country.agreement.UpdateRuleTemplateCategoryDTO;
 import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
@@ -56,6 +58,11 @@ public class RuleTemplateCategoryController {
         Map<String, Object> updatedRuleTemplate = ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, updatedRuleTemplate);
     }
+    @RequestMapping(value = COUNTRY_URL+"/rule_templates/category", method = RequestMethod.POST)
+    ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody RuleTemplateCategoryCTADTO ruleTemplateCategory, @PathVariable long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId,ruleTemplateCategory));
+    }
+
 
 
 }

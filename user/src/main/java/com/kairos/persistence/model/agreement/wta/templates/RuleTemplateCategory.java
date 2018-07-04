@@ -1,9 +1,6 @@
 package com.kairos.persistence.model.agreement.wta.templates;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
@@ -11,6 +8,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,16 +29,17 @@ import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 @NodeEntity
 public class RuleTemplateCategory extends UserBaseEntity {
 
-     @NotNull(message = "error.RuleTemplateCategory.name.notnull")
+    @NotNull(message = "error.RuleTemplateCategory.name.notnull")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     @JsonIgnore
-    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY,direction =UNDIRECTED )
+    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY, direction = UNDIRECTED)
     private Country country;
     @JsonBackReference
-    @Relationship(type = HAS_RULE_TEMPLATES,direction =UNDIRECTED)
-    private List<RuleTemplate> ruleTemplates=new ArrayList<>();
+    @Relationship(type = HAS_RULE_TEMPLATES, direction = UNDIRECTED)
+    private List<RuleTemplate> ruleTemplates = new ArrayList<>();
+
     public RuleTemplateCategory(String name, String description, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -58,8 +57,10 @@ public class RuleTemplateCategory extends UserBaseEntity {
     public List<RuleTemplate> getRuleTemplates() {
         return ruleTemplates;
     }
+
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
+
     public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
@@ -72,6 +73,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
         getRuleTemplates().add(ruleTemplate);
         ruleTemplate.setRuleTemplateCategory(this);
     }
+
     public void removeRuleTemplate(RuleTemplate ruleTemplate) {
         if (ruleTemplate == null)
             throw new NullPointerException("Can't add null ruleTemplate");
@@ -90,6 +92,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
     public String getDescription() {
         return description;
     }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -97,6 +100,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -116,6 +120,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
     public void setCountry(Country country) {
         this.country = country;
     }
+
     public List<Tag> getTags() {
         return tags;
     }
