@@ -43,7 +43,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
                 , masterProcessingActivityDto.getOrganizationSubTypes(), masterProcessingActivityDto.getOrganizationServices(), masterProcessingActivityDto.getOrganizationSubServices());
         Map<String, Object> subProcessingActivity = new HashMap<>();
         if (masterProcessingActivityDto.getSubProcessingActivities() != null && masterProcessingActivityDto.getSubProcessingActivities().size() != 0) {
-            subProcessingActivity = createNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(),masterProcessingActivityDto);
+            subProcessingActivity = createNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
             masterProcessingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
         }
         masterProcessingActivity.setCountryId(countryId);
@@ -64,7 +64,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> createNewSubProcessingActivity(Long countryId, Long organizationId, List<MasterProcessingActivityDTO> subProcessingActivities,MasterProcessingActivityDTO parentProcessingActivity) {
+    public Map<String, Object> createNewSubProcessingActivity(Long countryId, Long organizationId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
 
         List<String> checkDuplicateInSubProcess = new ArrayList<>();
         List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
@@ -109,7 +109,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         } else {
             Map<String, Object> subProcessingActivity = new HashMap<>();
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
-                subProcessingActivity = updateExisitingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(),masterProcessingActivityDto);
+                subProcessingActivity = updateExisitingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
                 exists.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
             }
             exists.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
@@ -132,7 +132,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> updateExisitingAndCreateNewSubProcessingActivity(Long countryId,Long organizationId, List<MasterProcessingActivityDTO> subProcessingActivities,MasterProcessingActivityDTO parentProcessingActivity) {
+    public Map<String, Object> updateExisitingAndCreateNewSubProcessingActivity(Long countryId, Long organizationId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
 
         checkForDuplicacyInName(subProcessingActivities);
         List<MasterProcessingActivityDTO> upadateSubProcessingActivities = new ArrayList<>();
@@ -149,12 +149,12 @@ public class MasterProcessingActivityService extends MongoBaseService {
         List<BigInteger> subProcessingActivityIds = new ArrayList<>();
         List<MasterProcessingActivity> subProcessingActivityies = new ArrayList<>();
         if (!createNewSubProcessingActivities.isEmpty()) {
-            Map<String, Object> newSubProcesingActivities = createNewSubProcessingActivity(countryId, organizationId, createNewSubProcessingActivities,parentProcessingActivity);
+            Map<String, Object> newSubProcesingActivities = createNewSubProcessingActivity(countryId, organizationId, createNewSubProcessingActivities, parentProcessingActivity);
             subProcessingActivityIds.addAll((List<BigInteger>) newSubProcesingActivities.get(IDS_LIST));
             subProcessingActivityies.addAll((List<MasterProcessingActivity>) newSubProcesingActivities.get(PROCESSING_ACTIVITIES));
         }
         if (!upadateSubProcessingActivities.isEmpty()) {
-            Map<String, Object> updatedSubProceesingActivityList = updateSubProcessingActivities(countryId, organizationId, upadateSubProcessingActivities,parentProcessingActivity);
+            Map<String, Object> updatedSubProceesingActivityList = updateSubProcessingActivities(countryId, organizationId, upadateSubProcessingActivities, parentProcessingActivity);
             subProcessingActivityIds.addAll((List<BigInteger>) updatedSubProceesingActivityList.get(IDS_LIST));
             subProcessingActivityies.addAll((List<MasterProcessingActivity>) updatedSubProceesingActivityList.get(PROCESSING_ACTIVITIES));
         }
@@ -165,9 +165,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-
-    public Map<String,Object> updateSubProcessingActivities(Long countryId,Long organizationId,List<MasterProcessingActivityDTO> subProcessingActivities ,MasterProcessingActivityDTO parentProcessingActivity)
-    {
+    public Map<String, Object> updateSubProcessingActivities(Long countryId, Long organizationId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
 
 
         Map<BigInteger, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
@@ -221,7 +219,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
         return true;
 
     }
-
 
 
     public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, Long organizationId, BigInteger id) {
