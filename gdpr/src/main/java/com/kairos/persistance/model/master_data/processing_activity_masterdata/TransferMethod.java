@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
 
-@Document(collection = "transfer_method_destination")
+@Document(collection = "transfer_method")
 public class TransferMethod extends MongoBaseEntity {
 
 
