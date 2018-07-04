@@ -88,6 +88,8 @@ public class ShiftTemplateService extends MongoBaseService {
         ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
+        shiftTemplateDTO.setCreatedBy(shiftTemplate.getCreatedBy());
+        shiftTemplateDTO.setUnitId(unitId);
         return shiftTemplateDTO;
     }
 
@@ -105,11 +107,14 @@ public class ShiftTemplateService extends MongoBaseService {
         return shiftTemplateDTOS;
     }
 
-    public ShiftTemplateDTO updateShiftTemplate(BigInteger shiftTemplateId, ShiftTemplateDTO shiftTemplateDTO){
+    public ShiftTemplateDTO updateShiftTemplate(Long unitId,BigInteger shiftTemplateId, ShiftTemplateDTO shiftTemplateDTO){
         ShiftTemplate shiftTemplate= shiftTemplateRepository.findOneById(shiftTemplateId);
         if(!Optional.ofNullable(shiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
         }
+        shiftTemplateDTO.setId(shiftTemplateId);
+        shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
+        shiftTemplateDTO.setUnitId(unitId);
         ObjectMapperUtils.copyPropertiesUsingBeanUtils(shiftTemplateDTO,shiftTemplate,"shiftList");
         save(shiftTemplate);
         return shiftTemplateDTO;

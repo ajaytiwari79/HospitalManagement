@@ -16,29 +16,26 @@ public class IndividualShiftTemplateDTO {
     @Range(min = 0)
     @NotNull(message = "error.shiftTemplate.activityId.notnull")
     private BigInteger activityId;
-    private Long unitId;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
-    private boolean isMainShift;
+    private boolean mainShift;
     private List<IndividualShiftTemplateDTO> subShifts;
 
     public IndividualShiftTemplateDTO() {
         //Default Constructor
     }
 
-    public IndividualShiftTemplateDTO(BigInteger id, String name, String remarks, @Range(min = 0) @NotNull(message = "error.shiftTemplate.activityId.notnull") BigInteger activityId, Long unitId
-                               , LocalTime startTime, LocalTime endTime, boolean isMainShift,
+    public IndividualShiftTemplateDTO(BigInteger id, String name, String remarks, @Range(min = 0) @NotNull(message = "error.shiftTemplate.activityId.notnull") BigInteger activityId
+                               , LocalTime startTime, LocalTime endTime,
                                       List<IndividualShiftTemplateDTO> subShifts) {
         this.id = id;
         this.name = name;
         this.remarks = remarks;
         this.activityId = activityId;
-        this.unitId = unitId;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.isMainShift = isMainShift;
         this.subShifts = subShifts;
     }
 
@@ -74,14 +71,6 @@ public class IndividualShiftTemplateDTO {
         this.activityId = activityId;
     }
 
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
     public LocalTime getStartTime() {
         return startTime;
     }
@@ -98,19 +87,19 @@ public class IndividualShiftTemplateDTO {
         this.endTime = endTime;
     }
 
-    public boolean isMainShift() {
-        return isMainShift;
-    }
-
-    public void setMainShift(boolean mainShift) {
-        isMainShift = mainShift;
-    }
-
     public List<IndividualShiftTemplateDTO> getSubShifts() {
         return subShifts=Optional.ofNullable(subShifts).orElse(new ArrayList<>());
     }
 
     public void setSubShifts(List<IndividualShiftTemplateDTO> subShifts) {
         this.subShifts = subShifts;
+    }
+
+    public boolean isMainShift() {
+        return mainShift;
+    }
+
+    public void setMainShift(boolean mainShift) {
+        this.mainShift = mainShift;
     }
 }
