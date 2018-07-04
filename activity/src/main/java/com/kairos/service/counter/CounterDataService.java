@@ -15,6 +15,7 @@ import com.kairos.persistence.model.counter.chart.BaseChart;
 import com.kairos.persistence.model.counter.chart.PieChart;
 import com.kairos.persistence.model.counter.chart.PieDataUnit;
 import com.kairos.persistence.model.counter.chart.SingleNumberChart;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
@@ -43,11 +44,16 @@ public class CounterDataService {
     TaskService taskService;
     @Inject
     ShiftService shiftService;
+    @Inject
+    ExceptionService exceptionService;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolverConfigurationForUnit(unitId, solverConfigId);
         List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
         Set<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toSet());
+        if(shiftIds == null || shiftIds.isEmpty()){
+            exceptionService.dataNotFoundByIdException("error.kpi.vrp.shift.availability", shiftIds);
+        }
         List<Shift> shifts = shiftService.getAllShiftByIds(new ArrayList<>(shiftIds));
         ArrayList<KPI> kpiList = new ArrayList<>();
         kpiList.add(getTaskUnplannedKPI(vrpTaskPlanningDTO, tasks));
