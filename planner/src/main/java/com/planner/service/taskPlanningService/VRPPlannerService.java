@@ -45,22 +45,18 @@ public class VRPPlannerService {
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO){
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
         List<File> drlFileList = getDrlFileList(vrpTaskPlanningDTO.getSolverConfig());
-        //VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList);
-        runningSolversPerProblem.put(solution.getSolverConfigId().toString(),solver);
         VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath());
+        runningSolversPerProblem.put(solution.getSolverConfigId().toString(),solver);
+        Object[] solutionAndIndictment=solver.solveProblemOnRequest(solution);
         runningSolversPerProblem.remove(solution.getSolverConfigId().toString());
-        solution = (VrpTaskPlanningSolution)objects[0];
-        Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task,Indictment>)objects[1]);
+        solution = (VrpTaskPlanningSolution)solutionAndIndictment[0];
+        Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task,Indictment>)solutionAndIndictment[1]);
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],(List<com.planner.domain.task.Task>) solvedTasks[3]);
-        solution = (VrpTaskPlanningSolution) objects[0];
-        //Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task, Indictment>) objects[1]);
-        //VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(), (List<PlanningShift>) solvedTasks[0], solution.getEmployees(), (List<com.planner.domain.task.Task>) solvedTasks[1], (List<com.planner.domain.task.Task>) solvedTasks[2], (List<com.planner.domain.task.Task>) solvedTasks[3]);
+        vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
         plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
     }
 
-    private List<File> getDrlFileList(SolverConfigDTO solverConfigDTO) {
-        Map<String, File> fileMap = Arrays.asList(new File(appConfig.getDroolFilePath()).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
     //TODO make this run on problemId(submissionId) rather than solverConfigId
     public boolean terminateEarlyVrpPlanningSolver(String problemId){
         try{
@@ -91,7 +87,7 @@ public class VRPPlannerService {
     private List<File> getDrlFileList(SolverConfigDTO solverConfigDTO){
         List<File> drlFiles = new ArrayList<>();
         try{
-        Map<String,File> fileMap = Arrays.asList(new File(AppConstants.DROOL_FILES_PATH).listFiles()).stream().collect(Collectors.toMap(k->k.getName().replace(AppConstants.DROOL_FILE_EXTENTION,""), v->v));
+        Map<String, File> fileMap = Arrays.asList(new File(appConfig.getDroolFilePath()).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
         drlFiles.add(fileMap.get(AppConstants.DROOL_BASE_FILE));
         for (ConstraintValueDTO constraintValueDTO : solverConfigDTO.getConstraints()) {
             if (fileMap.containsKey(constraintValueDTO.getName())) {
