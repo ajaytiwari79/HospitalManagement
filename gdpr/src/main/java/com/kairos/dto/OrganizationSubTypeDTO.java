@@ -7,7 +7,7 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganizationTypeAndServiceBasicDTO {
+public class OrganizationSubTypeDTO {
 
     @NotNull(message = "id can't be null")
     private Long id;
@@ -29,5 +29,8 @@ public class OrganizationTypeAndServiceBasicDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public OrganizationSubTypeDTO() {
     }
 }

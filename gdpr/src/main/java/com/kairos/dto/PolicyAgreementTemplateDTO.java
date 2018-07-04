@@ -30,19 +30,19 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNull(message = "Organization Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationTypes;
+    private List<OrganizationTypeDTO>  organizationTypes;
 
     @NotNull(message = "Organization Sub Type cannot be null")
     @NotEmpty(message = "Organization Sub Type cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationSubTypes;
+    private List<OrganizationSubTypeDTO>  organizationSubTypes;
 
     @NotNull(message = "Service Type cannot be null")
     @NotEmpty(message = "Service Type cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationServices;
+    private List<ServiceCategoryDTO>  organizationServices;
 
     @NotNull(message = "Service Sub Type cannot be null")
     @NotEmpty(message = "Service Sub Type cannot be empty")
-    private List<OrganizationTypeAndServiceBasicDTO>  organizationSubServices;
+    private List<SubServiceCategoryDTO>  organizationSubServices;
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty(message = "Account Type cannot be empty")
@@ -77,35 +77,35 @@ public class PolicyAgreementTemplateDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

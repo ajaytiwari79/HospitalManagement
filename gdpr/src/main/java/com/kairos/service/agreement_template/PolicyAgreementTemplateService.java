@@ -94,7 +94,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 }
                 if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationTypes());
+                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
 
                 }
                 if (agreementSection.size() != 0) {
@@ -182,7 +182,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 }
                 if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationTypes());
+                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
 
                 }
                 if (agreementSection.size() != 0) {

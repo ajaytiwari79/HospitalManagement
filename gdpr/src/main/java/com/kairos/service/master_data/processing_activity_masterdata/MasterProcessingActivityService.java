@@ -42,12 +42,12 @@ public class MasterProcessingActivityService extends MongoBaseService {
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), masterProcessingActivityDto.getOrganizationTypes()
                 , masterProcessingActivityDto.getOrganizationSubTypes(), masterProcessingActivityDto.getOrganizationServices(), masterProcessingActivityDto.getOrganizationSubServices());
         Map<String, Object> subProcessingActivity = new HashMap<>();
-        if (masterProcessingActivityDto.getSubProcessingActivities() != null && masterProcessingActivityDto.getSubProcessingActivities().size() != 0) {
+        if (Optional.ofNullable(masterProcessingActivityDto.getSubProcessingActivities()).isPresent() && !masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
             subProcessingActivity = createNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
+            masterProcessingActivity.setHasSubProcess(true);
             masterProcessingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
         }
         masterProcessingActivity.setCountryId(countryId);
-        masterProcessingActivity.setSubProcess(true);
         masterProcessingActivity.setOrganizationId(organizationId);
         try {
 
@@ -77,6 +77,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
                     , parentProcessingActivity.getOrganizationSubTypes(), parentProcessingActivity.getOrganizationServices(), parentProcessingActivity.getOrganizationSubServices());
             subProcessingActivity.setOrganizationId(organizationId);
             subProcessingActivity.setCountryId(countryId);
+            subProcessingActivity.setSubProcess(true);
             subProcessingActivityList.add(subProcessingActivity);
         }
 
