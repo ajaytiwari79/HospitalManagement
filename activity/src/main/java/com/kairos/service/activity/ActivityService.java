@@ -343,6 +343,17 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
         }
+        //TODO optimize below db query by harish
+        TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
+        while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent()) {
+            timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
+        }
+        if(!Optional.ofNullable(activity.getGeneralActivityTab().getTextColor()).isPresent()&&
+           !Optional.ofNullable(activity.getGeneralActivityTab().getBackgroundColor()).isPresent()){
+        activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
+        activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
+        activity.getGeneralActivityTab().setColorPresent(true);
+        }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
         Long countryId = activity.getCountryId();
