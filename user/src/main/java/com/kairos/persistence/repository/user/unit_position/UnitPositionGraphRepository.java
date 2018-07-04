@@ -274,7 +274,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta_response:CostTimeAgreement) \n" +
-            " return expertise as expertise,cta_response as costTimeAgreement,unionData as union, positionCode as positionCode,\n" +
+            " return expertise as expertise,cta_response as costTimeAgreement, positionCode as positionCode,\n" +
             "unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
             "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo")
     List<UnitPositionQueryResult> getAllUnitPositionsBasicDetailsByUser(long userId);

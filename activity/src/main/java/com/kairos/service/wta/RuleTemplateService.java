@@ -1,7 +1,8 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
+
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateWrapper;

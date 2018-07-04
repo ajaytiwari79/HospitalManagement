@@ -17,7 +17,7 @@ import java.util.List;
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WTAResponseDTO {
 
-    private List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates;
+    private List<WTABaseRuleTemplateDTO> ruleTemplates;
 
     private BigInteger parentWTA;
 
@@ -145,11 +145,11 @@ public class WTAResponseDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> getRuleTemplates() {
+    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates) {
+    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 

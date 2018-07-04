@@ -2,11 +2,11 @@ package com.kairos.activity.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
-import com.kairos.enums.WTATemplateType;
 import com.kairos.enums.TimeBankTypeEnum;
+import com.kairos.enums.WTATemplateType;
 
 import java.util.ArrayList;
 import java.util.List;

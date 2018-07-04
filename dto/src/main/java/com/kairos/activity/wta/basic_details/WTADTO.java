@@ -20,7 +20,7 @@ public class WTADTO {
     private Long endDateMillis;
     private Long expiryDate;
     @NotNull(message = "error.RuleTemplate.description.notnull")
-    private List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates;
+    private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;
     private List<BigInteger> tags;
@@ -85,11 +85,11 @@ public class WTADTO {
         this.expiryDate = expiryDate;
     }
 
-    public List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> getRuleTemplates() {
+    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
         return this.ruleTemplates;
     }
 
-    public void setRuleTemplates(List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates) {
+    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
@@ -117,7 +117,7 @@ public class WTADTO {
         this.tags = tags;
     }
 
-    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
+    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
         this.name = name;
         this.description = description;
         this.expertiseId = expertiseId;

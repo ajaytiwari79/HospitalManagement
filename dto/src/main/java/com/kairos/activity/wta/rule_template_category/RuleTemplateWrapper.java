@@ -1,8 +1,7 @@
 package com.kairos.activity.wta.rule_template_category;
 
 
-
-import com.kairos.activity.wta.country.WTABaseRuleTemplateDTO;
+import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 
 import java.util.List;
 
