@@ -61,10 +61,10 @@ public class TimeTypeService extends MongoBaseService {
 
     public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
         timeTypeDTOS.forEach(timeTypeDTO -> {
-            TimeType timeType = timeTypeMongoRepository.findTimeTypeById(timeTypeDTO.getId(),timeTypeDTO.getLabel(), countryId);
-            if (timeType == null) {
+            TimeType timeType = timeTypeMongoRepository.findByIdNotEqualAndLabelAndCountryId(timeTypeDTO.getId(),timeTypeDTO.getLabel(), countryId);
+            if (!Optional.ofNullable(timeType).isPresent()) {
                 timeType = timeTypeMongoRepository.findOne(timeTypeDTO.getId());
-                if (timeType != null) {
+                if (Optional.ofNullable(timeType ).isPresent()) {
                     timeType.setLabel(timeTypeDTO.getLabel());
                     timeType.setDescription(timeTypeDTO.getDescription());
                     if(!Optional.ofNullable(timeTypeDTO.getUpperLevelTimeTypeId()).isPresent()){

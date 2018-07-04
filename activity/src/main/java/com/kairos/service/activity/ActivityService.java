@@ -344,11 +344,11 @@ public class ActivityService extends MongoBaseService {
         }
         //get parent time type id and hit 2 request
         TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
-        while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent())
-        {
+        while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent()) {
             timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
         }
-        if(activity.getGeneralActivityTab().getTextColor()==null&&activity.getGeneralActivityTab().getBackgroundColor()==null){
+        if(!Optional.ofNullable(activity.getGeneralActivityTab().getTextColor()).isPresent()&&
+           !Optional.ofNullable(activity.getGeneralActivityTab().getBackgroundColor()).isPresent()){
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
         activity.getGeneralActivityTab().setColorPresent(true);
