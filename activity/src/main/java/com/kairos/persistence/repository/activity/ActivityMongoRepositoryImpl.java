@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
@@ -339,6 +340,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Query query = new Query(criteria);
         Activity activity = mongoTemplate.findOne(query, Activity.class);
         return activity;
+    }
+
+   public ActivityWrapper findActivityAndTimeTypeByActivityId(BigInteger activityId){
+       Aggregation aggregation = Aggregation.newAggregation(
+               match(Criteria.where("id").is(activityId).and("deleted").is(false)),
+               lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                       "timeType"),
+               project().and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
+       );
+       AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
+       return (result.getMappedResults().isEmpty())?null:result.getMappedResults().get(0);
     }
 
 }

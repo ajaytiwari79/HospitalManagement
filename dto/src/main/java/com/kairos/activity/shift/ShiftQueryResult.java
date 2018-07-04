@@ -44,7 +44,7 @@ public class ShiftQueryResult {
     private ShiftState shiftState;
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
-
+    private String timeType;
     public ShiftQueryResult() {
         //DC
     }
@@ -281,6 +281,14 @@ public class ShiftQueryResult {
 
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
+    }
+
+    public String getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
     }
 }
 
