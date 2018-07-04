@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.FULL_DAY;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 
@@ -77,10 +76,15 @@ public class ShiftTemplateService extends MongoBaseService {
             IndividualShiftTemplate individualShiftTemplate=new IndividualShiftTemplate();
             ObjectMapperUtils.copyPropertiesUsingBeanUtils(individualShiftTemplateDTO,individualShiftTemplate,"shiftList");
             individualShiftTemplate.setSubShiftIds(subShiftIds);
+            individualShiftTemplate.setMainShift(true);
             individualShiftTemplates.add(individualShiftTemplate);
         });
         save(individualShiftTemplates);
-        Set<BigInteger> individualShiftTemplateIds=individualShiftTemplates.stream().map(individualShiftTemplate -> individualShiftTemplate.getId()).collect(Collectors.toSet());
+        Set<BigInteger> individualShiftTemplateIds=new HashSet<>();
+        for(int i=0;i<individualShiftTemplates.size();i++){
+            shiftTemplateDTO.getShiftList().get(i).setId(individualShiftTemplates.get(i).getId());
+            individualShiftTemplateIds.add(individualShiftTemplates.get(i).getId());
+            }
         ShiftTemplate shiftTemplate=new ShiftTemplate(shiftTemplateDTO.getName(),individualShiftTemplateIds,unitId,UserContext.getUserDetails().getId());
         save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
@@ -106,7 +110,7 @@ public class ShiftTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(shiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent", shiftTemplateId);
         }
-        BeanUtils.copyProperties(shiftTemplateDTO,shiftTemplate,"shiftList");
+        ObjectMapperUtils.copyPropertiesUsingBeanUtils(shiftTemplateDTO,shiftTemplate,"shiftList");
         save(shiftTemplate);
         return shiftTemplateDTO;
     }
@@ -116,11 +120,10 @@ public class ShiftTemplateService extends MongoBaseService {
         if(!Optional.ofNullable(shiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.shiftTemplate.absent",shiftTemplateId);
         }
-        //Need to verify that individual shifts should also be deleted or not / mapping
-//        List<IndividualShiftTemplate> individualShiftTemplates = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.get().getIndividualShiftTemplateIds());
-//        individualShiftTemplates.forEach(individualShiftTemplate -> {
-//            individualShiftTemplate.setDeleted(true);});
-//        save(individualShiftTemplates);
+        List<IndividualShiftTemplate> individualShiftTemplates = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
+        individualShiftTemplates.forEach(individualShiftTemplate -> {
+            individualShiftTemplate.setDeleted(true);});
+        save(individualShiftTemplates);
         shiftTemplate.setDeleted(true);
         save(shiftTemplate);
         return true;
@@ -133,7 +136,7 @@ public class ShiftTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", individualShiftTemplateId);
         }
         individualShiftTemplateDTO.setId(shiftDayTemplate.get().getId());
-        BeanUtils.copyProperties(individualShiftTemplateDTO,shiftDayTemplate.get());
+        ObjectMapperUtils.copyPropertiesUsingBeanUtils(individualShiftTemplateDTO,shiftDayTemplate.get(),"subShifts");
         save(shiftDayTemplate.get());
         return individualShiftTemplateDTO;
     }
@@ -155,6 +158,9 @@ public class ShiftTemplateService extends MongoBaseService {
         IndividualShiftTemplate individualShiftTemplate= individualShiftTemplateRepository.findOneById(individualShiftTemplateId);
         if(!Optional.ofNullable(individualShiftTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("message.individual.shiftTemplate.absent", individualShiftTemplateId);
+        }
+        if(!individualShiftTemplate.isMainShift()){
+            exceptionService.actionNotPermittedException("message.individualShift.not.mainShift");
         }
         individualShiftTemplate.setDeleted(true);
         save(individualShiftTemplate);

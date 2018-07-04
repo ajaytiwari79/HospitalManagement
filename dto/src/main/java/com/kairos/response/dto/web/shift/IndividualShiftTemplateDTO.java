@@ -21,7 +21,7 @@ public class IndividualShiftTemplateDTO {
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
-    private boolean isMainShift = true;
+    private boolean isMainShift;
     private List<IndividualShiftTemplateDTO> subShifts;
 
     public IndividualShiftTemplateDTO() {
