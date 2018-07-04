@@ -108,6 +108,7 @@ public class VRPPlannerService {
                         int drivingMin = nextTask.getDrivingTime();
                         com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, drivingMin * 60, nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
                         drivedTask.setPlannedStartTime(drivingTimeStart);
+                        drivedTask.setDrivingDistance(nextTask.getDrivingDistance());
                         drivedTask.setShiftId(shift.getId());
                         drivedTask.setStaffId(new Long(shift.getEmployee().getId()));
                         drivedTask.setPlannedEndTime(drivingTimeStart.plusMinutes(drivingMin));

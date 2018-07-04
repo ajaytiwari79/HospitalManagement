@@ -29,22 +29,22 @@ public class PlannerSyncService {
 
     @Async
     public Future<RestTemplateResponseEnvelope<Map>> publishStaffingLevel(Long unitId, StaffingLevelDTO staffingLevelDto, IntegrationOperation integrationOperation) {
-        return new AsyncResult(plannerRestClient.publish(staffingLevelDto, unitId, integrationOperation));
+        return null;//new AsyncResult(plannerRestClient.publish(staffingLevelDto, unitId, integrationOperation));
     }
 
     @Async
     public void publishStaffingLevels(Long unitId, List<StaffingLevelDTO> staffingLevelDtos, IntegrationOperation integrationOperation) {
-        plannerRestClient.publish(staffingLevelDtos, unitId, integrationOperation);
+        //plannerRestClient.publish(staffingLevelDtos, unitId, integrationOperation);
     }
 
     @Async
     public void publishActivity(Long unitId, Activity activity, IntegrationOperation integrationOperation) {
-        plannerRestClient.publish(createActivityDTO(activity), unitId, integrationOperation);
+       // plannerRestClient.publish(createActivityDTO(activity), unitId, integrationOperation);
     }
 
     @Async
     public void publishActivities(Long unitId, List<Activity> activities, IntegrationOperation integrationOperation) {
-        plannerRestClient.publish(createActivityDTOs(activities), unitId, integrationOperation);
+        //plannerRestClient.publish(createActivityDTOs(activities), unitId, integrationOperation);
     }
 
 

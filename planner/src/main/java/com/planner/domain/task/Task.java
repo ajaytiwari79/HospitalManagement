@@ -19,6 +19,7 @@ public class Task extends MongoBaseEntity{
     private Double longitude;
     private String skill;
     private int duration;
+    private int drivingDistance;
     private String streetName;
     private int houseNo;
     private String block;
@@ -54,6 +55,15 @@ public class Task extends MongoBaseEntity{
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+
+    public int getDrivingDistance() {
+        return drivingDistance;
+    }
+
+    public void setDrivingDistance(int drivingDistance) {
+        this.drivingDistance = drivingDistance;
     }
 
     public String getShiftId() {

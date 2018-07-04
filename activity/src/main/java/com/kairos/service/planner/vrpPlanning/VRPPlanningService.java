@@ -2,6 +2,7 @@ package com.kairos.service.planner.vrpPlanning;
 
 import com.kairos.activity.task_type.TaskTypeSettingDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.solver_config.PlannerUrl;
 import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 import com.kairos.persistence.model.activity.Shift;
@@ -80,7 +81,7 @@ public class VRPPlanningService extends MongoBaseService{
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
         save(solverConfig);
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
+        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
         return solverConfigDTO;
     }
 
@@ -95,7 +96,7 @@ public class VRPPlanningService extends MongoBaseService{
             c.setDescription(constraintDTO.getDescription());
         });
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,newSolverConfigDTO);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE);
+        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
         return newSolverConfigDTO;
     }
 
@@ -127,11 +128,12 @@ public class VRPPlanningService extends MongoBaseService{
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.READY);
         save(solverConfig);
+        plannerRestClient.publish(null,unitId, IntegrationOperation.DELETE,PlannerUrl.STOP_VRP_PROBLEM);
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
     }
 
     public VrpTaskPlanningDTO getSolverConfigurationForUnit(Long unitId, BigInteger solverConfigId){
-        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,solverConfigId);
+        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,PlannerUrl.GET_VRP_SOLUTION,solverConfigId);
 
         VrpTaskPlanningDTO vrpTaskPlanningDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VrpTaskPlanningDTO.class);
         if(vrpTaskPlanningDTO==null || vrpTaskPlanningDTO.getTasks().isEmpty()){

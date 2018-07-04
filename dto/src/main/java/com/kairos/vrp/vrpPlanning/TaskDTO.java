@@ -24,6 +24,7 @@ public class TaskDTO {
     private Set<String> skills;
     private int duration;
     private String streetName;
+    private int drivingDistance;
     private int houseNo;
     private String block;
     private int floorNo;
@@ -79,6 +80,13 @@ public class TaskDTO {
 
     public void setCitizenName(String citizenName) {
         this.citizenName = citizenName;
+    }
+    public int getDrivingDistance() {
+        return drivingDistance;
+    }
+
+    public void setDrivingDistance(int drivingDistance) {
+        this.drivingDistance = drivingDistance;
     }
 
     public boolean isBreakTime() {
