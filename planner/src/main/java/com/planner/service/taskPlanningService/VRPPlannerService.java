@@ -9,6 +9,7 @@ import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
+import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.constants.AppConstants;
 import com.planner.domain.staff.PlanningShift;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
@@ -35,6 +36,7 @@ public class VRPPlannerService {
     private VRPPlanningMongoRepository vrpPlanningMongoRepository;
     @Autowired
     private PlannerRestClient plannerRestClient;
+    @Autowired private AppConfig appConfig;
 
     @Async
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO) {
@@ -50,7 +52,7 @@ public class VRPPlannerService {
     }
 
     private List<File> getDrlFileList(SolverConfigDTO solverConfigDTO) {
-        Map<String, File> fileMap = Arrays.asList(new File(AppConstants.DROOL_FILES_PATH).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
+        Map<String, File> fileMap = Arrays.asList(new File(appConfig.getDroolFilePath()).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
         List<File> drlFiles = new ArrayList<>();
         drlFiles.add(fileMap.get(AppConstants.DROOL_BASE_FILE));
         for (ConstraintValueDTO constraintValueDTO : solverConfigDTO.getConstraints()) {
