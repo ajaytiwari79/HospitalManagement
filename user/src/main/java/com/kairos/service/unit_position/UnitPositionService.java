@@ -1112,7 +1112,7 @@ public class UnitPositionService extends UserBaseService {
     public Map<String, Object> getAllWTAOfStaff(Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
     //EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd(), employment.getMainEmploymentStartDate(), employment.getMainEmploymentEndDate(), employment.isMainEmployment());
-        List<UnitPositionQueryResult> unitPositionQueryResults =  unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId());
+        List<UnitPositionQueryResult> unitPositionQueryResults =  unitPositionGraphRepository.getAllUnitPositionsBasicDetailsByUser(user.getId());
         List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementRestClient.getWTAByIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
         Map<BigInteger, WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w -> w.getId(), w -> w));
         unitPositionQueryResults.forEach(u -> {
