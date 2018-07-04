@@ -1,6 +1,7 @@
 package com.kairos.controller.open_shift;
 
 import com.kairos.service.open_shift.OpenShiftService;
+import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import io.swagger.annotations.Api;
@@ -68,8 +69,8 @@ public class OpenShiftController {
     @RequestMapping(value = "open_shift/{openShiftId}/staff/{staffId}", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
-    public ResponseEntity<Map<String, Object>> fetchOpenShiftDataByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.fetchOpenShiftDataByStaff(unitId,openShiftId,staffId));
+    public ResponseEntity<Map<String, Object>> fetchOpenShiftDataByStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @PathVariable Long staffId, @RequestParam("role") AccessGroupRole role) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.fetchOpenShiftDataByStaff(unitId,openShiftId,staffId,role));
     }
 
     @ApiOperation(value = "notify staff for open shift")
