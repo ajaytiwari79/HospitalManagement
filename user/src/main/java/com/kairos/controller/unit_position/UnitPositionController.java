@@ -1,9 +1,9 @@
 package com.kairos.controller.unit_position;
 
 
-import com.kairos.activity.wta.country.WTADTO;
-import com.kairos.user.staff.unit_position.UnitPositionDTO;
+import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
+import com.kairos.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,8 +36,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
-    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.createUnitPosition(unitId, type, position, false));
+    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.createUnitPosition(unitId, type, position, false,saveAsDraft));
     }
 
     /*

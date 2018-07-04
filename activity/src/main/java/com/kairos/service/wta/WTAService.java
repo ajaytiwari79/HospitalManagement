@@ -2,10 +2,10 @@ package com.kairos.service.wta;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.activity.wta.basic_details.WTADTO;
+import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.country.WTABasicDetailsDTO;
-import com.kairos.activity.wta.country.WTADTO;
-import com.kairos.activity.wta.country.WTADefaultDataInfoDTO;
-import com.kairos.activity.wta.country.WTAResponseDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;

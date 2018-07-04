@@ -1,8 +1,8 @@
 package com.kairos.rest_client;
 
+import com.kairos.activity.wta.basic_details.WTADTO;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.wta.country.WTADTO;
-import com.kairos.activity.wta.country.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,7 +14,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-
 import java.math.BigInteger;
 import java.util.List;
 

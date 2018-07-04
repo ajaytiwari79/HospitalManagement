@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.country;
+package com.kairos.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.user.country.experties.ExpertiseResponseDTO;
@@ -17,7 +17,7 @@ import java.util.List;
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WTAResponseDTO {
 
-    private List<WTABaseRuleTemplateDTO> ruleTemplates;
+    private List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates;
 
     private BigInteger parentWTA;
 
@@ -145,11 +145,11 @@ public class WTAResponseDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
+    public List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
+    public void setRuleTemplates(List<com.kairos.activity.wta.country.WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
