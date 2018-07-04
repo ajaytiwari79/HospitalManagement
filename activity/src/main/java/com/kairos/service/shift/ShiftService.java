@@ -1148,22 +1148,6 @@ public class ShiftService extends MongoBaseService {
             ShiftQueryResult shiftQueryResult=addSubShift(unitId, shiftDTO1, "Organization");
             shifts.add(shiftQueryResult);
         });
-
-
-//        List<IndividualShiftTemplate> individualShiftTemplates = individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(shiftTemplate.getIndividualShiftTemplateIds());
-//        List<ShiftQueryResult> shifts = new ArrayList<>();
-//        individualShiftTemplates.forEach(individualShiftTemplate1 -> {
-//            List<ShiftDTO> subShifts=null;
-//            if(individualShiftTemplate1.getSubShiftIds().size()>0){
-//                List<IndividualShiftTemplate> individualSubShiftTemplates= individualShiftTemplateRepository.getAllByIdInAndDeletedFalse(individualShiftTemplate1.getSubShiftIds());
-//                subShifts=ObjectMapperUtils.copyProperties(individualSubShiftTemplates,ShiftDTO.class);
-//                subShifts.forEach(shiftDTO1 -> {shiftDTO1.setId(null);});
-//            }
-//            ShiftDTO shiftDTO1 = new ShiftDTO(individualShiftTemplate1.getActivityId(), unitId, shiftDTO.getStaffId(), shiftDTO.getUnitPositionId(), shiftDTO.getStartLocalDate(), shiftDTO.getEndLocalDate(), individualShiftTemplate1.getStartTime(), individualShiftTemplate1.getEndTime());
-//            shiftDTO1.setSubShifts(subShifts);
-//            List<ShiftQueryResult> shiftResponse = createShift(unitId, shiftDTO1, "Organization", false);
-//            shifts.add(shiftResponse.get(0));
-//        });
         return shifts;
     }
 
