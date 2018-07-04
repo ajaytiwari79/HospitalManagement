@@ -55,3 +55,4 @@ public class AssetType extends MongoBaseEntity {
         this.name = name;
     }
 }
+//todo add hasSubAsset boolean and Refactor isSubAsset for query and data model

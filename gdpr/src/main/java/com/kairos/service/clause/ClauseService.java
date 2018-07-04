@@ -74,11 +74,8 @@ public class ClauseService extends MongoBaseService {
         }
         List<ClauseTag> tagList=new ArrayList<>();
         // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
-        Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
-        newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
-        newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
-        newclause.setOrganizationServices(clauseDto.getOrganizationServices());
-        newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
+        Clause newclause = new Clause( clauseDto.getTitle(), clauseDto.getDescription(),countryId,clauseDto.getOrganizationTypes(),clauseDto.getOrganizationSubTypes()
+        ,clauseDto.getOrganizationServices(),clauseDto.getOrganizationSubServices());
         newclause.setOrganizationId(organizationId);
         newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
         //newclause.setOrganizationList(clauseDto.getOrgannizationList());
@@ -91,7 +88,7 @@ public class ClauseService extends MongoBaseService {
             return newclause;
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
-            LOGGER.warn(e.getMessage());
+            LOGGER.debug(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
 
