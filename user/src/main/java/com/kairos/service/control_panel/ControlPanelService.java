@@ -1,6 +1,8 @@
 package com.kairos.service.control_panel;
 import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
+import com.kairos.dto.QueueDTO;
+import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.control_panel.jobDetails.JobDetails;
@@ -11,6 +13,7 @@ import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetail
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.integration.IntegrationService;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +54,8 @@ public class ControlPanelService extends UserBaseService {
     JobDetailsRepository jobDetailsRepository;
     @Inject
     IntegrationService integrationService;
+    @Inject
+    private KafkaProducer kafkaProducer;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ControlPanelService.class);
@@ -290,6 +295,15 @@ public class ControlPanelService extends UserBaseService {
         return controlPanelDTO;
     }
 
+    public void pushToQueue() {
+
+        ControlPanel panel = controlPanelGraphRepository.findOne(1L);
+        QueueDTO job = new QueueDTO();
+        ObjectMapperUtils.copyProperties(panel,job);
+        kafkaProducer.pushToQueue(job);
+
+
+    }
 
 
 }

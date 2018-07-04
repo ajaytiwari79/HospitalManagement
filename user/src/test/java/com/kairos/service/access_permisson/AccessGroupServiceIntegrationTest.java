@@ -2,27 +2,25 @@ package com.kairos.service.access_permisson;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.organization.OrganizationCategoryDTO;
+//import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.enums.OrganizationCategory;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
+//import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
-<<<<<<< HEAD:kairosUser/src/test/java/com/kairos/service/access_permisson/AccessGroupServiceIntegrationTest.java
-import com.kairos.persistence.model.user.access_permission.*;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
-=======
+
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessGroupPermissionDTO;
-import com.kairos.persistence.model.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.AccessPermissionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.user.access_group.CountryAccessGroupDTO;
->>>>>>> KP-3748:user/src/test/java/com/kairos/service/access_permisson/AccessGroupServiceIntegrationTest.java
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.user.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.AccessPermissionDTO;
+import com.kairos.user.organization.OrganizationCategoryDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
