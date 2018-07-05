@@ -23,7 +23,7 @@ public enum CounterType {
     TASKS_COMPLETED_WITHIN_TIME("Tasks completed within time"),
     VALID_BREAK_PERCENT("Breaks within 11 to 13 from Mon-Thu"),
     FLEXI_TIME_PERCENT("Flexi Time Percent"),
-    FLEXI_TIME_TASK_COUNT("Flex Time Task time")
+    FLEXI_TIME_TASK_PERCENT("Flex Time Task time")
     //COMPLETED
 
     ;

@@ -201,9 +201,11 @@ public class CounterDataService {
     //KPI:Flexi Time Time Percent
     public KPI getFlexiTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
         long baseShiftWorkingTime = shifts.stream().mapToLong(baseShift -> Long.sum(baseShift.getEndDate().getTime(), -baseShift.getStartDate().getTime())).sum();
-        long plannedShiftWorkingTime = vrpTaskPlanningDTO.getShifts().stream().mapToLong(plannedShift -> Long.sum(plannedShift.getEndTime(), -plannedShift.getStartTime())).sum();
-        long flexiTime = (plannedShiftWorkingTime - baseShiftWorkingTime);
-        double flexiTimePercent = flexiTime*100.0/baseShiftWorkingTime;
+        Map<BigInteger, Shift> shiftsIdMap = shifts.parallelStream().collect(Collectors.toMap(shift -> shift.getId(), shift-> shift));
+        long flexiWorkingTime = vrpTaskPlanningDTO.getShifts().parallelStream().mapToLong(
+                plannedShift -> ((plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime())>=0)?(plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime()):0)
+                .sum();
+        double flexiTimePercent = flexiWorkingTime*100.0/baseShiftWorkingTime;
         return prepareFlexiTimePercentKPI(flexiTimePercent);
     }
 
@@ -211,6 +213,45 @@ public class CounterDataService {
         BaseChart baseChart = new SingleNumberChart(flexiTimePercent, RepresentationUnit.PERCENT, "Hours");
         KPI kpi = new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, null);
         kpi.setId(new BigInteger("8"));
+        return kpi;
+    }
+
+    //KPI: flexi time tasks
+    public KPI getFlexiTimeTaskPercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts, List<VRPTaskDTO> taskDTOs){
+        Map<Long, List<VRPTaskDTO>> installationNumberTaskMap = taskDTOs.stream().collect(Collectors.groupingBy(task -> task.getInstallationNumber(), Collectors.toList()));
+        Map<BigInteger, Shift> shiftIdMap = shifts.parallelStream().collect(Collectors.toMap(shift->shift.getId(), shift->shift));
+        List<TaskDTO> eligibleTaskGroups = vrpTaskPlanningDTO.getTasks().parallelStream().filter(task -> task.getPlannedEndTime().toInstant(ZoneOffset.UTC).toEpochMilli() > shiftIdMap.get(task.getShiftId()).getEndDate().getTime()).collect(toList());
+        List<Long> taskCounts = new ArrayList<>();
+        eligibleTaskGroups.parallelStream().forEach(taskGroup -> {
+            long shiftEndTime = shiftIdMap.get(taskGroup.getShiftId()).getEndDate().getTime();
+            long taskDurationWithinShift = shiftEndTime - taskGroup.getPlannedStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+            long taskCount = 0;
+            if(taskDurationWithinShift <= 0){
+                taskCount = installationNumberTaskMap.get(taskGroup.getInstallationNumber()).size();
+            }else {
+                List<VRPTaskDTO> tasks = installationNumberTaskMap.get(taskGroup.getInstallationNumber()).stream().sorted(new Comparator<VRPTaskDTO>() {
+                    @Override
+                    public int compare(VRPTaskDTO o1, VRPTaskDTO o2) {
+                        return o2.getDuration() - o1.getDuration();
+                    }
+                }).collect(toList());
+                long availableDuration = taskDurationWithinShift;
+                for(VRPTaskDTO task : tasks){
+                    availableDuration-=task.getDuration();
+                    taskCount = (availableDuration>=0)?taskCount:++taskCount;
+                }
+            }
+            taskCounts.add(taskCount);
+        });
+        long totalFlexiTaskCount = taskCounts.stream().mapToLong(t->t).sum();
+        double totalFlexiTaskCountPercent = totalFlexiTaskCount*100.0/taskDTOs.size();
+        return prepareFlexiTimeTaskPercent(totalFlexiTaskCountPercent);
+    }
+
+    private KPI prepareFlexiTimeTaskPercent(double flexiTimeTaskPercent){
+        BaseChart baseChart = new SingleNumberChart(flexiTimeTaskPercent, RepresentationUnit.PERCENT, "Tasks");
+        KPI kpi = new KPI(CounterType.FLEXI_TIME_TASK_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, null);
+        kpi.setId(new BigInteger("9"));
         return kpi;
     }
 
