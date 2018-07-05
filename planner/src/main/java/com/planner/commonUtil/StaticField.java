@@ -77,7 +77,6 @@ public class StaticField {
     public final static String DRL_SHORTEST_AND_AVERAGE_DAILY_REST = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_SENIOR_DAYS_PER_YEAR = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_CHILD_CARE_DAYS_CHECK = DRL_WTA_BASE_SRC+"java";
-    public final static String DRL_BREAK_IN_SHIFT = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_DAYS_OFF_AFTER_A_SERIES = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_NO_OF_SEQUENCE_SHIFT = DRL_WTA_BASE_SRC+"java";
     public final static String DRL_EMPLOYEES_WITH_INCREASE_RISK = DRL_WTA_BASE_SRC+"java";
