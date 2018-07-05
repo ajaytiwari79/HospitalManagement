@@ -4,8 +4,8 @@ import com.kairos.enums.WTATemplateType;
 import com.kairos.planner.solverconfig.ConstraintValueDTO;
 import com.kairos.planner.solverconfig.SolverConfigDTO;
 import com.kairos.planner.solverconfig.SolverConfigWTADTO;
+import com.kairos.planner.vrp.taskplanning.model.constraint.*;
 import com.planner.commonUtil.StaticField;
-import com.planner.domain.config.Constraint;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
 import com.planner.util.wta.FileIOUtil;
@@ -330,37 +330,34 @@ public class SolverConfigService {
         return true;*//*
     }*/
 
-
-   /* public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
+    public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
         SolverConfig solverConfig = new SolverConfig();
         solverConfig.setTerminationSeconds(solverConfigDTO.getTerminationTime());
         solverConfig.setUnitId(solverConfigDTO.getUnitId());
-        Constraint constraint = new
+        Constraint constraint = new Constraint();
         for (ConstraintValueDTO constraintValue : solverConfigDTO.getConstraints()) {
             switch (constraintValue.getName()){
-                case "Maximize flexitime utilization":
+                case "Maximize flexitime utilization":constraint.setMaximizeFlexitimeUtilization(new MaximizeFlexitimeUtilization(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Minimize driving time":
+                case "Minimize driving time":constraint.setMinimizeDrivingTime(new MinimizeDrivingTime(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Must Be Planned":
+                case "Must Be Planned":constraint.setMustBePlanned(new MustBePlanned(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Number of Task Per shift":
+                case "Number of Task Per shift":constraint.setNumberOfTaskPerShift(new NumberOfTaskPerShift(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Optimize plan based on Skill":
+                case "Optimize plan based on Skill":constraint.setOptimizePlanBasedOnSkill(new OptimizePlanBasedOnSkill(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Plan inside Time Window":
+                case "Plan inside Time Window":constraint.setPlanInsideTimeWindow(new PlanInsideTimeWindow(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Plan task from same installation number together":
+                case "Plan task from same installation number together":constraint.setPlanTaskFromSameInstallationNumber(new PlanTaskFromSameInstallationNumber(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Starts as First task":
+                case "Starts as First task":constraint.setStartsAsFirstTask(new StartsAsFirstTask(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-                case "Task from same installation number":
+                case "Task from same installation number":constraint.setTaskFromSameInstallationNumber(new TaskFromSameInstallationNumber(constraintValue.getPenalityValue(),constraintValue.getConstraintValue()));
                     break;
-
-
             }
         }
         return solverConfig;
-    }*/
+    }
 
 }
