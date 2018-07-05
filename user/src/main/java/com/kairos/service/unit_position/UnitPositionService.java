@@ -336,10 +336,6 @@ public class UnitPositionService extends UserBaseService {
 
         }
 
-        List<UnitPosition> oldUnitPositions
-                = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
-
-        validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(unitPositionId);
         EmploymentQueryResult employmentQueryResult;
         UnitPositionQueryResult unitPositionQueryResult;
@@ -349,6 +345,11 @@ public class UnitPositionService extends UserBaseService {
          *  Old unit position is published so need to create a new unit position
          **/
         if (oldUnitPosition.isPublished() && calculativeValueChanged && !saveAsDraft) {
+            List<UnitPosition> oldUnitPositions
+                    = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
+
+            validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
@@ -363,6 +364,10 @@ public class UnitPositionService extends UserBaseService {
             // update in current copy
             preparePosition(oldUnitPosition, unitPositionDTO, unitPositionEmploymentTypeRelationShip);
             if (!saveAsDraft) {
+                List<UnitPosition> oldUnitPositions
+                        = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
+
+                validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
                 oldUnitPosition.setPublished(true);
             }
             save(oldUnitPosition);

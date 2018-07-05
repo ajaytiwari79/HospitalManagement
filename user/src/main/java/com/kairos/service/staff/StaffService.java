@@ -16,6 +16,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
@@ -36,6 +37,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
@@ -46,6 +48,7 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
@@ -57,6 +60,7 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.UserBaseService;
@@ -70,6 +74,7 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -196,6 +201,10 @@ public class StaffService extends UserBaseService {
     private ExceptionService exceptionService;
     @Inject
     private ChatRestClient chatRestClient;
+    @Inject
+    private SystemLanguageService systemLanguageService;
+    @Inject
+    private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -249,7 +258,7 @@ public class StaffService extends UserBaseService {
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
 
         if (staffToUpdate == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notfound");
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
 
         }
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
@@ -705,6 +714,9 @@ public class StaffService extends UserBaseService {
 
             }
 
+            // TODO get CountryId
+            SystemLanguage defaultSystemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
+
             logger.info("Sheet has rows");
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
@@ -783,6 +795,8 @@ public class StaffService extends UserBaseService {
                         user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
+                            // set User's default language
+                            user.setUserLanguage(defaultSystemLanguage);
                             user.setFirstName(row.getCell(20).toString());
                             user.setLastName(row.getCell(21).toString());
                             Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
@@ -888,14 +902,16 @@ public class StaffService extends UserBaseService {
         return contactDetail;
     }
 
-    public Staff createStaff(Staff staff) {
+    public Staff createStaff(Staff staff, Long unitId) {
 
         if (checkStaffEmailConstraint(staff)) {
 
             logger.info("Creating Staff.......... " + staff.getFirstName() + " " + staff.getLastName());
             logger.info("Creating User for Staff");
+            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
             User user = new User();
             user.setEmail(staff.getEmail());
+            user.setUserLanguage(systemLanguage);
             staff.setUser(userGraphRepository.save(user));
             save(staff);
             return staff;
@@ -994,7 +1010,7 @@ public class StaffService extends UserBaseService {
         staff.setFamilyName(data.getFamilyName());
         //staff.setEmployedSince(data.getEmployedSince().getTime());
         staff.setCurrentStatus(data.getCurrentStatus());
-        staff = createStaff(staff);
+        staff = createStaff(staff, unitId);
         if (staff != null) {
             if (data.getTeamId() != null) {
                 //TODO hardcoded unit id to removes
@@ -1052,13 +1068,6 @@ public class StaffService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
-        User user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
-        Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
-        if (Optional.ofNullable(staff).isPresent()) {
-            exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
-
-        }
-        setBasicDetailsOfUser(user, payload);
         Organization parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
@@ -1067,6 +1076,27 @@ public class StaffService extends UserBaseService {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
 
+        // Check if Staff exists in organization with CPR Number
+        if(staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)){
+            exceptionService.invalidRequestException("error.staff.exists.same.cprNumber",payload.getCprNumber());
+        }
+        User user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
+
+        if(!Optional.ofNullable(user).isPresent()){
+            user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
+        }
+
+        Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
+        if (Optional.ofNullable(staff).isPresent()) {
+            exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
+
+        }
+        setBasicDetailsOfUser(user, payload);
+
+        // Set default language of User
+        Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId );
+        SystemLanguage  systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
+        user.setUserLanguage(systemLanguage);
         staff = createStaffObject(parent, unit, payload);
         Client client = createClientObject(staff, payload.getCprNumber());
         boolean isEmploymentExist = (staff.getId()) != null;
@@ -1084,7 +1114,9 @@ public class StaffService extends UserBaseService {
     public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
+            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organizationId);
             user = new User();
+            user.setUserLanguage(systemLanguage);
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
         }
@@ -1662,7 +1694,7 @@ public class StaffService extends UserBaseService {
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staffId);
-        staffAdditionalInfoQueryResult.setUserAccessRoleDTO(userAccessRoleDTO);
+        staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         return staffAdditionalInfoDTO;
 
     }
@@ -1771,11 +1803,13 @@ public class StaffService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.taskgiver.accesgroup.notPresent");
 
         }
+        SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
 
         for (TimeCareStaffDTO timeCareStaffDTO : timeCareStaffByWorkPlace) {
 
             String email = (timeCareStaffDTO.getEmail() == null) ? timeCareStaffDTO.getFirstName() + KAIROS_EMAIL : timeCareStaffDTO.getEmail();
             User user = Optional.ofNullable(userGraphRepository.findByEmail(email.trim())).orElse(new User());
+            user.setUserLanguage(systemLanguage);
             if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
                 exceptionService.duplicateDataException("message.staff.alreadyexist");
 
@@ -2073,7 +2107,7 @@ public class StaffService extends UserBaseService {
         auth.put("type", "m.login.dummy");
         auth.put("session", staff.getEmail());
         StaffChatDetails staffChatDetails = new StaffChatDetails(auth, staff.getEmail(), staff.getFirstName() + "@kairos");
-        StaffChatDetails chatDetails = chatRestClient.registerUser();
+        StaffChatDetails chatDetails = chatRestClient.registerUser(staffChatDetails);
         staff.setAccess_token(chatDetails.getAccess_token());
         staff.setUser_id(chatDetails.getUser_id());
     }
@@ -2081,6 +2115,11 @@ public class StaffService extends UserBaseService {
     public List<StaffDTO> getStaffByUnit(Long unitId){
         List<Staff> staffs = staffGraphRepository.getAllStaffByUnitId(unitId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs,StaffDTO.class);
+    }
+
+    public List<StaffResultDTO> getStaffIdsByUserId(Long UserId){
+        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserId(UserId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers,StaffResultDTO.class);
     }
 
 }

@@ -77,12 +77,13 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
                 return;
             }
             Task tempTask=task.getShift().getNextTask();
-            LocalDateTime plannedDateTime =((Shift)tempTask.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
+            //LocalDateTime plannedDateTime =((Shift)tempTask.getPrevTaskOrShift()).getLocalDate().atTime(Shift.getDefaultShiftStart());
+            LocalDateTime plannedDateTime =((Shift)tempTask.getPrevTaskOrShift()).getStartTime();
             updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
             tempTask=tempTask.getNextTask();
             while (tempTask!=null){
-                double duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
-                plannedDateTime=plannedDateTime.plusMinutes((long)duration);
+                int duration=tempTask.getPlannedDuration()+tempTask.getDrivingTime();
+                plannedDateTime=plannedDateTime.plusMinutes(duration);
                 updatePlannedTime(tempTask,plannedDateTime,scoreDirector);
                 tempTask=tempTask.getNextTask();
             }

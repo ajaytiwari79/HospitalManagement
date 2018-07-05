@@ -106,9 +106,8 @@ public class NightWorkerService extends MongoBaseService {
 
         StaffQuestionnaire staffQuestionnaire = staffQuestionnaireMongoRepository.findByIdAndDeleted(questionnaireId);
 
-        // Predicate to check if any question is unanswered ( null)
-        Predicate<QuestionAnswerDTO> predicate = s -> !Optional.ofNullable(s.getAnswer()).isPresent();
-        if(!staffQuestionnaire.isSubmitted() && ! (answerResponseDTO.getQuestionAnswerPair().stream().anyMatch(predicate)) ){
+        // check if any question is unanswered ( null)
+        if(!staffQuestionnaire.isSubmitted() && ! (answerResponseDTO.getQuestionAnswerPair().stream().anyMatch(questionAnswerPair-> !Optional.ofNullable(questionAnswerPair.getAnswer()).isPresent())) ){
             staffQuestionnaire.setSubmitted(true);
             staffQuestionnaire.setSubmittedOn(DateUtils.getLocalDateFromDate(DateUtils.getDate()));
             answerResponseDTO.setSubmitted(true);

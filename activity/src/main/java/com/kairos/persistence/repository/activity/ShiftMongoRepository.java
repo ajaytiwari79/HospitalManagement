@@ -43,6 +43,12 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<ShiftQueryResult> findAllShiftsByActivityIdAndBetweenDuration(Long staffId,BigInteger activityId,Date startDate, Date endDate);
 
     @Query("{deleted:false,staffId:{$in:?0}, isMainShift:true,startDate:{$gte:?1,$lte:?2}}")
-    List<com.kairos.vrp.vrpPlanning.ShiftDTO> findAllShiftsByStaffIds(List<Long> staffIds, Date startDate, Date endDate);
+    List<Shift> findAllShiftsByStaffIds(List<Long> staffIds,Date startDate,Date endDate);
+
+    @Query("{deleted:false, _id:{'$in':?0}}")
+    List<Shift> findAllByIds(List<String> shiftIds);
+
+    @Query("{'deleted':false,'staffId':{'$in':?0},'startDate':{$lte:?1},'endDate':{'$gte':?1}}")
+    ShiftQueryResult findShiftByStaffIdsAndDate(List<Long> staffids,Date date);
 
 }

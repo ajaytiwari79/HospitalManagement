@@ -25,11 +25,15 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shiftWithActivityDTO) {
+        if(Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()){
+            return true;
+        }
         List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
         PhaseTemplateValue phaseTemplateValue1 = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
                 phaseTemplateValue1 = phaseTemplateValue;
+                break;
             }
         }
         if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
@@ -42,18 +46,21 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shiftWithActivityDTO) {
-        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
-        PhaseTemplateValue phaseTemplateValue1 = null;
-        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
-                phaseTemplateValue1 = phaseTemplateValue;
+        if (Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+            List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
+            PhaseTemplateValue phaseTemplateValue1 = null;
+            for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+                if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
+                    phaseTemplateValue1 = phaseTemplateValue;
+                    break;
+                }
             }
-        }
-        if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-            if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
-                return Collections.singletonList("message.staff.employmentType.absent");
+            if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
+                if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
+                    return Collections.singletonList("message.staff.employmentType.absent");
+                }
             }
-        }
+            }
         return Collections.emptyList();
     }
 }

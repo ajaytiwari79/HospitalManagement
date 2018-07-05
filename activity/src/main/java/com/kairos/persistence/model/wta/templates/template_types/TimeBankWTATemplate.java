@@ -55,7 +55,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, getId());
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
             if (!isValid) {
                 if (limitAndCounter[1] != null) {

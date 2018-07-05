@@ -5,68 +5,13 @@ import com.kairos.planner.vrp.taskplanning.*;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 
 global HardMediumSoftLongScoreHolder scoreHolder;
-/********Task Rules*******/
-rule "Task eligibility"
-salience 20
-    when
-        $task:Task(prevTaskOrShift!=null, $m:missingSkills , $m!=0);
-    then
-        if($m>0)
-            scoreHolder.addHardConstraintMatch(kcontext,-$m);
-        else
-            scoreHolder.addSoftConstraintMatch(kcontext,$m);
-
-end
 
 
-rule "Unassigned Task"
-salience 20
-    when
-        $task:Task(shift==null);
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext,-1);
-end
-
-rule "Shift out of boundary half day"
-salience 21
-
-    when
-        Shift(isHalfWorkDay() && $minutes:totalPlannedMinutes)
-        $ot: Integer(intValue>0) from ($minutes-330)
-    then
-        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
-end
-
-rule "Shift out of boundary full day"
+//breaks rules
+rule "Full day shifts must have breaks"
 salience 22
     when
-        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes)
-        $ot: Integer(intValue>0) from ($minutes-510)
+        Shift(isFullWorkDay()  && $brks:numberOfBreaks, $brks!=1)
     then
-        scoreHolder.addHardConstraintMatch(kcontext,-$ot);
-end
-
-rule "Driving Time"
-salience 22
-    when
-        Task(prevTaskOrShift!=null ,$minutes:drivingTimeSeconds, $minutes>0)
-    then
-        scoreHolder.addSoftConstraintMatch(kcontext,-$minutes);
-end
-rule "Consecutive tasks"
-salience 22
-    when
-        $t1:Task(prevTaskOrShift!=null)
-        $t2:Task(prevTaskOrShift!=null && hasSameChain($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
-    then
-        scoreHolder.addMediumConstraintMatch(kcontext,-1);
-end
-
-rule "Consecutive tasks if same skillSet"
-salience 22
-    when
-        $t1:Task(prevTaskOrShift!=null)
-        $t2:Task(prevTaskOrShift!=null && !id.equals($t1.id) && hasSameSkillset($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
-    then
-        scoreHolder.addMediumConstraintMatch(kcontext,-1);
+        scoreHolder.addHardConstraintMatch(kcontext,$brks==0?-1:-$brks);
 end

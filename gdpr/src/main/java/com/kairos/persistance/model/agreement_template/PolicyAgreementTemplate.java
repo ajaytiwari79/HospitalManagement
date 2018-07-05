@@ -1,8 +1,10 @@
 package com.kairos.persistance.model.agreement_template;
 
 
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
-
+import com.kairos.dto.OrganizationSubTypeDTO;
+import com.kairos.dto.OrganizationTypeDTO;
+import com.kairos.dto.ServiceCategoryDTO;
+import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,6 +20,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "Name cannot be empty")
     private String name;
 
+    @NotNullOrEmpty(message = "template id cannot be empty")
+    private String templateId;
+
     @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
@@ -30,11 +35,11 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private Long countryId;
 
 
-    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypes;
 
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
-    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
+    private List<ServiceCategoryDTO> organizationServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
 
     public String getName() {
@@ -62,13 +67,6 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public Set<BigInteger> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
 
     public Set<BigInteger> getAgreementSections() {
         return agreementSections;
@@ -78,48 +76,64 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.agreementSections = agreementSections;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
+
+
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
+
+
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public PolicyAgreementTemplate(Long countryId,String name, String description) {
-        this.name = name;
-        this.countryId = countryId;
-        this.description = description;
+    public Set<BigInteger> getAccountTypes() {
+        return accountTypes;
+    }
 
+    public void setAccountTypes(Set<BigInteger> accountTypes) {
+        this.accountTypes = accountTypes;
+    }
+
+
+    public PolicyAgreementTemplate( Long countryId,String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.countryId = countryId;
     }
 
     public PolicyAgreementTemplate() {
-
     }
-
-
 }

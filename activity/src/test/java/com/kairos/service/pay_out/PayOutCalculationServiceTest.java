@@ -1,13 +1,13 @@
 package com.kairos.service.pay_out;
 
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.activity.dto.ShiftWithActivityDTO;
-import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.util.DateUtils;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
@@ -53,6 +53,8 @@ public class PayOutCalculationServiceTest {
     public void getMockShifts(){
         activity = new Activity(new BalanceSettingsActivityTab(new BigInteger("123")));
         activity.setId(new BigInteger("125"));
+        activity.setName("Activity1");
+        activity.setParentId(new BigInteger("12"));
         DateTime startDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("22/02/2018 00:00:00");
         DateTime endDate = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").parseDateTime("23/02/2018 00:00:00");
         interval = new Interval(startDate,endDate);
@@ -66,7 +68,7 @@ public class PayOutCalculationServiceTest {
 
     @Test
     public void calculatePayOut(){
-        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId())));
+        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
         DailyPayOutEntry dailyPayOutEntry = new DailyPayOutEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         payOutCalculationService.calculateDailyPayOut(interval, unitPositionWithCtaDetailsDTO,shifts, dailyPayOutEntry);

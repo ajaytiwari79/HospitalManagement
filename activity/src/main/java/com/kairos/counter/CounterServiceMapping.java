@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Component
 public class CounterServiceMapping {
-    @Inject
+    //@Inject
     private final static Logger logger = LoggerFactory.getLogger(CounterServiceMapping.class);
     private Map counters = null;
     private CounterServiceMapping(){

@@ -1,6 +1,6 @@
 package com.kairos.planner.config.mongo;
 
-import com.kairos.config.mongo_converter.*;
+import com.kairos.activity.config.mongo_converter.*;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;

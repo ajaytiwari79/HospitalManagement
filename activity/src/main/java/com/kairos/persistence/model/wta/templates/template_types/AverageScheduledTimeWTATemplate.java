@@ -132,7 +132,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getIntervals(interval);
-            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,getId());
+            Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
             for (DateTimeInterval dateTimeInterval : intervals) {
                 int totalMin = 0;
                 for (ShiftWithActivityDTO shift : shifts) {

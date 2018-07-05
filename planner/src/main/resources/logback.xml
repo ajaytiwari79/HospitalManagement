@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[TaskPlanner] %d %p [%t] %class{0}.%M\(%L\) | %m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="R" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+        <File>/opt/kairos/micro-service-logs/planner-service/kairos-planner.log</File>
+        <encoder>
+            <pattern>%cyan([Planner]) %d %magenta(%p) [%t] %highlight(%class{0}.%M\(%L\)) | %m%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>1</maxIndex>
+            <FileNamePattern>/opt/kairos/micro-service-logs/planner-service/kairos-planner.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10000KB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    <logger name="com" level="INFO"/>
+    <logger name="com.kairos.planner.vrp.taskplanning" level="DEBUG"/>
+    <logger name="org.optaplanner" level="DEBUG"/>
+    <root level="debug">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="R"/>
+    </root>
+</configuration>

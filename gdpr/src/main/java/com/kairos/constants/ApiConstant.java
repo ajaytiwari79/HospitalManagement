@@ -14,8 +14,8 @@ public final class ApiConstant {
 
     //master asset data
     public static final String API_MASTER_ASSET_URL = API_V1+ PARENT_ORGABNIZATION+COUNTRY_URL+ "/master_asset";
+    public static final String API_ASSET_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/asset_type";
     public static final String API_STORAGE_FORMAT_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/storage_format";
-    public static final String API_STORAGE_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/storage_type";
     public static final String API_HOSTING_PROVIDER_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/hosting_provider";
     public static final String API_HOSTING_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/hosting_type";
     public static final String API_ORG_SEC_MEASURE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/organization_security";
@@ -55,7 +55,6 @@ public final class ApiConstant {
 
 
     public static final String API_PROCESSING_ACTIVITY = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/processing_activity";
-    public static final String API_ASSET_TYPE_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/asset_type";
     public static final String API_HOSTING_LOCATION_URL = API_V1 + PARENT_ORGABNIZATION+COUNTRY_URL+ "/hosting_location";
 
 

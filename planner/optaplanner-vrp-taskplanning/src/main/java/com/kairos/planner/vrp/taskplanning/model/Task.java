@@ -24,6 +24,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil.getPreviousValidTask;
+
 /**
  * @author pradeep
  * @date - 7/6/18
@@ -56,6 +58,7 @@ public class Task extends TaskOrShift{
     @AnchorShadowVariable(sourceVariableName = "prevTaskOrShift")
     private Shift shift;
     private LocationsDistanceMatrix locationsDistanceMatrix;
+    private LocationsRouteMatrix locationsRouteMatrix;
     private boolean shiftBreak;
     public Task(String id, long installationNo, Double latitude, Double longitude, Set<String> skills, int duration, String streetName, int houseNo, String block, int floorNo, int post, String city,boolean shiftBreak) {
         this.id = id;
@@ -165,7 +168,7 @@ public class Task extends TaskOrShift{
         this.skills = skills;
     }
 
-
+    
 
     public long getInstallationNo() {
         return installationNo;
@@ -212,8 +215,8 @@ public class Task extends TaskOrShift{
         this.locationsDistanceMatrix = locationsDistanceMatrix;
     }
 
-    public double getPlannedDuration(){
-        return shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
+    public int getPlannedDuration(){
+        return (int)Math.ceil(shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d));
     }
     //for rules only
     public int getDrivingTimeSeconds(){
@@ -221,18 +224,26 @@ public class Task extends TaskOrShift{
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
         }
         if(prevTaskOrShift instanceof Shift || shiftBreak) return 0;
-        Task prevTask=getPreviousValidTask((Task)prevTaskOrShift);
+        Task prevTask=getPreviousValidTask();
         if(prevTask==null) return 0;
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
         return lpd.getTime();
     }
 
-    private Task getPreviousValidTask(Task task) {
-            while(task.isShiftBreak() && task.getPrevTaskOrShift() instanceof Task){
-                task= (Task) task.getPrevTaskOrShift();
-            }
+    /**
+     * call it using previous task
+     * @param task
+     * @return
+     */
+    public Task getPreviousValidTask() {
+            return VrpPlanningUtil.getPreviousValidTask(this);
+    }
 
-            return task.isShiftBreak() ?null : task;
+    public Task getPreviousTask() {
+        if(this.getPrevTaskOrShift() instanceof Task){
+            return (Task) this.getPrevTaskOrShift();
+        }
+        return null;
     }
 
     public int getDrivingTime(){
@@ -330,4 +341,41 @@ public class Task extends TaskOrShift{
         return this.houseNo %2 ==task.getHouseNo()%2;
     }
 
+    public LocationsRouteMatrix getLocationsRouteMatrix() {
+        return locationsRouteMatrix;
+    }
+
+    public void setLocationsRouteMatrix(LocationsRouteMatrix locationsRouteMatrix) {
+        this.locationsRouteMatrix = locationsRouteMatrix;
+    }
+    public boolean isOnOneWayStreet(){
+        /*if("5b18f9b4016fe33f761ebd92".equals(id)){
+            log.info("itssz");
+        }
+        if(installationNo==1002074l){
+            log.info("itssz");
+        }
+        if(latitude==56.46226953d){
+            log.info("itsz");
+        }*/
+        return streetName.equals("Adelgade")&&city.equals("Hobro");
+    }
+    public boolean isTaskLocationOnRightSide(Task prevTask){
+        /*assert !prevTask.isShiftBreak();
+
+        if("5b18f9b4016fe33f761ebd92".equals(id)){
+            log.info("itssz");
+        }
+        if(installationNo==1002074l){
+            log.info("itssz");
+        }
+        if(latitude==56.46226953d){
+            log.info("itsz");
+        }*/
+        LocationPair locationPair = new LocationPair(prevTask.getLatitude(), prevTask.getLongitude(), this.getLatitude(), this.getLongitude());
+        /*if(locationPair.equals(new LocationPair(56.46219053d,10.03474252d,56.46226953d,10.03495581d))){
+            log.info("its"+locationsRouteMatrix.checkIfRightSideArrival(locationPair));
+        }*/
+        return locationsRouteMatrix.checkIfRightSideArrival(locationPair);
+    }
 }

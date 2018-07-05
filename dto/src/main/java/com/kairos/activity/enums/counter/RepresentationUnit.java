@@ -6,5 +6,5 @@ package com.kairos.activity.enums.counter;
  */
 
 public enum RepresentationUnit {
-    NUMBER, STRING, DECIMAL
+    NUMBER, STRING, DECIMAL, PERCENT
 }

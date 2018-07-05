@@ -1,10 +1,11 @@
 package com.kairos.service.counter;
+
 import com.kairos.KairosActivityApplication;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.ModuleCounter;
 import com.kairos.persistence.model.counter.UnitRoleCounter;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
@@ -62,9 +63,8 @@ public class CounterManagementTest extends MongoBaseService {
         BigInteger unitRoleCounterId2 = BigInteger.valueOf(13);
 
 
-        Counter ctr = new Counter();
+        Counter ctr = new Counter(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
         ctr.setId(counterId);
-        ctr.setType(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
         ctr = save(ctr);
 
         ModuleCounter moduleCounter = new ModuleCounter(counterId, moduleId, ctr.getId());

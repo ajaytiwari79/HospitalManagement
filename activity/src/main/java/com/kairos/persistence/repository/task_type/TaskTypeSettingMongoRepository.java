@@ -14,7 +14,7 @@ import java.util.List;
  * @date - 11/6/18
  */
 @Repository
-public interface TaskTypeSettingMongoRepository extends MongoBaseRepository<TaskTypeSetting,BigInteger>{
+public interface TaskTypeSettingMongoRepository extends MongoBaseRepository<TaskTypeSetting,BigInteger>,CustomTaskTypeSettingMongoRepository{
 
     @Query("{'deleted':false,'staffId':?0,taskTypeId:?1}")
     TaskTypeSetting findByStaffIdAndTaskType(Long staffId, BigInteger taskTypeId);
@@ -26,8 +26,6 @@ public interface TaskTypeSettingMongoRepository extends MongoBaseRepository<Task
     @Query("{deleted:false,staffId:?0}")
     List<TaskTypeSettingDTO> findByStaffId(Long staffId);
 
-    @Query("{deleted:false,staffId:{$in:?0}}")
-    List<TaskTypeSettingDTO> findByStaffIds(List<Long> staffIds);
 
     @Query("{'deleted':false,'clientId':?0}")
     List<TaskTypeSettingDTO> findByClientId(Long clientId);

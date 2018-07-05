@@ -13,7 +13,6 @@ import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 
 @RestController
@@ -27,7 +26,7 @@ public class CostTimeAgreementRuleTemplateController {
      * @param countryId
      * @return
      */
-    @RequestMapping(value = "/country/{countryId}/cta_response/rule-templates", method = RequestMethod.GET)
+    @RequestMapping(value = "/country/{countryId}/cta/rule-templates", method = RequestMethod.GET)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> getAllCTARuleTemplate(@PathVariable Long countryId ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId));
@@ -35,7 +34,7 @@ public class CostTimeAgreementRuleTemplateController {
 
     //
     //TODO
-   /* @RequestMapping(value = "/country/{countryId}/cta_response/rule-templates", method = RequestMethod.POST)
+   /* @RequestMapping(value = "/country/{countryId}/cta/rule-templates", method = RequestMethod.POST)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable Long countryId ) {
         costTimeAgreementService.createDefaultCtaRuleTemplate(countryId);
@@ -47,14 +46,14 @@ public class CostTimeAgreementRuleTemplateController {
      * @param countryId
      * @return
      */
-    @RequestMapping(value = "/country/{countryId}/cta_response/rule-template/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/country/{countryId}/cta/rule-template/{id}", method = RequestMethod.PUT)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
             ,@RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO,@PathVariable Long id ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCTARuleTemplate(countryId,id,ctaRuleTemplateDTO));
     }
 
-    @RequestMapping(value = "/unit/{unitId}/cta_response/rule-templates", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/cta/rule-templates", method = RequestMethod.GET)
     @ApiOperation("get CTA rule template of Unit")
     public ResponseEntity<Map<String, Object>> getAllCTARuleTemplateForUnit(@PathVariable Long unitId ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByUnit(unitId));

@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 match(u:UnitPosition) set u.published=true;
+=======
+// TO set Country admin's Role as MANAGEMENT
+Match (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN" set ag.role="MANAGEMENT";
+>>>>>>> 21eac08805af36f448ef7ec6b884e49f9c8468eb

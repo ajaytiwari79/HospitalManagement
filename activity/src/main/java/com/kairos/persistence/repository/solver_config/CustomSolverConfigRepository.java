@@ -11,7 +11,6 @@ import java.util.List;
  */
 
 public interface CustomSolverConfigRepository {
-
     SolverConfigDTO getOneById(BigInteger solverConfigId);
 
     Boolean existsSolverConfigByNameAndUnitId(Long unitId, String name);

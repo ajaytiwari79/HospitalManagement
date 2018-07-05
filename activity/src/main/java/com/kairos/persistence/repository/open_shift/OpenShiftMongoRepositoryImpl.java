@@ -38,7 +38,7 @@ public class OpenShiftMongoRepositoryImpl implements CustomOpenShiftMongoReposit
                 match(Criteria.where("_id").is(openShiftId).and("unitId").is(unitId).and("deleted").is(false)),
                         lookup("activities","activityId","_id","activity"),
                 lookup("order","orderId","_id","order"),
-                project().and("order.expertiseId").as("expertiseId").and("activity").as("activity"));
+                project().and("order.expertiseId").arrayElementAt(0).as("expertiseId").and("activity").arrayElementAt(0).as("activity"));
         AggregationResults<OpenShiftActivityWrapper> result=mongoTemplate.aggregate(aggregation,OpenShift.class,OpenShiftActivityWrapper.class);
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
 

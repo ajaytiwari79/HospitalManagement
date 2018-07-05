@@ -2,21 +2,20 @@ package com.kairos.cta;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-
-import com.kairos.persistence.model.enums.FixedValueType;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.enums.FixedValueType;
 import com.kairos.persistence.model.agreement.cta.*;
+import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateCategoryWrapper;
+import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.Currency;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
-import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateCategoryWrapper;
-import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
-import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
+import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
@@ -24,6 +23,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
+import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -190,7 +190,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta_response",
+                baseUrl + "/cta",
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
@@ -235,7 +235,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta_response/" + createdCtaId,
+                baseUrl + "/cta/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId = response.getBody().getData().getId();
@@ -283,7 +283,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta_response/" + createdCtaId,
+                baseUrl + "/cta/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId = response.getBody().getData().getId();
@@ -339,7 +339,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionQueryResult>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<UnitPositionQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta_response/" + ctaLinkedWithUnitPosition.getId(),
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta/" + ctaLinkedWithUnitPosition.getId(),
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -353,7 +353,7 @@ public class CostTimeAgreementServiceTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<CTAListQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta_response",
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta",
                 HttpMethod.GET, null, resTypeReference);
 
         logger.info("STATUS CODE ---------------------> {}", response.getStatusCode());

@@ -16,6 +16,7 @@ import java.util.List;
 public class ShiftDTO {
 
     private String id;
+    private String name;
     private Long staffId;
     private EmployeeDTO employee;
     private LocalDate localDate;
@@ -24,13 +25,27 @@ public class ShiftDTO {
     private List<TaskDTO> tasks;
     private String color;
 
-    public ShiftDTO(String id, EmployeeDTO employee, LocalDate localDate, Date startTime, Date endTime) {
+
+    public ShiftDTO(String id,String name, EmployeeDTO employee, LocalDate localDate, Date startTime, Date endTime) {
         this.id = id;
         this.employee = employee;
         this.localDate = localDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.name = name;
     }
+
+
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     public String getColor() {
         return color;
