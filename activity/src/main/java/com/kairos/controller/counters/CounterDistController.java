@@ -1,5 +1,6 @@
 package com.kairos.controller.counters;
 
+import com.kairos.activity.counter.CategoryKPIsDTO;
 import com.kairos.activity.counter.CounterDistDTO;
 import com.kairos.activity.counter.ModuleCounterGroupingDTO;
 import com.kairos.activity.counter.RoleCounterDTO;
@@ -12,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -90,5 +88,16 @@ public class CounterDistController {
 
     public ResponseEntity<Map<String, Object>> getInitialCounterSettingsForIndividual(){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionData(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData());
+    }
+
+    @PostMapping("/category")
+    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistribution(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
+        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }

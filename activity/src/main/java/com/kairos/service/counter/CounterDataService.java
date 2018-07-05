@@ -81,7 +81,7 @@ public class CounterDataService {
         BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Task", new ArrayList());
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("Planned", String.valueOf(totalTasks-tasksUnplanned)));
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("UnPlanned", String.valueOf(tasksUnplanned)));
-        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, null);
+        KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, false, null);
         kpi.setId(new BigInteger("1"));
         return kpi;
     }
@@ -97,7 +97,7 @@ public class CounterDataService {
         BaseChart baseChart = new PieChart(RepresentationUnit.DECIMAL, "Hours", new ArrayList());
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("Planned Task", String.valueOf(plannedMinutes/60.0)));
         ((PieChart) baseChart).getDataList().add(new PieDataUnit("UnPlanned Task", String.valueOf(unplannedMinutes/60.0)));
-        KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, null);
+        KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, false, null);
         kpi.setId(new BigInteger("2"));
         return kpi;
     }
@@ -121,7 +121,7 @@ public class CounterDataService {
         staffTaskData.forEach((staffName, taskCount) -> {
             ((PieChart) baseChart).getDataList().add(new PieDataUnit(String.valueOf(staffName), String.valueOf(taskCount)));
         });
-        KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), ChartType.PIE, baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, null);
+        KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, false, null);
         kpi.setId(new BigInteger("3"));
         return kpi;
     }
@@ -136,7 +136,7 @@ public class CounterDataService {
 
     private KPI prepareTaskTimeVsWorkingTime(double workingTime, double totalTaskTime){
         BaseChart baseChart = new SingleNumberChart(totalTaskTime*100/workingTime, RepresentationUnit.PERCENT, "Hours");
-        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_TASK_TIME_PERCENT, null);
+        KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_TASK_TIME_PERCENT, false, null);
         kpi.setId(new BigInteger("4"));
         return kpi;
     }
@@ -151,7 +151,7 @@ public class CounterDataService {
 
     private KPI prepareRoadTimePercentKPI(double roadTimePercent){
         BaseChart baseChart = new SingleNumberChart(roadTimePercent, RepresentationUnit.PERCENT, "Hours");
-        KPI kpi = new KPI(CounterType.ROAD_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.ROAD_TIME_PERCENT, null);
+        KPI kpi = new KPI(CounterType.ROAD_TIME_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.ROAD_TIME_PERCENT, false, null);
         kpi.setId(new BigInteger("5"));
         return kpi;
     }
@@ -173,7 +173,7 @@ public class CounterDataService {
 
     private KPI prepareCompletedTaskWithinTimeWindow(long completedTasksCount){
         BaseChart baseChart = new SingleNumberChart(completedTasksCount, RepresentationUnit.NUMBER, "Tasks");
-        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHIN_TIME.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_COMPLETED_WITHIN_TIME, null);
+        KPI kpi = new KPI(CounterType.TASKS_COMPLETED_WITHIN_TIME.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_COMPLETED_WITHIN_TIME, false, null);
         kpi.setId(new BigInteger("6"));
         return kpi;
     }
@@ -190,7 +190,7 @@ public class CounterDataService {
 
     private KPI preparePercentOfBreaksIn11and13KPI(double validBreakPercentage){
         BaseChart baseChart = new SingleNumberChart(validBreakPercentage, RepresentationUnit.PERCENT, "Breaks");
-        KPI kpi = new KPI(CounterType.VALID_BREAK_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.VALID_BREAK_PERCENT, null);
+        KPI kpi = new KPI(CounterType.VALID_BREAK_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.VALID_BREAK_PERCENT, false, null);
         kpi.setId(new BigInteger("7"));
         return kpi;
     }
@@ -204,7 +204,7 @@ public class CounterDataService {
 
     private KPI prepareFlexiTimePercentKPI(double flexiTimePercent){
         BaseChart baseChart = new SingleNumberChart(flexiTimePercent, RepresentationUnit.PERCENT, "Breaks");
-        KPI kpi = new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, null);
+        KPI kpi = new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, false, null);
         kpi.setId(new BigInteger("8"));
         return kpi;
     }
