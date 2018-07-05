@@ -16,6 +16,7 @@ import java.util.List;
 public class ShiftDTO {
 
     private String id;
+    private String kairosShiftId;
     private String name;
     private Long staffId;
     private EmployeeDTO employee;
@@ -36,7 +37,13 @@ public class ShiftDTO {
     }
 
 
+    public String getKairosShiftId() {
+        return kairosShiftId;
+    }
 
+    public void setKairosShiftId(String kairosShiftId) {
+        this.kairosShiftId = kairosShiftId;
+    }
 
     public String getName() {
         return name;

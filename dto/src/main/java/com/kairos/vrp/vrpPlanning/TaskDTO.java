@@ -24,10 +24,12 @@ public class TaskDTO {
     private Set<String> skills;
     private int duration;
     private String streetName;
+    private int drivingDistance;
     private int houseNo;
     private String block;
     private int floorNo;
     private int post;
+    private String citizenName;
     private String city;
     private LocalDateTime plannedStartTime;
     private LocalDateTime plannedEndTime;
@@ -37,6 +39,7 @@ public class TaskDTO {
     private String color;
     private boolean breakTime;
     private int drivingTime;
+    private boolean escalated;
 
 
     public TaskDTO() {
@@ -55,6 +58,46 @@ public class TaskDTO {
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+
+    public boolean isEscalated() {
+        return escalated;
+    }
+
+    public void setEscalated(boolean escalated) {
+        this.escalated = escalated;
+    }
+
+    public int getDrivingTime() {
+        return drivingTime;
+    }
+
+    public void setDrivingTime(int drivingTime) {
+        this.drivingTime = drivingTime;
+    }
+
+    public String getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(String shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public String getCitizenName() {
+        return citizenName;
+    }
+
+    public void setCitizenName(String citizenName) {
+        this.citizenName = citizenName;
+    }
+    public int getDrivingDistance() {
+        return drivingDistance;
+    }
+
+    public void setDrivingDistance(int drivingDistance) {
+        this.drivingDistance = drivingDistance;
     }
 
     public boolean isBreakTime() {
@@ -217,19 +260,5 @@ public class TaskDTO {
         this.plannedStartTime = plannedStartTime;
     }
 
-    public String getShiftId() {
-        return shiftId;
-    }
 
-    public void setShiftId(String shiftId) {
-        this.shiftId = shiftId;
-    }
-
-    public int getDrivingTime() {
-        return drivingTime;
-    }
-
-    public void setDrivingTime(int drivingTime) {
-        this.drivingTime = drivingTime;
-    }
 }
