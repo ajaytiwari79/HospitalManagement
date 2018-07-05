@@ -44,7 +44,7 @@ public class ShiftQueryResult {
     private ShiftState shiftState;
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
-
+    private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
     public ShiftQueryResult() {
         //DC
     }
@@ -281,6 +281,14 @@ public class ShiftQueryResult {
 
     public void setExpertiseId(Long expertiseId) {
         this.expertiseId = expertiseId;
+    }
+
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 }
 
