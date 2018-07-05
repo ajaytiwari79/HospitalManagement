@@ -1694,7 +1694,7 @@ public class StaffService extends UserBaseService {
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staffId);
-        staffAdditionalInfoQueryResult.setUserAccessRoleDTO(userAccessRoleDTO);
+        staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         return staffAdditionalInfoDTO;
 
     }
