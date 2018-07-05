@@ -456,9 +456,10 @@ public class WTAService extends MongoBaseService {
 
 
     public List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
-        List<WTAVersionDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(wtaIds);
+        List<WTAQueryResultDTO> currentWTA = wtaRepository.getAllWTAByIds(wtaIds);
+        List<WTAVersionDTO> versionsOfWTA = wtaRepository.getWTAWithVersionIds(wtaIds);
 
-        return wtaQueryResultDTOS;
+        return versionsOfWTA;
     }
 
 

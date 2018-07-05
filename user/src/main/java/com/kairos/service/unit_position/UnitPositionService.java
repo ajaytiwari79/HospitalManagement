@@ -360,6 +360,11 @@ public class UnitPositionService extends UserBaseService {
             oldUnitPosition.setEndDateMillis(DateUtils.getLongFromLocalDate(unitPositionDTO.getEndLocalDate()));
             save(oldUnitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
+        } else if (oldUnitPosition.isPublished() && !calculativeValueChanged && saveAsDraft) {
+            //CREAte new UP
+            UnitPosition unitPosition = new UnitPosition();
+            createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
+            unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
             // update in current copy
             preparePosition(oldUnitPosition, unitPositionDTO, unitPositionEmploymentTypeRelationShip);
