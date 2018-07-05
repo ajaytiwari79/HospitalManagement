@@ -51,13 +51,14 @@ public class VRPPlannerService {
         runningSolversPerProblem.remove(solution.getSolverConfigId().toString());
         solution = (VrpTaskPlanningSolution)solutionAndIndictment[0];
         Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task,Indictment>)solutionAndIndictment[1]);
-        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],(List<com.planner.domain.task.Task>) solvedTasks[3]);
+        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
         vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
         plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
     }
 
     //TODO make this run on problemId(submissionId) rather than solverConfigId
+    @Async
     public boolean terminateEarlyVrpPlanningSolver(String problemId){
         try{
             VrpTaskPlanningSolver solver;
@@ -105,7 +106,6 @@ public class VRPPlannerService {
     private Object[] getSolvedTasks(List<Shift> shifts, Map<Task, Indictment> indictmentMap) {
         List<com.planner.domain.task.Task> tasks = new ArrayList<>();
         List<com.planner.domain.task.Task> drivedTaskList = new ArrayList<>();
-        List<com.planner.domain.task.Task> excalatedTaskList = new ArrayList<>();
         List<PlanningShift> planningShifts = new ArrayList<>(shifts.size());
         Map<String, Indictment> taskIdAndIndictmentMap = getIndictmentMap(indictmentMap);
         for (Shift shift : shifts) {
@@ -135,8 +135,9 @@ public class VRPPlannerService {
                         task.setStaffId(new Long(shift.getEmployee().getId()));
                         if (indictment != null) {
                             HardMediumSoftLongScore score = ((HardMediumSoftLongScore) indictment.getScoreTotal());
-                            if (score.getHardScore() > 0 || score.getMediumScore() > 0) {
-                                excalatedTaskList.add(task);
+                            if (score.getHardScore() < 0 || score.getMediumScore() < 0) {
+                                //excalatedTaskList.add(task);
+                                task.setEscalated(true);
                             }
                         }
                         tasks.add(task);
@@ -158,7 +159,7 @@ public class VRPPlannerService {
             }
             shift.setNextTask(null);
         }
-        return new Object[]{planningShifts, tasks, drivedTaskList, excalatedTaskList};
+        return new Object[]{planningShifts, tasks, drivedTaskList};
     }
 
 

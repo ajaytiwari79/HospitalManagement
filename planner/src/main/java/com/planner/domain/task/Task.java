@@ -33,6 +33,7 @@ public class Task extends MongoBaseEntity{
     private boolean breakTime;
     private String shiftId;
     private int drivingTime;
+    private boolean escalated;
 
     public int getDrivingTime() {
         return drivingTime;
@@ -57,6 +58,13 @@ public class Task extends MongoBaseEntity{
         this.city = city;
     }
 
+    public boolean isEscalated() {
+        return escalated;
+    }
+
+    public void setEscalated(boolean escalated) {
+        this.escalated = escalated;
+    }
 
     public int getDrivingDistance() {
         return drivingDistance;

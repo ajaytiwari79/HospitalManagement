@@ -153,12 +153,8 @@ public class VRPPlanningService extends MongoBaseService{
 
     public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolverConfigurationForUnit(unitId, solverConfigId);
-        List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
-        taskDTOS = getTasks(unitId,taskDTOS,vrpTaskPlanningDTO.getEmployees());
-        if(taskDTOS.isEmpty()){
-            exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
-        }
         List<TaskDTO> drivingTimeList = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
+        Object[] objects = getTasks(unitId,vrpTaskPlanningDTO,date);
         drivingTimeList.forEach(t->{
             t.setStartTime(Date.from(t.getPlannedStartTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
             t.setEndTime(Date.from(t.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
@@ -166,24 +162,32 @@ public class VRPPlanningService extends MongoBaseService{
         List<ShiftDTO> shiftDTOS = vrpTaskPlanningDTO.getShifts().stream().filter(s-> DateUtils.asLocalDate(new Date(s.getStartTime())).equals(date)).collect(toList());
         vrpTaskPlanningDTO.setShifts(shiftDTOS);
         vrpTaskPlanningDTO.setDrivingTimeList(drivingTimeList);
-        vrpTaskPlanningDTO.setTasks(taskDTOS);
+        vrpTaskPlanningDTO.setTasks((List<TaskDTO>)objects[0]);
+        vrpTaskPlanningDTO.setEscalatedTaskList((List<TaskDTO>)objects[1]);
         return vrpTaskPlanningDTO;
     }
 
-    public List<TaskDTO> getTasks(Long unitId,List<TaskDTO> taskDTOS,List<EmployeeDTO> employeeDTOS){
-        Map<String,EmployeeDTO> employeeDTOMap = employeeDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+    public Object[] getTasks(Long unitId,VrpTaskPlanningDTO vrpTaskPlanningDTO,LocalDate date){
+        List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
+        if(taskDTOS.isEmpty()){
+            exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
+        }
+        Map<String,EmployeeDTO> employeeDTOMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getInstallationNumber(), v->v));
         Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
         List<TaskDTO> tasks = new ArrayList<>();
+        List<TaskDTO> escalatedTasks = new ArrayList<>();
         for (Map.Entry<Long, List<VRPTaskDTO>> installationTasks : installationNOtasks.entrySet()) {
             TaskDTO taskDTO = taskMap.get(installationTasks.getKey());
             if(taskDTO!=null){
                 LocalDateTime updatedStartTime = taskDTO.getPlannedStartTime();
                 for (VRPTaskDTO vrpTaskDTO : installationTasks.getValue()) {
                     TaskDTO task= new TaskDTO(vrpTaskDTO.getId().toString(),vrpTaskDTO.getInstallationNumber(),new Double(vrpTaskDTO.getAddress().getLatitude()),new Double(vrpTaskDTO.getAddress().getLongitude()),null,vrpTaskDTO.getDuration(),vrpTaskDTO.getAddress().getStreet(),new Integer(vrpTaskDTO.getAddress().getHouseNumber()),vrpTaskDTO.getAddress().getBlock(),vrpTaskDTO.getAddress().getFloorNo(),vrpTaskDTO.getAddress().getZip(),vrpTaskDTO.getAddress().getCity());
+                    task.setEscalated(taskDTO.isEscalated());
                     task.setStaffId(taskDTO.getStaffId());
                     task.setName(vrpTaskDTO.getTaskType().getTitle());
                     task.setStartTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
+                    task.setCitizenName(vrpTaskDTO.getCitizenName());
                     EmployeeDTO employeeDTO = employeeDTOMap.get(taskDTO.getStaffId().toString());
                     int taskDuration = (int)Math.ceil(vrpTaskDTO.getDuration()/(employeeDTO.getEfficiency()/100d));
                     task.setDuration(taskDuration);
@@ -191,10 +195,14 @@ public class VRPPlanningService extends MongoBaseService{
                     task.setEndTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
                     task.setColor(vrpTaskDTO.getTaskType().getColorForGantt());
                     tasks.add(task);
+                    if(taskDTO.isEscalated()){
+                        escalatedTasks.add(task);
+                    }
                 }
             }
         }
-        return tasks;
+
+        return new Object[]{tasks,escalatedTasks};
     }
 
     public int[] getPlannedDuration(int duration,EmployeeDTO employeeDTO){

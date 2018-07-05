@@ -38,6 +38,7 @@ public class TaskDTO {
     private String color;
     private boolean breakTime;
     private int drivingTime;
+    private boolean escalated;
 
 
     public TaskDTO() {
@@ -56,6 +57,15 @@ public class TaskDTO {
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+
+    public boolean isEscalated() {
+        return escalated;
+    }
+
+    public void setEscalated(boolean escalated) {
+        this.escalated = escalated;
     }
 
     public int getDrivingTime() {
