@@ -6,6 +6,7 @@ import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
@@ -454,8 +455,8 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public List<Object> getWTAWithVersionIds(List<BigInteger> wtaIds) {
-        List<Object> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(wtaIds);
+    public List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
+        List<WTAVersionDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(wtaIds);
 
         return wtaQueryResultDTOS;
     }

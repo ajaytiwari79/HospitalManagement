@@ -729,6 +729,10 @@ public class UnitPositionService extends UserBaseService {
         result.setUnitId(unitPosition.getUnit().getId());
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setParentUnitId(parentOrganizationId);
+        result.setEditable(unitPosition.isEditable());
+        result.setHistory(unitPosition.isHistory());
+        result.setPublished(unitPosition.isPublished());
+
 
         // TODO Setting for compatibility
         Map<String, Object> unitInfo = new HashMap<>();
@@ -759,6 +763,10 @@ public class UnitPositionService extends UserBaseService {
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), null/*unitPosition.getWorkingTimeAgreement()*/);
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setUnitId(unitPositionQueryResult.getUnitId());
+        result.setEditable(unitPosition.isEditable());
+        result.setHistory(unitPosition.isHistory());
+        result.setPublished(unitPosition.isPublished());
+
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
 
 

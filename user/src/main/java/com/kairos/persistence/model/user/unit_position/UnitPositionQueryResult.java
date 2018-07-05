@@ -48,6 +48,9 @@ public class UnitPositionQueryResult {
     private Long reasonCodeId;
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
+    private Boolean history;
+    private Boolean editable;
+    private Boolean published;
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -264,6 +267,30 @@ public class UnitPositionQueryResult {
 
     public void setSeniorityLevel(Map<String, Object> seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
+    }
+
+    public Boolean getHistory() {
+        return history;
+    }
+
+    public void setHistory(Boolean history) {
+        this.history = history;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
     public UnitPositionQueryResult() {

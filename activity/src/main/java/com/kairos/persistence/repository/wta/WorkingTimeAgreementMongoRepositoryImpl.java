@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.wta;
 
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
@@ -181,8 +182,8 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
 
     @Override
-    public List<Object> getWTAWithVersionIds(List<BigInteger> wtaIds) {
-        String groupString = "{'$group':{'_id':{'id':'$versions._id',name:'$versions.name'},data:{'$push':'$ruleTemplatesInfo'}}}";
+    public List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
+        String groupString = "{'$group':{'_id':{'id':'$versions.id',startDate:'$versions.startDate',endDate:'$versions.endDate',name:'$versions.name',expertise:'$versions.expertise'},ruleTemplates:{'$push':'$ruleTemplatesInfo'}}}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("_id").in(wtaIds)),
                 graphLookup("workingTimeAgreement").startWith("$parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
@@ -192,7 +193,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 unwind("ruleTemplatesInfo"),
                 new CustomAggregationOperation(Document.parse(groupString))
         );
-        AggregationResults<Object> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, Object.class);
+        AggregationResults<WTAVersionDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAVersionDTO.class);
         return result.getMappedResults();
     }
 }
