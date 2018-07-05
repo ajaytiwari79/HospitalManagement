@@ -3,6 +3,7 @@ package com.kairos.vrp.vrpPlanning;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -20,7 +21,6 @@ public class TaskDTO {
     private Long installationNumber;
     private Double latitude;
     private Double longitude;
-    private String shiftId;
     private Set<String> skills;
     private int duration;
     private String streetName;
@@ -35,6 +35,7 @@ public class TaskDTO {
     private LocalDateTime plannedEndTime;
     private Long startTime;
     private Long endTime;
+    private String shiftId;
     private String color;
     private boolean breakTime;
     private int drivingTime;
@@ -258,4 +259,6 @@ public class TaskDTO {
     public void setPlannedStartTime(LocalDateTime plannedStartTime) {
         this.plannedStartTime = plannedStartTime;
     }
+
+
 }

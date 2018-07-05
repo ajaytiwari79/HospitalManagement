@@ -1,17 +1,23 @@
 package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
+import com.kairos.dto.OrganizationSubTypeDTO;
+import com.kairos.dto.OrganizationTypeDTO;
+import com.kairos.dto.ServiceCategoryDTO;
+import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterProcessingActivityDTO {
+
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "Name  can't be Empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
@@ -23,41 +29,38 @@ public class MasterProcessingActivityDTO {
     @NotEmpty(message = "Organization Type  can't be  Empty")
     @NotNull(message = "Organization  Type  can't be  null")
     @Valid
-    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypes;
 
     @NotNull(message = "Organization Sub Type  can't be  null")
     @NotEmpty(message = "Organization Sub Type  can't be Empty")
     @Valid
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     @NotNull(message = "Service Type  can't be  null")
     @NotEmpty(message = "Service Type  can't be  Empty")
     @Valid
-    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+    private List<ServiceCategoryDTO> organizationServices;
 
     @NotNull(message = "Service Sub Type  can't be  null")
     @NotEmpty(message = "Service Sub Type  can't be  Empty")
     @Valid
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
-
-    private Boolean isSubProcess=false;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
     private List<MasterProcessingActivityDTO> subProcessingActivities;
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public List<MasterProcessingActivityDTO> getSubProcessingActivities() {
         return subProcessingActivities;
     }
 
-    public Boolean getSubProcess() {
-        return isSubProcess;
-    }
-
-    public void setSubProcess(Boolean subProcess) {
-        isSubProcess = subProcess;
-    }
-
-    public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) {
+   public void setSubProcessingActivities(List<MasterProcessingActivityDTO> subProcessingActivities) {
         this.subProcessingActivities = subProcessingActivities;
     }
 
@@ -77,35 +80,35 @@ public class MasterProcessingActivityDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

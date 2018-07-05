@@ -73,4 +73,5 @@ public class PlanningShift extends MongoBaseEntity {
     public void setShiftType(ShiftType shiftType) {
         this.shiftType = shiftType;
     }
+
 }
