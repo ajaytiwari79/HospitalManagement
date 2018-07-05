@@ -510,8 +510,9 @@ public class ShiftService extends MongoBaseService {
         List<ShiftQueryResult> activities = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()) :
                 shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.forEach(activitie->{
-       //     TimeType timeType=timeTypeMongoRepository.findOneById(activitie.getActivityId());
-         //   activitie.setTimeType(String.valueOf(timeType.getTimeTypes()));
+            Activity activity = activityRepository.findActivityByIdAndEnabled(activitie.getActivityId());
+          TimeType timeType=timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+            activitie.setTimeType(String.valueOf(timeType.getTimeTypes()));
         });
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
 
