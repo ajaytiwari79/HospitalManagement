@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.dto.QueueDTO;
+import com.kairos.kafka.listener.DefaultKafkaMessageListener;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import com.kairos.util.userContext.UserContextInterceptor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -36,10 +37,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.listener.config.ContainerProperties;
@@ -75,6 +75,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
 @EnableCircuitBreaker
+@EnableKafka
 public class UserServiceApplication extends WebMvcConfigurerAdapter{
 
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
@@ -168,7 +169,6 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
         return template;
     }
 
-    @Bean
 	private Map<String, Object> consumerProps() {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -181,7 +181,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		return props;
 	}
 
-	@Bean
+
 	private Map<String, Object> senderProps() {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -194,34 +194,87 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		return props;
 	}
 
-	@Bean
-	private KafkaTemplate<Integer, QueueDTO> kafkaTemplate() {
+	/*@Bean
+	private KafkaTemplate<Integer, String> kafkaTemplate() {
 		Map<String, Object> senderProps = senderProps();
-		ProducerFactory<Integer, QueueDTO> pf =
-				new DefaultKafkaProducerFactory<Integer, QueueDTO>(senderProps);
-		KafkaTemplate<Integer, QueueDTO> template = new KafkaTemplate<>(pf);
+		ProducerFactory<Integer, String> pf =
+				new DefaultKafkaProducerFactory<Integer, String>(senderProps);
+		KafkaTemplate<Integer, String> template = new KafkaTemplate<>(pf);
 		return template;
+	}*/
+
+	/*@Bean
+	ConcurrentKafkaListenerContainerFactory<Integer, String>
+	kafkaListenerContainerFactory() {
+		ConcurrentKafkaListenerContainerFactory<Integer, String> factory =
+				new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory());
+		return factory;
+	}
+*/
+/*		@Bean
+	private KafkaMessageListenerContainer<Integer, String> kafkaContainer() {
+		ContainerProperties containerProps = new ContainerProperties("userSchedulerQueue");
+		containerProps.setMessageListener( new DefaultKafkaMessageListener());
+
+		Map<String, Object> props = consumerProps();
+		DefaultKafkaConsumerFactory<Integer, String> cf =
+				new DefaultKafkaConsumerFactory<Integer, String>(props);
+		KafkaMessageListenerContainer<Integer, String> container =
+				new KafkaMessageListenerContainer<>(cf, containerProps);
+		container.start();
+
+		return container;
+	}*/
+	@Bean
+	public ConsumerFactory<Integer, String> consumerFactory() {
+		return new DefaultKafkaConsumerFactory<>(consumerConfigs());
 	}
 
-//	@Bean
-//	private KafkaMessageListenerContainer<Integer, String> kafkaContainer() {
-//		ContainerProperties containerProps = new ContainerProperties("userSchedulerQueue");
-//		containerProps.setMessageListener(new MessageListener<Integer,QueueDTO>() {
-//
-//			public void onMessage(ConsumerRecord<Integer,QueueDTO> message) {
-//				logger.info("received: "+ message);
-//			}
-//		});
-//
-//		Map<String, Object> props = consumerProps();
-//		DefaultKafkaConsumerFactory<Integer, String> cf =
-//				new DefaultKafkaConsumerFactory<Integer, String>(props);
-//		KafkaMessageListenerContainer<Integer, String> container =
-//				new KafkaMessageListenerContainer<>(cf, containerProps);
-//		container.start();
-//
-//		return container;
-//	}
+	@Bean
+	public Map<String, Object> consumerConfigs() {
+		Map<String, Object> props = new HashMap<>();
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "groupId");
+		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+		props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
+		props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+		//props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafka.getBrokersAsString());
+
+		return props;
+	}
+
+	/*@Bean
+	public Listener listener() {
+		return new Listener();
+	}
+*/
+	@Bean
+	public ProducerFactory<Integer, String> producerFactory() {
+		return new DefaultKafkaProducerFactory<>(producerConfigs());
+	}
+
+	@Bean
+	public Map<String, Object> producerConfigs() {
+		Map<String, Object> props = new HashMap<>();
+		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		props.put(ProducerConfig.RETRIES_CONFIG, 0);
+		props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+		props.put(ProducerConfig.LINGER_MS_CONFIG, 1);
+		props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
+		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
+		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+		//props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafka.getBrokersAsString());
+		return props;
+	}
+
+	@Bean
+	public KafkaTemplate<Integer, String> kafkaTemplate() {
+		return new KafkaTemplate<Integer, String>(producerFactory());
+	}
+
 
 }
 

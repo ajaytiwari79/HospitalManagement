@@ -54,8 +54,8 @@ public class ControlPanelService extends UserBaseService {
     JobDetailsRepository jobDetailsRepository;
     @Inject
     IntegrationService integrationService;
-    @Inject
-    private KafkaProducer kafkaProducer;
+    /*@Inject
+    private KafkaProducer kafkaProducer;*/
 
 
     private static final Logger logger = LoggerFactory.getLogger(ControlPanelService.class);
@@ -300,7 +300,7 @@ public class ControlPanelService extends UserBaseService {
         ControlPanel panel = controlPanelGraphRepository.findOne(1L);
         QueueDTO job = new QueueDTO();
         ObjectMapperUtils.copyProperties(panel,job);
-        kafkaProducer.pushToQueue(job);
+       // kafkaProducer.pushToQueue(job);
 
 
     }
