@@ -135,7 +135,7 @@ public class VRPPlanningService extends MongoBaseService{
 
     public SolverConfigDTO stopToPlannerBySolverConfig(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
-        solverConfig.setStatus(SolverConfigStatus.READY);
+        solverConfig.setStatus(SolverConfigStatus.ON_HOLD);
         save(solverConfig);
         plannerRestClient.publish(null,unitId, IntegrationOperation.DELETE,PlannerUrl.STOP_VRP_PROBLEM,solverConfigId);
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
