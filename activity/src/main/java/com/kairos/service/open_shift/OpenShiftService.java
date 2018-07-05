@@ -22,6 +22,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
@@ -207,16 +208,19 @@ public class OpenShiftService extends MongoBaseService {
     }
 
 
-    public OpenShiftWrapper fetchOpenShiftDataByStaff(Long unitId, BigInteger openShiftId, Long staffId) {
+    public OpenShiftWrapper fetchOpenShiftDataByStaff(Long unitId, BigInteger openShiftId, Long staffId,AccessGroupRole role) {
         OpenShiftActivityWrapper openShiftActivityWrapper = openShiftMongoRepository.getOpenShiftAndActivity(openShiftId, unitId);
         OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         Date startDate = DateUtils.getStartDateOfWeekFromDate(DateUtils.asLocalDate(openShift.getStartDate()));
-        Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId(), openShift.getStartDate().getTime());
-        com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
-
+        int[] data={0,0};
+        if(role.equals(AccessGroupRole.STAFF)){
+            Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId(), openShift.getStartDate().getTime());
+            com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+            data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
+        }
         Date endDate = DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));
         List<OpenShift> similarShifts = openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate, endDate);
-        int[] data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
+
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         similarShifts.forEach(openShift1 -> {
             OpenShiftResponseDTO openShiftResponseDTO = new OpenShiftResponseDTO();

@@ -2,7 +2,8 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
+import com.kairos.dto.OrganizationSubTypeDTO;
+import com.kairos.dto.OrganizationTypeDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -19,9 +20,9 @@ public class DataSubjectMappingResponseDto {
 
     private Long countryId;
 
-    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypes;
 
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     private Set<DataCategoryResponseDto> dataCategories;
 
@@ -49,19 +50,19 @@ public class DataSubjectMappingResponseDto {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 

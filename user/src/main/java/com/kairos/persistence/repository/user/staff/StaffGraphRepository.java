@@ -391,6 +391,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} return staff")
     Staff getStaffByUserId(Long userId, Long parentOrganizationId);
 
+    @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(organization)={1}" +
+            "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where user.cprNumber={0} return count(staff)>0")
+    Boolean isStaffExistsByCPRNumber(String cprNumber, Long parentOrganizationId);
+
 
     @Query("match(s:Staff)-[:BELONGS_TO]-(u:Employment)-[:HAS_EMPLOYMENTS]-(o:Organization) where id(o)={1} AND s.externalId={0} return s")
     Staff findStaffByExternalId(Long externalId, Long organizationId);
@@ -498,4 +502,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(organization:Organization) where id(user)={0} AND id(organization)={1}  return id(staff)")
     Long findStaffIdByUserId(Long userId, Long unitId);
+
+    @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone")
+    List<StaffTimezoneQueryResult> getStaffAndUnitTimezoneByUserId(Long id);
 }

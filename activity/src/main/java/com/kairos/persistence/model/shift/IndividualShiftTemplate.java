@@ -10,11 +10,9 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     private String name;
     private String remarks;
     private BigInteger activityId;
-    private Long unitId;
-    private Long createdBy;// using userId here
     private LocalTime startTime;
     private LocalTime endTime;
-    private boolean isMainShift = true;
+    private boolean mainShift;
     private Set<BigInteger> subShiftIds;
 
     public IndividualShiftTemplate() {
@@ -47,14 +45,6 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
         this.activityId = activityId;
     }
 
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
     public LocalTime getStartTime() {
         return startTime;
     }
@@ -72,11 +62,11 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     }
 
     public boolean isMainShift() {
-        return isMainShift;
+        return mainShift;
     }
 
     public void setMainShift(boolean mainShift) {
-        isMainShift = mainShift;
+        this.mainShift = mainShift;
     }
 
     public Set<BigInteger> getSubShiftIds() {
@@ -87,11 +77,4 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
         this.subShiftIds = subShiftIds;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
 }

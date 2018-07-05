@@ -14,7 +14,7 @@ public class AssetTypeDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Title cannot be empty ")
+    @NotNullOrEmpty(message = "Name cannot be empty ")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 

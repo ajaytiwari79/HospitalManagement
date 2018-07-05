@@ -1,0 +1,2 @@
+// TO set Country admin's Role as MANAGEMENT
+Match (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN" set ag.role="MANAGEMENT";

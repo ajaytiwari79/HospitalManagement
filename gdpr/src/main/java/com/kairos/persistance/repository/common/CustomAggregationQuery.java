@@ -3,31 +3,30 @@ package com.kairos.persistance.repository.common;
 public class CustomAggregationQuery {
 
 
-    public static String processingActivityWithSubProcessingNonDeletedData()
-    {
+    public static String processingActivityWithSubProcessingNonDeletedData() {
         return "{ '$project':" +
                 " {'subProcessingActivities':" +
                 " {'$filter': {'input': '$subProcessingActivities'," +
                 "'as': 'subProcessingActivities'," +
-                "'cond': { '$eq': [ '$$subProcessingActivities.deleted',"+false+" ] }}}" +
+                "'cond': { '$eq': [ '$$subProcessingActivities.deleted'," + false + " ] }}}" +
                 ",'name':1," +
                 "'description':1," +
                 "'organizationSubServices':1," +
                 "'organizationServices':1," +
+                "'hasSubProcess':1," +
                 "'organizationSubTypes':1," +
                 "'organizationTypes':1," +
                 "'countryId':1}}";
 
     }
 
-    public static String dataSubjectAddNonDeletedDataElementAddFileds()
-    {
+    public static String dataSubjectAddNonDeletedDataElementAddFileds() {
         return "{  '$addFields':" +
                 "{'dataCategories.dataElements':" +
-                "{$filter : { "+
-                "'input': '$dataCategories.dataElements',"+
-                "as: 'dataElements', "+
-                "cond: {$eq: ['$$dataElements.deleted',"+false+"]}" +
+                "{$filter : { " +
+                "'input': '$dataCategories.dataElements'," +
+                "as: 'dataElements', " +
+                "cond: {$eq: ['$$dataElements.deleted'," + false + "]}" +
                 "}}}} ";
     }
 
@@ -43,47 +42,40 @@ public class CustomAggregationQuery {
                 "}}}} ";
     }*/
 
-    public static String questionnnaireTemplateAddNonDeletedQuestions()
-    {
+    public static String questionnnaireTemplateAddNonDeletedQuestions() {
         return "{  '$addFields':" +
                 "{'sections.questions':" +
-                "{$filter : { "+
-                "'input': '$questions',"+
-                "as: 'questions', "+
-                "cond: {$eq: ['$$questions.deleted',"+false+"]}" +
+                "{$filter : { " +
+                "'input': '$questions'," +
+                "as: 'questions', " +
+                "cond: {$eq: ['$$questions.deleted'," + false + "]}" +
                 "}}}} ";
     }
 
 
-    public static String questionnnaireTemplateAddNonDeletedSections()
-    {
+    public static String questionnnaireTemplateAddNonDeletedSections() {
         return "{  '$addFields':" +
                 "{'sections':" +
-                "{$filter : { "+
-                "'input': '$sections',"+
-                "as: 'sections', "+
-                "cond: {$eq: ['$$sections.deleted',"+false+"]}" +
+                "{$filter : { " +
+                "'input': '$sections'," +
+                "as: 'sections', " +
+                "cond: {$eq: ['$$sections.deleted'," + false + "]}" +
                 "}}}} ";
     }
 
 
-
-    public static String questionnnaireTemplateAddNonDeletedAssetType()
-    {
+    public static String questionnnaireTemplateAddNonDeletedAssetType() {
         return "{  '$addFields':" +
                 "{'assetType':" +
-                "{$filter : { "+
-                "'input': '$assetType',"+
-                "as: 'assetType', "+
-                "cond: {$eq: ['$$assetType.deleted',"+false+"]}" +
+                "{$filter : { " +
+                "'input': '$assetType'," +
+                "as: 'assetType', " +
+                "cond: {$eq: ['$$assetType.deleted'," + false + "]}" +
                 "}}}} ";
     }
 
 
-
-
-    public static String questionnnaireTemplateGroupOperation()
-    {
+    public static String questionnnaireTemplateGroupOperation() {
         return "{'$group':{" +
                 "'_id':'$_id','sections':{'$push':{ '$cond': [ { '$eq': [ '$sections.deleted',false ] }, '$sections', {} ] }}," +
                 "'name':{$first:'$name'}," +
@@ -92,10 +84,10 @@ public class CustomAggregationQuery {
                 "'templateType':{$first:'$templateType'}," +
                 "}}";
     }
-    public static String questionnnaireTemplateProjectionBeforeGroupOperationForAssetType()
-    {
+
+    public static String questionnnaireTemplateProjectionBeforeGroupOperationForAssetType() {
         return " {" +
-                "'$project':{"+
+                "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
                 "         'name':1," +
                 "        'sections':1," +
@@ -106,7 +98,6 @@ public class CustomAggregationQuery {
     }
 
 
-
     public static String dataCategoryWithDataElementProjectionData() {
         return "{  '$project':" +
                 "{'dataElements':" +
@@ -115,9 +106,20 @@ public class CustomAggregationQuery {
                 "as: 'dataElement', " +
                 "cond:{$eq:['$$dataElement.deleted',false]}" +
                 "}}," +
-                "'countryId':1"+
+                "'countryId':1" +
                 ", 'name':1" +
                 ",'deleted':1 }}";
+    }
+
+
+    public static String assetTypesAddNonDeletedSubAssetTypes() {
+        return "{ '$addFields':" +
+                "   {'subAssetTypes':" +
+                "   {'$filter' :{ " +
+                "    'input': '$subAssetTypes'," +
+                "   'as':'subAssetTypes', " +
+                "  'cond': {'$eq': ['$$subAssetTypes.deleted',false]}" +
+                "  }}}}";
     }
 
 

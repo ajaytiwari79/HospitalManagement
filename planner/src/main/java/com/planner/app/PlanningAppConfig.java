@@ -9,11 +9,13 @@ import com.planner.constants.AppConstants;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.ClassPathResource;
@@ -44,10 +46,8 @@ public class PlanningAppConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
 
-    public static void main(String[] args) {
-        //ch.qos.logback.classic.turbo.TurboFilter tf=null;
-        logger.info("drool files path "+new File(AppConstants.DROOL_FILES_PATH).exists());
 
+    public static void main(String[] args) {
         SpringApplication.run(PlanningAppConfig.class, args);
     }
 
@@ -56,13 +56,29 @@ public class PlanningAppConfig {
         System.setProperty("user.timezone", "UTC");
     }
 
-    @Bean(name ="schedulerRestTemplate")
-    public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder.interceptors(new UserContextInterceptor())
+    @Profile({"!local"})
+    @LoadBalanced
+    @Primary
+    @Bean
+    public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
         return template;
     }
+
+    @Profile({"local"})
+    @Primary
+    @Bean
+    public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new UserContextInterceptor())
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
     @Bean("objectMapperJackson")
     @Primary
     public ObjectMapper serializingObjectMapper() {

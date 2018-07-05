@@ -1,8 +1,10 @@
 package com.kairos.persistance.repository.template_type;
 
 import com.kairos.persistance.model.template_type.TemplateType;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.Set;
  * @Auther vikash patwal
  */
 
+
+@Repository
+@JaversSpringDataAuditable
 public interface TemplateTypeMongoRepository extends MongoRepository<TemplateType,BigInteger> {
 
 
