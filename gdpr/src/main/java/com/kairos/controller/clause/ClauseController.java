@@ -16,8 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
@@ -42,7 +40,7 @@ public class ClauseController {
 
 
     @ApiOperation("add new clause")
-    @PostMapping( COUNTRY_URL+"/clause/add")
+    @PostMapping( "/clause/add")
     public ResponseEntity<Object> createClause(@PathVariable Long countryId, @PathVariable Long organizationId, @Validated @RequestBody ClauseDTO clauseDto)  {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -54,7 +52,7 @@ public class ClauseController {
     }
 
     @ApiOperation("get clause by id")
-    @GetMapping(COUNTRY_URL+"/clause/{id}")
+    @GetMapping("/clause/{id}")
     public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -72,7 +70,7 @@ public class ClauseController {
 
 
     @ApiOperation("delete clause by id")
-    @DeleteMapping(COUNTRY_URL+"/clause/delete/{id}")
+    @DeleteMapping("/clause/delete/{id}")
     public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
 
         if (id == null) {
@@ -89,7 +87,7 @@ public class ClauseController {
     }
 
     @ApiOperation("update clause description")
-    @PutMapping(COUNTRY_URL+"/clause/update/{clauseId}")
+    @PutMapping("/clause/update/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto)  {
 
         if (clauseId == null) {
@@ -108,7 +106,7 @@ public class ClauseController {
 
 
     @ApiOperation("get All clauses")
-    @GetMapping(COUNTRY_URL+"/clause/all")
+    @GetMapping("/clause/all")
     public ResponseEntity<Object> getAllClauses(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");

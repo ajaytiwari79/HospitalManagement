@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
@@ -29,7 +28,7 @@ public class DataSubjectMappingController {
 
 
     @ApiOperation("create  data Subject mapping ")
-    @PostMapping(COUNTRY_URL+"/dataSubject_mapping/add")
+    @PostMapping("/dataSubject_mapping/add")
     public ResponseEntity<Object> addDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -40,7 +39,7 @@ public class DataSubjectMappingController {
     }
 
     @ApiOperation("delete data Subject mapping by id ")
-    @DeleteMapping(COUNTRY_URL+"/dataSubject_mapping/delete/{id}")
+    @DeleteMapping("/dataSubject_mapping/delete/{id}")
     public ResponseEntity<Object> deleteDataSubjectAndMappingById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -55,7 +54,7 @@ public class DataSubjectMappingController {
     }
 
     @ApiOperation("get data Subject mapping with data Category and data elements by id ")
-    @GetMapping(COUNTRY_URL+"/dataSubject_mapping/{id}")
+    @GetMapping("/dataSubject_mapping/{id}")
     public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementsById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -71,7 +70,7 @@ public class DataSubjectMappingController {
     }
 
     @ApiOperation("get all data Subject mapping ")
-    @GetMapping(COUNTRY_URL+"/dataSubject_mapping/all")
+    @GetMapping("/dataSubject_mapping/all")
     public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -83,7 +82,7 @@ public class DataSubjectMappingController {
     }
 
     @ApiOperation("update data Subject mapping ")
-    @PutMapping(COUNTRY_URL+"/dataSubject_mapping/update/{id}")
+    @PutMapping("/dataSubject_mapping/update/{id}")
     public ResponseEntity<Object> updateDataSubjectAndMapping(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataSubjectMappingDTO dataSubjectMappingDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 /*
@@ -38,7 +37,7 @@ public class DataSourceController {
 
 
     @ApiOperation("add dataSource")
-    @PostMapping(COUNTRY_URL+"/data_source/add")
+    @PostMapping("/data_source/add")
     public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@PathVariable Long organizationId,@Valid @RequestBody ValidateListOfRequestBody<DataSource> dataSource) {
        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -52,7 +51,7 @@ public class DataSourceController {
 
 
     @ApiOperation("get dataSource by id")
-    @GetMapping(COUNTRY_URL+"/data_source/{id}")
+    @GetMapping("/data_source/{id}")
     public ResponseEntity<Object> getDataSource(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -68,7 +67,7 @@ public class DataSourceController {
 
 
     @ApiOperation("get all dataSource ")
-    @GetMapping(COUNTRY_URL+"/data_source/all")
+    @GetMapping("/data_source/all")
     public ResponseEntity<Object> getAllDataSource(@PathVariable Long countryId,@PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -81,7 +80,7 @@ public class DataSourceController {
     }
 
     @ApiOperation("get dataSource by name")
-    @GetMapping(COUNTRY_URL+"/data_source/name")
+    @GetMapping("/data_source/name")
     public ResponseEntity<Object> getDataSourceByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -95,7 +94,7 @@ public class DataSourceController {
 
 
     @ApiOperation("delete dataSource  by id")
-    @DeleteMapping(COUNTRY_URL+"/data_source/delete/{id}")
+    @DeleteMapping("/data_source/delete/{id}")
     public ResponseEntity<Object> deleteDataSource(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -109,7 +108,7 @@ public class DataSourceController {
     }
 
     @ApiOperation("update dataSource by id")
-    @PutMapping(COUNTRY_URL+"/data_source/update/{id}")
+    @PutMapping("/data_source/update/{id}")
     public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @Valid @RequestBody DataSource dataSource) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

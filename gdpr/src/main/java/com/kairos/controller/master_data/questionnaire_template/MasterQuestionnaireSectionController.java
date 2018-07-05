@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
@@ -35,7 +34,7 @@ public class MasterQuestionnaireSectionController {
      * @return
      */
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
-    @PostMapping(COUNTRY_URL+"/questionnaire_template/{templateId}/section")
+    @PostMapping("/questionnaire_template/{templateId}/section")
     public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionnaireSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -48,7 +47,7 @@ public class MasterQuestionnaireSectionController {
     }
 
     @ApiOperation(value = "update list of questionniare section and deleted section if deleted property is true")
-    @PutMapping(COUNTRY_URL+"/questionnaire_template/{templateId}/section/update")
+    @PutMapping("/questionnaire_template/{templateId}/section/update")
     public ResponseEntity updateQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionniareSectionDTOs) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -61,7 +60,7 @@ public class MasterQuestionnaireSectionController {
     }
 
     @ApiOperation("delete questionnaire section by id ")
-    @DeleteMapping(COUNTRY_URL+"/questionnaire_template/section/{id}")
+    @DeleteMapping("/questionnaire_template/section/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

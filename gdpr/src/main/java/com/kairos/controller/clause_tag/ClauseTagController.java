@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import static  com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static  com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 import javax.inject.Inject;
@@ -34,7 +33,7 @@ public class ClauseTagController {
     private ClauseTagService clauseTagService;
 
     @ApiOperation("add clauseTag")
-    @PostMapping(COUNTRY_URL+"/clause_tag/add")
+    @PostMapping("/clause_tag/add")
     public ResponseEntity<Object> createClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam  String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "name can't be empty ");
@@ -52,7 +51,7 @@ public class ClauseTagController {
 
 
     @ApiOperation("get clauseTag by id")
-    @GetMapping(COUNTRY_URL+"/clause_tag/{id}")
+    @GetMapping("/clause_tag/{id}")
     public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -70,7 +69,7 @@ public class ClauseTagController {
 
 
     @ApiOperation("get all clauseTag ")
-    @GetMapping(COUNTRY_URL+"/clause_tag/all")
+    @GetMapping("/clause_tag/all")
     public ResponseEntity<Object> getAllClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getAllClauseTag(countryId,organizationId));
 
@@ -78,7 +77,7 @@ public class ClauseTagController {
 
 
     @ApiOperation("delete clauseTag  by id")
-    @DeleteMapping(COUNTRY_URL+"/clause_tag/delete/{id}")
+    @DeleteMapping("/clause_tag/delete/{id}")
     public ResponseEntity<Object> deleteClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -95,7 +94,7 @@ public class ClauseTagController {
     }
 
     @ApiOperation("update clauseTag by id")
-    @PutMapping(COUNTRY_URL+"/clause_tag/update/{id}")
+    @PutMapping("/clause_tag/update/{id}")
     public ResponseEntity<Object> updateClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestParam  String clauseTag) {
 
         if (id == null) {

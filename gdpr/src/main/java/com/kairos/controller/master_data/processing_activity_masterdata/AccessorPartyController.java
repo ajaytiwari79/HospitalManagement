@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 /*
@@ -38,7 +37,7 @@ public class AccessorPartyController {
 
 
     @ApiOperation("add AccessorParty")
-    @PostMapping(COUNTRY_URL+"/accessor_party/add")
+    @PostMapping("/accessor_party/add")
     public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId,@PathVariable Long organizationId,@Valid @RequestBody ValidateListOfRequestBody<AccessorParty> accessorParties) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -52,7 +51,7 @@ public class AccessorPartyController {
 
 
     @ApiOperation("get AccessorParty by id")
-    @GetMapping(COUNTRY_URL+"/accessor_party/{id}")
+    @GetMapping("/accessor_party/{id}")
     public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -70,7 +69,7 @@ public class AccessorPartyController {
 
 
     @ApiOperation("get all AccessorParty ")
-    @GetMapping(COUNTRY_URL+"/accessor_party/all")
+    @GetMapping("/accessor_party/all")
     public ResponseEntity<Object> getAllAccessorParty(@PathVariable Long countryId,@PathVariable Long organizationId) {
          if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -83,7 +82,7 @@ public class AccessorPartyController {
     }
 
     @ApiOperation("get AccessorParty by name")
-    @GetMapping(COUNTRY_URL+"/accessor_party/name")
+    @GetMapping("/accessor_party/name")
     public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
          if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -97,7 +96,7 @@ public class AccessorPartyController {
 
 
     @ApiOperation("delete AccessorParty  by id")
-    @DeleteMapping(COUNTRY_URL+"/accessor_party/delete/{id}")
+    @DeleteMapping("/accessor_party/delete/{id}")
     public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -114,7 +113,7 @@ public class AccessorPartyController {
     }
 
     @ApiOperation("update AccessorParty by id")
-    @PutMapping(COUNTRY_URL+"/accessor_party/update/{id}")
+    @PutMapping("/accessor_party/update/{id}")
     public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @Valid @RequestBody AccessorParty accessorParty) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

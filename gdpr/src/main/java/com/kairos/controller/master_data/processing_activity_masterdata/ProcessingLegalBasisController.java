@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 /*
@@ -38,7 +37,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("add ProcessingLegalBasis")
-    @PostMapping(COUNTRY_URL+"/legal_basis/add")
+    @PostMapping("/legal_basis/add")
     public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingLegalBasis> legalBases) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -52,7 +51,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
-    @GetMapping(COUNTRY_URL+"/legal_basis/{id}")
+    @GetMapping("/legal_basis/{id}")
     public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -70,7 +69,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("get all ProcessingLegalBasis ")
-    @GetMapping(COUNTRY_URL+"/legal_basis/all")
+    @GetMapping("/legal_basis/all")
     public ResponseEntity<Object> getAllProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -83,7 +82,7 @@ public class ProcessingLegalBasisController {
     }
 
     @ApiOperation("get ProcessingLegalBasis by name")
-    @GetMapping(COUNTRY_URL+"/legal_basis/name")
+    @GetMapping("/legal_basis/name")
     public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -96,7 +95,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
-    @DeleteMapping(COUNTRY_URL+"/legal_basis/delete/{id}")
+    @DeleteMapping("/legal_basis/delete/{id}")
     public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -113,7 +112,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("update ProcessingLegalBasis by id")
-    @PutMapping(COUNTRY_URL+"/legal_basis/update/{id}")
+    @PutMapping("/legal_basis/update/{id}")
     public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasis legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

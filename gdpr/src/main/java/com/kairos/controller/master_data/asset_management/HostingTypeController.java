@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 /*
@@ -38,7 +37,7 @@ public class HostingTypeController {
 
 
     @ApiOperation("add HostingType")
-    @PostMapping(COUNTRY_URL+"/hosting_type/add")
+    @PostMapping("/hosting_type/add")
     public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<HostingType> hostingTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -53,7 +52,7 @@ public class HostingTypeController {
 
 
     @ApiOperation("get HostingType by id")
-    @GetMapping(COUNTRY_URL+"/hosting_type/{id}")
+    @GetMapping("/hosting_type/{id}")
     public ResponseEntity<Object> getHostingType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -71,7 +70,7 @@ public class HostingTypeController {
 
 
     @ApiOperation("get all HostingType ")
-    @GetMapping(COUNTRY_URL+"/hosting_type/all")
+    @GetMapping("/hosting_type/all")
     public ResponseEntity<Object> getAllHostingType(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -84,7 +83,7 @@ public class HostingTypeController {
 
 
     @ApiOperation("get HostingType by name")
-    @GetMapping(COUNTRY_URL+"/hosting_type/name")
+    @GetMapping("/hosting_type/name")
     public ResponseEntity<Object> getHostingTypeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -98,7 +97,7 @@ public class HostingTypeController {
 
 
     @ApiOperation("delete HostingType  by id")
-    @DeleteMapping(COUNTRY_URL+"/hosting_type/delete/{id}")
+    @DeleteMapping("/hosting_type/delete/{id}")
     public ResponseEntity<Object> deleteHostingType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -114,7 +113,7 @@ public class HostingTypeController {
     }
 
     @ApiOperation("update HostingType by id")
-    @PutMapping(COUNTRY_URL+"/hosting_type/update/{id}")
+    @PutMapping("/hosting_type/update/{id}")
     public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody HostingType hostingtype) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

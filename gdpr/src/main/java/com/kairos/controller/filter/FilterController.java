@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
@@ -35,7 +34,7 @@ public class FilterController {
      */
 
     @ApiOperation("get category or values of Properties on which filter apply by module id")
-    @GetMapping(COUNTRY_URL+"/filter/category/{moduleId}")
+    @GetMapping("/filter/category/{moduleId}")
     public ResponseEntity<Object> getFilterData(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String moduleId) {
 
         if (countryId == null) {
@@ -58,7 +57,7 @@ public class FilterController {
      * @return Filter data on the basis of filter type selection and Ids
      */
     @ApiOperation("get  filter data by filter selection value")
-    @PostMapping(COUNTRY_URL+"/filter/data/{moduleId}")
+    @PostMapping("/filter/data/{moduleId}")
     public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
 
         if (countryId == null) {

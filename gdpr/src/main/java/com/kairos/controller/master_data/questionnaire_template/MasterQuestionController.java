@@ -13,7 +13,6 @@ import javax.inject.Inject;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
@@ -28,7 +27,7 @@ public class MasterQuestionController {
 
 
     @ApiOperation("get question of Questionnaire section by id ")
-    @GetMapping(COUNTRY_URL+"/question_section/question/{id}")
+    @GetMapping("/question_section/question/{id}")
     public ResponseEntity<Object> getMasterQuestionById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -42,7 +41,7 @@ public class MasterQuestionController {
     }
 
     @ApiOperation("get All question of Questionnaire section")
-    @GetMapping(COUNTRY_URL+"/question_section/question/all")
+    @GetMapping("/question_section/question/all")
     public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -55,7 +54,7 @@ public class MasterQuestionController {
 
 
 
-    @DeleteMapping(COUNTRY_URL+"/question_section/question/delete/{id}")
+    @DeleteMapping("/question_section/question/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
@@ -38,7 +37,7 @@ public class MasterAssetController {
 
 
     @ApiOperation(value = "add master asset")
-    @PostMapping(COUNTRY_URL+ "/master_asset/add_asset")
+    @PostMapping( "/master_asset/add_asset")
     public ResponseEntity<Object> addMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @Validated @RequestBody MasterAssetDTO masterAssetDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -50,7 +49,7 @@ public class MasterAssetController {
     }
 
     @ApiOperation(value = "get all master asset")
-    @GetMapping(COUNTRY_URL+"/master_asset/all")
+    @GetMapping("/master_asset/all")
     public ResponseEntity<Object> getAllMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -62,7 +61,7 @@ public class MasterAssetController {
     }
 
     @ApiOperation(value = "update master asset by id")
-    @PutMapping(COUNTRY_URL+"/master_asset/update/{id}")
+    @PutMapping("/master_asset/update/{id}")
     public ResponseEntity<Object> updateMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Validated @RequestBody MasterAssetDTO assetDTO) {
 
         if (id == null) {
@@ -77,7 +76,7 @@ public class MasterAssetController {
 
 
     @ApiOperation(value = "delete master asset")
-    @DeleteMapping(COUNTRY_URL+"/master_asset/delete/{id}")
+    @DeleteMapping("/master_asset/delete/{id}")
     public ResponseEntity<Object> deleteMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -91,7 +90,7 @@ public class MasterAssetController {
     }
 
     @ApiOperation(value = "get master asset by id")
-    @GetMapping(COUNTRY_URL+"/master_asset/{id}")
+    @GetMapping("/master_asset/{id}")
     public ResponseEntity<Object> getMasterAsset(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
