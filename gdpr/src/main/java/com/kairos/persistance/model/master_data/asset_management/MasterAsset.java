@@ -16,7 +16,7 @@ import java.util.List;
 public class MasterAsset extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Name can't be empty")
     private  String name;
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")

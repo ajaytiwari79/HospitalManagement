@@ -1,6 +1,7 @@
 package com.kairos.service.clause;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.master_data.ClauseDTO;
@@ -12,14 +13,11 @@ import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ComparisonUtils;
-import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -74,19 +72,25 @@ public class ClauseService extends MongoBaseService {
         }
         List<ClauseTag> tagList=new ArrayList<>();
         // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
-        Clause newclause = new Clause( clauseDto.getTitle(), clauseDto.getDescription(),countryId,clauseDto.getOrganizationTypes(),clauseDto.getOrganizationSubTypes()
+        Clause newClause = new Clause( clauseDto.getTitle(), clauseDto.getDescription(),countryId,clauseDto.getOrganizationTypes(),clauseDto.getOrganizationSubTypes()
         ,clauseDto.getOrganizationServices(),clauseDto.getOrganizationSubServices());
-        newclause.setOrganizationId(organizationId);
-        newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        //newclause.setOrganizationList(clauseDto.getOrgannizationList());
-        // newclause.setTemplateType(clauseDto.getTemplateType());
+        newClause.setOrganizationId(organizationId);
+        newClause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        //newClause.setOrganizationList(clauseDto.getOrganizationList());
+        // newClause.setTemplateType(clauseDto.getTemplateType());
 
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-            newclause.setTags(tagList);
-            newclause = clauseRepository.save(sequenceGenerator(newclause));
-            return newclause;
-        } catch (Exception e) {
+            newClause.setTags(tagList);
+            newClause = clauseRepository.save(sequenceGenerator(newClause));
+            return newClause;
+        } catch (DuplicateDataException e) {
+            clauseTagMongoRepository.deleteAll(tagList);
+            LOGGER.debug(e.getMessage());
+            throw new DuplicateDataException(e.getMessage());
+        }
+        catch (Exception e)
+        {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.debug(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -126,7 +130,7 @@ public class ClauseService extends MongoBaseService {
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
            //exists.setTemplateType(clauseDto.getTemplateType());
-           // exists.setOrganizationList(clauseDto.getOrgannizationList());
+           // exists.setOrganizationList(clauseDto.getOrganizationList());
             exists = clauseRepository.save(sequenceGenerator(exists));
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -158,10 +162,6 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Page<Clause> getClausePagination(int page, int size) {
-        //  return clauseRepository.findAll(new PageRequest(page, size));
-        return null;
-    }
 
 
 }

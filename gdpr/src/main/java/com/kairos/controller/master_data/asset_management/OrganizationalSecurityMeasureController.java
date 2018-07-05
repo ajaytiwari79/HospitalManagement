@@ -17,7 +17,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORG_SEC_MEASURE_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 /*
  *
  *  created by bobby 17/5/2018
@@ -25,8 +26,8 @@ import static com.kairos.constants.ApiConstant.API_ORG_SEC_MEASURE_URL;
 
 
 @RestController
-@RequestMapping(API_ORG_SEC_MEASURE_URL)
-@Api(API_ORG_SEC_MEASURE_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class OrganizationalSecurityMeasureController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationalSecurityMeasureController.class);
@@ -36,7 +37,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("add OrganizationalSecurityMeasure")
-    @PostMapping("/add")
+    @PostMapping(COUNTRY_URL+"/organization_security/add")
     public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<OrganizationalSecurityMeasure> orgSecurityMeasures) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -50,7 +51,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
-    @GetMapping("/{id}")
+    @GetMapping(COUNTRY_URL+"/organization_security/{id}")
     public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -68,7 +69,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get all OrganizationalSecurityMeasure ")
-    @GetMapping("/all")
+    @GetMapping(COUNTRY_URL+"/organization_security/all")
     public ResponseEntity<Object> getAllOrganizationalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -81,7 +82,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get Organizational Security Measure by name")
-    @GetMapping("/name")
+    @GetMapping(COUNTRY_URL+"/organization_security/name")
     public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -95,7 +96,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping(COUNTRY_URL+"/organization_security/delete/{id}")
     public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -111,7 +112,7 @@ public class OrganizationalSecurityMeasureController {
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
-    @PutMapping("/update/{id}")
+    @PutMapping(COUNTRY_URL+"/organization_security/update/{id}")
     public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody OrganizationalSecurityMeasure orgSecurityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

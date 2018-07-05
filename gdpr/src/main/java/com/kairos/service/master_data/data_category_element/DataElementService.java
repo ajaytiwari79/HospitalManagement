@@ -119,11 +119,11 @@ public class DataElementService extends MongoBaseService {
     public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
-        List<DataElementDTO> upadateDataElementsDto = new ArrayList<>();
+        List<DataElementDTO> updateDataElementsDto = new ArrayList<>();
         List<DataElementDTO> createNewDataElementsDto = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
             if (Optional.ofNullable(dataElementDto.getId()).isPresent()) {
-                upadateDataElementsDto.add(dataElementDto);
+                updateDataElementsDto.add(dataElementDto);
             } else {
                 createNewDataElementsDto.add(dataElementDto);
             }
@@ -138,8 +138,8 @@ public class DataElementService extends MongoBaseService {
             dataElementsIds.addAll((List<BigInteger>) newDataElements.get(IDS_LIST));
             dataElementList.addAll((List<DataElement>) newDataElements.get(DATA_EMELENTS_LIST));
         }
-        if (upadateDataElementsDto.size() != 0) {
-            updatedDataElements = updateDataElementsList(countryId, organizationId, upadateDataElementsDto);
+        if (updateDataElementsDto.size() != 0) {
+            updatedDataElements = updateDataElementsList(countryId, organizationId, updateDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) updatedDataElements.get(IDS_LIST));
             dataElementList.addAll((List<DataElement>) updatedDataElements.get(DATA_EMELENTS_LIST));
         }
@@ -188,13 +188,13 @@ public class DataElementService extends MongoBaseService {
     }
 
 
-    public void checkForDuplicacyInName(List<DataElementDTO> dataElementDtos) {
+    public void checkForDuplicacyInName(List<DataElementDTO> dataElementDTOs) {
         List<String> names = new ArrayList<>();
-        dataElementDtos.forEach(dataElementDto -> {
-            if (names.contains(dataElementDto.getName())) {
-                throw new DuplicateDataException("Duplicate Entry with name " + dataElementDto.getName());
+        dataElementDTOs.forEach(dataElementDTO -> {
+            if (names.contains(dataElementDTO.getName())) {
+                throw new DuplicateDataException("Duplicate Entry with name " + dataElementDTO.getName());
             }
-            names.add(dataElementDto.getName());
+            names.add(dataElementDTO.getName());
         });
 
 
@@ -202,8 +202,8 @@ public class DataElementService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param dataElementDtoMap map contain dataElemenet corresponding to id
-     * @param dataElementNames  list of data elemenets names which we need to check if duplicate data present on updating existing Data elements
+     * @param dataElementDtoMap map contain dataElement corresponding to id
+     * @param dataElementNames  list of data elemnets names which we need to check if duplicate data present on updating existing Data elements
      */
     public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Long orgId, Map<BigInteger, DataElementDTO> dataElementDtoMap, List<String> dataElementNames) {
 

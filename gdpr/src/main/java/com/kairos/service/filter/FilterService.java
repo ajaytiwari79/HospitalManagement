@@ -57,7 +57,7 @@ public class FilterService {
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
-    //get fields with distinct values on which fiter is applicable
+    //get fields with distinct values on which fliter is applicable
     public FilterAndFavouriteFilterDTO getFilterCategories(Long countryId, Long organizationId, String moduleId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
@@ -85,7 +85,7 @@ public class FilterService {
             return filterAndFavouriteFilterDto;
 
         } else
-            throw new InvalidRequestException("invalide Request filter group not exist for moduleId " + moduleId);
+            throw new InvalidRequestException("invalid Request filter group not exist for moduleId " + moduleId);
 
 
     }
@@ -110,7 +110,7 @@ public class FilterService {
     }
 
 
-    //get filter data on the bases of selection of data and get filterGroiup By moduleId
+    //get filter data on the bases of selection of data and get filter Group By moduleId
     public FilterResponseWithData getFilterDataWithFilterSelection(Long countryId, Long organizationId, String moduleId, FilterSelectionDTO filterSelectionDto) {
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         if (!Optional.ofNullable(filterGroup).isPresent()) {
@@ -136,21 +136,21 @@ public class FilterService {
         switch (moduleName) {
             case CLAUSE_MODULE_NAME:
                 List<Clause> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<ClauseResponseDTO> clauseResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
+                List<ClauseResponseDTO> clauseResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
                 FilterResponseWithData<List<ClauseResponseDTO>> clauseFilterData = new FilterResponseWithData<>();
-                clauseFilterData.setData(clauseResponseDtos);
+                clauseFilterData.setData(clauseResponseDTOs);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
                 List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterAssetResponseDTO> masterAssetResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDTO.class);
-                FilterResponseWithData<List<MasterAssetResponseDTO>> assetfilterData = new FilterResponseWithData<>();
-                assetfilterData.setData(masterAssetResponseDtos);
-                return assetfilterData;
+                List<MasterAssetResponseDTO> masterAssetResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDTO.class);
+                FilterResponseWithData<List<MasterAssetResponseDTO>> assetFilterData = new FilterResponseWithData<>();
+                assetFilterData.setData(masterAssetResponseDTOs);
+                return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
                 List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterProcessingActivityResponseDTO> processingActivityResponseDtos = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDTO.class);
+                List<MasterProcessingActivityResponseDTO> processingActivityResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDTO.class);
                 FilterResponseWithData<List<MasterProcessingActivityResponseDTO>> processingActivityFilterData = new FilterResponseWithData<>();
-                processingActivityFilterData.setData(processingActivityResponseDtos);
+                processingActivityFilterData.setData(processingActivityResponseDTOs);
                 return processingActivityFilterData;
             default:
                 throw new DataNotFoundByIdException("data not found by moduleName " + moduleName);

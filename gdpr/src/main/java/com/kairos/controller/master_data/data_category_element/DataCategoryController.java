@@ -15,11 +15,13 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_DATA_CATEGORY_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+
 
 @RestController
-@RequestMapping(API_DATA_CATEGORY_URL)
-@Api(API_DATA_CATEGORY_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class DataCategoryController {
 
 
@@ -28,7 +30,7 @@ public class DataCategoryController {
 
 
     @ApiOperation("add data category ")
-    @PostMapping("/add")
+    @PostMapping(COUNTRY_URL+"/data_category/add")
     public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -40,7 +42,7 @@ public class DataCategoryController {
     }
 
     @ApiOperation("get data category by id with data Elements ")
-    @GetMapping("/{id}")
+    @GetMapping(COUNTRY_URL+"/data_category/{id}")
     public ResponseEntity<Object> getDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -57,7 +59,7 @@ public class DataCategoryController {
     }
 
     @ApiOperation("get all data category ")
-    @GetMapping("/all")
+    @GetMapping(COUNTRY_URL+"/data_category/all")
     public ResponseEntity<Object> getAllDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -69,7 +71,7 @@ public class DataCategoryController {
     }
 
     @ApiOperation("delete data category by id ")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping(COUNTRY_URL+"/data_category/delete/{id}")
     public ResponseEntity<Object> deleteDataCategory(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -85,7 +87,7 @@ public class DataCategoryController {
     }
 
 
-    @PutMapping("/update/{id}")
+    @PutMapping(COUNTRY_URL+"/data_category/update/{id}")
     public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

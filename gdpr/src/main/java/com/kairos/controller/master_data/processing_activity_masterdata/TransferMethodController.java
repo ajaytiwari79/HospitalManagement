@@ -18,7 +18,9 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_TRANSFER_METHOD;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+
 /*
  *
  *  created by bobby 20/5/2018
@@ -26,8 +28,8 @@ import static com.kairos.constants.ApiConstant.API_TRANSFER_METHOD;
 
 
 @RestController
-@RequestMapping(API_TRANSFER_METHOD)
-@Api(API_TRANSFER_METHOD)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class TransferMethodController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodController.class);
@@ -37,7 +39,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("add transfer Method ")
-    @PostMapping("/add")
+    @PostMapping(COUNTRY_URL+"/transfer_method/add")
     public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<TransferMethod> transferMethods) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -50,7 +52,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("get transfer Method by id")
-    @GetMapping("/{id}")
+    @GetMapping(COUNTRY_URL+"/transfer_method/{id}")
     public ResponseEntity<Object> getTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -67,7 +69,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("get all transfer Method")
-    @GetMapping("/all")
+    @GetMapping(COUNTRY_URL+"/transfer_method/all")
     public ResponseEntity<Object> getAllTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -79,7 +81,7 @@ public class TransferMethodController {
     }
 
     @ApiOperation("get transfer Method by name")
-    @GetMapping("/name")
+    @GetMapping(COUNTRY_URL+"/transfer_method/name")
     public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -92,7 +94,7 @@ public class TransferMethodController {
 
 
     @ApiOperation("delete transfer Method by id")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping(COUNTRY_URL+"/transfer_method/delete/{id}")
     public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -108,7 +110,7 @@ public class TransferMethodController {
     }
 
     @ApiOperation("update transfer Method by id")
-    @PutMapping("/update/{id}")
+    @PutMapping(COUNTRY_URL+"/transfer_method/update/{id}")
     public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethod transferMethod) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

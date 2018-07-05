@@ -16,7 +16,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_TECH_SECURITY_MEASURE_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+
 /*
  *
  *  created by bobby 17/5/2018
@@ -24,8 +26,8 @@ import static com.kairos.constants.ApiConstant.API_TECH_SECURITY_MEASURE_URL;
 
 
 @RestController
-@RequestMapping(API_TECH_SECURITY_MEASURE_URL)
-@Api(API_TECH_SECURITY_MEASURE_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class TechnicalSecurityController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TechnicalSecurityController.class);
@@ -35,7 +37,7 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("add TechnicalSecurityMeasure")
-    @PostMapping("/add")
+    @PostMapping(COUNTRY_URL+"/technical_security/add")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId,@Valid @RequestBody ValidateListOfRequestBody<TechnicalSecurityMeasure> securityMeasures) {
        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -48,7 +50,7 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
-    @GetMapping("/{id}")
+    @GetMapping(COUNTRY_URL+"/technical_security/{id}")
     public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -64,7 +66,7 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("get all TechnicalSecurityMeasure ")
-    @GetMapping("/all")
+    @GetMapping(COUNTRY_URL+"/technical_security/all")
     public ResponseEntity<Object> getAllTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -76,7 +78,7 @@ public class TechnicalSecurityController {
     }
 
     @ApiOperation("get TechnicalSecurityMeasure by name")
-    @GetMapping("/name")
+    @GetMapping(COUNTRY_URL+"/technical_security/name")
     public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@PathVariable Long countryId,@PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -89,7 +91,7 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping(COUNTRY_URL+"/technical_security/delete/{id}")
     public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -103,7 +105,7 @@ public class TechnicalSecurityController {
     }
 
     @ApiOperation("update TechnicalSecurityMeasure by id")
-    @PutMapping("/update/{id}")
+    @PutMapping(COUNTRY_URL+"/technical_security/update/{id}")
     public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id,  @Valid @RequestBody TechnicalSecurityMeasure securityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

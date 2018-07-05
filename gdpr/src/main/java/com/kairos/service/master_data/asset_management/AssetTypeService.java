@@ -107,7 +107,7 @@ public class AssetTypeService extends MongoBaseService {
             subAssetTypesIds.add(subAssetTypeDto.getId());
             subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
         });
-        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, organizationId, subAssetTypesIds);
+        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, organizationId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
 
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
@@ -145,7 +145,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         }
         if (Optional.ofNullable(exist.getSubAssetTypes()).isPresent()) {
-            List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, organizationId, exist.getSubAssetTypes());
+            List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, organizationId, exist.getSubAssetTypes());
             assetTypeMongoRepository.deleteAll(subAssetTypes);
         }
         delete(exist);
@@ -218,15 +218,15 @@ public class AssetTypeService extends MongoBaseService {
      */
 
     /**
-     * @param assetTypeDtos check for duplicacy in name of Asset types
+     * @param assetTypeDTOs check for duplicates in name of Asset types
      */
-    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDtos) {
+    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDTOs) {
         List<String> names = new ArrayList<>();
-        for (AssetTypeDTO assetTypeDto : assetTypeDtos) {
-            if (names.contains(assetTypeDto.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
+        for (AssetTypeDTO assetTypeDTO : assetTypeDTOs) {
+            if (names.contains(assetTypeDTO.getName().toLowerCase())) {
+                exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDTO.getName());
             }
-            names.add(assetTypeDto.getName().toLowerCase());
+            names.add(assetTypeDTO.getName().toLowerCase());
         }
     }
 

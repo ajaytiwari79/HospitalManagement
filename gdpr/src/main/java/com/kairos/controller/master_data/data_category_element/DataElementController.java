@@ -17,11 +17,12 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_DATA_ELEMENT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 @RestController
-@RequestMapping(API_DATA_ELEMENT_URL)
-@Api(API_DATA_ELEMENT_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class DataElementController {
 
 
@@ -30,7 +31,7 @@ public class DataElementController {
 
 
     @ApiOperation("create  data Element ")
-    @PostMapping("/add")
+    @PostMapping(COUNTRY_URL+"/data_element/add")
     public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDTO> dataElements) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -44,7 +45,7 @@ public class DataElementController {
 
 
     @ApiOperation("get data Element by id")
-    @GetMapping("/{id}")
+    @GetMapping(COUNTRY_URL+"/data_element/{id}")
     public ResponseEntity<Object> getDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -60,7 +61,7 @@ public class DataElementController {
     }
 
     @ApiOperation("get All data Element ")
-    @GetMapping("/all")
+    @GetMapping(COUNTRY_URL+"/data_element/all")
     public ResponseEntity<Object> getAllDataElement(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -73,7 +74,7 @@ public class DataElementController {
     }
 
     @ApiOperation("deleted  data element by id ")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping(COUNTRY_URL+"/data_element/delete/{id}")
     public ResponseEntity<Object> deleteDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -89,8 +90,8 @@ public class DataElementController {
     }
 
 
-    @ApiOperation("update  data Eelements ")
-    @PutMapping("/update/{id}")
+    @ApiOperation("update  data Eelement ")
+    @PutMapping(COUNTRY_URL+"/data_element/update/{id}")
     public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElement dataElements) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

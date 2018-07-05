@@ -5,19 +5,22 @@ import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.service.filter.FilterService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constants.ApiConstant.API_FILTER;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(API_FILTER)
-@Api(API_FILTER)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class FilterController {
 
 
@@ -30,7 +33,9 @@ public class FilterController {
      * @param moduleId  is required to get filter group with contain Filter types on which filtering can apply
      * @return
      */
-    @GetMapping("/category/{moduleId}")
+
+    @ApiOperation("get category or values of Properties on which filter apply by module id")
+    @GetMapping(COUNTRY_URL+"/filter/category/{moduleId}")
     public ResponseEntity<Object> getFilterData(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String moduleId) {
 
         if (countryId == null) {
@@ -52,7 +57,8 @@ public class FilterController {
      * @param filterSelectionDto contain List of id and and Filter type filtering data
      * @return Filter data on the basis of filter type selection and Ids
      */
-    @PostMapping("/data/{moduleId}")
+    @ApiOperation("get  filter data by filter selection value")
+    @PostMapping(COUNTRY_URL+"/filter/data/{moduleId}")
     public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
 
         if (countryId == null) {

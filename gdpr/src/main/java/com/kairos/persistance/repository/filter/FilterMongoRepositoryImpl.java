@@ -33,7 +33,7 @@ import static com.kairos.constants.AppConstant.DELETED;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 
 
-public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
+public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
 
 
     @Inject

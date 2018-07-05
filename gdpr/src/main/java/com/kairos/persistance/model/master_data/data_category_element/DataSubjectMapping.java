@@ -18,7 +18,7 @@ import java.util.Set;
 public class DataSubjectMapping extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "name cannotbe null or empty")
+    @NotNullOrEmpty(message = "Name can't be null or empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
