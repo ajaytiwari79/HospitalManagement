@@ -137,7 +137,8 @@ public class PlannerService {
     }
 
     public boolean stopVRPPlanning(BigInteger solverConfigId){
-
+        vrpPlannerService.terminateEarlyVrpPlanningSolver(solverConfigId.toString());
+        return true;
     }
 
 

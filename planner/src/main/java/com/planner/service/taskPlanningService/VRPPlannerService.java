@@ -111,7 +111,7 @@ public class VRPPlannerService {
         for (Shift shift : shifts) {
             Task nextTask = shift.getNextTask();
             if (shift.getPlannedEndTime() != null) {
-                planningShifts.add(new PlanningShift(shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
+                planningShifts.add(new PlanningShift(shift.getId(),shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
                 int i = 0;
                 while (nextTask != null) {
                     LocalDateTime drivingTimeStart = null;
@@ -144,7 +144,7 @@ public class VRPPlannerService {
                     nextTask = nextTask.getNextTask();
                     if (nextTask != null) {
                         int drivingMin = nextTask.getDrivingTime();
-                        com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, drivingMin * 60, nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+                        com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, drivingMin, nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
                         drivedTask.setPlannedStartTime(drivingTimeStart);
                         drivedTask.setDrivingDistance(nextTask.getDrivingDistance());
                         drivedTask.setShiftId(shift.getId());
