@@ -96,9 +96,6 @@ public class WTABuilderService extends MongoBaseService {
             case CHILD_CARE_DAYS_CHECK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
                 break;
-            case BREAK_IN_SHIFT:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, BreaksInShiftWTATemplate.class);
-                break;
             case DAYS_OFF_AFTER_A_SERIES:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DaysOffAfterASeriesWTATemplate.class);
                 break;

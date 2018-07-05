@@ -36,9 +36,7 @@ public class BreaksInShiftWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public BreaksInShiftWTATemplateDTO() {
-        this.wtaTemplateType = WTATemplateType.BREAK_IN_SHIFT;
-    }
+
     public BreaksInShiftWTATemplateDTO(String name, String templateType, boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {
         this.name = name;
         //this.templateType = WTATemplateType.;

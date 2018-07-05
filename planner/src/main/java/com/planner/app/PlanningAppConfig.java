@@ -9,7 +9,6 @@ import com.planner.constants.AppConstants;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,8 +45,12 @@ public class PlanningAppConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
 
-
     public static void main(String[] args) {
+        //ch.qos.logback.classic.turbo.TurboFilter tf=null;
+        //ClassPathResource cps= new ClassPathResource("droolsFile");
+
+        //logger.info("drool files path "+new File(AppConstants.DROOL_FILES_PATH).exists());
+
         SpringApplication.run(PlanningAppConfig.class, args);
     }
 
