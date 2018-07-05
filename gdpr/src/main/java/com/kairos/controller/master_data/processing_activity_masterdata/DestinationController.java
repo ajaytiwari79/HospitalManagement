@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -42,10 +43,8 @@ public class DestinationController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.createDestination(countryId, organizationId, destinations.getRequestBody()));
-
     }
 
 
@@ -62,7 +61,6 @@ public class DestinationController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, destinationService.getDestination(countryId, organizationId, id));
-
     }
 
 

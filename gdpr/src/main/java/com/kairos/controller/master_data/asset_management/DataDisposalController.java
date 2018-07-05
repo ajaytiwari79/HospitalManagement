@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -125,4 +126,32 @@ public class DataDisposalController {
     }
 
 
+    @ApiOperation("get all DataDisposal of unit")
+    @GetMapping(UNIT_URL+"/data_disposal/all")
+    public ResponseEntity<Object> getAllDataDisposalOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unit id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal(countryId, unitId));
+
+    }
+
+    @ApiOperation("get DataDisposal of unit by id")
+    @GetMapping(UNIT_URL+"/data_disposal/{id}")
+    public ResponseEntity<Object> getDataDisposalByIdOfunit(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unit id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, unitId, id));
+
+    }
 }

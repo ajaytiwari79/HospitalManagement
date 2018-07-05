@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -53,14 +54,14 @@ public class TechnicalSecurityController {
     public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } if (countryId == null) {
+        }
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }  if (organizationId == null) {
+        }
+        if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
             return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId,organizationId,id));
-
     }
 
 
@@ -73,7 +74,6 @@ public class TechnicalSecurityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(countryId,organizationId));
-
     }
 
     @ApiOperation("get TechnicalSecurityMeasure by name")
@@ -116,6 +116,34 @@ public class TechnicalSecurityController {
         }  return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(countryId,organizationId,id, securityMeasure));
 
     }
+
+    @ApiOperation("get TechnicalSecurityMeasure of Unit by id")
+    @GetMapping(UNIT_URL+"/technical_security/{id}")
+    public ResponseEntity<Object> getTechnicalSecurityMeasureOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId,unitId,id));
+    }
+
+
+    @ApiOperation("get all TechnicalSecurityMeasure of Unit")
+    @GetMapping(UNIT_URL+"/technical_security/all")
+    public ResponseEntity<Object> getAllTechnicalSecurityMeasureOfUnit(@PathVariable Long countryId,@PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(countryId,unitId));
+    }
+
 
 
 }

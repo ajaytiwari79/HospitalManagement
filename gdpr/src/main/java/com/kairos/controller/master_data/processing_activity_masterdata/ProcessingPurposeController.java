@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -62,10 +63,8 @@ public class ProcessingPurposeController {
         }
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, organizationId, id));
-
     }
 
 
@@ -76,10 +75,8 @@ public class ProcessingPurposeController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(countryId, organizationId));
-
     }
 
     @ApiOperation("get Processing purpose by name")
@@ -124,8 +121,34 @@ public class ProcessingPurposeController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(countryId, organizationId, id, processingPurpose));
-
     }
 
+
+    @ApiOperation("get processing purpose of unit by id")
+    @GetMapping(UNIT_URL+"/processing_purpose/{id}")
+    public ResponseEntity<Object> getProcessingPurposeOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(countryId, unitId, id));
+    }
+
+
+    @ApiOperation("get all processing purpose of unit")
+    @GetMapping(UNIT_URL+"/processing_purpose/all")
+    public ResponseEntity<Object> getAllProcessingPurposeOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(countryId, unitId));
+    }
 
 }

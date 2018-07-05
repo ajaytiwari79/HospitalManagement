@@ -18,6 +18,8 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
+
 
 /*
  *
@@ -117,6 +119,35 @@ public class HostingProviderController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         } return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, organizationId, id, hostingProvider));
+
+    }
+
+    @ApiOperation("get HostingProvider of Unit by id")
+    @GetMapping(UNIT_URL+"/hosting_provider/{id}")
+    public ResponseEntity<Object> getHostingProviderOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        } if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }  if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, unitId, id));
+
+    }
+
+
+    @ApiOperation("get all HostingProvider of Unit")
+    @GetMapping(UNIT_URL+"/hosting_provider/all")
+    public ResponseEntity<Object> getAllHostingProviderOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }  if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider(countryId, unitId));
 
     }
 

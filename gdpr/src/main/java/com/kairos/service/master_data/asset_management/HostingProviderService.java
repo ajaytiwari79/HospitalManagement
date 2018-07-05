@@ -31,6 +31,13 @@ public class HostingProviderService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param hostingProviders
+     * @return return map which contain list of new hosting providers and list of existing hosting provider if hosting provider already exist
+     */
     public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
 
         Map<String, List<HostingProvider>> result = new HashMap<>();

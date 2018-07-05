@@ -32,11 +32,10 @@ public class DataSubjectMappingService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @param dataSubjectMappingDto request body of Data Subject ANd Mapping
-     * @return new Data Subject Object
+     * @return  Data Subject which contain list of data category ids
      */
     public DataSubjectMapping addDataSubjectAndMapping(Long countryId, Long organizationId, DataSubjectMappingDTO dataSubjectMappingDto) {
 
@@ -47,15 +46,11 @@ public class DataSubjectMappingService extends MongoBaseService {
         if (dataCategoryService.getDataCategoryByIds(countryId, organizationId, dataSubjectMappingDto.getDataCategories()).size() != dataSubjectMappingDto.getDataCategories().size()) {
             exceptionService.invalidRequestException("message.invalid.request", "");
         }
-        DataSubjectMapping dataSubjectMapping = new DataSubjectMapping();
-        dataSubjectMapping.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
-        dataSubjectMapping.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
-        dataSubjectMapping.setName(dataSubjectMappingDto.getName());
-        dataSubjectMapping.setDescription(dataSubjectMappingDto.getDescription());
+        DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectMappingDto.getName(), dataSubjectMappingDto.getDescription(), dataSubjectMappingDto.getOrganizationTypes(), dataSubjectMappingDto.getOrganizationSubTypes()
+                , dataSubjectMappingDto.getDataCategories());
         dataSubjectMapping.setCountryId(countryId);
         dataSubjectMapping.setOrganizationId(organizationId);
-        dataSubjectMapping.setDataCategories(dataSubjectMappingDto.getDataCategories());
-       return dataSubjectMappingRepository.save( sequenceGenerator(dataSubjectMapping));
+        return dataSubjectMappingRepository.save(sequenceGenerator(dataSubjectMapping));
 
 
     }
@@ -73,7 +68,7 @@ public class DataSubjectMappingService extends MongoBaseService {
     }
 
     public DataSubjectMappingResponseDto getDataSubjectAndMappingWithData(Long countryId, Long organizationId, BigInteger id) {
-        DataSubjectMappingResponseDto dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategory(countryId, organizationId,id);
+        DataSubjectMappingResponseDto dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategory(countryId, organizationId, id);
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
@@ -81,21 +76,19 @@ public class DataSubjectMappingService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @return list of DataSubject With Data category List
      */
     public List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithData(Long countryId, Long organizationId) {
-        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategory(countryId,organizationId);
+        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategory(countryId, organizationId);
     }
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
-     * @param id  id of data SubjectMapping model
+     * @param id                    id of data SubjectMapping model
      * @param dataSubjectMappingDto request body for updating Data Subject Mapping Object
      * @return updated Data SubjectMapping object
      */

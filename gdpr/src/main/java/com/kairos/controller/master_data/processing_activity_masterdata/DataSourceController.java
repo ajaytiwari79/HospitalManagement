@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -59,10 +60,8 @@ public class DataSourceController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }  if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
             return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId,organizationId,id));
-
     }
 
 
@@ -73,10 +72,8 @@ public class DataSourceController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(countryId,organizationId));
-
     }
 
     @ApiOperation("get dataSource by name")
@@ -120,6 +117,33 @@ public class DataSourceController {
         }  return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(countryId,organizationId,id, dataSource));
 
     }
+
+
+    @ApiOperation("get dataSource of Unit by id")
+    @GetMapping(UNIT_URL+"/data_source/{id}")
+    public ResponseEntity<Object> getDataSourceOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        } if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }  if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId,unitId,id));
+    }
+
+
+    @ApiOperation("get all dataSource of Unit")
+    @GetMapping(UNIT_URL+"/data_source/all")
+    public ResponseEntity<Object> getAllDataSourceOfUnit(@PathVariable Long countryId,@PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(countryId,unitId));
+    }
+
 
 
 }

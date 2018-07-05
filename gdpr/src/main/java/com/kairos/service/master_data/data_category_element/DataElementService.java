@@ -114,7 +114,7 @@ public class DataElementService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param dataElementsDto request body contain list Of Existing Data Elements which needs to be Update and List of New Data Elements
-     * @return map of Data Elements ids List and updated and new Data Elements List
+     * @return map of Data Element ids and ,List of  updated and new Data Elements
      */
     public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 

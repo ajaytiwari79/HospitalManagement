@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 
 /*
@@ -53,9 +54,8 @@ public class MasterAssetController {
     public ResponseEntity<Object> getAllMasterAsset(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }  if (organizationId == null) {
+        }else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getAllMasterAsset(countryId, organizationId));
     }
@@ -103,5 +103,35 @@ public class MasterAssetController {
 
     }
 
+
+    @ApiOperation(value = "get master asset of Unitby id")
+    @GetMapping(UNIT_URL+"/master_asset/{id}")
+    public ResponseEntity<Object> getMasterAssetOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(countryId,unitId,id));
+
+    }
+
+
+
+    @ApiOperation(value = "get all master asset of Unit")
+    @GetMapping(UNIT_URL+"/master_asset/all")
+    public ResponseEntity<Object> getAllMasterAssetOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getAllMasterAsset(countryId, unitId));
+    }
 
 }

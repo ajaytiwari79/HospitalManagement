@@ -15,6 +15,8 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
+
 
 
 @RestController
@@ -64,7 +66,6 @@ public class DataSubjectMappingController {
         }
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithData(countryId, organizationId, id));
     }
@@ -94,6 +95,33 @@ public class DataSubjectMappingController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.updateDataSubjectAndMapping(countryId, organizationId, id, dataSubjectMappingDto));
+    }
+
+    @ApiOperation("get data Subject mapping with data Category and data elements of unit by id ")
+    @GetMapping(UNIT_URL+"/dataSubject_mapping/{id}")
+    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndElementOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getDataSubjectAndMappingWithData(countryId, unitId, id));
+    }
+
+    @ApiOperation("get all data Subject mapping of Unit ")
+    @GetMapping(UNIT_URL+"/dataSubject_mapping/all")
+    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElementOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithData(countryId, unitId));
     }
 
 

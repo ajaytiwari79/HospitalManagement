@@ -87,13 +87,15 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public DataSubjectMapping(String name, String description) {
+    public DataSubjectMapping(String name, String description,  List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes,
+                              Set<BigInteger> dataCategories) {
         this.name = name;
         this.description = description;
-
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.dataCategories = dataCategories;
     }
 
     public DataSubjectMapping() {
-
     }
 }

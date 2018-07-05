@@ -29,6 +29,14 @@ public class HostingTypeService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param hostingTypes
+     * @return map of new hosting types and existing hosting types(already exist with same name)
+     */
     public Map<String, List<HostingType>> createHostingType(Long countryId,Long organizationId,List<HostingType> hostingTypes) {
 
         Map<String, List<HostingType>> result = new HashMap<>();
@@ -45,16 +53,12 @@ public class HostingTypeService extends MongoBaseService {
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (hostingTypeNames.size()!=0) {
                 for (String name : hostingTypeNames) {
-
                     HostingType newHostingType = new HostingType();
                     newHostingType.setName(name);
                     newHostingType.setCountryId(countryId);
                     newHostingType.setOrganizationId(organizationId);
                     newHostingTypes.add(newHostingType);
-
                 }
-
-
                 newHostingTypes = hostingTypeMongoRepository.saveAll(sequenceGenerator(newHostingTypes));
             }
             result.put("existing", existing);

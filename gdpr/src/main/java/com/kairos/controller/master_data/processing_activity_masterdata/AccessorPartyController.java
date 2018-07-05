@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -61,10 +62,8 @@ public class AccessorPartyController {
         }
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
             return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId,organizationId,id));
-
     }
 
 
@@ -78,7 +77,6 @@ public class AccessorPartyController {
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllAccessorParty(countryId,organizationId));
-
     }
 
     @ApiOperation("get AccessorParty by name")
@@ -127,6 +125,36 @@ public class AccessorPartyController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(countryId,organizationId,id, accessorParty));
 
+    }
+
+
+
+    @ApiOperation("get AccessorParty by id")
+    @GetMapping(UNIT_URL+"/accessor_party/{id}")
+    public ResponseEntity<Object> getAccessorPartyOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId,unitId,id));
+    }
+
+
+    @ApiOperation("get all AccessorParty ")
+    @GetMapping(UNIT_URL+"/accessor_party/all")
+    public ResponseEntity<Object> getAllAccessorPartyOfUnit(@PathVariable Long countryId,@PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllAccessorParty(countryId,unitId));
     }
 
 

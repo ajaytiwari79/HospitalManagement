@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 
 import javax.inject.Inject;
@@ -97,4 +98,31 @@ public class MasterProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityListWithSubProcessing(countryId, organizationId));
     }
+
+    @ApiOperation(value = "get MasterProcessingActivity of unit by id")
+    @GetMapping(UNIT_URL+"/master_processing_activity/{id}")
+    public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId  can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, unitId, id));
+    }
+
+    @ApiOperation(value = "get MasterProcessingActivity list with SubProcessing Activity of unit ")
+    @GetMapping(UNIT_URL+"/master_processing_activity/all")
+    public ResponseEntity<Object> getMasterProcessingActivityListWithSubProcessingActivityOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityListWithSubProcessing(countryId, unitId));
+    }
+
 }

@@ -89,4 +89,15 @@ public class MasterAsset extends MongoBaseEntity {
     public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
+
+    public MasterAsset(String name, String description, List<OrganizationTypeDTO> organizationTypes,
+                       List<OrganizationSubTypeDTO> organizationSubTypes,  List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+        this.name = name;
+        this.description = description;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationServices = organizationServices;
+        this.organizationSubServices = organizationSubServices;
+
+    }
 }
