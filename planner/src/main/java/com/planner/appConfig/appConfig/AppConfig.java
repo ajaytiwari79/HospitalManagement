@@ -21,6 +21,8 @@ public class AppConfig implements IAppConfig{
     @Value("${graphhopper.key}")
     private String graphhoperkey;
 
+    @Value("${drool.files.path}")
+    private String droolFilePath;
     //@Value("${cassandra.keyspace}")
     private String cassandraKeySpace;
 
@@ -60,4 +62,7 @@ public class AppConfig implements IAppConfig{
         graphhoperKeyExpireCount = count;
     }
 
+    public String getDroolFilePath() {
+        return droolFilePath;
+    }
 }

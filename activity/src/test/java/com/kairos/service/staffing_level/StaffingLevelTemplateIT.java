@@ -3,8 +3,8 @@ package com.kairos.service.staffing_level;
 import com.kairos.KairosActivityApplication;
 import com.kairos.activity.staffing_level.Duration;
 import com.kairos.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.dto.staffing_level.PresenceStaffingLevelDto;
-import com.kairos.dto.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.util.DateUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -23,7 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

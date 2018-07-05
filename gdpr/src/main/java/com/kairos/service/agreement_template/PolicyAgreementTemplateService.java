@@ -52,6 +52,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     @Inject
     private TemplateTypeMongoRepository templateTypeMongoRepository;
 
+    //todo working on it
     public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organziationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
 
         String name = policyAgreementTemplateDto.getName();
@@ -93,7 +94,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 }
                 if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationTypes());
+                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
 
                 }
                 if (agreementSection.size() != 0) {
@@ -101,7 +102,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
                 }
                 policyAgreementTemplate.setCountryId(countryId);
-                policyAgreementTemplate = save(policyAgreementTemplate);
+                policyAgreementTemplate = sequenceGenerator(policyAgreementTemplate);
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
@@ -135,7 +136,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
-            save(exist);
+            sequenceGenerator(exist);
             return true;
         }
         throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
@@ -181,7 +182,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 }
                 if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationTypes());
+                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
 
                 }
                 if (agreementSection.size() != 0) {
@@ -195,7 +196,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
-            return save(exist);
+            return sequenceGenerator(exist);
 
         }
 

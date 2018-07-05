@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.clause_tag;
 
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import org.bson.types.ObjectId;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
+@JaversSpringDataAuditable
 public interface ClauseTagMongoRepository extends MongoRepository<ClauseTag,BigInteger> {
 
     @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")

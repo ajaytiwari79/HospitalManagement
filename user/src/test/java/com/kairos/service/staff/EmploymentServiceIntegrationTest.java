@@ -3,7 +3,6 @@ package com.kairos.service.staff;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.activity.web.UnitPositionDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;

@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
@@ -58,5 +59,7 @@ public interface CustomActivityMongoRepository {
     Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate,LocalDate endDate);
 
     ActivityWrapper findActivityAndTimeTypeByActivityId(BigInteger activityId);
+
+    List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds);
 
 }

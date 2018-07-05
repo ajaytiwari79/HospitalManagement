@@ -1068,13 +1068,6 @@ public class StaffService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
-        User user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
-        Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
-        if (Optional.ofNullable(staff).isPresent()) {
-            exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
-
-        }
-        setBasicDetailsOfUser(user, payload);
         Organization parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
@@ -1082,6 +1075,23 @@ public class StaffService extends UserBaseService {
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
+
+        // Check if Staff exists in organization with CPR Number
+        if(staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)){
+            exceptionService.invalidRequestException("error.staff.exists.same.cprNumber",payload.getCprNumber());
+        }
+        User user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
+
+        if(!Optional.ofNullable(user).isPresent()){
+            user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
+        }
+
+        Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
+        if (Optional.ofNullable(staff).isPresent()) {
+            exceptionService.duplicateDataException("message.staff.externalid.alreadyexist");
+
+        }
+        setBasicDetailsOfUser(user, payload);
 
         // Set default language of User
         Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId );

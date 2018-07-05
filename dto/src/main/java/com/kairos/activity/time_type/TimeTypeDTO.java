@@ -18,7 +18,8 @@ public class TimeTypeDTO {
     private BigInteger upperLevelTimeTypeId;
     private boolean selected;
     private List<TimeTypeDTO> children = new ArrayList<>();
-
+    private String backgroundColor;
+    private String textColor;
 
     public TimeTypeDTO(String timeTypes) {
         this.timeTypes = timeTypes;
@@ -57,6 +58,14 @@ public class TimeTypeDTO {
         this.timeTypes = timeTypes;
     }
 
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,String textColor) {
+        this.id = id;
+        this.timeTypes = timeTypes;
+        this.label = label;
+        this.description = description;
+        this.backgroundColor=backgroundColor;
+        this.textColor=textColor;
+    }
     public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description) {
         this.id = id;
         this.timeTypes = timeTypes;
@@ -105,4 +114,19 @@ public class TimeTypeDTO {
         this.description = description;
     }
 
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public String getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
+    }
 }

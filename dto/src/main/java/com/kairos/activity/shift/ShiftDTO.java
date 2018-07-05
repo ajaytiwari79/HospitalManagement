@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by vipul on 30/8/17.
@@ -77,6 +78,19 @@ public class ShiftDTO {
         this.endLocalDate=endLocalDate;
         this.startTime=startTime;
         this.endTime=endTime;
+    }
+
+    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
+            Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime,List<ShiftDTO> subShifts) {
+        this.activityId = activityId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.unitPositionId = unitPositionId;
+        this.startLocalDate=startLocalDate;
+        this.endLocalDate=endLocalDate;
+        this.startTime=startTime;
+        this.endTime=endTime;
+        this.subShifts=subShifts;
     }
 
     public LocalDate getStartLocalDate() {

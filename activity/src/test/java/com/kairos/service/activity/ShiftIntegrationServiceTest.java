@@ -1,19 +1,18 @@
 package com.kairos.service.activity;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.rest_client.OrganizationRestClient;
-
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.enums.shift.ShiftState;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.dto.ActivityDTO;
-import com.kairos.activity.dto.activity.ActivityTagDTO;
+import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.activity.shift.ShiftPublishDTO;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
