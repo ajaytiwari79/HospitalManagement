@@ -74,9 +74,6 @@ public class WTABuilderService {
             case CHILD_CARE_DAYS_CHECK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
                 break;
-            case BREAK_IN_SHIFT:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, BreaksInShiftWTATemplate.class);
-                break;
             default:
                 throw new IllegalStateException("Invalid TEMPLATE");
         }
