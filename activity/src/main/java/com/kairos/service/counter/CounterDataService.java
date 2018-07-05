@@ -54,6 +54,8 @@ public class CounterDataService {
         if(shiftIds == null || shiftIds.isEmpty()){
             exceptionService.dataNotFoundByIdException("error.kpi.vrp.shift.availability", shiftIds);
         }
+        logger.info("Shifts Count: "+shiftIds.size());
+        logger.info("Planned Shift Count: "+vrpTaskPlanningDTO.getShifts().size());
         List<Shift> shifts = shiftService.getAllShiftByIds(new ArrayList<>(shiftIds));
         ArrayList<KPI> kpiList = new ArrayList<>();
         kpiList.add(getTaskUnplannedKPI(vrpTaskPlanningDTO, tasks));
@@ -63,6 +65,7 @@ public class CounterDataService {
         kpiList.add(getRoadTimePercentKPI(vrpTaskPlanningDTO, shifts));
         kpiList.add(getCompletedTaskWithinTimeWindowKPI(vrpTaskPlanningDTO, shifts, tasks));
         kpiList.add(getPercentOfBreaksIn11and13KPI(vrpTaskPlanningDTO));
+        kpiList.add(getFlexiTimePercentKPI(vrpTaskPlanningDTO,shifts));
         return kpiList;
     }
 
@@ -135,7 +138,7 @@ public class CounterDataService {
     }
 
     private KPI prepareTaskTimeVsWorkingTime(double workingTime, double totalTaskTime){
-        BaseChart baseChart = new SingleNumberChart(totalTaskTime*100/workingTime, RepresentationUnit.PERCENT, "Hours");
+        BaseChart baseChart = new SingleNumberChart(totalTaskTime*100.0/workingTime, RepresentationUnit.PERCENT, "Hours");
         KPI kpi = new KPI(CounterType.TOTAL_TASK_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_TASK_TIME_PERCENT, null);
         kpi.setId(new BigInteger("4"));
         return kpi;
@@ -145,7 +148,7 @@ public class CounterDataService {
     public KPI getRoadTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> includedShifts){
         double workingTimeMinutes = includedShifts.parallelStream().mapToLong(shift -> Long.sum(shift.getEndDate().getTime(), -shift.getStartDate().getTime())).sum()/(1000*60);
         double totalRoadTimeMinutes=vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> !task.isBreakTime()).mapToLong(task -> task.getDuration()).sum();
-        double roadTimePercent = totalRoadTimeMinutes*100/workingTimeMinutes;
+        double roadTimePercent = totalRoadTimeMinutes*100.0/workingTimeMinutes;
         return prepareRoadTimePercentKPI(roadTimePercent);
     }
 
@@ -184,7 +187,7 @@ public class CounterDataService {
         List<TaskDTO> allBreaks = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(task -> task.isBreakTime()).collect(toList());
         List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY);
         List<TaskDTO> validBreaks = allBreaks.stream().filter(task -> (days.contains(task.getPlannedStartTime().getDayOfWeek()) && task.getPlannedStartTime().getHour() >=11 && task.getPlannedEndTime().getHour() <=13)).collect(toList());
-        double validBreakPercentage = validBreaks.size()*100*1.0/(allBreaks.size()*1.0);
+        double validBreakPercentage = validBreaks.size()*100.0/allBreaks.size();
         return preparePercentOfBreaksIn11and13KPI(validBreakPercentage);
     }
 
@@ -197,13 +200,15 @@ public class CounterDataService {
 
     //KPI:Flexi Time Time Percent
     public KPI getFlexiTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
-        Map<String, Shift> shiftIdMap = shifts.stream().collect(Collectors.toMap(shift-> shift.getId().toString(), shift->shift));
-
-        return prepareFlexiTimePercentKPI(0);
+        long baseShiftWorkingTime = shifts.stream().mapToLong(baseShift -> Long.sum(baseShift.getEndDate().getTime(), -baseShift.getStartDate().getTime())).sum();
+        long plannedShiftWorkingTime = vrpTaskPlanningDTO.getShifts().stream().mapToLong(plannedShift -> Long.sum(plannedShift.getEndTime(), -plannedShift.getStartTime())).sum();
+        long flexiTime = (plannedShiftWorkingTime - baseShiftWorkingTime);
+        double flexiTimePercent = flexiTime*100.0/baseShiftWorkingTime;
+        return prepareFlexiTimePercentKPI(flexiTimePercent);
     }
 
     private KPI prepareFlexiTimePercentKPI(double flexiTimePercent){
-        BaseChart baseChart = new SingleNumberChart(flexiTimePercent, RepresentationUnit.PERCENT, "Breaks");
+        BaseChart baseChart = new SingleNumberChart(flexiTimePercent, RepresentationUnit.PERCENT, "Hours");
         KPI kpi = new KPI(CounterType.FLEXI_TIME_PERCENT.getName(), ChartType.NUMBER_ONLY, baseChart, CounterSize.SIZE_1X1, CounterType.FLEXI_TIME_PERCENT, null);
         kpi.setId(new BigInteger("8"));
         return kpi;
