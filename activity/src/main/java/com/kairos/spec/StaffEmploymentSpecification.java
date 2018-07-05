@@ -33,6 +33,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
                 phaseTemplateValue1 = phaseTemplateValue;
+                break;
             }
         }
         if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
@@ -51,6 +52,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
             for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
                 if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
                     phaseTemplateValue1 = phaseTemplateValue;
+                    break;
                 }
             }
             if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
