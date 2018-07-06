@@ -74,10 +74,10 @@ public class CounterDataService {
         kpiList.add(getRoadTimePercentKPI(vrpTaskPlanningDTO, shifts));
         kpiList.add(getCompletedTaskWithinTimeWindowKPI(vrpTaskPlanningDTO, shifts, tasks));
         kpiList.add(getPercentOfBreaksIn11and13KPI(vrpTaskPlanningDTO));
-        kpiList.add(getFlexiTimePercentKPI(vrpTaskPlanningDTO,shifts));
-        kpiList.add(getFlexiTimeTaskPercentKPI(vrpTaskPlanningDTO, shifts, tasks));
-        kpiList.add(getTotalKMsDrivenByStaff(vrpTaskPlanningDTO, employeeDataIdMap));
-        kpiList.add(getTotalTaskEfficiencyKPI(vrpTaskPlanningDTO, tasks));
+        //kpiList.add(getFlexiTimePercentKPI(vrpTaskPlanningDTO,shifts));
+        //kpiList.add(getFlexiTimeTaskPercentKPI(vrpTaskPlanningDTO, shifts, tasks));
+        //kpiList.add(getTotalKMsDrivenByStaff(vrpTaskPlanningDTO, employeeDataIdMap));
+        //kpiList.add(getTotalTaskEfficiencyKPI(vrpTaskPlanningDTO, tasks));
         return kpiList;
     }
 
