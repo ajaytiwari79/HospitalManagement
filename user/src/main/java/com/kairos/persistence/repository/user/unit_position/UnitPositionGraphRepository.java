@@ -266,9 +266,28 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
+            "return expertise as expertise, positionCode as positionCode, \n" +
+            "unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
+            "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
+            "UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
+            "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
+            "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
+            "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
+            "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
+            " return expertise as expertise,positionCode as positionCode,\n" +
+            "unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
+            "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo")
+    List<UnitPositionQueryResult> getAllUnitPositionsBasicDetailsAndWTAByUser(long userId);
+
+
+    @Query("match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
+            "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
+            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
+            "match(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) \n" +
+            "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta_response:CostTimeAgreement) \n" +
             "return expertise as expertise,cta_response as costTimeAgreement, positionCode as positionCode, \n" +
-            "unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
+            "unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
             "UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
@@ -277,7 +296,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta_response:CostTimeAgreement) \n" +
             " return expertise as expertise,cta_response as costTimeAgreement, positionCode as positionCode,\n" +
-            "unitPosition.workingTimeAgreementId as workingTimeAgreementId,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
+            "unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published,\n" +
             "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo")
-    List<UnitPositionQueryResult> getAllUnitPositionsBasicDetailsByUser(long userId);
+    List<UnitPositionQueryResult> getAllUnitPositionsBasicDetailsAndCTAByUser(long userId);
 }

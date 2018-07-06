@@ -454,16 +454,15 @@ public class WTAService extends MongoBaseService {
 
 
     public List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
-        List<WTAVersionDTO> currentVersionWTA = wtaRepository.getAllParentWTAByIds(wtaIds);
-        List<WTAVersionDTO> versionsOfWTA = wtaRepository.getWTAWithVersionIds(wtaIds);
-        currentVersionWTA.forEach(w -> {
-            Optional<WTAVersionDTO> currentObject = versionsOfWTA.parallelStream().filter(wtaVersionDTO -> w.getId().equals(wtaVersionDTO.getId())).findFirst();
+        List<WTAVersionDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(wtaIds);
+        List<WTAVersionDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(wtaIds);
+        currentWTAList.forEach(currentWTA -> {
+            Optional<WTAVersionDTO> currentObject = versionsOfWTAs.parallelStream().filter(wtaVersionDTO -> currentWTA.getId().equals(wtaVersionDTO.getId())).findFirst();
             if (currentObject.isPresent()) {
-                w.setVersions(currentObject.get().getVersions());
+                currentWTA.setVersions(currentObject.get().getVersions());
             }
-
         });
-        return currentVersionWTA;
+        return currentWTAList;
     }
 
 

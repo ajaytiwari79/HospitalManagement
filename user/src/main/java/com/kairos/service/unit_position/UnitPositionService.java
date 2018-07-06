@@ -357,11 +357,12 @@ public class UnitPositionService extends UserBaseService {
             save(unitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else if (oldUnitPosition.isPublished() && !calculativeValueChanged) {
-            // TODO make functions to update non calc value changed
+
             oldUnitPosition.setEndDateMillis(DateUtils.getLongFromLocalDate(unitPositionDTO.getEndLocalDate()));
             save(oldUnitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
-        } else if (oldUnitPosition.isPublished() && !calculativeValueChanged && saveAsDraft) {
+        } //
+        else if (oldUnitPosition.isPublished() && !calculativeValueChanged && saveAsDraft) {
             //CREAte new UP
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
@@ -414,7 +415,6 @@ public class UnitPositionService extends UserBaseService {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unitPositionDTO.getUnionId());
             if (!Optional.ofNullable(union).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.unitposition.union.notexist", unitPositionDTO.getUnionId());
-
             }
             unitPosition.setUnion(union);
         }
@@ -431,8 +431,6 @@ public class UnitPositionService extends UserBaseService {
         }
         copyAndLinkNewWTA(unitPosition, wta.get());
 */
-
-
         CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
                 costTimeAgreementGraphRepository.findOne(unitPositionDTO.getCtaId());
         if (cta != null) {
@@ -822,6 +820,7 @@ public class UnitPositionService extends UserBaseService {
         return unitPositionWithCtaDetailsDTO;
     }
 
+
     public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionWithCTA(Long unitPositionId, Organization organization, Long countryId) {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
@@ -1130,15 +1129,22 @@ public class UnitPositionService extends UserBaseService {
 
     public List<UnitPositionQueryResult> getAllWTAOfStaff(Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        //EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd(), employment.getMainEmploymentStartDate(), employment.getMainEmploymentEndDate(), employment.isMainEmployment());
-        List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsByUser(user.getId());
+        List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndWTAByUser(user.getId());
         List<WTAVersionDTO> wtaResponseDTOS = workingTimeAgreementRestClient.getWTAWithVersionIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
         Map<BigInteger, WTAVersionDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w -> w.getId(), w -> w));
         unitPositionQueryResults.forEach(u -> {
             u.setWorkingTimeAgreementVersion(wtaResponseDTOMap.get(u.getWorkingTimeAgreementId()));
         });
+        return unitPositionQueryResults;
+    }
+
+    public List<UnitPositionQueryResult> getAllCTAOfStaff(Long staffId) {
+
+        User user = userGraphRepository.getUserByStaffId(staffId);
+        List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndCTAByUser(user.getId());
 
         return unitPositionQueryResults;
-
     }
+
+
 }
