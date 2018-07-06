@@ -1,8 +1,8 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
+import com.kairos.activity.shift.FunctionDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.activity.web.FunctionDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -21,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

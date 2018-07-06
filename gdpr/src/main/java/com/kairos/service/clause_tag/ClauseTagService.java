@@ -1,20 +1,19 @@
 package com.kairos.service.clause_tag;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
-import com.kairos.service.MongoBaseService;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.javers.JaversCommonService;
+import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -29,9 +28,14 @@ public class ClauseTagService extends MongoBaseService {
 
     @Inject
     ClauseTagMongoRepository clauseTagMongoRepository;
+
     @Inject
     private
     MessageSource messageSource;
+
+
+    @Inject
+    private JaversCommonService javersCommonService;
 
 
     public ClauseTag createClauseTag(Long countryId, Long organizationId, String clauseTag) {
@@ -46,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
             newClauseTag.setOrganizationId(organizationId);
-            return save(newClauseTag);
+            return clauseTagMongoRepository.save(sequenceGenerator(newClauseTag));
         }
     }
 
@@ -74,8 +78,7 @@ public class ClauseTagService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-            exist.setDeleted(true);
-            save(exist);
+           delete(exist);
             return true;
 
         }
@@ -89,11 +92,11 @@ public class ClauseTagService extends MongoBaseService {
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            exist.setName(clauseTag);
-            return save(exist);
-
         }
+        clauseTagMongoRepository.save(exist);
+return exist;
+
+
     }
 
     //add tags in clause if tag exist then simply add and create new tag and add
@@ -124,7 +127,7 @@ public class ClauseTagService extends MongoBaseService {
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = save(clauseTagList);
+            clauseTagList = clauseTagMongoRepository.saveAll(sequenceGenerator(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;

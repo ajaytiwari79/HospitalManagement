@@ -44,4 +44,7 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
     @Query("Match (language:SystemLanguage{deleted:false}) SET language.defaultLanguage={0}")
     void setDefaultStatusForAllLangugae(boolean defaultStatus);
 
+    @Query("Match (language:SystemLanguage{deleted:false, defaultLanguage:true}) return language")
+    SystemLanguage getDefaultSystemLangugae();
+
 }

@@ -2,7 +2,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.master_data_management.asset_management.AssetType;
+import com.kairos.persistance.model.master_data.asset_management.AssetType;
 
 import java.math.BigInteger;
 import java.util.List;

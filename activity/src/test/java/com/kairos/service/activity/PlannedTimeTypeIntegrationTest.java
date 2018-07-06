@@ -1,9 +1,9 @@
 package com.kairos.service.activity;
 
 import com.kairos.KairosActivityApplication;
+import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class PlannedTimeTypeIntegrationTest {
         ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = testRestTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, typeReference);
         System.out.println("reponse: "+response.getStatusCode());
         Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        createdId = response.getBody().getData().getId().longValue();
+        createdId = response.getBody().getData().getId();
     }
 
     @Test
@@ -68,7 +68,7 @@ public class PlannedTimeTypeIntegrationTest {
     public void case3_updatePlannedTimeType() throws Exception{
         String baseUrl = getBaseUrl(24L, 4L)+"/"+createdId;
         System.out.println("baseUrl: "+baseUrl);
-        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType-updated"+createdId, BigInteger.valueOf(createdId));
+        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PlannedTimeType-updated"+createdId, createdId);
         HttpEntity<PresenceTypeDTO> requestEntity = new HttpEntity<>(presenceTypeDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> responseRef = new ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>>() {
         };

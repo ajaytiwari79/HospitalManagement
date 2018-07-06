@@ -52,9 +52,9 @@ public class ConstraintValue {
     public ConstraintValue() {
     }
 
-    public ConstraintValue(BigInteger id,Integer constraintValue) {
+    public ConstraintValue(BigInteger id,Integer penalityValue) {
         this.id = id;
-        this.constraintValue = null;
+        this.penalityValue = penalityValue;
     }
 
     public BigInteger getId() {

@@ -2,6 +2,7 @@ package com.kairos.planner.vrp.taskplanning.solution;
 
 import com.kairos.planner.vrp.taskplanning.model.*;
 import org.optaplanner.core.api.domain.lookup.LookUpStrategyType;
+import com.kairos.planner.vrp.taskplanning.model.constraint.Constraint;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -30,9 +31,20 @@ public class VrpTaskPlanningSolution {
     private LocationsDistanceMatrix locationsDistanceMatrix;
     @ProblemFactProperty
     private LocationsRouteMatrix locationsRouteMatrix;
+    @ProblemFactProperty
+    private Constraint constraint;
+
     @PlanningScore
     private HardMediumSoftLongScore hardMediumSoftScore;
 
+
+    public Constraint getConstraint() {
+        return constraint;
+    }
+
+    public void setConstraint(Constraint constraint) {
+        this.constraint = constraint;
+    }
 
     public BigInteger getSolverConfigId() {
         return solverConfigId;

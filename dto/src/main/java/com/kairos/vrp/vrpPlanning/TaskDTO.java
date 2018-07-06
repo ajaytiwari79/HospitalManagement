@@ -3,6 +3,7 @@ package com.kairos.vrp.vrpPlanning;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -23,17 +24,22 @@ public class TaskDTO {
     private Set<String> skills;
     private int duration;
     private String streetName;
+    private int drivingDistance;
     private int houseNo;
     private String block;
     private int floorNo;
     private int post;
+    private String citizenName;
     private String city;
     private LocalDateTime plannedStartTime;
     private LocalDateTime plannedEndTime;
     private Long startTime;
     private Long endTime;
+    private String shiftId;
     private String color;
     private boolean breakTime;
+    private int drivingTime;
+    private boolean escalated;
 
 
     public TaskDTO() {
@@ -52,6 +58,46 @@ public class TaskDTO {
         this.floorNo = floorNo;
         this.post = post;
         this.city = city;
+    }
+
+
+    public boolean isEscalated() {
+        return escalated;
+    }
+
+    public void setEscalated(boolean escalated) {
+        this.escalated = escalated;
+    }
+
+    public int getDrivingTime() {
+        return drivingTime;
+    }
+
+    public void setDrivingTime(int drivingTime) {
+        this.drivingTime = drivingTime;
+    }
+
+    public String getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(String shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public String getCitizenName() {
+        return citizenName;
+    }
+
+    public void setCitizenName(String citizenName) {
+        this.citizenName = citizenName;
+    }
+    public int getDrivingDistance() {
+        return drivingDistance;
+    }
+
+    public void setDrivingDistance(int drivingDistance) {
+        this.drivingDistance = drivingDistance;
     }
 
     public boolean isBreakTime() {
@@ -213,4 +259,6 @@ public class TaskDTO {
     public void setPlannedStartTime(LocalDateTime plannedStartTime) {
         this.plannedStartTime = plannedStartTime;
     }
+
+
 }
