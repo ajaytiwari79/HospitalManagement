@@ -3,6 +3,8 @@ package com.kairos.planner.vrp.taskplanning.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.solverconfig.SolverConfigConstraintWrapper;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Set;
 
@@ -55,4 +57,29 @@ public class Employee {
         this.efficiency = efficiency;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Employee employee = (Employee) o;
+
+        return new EqualsBuilder()
+                .append(efficiency, employee.efficiency)
+                .append(id, employee.id)
+                .append(name, employee.name)
+                .append(skills, employee.skills)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .append(skills)
+                .append(efficiency)
+                .toHashCode();
+    }
 }

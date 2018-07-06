@@ -175,6 +175,7 @@ public class VrpTaskPlanningSolver {
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
             t.setLocationsRouteMatrix(problem.getLocationsRouteMatrix());
         });
+        //removeBreaks(problem);
         VrpTaskPlanningSolution solution=null;
         try {
             //TODO put submiss id here
@@ -185,10 +186,22 @@ public class VrpTaskPlanningSolver {
             director.setWorkingSolution(solution);
             Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
             printSolutionInformation( solution);
+            getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
             return new Object[]{solution,indictmentMap};
         }catch (Exception e){
-            //e.printStackTrace();
-            throw  e;
+            e.printStackTrace();
+            //throw  e;
+        }
+        return null;
+    }
+
+    private void removeBreaks(VrpTaskPlanningSolution problem) {
+        Iterator<Task> iterator = problem.getTasks().iterator();
+        while (iterator.hasNext()){
+            Task task =iterator.next();
+            if(task.isShiftBreak()){
+                iterator.remove();
+            }
         }
     }
 

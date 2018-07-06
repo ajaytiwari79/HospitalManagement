@@ -1,6 +1,7 @@
 package com.kairos.planner.vrp.taskplanning.solution;
 
 import com.kairos.planner.vrp.taskplanning.model.*;
+import org.optaplanner.core.api.domain.lookup.LookUpStrategyType;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -13,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
-@PlanningSolution
+@PlanningSolution(lookUpStrategyType = LookUpStrategyType.EQUALITY)
 public class VrpTaskPlanningSolution {
     private String id;
     private BigInteger solverConfigId;

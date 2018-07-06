@@ -37,7 +37,7 @@ public class VrpTaskPlanningSolverTest {
     public void solveWithDrls(){
         String drlsPath="../../planner/src/main/resources/droolsFile";
         List<File> files=  Arrays.stream(new File(drlsPath).listFiles()).filter(f->f.getName().endsWith(".drl")).collect(Collectors.toList());
-        VrpTaskPlanningSolver vrpTaskPlanningSolver = new VrpTaskPlanningSolver(files);
+        VrpTaskPlanningSolver vrpTaskPlanningSolver = new VrpTaskPlanningSolver(files,"src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml");
         VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) vrpTaskPlanningSolver.getxStream().fromXML(new File("src/main/resources/problem.xml"));
         vrpTaskPlanningSolver.solveProblemOnRequest(problem);
 
