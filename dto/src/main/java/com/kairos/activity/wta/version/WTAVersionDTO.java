@@ -5,6 +5,7 @@ import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,11 +17,20 @@ public class WTAVersionDTO {
     private String name;
     private BigInteger id;
     private Expertise expertise;
-    private List<WTAVersionDTO> versions;
+    private Boolean disabled;
+    private List<WTAVersionDTO> versions = new ArrayList<>();
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
 
     public WTAVersionDTO() {
         //dc
+    }
+
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
     }
 
     public Date getStartDate() {

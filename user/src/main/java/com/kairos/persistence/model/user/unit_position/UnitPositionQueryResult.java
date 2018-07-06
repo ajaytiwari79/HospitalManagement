@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -48,6 +49,9 @@ public class UnitPositionQueryResult {
     private Long reasonCodeId;
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
+
+    private WTAVersionDTO workingTimeAgreementVersion;    // Its for version of the WTA
+
     private Boolean history;
     private Boolean editable;
     private Boolean published;
@@ -291,6 +295,14 @@ public class UnitPositionQueryResult {
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public WTAVersionDTO getWorkingTimeAgreementVersion() {
+        return workingTimeAgreementVersion;
+    }
+
+    public void setWorkingTimeAgreementVersion(WTAVersionDTO workingTimeAgreementVersion) {
+        this.workingTimeAgreementVersion = workingTimeAgreementVersion;
     }
 
     public UnitPositionQueryResult() {

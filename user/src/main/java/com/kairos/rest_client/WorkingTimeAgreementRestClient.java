@@ -2,6 +2,7 @@ package com.kairos.rest_client;
 
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,19 +186,20 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public List<WTAResponseDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
+    public List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
         String baseUrl = getBaseUrl(true);
         String param = wtaIds.toString().replace("[", "").replace("]", "");
         try {
             //HttpEntity<List<BigInteger>> request = new HttpEntity<>(wtaIds);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAVersionDTO>>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAVersionDTO>>>() {
+                    };
+            ResponseEntity<RestTemplateResponseEnvelope<List<WTAVersionDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/wta/versions?wtaIds=" + param,
                             HttpMethod.GET, null, typeReference);
 
-            RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<WTAVersionDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
