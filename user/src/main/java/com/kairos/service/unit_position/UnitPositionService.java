@@ -181,10 +181,10 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(positionCode).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.position.name.notexist", unitPositionDTO.getPositionCodeId());
         }
-        if (saveAsDraft) {
+        /*if (saveAsDraft) {
             List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getStaffUnitPositionsByExpertise(organization.getId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId());
             validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
-        }
+        }*/
         UnitPosition unitPosition = new UnitPosition();
 
         EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentOrganization.getId(), unitPositionDTO.getEmploymentTypeId(), false);
