@@ -141,7 +141,7 @@ public class DataDisposalController {
 
     @ApiOperation("get DataDisposal of unit by id")
     @GetMapping(UNIT_URL+"/data_disposal/{id}")
-    public ResponseEntity<Object> getDataDisposalByIdOfunit(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getDataDisposalByIdofUnit(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }

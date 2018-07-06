@@ -50,8 +50,8 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     private MasterQuestionMongoRepository masterQuestionMongoRepository;
 
     public MasterQuestionnaireTemplate addQuestionnaireTemplate(Long countryId,Long organizationId, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,organizationId,templateDto.getName());
-        if (Optional.ofNullable(exisiting).isPresent()) {
+        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,organizationId,templateDto.getName());
+        if (Optional.ofNullable(existing).isPresent()) {
             throw new DuplicateDataException("Template Exists with same name");
         }
         MasterQuestionnaireTemplate questionnaireTemplate = new MasterQuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
@@ -117,25 +117,25 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         return true;
     }
 
-    public MasterQuestionnaireTemplate updateQuestionniareTemplate(Long countryId, Long orgId,BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
-        if (Optional.ofNullable(exisiting).isPresent() && !id.equals(exisiting.getId())) {
+    public MasterQuestionnaireTemplate updateQuestionnaireTemplate(Long countryId, Long orgId,BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
+        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
+        if (Optional.ofNullable(existing).isPresent() && !id.equals(existing.getId())) {
             throw new DuplicateDataException("Template Exists with same name");
         }
-        exisiting = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,orgId,id);
-        if (!Optional.ofNullable(exisiting).isPresent()) {
+        existing = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,orgId,id);
+        if (!Optional.ofNullable(existing).isPresent()) {
             exceptionService.duplicateDataException("message.dataNotFound", "questionnaire template", id);
         }
-        exisiting.setName(templateDto.getName());
-        exisiting.setDescription(templateDto.getDescription());
-        exisiting = buildQuestionnaireTemplate(templateDto, exisiting);
+        existing.setName(templateDto.getName());
+        existing.setDescription(templateDto.getDescription());
+        existing = buildQuestionnaireTemplate(templateDto, existing);
         try {
-            exisiting = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(exisiting));
+            existing = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(existing));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());
         }
-        return exisiting;
+        return existing;
     }
 
     /**
@@ -155,7 +155,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
-    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionniareTemplateWithSection(Long countryId,Long organizationId) {
+    public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSection(Long countryId,Long organizationId) {
         List<MasterQuestionnaireTemplateResponseDTO> templateResponseDTOs = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId);
         templateResponseDTOs.forEach(template -> {
             if (template.getSections().get(0).getId() == null) {

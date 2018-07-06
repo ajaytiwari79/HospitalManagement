@@ -36,7 +36,7 @@ public class DataSubjectMappingDTO {
     @Valid
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
-    @NotEmpty(message = "DataCategorie  can't be  empty")
+    @NotEmpty(message = "Data Category  can't be  empty")
     @NotNull(message = "Data category  can't be  null")
     private Set<BigInteger> dataCategories;
 

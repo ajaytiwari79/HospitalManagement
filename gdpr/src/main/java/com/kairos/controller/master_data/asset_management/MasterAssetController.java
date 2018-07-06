@@ -104,7 +104,7 @@ public class MasterAssetController {
     }
 
 
-    @ApiOperation(value = "get master asset of Unitby id")
+    @ApiOperation(value = "get master asset of Unit by id")
     @GetMapping(UNIT_URL+"/master_asset/{id}")
     public ResponseEntity<Object> getMasterAssetOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {
         if (id == null) {

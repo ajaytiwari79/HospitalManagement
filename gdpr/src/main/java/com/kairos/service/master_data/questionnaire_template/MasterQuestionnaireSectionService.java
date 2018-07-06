@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.constants.AppConstant.QUESTIONNIARE_SECTIONS;
+import static com.kairos.constants.AppConstant.QUESTIONNAIRE_SECTIONS;
 import static com.kairos.constants.AppConstant.QUESTION_LIST;
 import static com.kairos.constants.AppConstant.IDS_LIST;
 
@@ -55,7 +55,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @param countryId
      * @param templateId
      * @param masterQuestionnaireSectionDto contains list of sections and questions
-     * @return add sections ids to questionniare template and return questionnaire template
+     * @return add sections ids to questionnaire template and return questionnaire template
      */
     public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long orgId, BigInteger templateId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDto) {
         MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
@@ -68,7 +68,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         try {
             questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(questionnaireTemplate));
         } catch (Exception e) {
-            masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNIARE_SECTIONS));
+            masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNAIRE_SECTIONS));
             masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e);
@@ -104,7 +104,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             throw new MongoException(e.getMessage());
         }
         result.put(IDS_LIST, questionSectionIds);
-        result.put(QUESTIONNIARE_SECTIONS, masterQuestionnaireSections);
+        result.put(QUESTIONNAIRE_SECTIONS, masterQuestionnaireSections);
         result.put(QUESTION_LIST, questionList);
         return result;
 
@@ -123,7 +123,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    public Boolean deletedQuestionniareSection(Long countryId, Long orgId, BigInteger id) {
+    public Boolean deletedQuestionnaireSection(Long countryId, Long orgId, BigInteger id) {
         MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, orgId, id);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire section", id);
@@ -139,7 +139,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @param questionnaireSectionDto contain list of updated section and new section which we have to create and add to questionnaire template
      * @return
      */
-    public MasterQuestionnaireTemplate updateExistingQuestionniareSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, BigInteger id, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
+    public MasterQuestionnaireTemplate updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, BigInteger id, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
 
         MasterQuestionnaireTemplate template = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
         if (!Optional.ofNullable(template).isPresent()) {
@@ -173,8 +173,8 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         } catch (MongoException e) {
 
             List<MasterQuestionnaireSection> sections = new ArrayList<>();
-            sections.addAll((List<MasterQuestionnaireSection>) newSections.get(QUESTIONNIARE_SECTIONS));
-            sections.addAll((List<MasterQuestionnaireSection>) updatedSections.get(QUESTIONNIARE_SECTIONS));
+            sections.addAll((List<MasterQuestionnaireSection>) newSections.get(QUESTIONNAIRE_SECTIONS));
+            sections.addAll((List<MasterQuestionnaireSection>) updatedSections.get(QUESTIONNAIRE_SECTIONS));
             List<MasterQuestion> questions = new ArrayList<>();
             questions.addAll((List<MasterQuestion>) newSections.get(QUESTION_LIST));
             questions.addAll((List<MasterQuestion>) updatedSections.get(QUESTION_LIST));
@@ -207,7 +207,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         List<MasterQuestion> questionList = new ArrayList<>();
 
         Map<String, Object> result = new HashMap<>();
-        List<MasterQuestionnaireSection> sections = masterQuestionnaireSectionRepository.getQuestionnniareSectionListByIds(countryId, orgId, sectionsIds);
+        List<MasterQuestionnaireSection> sections = masterQuestionnaireSectionRepository.getQuestionnaireSectionListByIds(countryId, orgId, sectionsIds);
         for (MasterQuestionnaireSection section : sections) {
             MasterQuestionnaireSectionDTO sectionDto = (MasterQuestionnaireSectionDTO) sectionsDtoCorrespondingToId.get(section.getId());
             Map<String, Object> questions = masterQuestionService.updateExistingQuestionAndCreateNewQuestions(countryId, orgId, sectionDto.getQuestions());
@@ -226,7 +226,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             throw new MongoException(e.getMessage());
         }
         result.put(IDS_LIST, sectionsIds);
-        result.put(QUESTIONNIARE_SECTIONS, updateSectionsList);
+        result.put(QUESTIONNAIRE_SECTIONS, updateSectionsList);
         result.put(QUESTION_LIST, questionList);
         return result;
 

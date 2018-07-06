@@ -26,10 +26,10 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNull(message = "Account types cannot be empty ")
+    @NotNull(message = "Account types can't be empty ")
     private Set<BigInteger> accountTypes;
 
-    @NotNull(message = "Sections cannot be emoty")
+    @NotNull(message = "Sections can't be empty")
     private Set<BigInteger> agreementSections;
 
     private Long countryId;
