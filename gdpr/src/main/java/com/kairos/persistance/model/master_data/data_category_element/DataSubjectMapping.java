@@ -18,7 +18,7 @@ import java.util.Set;
 public class DataSubjectMapping extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "name cannotbe null or empty")
+    @NotNullOrEmpty(message = "Name can't be null or empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -87,13 +87,15 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public DataSubjectMapping(String name, String description) {
+    public DataSubjectMapping(String name, String description,  List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes,
+                              Set<BigInteger> dataCategories) {
         this.name = name;
         this.description = description;
-
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.dataCategories = dataCategories;
     }
 
     public DataSubjectMapping() {
-
     }
 }

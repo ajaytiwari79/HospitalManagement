@@ -31,6 +31,13 @@ public class HostingProviderService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param hostingProviders
+     * @return return map which contain list of new hosting providers and list of existing hosting provider if hosting provider already exist
+     */
     public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
 
         Map<String, List<HostingProvider>> result = new HashMap<>();
@@ -44,7 +51,7 @@ public class HostingProviderService extends MongoBaseService {
             }
             List<HostingProvider> existing  = findByNamesList(countryId,organizationId,hostingProviderNames,HostingProvider.class);
             hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
-            List<HostingProvider> newhostingProviders = new ArrayList<>();
+            List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (hostingProviderNames.size()!=0) {
                 for (String name : hostingProviderNames) {
 
@@ -52,14 +59,14 @@ public class HostingProviderService extends MongoBaseService {
                     newHostingProvider.setName(name);
                     newHostingProvider.setCountryId(countryId);
                     newHostingProvider.setOrganizationId(organizationId);
-                    newhostingProviders.add(newHostingProvider);
+                    newHostingProviders.add(newHostingProvider);
 
                 }
 
-                newhostingProviders = hostingProviderMongoRepository.saveAll(sequenceGenerator(newhostingProviders));
+                newHostingProviders = hostingProviderMongoRepository.saveAll(sequenceGenerator(newHostingProviders));
             }
             result.put("existing", existing);
-            result.put("new", newhostingProviders);
+            result.put("new", newHostingProviders);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");

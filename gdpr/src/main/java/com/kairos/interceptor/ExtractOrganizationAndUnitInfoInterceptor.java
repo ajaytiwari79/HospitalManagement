@@ -34,14 +34,14 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if (pathVariables == null) {
             throw new InvalidRequestException("Url or Parameter is not correct");
         }
-        String orgIdStirng = pathVariables.get("organizationId");
+        String orgIdString = pathVariables.get("organizationId");
         String unitIdString = pathVariables.get("unitId");
         String countryIdString = pathVariables.get("countryId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI() + "[ orgainzationID ,Unit Id " + orgIdStirng + " ," + unitIdString + " ]");
+                + "]" + request.getRequestURI() + "[ orgainzationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
 
-        if (orgIdStirng != null) {
-            final Long orgId = Long.valueOf(orgIdStirng);
+        if (orgIdString != null) {
+            final Long orgId = Long.valueOf(orgIdString);
             UserContext.setOrgId(orgId);
         }
         if (countryIdString != null) {

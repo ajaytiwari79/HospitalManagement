@@ -36,7 +36,7 @@ public class AgreementSectionService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-//todo clause versioning and refactor
+//todo clause versionning and refactor
     public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
 
         List<AgreementSectionResponseDTO> result = new ArrayList<>();

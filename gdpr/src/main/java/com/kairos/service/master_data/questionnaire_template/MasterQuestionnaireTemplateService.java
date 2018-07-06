@@ -56,7 +56,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         }
         MasterQuestionnaireTemplate questionnaireTemplate = new MasterQuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
         questionnaireTemplate.setOrganizationId(organizationId);
-        questionnaireTemplate = buildQuestionniareTemplate(templateDto, questionnaireTemplate);
+        questionnaireTemplate = buildQuestionnaireTemplate(templateDto, questionnaireTemplate);
         try {
             questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(questionnaireTemplate));
         } catch (MongoException e) {
@@ -68,11 +68,11 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
 
     /**
-     * @param templateDto           contain data to create basic questionniare Template
+     * @param templateDto           contain data to create basic questionnaire Template
      * @param questionnaireTemplate is template in which we add properties of Template Type and Asset Type if present
      * @return
      */
-    public MasterQuestionnaireTemplate buildQuestionniareTemplate(MasterQuestionnaireTemplateDTO templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
+    public MasterQuestionnaireTemplate buildQuestionnaireTemplate(MasterQuestionnaireTemplateDTO templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
         if (QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()) == null) {
             throw new InvalidRequestException("template type not found for" + templateDto.getTemplateType());
         }
@@ -111,7 +111,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     public Boolean deleteMasterQuestionnaireTemplate(Long countryId,Long organizationId, BigInteger id) {
         MasterQuestionnaireTemplate exist = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionniare template", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", id);
         }
         delete(exist);
         return true;
@@ -124,11 +124,11 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         }
         exisiting = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,orgId,id);
         if (!Optional.ofNullable(exisiting).isPresent()) {
-            exceptionService.duplicateDataException("message.dataNotFound", "quetionnaire template", id);
+            exceptionService.duplicateDataException("message.dataNotFound", "questionnaire template", id);
         }
         exisiting.setName(templateDto.getName());
         exisiting.setDescription(templateDto.getDescription());
-        exisiting = buildQuestionniareTemplate(templateDto, exisiting);
+        exisiting = buildQuestionnaireTemplate(templateDto, exisiting);
         try {
             exisiting = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(exisiting));
         } catch (MongoException e) {
@@ -146,7 +146,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @param id
      * @return
      */
-    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionniareTemplateWithSectionById(Long countryId,Long organizationId,BigInteger id) {
+    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionById(Long countryId,Long organizationId,BigInteger id) {
         MasterQuestionnaireTemplateResponseDTO templateResponseDto = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId,id);
         if (templateResponseDto.getSections().get(0).getId() == null) {
             templateResponseDto.setSections(new ArrayList<>());
@@ -156,13 +156,13 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
 
     public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionniareTemplateWithSection(Long countryId,Long organizationId) {
-        List<MasterQuestionnaireTemplateResponseDTO> templateResponseDtos = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId);
-        templateResponseDtos.forEach(template -> {
+        List<MasterQuestionnaireTemplateResponseDTO> templateResponseDTOs = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId);
+        templateResponseDTOs.forEach(template -> {
             if (template.getSections().get(0).getId() == null) {
                 template.setSections(new ArrayList<>());
             }
         });
-        return templateResponseDtos;
+        return templateResponseDTOs;
 
     }
 

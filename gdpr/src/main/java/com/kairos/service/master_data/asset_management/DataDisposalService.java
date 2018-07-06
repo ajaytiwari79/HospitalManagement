@@ -29,6 +29,14 @@ public class DataDisposalService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param dataDisposals
+     * @return return map which contain list of new data disposal and list of existing data disposal if data disposal already exist
+     */
     public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, Long organizationId, List<DataDisposal> dataDisposals) {
 
         Map<String, List<DataDisposal>> result = new HashMap<>();

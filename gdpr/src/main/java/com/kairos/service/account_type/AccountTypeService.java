@@ -59,11 +59,11 @@ public class AccountTypeService extends MongoBaseService {
     public List<AccountType> getAccountTypeList(Long countryId, Set<BigInteger> ids) {
         List<AccountType> accountTypes = accountTypeRepository.getAccountTypeList(countryId, ids);
         if (accountTypes.size() != ids.size()) {
-            Set<BigInteger> accounTypeIds = new HashSet<>();
+            Set<BigInteger> accountTypeIds = new HashSet<>();
             accountTypes.forEach(accountType -> {
-                accounTypeIds.add(accountType.getId());
+                accountTypeIds.add(accountType.getId());
             });
-            ids.removeAll(accounTypeIds);
+            ids.removeAll(accountTypeIds);
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "account type ", ids.iterator().next());
         }
         return accountTypes;

@@ -39,14 +39,9 @@ public class MasterAssetService extends MongoBaseService {
         if (masterAssetMongoRepository.findByName(countryId, organizationId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        MasterAsset newAsset = new MasterAsset();
-        newAsset.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
-        newAsset.setOrganizationSubTypes(masterAssetDto.getOrganizationSubTypes());
-        newAsset.setOrganizationServices(masterAssetDto.getOrganizationServices());
-        newAsset.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
-        newAsset.setName(masterAssetDto.getName());
+        MasterAsset newAsset = new MasterAsset(masterAssetDto.getName(),masterAssetDto.getDescription(),masterAssetDto.getOrganizationTypes(),masterAssetDto.getOrganizationSubTypes()
+        ,masterAssetDto.getOrganizationServices(),masterAssetDto.getOrganizationSubServices());
         newAsset.setCountryId(countryId);
-        newAsset.setDescription(masterAssetDto.getDescription());
         newAsset.setOrganizationId(organizationId);
         return masterAssetMongoRepository.save(sequenceGenerator(newAsset));
     }

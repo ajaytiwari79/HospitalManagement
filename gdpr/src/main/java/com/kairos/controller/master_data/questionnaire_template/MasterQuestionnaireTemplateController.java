@@ -9,17 +9,16 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
-
 import java.math.BigInteger;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
 
-import static com.kairos.constants.ApiConstant.API_MASTER_QUESTIONNAIRE_TEMPLATE;
 
 @RestController
-@RequestMapping(API_MASTER_QUESTIONNAIRE_TEMPLATE)
-@Api(API_MASTER_QUESTIONNAIRE_TEMPLATE)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class MasterQuestionnaireTemplateController {
 
 
@@ -32,8 +31,8 @@ public class MasterQuestionnaireTemplateController {
      * @param templateDto
      * @return masterQuestionnaireTemplate basic response
      */
-    @PostMapping("/add")
     @ApiOperation(value = "add questionnaire template basic data ")
+    @PostMapping("/questionnaire_template/add")
     public ResponseEntity<Object> addMasterQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody MasterQuestionnaireTemplateDTO templateDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -45,9 +44,8 @@ public class MasterQuestionnaireTemplateController {
 
     }
 
-
-    @GetMapping("/all")
     @ApiOperation(value = "get all questionnaire template basic response ")
+    @GetMapping("/questionnaire_template/all")
     public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -57,8 +55,8 @@ public class MasterQuestionnaireTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionniareTemplateWithSection(countryId, organizationId));
     }
 
-    @GetMapping("/{id}")
-    @ApiOperation(value = "get all questionnaire template basic response ")
+    @ApiOperation(value = "get all questionnaire template ")
+    @GetMapping("/questionnaire_template/{id}")
     public ResponseEntity<Object> getMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -69,11 +67,11 @@ public class MasterQuestionnaireTemplateController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getMasterQuestionniareTemplateWithSectionById(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, organizationId, id));
     }
 
-    @DeleteMapping("/delete/{id}")
     @ApiOperation(value = "delete questionnaire template by id ")
+    @DeleteMapping("/questionnaire_template/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -87,11 +85,10 @@ public class MasterQuestionnaireTemplateController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.deleteMasterQuestionnaireTemplate(countryId, organizationId, id));
 
-
     }
 
-    @PutMapping("/update/{id}")
     @ApiOperation(value = "update basic detail of Questionniare template ")
+    @PutMapping("/questionnaire_template/update/{id}")
     public ResponseEntity<Object> updateQuestionniareTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody MasterQuestionnaireTemplateDTO templateDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -104,6 +101,32 @@ public class MasterQuestionnaireTemplateController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.updateQuestionniareTemplate(countryId, organizationId, id, templateDto));
 
+    }
+
+    @ApiOperation(value = "get all questionnaire template basic response of unit")
+    @GetMapping(UNIT_URL+"/questionnaire_template/all")
+    public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestionOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionniareTemplateWithSection(countryId, unitId));
+    }
+
+    @ApiOperation(value = "get all questionnaire template  ")
+    @GetMapping(UNIT_URL+"/questionnaire_template/{id}")
+    public ResponseEntity<Object> getMasterQuestionnaireTemplateWithSectionAndQuestionOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, unitId, id));
     }
 
 }

@@ -27,7 +27,7 @@ public class DataSubjectMappingDTO {
     private String description;
 
     @NotNull(message = "Organization  Type  can't be  null")
-    @NotEmpty(message = "Oraganization Type  can't be  empty")
+    @NotEmpty(message = "Organization Type  can't be  empty")
     @Valid
     private List<OrganizationTypeDTO> organizationTypes;
 
