@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import java.util.List;
 import java.util.Map;
 
-public interface CustomeFilterMongoRepository {
+public interface CustomFilterMongoRepository {
 
 
     Map<String, AggregationOperation> getFilterCriterias(Long countryId,Long organizationId,List<FilterType> filterTypes);

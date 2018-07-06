@@ -16,7 +16,7 @@ import java.util.List;
 public class MasterAsset extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Name can't be empty")
     private  String name;
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
@@ -88,5 +88,16 @@ public class MasterAsset extends MongoBaseEntity {
 
     public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
+    }
+
+    public MasterAsset(String name, String description, List<OrganizationTypeDTO> organizationTypes,
+                       List<OrganizationSubTypeDTO> organizationSubTypes,  List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+        this.name = name;
+        this.description = description;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationServices = organizationServices;
+        this.organizationSubServices = organizationSubServices;
+
     }
 }

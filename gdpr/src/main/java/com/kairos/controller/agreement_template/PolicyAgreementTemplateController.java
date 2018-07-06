@@ -60,7 +60,7 @@ public class PolicyAgreementTemplateController {
     }
 
     @PutMapping("/update/{id}")
-    public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto ) {
+    public   ResponseEntity<Object> updateAgreementTemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto ) {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }

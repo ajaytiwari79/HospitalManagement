@@ -58,14 +58,14 @@ public class ClauseDTO {
 
     private BigInteger templateType;
 
-    private List<Long> organnizationList;
+    private List<Long> organizationList;
 
-    public List<Long> getOrgannizationList() {
-        return organnizationList;
+    public List<Long> getOrganizationList() {
+        return organizationList;
     }
 
-    public void setOrgannizationList(List<Long> organnizationList) {
-        this.organnizationList = organnizationList;
+    public void setOrganizationList(List<Long> organizationList) {
+        this.organizationList = organizationList;
     }
 
     public BigInteger getTemplateType() { return templateType; }
