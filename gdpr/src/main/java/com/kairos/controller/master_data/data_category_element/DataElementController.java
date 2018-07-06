@@ -91,7 +91,7 @@ public class DataElementController {
     }
 
 
-    @ApiOperation("update  data Eelement ")
+    @ApiOperation("update  data Element ")
     @PutMapping("/data_element/update/{id}")
     public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElement dataElements) {
         if (id == null) {

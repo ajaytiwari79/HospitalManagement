@@ -72,7 +72,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("get all data Subject mapping ")
     @GetMapping("/dataSubject_mapping/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
+    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElements(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
@@ -114,7 +114,7 @@ public class DataSubjectMappingController {
 
     @ApiOperation("get all data Subject mapping of Unit ")
     @GetMapping(UNIT_URL+"/dataSubject_mapping/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCateogryAndElementOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElementOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (unitId == null) {

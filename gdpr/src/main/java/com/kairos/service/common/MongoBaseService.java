@@ -185,7 +185,7 @@ public class MongoBaseService {
         String collectionName = entity.getClass().getSimpleName();
 
         if (namesList.size() == 0) {
-            throw new InvalidRequestException("list cannt be empty");
+            throw new InvalidRequestException("list can't be empty");
         }
 
         Query query = new Query();

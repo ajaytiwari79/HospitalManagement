@@ -40,7 +40,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriterias(Long countryId,Long organizationId,List<FilterType> filterTypes) {
+    public Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
         aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         filterTypes.forEach(filterType -> {

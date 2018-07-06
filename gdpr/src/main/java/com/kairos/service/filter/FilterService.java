@@ -57,7 +57,7 @@ public class FilterService {
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
-    //get fields with distinct values on which fliter is applicable
+    //get fields with distinct values on which filter is applicable
     public FilterAndFavouriteFilterDTO getFilterCategories(Long countryId, Long organizationId, String moduleId) {
 
         Map<String, AggregationOperation> filterCriteria = new HashMap<>();
@@ -66,7 +66,7 @@ public class FilterService {
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterMongoRepository.getFilterCriterias(countryId, organizationId, filterTypes);
+            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes);
             Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
             AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();

@@ -79,15 +79,15 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
 
         }
         if ( processingActivityFilterGroup==null) {
-            List<ModuleIdDTO> moduleIdDtos = new ArrayList<>();
+            List<ModuleIdDTO> moduleIdDtoList = new ArrayList<>();
             ModuleIdDTO moduleIdDto = new ModuleIdDTO(MASTER_PROCESSING_ACTIVITY_MODULE_NAME, MASTER_PROCESSING_ACTIVITY_MODULE_ID, false, true);
-            moduleIdDtos.add(moduleIdDto);
+            moduleIdDtoList.add(moduleIdDto);
             List<FilterType> filterTypes = new ArrayList<FilterType>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SERVICES);
             filterTypes.add(FilterType.ORGANIZATION_SUB_SERVICES);
-            FilterGroup filterGroup = new FilterGroup(moduleIdDtos, filterTypes, 4L);
+            FilterGroup filterGroup = new FilterGroup(moduleIdDtoList, filterTypes, 4L);
             createFilterGroups.add(filterGroup);
 
         }

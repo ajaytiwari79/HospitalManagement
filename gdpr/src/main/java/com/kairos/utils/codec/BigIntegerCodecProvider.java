@@ -16,7 +16,7 @@ public class BigIntegerCodecProvider implements CodecProvider {
             return (Codec<T>) new BigIntegerCodec() ;
         }
 
-        // CodecProvider returns null if it's not a provider for the requresed Class
+        // CodecProvider returns null if it's not a provider for the requested Class
         return null;
     }
 }
