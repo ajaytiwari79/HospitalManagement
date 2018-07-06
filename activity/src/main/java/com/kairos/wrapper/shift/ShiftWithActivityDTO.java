@@ -48,7 +48,7 @@ public class ShiftWithActivityDTO {
     private ShiftState shiftState;
     private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
     private BigInteger plannedTypeId ;
-
+    private String timeType;
     public ShiftState getShiftState() {
         return shiftState;
     }
@@ -272,5 +272,13 @@ public class ShiftWithActivityDTO {
 
     public void setPlannedTypeId(BigInteger plannedTypeId) {
         this.plannedTypeId = plannedTypeId;
+    }
+
+    public String getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
     }
 }
