@@ -574,7 +574,7 @@ public class ShiftService extends MongoBaseService {
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         //Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, shift.getActivity(), staffAdditionalInfoDTO);
-        Specification<ShiftWithActivityDTO> activityPlannedTimeSpecification = new ActivityPlannedTimeSpecification(staffAdditionalInfoDTO.getUnitTimeZone());
+        Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(),shift.getStartDate(),shift.getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
 
 
         /* List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
@@ -588,7 +588,7 @@ public class ShiftService extends MongoBaseService {
                 .and(activitySkillSpec)
                 //.and(wtaRulesSpecification)
                 .and(staffEmploymentSpecification)
-                .and(activityPlannedTimeSpecification);
+                .and(shiftTimeLessThan);
 
 
         activitySpecification.isSatisfied(shift);
