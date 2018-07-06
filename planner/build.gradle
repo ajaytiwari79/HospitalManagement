@@ -88,6 +88,10 @@ dependencies {
 
 }
 subprojects {
+	repositories {
+		mavenCentral()
+		maven { url 'https://repository.jboss.org/'}
+	}
 	if (!it.name.startsWith('responseWrapper')) {
 		apply plugin: 'java'
 		dependencies {
