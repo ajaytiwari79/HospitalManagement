@@ -46,7 +46,7 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
             }
                 if ((Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement() && !currentPhase.isManagementCanDelete()) ||
                         (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff() && !currentPhase.isStaffCanDelete())) {
-                    return Collections.singletonList("message.staff.employmentType.absent");
+                    return Collections.singletonList("message.phase.authority.absent");
                 }
             }
         return Collections.emptyList();
