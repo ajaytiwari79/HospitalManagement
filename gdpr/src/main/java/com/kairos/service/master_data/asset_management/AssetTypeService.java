@@ -73,7 +73,7 @@ public class AssetTypeService extends MongoBaseService {
     /**
      * @param countryId
      * @param subAssetTypesDto contain list of sub Asset DTOs
-     * @return create new Sub Asset type And retun  map of Sub Asset types and Ids of Sub Asset types
+     * @return create new Sub Asset type And return  map of Sub Asset types and Ids of Sub Asset types
      */
     public Map<String, Object> createNewSubAssetTypesList(Long countryId, Long organizationId, List<AssetTypeDTO> subAssetTypesDto) {
 

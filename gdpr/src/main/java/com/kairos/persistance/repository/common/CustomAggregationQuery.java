@@ -20,7 +20,7 @@ public class CustomAggregationQuery {
 
     }
 
-    public static String dataSubjectAddNonDeletedDataElementAddFileds() {
+    public static String dataSubjectAddNonDeletedDataElementAddFields() {
         return "{  '$addFields':" +
                 "{'dataCategories.dataElements':" +
                 "{$filter : { " +

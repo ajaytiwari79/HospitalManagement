@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
 
 @Document(collection = "agreement_section")
 public class AgreementSection extends MongoBaseEntity {

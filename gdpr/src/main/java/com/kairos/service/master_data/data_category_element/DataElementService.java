@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.IDS_LIST;
-import static com.kairos.constants.AppConstant.DATA_EMELENTS_LIST;
+import static com.kairos.constants.AppConstant.DATA_ELEMENTS_LIST;
 
 
 @Service
@@ -49,7 +49,7 @@ public class DataElementService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
         List<DataElement> dataElementList = new ArrayList<>();
-        List<BigInteger> dataElementids = new ArrayList<>();
+        List<BigInteger> dataElementIdList = new ArrayList<>();
         for (String name : dataElementNames) {
             DataElement newDataElement = new DataElement(name,countryId);
             newDataElement.setOrganizationId(organizationId);
@@ -58,15 +58,15 @@ public class DataElementService extends MongoBaseService {
         try {
             dataElementList = dataElementMognoRepository.saveAll(sequenceGenerator(dataElementList));
             dataElementList.forEach(dataElement -> {
-                dataElementids.add(dataElement.getId());
+                dataElementIdList.add(dataElement.getId());
             });
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
         Map<String, Object> result = new HashMap<>();
-        result.put(IDS_LIST, dataElementids);
-        result.put(DATA_EMELENTS_LIST, dataElementList);
+        result.put(IDS_LIST, dataElementIdList);
+        result.put(DATA_ELEMENTS_LIST, dataElementList);
         return result;
 
     }
@@ -131,15 +131,15 @@ public class DataElementService extends MongoBaseService {
         if (createNewDataElementsDto.size() != 0) {
             Map<String, Object> newDataElements = createDataElements(countryId, organizationId, createNewDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) newDataElements.get(IDS_LIST));
-            dataElementList.addAll((List<DataElement>) newDataElements.get(DATA_EMELENTS_LIST));
+            dataElementList.addAll((List<DataElement>) newDataElements.get(DATA_ELEMENTS_LIST));
         }
         if (updateDataElementsDto.size() != 0) {
             updatedDataElements = updateDataElementsList(countryId, organizationId, updateDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) updatedDataElements.get(IDS_LIST));
-            dataElementList.addAll((List<DataElement>) updatedDataElements.get(DATA_EMELENTS_LIST));
+            dataElementList.addAll((List<DataElement>) updatedDataElements.get(DATA_ELEMENTS_LIST));
         }
         updatedDataElements.put(IDS_LIST, dataElementsIds);
-        updatedDataElements.put(DATA_EMELENTS_LIST, dataElementList);
+        updatedDataElements.put(DATA_ELEMENTS_LIST, dataElementList);
         return updatedDataElements;
 
     }
@@ -179,7 +179,7 @@ public class DataElementService extends MongoBaseService {
         }
 
         result.put(IDS_LIST, dataElementsIds);
-        result.put(DATA_EMELENTS_LIST, dataElementList);
+        result.put(DATA_ELEMENTS_LIST, dataElementList);
         return result;
     }
 
@@ -199,7 +199,7 @@ public class DataElementService extends MongoBaseService {
     /**@description check if data element already exist with same name ,and map not contain id then throw exception.
      * @param countryId
      * @param dataElementDtoMap map contain dataElement corresponding to id
-     * @param dataElementNames  list of data elemnets names which we need to check if duplicate data present on updating existing Data elements
+     * @param dataElementNames  list of data elements names which we need to check if duplicate data present on updating existing Data elements
      */
     public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Long orgId, Map<BigInteger, DataElementDTO> dataElementDtoMap, List<String> dataElementNames) {
 

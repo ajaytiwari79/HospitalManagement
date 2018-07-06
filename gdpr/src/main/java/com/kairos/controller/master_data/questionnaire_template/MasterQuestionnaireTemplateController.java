@@ -58,7 +58,7 @@ public class MasterQuestionnaireTemplateController {
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionniareTemplateWithSection(countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionnaireTemplateWithSection(countryId, organizationId));
     }
 
 
@@ -116,9 +116,9 @@ public class MasterQuestionnaireTemplateController {
      * @param templateDto
      * @return return update masterQuestionnaireTemplate object
      */
-    @ApiOperation(value = "update basic detail of Questionniare template ")
+    @ApiOperation(value = "update basic detail of Questionnaire template ")
     @PutMapping("/questionnaire_template/update/{id}")
-    public ResponseEntity<Object> updateQuestionniareTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody MasterQuestionnaireTemplateDTO templateDto) {
+    public ResponseEntity<Object> updateQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody MasterQuestionnaireTemplateDTO templateDto) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
@@ -128,7 +128,7 @@ public class MasterQuestionnaireTemplateController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.updateQuestionniareTemplate(countryId, organizationId, id, templateDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.updateQuestionnaireTemplate(countryId, organizationId, id, templateDto));
 
     }
 
@@ -140,7 +140,7 @@ public class MasterQuestionnaireTemplateController {
         } else if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionniareTemplateWithSection(countryId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionnaireTemplateWithSection(countryId, unitId));
     }
 
     @ApiOperation(value = "get all questionnaire template  ")

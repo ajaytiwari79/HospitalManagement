@@ -183,4 +183,20 @@ public class CounterRepository {
     public List getEntityItemList(Class claz){
         return mongoTemplate.findAll(claz);
     }
+
+    //CounterCategories crud
+
+    public List<KPICategory> getCategoriesByNames(List<String> names){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").in(names).and("deleted").is(false));
+        return mongoTemplate.find(query, KPICategory.class);
+    }
+
+    //counterKPI crud
+
+    public List<KPI> getKPIsByCategory(BigInteger categoryId){
+        Query query = new Query(Criteria.where("categoryId").is(categoryId).and("deleted").is(false));
+        return mongoTemplate.find(query, KPI.class);
+    }
+
 }

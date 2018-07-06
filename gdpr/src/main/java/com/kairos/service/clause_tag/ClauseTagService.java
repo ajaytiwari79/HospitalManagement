@@ -8,7 +8,6 @@ import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.javers.JaversCommonService;
-import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -89,7 +88,7 @@ public class ClauseTagService extends MongoBaseService {
 
     public ClauseTag updateClauseTag(Long countryId,Long organizationId,BigInteger id, String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
-            throw new InvalidRequestException("requested paran name is null or empty");
+            throw new InvalidRequestException("requested param name is null or empty");
         }
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {

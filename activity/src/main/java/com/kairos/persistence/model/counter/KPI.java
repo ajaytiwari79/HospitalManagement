@@ -7,6 +7,7 @@ import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.chart.BaseChart;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /*
@@ -16,25 +17,13 @@ import java.util.List;
 
 @Document(collection = "counter")
 public class KPI extends Counter {
-    private String title;
-    private ChartType chartType;
     private BaseChart chart;
     private CounterSize size;
 
-    public KPI(String title, ChartType chartType, BaseChart chart, CounterSize size, CounterType type, List<FilterCriteria> filters){
-        super(type, filters);
-        this.title = title;
-        this.chartType = chartType;
+    public KPI(String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter){
+        super(title, type, treatAsCounter, primaryCounter);
         this.chart = chart;
         this.size = size;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public BaseChart getChart() {
@@ -43,13 +32,5 @@ public class KPI extends Counter {
 
     public void setChart(BaseChart chart) {
         this.chart = chart;
-    }
-
-    public ChartType getChartType() {
-        return chartType;
-    }
-
-    public void setChartType(ChartType chartType) {
-        this.chartType = chartType;
     }
 }

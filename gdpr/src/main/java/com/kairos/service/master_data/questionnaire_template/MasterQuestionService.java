@@ -45,7 +45,7 @@ public class MasterQuestionService extends MongoBaseService {
         checkForDuplicacyInQuestion(masterQuestionDTOs);
         for (MasterQuestionDTO masterQuestion : masterQuestionDTOs) {
             if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
-                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);;
+                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
                 question.setNotSureAllowed(masterQuestion.getNotSureAllowed());
                 question.setRequired(masterQuestion.getRequired());
                 question.setOrganizationId(organizationId);
@@ -158,14 +158,14 @@ public class MasterQuestionService extends MongoBaseService {
 
         List<BigInteger> questionIds = new ArrayList<>();
         masterQuestionDTOs.forEach(question -> questionIds.add(question.getId()));
-        List<MasterQuestion> exisitingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId,organizationId,questionIds);
+        List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId,organizationId,questionIds);
 
         Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
         masterQuestionDTOs.forEach(masterQuestionDto -> {
             masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto);
         });
         List<MasterQuestion> updatedQuestionsList = new ArrayList<>();
-        for (MasterQuestion masterQuestion : exisitingMasterQuestions) {
+        for (MasterQuestion masterQuestion : existingMasterQuestions) {
 
             MasterQuestionDTO questionDto = (MasterQuestionDTO) masterQuestionDtoCorrespondingToId.get(masterQuestion.getId());
             if (QuestionType.valueOf(questionDto.getQuestionType()) != null) {
