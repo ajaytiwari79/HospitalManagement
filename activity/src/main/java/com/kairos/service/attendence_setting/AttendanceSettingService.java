@@ -7,19 +7,22 @@ import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRep
 import com.kairos.response.dto.web.attendance.AttendanceDuration;
 import com.kairos.response.dto.web.attendance.AttendanceDTO;
 import com.kairos.response.dto.web.attendance.AttendanceDurationDTO;
-import com.kairos.response.dto.web.attendance.UnitIdAndNameDTO;
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.user.organization.OrganizationCommonDTO;
+import com.kairos.user.reason_code.ReasonCodeDTO;
 import com.kairos.util.DateUtils;
+import com.kairos.util.ObjectUtils;
 import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -46,7 +49,7 @@ public class AttendanceSettingService extends MongoBaseService {
         return new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
     }
 
-    public AttendanceDTO updateAttendanceSetting(Long unitId, boolean checkIn) {
+    public AttendanceDTO updateAttendanceSetting(Long unitId, Long reasonCodeId,boolean checkIn) {
         AttendanceDTO attendanceDTO = null;
         AttendanceSetting attendanceSetting = null;
         Long userId = Long.valueOf(UserContext.getUserDetails().getId());
@@ -54,28 +57,31 @@ public class AttendanceSettingService extends MongoBaseService {
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }
-        attendanceSetting = (checkIn == true) ? checkInAttendanceSetting(unitId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
+        attendanceSetting = (checkIn) ? checkInAttendanceSetting(unitId,reasonCodeId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
         if(Optional.ofNullable(attendanceSetting).isPresent()) {
             save(attendanceSetting);
             attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
         } else {
-            List<UnitIdAndNameDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new UnitIdAndNameDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
-            attendanceDTO = new AttendanceDTO(unitIdAndNames);
+            List<OrganizationCommonDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new OrganizationCommonDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
+            Set<ReasonCodeDTO> reasonCode=staffAndOrganizationIds.stream().flatMap(s->s.getReasonCode().stream()).collect(Collectors.toSet());
+            attendanceDTO = new AttendanceDTO(unitIdAndNames,reasonCode);
         }
         return attendanceDTO;
     }
 
-    private AttendanceSetting checkInAttendanceSetting(Long unitId, List<StaffResultDTO> staffAndOrganizationIds) {
+    private AttendanceSetting checkInAttendanceSetting(Long unitId,Long reasonCodeId, List<StaffResultDTO> staffAndOrganizationIds) {
         AttendanceSetting attendanceSetting = null;
         StaffResultDTO staffAndOrganizationId;
-        if (Optional.ofNullable(unitId).isPresent()) {
+        if (Optional.ofNullable(unitId).isPresent()&&!Optional.ofNullable(reasonCodeId).isPresent()) {
+            exceptionService.actionNotPermittedException("message.unitid.reasoncodeid.notnull");
+        }else if(Optional.ofNullable(unitId).isPresent()&&Optional.ofNullable(reasonCodeId).isPresent()){
             staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
             if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {
                 exceptionService.actionNotPermittedException("message.staff.unitid.notfound");
             }
             AttendanceDuration attendanceDuration = new AttendanceDuration(DateUtils.getTimezonedCurrentDateTime(staffAndOrganizationId.getTimeZone()));
-            attendanceSetting = new AttendanceSetting(unitId, staffAndOrganizationId.getStaffId(), UserContext.getUserDetails().getId(), attendanceDuration);
-        } else {
+            attendanceSetting = new AttendanceSetting(unitId, staffAndOrganizationId.getStaffId(), UserContext.getUserDetails().getId(),reasonCodeId,attendanceDuration);
+        } else{
             List<Long> staffIds = staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
             ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
             if(Optional.ofNullable(shiftQueryResults).isPresent()) {
