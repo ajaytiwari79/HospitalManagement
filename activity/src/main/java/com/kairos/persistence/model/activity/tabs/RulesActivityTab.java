@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.activity.open_shift.DurationField;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,9 @@ public class RulesActivityTab implements Serializable{
     private Integer shortestTime;
     private Integer longestTime;
     private boolean eligibleForCopy;
+    private DurationField plannedTimeInAdvance;
+    private DurationField approvalTimeInAdvance;
+    private Float approvalPercentage;
 
 
     public boolean isEligibleForStaffingLevel() {
@@ -83,7 +88,7 @@ public class RulesActivityTab implements Serializable{
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
 
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy) {
+    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -103,6 +108,10 @@ public class RulesActivityTab implements Serializable{
         this.shortestTime = shortestTime;
         this.longestTime = longestTime;
         this.eligibleForCopy=eligibleForCopy;
+        this.plannedTimeInAdvance=plannedTimeInAdvance;
+        this.approvalTimeInAdvance=approvalTimeInAdvance;
+        this.approvalPercentage=approvalPercentage;
+
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -225,4 +234,28 @@ public class RulesActivityTab implements Serializable{
     public void setEligibleForCopy(boolean eligibleForCopy) {
         this.eligibleForCopy = eligibleForCopy;
         }
+
+    public DurationField getPlannedTimeInAdvance() {
+        return plannedTimeInAdvance;
+    }
+
+    public void setPlannedTimeInAdvance(DurationField plannedTimeInAdvance) {
+        this.plannedTimeInAdvance = plannedTimeInAdvance;
+    }
+
+    public DurationField getApprovalTimeInAdvance() {
+        return approvalTimeInAdvance;
+    }
+
+    public void setApprovalTimeInAdvance(DurationField approvalTimeInAdvance) {
+        this.approvalTimeInAdvance = approvalTimeInAdvance;
+    }
+
+    public Float getApprovalPercentage() {
+        return approvalPercentage;
+    }
+
+    public void setApprovalPercentage(Float approvalPercentage) {
+        this.approvalPercentage = approvalPercentage;
+    }
 }

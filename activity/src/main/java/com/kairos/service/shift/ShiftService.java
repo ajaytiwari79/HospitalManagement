@@ -39,10 +39,7 @@ import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
-import com.kairos.rule_validator.activity.EmploymentTypeSpecification;
-import com.kairos.rule_validator.activity.ExpertiseSpecification;
-import com.kairos.rule_validator.activity.StaffAndSkillSpecification;
-import com.kairos.rule_validator.activity.StaffEmploymentSpecification;
+import com.kairos.rule_validator.activity.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
@@ -284,9 +281,10 @@ public class ShiftService extends MongoBaseService {
 
     private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
         if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
-            return plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+            plannedTypeId= plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
         }
         return plannedTypeId;
+
     }
 
     private List<ShiftQueryResult> addBreakInShifts(Activity activity, Shift mainShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -534,6 +532,17 @@ public class ShiftService extends MongoBaseService {
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
         validateStaffingLevel(shift, activity, false, staffAdditionalInfoDTO);
+        Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
+        Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activity.getRulesActivityTab().getEligibleForSchedules(),staffAdditionalInfoDTO.getUserAccessRoleDTO());
+        Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
+        List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
+        if (!messages.isEmpty()) {
+            List<String> errors = new ArrayList<>();
+            messages.forEach(responseMessage -> {
+                errors.add(localeService.getMessage(responseMessage));
+            });
+            exceptionService.actionNotPermittedException(errors.get(0));
+        }
         shift.setDeleted(true);
         save(shift);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
@@ -566,6 +575,8 @@ public class ShiftService extends MongoBaseService {
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         //Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, shift.getActivity(), staffAdditionalInfoDTO);
+        Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(),shift.getStartDate(),shift.getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
+
 
         /* List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
         if (dayTypeIds != null) {
@@ -577,7 +588,9 @@ public class ShiftService extends MongoBaseService {
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
                 //.and(wtaRulesSpecification)
-                .and(staffEmploymentSpecification);
+                .and(staffEmploymentSpecification)
+                .and(shiftTimeLessThan);
+
 
         activitySpecification.isSatisfied(shift);
         // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
