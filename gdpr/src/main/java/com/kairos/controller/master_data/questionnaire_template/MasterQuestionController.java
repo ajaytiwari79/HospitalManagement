@@ -24,6 +24,12 @@ public class MasterQuestionController {
     private MasterQuestionService masterQuestionService;
 
 
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param id id of question
+     * @return return MasterQuestion on the basis of id
+     */
     @ApiOperation("get question of Questionnaire section by id ")
     @GetMapping("/question_section/question/{id}")
     public ResponseEntity<Object> getMasterQuestionById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
@@ -38,6 +44,12 @@ public class MasterQuestionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestion(countryId,organizationId,id));
     }
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return
+     */
     @ApiOperation("get All question of Questionnaire section")
     @GetMapping("/question_section/question/all")
     public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId) {

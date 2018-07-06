@@ -30,11 +30,13 @@ public class StorageFormatService extends MongoBaseService {
     private ComparisonUtils  comparisonUtils;
 
     /**
-     *
+     * @description this method create new StorageFormat if StorageFormat not exist with same name ,
+     * and if exist then simply add  StorageFormat to existing list and return list ;
+     * findByNamesList()  return list of existing StorageFormat using collation ,used for case insensitive result
      * @param countryId
      * @param organizationId
      * @param storageFormats
-     * @return return map which contain list of new storage format and list of existing  storage format  if  storage format already exist
+     * @return return map which contain list of new StorageFormat and list of existing StorageFormat if StorageFormat already exist
      *
      */
     public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
@@ -76,11 +78,23 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of StorageFormat
+     */
     public List<StorageFormat> getAllStorageFormat(Long countryId, Long organizationId) {
         return storageFormatMongoRepository.findAllStorageFormats(countryId, organizationId);
     }
 
-
+    /**
+     * @throws DataNotFoundByIdException throw exception if StorageFormat not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of StorageFormat
+     * @return StorageFormat object fetch via given id
+     */
     public StorageFormat getStorageFormat(Long countryId, Long organizationId, BigInteger id) {
 
         StorageFormat exist = storageFormatMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
@@ -106,6 +120,14 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
+    /**
+     * @throws  DuplicateDataException throw exception if data not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of StorageFormat
+     * @param storageFormat
+     * @return StorageFormat updated object
+     */
     public StorageFormat updateStorageFormat(Long countryId, Long organizationId, BigInteger id, StorageFormat storageFormat) {
 
         StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, organizationId, storageFormat.getName());
@@ -122,7 +144,13 @@ public class StorageFormatService extends MongoBaseService {
         }
     }
 
-
+    /**
+     * @throws DataNotExists throw exception if StorageFormatnot exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of StorageFormat
+     * @return StorageFormat object fetch on basis of  name
+     */
     public StorageFormat getStorageFormatByName(Long countryId, Long organizationId, String name) {
 
 

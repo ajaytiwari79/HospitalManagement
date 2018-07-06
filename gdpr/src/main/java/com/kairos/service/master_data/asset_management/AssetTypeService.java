@@ -34,6 +34,15 @@ public class AssetTypeService extends MongoBaseService {
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
+
+    /**
+     * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
+     * @param countryId
+     * @param organizationId
+     * @param assetTypeDto contain asset data ,and list of sub asset types
+     * @return asset type object
+     * @exception DuplicateDataException if asset type is already present with same name
+     */
     public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, Long organizationId, AssetTypeDTO assetTypeDto) {
 
 
@@ -94,10 +103,11 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    /**
+    /**@description  this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      * @param countryId
      * @param subAssetTypesDto contain list of Existing Sub Asset type which need to we update
      * @return map of Sub asset Types List and Ids (List for rollback)
+     *
      */
     public Map<String, Object> updateSubAssetTypes(Long countryId, Long organizationId, List<AssetTypeDTO> subAssetTypesDto) {
 
@@ -166,12 +176,13 @@ public class AssetTypeService extends MongoBaseService {
 
 
     /**
-     *
+     * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      * @param countryId
      * @param organizationId
      * @param id          id of Asset Type to which Sub Asset Types Link.
      * @param assetTypeDto     asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
      * @return Asset Type with updated Sub Asset and new Sub Asset Types
+     * @exception DuplicateDataException if Asset type is already present with same name .
      */
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
         AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName());
@@ -217,6 +228,13 @@ public class AssetTypeService extends MongoBaseService {
 
     }
 
+    /**
+     * @throws DataNotExists if Asset type not found for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of asset types
+     * @return return basic object of asset type
+     */
     public AssetType getAssetTypeByName(Long countryId, Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
             AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, name);
