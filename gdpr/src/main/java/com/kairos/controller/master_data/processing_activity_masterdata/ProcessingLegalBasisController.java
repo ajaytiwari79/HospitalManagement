@@ -17,7 +17,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_PROCESSING_LEGAL_BASIS;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
+
 /*
  *
  *  created by bobby 20/5/2018
@@ -25,8 +27,8 @@ import static com.kairos.constants.ApiConstant.API_PROCESSING_LEGAL_BASIS;
 
 
 @RestController
-@RequestMapping(API_PROCESSING_LEGAL_BASIS)
-@Api(API_PROCESSING_LEGAL_BASIS)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class ProcessingLegalBasisController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingLegalBasisController.class);
@@ -36,7 +38,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("add ProcessingLegalBasis")
-    @PostMapping("/add")
+    @PostMapping("/legal_basis/add")
     public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingLegalBasis> legalBases) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -50,7 +52,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
-    @GetMapping("/{id}")
+    @GetMapping("/legal_basis/{id}")
     public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -60,28 +62,24 @@ public class ProcessingLegalBasisController {
         }
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, organizationId, id));
-
     }
 
 
     @ApiOperation("get all ProcessingLegalBasis ")
-    @GetMapping("/all")
+    @GetMapping("/legal_basis/all")
     public ResponseEntity<Object> getAllProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis(countryId, organizationId));
-
     }
 
     @ApiOperation("get ProcessingLegalBasis by name")
-    @GetMapping("/name")
+    @GetMapping("/legal_basis/name")
     public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -94,7 +92,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("delete ProcessingLegalBasis  by id")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/legal_basis/delete/{id}")
     public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -111,7 +109,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("update ProcessingLegalBasis by id")
-    @PutMapping("/update/{id}")
+    @PutMapping("/legal_basis/update/{id}")
     public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasis legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -124,6 +122,34 @@ public class ProcessingLegalBasisController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, organizationId, id, legalBasis));
 
+    }
+
+
+    @ApiOperation("get ProcessingLegalBasis of unit by id")
+    @GetMapping(UNIT_URL+"/legal_basis/{id}")
+    public ResponseEntity<Object> getProcessingLegalBasisOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, unitId, id));
+    }
+
+
+    @ApiOperation("get all ProcessingLegalBasis of unit ")
+    @GetMapping(UNIT_URL+"/legal_basis/all")
+    public ResponseEntity<Object> getAllProcessingLegalBasisOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis(countryId, unitId));
     }
 
 

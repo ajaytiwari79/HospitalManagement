@@ -8,6 +8,7 @@ import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.core.impl.score.director.drools.DroolsScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
@@ -40,10 +41,11 @@ public class VrpTaskPlanningSolver {
       //  solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
         //solverFactory = SolverFactory.createFromXmlFile(new File(config));
         //solverFactory = SolverFactory.createFromXmlResource("config/Kamstrup_Vrp_taskPlanning.solver.xml");
-    public VrpTaskPlanningSolver(List<File> drlFileList,String vrpXmlFilePath){
+    public VrpTaskPlanningSolver(List<File> drlFileList,String vrpXmlFilePath,int terminationTime){
         solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+            solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
         }
         solver = solverFactory.buildSolver();
     }
@@ -275,5 +277,8 @@ public class VrpTaskPlanningSolver {
 
     public boolean terminateEarly() {
         return solver.terminateEarly();
+    }
+    public boolean isTerminateEarly() {
+        return solver.isTerminateEarly();
     }
 }

@@ -16,10 +16,10 @@ public class PolicyAgreementTemplateResponseDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty
     private String name;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty
     private String description;
 
     private List<AccountTypeResponseDTO> accountTypes;

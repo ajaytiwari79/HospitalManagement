@@ -11,12 +11,12 @@ import java.util.List;
  */
 
 public class PieChart extends BaseChart {
-    public static final ChartType type = ChartType.PIE;
     private RepresentationUnit unit;
     private String displayUnit;
     private List<PieDataUnit> dataList;
 
     public PieChart(RepresentationUnit unit, String displayUnit, List dataList){
+        super(ChartType.PIE);
         this.unit = unit;
         this.dataList = dataList;
         this.displayUnit = displayUnit;

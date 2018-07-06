@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.counter.chart;
 
+import com.kairos.activity.enums.counter.ChartType;
 import com.kairos.activity.enums.counter.RepresentationUnit;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class GaugeChart extends BaseChart {
     private String unitName;
 
     public GaugeChart(double minValue, double maxValue, double value, List<Double> bandInitValues, List<String> bandColors, RepresentationUnit unit, String unitName){
+        super(ChartType.GAUGE);
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.value = value;

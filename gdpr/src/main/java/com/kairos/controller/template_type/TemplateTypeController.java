@@ -49,7 +49,7 @@ public class TemplateTypeController {
     }
 
     /**
-     * @description this method is used get template by name for updation purpose.
+     * @description this method is used get template by name for update purpose.
      * @author vikash patwal
      * @param countryId
      * @param templateName

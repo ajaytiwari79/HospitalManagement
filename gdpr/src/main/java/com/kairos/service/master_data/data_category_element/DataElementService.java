@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.IDS_LIST;
-import static com.kairos.constants.AppConstant.DATA_EMELENTS_LIST;
+import static com.kairos.constants.AppConstant.DATA_ELEMENTS_LIST;
 
 
 @Service
@@ -50,7 +50,7 @@ public class DataElementService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
         List<DataElement> dataElementList = new ArrayList<>();
-        List<BigInteger> dataElementids = new ArrayList<>();
+        List<BigInteger> dataElementIdList = new ArrayList<>();
         for (String name : dataElementNames) {
             DataElement newDataElement = new DataElement();
             newDataElement.setName(name);
@@ -61,15 +61,15 @@ public class DataElementService extends MongoBaseService {
         try {
             dataElementList = dataElementMognoRepository.saveAll(sequenceGenerator(dataElementList));
             dataElementList.forEach(dataElement -> {
-                dataElementids.add(dataElement.getId());
+                dataElementIdList.add(dataElement.getId());
             });
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
         Map<String, Object> result = new HashMap<>();
-        result.put(IDS_LIST, dataElementids);
-        result.put(DATA_EMELENTS_LIST, dataElementList);
+        result.put(IDS_LIST, dataElementIdList);
+        result.put(DATA_ELEMENTS_LIST, dataElementList);
         return result;
 
     }
@@ -114,16 +114,16 @@ public class DataElementService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param dataElementsDto request body contain list Of Existing Data Elements which needs to be Update and List of New Data Elements
-     * @return map of Data Elements ids List and updated and new Data Elements List
+     * @return map of Data Element ids and ,List of  updated and new Data Elements
      */
     public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
-        List<DataElementDTO> upadateDataElementsDto = new ArrayList<>();
+        List<DataElementDTO> updateDataElementsDto = new ArrayList<>();
         List<DataElementDTO> createNewDataElementsDto = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
             if (Optional.ofNullable(dataElementDto.getId()).isPresent()) {
-                upadateDataElementsDto.add(dataElementDto);
+                updateDataElementsDto.add(dataElementDto);
             } else {
                 createNewDataElementsDto.add(dataElementDto);
             }
@@ -136,15 +136,15 @@ public class DataElementService extends MongoBaseService {
         if (createNewDataElementsDto.size() != 0) {
             Map<String, Object> newDataElements = createDataElements(countryId, organizationId, createNewDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) newDataElements.get(IDS_LIST));
-            dataElementList.addAll((List<DataElement>) newDataElements.get(DATA_EMELENTS_LIST));
+            dataElementList.addAll((List<DataElement>) newDataElements.get(DATA_ELEMENTS_LIST));
         }
-        if (upadateDataElementsDto.size() != 0) {
-            updatedDataElements = updateDataElementsList(countryId, organizationId, upadateDataElementsDto);
+        if (updateDataElementsDto.size() != 0) {
+            updatedDataElements = updateDataElementsList(countryId, organizationId, updateDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) updatedDataElements.get(IDS_LIST));
-            dataElementList.addAll((List<DataElement>) updatedDataElements.get(DATA_EMELENTS_LIST));
+            dataElementList.addAll((List<DataElement>) updatedDataElements.get(DATA_ELEMENTS_LIST));
         }
         updatedDataElements.put(IDS_LIST, dataElementsIds);
-        updatedDataElements.put(DATA_EMELENTS_LIST, dataElementList);
+        updatedDataElements.put(DATA_ELEMENTS_LIST, dataElementList);
         return updatedDataElements;
 
     }
@@ -183,18 +183,18 @@ public class DataElementService extends MongoBaseService {
         }
 
         result.put(IDS_LIST, dataElementsIds);
-        result.put(DATA_EMELENTS_LIST, dataElementList);
+        result.put(DATA_ELEMENTS_LIST, dataElementList);
         return result;
     }
 
 
-    public void checkForDuplicacyInName(List<DataElementDTO> dataElementDtos) {
+    public void checkForDuplicacyInName(List<DataElementDTO> dataElementDTOs) {
         List<String> names = new ArrayList<>();
-        dataElementDtos.forEach(dataElementDto -> {
-            if (names.contains(dataElementDto.getName())) {
-                throw new DuplicateDataException("Duplicate Entry with name " + dataElementDto.getName());
+        dataElementDTOs.forEach(dataElementDTO -> {
+            if (names.contains(dataElementDTO.getName())) {
+                throw new DuplicateDataException("Duplicate Entry with name " + dataElementDTO.getName());
             }
-            names.add(dataElementDto.getName());
+            names.add(dataElementDTO.getName());
         });
 
 
@@ -202,8 +202,8 @@ public class DataElementService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param dataElementDtoMap map contain dataElemenet corresponding to id
-     * @param dataElementNames  list of data elemenets names which we need to check if duplicate data present on updating existing Data elements
+     * @param dataElementDtoMap map contain dataElement corresponding to id
+     * @param dataElementNames  list of data elements names which we need to check if duplicate data present on updating existing Data elements
      */
     public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Long orgId, Map<BigInteger, DataElementDTO> dataElementDtoMap, List<String> dataElementNames) {
 

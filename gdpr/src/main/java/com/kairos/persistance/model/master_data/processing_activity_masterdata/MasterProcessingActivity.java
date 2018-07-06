@@ -16,10 +16,10 @@ import java.util.List;
 @Document(collection = "master_processing_activity")
 public class MasterProcessingActivity extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Name can't be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Description can't be empty")
     private String description;
 
     @NotNull

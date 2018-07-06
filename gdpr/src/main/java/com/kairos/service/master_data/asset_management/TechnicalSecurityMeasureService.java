@@ -30,7 +30,13 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
-
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param techSecurityMeasures
+     * @return return map which contain list of new technical measure and list of existing  storage format  if  technical measure  already exist
+     */
     public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, Long organizationId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
 
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();

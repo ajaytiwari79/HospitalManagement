@@ -22,7 +22,6 @@ public enum WTATemplateType {
     SHORTEST_AND_AVERAGE_DAILY_REST("Shortest And Average Daily Rest"),
     SENIOR_DAYS_PER_YEAR("Maximum Senior Days Per Year"),
     CHILD_CARE_DAYS_CHECK("Child Care Day Check"),
-    BREAK_IN_SHIFT("Break In Shift"),
     DAYS_OFF_AFTER_A_SERIES("days off after a series"),
     NO_OF_SEQUENCE_SHIFT("no of sequence shift"),
     EMPLOYEES_WITH_INCREASE_RISK("employees with increase risk");

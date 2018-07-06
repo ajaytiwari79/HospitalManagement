@@ -8,6 +8,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 /*
  * @author: mohit.shakya@oodlestechnologies.com
  * @dated: Jun/26/2018
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 public class CounterManagementService extends MongoBaseService{
     @Inject private CounterServiceMapping counterServiceMapping;
     @Inject private CounterRepository counterRepository;
+    @Inject private ExceptionService exceptionService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
 
@@ -39,7 +43,7 @@ public class CounterManagementService extends MongoBaseService{
 
     //storeCounter -List
     public void storeCounters(List<Counter> counterDefs){
-        List<CounterType> counterTypes = counterDefs.stream().map(def -> def.getType()).collect(Collectors.toList());
+        List<CounterType> counterTypes = counterDefs.stream().map(def -> def.getType()).collect(toList());
         List<Counter> existingCounters = counterRepository.getCounterByTypes(counterTypes);
         Map<CounterType, Counter> existingCounterIdMap = existingCounters.parallelStream().collect(Collectors.toMap(counter->counter.getType(), counter->counter));
         List<Counter> countersToSave = new ArrayList<>();
@@ -275,5 +279,46 @@ public class CounterManagementService extends MongoBaseService{
     //getCountOfCounterModuleLinks
     public long getCounterModuleLinksCount(){
         return counterRepository.getEntityItemList(ModuleCounter.class).size();
+    }
+
+    //setting category distribution
+
+    public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(){
+        List<KPI> kpisList = counterRepository.getEntityItemList(Counter.class);
+        List<KPICategory> categories = counterRepository.getEntityItemList(KPICategory.class);
+        Map<BigInteger, List<BigInteger>> categoryKPIsMap = new HashMap<>();
+        categories.forEach(category -> {
+            categoryKPIsMap.put(category.getId(), new ArrayList<>());
+        });
+        //categoryKPIsMap.put(BigInteger.valueOf(-1), new ArrayList<>());
+        kpisList.forEach(kpi -> {
+            if(kpi.getCategoryId() != null){
+                categoryKPIsMap.get(kpi.getCategoryId()).add(kpi.getId());
+            }
+        });
+
+        return new InitialKPICategoryDistDataDTO(kpisList, categories, categoryKPIsMap);
+    }
+
+    public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails){
+        List<KPI> kpis = counterRepository.getEntityItemList(KPI.class);
+        Map<BigInteger, List<KPI>> categoryKPIMap = kpis.stream().collect(Collectors.groupingBy(kpi-> (kpi.getCategoryId()!=null)?kpi.getCategoryId():BigInteger.valueOf(-1), Collectors.toList()));
+        Map<BigInteger, Counter> kpisIdMap = new HashMap<>();
+        kpis.parallelStream().forEach(kpi -> {
+            kpisIdMap.put(kpi.getId(), kpi);
+        });
+        if(categoryKPIMap.get(categoryKPIsDetails.getCategoryId())!=null) {
+            categoryKPIMap.get(categoryKPIsDetails.getCategoryId()).forEach(kpi -> {
+                if (!categoryKPIsDetails.getKpiIds().contains(kpi.getId()))
+                    kpi.setCategoryId(null);
+            });
+        }
+        categoryKPIsDetails.getKpiIds().forEach(kpiId ->{
+            if(categoryKPIsDetails.getCategoryId().equals(kpisIdMap.get(kpiId).getCategoryId()))
+                exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+            kpisIdMap.get(kpiId).setCategoryId(categoryKPIsDetails.getCategoryId());
+        });
+
+        save(kpis);
     }
 }

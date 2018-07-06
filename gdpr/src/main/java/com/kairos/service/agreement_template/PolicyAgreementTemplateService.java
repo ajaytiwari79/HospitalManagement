@@ -53,7 +53,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private TemplateTypeMongoRepository templateTypeMongoRepository;
 
     //todo working on it
-    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organziationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
+    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
 
         String name = policyAgreementTemplateDto.getName();
         if (policyAgreementTemplateRepository.findByName(name) != null) {

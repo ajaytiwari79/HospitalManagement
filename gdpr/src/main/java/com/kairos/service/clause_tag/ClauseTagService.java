@@ -40,7 +40,7 @@ public class ClauseTagService extends MongoBaseService {
 
     public ClauseTag createClauseTag(Long countryId, Long organizationId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
-            throw new InvalidRequestException("requested paran name is null or empty");
+            throw new InvalidRequestException("requested param name is null or empty");
         }
         ClauseTag exist = clauseTagMongoRepository.findByNameAndCountryId(countryId, organizationId, clauseTag);
         if (Optional.ofNullable(exist).isPresent()) {
@@ -87,7 +87,7 @@ public class ClauseTagService extends MongoBaseService {
 
     public ClauseTag updateClauseTag(Long countryId,Long organizationId,BigInteger id, String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
-            throw new InvalidRequestException("requested paran name is null or empty");
+            throw new InvalidRequestException("requested param name is null or empty");
         }
         ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {

@@ -16,7 +16,10 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ASSET_TYPE_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
+
+
 /*
  *
  *  created by bobby 17/5/2018
@@ -24,8 +27,8 @@ import static com.kairos.constants.ApiConstant.API_ASSET_TYPE_URL;
 
 
 @RestController
-@RequestMapping(API_ASSET_TYPE_URL)
-@Api(API_ASSET_TYPE_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class AssetTypeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetTypeController.class);
@@ -35,7 +38,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("add AssetType")
-    @PostMapping("/add")
+    @PostMapping("/asset_type/add")
     public ResponseEntity<Object> createAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody AssetTypeDTO assetTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -48,7 +51,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("get AssetType by id")
-    @GetMapping("/{id}")
+    @GetMapping("/asset_type/{id}")
     public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -65,7 +68,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("get all AssetType ")
-    @GetMapping("/all")
+    @GetMapping("/asset_type/all")
     public ResponseEntity<Object> getAllAssetType(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -78,8 +81,9 @@ public class AssetTypeController {
     }
 
 
+
     @ApiOperation("get AssetType by name")
-    @GetMapping("/name")
+    @GetMapping("/asset_type/name")
     public ResponseEntity<Object> getAssetTypeByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -93,7 +97,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("delete AssetType  by id")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/asset_type/delete/{id}")
     public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -110,7 +114,7 @@ public class AssetTypeController {
     }
 
     @ApiOperation("update subAsset by id")
-    @PutMapping("/update/{id}")
+    @PutMapping("/asset_type/update/{id}")
     public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody AssetTypeDTO assetType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -126,17 +130,34 @@ public class AssetTypeController {
 
     }
 
-
-  /*  @ApiOperation("update subAsset by id")
-    @PostMapping("/subAsset/add")
-    public ResponseEntity<Object> addSubAssetTypes(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody AssetTypeDTO assetTypeDto) {
+    @ApiOperation("get all AssetType ")
+    @GetMapping(UNIT_URL+"/asset_type/all")
+    public ResponseEntity<Object> getAllAssetTypeOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
+        }
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.createAssetTypeAndAddSubAssetTypes(countryId, organizationId, assetTypeDto));
-    }*/
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetType(countryId, unitId));
 
+    }
+
+
+    @ApiOperation("get AssetType by id")
+    @GetMapping(UNIT_URL+"/asset_type/{id}")
+    public ResponseEntity<Object> getAssetTypeOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, unitId, id));
+
+    }
 
 }
