@@ -33,6 +33,17 @@ public class AccessorPartyService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
 
+
+    /**
+     * @description this method create new AccessorParty if AccessorParty not exist with same name ,
+     * and if exist then simply add  AccessorParty to existing list and return list ;
+     * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
+     * @param countryId
+     * @param organizationId
+     * @param accessorParties
+     * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
+     *
+     */
     public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorParties) {
 
         Map<String, List<AccessorParty>> result = new HashMap<>();
@@ -71,7 +82,13 @@ public class AccessorPartyService extends MongoBaseService {
         return accessorPartyMongoRepository.findAllAccessorParty(countryId, organizationId);
     }
 
-
+    /**
+     * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of AccessorParty
+     * @return AccessorParty object fetch by given id
+     */
     public AccessorParty getAccessorParty(Long countryId, Long organizationId, BigInteger id) {
 
         AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
@@ -96,7 +113,14 @@ public class AccessorPartyService extends MongoBaseService {
         }
     }
 
-
+    /**
+     * @throws  DuplicateDataException throw exception if AccessorParty data not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of AccessorParty
+     * @param accessorParty
+     * @return AccessorParty updated object
+     */
     public AccessorParty updateAccessorParty(Long countryId, Long organizationId, BigInteger id, AccessorParty accessorParty) {
 
         AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, organizationId, accessorParty.getName());
@@ -113,7 +137,12 @@ public class AccessorPartyService extends MongoBaseService {
         }
     }
 
-
+ /** @throws DataNotExists throw exception if AccessorParty exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of AccessorParty
+     * @return AccessorParty object fetch on basis of  name
+     */
     public AccessorParty getAccessorPartyByName(Long countryId, Long organizationId, String name) {
 
 

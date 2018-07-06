@@ -29,9 +29,9 @@ public class MasterQuestionnaireSectionController {
 
     /**
      * @param countryId
-     * @param templateId
+     * @param templateId id of MAsterQuestionnaireTemplate
      * @param questionnaireSectionsDto
-     * @return
+     * @return  master questionnaire template with questionniare sections
      */
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping("/questionnaire_template/{templateId}/section")
@@ -46,6 +46,13 @@ public class MasterQuestionnaireSectionController {
 
     }
 
+
+    /**@param countryId
+     * @param organizationId
+     * @param templateId id of MasterQUestionnaireTemplate
+     * @param questionnaireSectionDTOs contains list of existing MasterQusetionniareSection list and new  MasterQusetionniareSection
+     * @return return MasterQUestionnaireTemplate object with QuestionnaireSection
+     */
     @ApiOperation(value = "update list of questionnaire section and deleted section if deleted property is true")
     @PutMapping("/questionnaire_template/{templateId}/section/update")
     public ResponseEntity updateQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionnaireSectionDTOs) {
@@ -59,6 +66,13 @@ public class MasterQuestionnaireSectionController {
 
     }
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param id id of MasterQuestionnaireSection
+     * @return true with responseEntity on deletion
+     */
     @ApiOperation("delete questionnaire section by id ")
     @DeleteMapping("/questionnaire_template/section/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {

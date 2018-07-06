@@ -30,12 +30,16 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
 
+
     /**
-     *
+     * @description this method create new OrganizationalSecurityMeasure if OrganizationalSecurityMeasure not exist with same name ,
+     * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
+     * findByNamesList()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      * @param countryId
      * @param organizationId
      * @param orgSecurityMeasures
-     * @return return map which contain list of new organization measure and list of existing  organization measure  if  organization measure already exist
+     * @return return map which contain list of new OrganizationalSecurityMeasure and list of existing OrganizationalSecurityMeasure if OrganizationalSecurityMeasure already exist
+     *
      */
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, Long organizationId, List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
 
@@ -73,11 +77,24 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     }
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of OrganizationalSecurityMeasure
+     */
     public List<OrganizationalSecurityMeasure> getAllOrganizationalSecurityMeasure(Long countryId, Long organizationId) {
         return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId, organizationId);
     }
 
 
+    /**
+     * @throws DataNotFoundByIdException throw exception if OrganizationalSecurityMeasure not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of OrganizationalSecurityMeasure
+     * @return OrganizationalSecurityMeasure object fetch via id
+     */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasure(Long countryId, Long organizationId, BigInteger id) {
 
         OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
@@ -102,7 +119,14 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         }
     }
 
-
+    /**
+     * @throws DuplicateDataException if OrganizationalSecurityMeasure not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id  id of OrganizationalSecurityMeasure
+     * @param orgSecurityMeasure
+     * @return return updated OrganizationalSecurityMeasure object
+     */
     public OrganizationalSecurityMeasure updateOrganizationalSecurityMeasure(Long countryId, Long organizationId, BigInteger id, OrganizationalSecurityMeasure orgSecurityMeasure) {
 
         OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(countryId, organizationId, orgSecurityMeasure.getName());
@@ -119,7 +143,13 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         }
     }
 
-
+    /**
+     * @throws DataNotExists throw exception if OrganizationalSecurityMeasure not exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name OrganizationalSecurityMeasure name
+     * @return OrganizationalSecurityMeasure fetch via name
+     */
     public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(Long countryId, Long organizationId, String name) {
 
 

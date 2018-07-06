@@ -13,11 +13,11 @@ import java.util.List;
 public class AgreementSection extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Title cannot be empty")
+    @NotNullOrEmpty(message = "Section Title cannot be empty")
     private String title;
 
     @NotNull
-    private List<BigInteger> clauseIds;
+    private List<BigInteger> clauses;
 
     private Long countryId;
 
@@ -29,12 +29,12 @@ public class AgreementSection extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public List<BigInteger> getClauseIds() {
-        return clauseIds;
+    public List<BigInteger> getClauses() {
+        return clauses;
     }
 
-    public void setClauseIds(List<BigInteger> clauseIds) {
-        this.clauseIds = clauseIds;
+    public void setClauses(List<BigInteger> clauses) {
+        this.clauses = clauses;
     }
 
     public String getTitle() {
@@ -46,16 +46,13 @@ public class AgreementSection extends MongoBaseEntity {
     }
 
 
-   public AgreementSection(Long countryId ,String title,List<BigInteger> clauseIds)
+   public AgreementSection(Long countryId ,String title,List<BigInteger> clauses)
     {
         this.title=title;
-        this.clauseIds=clauseIds;
+        this.clauses=clauses;
         this.countryId=countryId;
     }
-public AgreementSection()
-{
-
-}
+public AgreementSection(){ }
 
 
 }

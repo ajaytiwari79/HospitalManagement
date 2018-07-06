@@ -39,10 +39,10 @@ public class DataCategoryService extends MongoBaseService {
 
 
     /**
-     *
+     * @descitpion this method create new data category and add new data elements to data Category
      * @param countryId
-     * @param dataCategoryDto
-     * @return
+     * @param dataCategoryDto contain data categoy name and list of data elements
+     * @return return data category object.
      */
     public DataCategory addDataCategoryAndDataElement(Long countryId,Long organizationId,DataCategoryDTO dataCategoryDto) {
 
@@ -74,7 +74,12 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    //get data  category with data element
+    /**
+      * @param countryId
+     * @param organizationId
+     * @param id data category id
+     * @return return data category with its data elements
+     */
     public DataCategoryResponseDto getDataCategoryWithDataElement(Long countryId,Long organizationId,BigInteger id) {
         DataCategoryResponseDto dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementById(countryId,organizationId,id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
@@ -84,7 +89,11 @@ public class DataCategoryService extends MongoBaseService {
 
     }
 
-    //get data  category with data element
+    /**
+     * @param countryId
+     * @param organizationId
+     * @return return list of Data Category with data Elements
+     */
     public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId) {
         return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId,organizationId);
     }
@@ -113,7 +122,7 @@ public class DataCategoryService extends MongoBaseService {
 
 
     /**
-     *
+     * @description this method update data category , data elements and create new data elements if add to data category
      * @param countryId
      * @param organizationId
      * @param id id of Data Category

@@ -31,11 +31,14 @@ public class DataDisposalService extends MongoBaseService {
 
 
     /**
-     *
+     * @description this method create new data Disposal if data disposal not exist with same name ,
+     * and if exist then simply add  data disposal to existing list and return list ;
+     * findByNamesList()  return list of existing data disposal using collation ,used for case insensitive result
      * @param countryId
      * @param organizationId
      * @param dataDisposals
      * @return return map which contain list of new data disposal and list of existing data disposal if data disposal already exist
+     *
      */
     public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, Long organizationId, List<DataDisposal> dataDisposals) {
 
@@ -74,12 +77,24 @@ public class DataDisposalService extends MongoBaseService {
 
     }
 
-
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of DataDisposal
+     */
     public List<DataDisposal> getAllDataDisposal(Long countryId, Long organizationId) {
         return dataDisposalMongoRepository.findAllDataDisposals(countryId, organizationId);
     }
 
 
+    /**
+     * @throws DataNotFoundByIdException if data disposal not found for id
+     * @param countryId
+     * @param organizationId
+     * @param id id of data disposal
+     * @return onject of data disposal
+     */
     public DataDisposal getDataDisposalById(Long countryId, Long organizationId, BigInteger id) {
 
         DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
@@ -105,6 +120,14 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
+    /**
+     * @throws DuplicateDataException if data disposal exist with same name then throw exception
+     * @param countryId
+     * @param organizationId
+     * @param id id of Data Disposal
+     * @param dataDisposal
+     * @return updated data disposal object
+     */
     public DataDisposal updateDataDisposal(Long countryId, Long organizationId, BigInteger id, DataDisposal dataDisposal) {
 
 
@@ -123,6 +146,13 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
+    /**
+     * @param countryId
+     * @param name
+     * @throws DataNotExists if data  disposal not exist of requested name
+     * @description this method is used for get  data disposal by name
+     * @return object of data disposal
+     */
     public DataDisposal getDataDisposalByName(Long countryId, Long organizationId, String name) {
 
 
