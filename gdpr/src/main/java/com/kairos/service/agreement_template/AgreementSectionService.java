@@ -59,7 +59,7 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     public AgreementSection buildAgreementSection(Long countryId, AgreementSection agreementSection) {
-        return sequenceGenerator(new AgreementSection(countryId, agreementSection.getTitle(), agreementSection.getClauseIds()));
+        return sequenceGenerator(new AgreementSection( countryId,agreementSection.getTitle(), agreementSection.getClauses()));
 
     }
 

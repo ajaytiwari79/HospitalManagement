@@ -53,15 +53,9 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
 
     /**@description  questionnaireSection contain list of sections and list of sections ids.
      * @param countryId
-<<<<<<< HEAD
      * @param templateId questionniare template id ,required to fetch
      * @param masterQuestionnaireSectionDto contains list of sections ,And section contain list of questions
      * @return add sections ids to questionniare template and return questionniare template
-=======
-     * @param templateId
-     * @param masterQuestionnaireSectionDto contains list of sections and questions
-     * @return add sections ids to questionnaire template and return questionnaire template
->>>>>>> a2b2957cc09ffd630f5d8141f42eda91295fd1d5
      */
     public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long orgId, BigInteger templateId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDto) {
         MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
