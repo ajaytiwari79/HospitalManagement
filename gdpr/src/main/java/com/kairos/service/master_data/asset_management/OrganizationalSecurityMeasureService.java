@@ -29,6 +29,14 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param orgSecurityMeasures
+     * @return return map which contain list of new organization measure and list of existing  organization measure  if  organization measure already exist
+     */
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, Long organizationId, List<OrganizationalSecurityMeasure> orgSecurityMeasures) {
 
         Map<String, List<OrganizationalSecurityMeasure>> result = new HashMap<>();

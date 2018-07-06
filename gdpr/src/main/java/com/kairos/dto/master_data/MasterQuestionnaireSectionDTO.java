@@ -17,7 +17,7 @@ public class MasterQuestionnaireSectionDTO {
     private BigInteger id;
 
     @NotNullOrEmpty(message = "Title  can't be empty")
-    @Pattern(message = "special character or numberic data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Special character or Numbers data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @NotNull(message = "Question  can't be null")

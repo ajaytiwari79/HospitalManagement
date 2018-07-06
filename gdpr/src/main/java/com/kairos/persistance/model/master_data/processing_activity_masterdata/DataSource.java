@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 public class DataSource extends  MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 

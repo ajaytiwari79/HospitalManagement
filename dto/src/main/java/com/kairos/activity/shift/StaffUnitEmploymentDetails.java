@@ -114,7 +114,7 @@ public class StaffUnitEmploymentDetails {
         this.employmentType = employmentType;
     }
 
-    public WTAResponseDTO  getWorkingTimeAgreement() {
+    public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 

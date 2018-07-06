@@ -29,24 +29,24 @@ public class ResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
+    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> responsibilityTypes) {
 
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-        Set<String> rsponsibilityTypesNames = new HashSet<>();
-        if (rsponsibilityTypes.size() != 0) {
-            for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
+        Set<String> responsibilityTypeNames = new HashSet<>();
+        if (responsibilityTypes.size() != 0) {
+            for (ResponsibilityType responsibilityType : responsibilityTypes) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    rsponsibilityTypesNames.add(responsibilityType.getName());
+                    responsibilityTypeNames.add(responsibilityType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,rsponsibilityTypesNames,ResponsibilityType.class);
-            rsponsibilityTypesNames = comparisonUtils.getNameListForMetadata(existing, rsponsibilityTypesNames);
+            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,responsibilityTypeNames,ResponsibilityType.class);
+            responsibilityTypeNames = comparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
-            if (rsponsibilityTypesNames.size() != 0) {
-                for (String name : rsponsibilityTypesNames) {
+            if (responsibilityTypeNames.size() != 0) {
+                for (String name : responsibilityTypeNames) {
 
                     ResponsibilityType newResponsibilityType = new ResponsibilityType();
                     newResponsibilityType.setName(name);

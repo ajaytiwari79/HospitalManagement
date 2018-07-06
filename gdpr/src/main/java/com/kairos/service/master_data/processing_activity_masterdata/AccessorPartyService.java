@@ -33,12 +33,12 @@ public class AccessorPartyService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
 
-    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorPartys) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorParties) {
 
         Map<String, List<AccessorParty>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
-        if (accessorPartys.size() != 0) {
-            for (AccessorParty accessorParty : accessorPartys) {
+        if (!accessorParties.isEmpty()) {
+            for (AccessorParty accessorParty : accessorParties) {
                 if (!StringUtils.isBlank(accessorParty.getName())) {
                     accessorPartyNames.add(accessorParty.getName());
                 } else
@@ -47,19 +47,19 @@ public class AccessorPartyService extends MongoBaseService {
             List<AccessorParty> existing = findByNamesList(countryId, organizationId, accessorPartyNames, AccessorParty.class);
             accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
-            List<AccessorParty> newAccessorPartys = new ArrayList<>();
-            if (accessorPartyNames.size() != 0) {
+            List<AccessorParty> newAccessorPartyList = new ArrayList<>();
+            if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
                     AccessorParty newAccessorParty = new AccessorParty();
                     newAccessorParty.setName(name);
                     newAccessorParty.setCountryId(countryId);
                     newAccessorParty.setOrganizationId(organizationId);
-                    newAccessorPartys.add(newAccessorParty);
+                    newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartys = accessorPartyMongoRepository.saveAll(sequenceGenerator(newAccessorPartys));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(sequenceGenerator(newAccessorPartyList));
             }
             result.put("existing", existing);
-            result.put("new", newAccessorPartys);
+            result.put("new", newAccessorPartyList);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");
@@ -68,13 +68,7 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorParty> getAllAccessorParty(Long countryId, Long organizationId) {
-        return accessorPartyMongoRepository.findAllAccessorPartys(countryId, organizationId);
-/*
-         Set<String> strings=new HashSet<>();
-         strings.add("qwert");
-         strings.add("qwertyu");
-         strings.add("qazxsw");
-         return findByNamesList(countryId,organizationId,strings,AccessorParty.class);*/
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId, organizationId);
     }
 
 

@@ -4,8 +4,6 @@ package com.kairos.dto.master_data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotNull;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ModuleIdDTO {
 

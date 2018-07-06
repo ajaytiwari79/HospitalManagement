@@ -1,7 +1,6 @@
 package com.kairos.persistance.repository.account_type;
 
 import com.kairos.persistance.model.account_type.AccountType;
-import org.bson.types.ObjectId;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

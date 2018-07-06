@@ -29,6 +29,14 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private ComparisonUtils  comparisonUtils;
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param storageFormats
+     * @return return map which contain list of new storage format and list of existing  storage format  if  storage format already exist
+     *
+     */
     public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, Long organizationId, List<StorageFormat> storageFormats) {
 
         Map<String, List<StorageFormat>> result = new HashMap<>();

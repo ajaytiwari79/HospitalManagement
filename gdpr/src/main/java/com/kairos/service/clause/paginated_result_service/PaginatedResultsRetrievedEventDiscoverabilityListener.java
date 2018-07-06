@@ -27,9 +27,7 @@ public class PaginatedResultsRetrievedEventDiscoverabilityListener implements Ap
     void addLinkHeaderOnPagedResourceRetrieval(final UriComponentsBuilder uriBuilder, final HttpServletResponse response, final Class clazz, final int page, final int totalPages, final int pageSize) {
         final String resourceName = clazz.getSimpleName().toString().toLowerCase();
 
-        System.err.println("+++++++uribuilder :  "+uriBuilder.toUriString());
         uriBuilder.path("/page/" + resourceName);
-        System.err.println("+++++++uribuilder :  "+uriBuilder.toUriString());
 
 
         final StringBuilder linkHeader = new StringBuilder();

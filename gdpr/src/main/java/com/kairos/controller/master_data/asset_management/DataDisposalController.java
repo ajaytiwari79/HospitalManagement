@@ -16,7 +16,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_DATA_DISPOSAL_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.UNIT_URL;
+
 /*
  *
  *  created by bobby 16/5/2018
@@ -24,8 +26,8 @@ import static com.kairos.constants.ApiConstant.API_DATA_DISPOSAL_URL;
 
 
 @RestController
-@RequestMapping(API_DATA_DISPOSAL_URL)
-@Api(API_DATA_DISPOSAL_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class DataDisposalController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalController.class);
@@ -35,7 +37,7 @@ public class DataDisposalController {
 
 
     @ApiOperation("add DataDisposal")
-    @PostMapping("/add")
+    @PostMapping("/data_disposal/add")
     public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<DataDisposal> dataDisposals) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -48,7 +50,7 @@ public class DataDisposalController {
 
 
     @ApiOperation("get DataDisposal by id")
-    @GetMapping("/{id}")
+    @GetMapping("/data_disposal/{id}")
     public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -65,7 +67,7 @@ public class DataDisposalController {
 
 
     @ApiOperation("get all DataDisposal ")
-    @GetMapping("/all")
+    @GetMapping("/data_disposal/all")
     public ResponseEntity<Object> getAllDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -78,7 +80,7 @@ public class DataDisposalController {
     }
 
     @ApiOperation("get DataDisposal by name")
-    @GetMapping("/name")
+    @GetMapping("/data_disposal/name")
     public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam String name) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -91,7 +93,7 @@ public class DataDisposalController {
 
 
     @ApiOperation("delete data disposal by id")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/data_disposal/delete/{id}")
     public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -108,7 +110,7 @@ public class DataDisposalController {
     }
 
     @ApiOperation("update DataDisposal by id")
-    @PutMapping("/update/{id}")
+    @PutMapping("/data_disposal/update/{id}")
     public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataDisposal dataDisposal) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -124,4 +126,32 @@ public class DataDisposalController {
     }
 
 
+    @ApiOperation("get all DataDisposal of unit")
+    @GetMapping(UNIT_URL+"/data_disposal/all")
+    public ResponseEntity<Object> getAllDataDisposalOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unit id can't be null");
+
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal(countryId, unitId));
+
+    }
+
+    @ApiOperation("get DataDisposal of unit by id")
+    @GetMapping(UNIT_URL+"/data_disposal/{id}")
+    public ResponseEntity<Object> getDataDisposalByIdofUnit(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unit id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, unitId, id));
+
+    }
 }

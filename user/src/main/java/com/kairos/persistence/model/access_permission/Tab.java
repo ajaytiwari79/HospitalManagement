@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.persistence.model.deserializer.XmlDeserializer;
-
 
 import java.util.List;
 
@@ -73,13 +71,13 @@ public class Tab {
         this.subPages = Optional.fromNullable(children).or(Lists.<Tab>newArrayList());
     }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-                .add("id", moduleId)
-                .add("subPages", subPages)
-                .toString();
-    }
+//    @Override
+//    public String toString() {
+//        return Objects.toStringHelper(this)
+//                .add("id", moduleId)
+//                .add("subPages", subPages)
+//                .toString();
+//    }
 
     public Tab() {
     }
