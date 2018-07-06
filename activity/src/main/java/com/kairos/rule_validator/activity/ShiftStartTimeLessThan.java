@@ -13,13 +13,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class ShiftTimeLessThan extends AbstractActivitySpecification<ShiftWithActivityDTO> {
+public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftWithActivityDTO> {
 
     private ZoneId zoneId;
     private Date shiftStartDateTime;
     private DurationField durationField;
 
-    public ShiftTimeLessThan(ZoneId zoneId, Date shiftStartDateTime, DurationField durationField) {
+    public ShiftStartTimeLessThan(ZoneId zoneId, Date shiftStartDateTime, DurationField durationField) {
         this.zoneId = zoneId;
         this.shiftStartDateTime = shiftStartDateTime;
         this.durationField = durationField;
