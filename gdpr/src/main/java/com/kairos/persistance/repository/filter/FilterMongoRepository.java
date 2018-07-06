@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @Repository
-public interface FilterMongoRepository extends MongoRepository<FilterGroup, BigInteger>, CustomeFilterMongoRepository {
+public interface FilterMongoRepository extends MongoRepository<FilterGroup, BigInteger>, CustomFilterMongoRepository {
 
 
     @Query("{'accessModule.moduleId':?0,countryId:?1}")

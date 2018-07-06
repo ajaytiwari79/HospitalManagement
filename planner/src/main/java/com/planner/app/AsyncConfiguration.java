@@ -7,12 +7,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
-/**
- * @author pradeep
- * @date - 2/7/18
- */
-
-
 @Configuration
 @EnableAsync
 public class AsyncConfiguration  implements AsyncConfigurer {

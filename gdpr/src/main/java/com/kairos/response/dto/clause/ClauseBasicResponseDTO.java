@@ -5,7 +5,7 @@ import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 import java.math.BigInteger;
 
 /*
-* clause basic response dto is for Aggrement section
+* clause basic response dto is for Agreement section
 *
 * */
 

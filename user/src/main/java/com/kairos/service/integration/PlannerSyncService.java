@@ -5,11 +5,11 @@ import com.kairos.activity.wta.UnitPositionWtaDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.user.staff.staff.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
+import com.kairos.user.staff.staff.Staff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class PlannerSyncService {
         plannerRestClient.publish(createStaffList(staff),unitId,integrationOperation);
     }
     //@Async
-    public void publishWTA(Long unitId,Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
+    public void publishWTA(Long unitId, Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
         plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,unitPositionId);
     }
     //@Async

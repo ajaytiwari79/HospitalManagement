@@ -28,11 +28,11 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
     private MongoTemplate mongoTemplate;
 
 
-    final String addFieldSections = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedSections();
-    final String addFieldQuestions = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedQuestions();
-    final String addFieldAssetType = CustomAggregationQuery.questionnnaireTemplateAddNonDeletedAssetType();
-    final String groupData = CustomAggregationQuery.questionnnaireTemplateGroupOperation();
-    final String projection = CustomAggregationQuery.questionnnaireTemplateProjectionBeforeGroupOperationForAssetType();
+    final String addFieldSections = CustomAggregationQuery.questionnaireTemplateAddNonDeletedSections();
+    final String addFieldQuestions = CustomAggregationQuery.questionnaireTemplateAddNonDeletedQuestions();
+    final String addFieldAssetType = CustomAggregationQuery.questionnaireTemplateAddNonDeletedAssetType();
+    final String groupData = CustomAggregationQuery.questionnaireTemplateGroupOperation();
+    final String projection = CustomAggregationQuery.questionnaireTemplateProjectionBeforeGroupOperationForAssetType();
 
     Document assetTypeAddFieldOperation = Document.parse(addFieldAssetType);
     Document questionsAddFieldOperation = Document.parse(addFieldQuestions);

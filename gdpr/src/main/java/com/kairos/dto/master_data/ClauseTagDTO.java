@@ -13,7 +13,7 @@ public class ClauseTagDTO {
     private BigInteger id;
 
     @NotNullOrEmpty(message = "Tag  can't be Empty")
-    @Pattern(message = "numberic and Special character are not allowed in tag",regexp ="^[a-zA-Z\\s]+$" )
+    @Pattern(message = "Numbers and Special character are not allowed in tag",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
     public BigInteger getId() {

@@ -3,8 +3,8 @@ package com.kairos.activity.wta.rules;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.enums.WTATemplateType;
 import com.kairos.activity.wta.templates.BreakTemplateValue;
+import com.kairos.enums.WTATemplateType;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -36,9 +36,7 @@ public class BreaksInShiftWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public BreaksInShiftWTATemplateDTO() {
-        this.wtaTemplateType = WTATemplateType.BREAK_IN_SHIFT;
-    }
+
     public BreaksInShiftWTATemplateDTO(String name, String templateType, boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {
         this.name = name;
         //this.templateType = WTATemplateType.;

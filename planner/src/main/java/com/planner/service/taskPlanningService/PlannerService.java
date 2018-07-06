@@ -8,6 +8,7 @@ import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
+import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.domain.taskPlanning.PlanningProblem;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.enums.PlanningStatus;
@@ -56,6 +57,7 @@ public class PlannerService {
     @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
     @Autowired private PlannerRestClient plannerRestClient;
     @Autowired private VRPPlannerService vrpPlannerService;
+
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
         PlanningProblem planningProblem = (PlanningProblem) planningRepository.findById(id,PlanningProblem.class);
@@ -131,6 +133,11 @@ public class PlannerService {
             vrpPlanningMongoRepository.delete(solution);
         }
         vrpPlannerService.startVRPPlanningSolverOnThisVM(vrpTaskPlanningDTO);
+        return true;
+    }
+
+    public boolean stopVRPPlanning(BigInteger solverConfigId){
+        vrpPlannerService.terminateEarlyVrpPlanningSolver(solverConfigId.toString());
         return true;
     }
 
