@@ -283,7 +283,10 @@ public class ShiftService extends MongoBaseService {
     }
 
     private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
-        return staffUnitPositionDetails.getExcludedPlannedTime().equals(plannedTypeId) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+        if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
+            return plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
+        }
+        return plannedTypeId;
     }
 
     private List<ShiftQueryResult> addBreakInShifts(Activity activity, Shift mainShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -577,7 +580,7 @@ public class ShiftService extends MongoBaseService {
                 .and(staffEmploymentSpecification);
 
         activitySpecification.isSatisfied(shift);
-       // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
+        // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
         //.and(wtaRulesSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(shift);
         if (!messages.isEmpty()) {
@@ -726,7 +729,7 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = shift.getShiftQueryResult();
         } else {
             List<Shift> shifts;
-            shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId(),activity);
+            shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId(), activity);
             save(shifts);
             Set<BigInteger> subShiftsIds = shifts.parallelStream().map(Shift::getId).collect(Collectors.toSet());
             shift = buildShift(shiftDTO);
@@ -768,7 +771,7 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
-    private List<Shift> verifyCompositeShifts(ShiftDTO shiftDTO, BigInteger shiftId,Activity activity ) {
+    private List<Shift> verifyCompositeShifts(ShiftDTO shiftDTO, BigInteger shiftId, Activity activity) {
         if (shiftDTO.getSubShifts().size() == 0) {
             exceptionService.invalidRequestException("message.sub-shift.create");
         }
@@ -1148,7 +1151,7 @@ public class ShiftService extends MongoBaseService {
             shiftDTO1.setStartLocalDate(shiftDTO.getStartLocalDate());
             shiftDTO1.setEndLocalDate(shiftDTO.getEndLocalDate());
 
-            ShiftQueryResult shiftQueryResult=addSubShift(unitId, shiftDTO1, "Organization");
+            ShiftQueryResult shiftQueryResult = addSubShift(unitId, shiftDTO1, "Organization");
             shifts.add(shiftQueryResult);
         });
         return shifts;
@@ -1177,12 +1180,12 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public List<Shift> getAllShiftByIds(List<String> shiftIds){
+    public List<Shift> getAllShiftByIds(List<String> shiftIds) {
         return shiftMongoRepository.findAllByIds(shiftIds);
     }
-  
-    public ShiftQueryResult getShiftByStaffIdAndDate(List<Long> staffIds,Date date){
-        ShiftQueryResult shiftQueryResults=shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds,date);
+
+    public ShiftQueryResult getShiftByStaffIdAndDate(List<Long> staffIds, Date date) {
+        ShiftQueryResult shiftQueryResults = shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds, date);
         return shiftQueryResults;
     }
 }
