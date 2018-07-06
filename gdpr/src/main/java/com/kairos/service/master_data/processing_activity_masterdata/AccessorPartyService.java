@@ -69,12 +69,6 @@ public class AccessorPartyService extends MongoBaseService {
 
     public List<AccessorParty> getAllAccessorParty(Long countryId, Long organizationId) {
         return accessorPartyMongoRepository.findAllAccessorPartys(countryId, organizationId);
-/*
-         Set<String> strings=new HashSet<>();
-         strings.add("qwert");
-         strings.add("qwertyu");
-         strings.add("qazxsw");
-         return findByNamesList(countryId,organizationId,strings,AccessorParty.class);*/
     }
 
 

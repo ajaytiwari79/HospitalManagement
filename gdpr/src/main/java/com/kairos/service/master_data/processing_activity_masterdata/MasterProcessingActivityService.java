@@ -177,7 +177,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
             subProcessingActivitiesIds.add(subProcess.getId());
             subProcessingActivitesNames.add(subProcess.getName());
         });
-        //checkDuplicateInsertionOnUpdatingDataElements(countryId, organizationId, dataElementsDtoList, dataElementsNames);
         List<MasterProcessingActivity> subProcessingActivityiesList = masterProcessingActivityRepository.getAllMasterSubProcessingsctivitiesByIds(countryId, organizationId, subProcessingActivitiesIds);
         subProcessingActivityiesList.forEach(subProcess -> {
             MasterProcessingActivityDTO subProcessDto = subProcessingActivityDTOList.get(subProcess.getId());

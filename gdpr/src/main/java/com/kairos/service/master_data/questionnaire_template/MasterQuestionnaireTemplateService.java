@@ -49,6 +49,13 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     @Inject
     private MasterQuestionMongoRepository masterQuestionMongoRepository;
 
+
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param templateDto contain data of Questionnaire template
+     * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE)
+     */
     public MasterQuestionnaireTemplate addQuestionnaireTemplate(Long countryId,Long organizationId, MasterQuestionnaireTemplateDTO templateDto) {
         MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,organizationId,templateDto.getName());
         if (Optional.ofNullable(exisiting).isPresent()) {
@@ -67,10 +74,12 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
-    /**
-     * @param templateDto           contain data to create basic questionniare Template
+    /**@descriptiom buildQuestionniareTemplate()  buld questionnaire template ,add template type to questionniare template (Template Type enum) and if enum type
+     * is ASSET_TYPE then add asset to template and return ;(addTemplateTypeToQuestionnaireTemplate)
+     * @param templateDto   create basic questionniare Template without sections
      * @param questionnaireTemplate is template in which we add properties of Template Type and Asset Type if present
-     * @return
+     * @return object of questionniare template with template type
+     * @throws  InvalidRequestException; if template type enum value not exist
      */
     public MasterQuestionnaireTemplate buildQuestionniareTemplate(MasterQuestionnaireTemplateDTO templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
         if (QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()) == null) {
@@ -79,6 +88,8 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         addTemplateTypeToQuestionnaireTemplate(templateDto.getAssetType(), questionnaireTemplate, QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()));
         return questionnaireTemplate;
     }
+
+
 
     public void addTemplateTypeToQuestionnaireTemplate(BigInteger assetTypeId, MasterQuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateType templateType) {
 
@@ -117,6 +128,15 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         return true;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param orgId organization id to which questionniare template belong
+     * @param id questionniare template id
+     * @param templateDto
+     * @return updated Questionniare template with basic data (name,decription ,template type)
+     */
     public MasterQuestionnaireTemplate updateQuestionniareTemplate(Long countryId, Long orgId,BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
         MasterQuestionnaireTemplate exisiting = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
         if (Optional.ofNullable(exisiting).isPresent() && !id.equals(exisiting.getId())) {
@@ -139,12 +159,12 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
     /**
-     * we get section[ {} ] as query response from mongo we are not using JsonInclude non empty so we can filter data
-     * we are not using JsonInclude.NON_EMPTY so that we  get object with {id=null,name=null,description=null} for section
-     * and send section as empty array after filtering data
+     * @description  we get  section[ {} ] as query response from mongo on using group operation,
+     * That why  we are not using JsonInclude.NON_EMPTY so we can get reponse of section as [{id=null,name=null,description=null}] instead of section [{}]
+     * and filter section in application layer and send empty array of section []
      * @param countryId
-     * @param id
-     * @return
+     * @param id questionnaire template id
+     * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
      */
     public MasterQuestionnaireTemplateResponseDTO getMasterQuestionniareTemplateWithSectionById(Long countryId,Long organizationId,BigInteger id) {
         MasterQuestionnaireTemplateResponseDTO templateResponseDto = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId,id);
@@ -155,6 +175,14 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
+    /**
+     * @description we get  section[ {} ] as query response from mongo on using group operation,
+     *  That why  we are not using JsonInclude.NON_EMPTY so we can get reponse of section as [{id=null,name=null,description=null}] instead of section [{}]
+     *  and filter section in application layer and send empty array of section []
+     * @param countryId
+     * @param organizationId
+     * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
+     */
     public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionniareTemplateWithSection(Long countryId,Long organizationId) {
         List<MasterQuestionnaireTemplateResponseDTO> templateResponseDtos = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId);
         templateResponseDtos.forEach(template -> {
