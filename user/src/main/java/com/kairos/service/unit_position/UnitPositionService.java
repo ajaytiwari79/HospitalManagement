@@ -1142,6 +1142,7 @@ public class UnitPositionService extends UserBaseService {
 
         User user = userGraphRepository.getUserByStaffId(staffId);
         List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndCTAByUser(user.getId());
+        List<Long> currentApplicableIds = unitPositionQueryResults.stream().map(u -> u.getCostTimeAgreement().getId()).collect(Collectors.toList());
 
         return unitPositionQueryResults;
     }
