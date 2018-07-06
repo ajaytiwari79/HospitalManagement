@@ -9,10 +9,7 @@ import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.agreement.cta.CTAListQueryResult;
-import com.kairos.persistence.model.agreement.cta.CTARuleTemplateQueryResult;
-import com.kairos.persistence.model.agreement.cta.CompensationTableInterval;
-import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.agreement.cta.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientMinimumDTO;
 import com.kairos.persistence.model.country.DayType;
@@ -63,6 +60,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.user.organization.position_code.PositionCodeDTO;
 import com.kairos.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -1127,24 +1125,29 @@ public class UnitPositionService extends UserBaseService {
         return staffData;
     }
 
-    public List<UnitPositionQueryResult> getAllWTAOfStaff(Long staffId) {
+    public List<WTAVersionDTO> getAllWTAOfStaff(Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
         List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndWTAByUser(user.getId());
-        List<WTAVersionDTO> wtaResponseDTOS = workingTimeAgreementRestClient.getWTAWithVersionIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
-        Map<BigInteger, WTAVersionDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w -> w.getId(), w -> w));
-        unitPositionQueryResults.forEach(u -> {
-            u.setWorkingTimeAgreementVersion(wtaResponseDTOMap.get(u.getWorkingTimeAgreementId()));
+        // The keys is because of same component in FE
+        List<WTAVersionDTO> agreements = workingTimeAgreementRestClient.getWTAWithVersionIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
+        Map<BigInteger, UnitPositionQueryResult> wtaPositionMap = unitPositionQueryResults.stream().collect(Collectors.toMap(w -> w.getWorkingTimeAgreementId(), w -> w));
+        agreements.forEach(currentWTA -> {
+            currentWTA.setUnitInfo(wtaPositionMap.get(currentWTA.getId()).getUnitInfo());
+            currentWTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(wtaPositionMap.get(currentWTA.getId()).getPositionCode(), PositionCodeDTO.class));
+
         });
-        return unitPositionQueryResults;
+        return agreements;
     }
 
-    public List<UnitPositionQueryResult> getAllCTAOfStaff(Long staffId) {
-
+    public List<CTAResponseDTO> getAllCTAOfStaff(Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndCTAByUser(user.getId());
-        List<Long> currentApplicableIds = unitPositionQueryResults.stream().map(u -> u.getCostTimeAgreement().getId()).collect(Collectors.toList());
-
-        return unitPositionQueryResults;
+        List<CTAResponseDTO> agreements = unitPositionGraphRepository.getAllCtaByUserId(user.getId());
+        List<CTAResponseDTO> ctaResponseDTOS = unitPositionGraphRepository.getAllVersionsOfCTAByIds(agreements.stream().map(u -> u.getId()).collect(Collectors.toList()));
+        Map<Long, List<CTAResponseDTO>> ctaMapByParentId = ctaResponseDTOS.stream().collect(Collectors.groupingBy(w -> w.getParentCTAId(), Collectors.toList()));
+        agreements.forEach(currentCTA -> {
+            currentCTA.setVersions(ctaMapByParentId.get(currentCTA.getId()));
+        });
+        return agreements;
     }
 
 

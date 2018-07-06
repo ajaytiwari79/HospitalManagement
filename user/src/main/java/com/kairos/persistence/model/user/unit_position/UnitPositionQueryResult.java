@@ -50,7 +50,6 @@ public class UnitPositionQueryResult {
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
 
-    private WTAVersionDTO workingTimeAgreementVersion;    // Its for version of the WTA
 
     private Boolean history;
     private Boolean editable;
@@ -297,13 +296,7 @@ public class UnitPositionQueryResult {
         this.published = published;
     }
 
-    public WTAVersionDTO getWorkingTimeAgreementVersion() {
-        return workingTimeAgreementVersion;
-    }
 
-    public void setWorkingTimeAgreementVersion(WTAVersionDTO workingTimeAgreementVersion) {
-        this.workingTimeAgreementVersion = workingTimeAgreementVersion;
-    }
 
     public UnitPositionQueryResult() {
         //default cons

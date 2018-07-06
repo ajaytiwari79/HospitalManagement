@@ -2,12 +2,14 @@ package com.kairos.activity.wta.version;
 
 import com.kairos.activity.shift.Expertise;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.user.organization.position_code.PositionCodeDTO;
 
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class WTAVersionDTO {
 
@@ -20,6 +22,10 @@ public class WTAVersionDTO {
     private Boolean disabled;
     private List<WTAVersionDTO> versions = new ArrayList<>();
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
+    private Long parentUnitId;
+    private Long unitId;
+    private Map<String, Object> unitInfo;
+    private PositionCodeDTO positionCode;
 
     public WTAVersionDTO() {
         //dc
@@ -95,5 +101,37 @@ public class WTAVersionDTO {
 
     public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
+    }
+
+    public Long getParentUnitId() {
+        return parentUnitId;
+    }
+
+    public void setParentUnitId(Long parentUnitId) {
+        this.parentUnitId = parentUnitId;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public Map<String, Object> getUnitInfo() {
+        return unitInfo;
+    }
+
+    public void setUnitInfo(Map<String, Object> unitInfo) {
+        this.unitInfo = unitInfo;
+    }
+
+    public PositionCodeDTO getPositionCode() {
+        return positionCode;
+    }
+
+    public void setPositionCode(PositionCodeDTO positionCode) {
+        this.positionCode = positionCode;
     }
 }
