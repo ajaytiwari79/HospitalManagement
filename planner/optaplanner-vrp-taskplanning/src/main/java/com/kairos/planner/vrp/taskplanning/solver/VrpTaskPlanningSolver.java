@@ -41,12 +41,15 @@ public class VrpTaskPlanningSolver {
       //  solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
         //solverFactory = SolverFactory.createFromXmlFile(new File(config));
         //solverFactory = SolverFactory.createFromXmlResource("config/Kamstrup_Vrp_taskPlanning.solver.xml");
-    public VrpTaskPlanningSolver(List<File> drlFileList,String vrpXmlFilePath,int terminationTime){
+    public VrpTaskPlanningSolver(List<File> drlFileList, String vrpXmlFilePath, int terminationTime, int numberOfThread){
+        if(numberOfThread<=0 || numberOfThread>=40){
+            throw new IllegalArgumentException("Invalid threads provided, please provide a sane number."+numberOfThread);
+        }
         solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
             solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
-            solverFactory.getSolverConfig().setMoveThreadCount("6");
+            solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
         }
         solver = solverFactory.buildSolver();
     }
