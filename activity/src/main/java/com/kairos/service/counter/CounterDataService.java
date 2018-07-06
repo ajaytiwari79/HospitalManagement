@@ -74,10 +74,10 @@ public class CounterDataService {
         kpiList.add(getRoadTimePercentKPI(vrpTaskPlanningDTO, shifts));
         kpiList.add(getCompletedTaskWithinTimeWindowKPI(vrpTaskPlanningDTO, shifts, tasks));
         kpiList.add(getPercentOfBreaksIn11and13KPI(vrpTaskPlanningDTO));
-        //kpiList.add(getFlexiTimePercentKPI(vrpTaskPlanningDTO,shifts));
-        //kpiList.add(getFlexiTimeTaskPercentKPI(vrpTaskPlanningDTO, shifts, tasks));
-        //kpiList.add(getTotalKMsDrivenByStaff(vrpTaskPlanningDTO, employeeDataIdMap));
-        //kpiList.add(getTotalTaskEfficiencyKPI(vrpTaskPlanningDTO, tasks));
+        kpiList.add(getFlexiTimePercentKPI(vrpTaskPlanningDTO,shifts));
+        kpiList.add(getFlexiTimeTaskPercentKPI(vrpTaskPlanningDTO, shifts, tasks));
+        kpiList.add(getTotalKMsDrivenByStaff(vrpTaskPlanningDTO, employeeDataIdMap));
+        kpiList.add(getTotalTaskEfficiencyKPI(vrpTaskPlanningDTO, tasks));
         return kpiList;
     }
 
@@ -214,9 +214,11 @@ public class CounterDataService {
     //KPI:Flexi Time Time Percent
     public KPI getFlexiTimePercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts){
         long baseShiftWorkingTime = shifts.stream().mapToLong(baseShift -> Long.sum(baseShift.getEndDate().getTime(), -baseShift.getStartDate().getTime())).sum();
-        Map<BigInteger, Shift> shiftsIdMap = shifts.parallelStream().collect(Collectors.toMap(shift -> shift.getId(), shift-> shift));
+        Map<String, Shift> shiftsIdMap = shifts.parallelStream().collect(Collectors.toMap(shift -> shift.getId().toString(), shift-> shift));
         long flexiWorkingTime = vrpTaskPlanningDTO.getShifts().parallelStream().mapToLong(
-                plannedShift -> (shiftsIdMap.get(plannedShift.getKairosShiftId()) !=null && (plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime())>=0)?(plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime()):0)
+                plannedShift -> ((plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime())>=0)
+                        ?(plannedShift.getEndTime() - shiftsIdMap.get(plannedShift.getKairosShiftId()).getEndDate().getTime())
+                        :0)
                 .sum();
         double flexiTimePercent = flexiWorkingTime*100.0/baseShiftWorkingTime;
         return prepareFlexiTimePercentKPI(flexiTimePercent);
@@ -232,7 +234,7 @@ public class CounterDataService {
     //KPI: flexi time tasks
     public KPI getFlexiTimeTaskPercentKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<Shift> shifts, List<VRPTaskDTO> taskDTOs){
         Map<Long, List<VRPTaskDTO>> installationNumberTaskMap = taskDTOs.stream().collect(Collectors.groupingBy(task -> task.getInstallationNumber(), Collectors.toList()));
-        Map<BigInteger, Shift> shiftIdMap = shifts.parallelStream().collect(Collectors.toMap(shift->shift.getId(), shift->shift));
+        Map<String, Shift> shiftIdMap = shifts.parallelStream().collect(Collectors.toMap(shift->shift.getId().toString(), shift->shift));
         List<TaskDTO> eligibleTaskGroups = vrpTaskPlanningDTO.getTasks().parallelStream().filter(task ->  shiftIdMap.get(task.getShiftId())!=null && task.getPlannedEndTime().toInstant(ZoneOffset.UTC).toEpochMilli() > shiftIdMap.get(task.getShiftId()).getEndDate().getTime()).collect(toList());
         List<Long> taskCounts = new ArrayList<>();
         eligibleTaskGroups.parallelStream().forEach(taskGroup -> {
@@ -307,12 +309,11 @@ public class CounterDataService {
     //public KPI
 
     private double decimalSpecification(double value){
-        return Math.round(value*100)/100;
+        return Math.round(value*100)/100.0;
     }
 
     //TODO: scope in future, for collecting counters metadata separatly
-    public void getCounterMetadataForVRP(){
-        //list of KPIs
+    public void getCounterMetadataForVRP(){//list of KPIs
 
     }
 
