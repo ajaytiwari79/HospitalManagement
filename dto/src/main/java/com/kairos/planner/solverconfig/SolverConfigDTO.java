@@ -24,9 +24,27 @@ public class SolverConfigDTO {
     private BigInteger parentSolverConfigId;
     private Integer terminationTime;
     private List<ConstraintValueDTO> constraints;
+    private int numberOfThread;
+    private int plannerNumber;
     private SolverConfigStatus status;
     private boolean isDefault;
 
+
+    public int getNumberOfThread() {
+        return numberOfThread;
+    }
+
+    public void setNumberOfThread(int numberOfThread) {
+        this.numberOfThread = numberOfThread;
+    }
+
+    public int getPlannerNumber() {
+        return plannerNumber;
+    }
+
+    public void setPlannerNumber(int plannerNumber) {
+        this.plannerNumber = plannerNumber;
+    }
 
     public Long getUnitId() {
         return unitId;

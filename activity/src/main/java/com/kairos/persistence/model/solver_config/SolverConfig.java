@@ -26,6 +26,8 @@ public class SolverConfig extends MongoBaseEntity{
     private Integer terminationTime;//In minutes
     private List<ConstraintValue> constraints;
     private boolean isDefault;
+    private int numberOfThread;
+    private int plannerNumber;
 
 
     public SolverConfig() {
@@ -41,6 +43,23 @@ public class SolverConfig extends MongoBaseEntity{
         this.constraints = constraints;
         this.isDefault = isDefault;
         this.status = status;
+    }
+
+
+    public int getNumberOfThread() {
+        return numberOfThread;
+    }
+
+    public void setNumberOfThread(int numberOfThread) {
+        this.numberOfThread = numberOfThread;
+    }
+
+    public int getPlannerNumber() {
+        return plannerNumber;
+    }
+
+    public void setPlannerNumber(int plannerNumber) {
+        this.plannerNumber = plannerNumber;
     }
 
     public SolverConfigStatus getStatus() {
