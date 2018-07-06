@@ -8,7 +8,6 @@ import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.javers.JaversCommonService;
-import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;

@@ -37,7 +37,6 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(true));
-        ;
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, AssetType.class);

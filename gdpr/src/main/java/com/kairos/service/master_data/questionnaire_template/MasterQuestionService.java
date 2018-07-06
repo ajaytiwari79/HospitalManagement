@@ -39,7 +39,7 @@ public class MasterQuestionService extends MongoBaseService {
         checkForDuplicacyInQuestion(masterQuestionDTOs);
         for (MasterQuestionDTO masterQuestion : masterQuestionDTOs) {
             if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
-                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);;
+                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
                 question.setNotSureAllowed(masterQuestion.getNotSureAllowed());
                 question.setRequired(masterQuestion.getRequired());
                 question.setOrganizationId(organizationId);
