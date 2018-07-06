@@ -192,6 +192,7 @@ public class VrpTaskPlanningSolver {
             director.setWorkingSolution(solution);
             Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
             printSolutionInformation( solution);
+            //log.info(solver.explainBestScore());
             getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
             return new Object[]{solution,indictmentMap};
         }catch (Exception e){

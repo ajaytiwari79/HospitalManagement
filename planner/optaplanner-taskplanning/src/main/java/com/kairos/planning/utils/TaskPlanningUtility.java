@@ -116,7 +116,7 @@ public class TaskPlanningUtility {
     public static boolean checkEmployeeCanWorkThisIntervalUsingDroolsMemory(Employee employee, Interval interval,ScoreDirector<TaskPlanningSolution> director){
 		LegacyDroolsScoreDirectorFactory<TaskPlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<TaskPlanningSolution>)((DroolsScoreDirector<TaskPlanningSolution>)director).getScoreDirectorFactory();
 		KnowledgeBaseImpl kbase=(KnowledgeBaseImpl)scoreDirectorFactory.getKieBase();
-		StatefulKnowledgeSessionImpl kieSession=((org.drools.core.impl.StatefulKnowledgeSessionImpl)kbase.getWorkingMemories()[0]);
+		StatefulKnowledgeSessionImpl kieSession=null;//((org.drools.core.impl.StatefulKnowledgeSessionImpl)kbase.getWorkingMemories()[0]);
 		for (Object object : kieSession.getObjects()) {
 			if ( object instanceof AvailabilityRequest && ((AvailabilityRequest)object).getEmployee().getId().equals(employee.getId())
             		&& ((AvailabilityRequest) object).containsInterval(interval)) {
@@ -140,7 +140,7 @@ public class TaskPlanningUtility {
     public static boolean checkEmployeeAttemptedToPlanThisInterval(Employee employee, Interval interval,ScoreDirector<TaskPlanningSolution> director){
 		LegacyDroolsScoreDirectorFactory<TaskPlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<TaskPlanningSolution>)((DroolsScoreDirector<TaskPlanningSolution>)director).getScoreDirectorFactory();
 		KnowledgeBaseImpl kbase=(KnowledgeBaseImpl)scoreDirectorFactory.getKieBase();
-		StatefulKnowledgeSessionImpl kieSession=((org.drools.core.impl.StatefulKnowledgeSessionImpl)kbase.getWorkingMemories()[0]);
+		StatefulKnowledgeSessionImpl kieSession=null;//((org.drools.core.impl.StatefulKnowledgeSessionImpl)kbase.getWorkingMemories()[0]);
 		for (Object object : kieSession.getObjects()) {
 			if ( object instanceof AvailabilityRequest && ((AvailabilityRequest)object).getEmployee().getId().equals(employee.getId())
             		&& ((AvailabilityRequest) object).overlaps(interval)) {
@@ -174,7 +174,7 @@ public class TaskPlanningUtility {
     public static void updateInsertedAvialabilities(ScoreDirector<TaskPlanningSolution> director){
     	LegacyDroolsScoreDirectorFactory<TaskPlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<TaskPlanningSolution>)((DroolsScoreDirector<TaskPlanningSolution>)director).getScoreDirectorFactory();
 		KnowledgeBaseImpl kbase=(KnowledgeBaseImpl)scoreDirectorFactory.getKieBase();
-		StatefulKnowledgeSessionImpl kieSession=((org.drools.core.impl.StatefulKnowledgeSessionImpl)kbase.getWorkingMemories()[0]);
+		StatefulKnowledgeSessionImpl kieSession=null;//((org.drools.core.impl.StatefulKnowledgeSessionImpl)kbase.getWorkingMemories()[0]);
 		StatefulKnowledgeSessionImpl.ObjectStoreWrapper insertedFacts=(StatefulKnowledgeSessionImpl.ObjectStoreWrapper)kieSession.getObjects(new ObjectFilter() {
 			@Override
 			public boolean accept(Object object) {

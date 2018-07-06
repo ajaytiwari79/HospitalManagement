@@ -8,7 +8,7 @@ ext {
     neo4jversion='3.1.3'
 }
 
-apply plugin: 'java'
+//apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
@@ -19,13 +19,13 @@ repositories {
 
 dependencies {
    // compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '1.2.0'
-    compile 'org.freemarker:freemarker:2.3.28'
+    /*compile 'org.freemarker:freemarker:2.3.28'
     compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
     compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
     compile group: 'org.slf4j', name: 'slf4j-api', version: versionslf4j
-    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'*/
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'org.json',name: 'json',version: '20090211'
    // compile 'com.thoughtworks.xstream:xstream:1.4.10'
@@ -38,10 +38,10 @@ dependencies {
    // compile group: 'org.kie.server', name: 'kie-server-api', version: versionoptaplannerbom
   //  compile group: 'org.kie.server', name: 'kie-server-client', version: versionoptaplannerbom
     //compile group: 'org.slf4j', name: 'slf4j-log4j12', version: versionslf4j
-    compile group: 'ch.qos.logback', name: 'logback-core', version:versionlogback
+   /* compile group: 'ch.qos.logback', name: 'logback-core', version:versionlogback
     compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
 
 
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'junit', name: 'junit', version: '4.12'*/
 }
