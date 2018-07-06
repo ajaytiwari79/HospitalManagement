@@ -31,7 +31,7 @@ public class PlannerRestClient {
     public <T, V> RestTemplateResponseEnvelope<V> publish(int plannerNo,T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
         try {
-            String url=+plannerNo+"/api/v1/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
+            String url=baseUrl+"/"+plannerNo+"/api/v1/"+"unit/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
