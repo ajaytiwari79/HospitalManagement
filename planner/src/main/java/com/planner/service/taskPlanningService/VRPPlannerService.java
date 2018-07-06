@@ -45,7 +45,7 @@ public class VRPPlannerService {
     public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO){
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
         List<File> drlFileList = getDrlFileList(vrpTaskPlanningDTO.getSolverConfig());
-        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath());
+        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath(),vrpTaskPlanningDTO.getSolverConfig().getTerminationTime(),vrpTaskPlanningDTO.getSolverConfig().getNumberOfThread());
         runningSolversPerProblem.put(solution.getSolverConfigId().toString(),solver);
         Object[] solutionAndIndictment=solver.solveProblemOnRequest(solution);
         runningSolversPerProblem.remove(solution.getSolverConfigId().toString());
@@ -54,11 +54,13 @@ public class VRPPlannerService {
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
         vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
-        plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
+        if(!solver.isTerminateEarly()){
+            plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
+        }
     }
 
     //TODO make this run on problemId(submissionId) rather than solverConfigId
-    @Async
+   // @Async
     public boolean terminateEarlyVrpPlanningSolver(String problemId){
         try{
             VrpTaskPlanningSolver solver;

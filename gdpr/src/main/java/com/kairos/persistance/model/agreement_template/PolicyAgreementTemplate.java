@@ -20,27 +20,33 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "Name cannot be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "template id cannot be empty")
-    private String templateId;
-
     @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNull(message = "Account types cannot be empty ")
+    @NotNull(message = "Account types can't be empty ")
     private Set<BigInteger> accountTypes;
 
-    @NotNull(message = "Sections cannot be emoty")
+    @NotNull(message = "Sections can't be empty")
     private Set<BigInteger> agreementSections;
 
     private Long countryId;
 
 
     private List<OrganizationTypeDTO> organizationTypes;
-
     private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
 
+
+    private BigInteger templateTypeId;
+
+    public BigInteger getTemplateTypeId() {
+        return templateTypeId;
+    }
+
+    public void setTemplateTypeId(BigInteger templateTypeId) {
+        this.templateTypeId = templateTypeId;
+    }
 
     public String getName() {
         return name;
@@ -75,17 +81,6 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     public void setAgreementSections(Set<BigInteger> agreementSections) {
         this.agreementSections = agreementSections;
     }
-
-
-
-    public String getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(String templateId) {
-        this.templateId = templateId;
-    }
-
 
     public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;

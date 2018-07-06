@@ -112,8 +112,6 @@ public class SolverConfigService {
                 return StaticField.DRL_SENIOR_DAYS_PER_YEAR;
             case CHILD_CARE_DAYS_CHECK:
                 return StaticField.DRL_CHILD_CARE_DAYS_CHECK;
-            case BREAK_IN_SHIFT:
-                return StaticField.DRL_BREAK_IN_SHIFT;
             case DAYS_OFF_AFTER_A_SERIES:
                 return StaticField.DRL_DAYS_OFF_AFTER_A_SERIES;
             case NO_OF_SEQUENCE_SHIFT:

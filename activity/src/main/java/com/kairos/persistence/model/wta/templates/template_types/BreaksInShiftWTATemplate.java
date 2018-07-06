@@ -38,9 +38,7 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public BreaksInShiftWTATemplate() {
-        this.wtaTemplateType = WTATemplateType.BREAK_IN_SHIFT;
-    }
+
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
@@ -52,7 +50,6 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
         this.disabled = disabled;
         this.description = description;
         this.breakTemplateValues=breakTemplateValues;
-        this.wtaTemplateType = WTATemplateType.BREAK_IN_SHIFT;
     }
 
     public List<BreakTemplateValue> getBreakTemplateValues() {

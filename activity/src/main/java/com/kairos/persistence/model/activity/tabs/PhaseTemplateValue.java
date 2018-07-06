@@ -15,6 +15,10 @@ public class PhaseTemplateValue implements Serializable {
     private String description;
     private List<Long> eligibleEmploymentTypes;
     private boolean eligibleForManagement;
+    private boolean staffCanDelete;
+    private boolean managementCanDelete;
+    private boolean staffCanSell;
+    private boolean managementCanSell;
 
     public BigInteger getPhaseId() {
         return phaseId;
@@ -60,11 +64,48 @@ public class PhaseTemplateValue implements Serializable {
 
     }
 
-    public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement) {
+    public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement,
+                              boolean staffCanDelete, boolean managementCanDelete, boolean staffCanSell, boolean managementCanSell) {
         this.phaseId = phaseId;
         this.name = name;
         this.description = description;
         this.eligibleEmploymentTypes = eligibleEmploymentTypes;
         this.eligibleForManagement = eligibleForManagement;
+        this.staffCanDelete = staffCanDelete;
+        this.managementCanDelete = managementCanDelete;
+        this.staffCanSell = staffCanSell;
+        this.managementCanSell = managementCanSell;
+    }
+
+    public boolean isStaffCanDelete() {
+        return staffCanDelete;
+    }
+
+    public void setStaffCanDelete(boolean staffCanDelete) {
+        this.staffCanDelete = staffCanDelete;
+    }
+
+    public boolean isManagementCanDelete() {
+        return managementCanDelete;
+    }
+
+    public void setManagementCanDelete(boolean managementCanDelete) {
+        this.managementCanDelete = managementCanDelete;
+    }
+
+    public boolean isStaffCanSell() {
+        return staffCanSell;
+    }
+
+    public void setStaffCanSell(boolean staffCanSell) {
+        this.staffCanSell = staffCanSell;
+    }
+
+    public boolean isManagementCanSell() {
+        return managementCanSell;
+    }
+
+    public void setManagementCanSell(boolean managementCanSell) {
+        this.managementCanSell = managementCanSell;
     }
 }

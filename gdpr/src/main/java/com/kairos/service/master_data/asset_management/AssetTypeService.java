@@ -34,6 +34,15 @@ public class AssetTypeService extends MongoBaseService {
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
+
+    /**
+     * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
+     * @param countryId
+     * @param organizationId
+     * @param assetTypeDto contain asset data ,and list of sub asset types
+     * @return asset type object
+     * @exception DuplicateDataException if asset type is already present with same name
+     */
     public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, Long organizationId, AssetTypeDTO assetTypeDto) {
 
 
@@ -63,8 +72,8 @@ public class AssetTypeService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param subAssetTypesDto list of sub asset types needed to create new Sub asset types
-     * @return
+     * @param subAssetTypesDto contain list of sub Asset DTOs
+     * @return create new Sub Asset type And return  map of Sub Asset types and Ids of Sub Asset types
      */
     public Map<String, Object> createNewSubAssetTypesList(Long countryId, Long organizationId, List<AssetTypeDTO> subAssetTypesDto) {
 
@@ -94,10 +103,11 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    /**
+    /**@description  this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      * @param countryId
      * @param subAssetTypesDto contain list of Existing Sub Asset type which need to we update
-     * @return
+     * @return map of Sub asset Types List and Ids (List for rollback)
+     *
      */
     public Map<String, Object> updateSubAssetTypes(Long countryId, Long organizationId, List<AssetTypeDTO> subAssetTypesDto) {
 
@@ -107,7 +117,7 @@ public class AssetTypeService extends MongoBaseService {
             subAssetTypesIds.add(subAssetTypeDto.getId());
             subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
         });
-        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, organizationId, subAssetTypesIds);
+        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, organizationId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
 
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
@@ -128,11 +138,23 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
+     */
     public List<AssetTypeResponseDto> getAllAssetType(Long countryId, Long organizationId) {
         return assetTypeMongoRepository.getAllAssetTypesWithSubAssetTypes(countryId, organizationId);
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
+     */
     public AssetTypeResponseDto getAssetTypeById(Long countryId, Long organizationId, BigInteger id) {
         return assetTypeMongoRepository.getAssetTypesWithSubAssetTypes(countryId, organizationId, id);
 
@@ -145,7 +167,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         }
         if (Optional.ofNullable(exist.getSubAssetTypes()).isPresent()) {
-            List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypesbyIds(countryId, organizationId, exist.getSubAssetTypes());
+            List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, organizationId, exist.getSubAssetTypes());
             assetTypeMongoRepository.deleteAll(subAssetTypes);
         }
         delete(exist);
@@ -153,7 +175,15 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-
+    /**
+     * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
+     * @param countryId
+     * @param organizationId
+     * @param id          id of Asset Type to which Sub Asset Types Link.
+     * @param assetTypeDto     asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
+     * @return Asset Type with updated Sub Asset and new Sub Asset Types
+     * @exception DuplicateDataException if Asset type is already present with same name .
+     */
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
         AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName());
         if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
@@ -198,7 +228,13 @@ public class AssetTypeService extends MongoBaseService {
 
     }
 
-
+    /**
+     * @throws DataNotExists if Asset type not found for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of asset types
+     * @return return basic object of asset type
+     */
     public AssetType getAssetTypeByName(Long countryId, Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
             AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, name);
@@ -211,22 +247,17 @@ public class AssetTypeService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param subAssetTypesDto contains list of Sub Asset Types
-     * @return
-     */
 
     /**
-     * @param assetTypeDtos check for duplicacy in name of Asset types
+     * @param assetTypeDTOs check for duplicates in name of Asset types
      */
-    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDtos) {
+    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDTOs) {
         List<String> names = new ArrayList<>();
-        for (AssetTypeDTO assetTypeDto : assetTypeDtos) {
-            if (names.contains(assetTypeDto.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
+        for (AssetTypeDTO assetTypeDTO : assetTypeDTOs) {
+            if (names.contains(assetTypeDTO.getName().toLowerCase())) {
+                exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDTO.getName());
             }
-            names.add(assetTypeDto.getName().toLowerCase());
+            names.add(assetTypeDTO.getName().toLowerCase());
         }
     }
 

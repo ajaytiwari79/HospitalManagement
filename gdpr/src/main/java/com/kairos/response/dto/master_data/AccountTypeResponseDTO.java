@@ -2,7 +2,6 @@ package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;

@@ -8,16 +8,14 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.inject.Inject;
-
 import java.math.BigInteger;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
-import static com.kairos.constants.ApiConstant.API_MASTER_QUESTION_SECTION;
 
 @RestController
-@RequestMapping(API_MASTER_QUESTION_SECTION)
-@Api(API_MASTER_QUESTION_SECTION)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class MasterQuestionController {
 
 
@@ -25,8 +23,14 @@ public class MasterQuestionController {
     private MasterQuestionService masterQuestionService;
 
 
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param id id of question
+     * @return return MasterQuestion on the basis of id
+     */
     @ApiOperation("get question of Questionnaire section by id ")
-    @GetMapping("/question/{id}")
+    @GetMapping("/question_section/question/{id}")
     public ResponseEntity<Object> getMasterQuestionById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -39,8 +43,14 @@ public class MasterQuestionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestion(countryId,organizationId,id));
     }
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return
+     */
     @ApiOperation("get All question of Questionnaire section")
-    @GetMapping("/question/all")
+    @GetMapping("/question_section/question/all")
     public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -53,7 +63,7 @@ public class MasterQuestionController {
 
 
 
-    @DeleteMapping("/question/delete/{id}")
+    @DeleteMapping("/question_section/question/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId,@PathVariable Long organizationId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");

@@ -3,11 +3,12 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
@@ -40,7 +41,6 @@ public class UnitPositionQueryResult {
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    /*private WorkingTimeAgreement workingTimeAgreement;*/
     private CostTimeAgreement costTimeAgreement;
     private Organization union;
     private Long lastWorkingDateMillis;
@@ -49,6 +49,12 @@ public class UnitPositionQueryResult {
     private Long reasonCodeId;
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
+
+    private WTAVersionDTO workingTimeAgreementVersion;    // Its for version of the WTA
+
+    private Boolean history;
+    private Boolean editable;
+    private Boolean published;
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -265,6 +271,38 @@ public class UnitPositionQueryResult {
 
     public void setSeniorityLevel(Map<String, Object> seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
+    }
+
+    public Boolean getHistory() {
+        return history;
+    }
+
+    public void setHistory(Boolean history) {
+        this.history = history;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
+
+    public WTAVersionDTO getWorkingTimeAgreementVersion() {
+        return workingTimeAgreementVersion;
+    }
+
+    public void setWorkingTimeAgreementVersion(WTAVersionDTO workingTimeAgreementVersion) {
+        this.workingTimeAgreementVersion = workingTimeAgreementVersion;
     }
 
     public UnitPositionQueryResult() {

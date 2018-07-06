@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.counter.chart;
 
+import com.kairos.activity.enums.counter.ChartType;
 import com.kairos.activity.enums.counter.RepresentationUnit;
 
 /*
@@ -13,6 +14,7 @@ public class SingleNumberChart extends BaseChart {
     private String unitName;
 
     public SingleNumberChart(double value, RepresentationUnit unit, String unitName){
+        super(ChartType.NUMBER_ONLY);
         this.value = value;
         this.unit = unit;
     }

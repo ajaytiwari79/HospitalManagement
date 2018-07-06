@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.activity;
 
 public class ActivityWrapper {
-    public Activity activity;
-    public String timeType;
+    private Activity activity;
+    private String timeType;
 
     public Activity getActivity() {
         return activity;

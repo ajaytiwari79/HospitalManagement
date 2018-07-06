@@ -1,10 +1,8 @@
 package com.kairos.response.dto.master_data.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

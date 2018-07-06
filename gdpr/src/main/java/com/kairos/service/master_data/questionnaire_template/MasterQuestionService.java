@@ -30,16 +30,22 @@ public class MasterQuestionService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-
-    public Map<String, Object> addQuestionsToQuestionSection(Long countryId,Long organizationId,List<MasterQuestionDTO> masterQuestionDtos) {
+    /**
+     * @description
+     * @param countryId
+     * @param organizationId
+     * @param masterQuestionDTOs  list of questionDto which belongs to section
+     * @return map contain list of questions and question ids
+     */
+    public Map<String, Object> addQuestionsToQuestionSection(Long countryId,Long organizationId,List<MasterQuestionDTO> masterQuestionDTOs) {
 
         List<BigInteger> questionSectionIds = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         List<MasterQuestion> masterQuestions = new ArrayList<>();
-        checkForDuplicacyInQuestion(masterQuestionDtos);
-        for (MasterQuestionDTO masterQuestion : masterQuestionDtos) {
+        checkForDuplicacyInQuestion(masterQuestionDTOs);
+        for (MasterQuestionDTO masterQuestion : masterQuestionDTOs) {
             if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
-                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);;
+                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
                 question.setNotSureAllowed(masterQuestion.getNotSureAllowed());
                 question.setRequired(masterQuestion.getRequired());
                 question.setOrganizationId(organizationId);
@@ -62,16 +68,15 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public void checkForDuplicacyInQuestion(List<MasterQuestionDTO> masterQuestionDtos) {
+    public void checkForDuplicacyInQuestion(List<MasterQuestionDTO> masterQuestionDTOs) {
 
         List<String> titles = new ArrayList<>();
-        for (MasterQuestionDTO masterQuestionDto : masterQuestionDtos) {
+        for (MasterQuestionDTO masterQuestionDto : masterQuestionDTOs) {
             if (titles.contains(masterQuestionDto.getQuestion().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", " question ", masterQuestionDto.getQuestion());
             }
             titles.add(masterQuestionDto.getQuestion().toLowerCase());
         }
-
 
     }
 
@@ -88,14 +93,12 @@ public class MasterQuestionService extends MongoBaseService {
 
 
     public List<MasterQuestion> getAllMasterQuestion(Long countryId,Long organizationId) {
-
         return questionMongoRepository.getAllMasterQuestion(countryId,organizationId);
 
     }
 
 
     public MasterQuestion getMasterQuestion(Long countryId,Long organizationId,BigInteger id) {
-
         MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (exist == null) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.master.question", id);
@@ -105,13 +108,21 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId,Long organizationId,List<MasterQuestionDTO> questionDtos) {
 
-        checkForDuplicacyInQuestion(questionDtos);
+    /**
+     * @description method update the existing question(if question contain id) and create new question questions(if not contain id)
+     * @param countryId
+     * @param organizationId
+     * @param questionDTOs   contain list of Existing questions and new questions
+     * @return map contain list of questions and question ids.
+     */
+    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId,Long organizationId,List<MasterQuestionDTO> questionDTOs) {
+
+        checkForDuplicacyInQuestion(questionDTOs);
         List<MasterQuestionDTO> updateExistingQuestions = new ArrayList<>();
         List<MasterQuestionDTO> createNewQuestions = new ArrayList<>();
 
-        questionDtos.forEach(sectionDto -> {
+        questionDTOs.forEach(sectionDto -> {
                     if (Optional.ofNullable(sectionDto.getId()).isPresent()) {
                         updateExistingQuestions.add(sectionDto);
                     } else {
@@ -142,18 +153,19 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> updateQuestionsList(Long countryId,Long organizationId, List<MasterQuestionDTO> masterQuestionDtos) {
 
-        List<BigInteger> questionids = new ArrayList<>();
-        masterQuestionDtos.forEach(question -> questionids.add(question.getId()));
-        List<MasterQuestion> ExisitingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId,organizationId,questionids);
+    public Map<String, Object> updateQuestionsList(Long countryId,Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs) {
+
+        List<BigInteger> questionIds = new ArrayList<>();
+        masterQuestionDTOs.forEach(question -> questionIds.add(question.getId()));
+        List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId,organizationId,questionIds);
 
         Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
-        masterQuestionDtos.forEach(masterQuestionDto -> {
+        masterQuestionDTOs.forEach(masterQuestionDto -> {
             masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto);
         });
         List<MasterQuestion> updatedQuestionsList = new ArrayList<>();
-        for (MasterQuestion masterQuestion : ExisitingMasterQuestions) {
+        for (MasterQuestion masterQuestion : existingMasterQuestions) {
 
             MasterQuestionDTO questionDto = (MasterQuestionDTO) masterQuestionDtoCorrespondingToId.get(masterQuestion.getId());
             if (QuestionType.valueOf(questionDto.getQuestionType()) != null) {
@@ -174,7 +186,7 @@ public class MasterQuestionService extends MongoBaseService {
             throw new MongoClientException(e.getMessage());
         }
         Map<String, Object> result = new HashMap<>();
-        result.put(IDS_LIST, questionids);
+        result.put(IDS_LIST, questionIds);
         result.put(QUESTION_LIST, updatedQuestionsList);
         return result;
 

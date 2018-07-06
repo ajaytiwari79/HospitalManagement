@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.wta;
 
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getWtaByOrganization(Long organizationId);
+
     WTAQueryResultDTO getOne(BigInteger wtaId);
 
     List<WTAQueryResultDTO> getAllWTAByOrganizationTypeId(long organizationId);
@@ -22,19 +24,22 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
-    List<WTAQueryResultDTO> getAllWTABySubType(List<Long> subTypeIds,Long countryId);
+    List<WTAQueryResultDTO> getAllWTABySubType(List<Long> subTypeIds, Long countryId);
+
     List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId);
 
     List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
 
-    /*WTAQueryResultDTO getWTAByCountryId(long countryId, BigInteger wtaId);*/
-
     WTAQueryResultDTO getVersionOfWTA(BigInteger wtaId);
-    List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId);
+
+    List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId);
 
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
     List<WTAQueryResultDTO> getAllWTAByIds(List<BigInteger> wtaIds);
+    List<WTAVersionDTO> getAllParentWTAByIds(List<BigInteger> wtaIds);
+
+    List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds);
 }

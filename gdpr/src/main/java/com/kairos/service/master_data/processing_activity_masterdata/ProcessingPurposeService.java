@@ -31,6 +31,16 @@ public class ProcessingPurposeService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
 
+    /**
+     * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
+     * and if exist then simply add  ProcessingPurpose to existing list and return list ;
+     * findByNamesList()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
+     * @param countryId
+     * @param organizationId
+     * @param processingPurposes
+     * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
+     *
+     */
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId,Long organizationId,List<ProcessingPurpose> processingPurposes) {
 
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
@@ -68,11 +78,24 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of ProcessingPurpose
+     */
     public List<ProcessingPurpose> getAllProcessingPurpose(Long countryId,Long organizationId) {
         return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,organizationId);
     }
 
-
+    /**
+     * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of ProcessingPurpose
+     * @return ProcessingPurpose object fetch by given id
+     */
     public ProcessingPurpose getProcessingPurpose(Long countryId,Long organizationId,BigInteger id) {
 
         ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
@@ -97,7 +120,14 @@ public class ProcessingPurposeService extends MongoBaseService {
         }
     }
 
-
+    /***
+     * @throws  DuplicateDataException throw exception if ProcessingPurpose data not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of ProcessingPurpose
+     * @param processingPurpose
+     * @return ProcessingPurpose updated object
+     */
     public ProcessingPurpose updateProcessingPurpose(Long countryId,Long organizationId,BigInteger id, ProcessingPurpose processingPurpose) {
 
 
@@ -116,6 +146,13 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
+    /**
+     * @throws DataNotExists throw exception if ProcessingPurpose not exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of ProcessingPurpose
+     * @return ProcessingPurpose object fetch on basis of  name
+     */
     public ProcessingPurpose getProcessingPurposeByName(Long countryId,Long organizationId,String name) {
 
 
