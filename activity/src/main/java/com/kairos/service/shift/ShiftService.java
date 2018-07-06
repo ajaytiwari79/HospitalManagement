@@ -531,9 +531,6 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activity.getRulesActivityTab().getEligibleForSchedules(),staffAdditionalInfoDTO.getUserAccessRoleDTO());
         Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
-
-        // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
-        //.and(wtaRulesSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
         if (!messages.isEmpty()) {
             List<String> errors = new ArrayList<>();
