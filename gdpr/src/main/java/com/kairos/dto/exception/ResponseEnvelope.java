@@ -28,7 +28,7 @@ public class ResponseEnvelope {
     public void addError(FieldErrorDTO error) {
         if(errors==null)
         {
-            errors = new ArrayList<FieldErrorDTO>();
+            errors = new ArrayList<>();
         }
         errors.add(error);
     }

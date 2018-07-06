@@ -88,7 +88,7 @@ public class DataSubjectMappingService extends MongoBaseService {
     /**
      * @param countryId
      * @param organizationId
-     * @param id                    id of data SubjectMapping model
+     * @param id   id of data SubjectMapping model
      * @param dataSubjectMappingDto request body for updating Data Subject Mapping Object
      * @return updated Data SubjectMapping object
      */

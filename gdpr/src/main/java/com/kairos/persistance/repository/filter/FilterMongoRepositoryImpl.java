@@ -86,8 +86,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
                 groupOperation = groupOperation.addToSet(entry.getKey()).as(entry.getKey());
             }
         operations.add(groupOperation);
-        Aggregation aggregation = Aggregation.newAggregation(operations);
-        return aggregation;
+        return Aggregation.newAggregation(operations);
 
     }
 
@@ -95,7 +94,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
         List<ModuleIdDTO> moduleIdDto = filterGroup.getAccessModule();
-        String domainName = new String();
+        String domainName = null;
         for (ModuleIdDTO moduleIdDto1 : moduleIdDto) {
             if (moduleIdDto1.getModuleId().equalsIgnoreCase(moduleId)) {
                 domainName = moduleIdDto1.getName();

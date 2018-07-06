@@ -114,8 +114,9 @@ public class OrganizationActivityService extends MongoBaseService {
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
-                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(),
-                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement());
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(),activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(),activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
                 phaseTemplateValues.add(phaseTemplateValue);
             }
             activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);

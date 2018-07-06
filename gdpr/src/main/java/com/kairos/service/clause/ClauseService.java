@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.List;
 
 
 @Service
@@ -61,7 +60,13 @@ public class ClauseService extends MongoBaseService {
     private TemplateTypeService templateTypeService;
 
 
-
+    /**@desciption  this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
+     * @param countryId
+     * @param organizationId
+     * @param clauseDto contain data about clause and template type which belong to clause
+     * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
+     * @exception DuplicateDataException: if clause already exist for id ,{@link com.kairos.custom_exception.InvalidRequestException if account type is not selected}
+     */
     public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) {
 
         if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
@@ -107,6 +112,15 @@ public class ClauseService extends MongoBaseService {
     }
 
 
+    /**
+     * @description this method updateclause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
+     * @param countryId
+     * @param organizationId
+     * @param clauseId clause id
+     * @param clauseDto contain update data for clause
+     * @return updated clause object
+     * @throws  DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
+     */
     public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
         Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
@@ -146,11 +160,25 @@ public class ClauseService extends MongoBaseService {
     }
 
 
+    /**
+     * @description
+     * @param countryId
+     * @param organizationId
+     * @return return caluse with account type basic response,org types ,sub types,service category ,sub service category and tags
+     */
     public List<ClauseResponseDTO> getAllClauses(Long countryId, Long organizationId) {
         return clauseRepository.findAllClause(countryId, organizationId);
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param id
+     * @return bollean true if data deleted successfully
+     * @exception DataNotFoundByIdException; if clause not found for id
+     */
     public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {
 
         Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);

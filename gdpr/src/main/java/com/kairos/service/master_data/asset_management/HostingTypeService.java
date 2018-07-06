@@ -31,11 +31,14 @@ public class HostingTypeService extends MongoBaseService {
 
 
     /**
-     *
+     * @description this method create new HostingType if HostingType not exist with same name ,
+     * and if exist then simply add  HostingType to existing list and return list ;
+     * findByNamesList()  return list of existing HostingType using collation ,used for case insensitive result
      * @param countryId
      * @param organizationId
      * @param hostingTypes
-     * @return map of new hosting types and existing hosting types(already exist with same name)
+     * @return return map which contain list of new HostingType and list of existing HostingType if HostingType already exist
+     *
      */
     public Map<String, List<HostingType>> createHostingType(Long countryId,Long organizationId,List<HostingType> hostingTypes) {
 
@@ -70,11 +73,25 @@ public class HostingTypeService extends MongoBaseService {
 
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of HostingType
+     */
     public List<HostingType> getAllHostingType(Long countryId,Long organizationId) {
        return hostingTypeMongoRepository.findAllHostingTypes(countryId,organizationId);
           }
 
 
+    /**
+     * @throws DataNotFoundByIdException throw exception if HostingType not found for given id
+     * @param countryId
+     * @param organizationId
+     * @param id of HostingType
+     * @return HostingType object fetch by given id
+     */
     public HostingType getHostingType(Long countryId,Long organizationId,BigInteger id) {
 
         HostingType exist = hostingTypeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
@@ -100,6 +117,14 @@ public class HostingTypeService extends MongoBaseService {
     }
 
 
+    /**
+     * @throws DuplicateDataException  if HostingType already exist with same name
+     * @param countryId
+     * @param organizationId
+     * @param id id of HostingType
+     * @param hostingType
+     * @return HostingType updated object
+     */
     public HostingType updateHostingType(Long countryId,Long organizationId,BigInteger id, HostingType hostingType) {
 
 
@@ -117,6 +142,14 @@ public class HostingTypeService extends MongoBaseService {
         }
     }
 
+
+    /**
+     * @throws DataNotExists if HostingType not exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name  name of HostingType
+     * @return HostingType object fetch on the basis of name
+     */
     public HostingType getHostingTypeByName(Long countryId,Long organizationId,String name) {
 
 

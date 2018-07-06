@@ -21,9 +21,7 @@ public class JaversCommonService {
     public <T extends MongoBaseEntity> T saveToJavers(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
-        /**
-         *  Get class name for sequence class
-         * */
+        // Get class name for sequence class
          Commit commit = javers.commit(UserContext.getUserDetails().getUserName(), entity);
         return entity;
 

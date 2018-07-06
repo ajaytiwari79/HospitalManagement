@@ -32,6 +32,13 @@ public class MasterAssetService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    /**
+     * @throws DuplicateDataException throw exception id MasterAsset not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param masterAssetDto
+     * @return return MasterAsset object
+     */
 
     public MasterAsset addMasterAsset(Long countryId, Long organizationId, MasterAssetDTO masterAssetDto) {
 
@@ -47,11 +54,27 @@ public class MasterAssetService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of MasterAsset
+     */
+
     public List<MasterAsset> getAllMasterAsset(Long countryId, Long organizationId) {
         return masterAssetMongoRepository.findAllMasterAssets(countryId, organizationId);
     }
 
 
+    /**
+     * @throws  DuplicateDataException if MasterAsset not exist already exist with same  name
+     * {@link DataNotFoundByIdException throw exception if MasterAsset not found for given id}
+     * @param countryId
+     * @param organizationId
+     * @param id id of MasterAsset
+     * @param masterAssetDto
+     * @return updated object of MasterAsset
+     */
     public MasterAsset updateMasterAsset(Long countryId, Long organizationId, BigInteger id, MasterAssetDTO masterAssetDto) {
 
 
@@ -83,6 +106,7 @@ public class MasterAssetService extends MongoBaseService {
         return true;
 
     }
+
 
     public MasterAsset getMasterAssetById(Long countryId, Long organizationId, BigInteger id) {
         MasterAsset exists = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, organizationId, id);

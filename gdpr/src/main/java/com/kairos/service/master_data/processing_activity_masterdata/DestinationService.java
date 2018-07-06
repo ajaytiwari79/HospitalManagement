@@ -70,6 +70,7 @@ public class DestinationService extends MongoBaseService {
 
     }
 
+
     public List<Destination> getAllDestination(Long countryId, Long organizationId) {
         return destinationMongoRepository.findAllDestinations(countryId, organizationId);
     }

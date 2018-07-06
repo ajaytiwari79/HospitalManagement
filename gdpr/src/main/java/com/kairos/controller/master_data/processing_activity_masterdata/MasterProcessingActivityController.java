@@ -11,11 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
-
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;

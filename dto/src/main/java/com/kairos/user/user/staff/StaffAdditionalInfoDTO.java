@@ -49,19 +49,13 @@ public class StaffAdditionalInfoDTO {
     }
     private UserAccessRoleDTO userAccessRoleDTO;
 
-
-    public DateTimeZone getUnitTimeZone() {
-        return unitTimeZone!=null ? DateTimeZone.forID(unitTimeZone.getId()) : null;
-    }
-
-    public ZoneId getUnitZoneId() {
+    public ZoneId getUnitTimeZone() {
         return unitTimeZone;
     }
 
     public void setUnitTimeZone(ZoneId unitTimeZone) {
         this.unitTimeZone = unitTimeZone;
     }
-
 
     public List<DayTypeDTO> getDayTypes() {
         return dayTypes;

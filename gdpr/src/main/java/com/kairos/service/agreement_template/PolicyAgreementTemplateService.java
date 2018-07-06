@@ -66,10 +66,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections = new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
 
-            if(policyAgreementTemplateDto.getTemplateId()!=null){
-                TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));
+            if(policyAgreementTemplateDto.getTemplateTypeId()!=null){
+                TemplateType exits =templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
                 if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateId(policyAgreementTemplateDto.getTemplateId());
+                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
                 } else {
                     throw new DataNotExists("Template Id ->" + exits + " Not exists");
                 }
@@ -155,10 +155,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections = new HashMap<>();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
-            if(policyAgreementTemplateDto.getTemplateId()!=null){
-                TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));
+            if(policyAgreementTemplateDto.getTemplateTypeId()!=null){
+                TemplateType exits =templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
                 if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateId(policyAgreementTemplateDto.getTemplateId());
+                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
                 } else {
                     throw new DataNotExists("Template Id ->" + exits + " Not exists");
                 }
