@@ -286,7 +286,7 @@ public class CounterDataService {
             ((PieChart) baseChart).getDataList().add(new PieDataUnit(staffName, decimalSpecification(kmDriven)));
         });
         KPI kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_KM_DRIVEN_PER_STAFF, false,null);
-        kpi.setId(new BigInteger("3"));
+        kpi.setId(new BigInteger("10"));
         return kpi;
     }
 
@@ -294,14 +294,14 @@ public class CounterDataService {
     public KPI getTotalTaskEfficiencyKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<VRPTaskDTO> tasks){
         long totalTaskDuration = tasks.parallelStream().mapToLong(task -> task.getDuration()).sum();
         long totalPlannedTaskDuration = vrpTaskPlanningDTO.getTasks().stream().mapToLong(task -> task.getDuration()).sum();
-        double efficiency = ((totalTaskDuration*2)-totalPlannedTaskDuration)*100.0/totalTaskDuration;
+        double efficiency = totalPlannedTaskDuration*1.0/totalTaskDuration;
         return prepareTaskEfficiencyKPI(efficiency);
     }
 
     public KPI prepareTaskEfficiencyKPI(double efficiency){
-        BaseChart baseChart = new SingleNumberChart(decimalSpecification(efficiency), RepresentationUnit.PERCENT, "Tasks");
+        BaseChart baseChart = new SingleNumberChart(decimalSpecification(efficiency), RepresentationUnit.DECIMAL, "Tasks");
         KPI kpi = new KPI(CounterType.TASK_EFFICIENCY.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_EFFICIENCY, false,null);
-        kpi.setId(new BigInteger("9"));
+        kpi.setId(new BigInteger("11"));
         return kpi;
     }
 
