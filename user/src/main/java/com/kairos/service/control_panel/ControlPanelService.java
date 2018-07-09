@@ -1,4 +1,6 @@
 package com.kairos.service.control_panel;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.dto.QueueDTO;
@@ -18,6 +20,10 @@ import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.IntegerDeserializer;
+import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -54,8 +60,8 @@ public class ControlPanelService extends UserBaseService {
     JobDetailsRepository jobDetailsRepository;
     @Inject
     IntegrationService integrationService;
-    /*@Inject
-    private KafkaProducer kafkaProducer;*/
+    @Inject
+    private KafkaProducer kafkaProducer;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ControlPanelService.class);
@@ -297,10 +303,10 @@ public class ControlPanelService extends UserBaseService {
 
     public void pushToQueue() {
 
-        ControlPanel panel = controlPanelGraphRepository.findOne(1L);
+        ControlPanel panel = controlPanelGraphRepository.findOne(14491L);
         QueueDTO job = new QueueDTO();
         ObjectMapperUtils.copyProperties(panel,job);
-       // kafkaProducer.pushToQueue(job);
+         kafkaProducer.pushToQueue(job);
 
 
     }

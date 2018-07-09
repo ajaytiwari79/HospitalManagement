@@ -1,5 +1,6 @@
 package com.kairos.dto;
 
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
@@ -28,6 +29,18 @@ public class QueueDTO {
     private String filterId;
     private JobType jobType;
     private JobSubType jobSubType;
+    private IntegrationOperation integrationOperation;
+
+
+
+    public IntegrationOperation getIntegrationOperation() {
+        return integrationOperation;
+    }
+
+    public void setIntegrationOperation(IntegrationOperation integrationOperation) {
+        this.integrationOperation = integrationOperation;
+    }
+
 
     public BigInteger getEntityId() {
         return entityId;

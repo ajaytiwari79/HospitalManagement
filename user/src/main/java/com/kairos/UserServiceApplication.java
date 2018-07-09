@@ -169,7 +169,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
         return template;
     }
 
-	private Map<String, Object> consumerProps() {
+/*	private Map<String, Object> consumerProps() {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, "groupId");
@@ -192,7 +192,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 		return props;
-	}
+	}*/
 
 	/*@Bean
 	private KafkaTemplate<Integer, String> kafkaTemplate() {
@@ -226,7 +226,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 
 		return container;
 	}*/
-	@Bean
+	/*@Bean
 	public ConsumerFactory<Integer, String> consumerFactory() {
 		return new DefaultKafkaConsumerFactory<>(consumerConfigs());
 	}
@@ -246,11 +246,11 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		return props;
 	}
 
-	/*@Bean
+	*//*@Bean
 	public Listener listener() {
 		return new Listener();
 	}
-*/
+*//*
 	@Bean
 	public ProducerFactory<Integer, String> producerFactory() {
 		return new DefaultKafkaProducerFactory<>(producerConfigs());
@@ -273,7 +273,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 	@Bean
 	public KafkaTemplate<Integer, String> kafkaTemplate() {
 		return new KafkaTemplate<Integer, String>(producerFactory());
-	}
+	}*/
 
 
 }
