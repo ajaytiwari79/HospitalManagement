@@ -32,14 +32,11 @@ public class PlanningPeriod extends MongoBaseEntity {
         // default constructor
     }
 
-    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId, List<PeriodPhaseFlippingDate> phaseFlippingDate, BigInteger currentPhaseId, BigInteger nextPhaseId) {
+    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
-        this.phaseFlippingDate = phaseFlippingDate;
-        this.currentPhaseId = currentPhaseId;
-        this.nextPhaseId = nextPhaseId;
     }
 
     public LocalDate getStartDate() {

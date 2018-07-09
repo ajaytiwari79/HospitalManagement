@@ -29,8 +29,6 @@ public class PlanningPeriodDTO {
     private LocalDate constructionToDraftDate;
     private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
     private String periodDuration;
-    private String type;
-
 
 
     public PlanningPeriodDTO(){
@@ -163,14 +161,6 @@ public class PlanningPeriodDTO {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }
 
