@@ -47,6 +47,7 @@ public class VrpTaskPlanningSolver {
         }
         solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
+            log.info("no of drool files"+drlFileList.size());
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
             solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
             solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
