@@ -13,13 +13,14 @@ public class CustomAggregationQuery {
                 "'description':1," +
                 "'organizationSubServices':1," +
                 "'organizationServices':1," +
+                "'hasSubProcess':1," +
                 "'organizationSubTypes':1," +
                 "'organizationTypes':1," +
                 "'countryId':1}}";
 
     }
 
-    public static String dataSubjectAddNonDeletedDataElementAddFileds() {
+    public static String dataSubjectAddNonDeletedDataElementAddFields() {
         return "{  '$addFields':" +
                 "{'dataCategories.dataElements':" +
                 "{$filter : { " +
@@ -30,18 +31,8 @@ public class CustomAggregationQuery {
     }
 
 
-   /* public static String questionnnaireTemplateAddNonDeletedQuestions()
-    {
-        return "{  '$addFields':" +
-                "{'questions':" +
-                "{$filter : { "+
-                "'input': '$questions',"+
-                "as: 'questions', "+
-                "cond: {$eq: ['$$questions.deleted',"+false+"]}" +
-                "}}}} ";
-    }*/
 
-    public static String questionnnaireTemplateAddNonDeletedQuestions() {
+    public static String questionnaireTemplateAddNonDeletedQuestions() {
         return "{  '$addFields':" +
                 "{'sections.questions':" +
                 "{$filter : { " +
@@ -52,7 +43,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateAddNonDeletedSections() {
+    public static String questionnaireTemplateAddNonDeletedSections() {
         return "{  '$addFields':" +
                 "{'sections':" +
                 "{$filter : { " +
@@ -63,7 +54,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateAddNonDeletedAssetType() {
+    public static String questionnaireTemplateAddNonDeletedAssetType() {
         return "{  '$addFields':" +
                 "{'assetType':" +
                 "{$filter : { " +
@@ -74,7 +65,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateGroupOperation() {
+    public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
                 "'_id':'$_id','sections':{'$push':{ '$cond': [ { '$eq': [ '$sections.deleted',false ] }, '$sections', {} ] }}," +
                 "'name':{$first:'$name'}," +
@@ -84,7 +75,7 @@ public class CustomAggregationQuery {
                 "}}";
     }
 
-    public static String questionnnaireTemplateProjectionBeforeGroupOperationForAssetType() {
+    public static String questionnaireTemplateProjectionBeforeGroupOperationForAssetType() {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +

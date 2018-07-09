@@ -308,8 +308,8 @@ public class PlannerController {
 
     @PostMapping(value = "/{solverConfigId}")
     @ApiOperation("submit solver config to planner")
-    public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId));
+    public ResponseEntity<Map<String, Object>> submitToPlanner(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId,@RequestBody SolverConfigDTO solverConfigDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.submitToPlanner(unitId,solverConfigId,solverConfigDTO));
     }
 
     @PostMapping(value = "/resubmit")

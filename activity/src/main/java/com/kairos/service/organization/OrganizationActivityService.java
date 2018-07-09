@@ -114,8 +114,9 @@ public class OrganizationActivityService extends MongoBaseService {
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
-                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(),
-                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement());
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(),activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(),activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
                 phaseTemplateValues.add(phaseTemplateValue);
             }
             activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
@@ -129,9 +130,10 @@ public class OrganizationActivityService extends MongoBaseService {
         save(activityCopied);
         return retrieveBasicDetails(activityCopied);
     }
+
     public ActivityDTO retrieveBasicDetails(Activity activity) {
-        ActivityDTO activityDTO=new ActivityDTO(activity.getId(),activity.getName(),activity.getParentId());
-        BeanUtils.copyProperties(activity,activityDTO);
+        ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
+        BeanUtils.copyProperties(activity, activityDTO);
         return activityDTO;
 
     }
@@ -206,7 +208,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         GeneralActivityTab generalTab = new GeneralActivityTab();
-        ObjectMapperUtils.copyProperties(generalDTO,generalTab);
+        ObjectMapperUtils.copyProperties(generalDTO, generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }
@@ -307,6 +309,7 @@ public class OrganizationActivityService extends MongoBaseService {
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
+        activityConfigurationService.createDefaultSettings(unitId, countryId, phases);
         return true;
     }
 

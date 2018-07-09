@@ -13,6 +13,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +31,15 @@ public class VrpTaskPlanningSolverTest {
         }else{
             new VrpTaskPlanningSolver().solve("src/main/resources/problem.xml",true);
         }
+
+    }
+    @Test
+    public void solveWithDrls(){
+        String drlsPath="../../planner/src/main/resources/droolsFile";
+        List<File> files=  Arrays.stream(new File(drlsPath).listFiles()).filter(f->f.getName().endsWith(".drl")).collect(Collectors.toList());
+        VrpTaskPlanningSolver vrpTaskPlanningSolver = new VrpTaskPlanningSolver(files,"src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml",2,4);
+        VrpTaskPlanningSolution problem=(VrpTaskPlanningSolution) vrpTaskPlanningSolver.getxStream().fromXML(new File("src/main/resources/problem.xml"));
+        vrpTaskPlanningSolver.solveProblemOnRequest(problem);
 
     }
 }

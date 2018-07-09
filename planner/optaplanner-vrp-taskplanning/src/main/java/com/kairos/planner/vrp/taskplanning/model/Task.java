@@ -215,8 +215,8 @@ public class Task extends TaskOrShift{
         this.locationsDistanceMatrix = locationsDistanceMatrix;
     }
 
-    public double getPlannedDuration(){
-        return shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d);
+    public int getPlannedDuration(){
+        return (int)Math.ceil(shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d));
     }
     //for rules only
     public int getDrivingTimeSeconds(){
@@ -228,6 +228,17 @@ public class Task extends TaskOrShift{
         if(prevTask==null) return 0;
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
         return lpd.getTime();
+    }
+
+    public int getDrivingDistance(){
+        if(prevTaskOrShift ==null){
+            throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
+        }
+        if(prevTaskOrShift instanceof Shift || shiftBreak) return 0;
+        Task prevTask=getPreviousValidTask();
+        if(prevTask==null) return 0;
+        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
+        return lpd.getDistance();
     }
 
     /**

@@ -6,6 +6,9 @@ import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTATableSettingWrapper;
+import com.kairos.activity.wta.version.WTAVersionDTO;
+import com.kairos.client.dto.TableConfiguration;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
@@ -23,9 +26,11 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
+import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +41,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 
 
 /**
@@ -73,9 +80,12 @@ public class WTAService extends MongoBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     private OrganizationRestClient organizationRestClient;
-    @Inject private SolverConfigService solverConfigService;
+    @Inject
+    private SolverConfigService solverConfigService;
     @Autowired
     private ExceptionService exceptionService;
+    @Inject
+    private TableSettingService tableSettingService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -172,7 +182,6 @@ public class WTAService extends MongoBaseService {
             save(workingTimeAgreements);
         }
     }
-
 
 
     private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta, WTADTO wtaDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
@@ -344,7 +353,6 @@ public class WTAService extends MongoBaseService {
     }
 
 
-
     public Map<String, Object> setWtaWithOrganizationType(Long countryId, BigInteger wtaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
         /*List<WTARuleTemplateDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTARuleTemplateDTO>();*/
@@ -388,7 +396,6 @@ public class WTAService extends MongoBaseService {
             logger.info("wta not found while updating unit Employment Position for staff %d");
             exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
-
 
 
         if (oldWta.getExpertise().getId() != wtadto.getExpertiseId()) {
@@ -453,6 +460,22 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTOS;
     }
 
+
+    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<BigInteger> wtaIds) {
+        List<WTAVersionDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(wtaIds);
+        List<WTAVersionDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(wtaIds);
+        currentWTAList.forEach(currentWTA -> {
+            Optional<WTAVersionDTO> currentObject = versionsOfWTAs.parallelStream().filter(wtaVersionDTO -> currentWTA.getId().equals(wtaVersionDTO.getId())).findFirst();
+            if (currentObject.isPresent()) {
+                currentWTA.setVersions(currentObject.get().getVersions());
+            }
+        });
+        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId( unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
+        WTATableSettingWrapper wtaTableSettingWrapper = new WTATableSettingWrapper(currentWTAList, tableConfiguration);
+        return wtaTableSettingWrapper;
+    }
+
+
     public WTAResponseDTO assignWTAToUnitPosition(BigInteger wtaId) {
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
@@ -485,7 +508,7 @@ public class WTAService extends MongoBaseService {
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w, WTAResponseDTO.class);
             WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
             List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-            if (wtaResponseDTO.getRuleTemplates()!=null && !wtaResponseDTO.getRuleTemplates().isEmpty()) {
+            if (wtaResponseDTO.getRuleTemplates() != null && !wtaResponseDTO.getRuleTemplates().isEmpty()) {
                 ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
                 save(ruleTemplates);
                 List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());

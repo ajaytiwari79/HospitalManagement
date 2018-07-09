@@ -2,21 +2,18 @@ package com.kairos.service.access_permisson;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-//import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.enums.OrganizationCategory;
-import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
-//import com.kairos.persistence.model.enums.OrganizationCategory;
-import com.kairos.persistence.model.organization.Organization;
-
 import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.user.access_group.CountryAccessGroupDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.user.access_group.CountryAccessGroupDTO;
 import com.kairos.user.access_permission.AccessGroupPermissionDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.access_permission.AccessPermissionDTO;
@@ -37,7 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.inject.Inject;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

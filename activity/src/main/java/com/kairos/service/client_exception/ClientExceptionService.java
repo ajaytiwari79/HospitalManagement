@@ -29,8 +29,8 @@ import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.spec.TaskLocationSpecification;
-import com.kairos.spec.TaskSpecification;
+import com.kairos.rule_validator.task.TaskLocationSpecification;
+import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.util.DateUtils;
 import com.kairos.util.functional_interface.PerformCalculation;
 import com.kairos.wrapper.task.TaskGanttDTO;
@@ -398,7 +398,7 @@ public class ClientExceptionService extends MongoBaseService {
     }
 
     /*
-    specification to check presence of client required for task
+    rule_validator to check presence of client required for task
     if task can be deliverd without presence of client, then task will not consider unhandled task ( unhandled task which
     effects by exception)
      //TODO we will use this method later after implement merge task functionality because now merge task can be create without task type

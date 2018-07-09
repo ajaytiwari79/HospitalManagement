@@ -1,12 +1,17 @@
 package com.kairos.persistence.model.agreement.cta;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.position_code.PositionCode;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by pavan on 16/4/18.
@@ -15,14 +20,23 @@ import java.util.List;
 public class CTAResponseDTO {
     @NotNull
     private Long id;
+    private Long parentCTAId;
     private String name;
     private String description;
     private Expertise expertise;
     private OrganizationType organizationType;
     private OrganizationType organizationSubType;
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
-    private Long startDateMillis;
-    private Long endDateMillis;
+    @DateLong
+    @JsonProperty("startDate")
+    private Date startDateMillis;
+    @DateLong
+    @JsonProperty("endDate")
+    private Date endDateMillis;
+    // Added for version of CTA
+    private List<CTAResponseDTO> versions = new ArrayList<>();
+    private Map<String, Object> unitInfo;
+    private PositionCode positionCode;
 
     public CTAResponseDTO() {
         //Default constructor
@@ -34,6 +48,14 @@ public class CTAResponseDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getParentCTAId() {
+        return parentCTAId;
+    }
+
+    public void setParentCTAId(Long parentCTAId) {
+        this.parentCTAId = parentCTAId;
     }
 
     public String getName() {
@@ -84,19 +106,43 @@ public class CTAResponseDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public Long getStartDateMillis() {
+    public Date getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
+    public void setStartDateMillis(Date startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDateMillis() {
+    public Date getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
+    public void setEndDateMillis(Date endDateMillis) {
         this.endDateMillis = endDateMillis;
+    }
+
+    public List<CTAResponseDTO> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<CTAResponseDTO> versions) {
+        this.versions = versions;
+    }
+
+    public Map<String, Object> getUnitInfo() {
+        return unitInfo;
+    }
+
+    public void setUnitInfo(Map<String, Object> unitInfo) {
+        this.unitInfo = unitInfo;
+    }
+
+    public PositionCode getPositionCode() {
+        return positionCode;
+    }
+
+    public void setPositionCode(PositionCode positionCode) {
+        this.positionCode = positionCode;
     }
 }

@@ -52,7 +52,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     @Inject
     private TemplateTypeMongoRepository templateTypeMongoRepository;
 
-    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organziationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
+    //todo working on it
+    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
 
         String name = policyAgreementTemplateDto.getName();
         if (policyAgreementTemplateRepository.findByName(name) != null) {
@@ -65,10 +66,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections = new HashMap<>();
             PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
 
-            if(policyAgreementTemplateDto.getTemplateId()!=null){
-                TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));
+            if(policyAgreementTemplateDto.getTemplateTypeId()!=null){
+                TemplateType exits =templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
                 if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateId(policyAgreementTemplateDto.getTemplateId());
+                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
                 } else {
                     throw new DataNotExists("Template Id ->" + exits + " Not exists");
                 }
@@ -93,7 +94,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 }
                 if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationTypes());
+                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
 
                 }
                 if (agreementSection.size() != 0) {
@@ -101,7 +102,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
                 }
                 policyAgreementTemplate.setCountryId(countryId);
-                policyAgreementTemplate = save(policyAgreementTemplate);
+                policyAgreementTemplate = sequenceGenerator(policyAgreementTemplate);
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
@@ -135,7 +136,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByid(id);
         if (Optional.ofNullable(exist).isPresent()) {
             exist.setDeleted(true);
-            save(exist);
+            sequenceGenerator(exist);
             return true;
         }
         throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
@@ -154,10 +155,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             Map<String, Object> sections = new HashMap<>();
             Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
-            if(policyAgreementTemplateDto.getTemplateId()!=null){
-                TemplateType exits =templateTypeMongoRepository.findByid(new BigInteger(policyAgreementTemplateDto.getTemplateId()));
+            if(policyAgreementTemplateDto.getTemplateTypeId()!=null){
+                TemplateType exits =templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
                 if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateId(policyAgreementTemplateDto.getTemplateId());
+                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
                 } else {
                     throw new DataNotExists("Template Id ->" + exits + " Not exists");
                 }
@@ -181,7 +182,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
                 }
                 if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationTypes());
+                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
 
                 }
                 if (agreementSection.size() != 0) {
@@ -195,7 +196,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             } else {
                 exceptionService.illegalArgumentException("account type not exist ");
             }
-            return save(exist);
+            return sequenceGenerator(exist);
 
         }
 

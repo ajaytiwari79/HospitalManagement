@@ -1,6 +1,7 @@
 package com.kairos.service.clause;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.dto.master_data.ClauseDTO;
@@ -17,14 +18,12 @@ import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.List;
 
 
 @Service
@@ -61,7 +60,14 @@ public class ClauseService extends MongoBaseService {
     private TemplateTypeService templateTypeService;
 
 
-    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto)  {
+    /**@desciption  this method create clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
+     * @param countryId
+     * @param organizationId
+     * @param clauseDto contain data about clause and template type which belong to clause
+     * @return clause  object , specific to organization type ,sub types ,Service Category and Sub Service Category
+     * @exception DuplicateDataException: if clause already exist for id ,{@link com.kairos.custom_exception.InvalidRequestException if account type is not selected}
+     */
+    public Clause createClause(Long countryId, Long organizationId, ClauseDTO clauseDto) {
 
         if (clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "clause", clauseDto.getTitle().toLowerCase());
@@ -69,25 +75,29 @@ public class ClauseService extends MongoBaseService {
         if (clauseDto.getAccountTypes().size() == 0) {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
         }
-        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-        templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
-        Clause newclause = new Clause(countryId, clauseDto.getTitle(), clauseDto.getDescription());
-        newclause.setOrganizationTypes(clauseDto.getOrganizationTypes());
-        newclause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
-        newclause.setOrganizationServices(clauseDto.getOrganizationServices());
-        newclause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
-        newclause.setOrganizationId(organizationId);
-        newclause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        newclause.setOrganizationList(clauseDto.getOrgannizationList());
-        newclause.setTemplateType(clauseDto.getTemplateType());
-        newclause.setTags(tagList);
+        List<ClauseTag> tagList=new ArrayList<>();
+        // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
+        Clause newClause = new Clause( clauseDto.getTitle(), clauseDto.getDescription(),countryId,clauseDto.getOrganizationTypes(),clauseDto.getOrganizationSubTypes()
+        ,clauseDto.getOrganizationServices(),clauseDto.getOrganizationSubServices());
+        newClause.setOrganizationId(organizationId);
+        newClause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        //newClause.setOrganizationList(clauseDto.getOrganizationList());
+        // newClause.setTemplateType(clauseDto.getTemplateType());
 
         try {
-            newclause = save(newclause);
-            return newclause;
-        } catch (Exception e) {
+            tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
+            newClause.setTags(tagList);
+            newClause = clauseRepository.save(sequenceGenerator(newClause));
+            return newClause;
+        } catch (DuplicateDataException e) {
             clauseTagMongoRepository.deleteAll(tagList);
-            LOGGER.warn(e.getMessage());
+            LOGGER.debug(e.getMessage());
+            throw new DuplicateDataException(e.getMessage());
+        }
+        catch (Exception e)
+        {
+            clauseTagMongoRepository.deleteAll(tagList);
+            LOGGER.debug(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
 
@@ -102,6 +112,15 @@ public class ClauseService extends MongoBaseService {
     }
 
 
+    /**
+     * @description this method updateclause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
+     * @param countryId
+     * @param organizationId
+     * @param clauseId clause id
+     * @param clauseDto contain update data for clause
+     * @return updated clause object
+     * @throws  DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
+     */
     public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
         Clause exists = clauseRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
@@ -112,10 +131,11 @@ public class ClauseService extends MongoBaseService {
         if (!Optional.ofNullable(exists).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
-        List<ClauseTag> tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
+        List<ClauseTag> tagList =new ArrayList<>();
         exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        templateTypeService.getTemplateByById(clauseDto.getTemplateType(),countryId);
+       // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
         try {
+            tagList= clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
             exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
             exists.setOrganizationServices(clauseDto.getOrganizationServices());
@@ -123,9 +143,9 @@ public class ClauseService extends MongoBaseService {
             exists.setTitle(clauseDto.getTitle());
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
-            exists.setTemplateType(clauseDto.getTemplateType());
-            exists.setOrganizationList(clauseDto.getOrgannizationList());
-            exists = save(exists);
+           //exists.setTemplateType(clauseDto.getTemplateType());
+           // exists.setOrganizationList(clauseDto.getOrganizationList());
+            exists = clauseRepository.save(sequenceGenerator(exists));
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -140,42 +160,36 @@ public class ClauseService extends MongoBaseService {
     }
 
 
+    /**
+     * @description
+     * @param countryId
+     * @param organizationId
+     * @return return caluse with account type basic response,org types ,sub types,service category ,sub service category and tags
+     */
     public List<ClauseResponseDTO> getAllClauses(Long countryId, Long organizationId) {
         return clauseRepository.findAllClause(countryId, organizationId);
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param id
+     * @return bollean true if data deleted successfully
+     * @exception DataNotFoundByIdException; if clause not found for id
+     */
     public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {
 
         Clause clause = clauseRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (Optional.ofNullable(clause).isPresent()) {
-            clause.setDeleted(true);
-            clauseRepository.save(clause);
-            return true;
-        } else
+        if (!Optional.ofNullable(clause).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + id);
-        return false;
-
+        }
+        delete(clause);
+        return true;
     }
 
 
-    public Page<Clause> getClausePagination(int page, int size) {
-        //  return clauseRepository.findAll(new PageRequest(page, size));
-        return null;
-    }
-
-/*
-
-    public StringBuffer getClauseVersion(BigInteger id, String version) throws RepositoryException {
-        return jackrabbitService.getClauseVersion(id, version);
-
-    }
-
-    public List<String> getAllClauseVersion(BigInteger id) throws RepositoryException {
-        return jackrabbitService.getClauseVersions(id);
-
-    }
-*/
 
 
 }

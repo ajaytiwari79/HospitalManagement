@@ -33,7 +33,7 @@ public class SwaagerConf {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select().apis(RequestHandlerSelectors.basePackage("com.kairos.controller"))
                 .paths(PathSelectors.any())
-                .build().pathMapping("/oragnization/24")
+                .build().pathMapping("/organization/24")
                 .globalOperationParameters(aParameters);
 
 

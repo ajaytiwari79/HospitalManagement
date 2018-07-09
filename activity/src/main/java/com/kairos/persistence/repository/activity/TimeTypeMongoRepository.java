@@ -40,4 +40,10 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
 
     @Query("{upperLevelTimeTypeId:{$in:?0},deleted : false}")
     List<TimeTypeResponseDTO> findAllChildByParentId(List<BigInteger> id);
+
+    @Query("{id: { $ne:?0},countryId:?2,label:?1,deleted : false}")
+    TimeType findByIdNotEqualAndLabelAndCountryId(BigInteger TimeTypeId,String label, Long countryId);
+
+    @Query("{id:{$in:?0},deleted : false}")
+    List<TimeType> findAllByTimeTypeIds(List<BigInteger> id);
 }

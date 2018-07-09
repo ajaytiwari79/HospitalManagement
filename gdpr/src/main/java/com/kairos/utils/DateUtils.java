@@ -37,8 +37,7 @@ public class DateUtils {
 
     public static LocalDate getLocalDateFromDate(Date date) {
 
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localDate;
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     public static Date getStartOfDay(Date date) {

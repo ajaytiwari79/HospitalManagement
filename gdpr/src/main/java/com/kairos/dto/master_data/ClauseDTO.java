@@ -1,7 +1,10 @@
 package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
+import com.kairos.dto.OrganizationSubTypeDTO;
+import com.kairos.dto.OrganizationTypeDTO;
+import com.kairos.dto.ServiceCategoryDTO;
+import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
@@ -32,37 +35,38 @@ public class ClauseDTO {
     @Valid
     @NotNull(message = "Organization  Type  can't be  null")
     @NotEmpty(message = "Organization  Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypes;
 
     @Valid
     @NotNull(message = "Organization Sub Type  can't be  null")
     @NotEmpty(message = "Organization Sub Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     @Valid
     @NotNull(message = "Service Type  can't be  null")
     @NotEmpty(message = "Service  Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+    private List<ServiceCategoryDTO> organizationServices;
 
     @Valid
     @NotNull(message = "Service Sub Type  can't be  null")
     @NotEmpty(message = "Service Sub Type  can't be  empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty
     private Set<BigInteger> accountTypes;
 
-
-    @NotNull
     private BigInteger templateType;
 
-    @NotNull
-    private Set<Long> organnizationList;
+    private List<Long> organizationList;
 
-    public Set<Long> getOrgannizationList() { return organnizationList; }
+    public List<Long> getOrganizationList() {
+        return organizationList;
+    }
 
-    public void setOrgannizationList(Set<Long> organnizationList) { this.organnizationList = organnizationList; }
+    public void setOrganizationList(List<Long> organizationList) {
+        this.organizationList = organizationList;
+    }
 
     public BigInteger getTemplateType() { return templateType; }
 
@@ -92,35 +96,35 @@ public class ClauseDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

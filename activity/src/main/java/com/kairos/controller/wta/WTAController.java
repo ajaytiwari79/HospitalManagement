@@ -72,9 +72,9 @@ public class WTAController {
 //    }
 
     /*
-      *get all WTA by countryId
-      * Created by vipul on 10 august 2017
-    */
+     *get all WTA by countryId
+     * Created by vipul on 10 august 2017
+     */
 
     @ApiOperation(value = "Get WTA by CountryId ID")
     @RequestMapping(value = COUNTRY_URL + "/wta/ByCountry", method = RequestMethod.GET)
@@ -83,9 +83,9 @@ public class WTAController {
     }
 
     /*
-      * get all available expertise by org Sub type Id
-      * Created by vipul on 12 sept 2017
-    */
+     * get all available expertise by org Sub type Id
+     * Created by vipul on 12 sept 2017
+     */
 
 /*    @ApiOperation(value = "Get all expertise which are not unlinked with this subOrg type of country")
     @GetMapping(value = COUNTRY_URL + "/{organizationSubTypeId}/expertises")
@@ -165,13 +165,13 @@ public class WTAController {
     @ApiOperation(value = "get WTA of Organization by Expertise")
     @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/wta")
     public ResponseEntity<Map<String, Object>> getAllWtaOfOrganizationByExpertise(@PathVariable long unitId, @PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getAllWtaOfOrganizationByExpertise(unitId,expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getAllWtaOfOrganizationByExpertise(unitId, expertiseId));
     }
 
     @ApiOperation(value = "Update WTA of UnitPosition")
     @PutMapping(value = UNIT_URL + "/wta")
     public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody WTADTO wtadto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId,wtadto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId, wtadto));
     }
 
 
@@ -208,10 +208,15 @@ public class WTAController {
 
     @ApiOperation(value = "get Wta By Ids")
     @PostMapping(value = COUNTRY_URL + "/wta/organization/{unitId}")
-    public ResponseEntity<Map<String, Object>> assignWTAToOrganization(@RequestBody List<Long> subTypeIds,@PathVariable Long unitId,@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignWTAToNewOrganization(subTypeIds,unitId,countryId));
+    public ResponseEntity<Map<String, Object>> assignWTAToOrganization(@RequestBody List<Long> subTypeIds, @PathVariable Long unitId, @PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignWTAToNewOrganization(subTypeIds, unitId, countryId));
     }
 
+    @ApiOperation(value = "get Wta with versions By Ids")
+    @GetMapping(value = UNIT_URL + "/wta/versions")
+    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId,@RequestParam List<BigInteger> wtaIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId,wtaIds));
+    }
 
 
 }
