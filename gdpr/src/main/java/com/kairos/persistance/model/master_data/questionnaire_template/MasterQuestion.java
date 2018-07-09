@@ -9,10 +9,10 @@ import javax.validation.constraints.NotNull;
 @Document(collection = "question")
 public class MasterQuestion extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Question cant'be empty")
     private String question;
 
-    @NotNullOrEmpty(message = "description.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Description can't be empty")
     private String description;
 
     private Boolean isRequired=false;

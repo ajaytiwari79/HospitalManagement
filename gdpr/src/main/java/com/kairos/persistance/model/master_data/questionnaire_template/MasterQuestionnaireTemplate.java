@@ -13,7 +13,7 @@ import java.util.List;
 @Document(collection = "questionnaire_template")
 public class MasterQuestionnaireTemplate extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Name can't be empty")
     @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
