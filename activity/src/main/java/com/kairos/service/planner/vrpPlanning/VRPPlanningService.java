@@ -262,7 +262,7 @@ public class VRPPlanningService extends MongoBaseService{
         }
         Map<Long,List<TaskTypeSettingDTO>> staffSettingMap = taskTypeSettingDTOS.stream().collect(Collectors.groupingBy(t->t.getStaffId(),toList()));
         List<EmployeeDTO> employees = staffSettingMap.entrySet().stream().map(s->new EmployeeDTO(s.getKey().toString(),"",getSkill(s.getValue()),s.getValue().get(0).getEfficiency())).collect(toList());
-        Map<Long,String> staffNameMap = staffs.stream().collect(Collectors.toMap(StaffDTO::getId,v->v.getFirstName()+""+v.getLastName()));
+        Map<Long,String> staffNameMap = staffs.stream().collect(Collectors.toMap(StaffDTO::getId,v->v.getFirstName()+" "+v.getLastName()));
         employees.forEach(e->e.setName(staffNameMap.get(new Long(e.getId()))));
         return new Object[]{employees,staffIds};
     }
