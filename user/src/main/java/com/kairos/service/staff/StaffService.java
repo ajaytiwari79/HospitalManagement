@@ -1692,8 +1692,17 @@ public class StaffService extends UserBaseService {
             //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
-        staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
-        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staffId);
+        staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        UserAccessRoleDTO userAccessRoleDTO=new UserAccessRoleDTO();
+        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        if(!Optional.ofNullable(staff).isPresent()){
+            userAccessRoleDTO.setManagement(true);
+        }
+        else {
+            userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
+        }
+
         staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         return staffAdditionalInfoDTO;
 
@@ -2088,8 +2097,13 @@ public class StaffService extends UserBaseService {
     }
 
     public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId) {
+        UserAccessRoleDTO userAccessRoleDTO=new UserAccessRoleDTO();
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        if(!Optional.ofNullable(staff).isPresent()){
+            userAccessRoleDTO.setManagement(true);
+            return userAccessRoleDTO;
+        }
         return accessGroupService.getStaffAccessRoles(unitId, staff.getId());
     }
 

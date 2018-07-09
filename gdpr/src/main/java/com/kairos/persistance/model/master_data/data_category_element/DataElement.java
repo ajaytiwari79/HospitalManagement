@@ -32,4 +32,12 @@ public class DataElement extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public DataElement( String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
+    public DataElement() {
+    }
 }

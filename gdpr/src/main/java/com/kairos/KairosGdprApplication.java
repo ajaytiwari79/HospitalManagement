@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.utils.userContext.UserContextInterceptor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -20,7 +19,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;;
+import org.springframework.web.client.RestTemplate;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -75,11 +75,10 @@ public class KairosGdprApplication {
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template = restTemplateBuilder
+        return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
 
     }
 

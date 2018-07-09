@@ -219,6 +219,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         });
         List<MasterProcessingActivity> subProcessingActivityList = masterProcessingActivityRepository.getAllMasterSubProcessingActivityByIds(countryId, organizationId, subProcessingActivitiesIds);
         subProcessingActivityList.forEach(subProcess -> {
+
             MasterProcessingActivityDTO subProcessDto = subProcessingActivityDTOList.get(subProcess.getId());
             subProcess.setName(subProcessDto.getName());
             subProcess.setDescription(parentProcessingActivity.getDescription());

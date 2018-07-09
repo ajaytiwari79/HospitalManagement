@@ -32,11 +32,14 @@ public class HostingProviderService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
     /**
-     *
+     * @description this method create new HostingProvider if HostingProvider not exist with same name ,
+     * and if exist then simply add  HostingProvider to existing list and return list ;
+     * findByNamesList()  return list of existing HostingProvider using collation ,used for case insensitive result
      * @param countryId
      * @param organizationId
      * @param hostingProviders
-     * @return return map which contain list of new hosting providers and list of existing hosting provider if hosting provider already exist
+     * @return return map which contain list of new HostingProvider and list of existing HostingProvider if HostingProvider already exist
+     *
      */
     public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
 
@@ -74,11 +77,25 @@ public class HostingProviderService extends MongoBaseService {
 
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of HostingProvider
+     */
     public List<HostingProvider> getAllHostingProvider(Long countryId,Long organizationId) {
         return hostingProviderMongoRepository.findAllHostingProviders(countryId,organizationId);
     }
 
 
+    /**
+     * @throws DataNotFoundByIdException if HostingProvider not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id
+     * @return HostingProvider object fetch by id
+     */
     public HostingProvider getHostingProviderById(Long countryId,Long organizationId, BigInteger id) {
 
         HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
@@ -104,6 +121,14 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
+    /**
+     * @throws DuplicateDataException if HostingProvider exist with same name
+     * @param countryId
+     * @param organizationId
+     * @param id id of HostingProvider
+     * @param hostingProvider
+     * @return return updated HostingProvider object
+     */
     public HostingProvider updateHostingProvider(Long countryId,Long organizationId,BigInteger id, HostingProvider hostingProvider) {
 
         HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,organizationId,hostingProvider.getName());
@@ -121,6 +146,13 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
+    /**
+     * @throws DataNotExists if hosting provider not exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of hsoting provider
+     * @return return object of hosting provider
+     */
     public HostingProvider getHostingProviderByName(Long countryId, Long organizationId,String name) {
 
 

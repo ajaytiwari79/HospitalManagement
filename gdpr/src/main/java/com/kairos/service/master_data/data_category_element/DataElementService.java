@@ -31,12 +31,11 @@ public class DataElementService extends MongoBaseService {
     private DataElementMognoRepository dataElementMognoRepository;
 
 
-    /**
-     *
+    /**@decription method create new Data Elements throw exception if data element already exist
      * @param countryId
      * @param organizationId
      * @param dataElementsDto request body for creating New Data Elements
-     * @return map of Data Elements ids List  and new Data Elements List
+     * @return map of Data Elements  List  and new Data Elements ids
      */
     public Map<String, Object> createDataElements(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
@@ -52,9 +51,7 @@ public class DataElementService extends MongoBaseService {
         List<DataElement> dataElementList = new ArrayList<>();
         List<BigInteger> dataElementIdList = new ArrayList<>();
         for (String name : dataElementNames) {
-            DataElement newDataElement = new DataElement();
-            newDataElement.setName(name);
-            newDataElement.setCountryId(countryId);
+            DataElement newDataElement = new DataElement(name,countryId);
             newDataElement.setOrganizationId(organizationId);
             dataElementList.add(newDataElement);
         }
@@ -110,7 +107,7 @@ public class DataElementService extends MongoBaseService {
     }
 
     /**
-     *
+     * @desciption method create new data Data elemnts and update data Element if data element already exist.
      * @param countryId
      * @param organizationId
      * @param dataElementsDto request body contain list Of Existing Data Elements which needs to be Update and List of New Data Elements
@@ -128,8 +125,6 @@ public class DataElementService extends MongoBaseService {
                 createNewDataElementsDto.add(dataElementDto);
             }
         });
-
-
         Map<String, Object> updatedDataElements = new HashMap<>();
         List<BigInteger> dataElementsIds = new ArrayList<>();
         List<DataElement> dataElementList = new ArrayList<>();
@@ -151,7 +146,8 @@ public class DataElementService extends MongoBaseService {
 
 
     /**
-     *
+     * @desciption update list of Existing Data elements,
+     * dataElementsDtoMap   contain data element coressponding to its id
      * @param countryId
      * @param organizationId
      * @param dataElementsDto request body for updating Existing Data Elements List
@@ -159,18 +155,18 @@ public class DataElementService extends MongoBaseService {
      */
     public Map<String, Object> updateDataElementsList(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
 
-        Map<BigInteger, DataElementDTO> dataElementsDtoList = new HashMap<>();
+        Map<BigInteger, DataElementDTO> dataElementsDtoMap = new HashMap<>();
         List<BigInteger> dataElementsIds = new ArrayList<>();
         List<String> dataElementsNames = new ArrayList<>();
         dataElementsDto.forEach(dataElementDto -> {
-            dataElementsDtoList.put(dataElementDto.getId(), dataElementDto);
+            dataElementsDtoMap.put(dataElementDto.getId(), dataElementDto);
             dataElementsIds.add(dataElementDto.getId());
             dataElementsNames.add(dataElementDto.getName());
         });
-        checkDuplicateInsertionOnUpdatingDataElements(countryId, organizationId, dataElementsDtoList, dataElementsNames);
+        checkDuplicateInsertionOnUpdatingDataElements(countryId, organizationId, dataElementsDtoMap, dataElementsNames);
         List<DataElement> dataElementList = dataElementMognoRepository.getAllDataElementListByIds(countryId, organizationId, dataElementsIds);
         dataElementList.forEach(dataElement -> {
-            DataElementDTO darElementDto = dataElementsDtoList.get(dataElement.getId());
+            DataElementDTO darElementDto = dataElementsDtoMap.get(dataElement.getId());
             dataElement.setName(darElementDto.getName());
         });
         Map<String, Object> result = new HashMap<>();
@@ -200,7 +196,7 @@ public class DataElementService extends MongoBaseService {
 
     }
 
-    /**
+    /**@description check if data element already exist with same name ,and map not contain id then throw exception.
      * @param countryId
      * @param dataElementDtoMap map contain dataElement corresponding to id
      * @param dataElementNames  list of data elements names which we need to check if duplicate data present on updating existing Data elements

@@ -51,18 +51,17 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     private MasterQuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
 
 
-    /**
+    /**@description  questionnaireSection contain list of sections and list of sections ids.
      * @param countryId
-     * @param templateId
-     * @param masterQuestionnaireSectionDto contains list of sections and questions
-     * @return add sections ids to questionnaire template and return questionnaire template
+     * @param templateId questionniare template id ,required to fetch
+     * @param masterQuestionnaireSectionDto contains list of sections ,And section contain list of questions
+     * @return add sections ids to questionniare template and return questionniare template
      */
     public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long orgId, BigInteger templateId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDto) {
         MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
-
         Map<String, Object> questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto);
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
         try {
@@ -77,7 +76,15 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
 
     }
 
-    //create questionnaire sections and create questions and add them to questionnaire template
+
+    /**
+     * @description  method create new question sections belong to questionnaire template and and questions which belong to section.
+     * and rollback if exception occur in questionnaire section service to delete inserted questions
+     * @param countryId
+     * @param orgId
+     * @param masterQuestionnaireSectionDTOs  contain list of sections ,and section list of questions
+     * @return return map ,which contain list of section ,list of sections id and list of questions which is nedded for rollback
+     */
     public Map<String, Object> createQuestionnaireSectionAndCreateAndAddQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDTOs) {
 
         Map<String, Object> result = new HashMap<>();
@@ -133,12 +140,13 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    /**
+    /**@description this method update existing sections (if contian id) and create new sections(if not contain id in request)
+     *and update exisiting questions if contain id in request and create new question if not contain id in request which belongs to section
      * @param countryId
-     * @param id
-     * @param questionnaireSectionDto contain list of updated section and new section which we have to create and add to questionnaire template
-     * @return
-     */
+     * @param id questionnaire template id
+     * @param questionnaireSectionDto contain list of  existing sections and new sections,( section conation list of existing questions and new question)
+     * @return return update master questionnaire template with sections qnd questions
+     **/
     public MasterQuestionnaireTemplate updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, BigInteger id, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
 
         MasterQuestionnaireTemplate template = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
@@ -188,10 +196,10 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    /**
+    /**@description  this method update list of existing sections and update questions if exist already other wise create questions
      * @param countryId
-     * @param updateSectionsAndQuestionsListDto contain list of Questionnaire section and questions list
-     * @return
+     * @param updateSectionsAndQuestionsListDto contain list of Questionniare section and questions list
+     * @return map which contain list of sections ,section ids and questions.
      */
     public Map<String, Object> updateQuestionnaireSectionAndQuestionList(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> updateSectionsAndQuestionsListDto) {
 

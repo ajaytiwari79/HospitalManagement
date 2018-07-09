@@ -29,6 +29,17 @@ public class TransferMethodService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
+
+    /**
+     * @description this method create new TransferMethod if TransferMethod not exist with same name ,
+     * and if exist then simply add  TransferMethod to existing list and return list ;
+     * findByNamesList()  return list of existing TransferMethod using collation ,used for case insensitive result
+     * @param countryId
+     * @param organizationId
+     * @param transferMethods
+     * @return return map which contain list of new TransferMethod and list of existing TransferMethod if TransferMethod already exist
+     *
+     */
     public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, Long organizationId, List<TransferMethod> transferMethods) {
 
         Map<String, List<TransferMethod>> result = new HashMap<>();
@@ -65,10 +76,23 @@ public class TransferMethodService extends MongoBaseService {
 
     }
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of TransferMethod
+     */
     public List<TransferMethod> getAllTransferMethod(Long countryId, Long organizationId) {
         return transferMethodRepository.findAllTransferMethods(countryId, organizationId);
     }
 
+    /**
+     * @throws DataNotFoundByIdException throw exception if TransferMethod not found for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of TransferMethod
+     * @return TransferMethod object fetch by given id
+     */
     public TransferMethod getTransferMethod(Long countryId, Long organizationId, BigInteger id) {
 
         TransferMethod exist = transferMethodRepository.findByIdAndNonDeleted(countryId, organizationId, id);
@@ -91,10 +115,17 @@ public class TransferMethodService extends MongoBaseService {
         }
     }
 
+    /***
+     * @throws  DuplicateDataException throw exception if TransferMethod data not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of TransferMethod
+     * @param transferMethod
+     * @return TransferMethod updated object
+     */
+    public TransferMethod updateTransferMethod(Long countryId, Long organizationId, BigInteger id, TransferMethod transferMethod) {
 
-    public TransferMethod updateTransferMethod(Long countryIdId, Long organizationId, BigInteger id, TransferMethod transferMethod) {
-
-        TransferMethod exist = transferMethodRepository.findByName(countryIdId, organizationId, transferMethod.getName());
+        TransferMethod exist = transferMethodRepository.findByName(countryId, organizationId, transferMethod.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
@@ -108,7 +139,13 @@ public class TransferMethodService extends MongoBaseService {
         }
     }
 
-
+    /**
+     * @throws DataNotExists throw exception if TransferMethod not exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of TransferMethod
+     * @return TransferMethod object fetch on basis of  name
+     */
     public TransferMethod getTransferMethodByName(Long countryId, Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
             TransferMethod exist = transferMethodRepository.findByName(countryId, organizationId, name);
