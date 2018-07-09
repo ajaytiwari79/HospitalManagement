@@ -86,6 +86,7 @@ public class ExceptionService {
     }
 
     public void actionNotPermittedException(String message) {
-        throw new ActionNotPermittedException(convertMessage(message));
+        throw new ActionNotPermittedException(message);
     }
+
 }
