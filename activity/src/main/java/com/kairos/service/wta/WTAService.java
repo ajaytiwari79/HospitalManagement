@@ -6,7 +6,9 @@ import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.activity.wta.version.WTAVersionDTO;
+import com.kairos.client.dto.TableConfiguration;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
@@ -24,9 +26,11 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
+import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 
 
 /**
@@ -78,6 +84,8 @@ public class WTAService extends MongoBaseService {
     private SolverConfigService solverConfigService;
     @Autowired
     private ExceptionService exceptionService;
+    @Inject
+    private TableSettingService tableSettingService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -453,7 +461,7 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds) {
+    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<BigInteger> wtaIds) {
         List<WTAVersionDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(wtaIds);
         List<WTAVersionDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(wtaIds);
         currentWTAList.forEach(currentWTA -> {
@@ -462,7 +470,9 @@ public class WTAService extends MongoBaseService {
                 currentWTA.setVersions(currentObject.get().getVersions());
             }
         });
-        return currentWTAList;
+        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId( unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
+        WTATableSettingWrapper wtaTableSettingWrapper = new WTATableSettingWrapper(currentWTAList, tableConfiguration);
+        return wtaTableSettingWrapper;
     }
 
 

@@ -23,7 +23,7 @@ public class CTARuleTemplateQueryResult {
     public String name;
     public String description;
     public boolean disabled;
-    @NotNull
+    //@NotNull
     public Long ruleTemplateCategory;
     private String ruleTemplateType;
     private String payrollType;

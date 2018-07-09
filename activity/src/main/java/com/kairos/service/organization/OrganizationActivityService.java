@@ -130,9 +130,10 @@ public class OrganizationActivityService extends MongoBaseService {
         save(activityCopied);
         return retrieveBasicDetails(activityCopied);
     }
+
     public ActivityDTO retrieveBasicDetails(Activity activity) {
-        ActivityDTO activityDTO=new ActivityDTO(activity.getId(),activity.getName(),activity.getParentId());
-        BeanUtils.copyProperties(activity,activityDTO);
+        ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
+        BeanUtils.copyProperties(activity, activityDTO);
         return activityDTO;
 
     }
@@ -207,7 +208,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         GeneralActivityTab generalTab = new GeneralActivityTab();
-        ObjectMapperUtils.copyProperties(generalDTO,generalTab);
+        ObjectMapperUtils.copyProperties(generalDTO, generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }
@@ -308,6 +309,7 @@ public class OrganizationActivityService extends MongoBaseService {
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
+        activityConfigurationService.createDefaultSettings(unitId, countryId, phases);
         return true;
     }
 
