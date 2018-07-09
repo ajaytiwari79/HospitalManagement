@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -105,12 +106,14 @@ public class SolverConfigService extends MongoBaseService {
                 c.setDescription(constraintDTO.getDescription());
             });
         });
-        solverConfigs.sort((s1,s2)-> s1.getLastSubmittedDate().compareTo(s2.getLastSubmittedDate()));
+
+        List<SolverConfigDTO> solverConfigDTOS = solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()!=null).sorted((s1,s2)-> s1.getLastSubmittedDate().compareTo(s2.getLastSubmittedDate())).collect(Collectors.toList());
+        solverConfigDTOS.addAll(solverConfigDTOS.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()==null).collect(Collectors.toList()));
         List<DefaultContraintsDTO> defaultContraints = constraints.stream().collect(Collectors.groupingBy(ConstraintDTO::getCategory,Collectors.toList())).entrySet().stream().map(c->new DefaultContraintsDTO(c.getKey().toValue(),c.getValue())).collect(Collectors.toList());
         defaultContraints.forEach(d->{
             d.getConstraints().sort((c1,c2)->c1.isDisabled().compareTo(c2.isDisabled()));
         });
-        return new SolverConfigConstraintWrapper(defaultContraints, solverConfigs);
+        return new SolverConfigConstraintWrapper(defaultContraints, solverConfigDTOS);
     }
 
 
