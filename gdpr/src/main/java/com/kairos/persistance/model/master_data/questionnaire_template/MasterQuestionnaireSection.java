@@ -14,7 +14,7 @@ import java.util.List;
 @Document(collection = "questionnaire_section")
 public class MasterQuestionnaireSection extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Title can't be empty")
     private String title;
 
     @NotNull(message = "list.cannot.be.null")

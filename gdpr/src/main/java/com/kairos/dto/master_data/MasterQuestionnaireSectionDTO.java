@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,12 +17,10 @@ public class MasterQuestionnaireSectionDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Title  can't be empty")
+    @NotNullOrEmpty(message = "Section Title  can't be empty")
     @Pattern(message = "Special character or Numbers data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
-    @NotNull(message = "Question  can't be null")
-    @NotEmpty(message = "Question  can't be  empty")
     @Valid
     private List<MasterQuestionDTO> questions;
 
