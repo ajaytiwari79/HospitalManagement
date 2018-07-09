@@ -84,4 +84,7 @@ public class ExceptionService {
     public void dataNotFoundException(String message, Object... params) {
         throw new DataNotFoundException(convertMessage(message, params));
     }
+    public void actionNotPermittedException(String message) {
+        throw new ActionNotPermittedException(message);
+    }
 }
