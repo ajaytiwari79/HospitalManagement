@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.counter.KPICategoryUpdationDTO;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
@@ -8,6 +9,7 @@ import com.kairos.persistence.model.counter.KPICategory;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -51,29 +53,42 @@ public class CounterConfService extends MongoBaseService {
     }
 
     private void verifyForCategoryAvailability(List<String> categoryNames){
-        List<KPICategory> categories = counterRepository.getCategoriesByNames(categoryNames);
-        if(categories!=null && categories.size()>0) exceptionService.duplicateDataException("error.kpi_category.duplicate");
+        List<String> formattedNames = new ArrayList<>();
+        categoryNames.forEach(category -> {
+            formattedNames.add(category.trim().toLowerCase());
+        });
+        List<KPICategory> categories = counterRepository.getEntityItemList(KPICategory.class);
+        List<KPICategory> duplicateEntries = new ArrayList<>();
+        categories.forEach(category -> {
+            if(formattedNames.contains(category.getName().trim().toLowerCase())){
+                duplicateEntries.add(category);
+            }
+        });
+        if(duplicateEntries.size()>0) exceptionService.duplicateDataException("error.kpi_category.duplicate");
     }
 
-    private List<String> formatCategoriesNames(List<KPICategory> categories){
+    private List<String> getTrimmedNames(List<KPICategory> categories){
         List<String> categoriesNames = new ArrayList<>();
         categories.forEach(category -> {
-            category.setName(category.getName().trim().toUpperCase());
+            category.setName(category.getName().trim());
             categoriesNames.add(category.getName());
         });
         return categoriesNames;
     }
 
     public List<KPICategory> addCategories(List<KPICategory> categories){
-        List<String > names = formatCategoriesNames(categories);
+        List<String > names = getTrimmedNames(categories);
         verifyForCategoryAvailability(names);
         return save(categories);
     }
 
-    public List<KPICategory> updateCategories(List<KPICategory> categories){
-        Set<String> categoriesNames = new HashSet<>(formatCategoriesNames(categories));
-        if(categoriesNames.size() != categories.size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
-        return save(categories);
+    public List<KPICategory> updateCategories(KPICategoryUpdationDTO categories){
+        Set<String> categoriesNames = categories.getUpdatedCategories().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
+        if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
+        List<KPICategory> updatableCategories = ObjectMapperUtils.copyPropertiesOfListByMapper(categories.getUpdatedCategories(), KPICategory.class);
+        List<KPICategory> deletableCategories = ObjectMapperUtils.copyPropertiesOfListByMapper(categories.getDeletedCategories(), KPICategory.class);
+        if(deletableCategories!=null && deletableCategories.size()>0)counterRepository.removeAll("id", deletableCategories.stream().map(category -> category.getId()).collect(Collectors.toList()), KPICategory.class);
+        return save(updatableCategories);
     }
 
     public void addEntries(){

@@ -4,6 +4,10 @@ public class KPIAccessPageDTO {
     private String name;
     private String moduleId;
 
+    public KPIAccessPageDTO(){
+
+    }
+
     public KPIAccessPageDTO(String name, String moduleId){
         this.name = name;
         this.moduleId = moduleId;
