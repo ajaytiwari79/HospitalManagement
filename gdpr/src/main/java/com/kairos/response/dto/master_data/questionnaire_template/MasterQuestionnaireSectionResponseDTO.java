@@ -17,7 +17,6 @@ public class MasterQuestionnaireSectionResponseDTO {
 
     private List<MasterQuestionBasicResponseDTO> questions;
 
-    private Long countryId;
 
     public BigInteger getId() {
         return id;
@@ -41,14 +40,6 @@ public class MasterQuestionnaireSectionResponseDTO {
 
     public void setQuestions(List<MasterQuestionBasicResponseDTO> questions) {
         this.questions = questions;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
 

@@ -46,26 +46,6 @@ public class MasterQuestionnaireSectionController {
 
     }
 
-
-    /**@param countryId
-     * @param organizationId
-     * @param templateId id of MasterQUestionnaireTemplate
-     * @param questionnaireSectionDTOs contains list of existing MasterQusetionniareSection list and new  MasterQusetionniareSection
-     * @return return MasterQUestionnaireTemplate object with QuestionnaireSection
-     */
-    @ApiOperation(value = "update list of questionnaire section and deleted section if deleted property is true")
-    @PutMapping("/questionnaire_template/{templateId}/section/update")
-    public ResponseEntity updateQuestionnaireSectionAndQuestions(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Valid @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionnaireSectionDTOs) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(countryId, organizationId, templateId, questionnaireSectionDTOs.getRequestBody()));
-
-
-    }
-
     /**
      *
      * @param countryId
