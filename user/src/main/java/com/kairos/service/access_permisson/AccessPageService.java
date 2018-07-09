@@ -8,9 +8,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.Tab;
-import com.kairos.user.staff.permission.StaffPermissionDTO;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
-import com.kairos.user.staff.permission.StaffTabPermission;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.employment.Employment;
@@ -32,8 +30,11 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
+import com.kairos.user.staff.permission.StaffPermissionDTO;
+import com.kairos.user.staff.permission.StaffTabPermission;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -409,5 +410,18 @@ public class AccessPageService extends UserBaseService {
     // For Test Cases
     public AccessPage getOneMainModule(){
         return accessPageRepository.getOneMainModule();
+    }
+
+    public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
+        List<AccessPage> accessPages = accessPageRepository.getMainModulesList();
+        Map<String, List<KPIAccessPageDTO>> kpiPageDetails = new HashMap<>();
+        accessPages.parallelStream().forEach(accessPage -> {
+            List<KPIAccessPageDTO> list = new ArrayList<>();
+            list.add(new KPIAccessPageDTO("KPI Tab-1", "tab"+accessPage.getModuleId()+"1"));
+            list.add(new KPIAccessPageDTO("KPI Tab-2", "tab"+accessPage.getModuleId()+"2"));
+            list.add(new KPIAccessPageDTO("KPI Tab-3", "tab"+accessPage.getModuleId()+"3"));
+            kpiPageDetails.put(accessPage.getModuleId(), list);
+        });
+        return kpiPageDetails.get(moduleId);
     }
 }

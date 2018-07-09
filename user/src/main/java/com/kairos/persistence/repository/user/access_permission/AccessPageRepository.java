@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -372,6 +372,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH org,collect( distinct {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,isModule:accessPage.isModule}) as permissions\n" +
             "return id(org) as unitId, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermission(Long userId);
+
+    @Query("Match (accessPage:AccessPage) where accessPage.isModule=true return accessPage")
+    List<AccessPage> getMainModulesList();
 }
 
 
