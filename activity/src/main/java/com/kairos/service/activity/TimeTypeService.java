@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
@@ -30,18 +31,20 @@ public class TimeTypeService extends MongoBaseService {
 
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
+        List<String> timeTypeLabels=timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
+        TimeType timeTypeResult=timeTypeMongoRepository.findAllByLabel(timeTypeLabels,countryId);
+        if(Optional.ofNullable(timeTypeResult).isPresent()){
+            exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
+        }
         timeTypeDTOs.forEach(timeTypeDTO -> {
             TimeType timeType;
             if (timeTypeDTO.getTimeTypes() != null) {
-                timeType = timeTypeMongoRepository.exists(timeTypeDTO.getLabel(), countryId);
+               timeType = timeTypeResult;
                 if (timeType == null) {
-                    timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription());
+                    timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(),timeTypeDTO.getBackgroundColor(),timeTypeDTO.getTextColor());
                     timeType.setCountryId(countryId);
                     if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                         timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
-                    }else{
-                        timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                        timeType.setTextColor(timeTypeDTO.getTextColor());
                     }
                     timeType = save(timeType);
                     if(timeTypeDTO.getUpperLevelTimeTypeId() != null){
@@ -51,8 +54,6 @@ public class TimeTypeService extends MongoBaseService {
                         save(parentTimeType);
                     }
                     timeTypeDTO.setId(timeType.getId());
-                } else {
-                    exceptionService.duplicateDataException("message.name");
                 }
             }
         });
@@ -60,25 +61,51 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
+        List<TimeType> timeTypes=new ArrayList<>();
+        List<BigInteger> timeTypeIds = timeTypeDTOS.stream().map(t->t.getId()).collect(Collectors.toList());
+        List<String> timeTypeLabels = timeTypeDTOS.stream().map(t->t.getLabel()).collect(Collectors.toList());
+        List<TimeType> timeTypesResult = timeTypeMongoRepository.findByIdNotEqualAndLabelAndCountryId(timeTypeIds,timeTypeLabels, countryId);
+        if(!timeTypesResult.isEmpty()){
+            exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
+        }
+        timeTypesResult = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
+        Map<BigInteger,TimeType> timeTypeMap = timeTypesResult.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        List<TimeType> childTimeTypes=timeTypeMongoRepository.findAllChildTimeTypeByParentId(timeTypeIds);
+        Map<BigInteger,List<TimeType>> childTimeTypesMap = childTimeTypes.stream().collect(Collectors.groupingBy(t->t.getUpperLevelTimeTypeId(),Collectors.toList()));
+        List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(t->t.getId()).collect(Collectors.toList());
+        List<TimeType> leafTimeTypes =timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
+        Map<BigInteger,List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(t->t.getUpperLevelTimeTypeId(),Collectors.toList()));
         timeTypeDTOS.forEach(timeTypeDTO -> {
-            TimeType timeType = timeTypeMongoRepository.findByIdNotEqualAndLabelAndCountryId(timeTypeDTO.getId(),timeTypeDTO.getLabel(), countryId);
-            if (!Optional.ofNullable(timeType).isPresent()) {
-                timeType = timeTypeMongoRepository.findOne(timeTypeDTO.getId());
-                if (Optional.ofNullable(timeType ).isPresent()) {
+                TimeType timeType = timeTypeMap.get(timeTypeDTO.getId());
+                if (Optional.ofNullable(timeType).isPresent()) {
                     timeType.setLabel(timeTypeDTO.getLabel());
                     timeType.setDescription(timeTypeDTO.getDescription());
-                    if(!Optional.ofNullable(timeTypeDTO.getUpperLevelTimeTypeId()).isPresent()){
-                        timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                        timeType.setTextColor(timeTypeDTO.getTextColor());
+                    timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                    timeType.setTextColor(timeTypeDTO.getTextColor());
+                    List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
+                    if (Optional.ofNullable(childTimeTypeList).isPresent()&&!childTimeTypeList.isEmpty()) {
+                        childTimeTypeList.forEach(childTimeType -> {
+                            childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                            childTimeType.setTextColor(timeTypeDTO.getTextColor());
+                            List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
+                                    if (Optional.ofNullable(leafTimeTypeList).isPresent()&&!leafTimeTypeList.isEmpty()) {
+                                        leafTimeTypeList.forEach(leafTimeType -> {
+                                            leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                                            leafTimeType.setTextColor(timeTypeDTO.getTextColor());
+                                        });
+                                        timeTypes.addAll(leafTimeTypeList);
+                                    }
+                        });
+                        timeTypes.addAll(childTimeTypeList);
                     }
-                    save(timeType);
-                    if(timeType.isLeafNode())
+                    timeTypes.add(timeType);
+                    if (timeType.isLeafNode()) {
                         activityCategoryService.updateActivityCategoryForTimeType(countryId, timeType);
+                    }
                 }
-            } else {
-                exceptionService.duplicateDataException("message.name");
-            }
+
         });
+        save(timeTypes);
         return timeTypeDTOS;
     }
 
@@ -134,7 +161,7 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOS;
     }
 
-    public List<TimeTypeDTO> getLowerLevelTimeTypeDTOs(BigInteger timeTypeId, BigInteger upperlevelTimeTypeId, List<TimeType> timeTypes) {
+    public List<TimeTypeDTO>    getLowerLevelTimeTypeDTOs(BigInteger timeTypeId, BigInteger upperlevelTimeTypeId, List<TimeType> timeTypes) {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
             if (timeType.getUpperLevelTimeTypeId().equals(upperlevelTimeTypeId)) {
@@ -185,3 +212,20 @@ public class TimeTypeService extends MongoBaseService {
 
 
 }
+//
+//
+// if(Optional.ofNullable(timeType.getChildTimeTypeIds().isEmpty()).isPresent()){
+//         List<TimeType> childTimeTypes=timeTypeMongoRepository.findAllByTimeTypeIds(timeType.getChildTimeTypeIds());
+//        childTimeTypes.forEach(childTimeType ->{
+//        childTimeType.setTextColor(timeTypeDTO.getTextColor());
+//        childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+//        if(Optional.ofNullable(childTimeType.getChildTimeTypeIds().isEmpty()).isPresent()){
+//        List<TimeType> subChildTimeTypes=timeTypeMongoRepository.findAllByTimeTypeIds(childTimeType.getChildTimeTypeIds());
+//        subChildTimeTypes.forEach(subChildTimeType ->
+//        {
+//        subChildTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+//        subChildTimeType.setTextColor(timeTypeDTO.getTextColor());
+//        });
+//        }
+//        });
+//        }
