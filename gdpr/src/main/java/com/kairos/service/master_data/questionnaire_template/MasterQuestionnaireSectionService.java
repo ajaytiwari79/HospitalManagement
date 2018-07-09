@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.questionnaire_template.MasterQue
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionMongoRepository;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireSectionRepository;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
@@ -46,6 +47,9 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     @Inject
     private MongoTemplate mongoTemplate;
 
+    @Inject
+    private MasterQuestionnaireTemplateService masterQuestionnaireTemplateService;
+
 
     @Inject
     private MasterQuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
@@ -58,7 +62,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @return add sections ids to questionniare template and return questionniare template
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
-    public MasterQuestionnaireTemplate addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long orgId, BigInteger templateId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDto) {
+    public MasterQuestionnaireTemplateResponseDTO addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long orgId, BigInteger templateId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDto) {
         MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
         if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
@@ -73,7 +77,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         Map<String, Object> questionnaireSection;
         if (flag) {
             questionnaireSection = updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(countryId, orgId, masterQuestionnaireSectionDto);
-        } else {
+        } else  {
             questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto);
 
         }
@@ -86,7 +90,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e);
         }
-        return questionnaireTemplate;
+        return masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId,orgId,questionnaireTemplate.getId());
 
     }
 
