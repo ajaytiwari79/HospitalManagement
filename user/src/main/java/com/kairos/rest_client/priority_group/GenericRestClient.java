@@ -21,8 +21,8 @@ import java.util.Optional;
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 
 @Service
-public class PriorityGroupRestClient {
-    private static Logger logger = LoggerFactory.getLogger(PriorityGroupRestClient.class);
+public class GenericRestClient {
+    private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;

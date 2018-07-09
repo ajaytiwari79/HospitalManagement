@@ -1,12 +1,15 @@
 package com.kairos.persistence.model.agreement.cta;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +27,12 @@ public class CTAResponseDTO {
     private OrganizationType organizationType;
     private OrganizationType organizationSubType;
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
-    private Long startDateMillis;
-    private Long endDateMillis;
+    @DateLong
+    @JsonProperty("startDate")
+    private Date startDateMillis;
+    @DateLong
+    @JsonProperty("endDate")
+    private Date endDateMillis;
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
@@ -99,19 +106,19 @@ public class CTAResponseDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public Long getStartDateMillis() {
+    public Date getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
+    public void setStartDateMillis(Date startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDateMillis() {
+    public Date getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
+    public void setEndDateMillis(Date endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 

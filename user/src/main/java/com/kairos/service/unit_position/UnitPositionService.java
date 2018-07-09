@@ -7,7 +7,9 @@ import com.kairos.activity.time_bank.CTAIntervalDTO;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.activity.wta.version.WTAVersionDTO;
+import com.kairos.client.dto.TableConfiguration;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.*;
 import com.kairos.persistence.model.auth.User;
@@ -53,9 +55,11 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionFunction
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
+import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
@@ -67,6 +71,7 @@ import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.PositionWrapper;
+import com.kairos.wrapper.cta.CTATableSettingWrapper;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +91,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.kairos.util.DateUtils.ONLY_DATE;
+import static com.kairos.util.table_constants.TableSettingsConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
+import static com.kairos.util.table_constants.TableSettingsConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -152,6 +159,8 @@ public class UnitPositionService extends UserBaseService {
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
     ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
+    @Inject
+    private PriorityGroupIntegrationService priorityGroupIntegrationService;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
@@ -1125,29 +1134,31 @@ public class UnitPositionService extends UserBaseService {
         return staffData;
     }
 
-    public List<WTAVersionDTO> getAllWTAOfStaff(Long staffId) {
+    public WTATableSettingWrapper getAllWTAOfStaff(Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
         List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndWTAByUser(user.getId());
         // The keys is because of same component in FE
-        List<WTAVersionDTO> agreements = workingTimeAgreementRestClient.getWTAWithVersionIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
+        WTATableSettingWrapper wtaWithTableSettings = workingTimeAgreementRestClient.getWTAWithVersionIds(unitPositionQueryResults.stream().map(u -> u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
         Map<BigInteger, UnitPositionQueryResult> wtaPositionMap = unitPositionQueryResults.stream().collect(Collectors.toMap(w -> w.getWorkingTimeAgreementId(), w -> w));
-        agreements.forEach(currentWTA -> {
+        wtaWithTableSettings.getAgreements().forEach(currentWTA -> {
             currentWTA.setUnitInfo(wtaPositionMap.get(currentWTA.getId()).getUnitInfo());
             currentWTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(wtaPositionMap.get(currentWTA.getId()).getPositionCode(), PositionCodeDTO.class));
 
         });
-        return agreements;
+        return wtaWithTableSettings;
     }
 
-    public List<CTAResponseDTO> getAllCTAOfStaff(Long staffId) {
+    public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        List<CTAResponseDTO> agreements = unitPositionGraphRepository.getAllCtaByUserId(user.getId());
-        List<CTAResponseDTO> ctaResponseDTOS = unitPositionGraphRepository.getAllVersionsOfCTAByIds(agreements.stream().map(u -> u.getId()).collect(Collectors.toList()));
+        List<CTAResponseDTO> currentCTAs = unitPositionGraphRepository.getAllCtaByUserId(user.getId());
+        List<CTAResponseDTO> ctaResponseDTOS = unitPositionGraphRepository.getAllVersionsOfCTAByIds(currentCTAs.stream().map(u -> u.getId()).collect(Collectors.toList()));
         Map<Long, List<CTAResponseDTO>> ctaMapByParentId = ctaResponseDTOS.stream().collect(Collectors.groupingBy(w -> w.getParentCTAId(), Collectors.toList()));
-        agreements.forEach(currentCTA -> {
+        currentCTAs.forEach(currentCTA -> {
             currentCTA.setVersions(ctaMapByParentId.get(currentCTA.getId()));
         });
-        return agreements;
+        TableConfiguration tableConfiguration = priorityGroupIntegrationService.getTableSettings(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
+        CTATableSettingWrapper ctaTableSettingWrapper = new CTATableSettingWrapper(currentCTAs, tableConfiguration);
+        return ctaTableSettingWrapper;
     }
 
 
