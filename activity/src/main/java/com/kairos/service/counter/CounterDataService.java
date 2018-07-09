@@ -294,7 +294,7 @@ public class CounterDataService {
     public KPI getTotalTaskEfficiencyKPI(VrpTaskPlanningDTO vrpTaskPlanningDTO, List<VRPTaskDTO> tasks){
         long totalTaskDuration = tasks.parallelStream().mapToLong(task -> task.getDuration()).sum();
         long totalPlannedTaskDuration = vrpTaskPlanningDTO.getTasks().stream().mapToLong(task -> task.getDuration()).sum();
-        double efficiency = totalPlannedTaskDuration*1.0/totalTaskDuration;
+        double efficiency = totalTaskDuration*1.0/totalPlannedTaskDuration;
         return prepareTaskEfficiencyKPI(efficiency);
     }
 
