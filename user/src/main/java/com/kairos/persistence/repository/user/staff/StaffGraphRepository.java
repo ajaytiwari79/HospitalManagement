@@ -505,7 +505,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Long findStaffIdByUserId(Long userId, Long unitId);
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
-            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) with staff,org\n"+
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
             "match (org)-[:" + BELONGS_TO + "]-(country:Country)<-[: " + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCode")
     List<StaffTimezoneQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id,ReasonCodeType reasonCodeType);
 }
