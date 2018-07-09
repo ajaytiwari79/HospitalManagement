@@ -191,11 +191,11 @@ public class VrpTaskPlanningSolver {
             DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 
             director.setWorkingSolution(solution);
-            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            Map<Object,Indictment> indictmentMap=(Map)director.getIndictmentMap();
             printSolutionInformation( solution);
             //log.info(solver.explainBestScore());
             getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
-            return new Object[]{solution,indictmentMap};
+            return new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()};
         }catch (Exception e){
             e.printStackTrace();
             //throw  e;
@@ -272,6 +272,7 @@ public class VrpTaskPlanningSolver {
             log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
             constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
                 constraintMatch.getJustificationList().forEach(o -> {
+
                     log.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift()+""+((Task)o).getSkills():""));
                 });
             });

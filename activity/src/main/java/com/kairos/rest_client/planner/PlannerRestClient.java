@@ -89,6 +89,7 @@ public class PlannerRestClient {
                 break;
             case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
                 break;
+            case GET_INDICTMENT:uri=String.format("/vrp/%s/get_indictment",pathParams);
         }/*
 
         else if (t instanceof VrpTaskPlanningDTO){
