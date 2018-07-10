@@ -35,6 +35,7 @@ import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.user.staff.permission.StaffPermissionDTO;
 import com.kairos.user.staff.permission.StaffTabPermission;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -413,15 +414,10 @@ public class AccessPageService extends UserBaseService {
     }
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
+        accessPageRepository.getKPITabsList(moduleId);
         List<AccessPage> accessPages = accessPageRepository.getMainModulesList();
-        Map<String, List<KPIAccessPageDTO>> kpiPageDetails = new HashMap<>();
-        accessPages.parallelStream().forEach(accessPage -> {
-            List<KPIAccessPageDTO> list = new ArrayList<>();
-            list.add(new KPIAccessPageDTO("KPI Tab-1", "tab"+accessPage.getModuleId()+"1"));
-            list.add(new KPIAccessPageDTO("KPI Tab-2", "tab"+accessPage.getModuleId()+"2"));
-            list.add(new KPIAccessPageDTO("KPI Tab-3", "tab"+accessPage.getModuleId()+"3"));
-            kpiPageDetails.put(accessPage.getModuleId(), list);
-        });
-        return kpiPageDetails.get(moduleId);
+        if(accessPages==null) return new ArrayList<>();
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return kpiTabs;
     }
 }

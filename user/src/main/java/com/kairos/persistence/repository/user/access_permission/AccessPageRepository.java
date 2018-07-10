@@ -7,6 +7,7 @@ import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -376,7 +377,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("Match (accessPage:AccessPage) where accessPage.isModule=true return accessPage")
     List<AccessPage> getMainModulesList();
 
-    //@Query("match (accessPage:AccessPage) where accessPage.")
+    @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) where n.moduleId={0} RETURN subPages")
+    List<AccessPage> getKPITabsList(String moduleId);
 }
 
 
