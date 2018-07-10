@@ -77,6 +77,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.employment.EmploymentDTO;
@@ -1971,7 +1972,7 @@ public class StaffService extends UserBaseService {
         return true;
     }
 
-    public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO, Boolean confirm) {
+    public MainEmploymentResultDTO updateMainEmployment(Long unitId,Long staffId, EmploymentDTO employmentDTO, Boolean confirm) {
         if (employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
         }
@@ -1982,6 +1983,11 @@ public class StaffService extends UserBaseService {
             if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
                 exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
             }
+        }
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Boolean userAccessRoleDTO=accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId);
+        if(!userAccessRoleDTO){
+            exceptionService.runtimeException("message.mainemployment.permission");
         }
         List<MainEmploymentQueryResult> mainEmploymentQueryResults = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
         MainEmploymentResultDTO mainEmploymentResultDTO = new MainEmploymentResultDTO();
@@ -2073,7 +2079,16 @@ public class StaffService extends UserBaseService {
     }
 
     public Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
-        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        Employment employment = employmentGraphRepository.findUnitPostionAndEmploymentByStaff(staffId);
+        if(!Optional.ofNullable(employment).isPresent()){
+                exceptionService.runtimeException("message.mainemployment.unitposition");
+        }
+        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())){
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentEndDate()))){
+            exceptionService.runtimeException("message.mainemployment.enddate.greaterthan");
+        }
         employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
         employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
         employment.setMainEmployment(true);
