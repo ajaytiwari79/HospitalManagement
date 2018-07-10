@@ -10,12 +10,22 @@ public class MasterQuestionBasicResponseDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Name can't be empty")
     private String question;
 
     private String description;
 
     private String questionType;
+
+    private Boolean isRequired;
+
+    public Boolean getRequired() {
+        return isRequired;
+    }
+
+    public void setRequired(Boolean required) {
+        isRequired = required;
+    }
 
     public BigInteger getId() {
         return id;
