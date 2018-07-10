@@ -11,7 +11,7 @@ import java.util.Map;
 @QueryResult
 public class OrgTypeSkillQueryResult {
 
-    private List<Map<String,Object>> skill;
+    private List<Map<String,Object>> skillList;
     private Long id;
     private String name ;
     private String description;
@@ -20,12 +20,12 @@ public class OrgTypeSkillQueryResult {
         // DC
     }
 
-    public void setSkill(List<Map<String, Object>> skill) {
-        this.skill = skill;
+    public void setSkillList(List<Map<String, Object>> skillList) {
+        this.skillList = skillList;
     }
 
-    public List<Map<String, Object>> getSkill() {
-        return skill;
+    public List<Map<String, Object>> getSkillList() {
+        return skillList;
     }
 
     public Long getId() {

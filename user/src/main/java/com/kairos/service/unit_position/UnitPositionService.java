@@ -185,7 +185,7 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(positionCode).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.position.name.notexist", unitPositionDTO.getPositionCodeId());
         }
-        if (saveAsDraft) {
+        if (!saveAsDraft) {
             List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getStaffUnitPositionsByExpertise(organization.getId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId());
             validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         }
@@ -203,7 +203,7 @@ public class UnitPositionService extends UserBaseService {
         }
         unitPosition.setWorkingTimeAgreementId(wtaResponseDTO.getId());
         unitPosition.setPositionCode(positionCode);
-        if (saveAsDraft) {
+        if (!saveAsDraft) {
             unitPosition.setPublished(true);
         }
         unitPosition.setUnit(organization);

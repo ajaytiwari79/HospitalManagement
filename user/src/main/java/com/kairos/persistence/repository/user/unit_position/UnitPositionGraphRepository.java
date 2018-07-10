@@ -280,7 +280,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
             "MATCH(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
-            "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
+            "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "MATCH (unitPosition:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false})\n" +
             "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH unitPosition,cta,expertise,positionCode,org\n" +

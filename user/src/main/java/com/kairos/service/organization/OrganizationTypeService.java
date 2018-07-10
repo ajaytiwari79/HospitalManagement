@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -147,7 +148,7 @@ public class OrganizationTypeService extends UserBaseService {
      * new relationship b/w skill and organization type will be created or updated(if relationship already exist) if parameter value is false
      * then relationship will be inactive (deleted param of relationship will set to true)
      */
-    public List<Map<String, Object>>  addExpertiseInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
+    public List<OrgTypeSkillQueryResult> addExpertiseInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
         if (isSelected) {
             organizationTypeGraphRepository.addSkillInOrgType(orgTypeId, expertiseId, DateUtil.getCurrentDateMillis(), DateUtil.getCurrentDateMillis());
         } else {
@@ -155,7 +156,7 @@ public class OrganizationTypeService extends UserBaseService {
         }
 
         // TODO remove As per request of FE its added for now
-        List<Map<String, Object>> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType( orgTypeId);
+        List<OrgTypeSkillQueryResult> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
         return orgTypeSkillQueryResult;
     }
 
@@ -165,8 +166,8 @@ public class OrganizationTypeService extends UserBaseService {
      * @param orgTypeId
      * @return
      */
-    public List<Map<String, Object>> getSkillsByOrganizationTypeId(long countryId, long orgTypeId) {
-        List<Map<String, Object>> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType( orgTypeId);
+    public List<OrgTypeSkillQueryResult> getSkillsByOrganizationTypeId(long countryId, long orgTypeId) {
+        List<OrgTypeSkillQueryResult> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
         return orgTypeSkillQueryResult;
     }
 

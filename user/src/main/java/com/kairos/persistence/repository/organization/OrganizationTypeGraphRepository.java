@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -89,7 +90,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_SKILL{deleted:false}]->(skill) where id(orgType)={0} " +
             "MATCH (skillCategory:SkillCategory)<-[:HAS_CATEGORY]-(skill) \n" +
             "return  case when skill is NULL then [] else collect({id:id(skill),name:skill.name}) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description")
-    List<Map<String, Object>> getSkillsOfOrganizationType(long orgTypeId);
+    List<OrgTypeSkillQueryResult> getSkillsOfOrganizationType(long orgTypeId);
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
