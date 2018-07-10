@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.user.country.tag.TagDTO;
 import com.kairos.user.organization.OrganizationTypeDTO;
+import com.kairos.util.DateUtils;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -180,4 +182,5 @@ public class WTAResponseDTO {
         this.organizationSubType = organizationSubType;
         this.tags = tags;
     }
+
 }

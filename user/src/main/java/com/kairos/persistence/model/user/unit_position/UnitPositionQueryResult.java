@@ -33,7 +33,7 @@ public class UnitPositionQueryResult {
     private float avgDailyWorkingHours;
     private int fullTimeWeeklyMinutes;
     private float hourlyWages;
-    private long id;
+    private Long id;
 
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
@@ -296,7 +296,9 @@ public class UnitPositionQueryResult {
         this.published = published;
     }
 
-
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public UnitPositionQueryResult() {
         //default cons
