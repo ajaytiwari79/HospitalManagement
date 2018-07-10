@@ -40,14 +40,14 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     private Boolean isSubProcess=false;
 
-    private Boolean hasSubProcess=false;
+    private Boolean hasSubProcessingActivity=false;
 
-    public Boolean getHasSubProcess() {
-        return hasSubProcess;
+    public Boolean getHasSubProcessingActivity() {
+        return hasSubProcessingActivity;
     }
 
-    public void setHasSubProcess(Boolean hasSubProcess) {
-        this.hasSubProcess = hasSubProcess;
+    public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) {
+        this.hasSubProcessingActivity = hasSubProcessingActivity;
     }
 
     public Boolean getSubProcess() {

@@ -20,6 +20,16 @@ public class AssetType extends MongoBaseEntity {
 
     private Boolean isSubAsset=false ;
 
+    private Boolean hasSubAsset=false;
+
+    public Boolean getHasSubAsset() {
+        return hasSubAsset;
+    }
+
+    public void setHasSubAsset(Boolean hasSubAsset) {
+        this.hasSubAsset = hasSubAsset;
+    }
+
     private List<BigInteger> subAssetTypes;
 
     public List<BigInteger> getSubAssetTypes() {
@@ -55,4 +65,3 @@ public class AssetType extends MongoBaseEntity {
         this.name = name;
     }
 }
-//todo add hasSubAsset boolean and Refactor isSubAsset for query and data model
