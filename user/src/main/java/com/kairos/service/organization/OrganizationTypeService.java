@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,7 @@ public class OrganizationTypeService extends UserBaseService {
     CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
 
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
@@ -43,7 +43,7 @@ public class OrganizationTypeService extends UserBaseService {
     public OrganizationType createOrganizationTypeForCountry(Long countryId, OrganizationTypeDTO organizationTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
 
         }
         OrganizationType isAlreadyExist = organizationTypeGraphRepository.findByName(countryId, organizationTypeDTO.getName().trim());
@@ -85,13 +85,13 @@ public class OrganizationTypeService extends UserBaseService {
 
     public List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId) {
         return organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
-        }
+    }
 
 
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organizationtype.id.notfound",updateOrganizationTypeDTO.getId());
+            exceptionService.dataNotFoundByIdException("message.organizationtype.id.notfound", updateOrganizationTypeDTO.getId());
 
         }
         if (!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()) {
@@ -143,32 +143,31 @@ public class OrganizationTypeService extends UserBaseService {
      * @param orgTypeId
      * @param isSelected
      * @author prabjot
-     * this method will update the relationship of expertise and organization Type based on parameter {isSelected},if parameter value is true
-     * new relationship b/w expertise and organization type will be created or updated(if relationship already exist) if parameter value is false
-     * then relationship will be inactive (isEnabled param of relationship will set to false)
+     * this method will update the relationship of skill and organization Type based on parameter {isSelected},if parameter value is true
+     * new relationship b/w skill and organization type will be created or updated(if relationship already exist) if parameter value is false
+     * then relationship will be inactive (deleted param of relationship will set to true)
      */
-    public void addExpertiseInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
+    public List<Map<String, Object>>  addExpertiseInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
         if (isSelected) {
-            if (organizationTypeGraphRepository.orgTypeHasAlreadySkill(orgTypeId, expertiseId) == 0) {
-                organizationTypeGraphRepository.addExpertiseInOrgType(orgTypeId, expertiseId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
-            } else {
-                organizationTypeGraphRepository.updateOrgTypeExpertise(orgTypeId, expertiseId, DateUtil.getCurrentDate().getTime());
-            }
+            organizationTypeGraphRepository.addSkillInOrgType(orgTypeId, expertiseId, DateUtil.getCurrentDateMillis(), DateUtil.getCurrentDateMillis());
         } else {
-            organizationTypeGraphRepository.deleteOrgTypeExpertise(orgTypeId, expertiseId, DateUtil.getCurrentDate().getTime());
+            organizationTypeGraphRepository.deleteSkillFromOrgType(orgTypeId, expertiseId, DateUtil.getCurrentDateMillis());
         }
+
+        // TODO remove As per request of FE its added for now
+        List<Map<String, Object>> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType( orgTypeId);
+        return orgTypeSkillQueryResult;
     }
 
     /**
-     * to get expertise for particular organization type
+     * to get skills for particular organization type
      *
      * @param orgTypeId
      * @return
      */
-    public List<Map<String, Object>> getExpertise(long countryId, long orgTypeId, String selectedDate) throws ParseException {
-        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId,selectedDateInLong);
-        return orgTypeExpertiseQueryResult.getExpertise();
+    public List<Map<String, Object>> getSkillsByOrganizationTypeId(long countryId, long orgTypeId) {
+        List<Map<String, Object>> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType( orgTypeId);
+        return orgTypeSkillQueryResult;
     }
 
     public OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId, Set<Long> orgSubServiceId) {
@@ -196,7 +195,6 @@ public class OrganizationTypeService extends UserBaseService {
         });
         return list;
     }
-
 
 
 }

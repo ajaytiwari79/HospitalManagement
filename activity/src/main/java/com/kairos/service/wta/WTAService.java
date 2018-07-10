@@ -98,7 +98,7 @@ public class WTAService extends MongoBaseService {
     public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO) {
 
         //TODO  API functionality has been changed for now KP-958
-        //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId());
+        //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getSkillId());
         WorkingTimeAgreement wta = wtaRepository.getWtaByName(wtaDTO.getName(), countryId);
         if (Optional.ofNullable(wta).isPresent()) {
             exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
@@ -537,6 +537,10 @@ public class WTAService extends MongoBaseService {
     private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto, WTAResponseDTO wtaResponseDTO) {
 
         WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+        newWta.setDescription(wtadto.getDescription());
+        newWta.setName(wtadto.getName());
+        newWta.setStartDate(new Date(wtadto.getStartDateMillis()));
+        newWta.setEndDate(wtadto.getEndDateMillis() != null ? new Date(wtadto.getStartDateMillis()) : null);
         newWta.setRuleTemplateIds(null);
         if (wtadto.getEndDateMillis() != null) {
             oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
@@ -555,6 +559,7 @@ public class WTAService extends MongoBaseService {
         save(newWta);
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
+        wtaResponseDTO.setParentWTA(oldWta.getId());
         return wtaResponseDTO;
     }
 
