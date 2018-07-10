@@ -1,15 +1,19 @@
 package com.kairos.interceptor;
 
+import com.kairos.config.swagger.SwaggerConfig;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.context.annotation.Import;
+import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * Created by prabjot on 21/11/16.
  */
 
+@EnableWebMvc
+@ComponentScan(basePackages= "com.kairos.controller")
 @Configuration
+@Import({SwaggerConfig.class})
 public class InterceptorRegister extends WebMvcConfigurerAdapter {
 
     @Override
@@ -22,5 +26,7 @@ public class InterceptorRegister extends WebMvcConfigurerAdapter {
 
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/**").addResourceLocations("/");
     }
+
 }
