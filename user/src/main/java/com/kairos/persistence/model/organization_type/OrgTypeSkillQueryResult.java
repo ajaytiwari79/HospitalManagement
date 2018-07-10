@@ -12,6 +12,13 @@ import java.util.Map;
 public class OrgTypeSkillQueryResult {
 
     private List<Map<String,Object>> skill;
+    private Long id;
+    private String name ;
+    private String description;
+
+    public OrgTypeSkillQueryResult() {
+        // DC
+    }
 
     public void setSkill(List<Map<String, Object>> skill) {
         this.skill = skill;
@@ -19,5 +26,29 @@ public class OrgTypeSkillQueryResult {
 
     public List<Map<String, Object>> getSkill() {
         return skill;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
