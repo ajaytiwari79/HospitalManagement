@@ -127,7 +127,7 @@ public class ShiftService extends MongoBaseService {
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
-
+    @Inject
     private WTAService wtaService;
     @Inject
     private ExceptionService exceptionService;

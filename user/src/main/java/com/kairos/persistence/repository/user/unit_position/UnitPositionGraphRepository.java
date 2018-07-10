@@ -62,7 +62,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false,published:true})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={2}\n" +
-            "return unitPosition")
+            "return unitPosition ORDER BY unitPosition.startDateMillis")
     List<UnitPosition> getStaffUnitPositionsByExpertise(Long unitId, Long staffId, Long expertiseId);
 
 
@@ -219,18 +219,19 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<Map<Long, Long>> getMapOfUnitPositionAndExpertiseId(Long unitId);
 
 
-    @Query("match(staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
+    @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) where id(user)={0}\n" +
             "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
-            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
+            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-            "return  positionCode as positionCode, unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
-            "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
-            "UNION MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
+            "return  id(unitPosition) as id,positionCode as positionCode,unitPosition.history as history, unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
+            "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY unitPosition.creationDate" +
+            " UNION " +
+            "MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
-            "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
+            "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-            "return positionCode as positionCode,unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
-            "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo")
+            "return id(unitPosition) as id, positionCode as positionCode,unitPosition.history as history,unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
+            "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo ORDER BY unitPosition.creationDate ")
     List<UnitPositionQueryResult> getAllUnitPositionsBasicDetailsAndWTAByUser(long userId);
 
 
@@ -278,36 +279,37 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
 
     @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
-            "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
+            "MATCH(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "MATCH (unitPosition:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false})\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise,positionCode,org\n" +
-            "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,ruleTemp,positionCode,org\n" +
-            "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes ,positionCode,org\n" +
-            "optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,dayType,positionCode,org\n" +
-            "optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,dayType,positionCode,org,CASE WHEN countryHolidayCalender IS NULL THEN [] ELSE collect(distinct ID(countryHolidayCalender)) END  as countryHolidayCalender\n" +
-            "optional  MATCH (ruleTemp)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,positionCode,org,\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH unitPosition,cta,expertise,positionCode,org\n" +
+            "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH unitPosition,cta,expertise,ruleTemp,positionCode,org\n" +
+            "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes ,positionCode,org \n" +
+            "optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,dayType,positionCode,org \n" +
+            "optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,dayType,positionCode,org,CASE WHEN countryHolidayCalender IS NULL THEN [] ELSE collect(distinct ID(countryHolidayCalender)) END  as countryHolidayCalender\n" +
+            "optional  MATCH (ruleTemp)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,positionCode,org ,\n" +
             "CASE WHEN cTARuleTemplateDayTypes IS NULL THEN [] ELSE collect(distinct {dayType:ID(dayType),countryHolidayCalenders:countryHolidayCalender}) END as calculateOnDayTypes \n" +
-            "optional  MATCH (ruleTemp)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`)  WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,positionCode,org,CASE WHEN employmentType IS NULL THEN [] ELSE  collect(distinct ID(employmentType)) END as employmentTypes\n" +
-            "optional  MATCH (ruleTemp)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes,positionCode,org, CASE WHEN timeType IS NULL THEN [] ELSE collect(distinct ID(timeType)) END as timeTypes\n" +
-            "optional  MATCH (ruleTemp)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTable`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,positionCode,org\n" +
+            "optional  MATCH (ruleTemp)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`)  WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,positionCode,org,CASE WHEN employmentType IS NULL THEN [] ELSE  collect(distinct ID(employmentType)) END as employmentTypes\n" +
+            "optional  MATCH (ruleTemp)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes,positionCode,org, CASE WHEN timeType IS NULL THEN [] ELSE collect(distinct ID(timeType)) END as timeTypes\n" +
+            "optional  MATCH (ruleTemp)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTable`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,positionCode,org \n" +
             "optional  MATCH (compensationTable)-[:`HAS_COMPENSATION_TABLE_INTERVAL`]-(compensationTableInterval:`CompensationTableInterval`)  \n" +
-            "WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,positionCode,org,CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END as compensationTableInterval,compensationTable\n" +
+            "WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,positionCode,org,CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END as compensationTableInterval,compensationTable\n" +
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(calculateValueAgainst:`CalculateValueAgainst`)  \n" +
             "optional  MATCH (calculateValueAgainst)-[:`BELONGS_TO`]-(fixedValue:`FixedValue`)  \n" +
-            "optional  MATCH (fixedValue)-[:`BELONGS_TO`]-(currency:`Currency`) WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,positionCode,org,\n" +
+            "optional  MATCH (fixedValue)-[:`BELONGS_TO`]-(currency:`Currency`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,positionCode,org,\n" +
             "CASE WHEN compensationTable IS NULL THEN NULL ELSE {id:ID(compensationTable),granularityLevel:compensationTable.granularityLevel,compensationMeasurementType:compensationTable.compensationMeasurementType,compensationTableInterval:compensationTableInterval} END as compensationTable,\n" +
             "CASE WHEN calculateValueAgainst IS NULL  THEN null ELSE {id:ID(calculateValueAgainst),scale:calculateValueAgainst.scale,fixedValue:{id:ID(fixedValue),amount:fixedValue.amount,type:fixedValue.type,currencyId:ID(currency)},\n" +
             "currency:{id:ID(currency), name:currency.name, description:currency.description}} END as calculateValueAgainst\n" +
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(cTARuleTemplatePhaseInfo:`CTARuleTemplatePhaseInfo`)  WITH \n" +
-            "cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,positionCode,org, \n" +
+            "unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,positionCode,org , \n" +
             "CASE WHEN cTARuleTemplatePhaseInfo IS NULL THEN [] ELSE collect({phaseId:cTARuleTemplatePhaseInfo.phaseId,type:cTARuleTemplatePhaseInfo.type,beforeStart:cTARuleTemplatePhaseInfo.beforeStart}) END  as phaseInfo\n" +
-            "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(activityType:`ActivityType`) " +
-            " WITH cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo,activityType ,positionCode,org\n" +
+            "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(activityType:`ActivityType`)  WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo,activityType ,positionCode,org\n" +
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
-            "cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo,activityType, plannedTimeWithFactor,positionCode,org\n" +
-            "RETURN {id:id(org),name:org.name} as unitInfo,positionCode as positionCode,id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, expertise as expertise,cta.disabled as disabled, cta.description as description,cta.name as name," +
-            "CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,timeTypes:timeTypes,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,activityType:{id:id(activityType),onlyForActivityThatPartOfCostCalculation:activityType.onlyForActivityThatPartOfCostCalculation,activityTypes:activityType.activityTypes },plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
+            "unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo,activityType, plannedTimeWithFactor,positionCode,org\n" +
+            "RETURN id(unitPosition) as unitPositionId,{id:id(org),name:org.name} as unitInfo,positionCode as positionCode,id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, expertise as expertise,cta.disabled as disabled, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),calculateScheduledHours:ruleTemp.calculateScheduledHours, calculationFor:ruleTemp.calculationFor, activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, plannedTimeId:ruleTemp.plannedTimeId, timeTypeId:ruleTemp.timeTypeId, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds \n" +
+            ",name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,\n" +
+            "ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned, \n" +
+            "employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
     List<CTAResponseDTO> getAllCtaByUserId(Long userId);
 }
