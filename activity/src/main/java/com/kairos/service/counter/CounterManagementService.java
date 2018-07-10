@@ -368,11 +368,12 @@ public class CounterManagementService extends MongoBaseService{
                 }
             });
         });
-
-        save(entriesToSave);
+        if(!entriesToSave.isEmpty())
+            save(entriesToSave);
     }
 
     public void removeTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries){
+        //this is only for single document deletion but the document identification fields are combination of two list.
         tabKPIEntries.getTabIds().forEach(tabId -> {
             tabKPIEntries.getKpiIds().forEach(kpiId -> {
                 counterRepository.removeTabKPIConfiguration(new TabKPIEntry(tabId, kpiId));

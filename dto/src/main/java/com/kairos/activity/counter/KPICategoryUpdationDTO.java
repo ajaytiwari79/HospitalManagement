@@ -19,7 +19,7 @@ public class KPICategoryUpdationDTO {
         return deletedCategories;
     }
 
-    public void setDeletedCategories(List deletedCategories) {
+    public void setDeletedCategories(List<KPICategoryDTO> deletedCategories) {
         this.deletedCategories = deletedCategories;
     }
 
@@ -27,7 +27,7 @@ public class KPICategoryUpdationDTO {
         return updatedCategories;
     }
 
-    public void setUpdatedCategories(List updatedCategories) {
+    public void setUpdatedCategories(List<KPICategoryDTO> updatedCategories) {
         this.updatedCategories = updatedCategories;
     }
 }

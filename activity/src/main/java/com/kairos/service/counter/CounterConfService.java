@@ -87,7 +87,15 @@ public class CounterConfService extends MongoBaseService {
         if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
         List<KPICategory> updatableCategories = ObjectMapperUtils.copyPropertiesOfListByMapper(categories.getUpdatedCategories(), KPICategory.class);
         List<KPICategory> deletableCategories = ObjectMapperUtils.copyPropertiesOfListByMapper(categories.getDeletedCategories(), KPICategory.class);
-        if(deletableCategories!=null && deletableCategories.size()>0)counterRepository.removeAll("id", deletableCategories.stream().map(category -> category.getId()).collect(Collectors.toList()), KPICategory.class);
+        if(deletableCategories!=null && deletableCategories.size()>0) {
+            List<BigInteger> categoryIds = deletableCategories.stream().map(category -> category.getId()).collect(Collectors.toList());
+            List<KPI> removedCategoriesKPIs = counterRepository.getKPIsByCategory(categoryIds);
+            removedCategoriesKPIs.parallelStream().forEach(kpi -> {
+                kpi.setCategoryId(null);
+            });
+            save(removedCategoriesKPIs);
+            counterRepository.removeAll("id", categoryIds, KPICategory.class);
+        }
         return save(updatableCategories);
     }
 

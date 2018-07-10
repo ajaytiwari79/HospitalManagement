@@ -195,8 +195,8 @@ public class CounterRepository {
 
     //categoryKPI crud
 
-    public List<KPI> getKPIsByCategory(BigInteger categoryId){
-        Query query = new Query(Criteria.where("categoryId").is(categoryId).and("deleted").is(false));
+    public List<KPI> getKPIsByCategory(List<BigInteger> categoryId){
+        Query query = new Query(Criteria.where("categoryId").in(categoryId).and("deleted").is(false));
         return mongoTemplate.find(query, KPI.class);
     }
 
