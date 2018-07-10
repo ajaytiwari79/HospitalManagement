@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -313,13 +310,6 @@ public class CounterManagementService extends MongoBaseService{
         kpis.parallelStream().forEach(kpi -> {
             kpisIdMap.put(kpi.getId(), kpi);
         });
-//
-//        if(categoryKPIMap.get(categoryKPIsDetails.getCategoryId())!=null) {
-//            categoryKPIMap.get(categoryKPIsDetails.getCategoryId()).forEach(kpi -> {
-//                if (!categoryKPIsDetails.getKpiIds().contains(kpi.getId()))
-//                    kpi.setCategoryId(null);
-//            });
-//        }
 
         categoryKPIsDetails.getKpiIds().forEach(kpiId ->{
             if(categoryKPIsDetails.getCategoryId().equals(kpisIdMap.get(kpiId).getCategoryId()))
@@ -380,4 +370,89 @@ public class CounterManagementService extends MongoBaseService{
             });
         });
     }
+
+    //setting accessGroup-KPI configuration
+    public Map<Long, List<BigInteger>> getInitialAccessGroupKPIDataConf(List<Long> accessGroupIds){
+        Map<Long, List<BigInteger>> accessGroupKPIMap = new HashMap<>();
+        accessGroupIds.forEach(accessGroupId -> {
+            accessGroupKPIMap.put(accessGroupId, new ArrayList<>());
+        });
+
+        List<AccessGroupKPIEntry> accessGroupKPIEntries = counterRepository.getAccessGroupKPIConfigurationByAccessGroupId(accessGroupIds);
+        accessGroupKPIEntries.forEach(accessGroupKPIEntry -> {
+            accessGroupKPIMap.get(accessGroupKPIEntry.getAccessGroupId()).add(accessGroupKPIEntry.getKpiId());
+        });
+        return accessGroupKPIMap;
+    }
+
+    public void addAccessGroupKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf){
+        List<AccessGroupKPIEntry> entries = counterRepository.getAccessGroupKPIConfigurationByAccessGroupId(accessGroupKPIConf.getAccessGroupIds());
+        Map<Long, Map<BigInteger, BigInteger>> tabKPIsMap = new HashMap<>();
+        List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
+        accessGroupKPIConf.getAccessGroupIds().forEach(accessGroupId -> {
+            tabKPIsMap.put(accessGroupId, new HashMap<BigInteger, BigInteger>());
+        });
+
+        entries.parallelStream().forEach(accessGroupKPIEntry -> {
+            tabKPIsMap.get(accessGroupKPIEntry.getAccessGroupId()).put(accessGroupKPIEntry.getKpiId(), accessGroupKPIEntry.getKpiId());
+        });
+
+        accessGroupKPIConf.getAccessGroupIds().parallelStream().forEach(accessGroupId ->{
+            accessGroupKPIConf.getKpiIds().forEach(kpiId -> {
+                if(tabKPIsMap.get(accessGroupId).get(kpiId) == null){
+                    entriesToSave.add(new AccessGroupKPIEntry(accessGroupId, kpiId));
+                }
+            });
+        });
+        if(!entriesToSave.isEmpty())
+            save(entriesToSave);
+    }
+
+    public void removeOrgTypeKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf){
+        accessGroupKPIConf.getAccessGroupIds().forEach(accessGroupId -> {
+            accessGroupKPIConf.getKpiIds().forEach(kpiId -> {
+                counterRepository.removeAccessGroupKPIEntry(new AccessGroupKPIEntry(accessGroupId, kpiId));
+            });
+        });
+    }
+
+    //setting orgType-KPI configuration
+    public List<BigInteger> getInitialOrgTypeKPIDataConf(Long orgTypeId){
+        Map<String, List<BigInteger>> accessGroupKPIsMap = new HashMap<>();
+        List<OrgTypeKPIEntry> orgTypeKPIEntries = counterRepository.getOrgTypeKPIConfigurationByOrgTypeId(Arrays.asList(orgTypeId));
+        if(orgTypeKPIEntries==null || orgTypeKPIEntries.isEmpty()) return new ArrayList<>();
+        return orgTypeKPIEntries.parallelStream().map(entry -> entry.getKpiId()).collect(Collectors.toList());
+    }
+
+    public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf){
+        List<OrgTypeKPIEntry> entries = counterRepository.getOrgTypeKPIConfigurationByOrgTypeId(orgTypeKPIConf.getOrgTypeIds());
+        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
+        List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
+        orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId -> {
+            orgTypeKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
+        });
+
+        entries.parallelStream().forEach(orgTypeKPIEntry -> {
+            orgTypeKPIMap.get(orgTypeKPIEntry.getOrgTypeId()).put(orgTypeKPIEntry.getKpiId(), orgTypeKPIEntry.getKpiId());
+        });
+
+        orgTypeKPIConf.getOrgTypeIds().parallelStream().forEach(orgTypeId ->{
+            orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
+                if(orgTypeKPIMap.get(orgTypeId).get(kpiId) == null){
+                    entriesToSave.add(new OrgTypeKPIEntry(orgTypeId, kpiId));
+                }
+            });
+        });
+        if(!entriesToSave.isEmpty())
+            save(entriesToSave);
+    }
+
+    public void removeOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf){
+        orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId -> {
+            orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
+                counterRepository.removeOrgTypeKPIEntry(new OrgTypeKPIEntry(orgTypeId, kpiId));
+            });
+        });
+    }
+
 }

@@ -212,5 +212,25 @@ public class CounterRepository {
             mongoTemplate.remove(query, TabKPIEntry.class);
     }
 
+    //accessGroupKPI distribution crud
 
+    public List<AccessGroupKPIEntry> getAccessGroupKPIConfigurationByAccessGroupId(List<Long> accessGroupIds){
+        Query query = new Query(Criteria.where("accessGroupId").in(accessGroupIds));
+        return mongoTemplate.find(query, AccessGroupKPIEntry.class);
+    }
+
+    public void removeAccessGroupKPIEntry(AccessGroupKPIEntry entry){
+        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()));
+        mongoTemplate.remove(query, AccessGroupKPIEntry.class);
+    }
+
+    public List<OrgTypeKPIEntry> getOrgTypeKPIConfigurationByOrgTypeId(List<Long> accessGroupIds){
+        Query query = new Query(Criteria.where("orgTypeId").in(accessGroupIds));
+        return mongoTemplate.find(query, OrgTypeKPIEntry.class);
+    }
+
+    public void removeOrgTypeKPIEntry(OrgTypeKPIEntry entry){
+        Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
+        mongoTemplate.remove(query, OrgTypeKPIEntry.class);
+    }
 }
