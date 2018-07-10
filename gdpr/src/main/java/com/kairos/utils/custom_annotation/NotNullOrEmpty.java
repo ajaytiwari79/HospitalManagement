@@ -1,4 +1,4 @@
-package com.kairos.utils.custome_annotation;
+package com.kairos.utils.custom_annotation;
 
 
 import javax.validation.Constraint;

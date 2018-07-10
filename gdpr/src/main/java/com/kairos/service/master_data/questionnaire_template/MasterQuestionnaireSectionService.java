@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -77,7 +78,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         Map<String, Object> questionnaireSection;
         if (flag) {
             questionnaireSection = updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(countryId, orgId, masterQuestionnaireSectionDto);
-        } else  {
+        } else {
             questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto);
 
         }
@@ -90,7 +91,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e);
         }
-        return masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId,orgId,questionnaireTemplate.getId());
+        return masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, orgId, questionnaireTemplate.getId());
 
     }
 
@@ -151,14 +152,23 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    public Boolean deletedQuestionnaireSection(Long countryId, Long orgId, BigInteger id) {
+    public Boolean deleteQuestionnaireSection(Long countryId, Long orgId, BigInteger id, BigInteger templateId) {
         MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, orgId, id);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire section", id);
         }
-        List<MasterQuestion> questions = masterQuestionMongoRepository.getMasterQuestionListByIds(countryId, orgId, questionnaireSection.getQuestions());
-        masterQuestionMongoRepository.deleteAll(questions);
+        MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
+        List<BigInteger> questionnaireTemplateSectionIdList = questionnaireTemplate.getSections();
+        if (!questionnaireTemplateSectionIdList.contains(id)) {
+            exceptionService.invalidRequestException("message.invalid", "section not present intemplate");
+        }
+        questionnaireTemplateSectionIdList.remove(id);
+        questionnaireTemplate.setSections(questionnaireTemplateSectionIdList);
+        if (!questionnaireSection.getQuestions().isEmpty()) {
+            masterQuestionService.deleteAll(countryId, orgId, questionnaireSection.getQuestions());
+        }
         delete(questionnaireSection);
+        masterQuestionnaireTemplateMongoRepository.save(questionnaireTemplate);
         return true;
     }
 
@@ -170,7 +180,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @description this method update existing sections (if contian id) and create new sections(if not contain id in request)
      * and update exisiting questions if contain id in request and create new question if not contain id in request which belongs to section
      **/
-    public Map<String, Object>  updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
+    public Map<String, Object> updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
 
         checkForDuplicacyInTitleOfSections(questionnaireSectionDto);
         List<MasterQuestionnaireSectionDTO> updateExistingSectionsList = new ArrayList<>();
@@ -202,10 +212,10 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             sections.addAll((List<MasterQuestionnaireSection>) newSections.get(QUESTIONNAIRE_SECTIONS));
 
         }
-        Map<String,Object> result=new HashMap<>();
-        result.put(QUESTIONNAIRE_SECTIONS,sections);
-        result.put(QUESTION_LIST,questions);
-        result.put(IDS_LIST,sectionsIds);
+        Map<String, Object> result = new HashMap<>();
+        result.put(QUESTIONNAIRE_SECTIONS, sections);
+        result.put(QUESTION_LIST, questions);
+        result.put(IDS_LIST, sectionsIds);
         return result;
     }
 
@@ -254,5 +264,27 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         return result;
 
     }
+
+
+    /**
+     * @param countryId
+     * @param orgId
+     * @param sectionIdList
+     * @return true on successfull deletion on questionnaire sections and questions
+     */
+    public Boolean deleteAll(Long countryId, Long orgId, List<BigInteger> sectionIdList) {
+        List<MasterQuestionnaireSection> questionnaireSections = masterQuestionnaireSectionRepository.getQuestionnaireSectionListByIds(countryId, orgId, sectionIdList);
+        List<BigInteger> questionIdList = new ArrayList<>();
+        questionnaireSections.forEach(masterQuestionnaireSection -> {
+            masterQuestionnaireSection.setDeleted(true);
+            questionIdList.addAll(masterQuestionnaireSection.getQuestions());
+        });
+        if (!questionIdList.isEmpty()) {
+            masterQuestionService.deleteAll(countryId, orgId, questionIdList);
+        }
+        masterQuestionnaireSectionRepository.saveAll(questionnaireSections);
+        return true;
+    }
+
 
 }

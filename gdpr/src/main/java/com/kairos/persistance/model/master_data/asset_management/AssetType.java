@@ -1,7 +1,7 @@
 package com.kairos.persistance.model.master_data.asset_management;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
@@ -19,6 +19,16 @@ public class AssetType extends MongoBaseEntity {
     private Long countryId;
 
     private Boolean isSubAsset=false ;
+
+    private Boolean hasSubAsset=false;
+
+    public Boolean getHasSubAsset() {
+        return hasSubAsset;
+    }
+
+    public void setHasSubAsset(Boolean hasSubAsset) {
+        this.hasSubAsset = hasSubAsset;
+    }
 
     private List<BigInteger> subAssetTypes;
 
@@ -55,4 +65,3 @@ public class AssetType extends MongoBaseEntity {
         this.name = name;
     }
 }
-//todo add hasSubAsset boolean and Refactor isSubAsset for query and data model

@@ -6,7 +6,7 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -33,14 +33,14 @@ public class MasterProcessingActivityResponseDTO {
 
     private List<MasterProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
 
-    private Boolean hasSubProcess;
+    private Boolean hasSubProcessingActivity;
 
-    public Boolean getHasSubProcess() {
-        return hasSubProcess;
+    public Boolean getHasSubProcessingActivity() {
+        return hasSubProcessingActivity;
     }
 
-    public void setHasSubProcess(Boolean hasSubProcess) {
-        this.hasSubProcess = hasSubProcess;
+    public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) {
+        this.hasSubProcessingActivity = hasSubProcessingActivity;
     }
 
     public BigInteger getId() {
