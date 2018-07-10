@@ -83,12 +83,12 @@ public class TimeTypeService extends MongoBaseService {
                     timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                     timeType.setTextColor(timeTypeDTO.getTextColor());
                     List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
-                    if (Optional.ofNullable(childTimeTypeList).isPresent()&&!childTimeTypeList.isEmpty()) {
+                    if (Optional.ofNullable(childTimeTypeList).isPresent()) {
                         childTimeTypeList.forEach(childTimeType -> {
                             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                             childTimeType.setTextColor(timeTypeDTO.getTextColor());
                             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
-                                    if (Optional.ofNullable(leafTimeTypeList).isPresent()&&!leafTimeTypeList.isEmpty()) {
+                                    if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
                                         leafTimeTypeList.forEach(leafTimeType -> {
                                             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                                             leafTimeType.setTextColor(timeTypeDTO.getTextColor());
