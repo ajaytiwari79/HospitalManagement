@@ -18,6 +18,8 @@ public class AppConstant {
 
 //rollback
     public static final String QUESTION_LIST = "question_list";
+    public static final String AGREEMENT_SECTION_LIST = "agreement_sections";
+
     public static final String QUESTIONNAIRE_SECTIONS = "questionnaire_sectionList";
     public static final String PROCESSING_ACTIVITIES = "processing_activities";
     public static final String IDS_LIST = "ids";

@@ -5,10 +5,12 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
+import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
@@ -23,20 +25,16 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotNullOrEmpty(message = "Description cannot be empty")
     private String description;
 
-    @NotNull(message = "Account types can't be empty ")
-    private Set<BigInteger> accountTypes;
+    private List<AccountType> accountTypes;
 
-    @NotNull(message = "Sections can't be empty")
-    private Set<BigInteger> agreementSections;
+    private List<BigInteger> agreementSections;
 
     private Long countryId;
-
 
     private List<OrganizationTypeDTO> organizationTypes;
     private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
-
 
     private BigInteger templateTypeId;
 
@@ -74,11 +72,11 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     }
 
 
-    public Set<BigInteger> getAgreementSections() {
+    public List<BigInteger> getAgreementSections() {
         return agreementSections;
     }
 
-    public void setAgreementSections(Set<BigInteger> agreementSections) {
+    public void setAgreementSections(List<BigInteger> agreementSections) {
         this.agreementSections = agreementSections;
     }
 
@@ -114,19 +112,22 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountTypes() {
+    public List<AccountType> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
+    public void setAccountTypes(List<AccountType> accountTypes) {
         this.accountTypes = accountTypes;
     }
 
-
-    public PolicyAgreementTemplate( Long countryId,String name, String description) {
+    public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes, List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
         this.name = name;
         this.description = description;
         this.countryId = countryId;
+        this.organizationTypes = organizationTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationServices = organizationServices;
+        this.organizationSubServices = organizationSubServices;
     }
 
     public PolicyAgreementTemplate() {

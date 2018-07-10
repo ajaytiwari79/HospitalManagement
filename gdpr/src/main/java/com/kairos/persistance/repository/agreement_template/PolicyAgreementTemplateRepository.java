@@ -11,10 +11,9 @@ import java.math.BigInteger;
 @Repository
 public interface PolicyAgreementTemplateRepository extends MongoRepository<PolicyAgreementTemplate,Serializable>,CustomPolicyAgreementTemplateRepository {
 
-    @Query("{'_id':?0,deleted:false}")
-    PolicyAgreementTemplate findByIdAndNonDeleted(BigInteger id);
+    @Query("{'countryId:?0,organizationId:?1,_id':?2,deleted:false}")
+    PolicyAgreementTemplate findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    PolicyAgreementTemplate findByName(String name);
 
     PolicyAgreementTemplate findByid(BigInteger id);
 

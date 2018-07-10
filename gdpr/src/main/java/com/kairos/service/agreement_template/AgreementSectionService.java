@@ -4,8 +4,11 @@ package com.kairos.service.agreement_template;
 import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.master_data.AgreementSectionDTO;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
+import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
+import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -14,13 +17,15 @@ import com.kairos.utils.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-@Transactional
+import static com.kairos.constants.AppConstant.IDS_LIST;
+import static com.kairos.constants.AppConstant.AGREEMENT_SECTION_LIST;
+
+
 @Service
 public class AgreementSectionService extends MongoBaseService {
 
@@ -31,36 +36,73 @@ public class AgreementSectionService extends MongoBaseService {
 
     @Inject
     private ClauseMongoRepository clauseMongoRepository;
-
-
+    @Inject
+    private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
     @Inject
     private ExceptionService exceptionService;
 
-//todo clause versioning and refactor
-    public Map<String, Object> createAgreementSections(List<AgreementSection> agreementSections) {
+    public void createAndAddAgreementSectionsAndClausesToAgreementTemplate(Long countryId, Long organizationId, BigInteger agreementTemplateId, List<AgreementSectionDTO> agreementSectionDTOs) {
 
-        List<AgreementSectionResponseDTO> result = new ArrayList<>();
-        Set<BigInteger> ids = new HashSet<>();
-        Map<String, Object> response = new HashMap<>();
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, agreementTemplateId);
+        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", agreementTemplateId);
+        }
+        Boolean flag = false;
+        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
 
-        if (agreementSections.size() != 0) {
-
-            for (AgreementSection agreementSection : agreementSections) {
-                AgreementSection section = buildAgreementSection(UserContext.getCountryId(), agreementSection);
-                ids.add(section.getId());
-
+            if (Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
+                flag = true;
+                break;
             }
-            response.put("section", agreementSectionMongoRepository.getAgreementSectionWithDataList(UserContext.getCountryId(),ids));
-            response.put("ids", ids);
-            return response;
-        } else
-            throw new InvalidRequestException("agreement section list is empty");
+
+        }
+        Map<String, Object> agreementSections = new HashMap<>();
+        if (flag) {
+
+
+        } else {
+
+            agreementSections = createNewAggrementTemplateSection(countryId, organizationId, agreementSectionDTOs,policyAgreementTemplate);
+        }
+
 
     }
 
-    public AgreementSection buildAgreementSection(Long countryId, AgreementSection agreementSection) {
-        return sequenceGenerator(new AgreementSection( countryId,agreementSection.getTitle(), agreementSection.getClauses()));
 
+    public Map<String, Object> createNewAggrementTemplateSection(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS,PolicyAgreementTemplate policyAgreementTemplate) {
+
+        checkForDuplicacyInTitleOfAgreementSections(agreementSectionDTOS);
+        List<AgreementSection> agreementSectionList=new ArrayList<>();
+        Map<String,Object> result=new HashMap<>();
+        agreementSectionDTOS.forEach(agreementSectionDTO -> {
+
+
+            AgreementSection agreementSection=new AgreementSection();
+
+
+
+
+
+
+
+
+
+
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        return null;
     }
 
 
@@ -100,8 +142,19 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     public List<AgreementSectionResponseDTO> getAgreementSectionWithDataList(Long countryId, Set<BigInteger> ids) {
-        return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId,ids);
+        return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId, ids);
 
+    }
+
+
+    public void checkForDuplicacyInTitleOfAgreementSections(List<AgreementSectionDTO> agreementSectionDTOS) {
+        List<String> titles = new ArrayList<>();
+        for (AgreementSectionDTO questionnaireSectionDto : agreementSectionDTOS) {
+            if (titles.contains(questionnaireSectionDto.getName().toLowerCase())) {
+                exceptionService.duplicateDataException("message.duplicate", "questionnaire section", questionnaireSectionDto.getName());
+            }
+            titles.add(questionnaireSectionDto.getName().toLowerCase());
+        }
     }
 
 
