@@ -295,7 +295,7 @@ public class ActivityService extends MongoBaseService {
         save(activity);
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
-        generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+     //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
         return activityTabsWrapper;
@@ -309,7 +309,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+//        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
         return activityTabsWrapper;

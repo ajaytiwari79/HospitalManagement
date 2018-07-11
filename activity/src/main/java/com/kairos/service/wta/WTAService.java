@@ -497,11 +497,11 @@ public class WTAService extends MongoBaseService {
             logger.info("wta not found while updating at unit %d", wtadto.getId());
             exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
         }
-        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
+        WTAResponseDTO wtaResponseDTO;
         if (oldUnitPositionPublished) {
-            updateWTAOfPublishedUnitPosition(oldWta.get(), wtadto, wtaResponseDTO);
+            wtaResponseDTO = updateWTAOfPublishedUnitPosition(oldWta.get(), wtadto);
         } else {
-            updateWTAOfUnpublishedUnitPosition(oldWta.get(), wtadto, wtaResponseDTO);
+            wtaResponseDTO = updateWTAOfUnpublishedUnitPosition(oldWta.get(), wtadto);
         }
         wtaResponseDTO.setStartDateMillis(oldWta.get().getStartDate().getTime());
         if (oldWta.get().getEndDate() != null) {
@@ -510,8 +510,8 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    private WTAResponseDTO updateWTAOfUnpublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO, WTAResponseDTO wtaResponseDTO) {
-
+    private WTAResponseDTO updateWTAOfUnpublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
 
@@ -534,8 +534,8 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTO;
     }
 
-    private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto, WTAResponseDTO wtaResponseDTO) {
-
+    private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto) {
+        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
         WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
         newWta.setDescription(wtadto.getDescription());
         newWta.setName(wtadto.getName());
