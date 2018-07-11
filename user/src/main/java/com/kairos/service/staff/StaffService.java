@@ -1698,6 +1698,7 @@ public class StaffService extends UserBaseService {
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         if(!Optional.ofNullable(staff).isPresent()){
             userAccessRoleDTO.setManagement(true);
+            userAccessRoleDTO.setStaff(false);
         }
         else {
             userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
