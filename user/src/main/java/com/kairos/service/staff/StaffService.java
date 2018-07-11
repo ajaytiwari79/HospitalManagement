@@ -1933,6 +1933,7 @@ public class StaffService extends UserBaseService {
     }
 
     private Integer nextSeniorityLevelInMonths(List<SeniorityLevel> seniorityLevels, int currentExperienceInMonths) {
+        Collections.sort(seniorityLevels);
         Integer nextSeniorityLevelInMonths = null;
         for (int i = 0; i < seniorityLevels.size(); i++) {
             if (currentExperienceInMonths < seniorityLevels.get(i).getFrom() * 12) {
