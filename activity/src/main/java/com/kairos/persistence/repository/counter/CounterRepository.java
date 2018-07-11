@@ -181,7 +181,8 @@ public class CounterRepository {
     //test cases..
     //getCounterListByType for testcases
     public List getEntityItemList(Class claz){
-        return mongoTemplate.findAll(claz);
+        Query query = new Query(Criteria.where("deleted").is(false));
+        return mongoTemplate.find(query, claz);
     }
 
     //CounterCategories crud
@@ -192,11 +193,24 @@ public class CounterRepository {
         return mongoTemplate.find(query, KPICategory.class);
     }
 
-    //counterKPI crud
+    //categoryKPI crud
 
-    public List<KPI> getKPIsByCategory(BigInteger categoryId){
-        Query query = new Query(Criteria.where("categoryId").is(categoryId).and("deleted").is(false));
+    public List<KPI> getKPIsByCategory(List<BigInteger> categoryId){
+        Query query = new Query(Criteria.where("categoryId").in(categoryId).and("deleted").is(false));
         return mongoTemplate.find(query, KPI.class);
     }
+
+    //tabKPI distribution crud
+
+    public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds){
+        Query query = new Query(Criteria.where("tabId").in(tabIds));
+        return mongoTemplate.find(query, TabKPIEntry.class);
+    }
+
+    public void removeTabKPIConfiguration(TabKPIEntry entry){
+            Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()));
+            mongoTemplate.remove(query, TabKPIEntry.class);
+    }
+
 
 }

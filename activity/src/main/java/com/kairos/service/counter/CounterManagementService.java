@@ -7,8 +7,10 @@ import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +36,7 @@ public class CounterManagementService extends MongoBaseService{
     @Inject private CounterServiceMapping counterServiceMapping;
     @Inject private CounterRepository counterRepository;
     @Inject private ExceptionService exceptionService;
+    @Inject private GenericIntegrationService genericIntegrationService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
 
@@ -283,36 +286,41 @@ public class CounterManagementService extends MongoBaseService{
 
     //setting category distribution
 
+    public List<KPI> getKPIsList(){
+        return counterRepository.getEntityItemList(KPI.class);
+    }
+
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(){
-        List<KPI> kpisList = counterRepository.getEntityItemList(Counter.class);
+        List<KPI> kpisList = getKPIsList();
         List<KPICategory> categories = counterRepository.getEntityItemList(KPICategory.class);
         Map<BigInteger, List<BigInteger>> categoryKPIsMap = new HashMap<>();
         categories.forEach(category -> {
             categoryKPIsMap.put(category.getId(), new ArrayList<>());
         });
-        //categoryKPIsMap.put(BigInteger.valueOf(-1), new ArrayList<>());
         kpisList.forEach(kpi -> {
             if(kpi.getCategoryId() != null){
                 categoryKPIsMap.get(kpi.getCategoryId()).add(kpi.getId());
             }
         });
 
-        return new InitialKPICategoryDistDataDTO(kpisList, categories, categoryKPIsMap);
+        return new InitialKPICategoryDistDataDTO(categories, categoryKPIsMap);
     }
 
     public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails){
-        List<KPI> kpis = counterRepository.getEntityItemList(KPI.class);
+        List<KPI> kpis = getKPIsList();
         Map<BigInteger, List<KPI>> categoryKPIMap = kpis.stream().collect(Collectors.groupingBy(kpi-> (kpi.getCategoryId()!=null)?kpi.getCategoryId():BigInteger.valueOf(-1), Collectors.toList()));
         Map<BigInteger, Counter> kpisIdMap = new HashMap<>();
         kpis.parallelStream().forEach(kpi -> {
             kpisIdMap.put(kpi.getId(), kpi);
         });
-        if(categoryKPIMap.get(categoryKPIsDetails.getCategoryId())!=null) {
-            categoryKPIMap.get(categoryKPIsDetails.getCategoryId()).forEach(kpi -> {
-                if (!categoryKPIsDetails.getKpiIds().contains(kpi.getId()))
-                    kpi.setCategoryId(null);
-            });
-        }
+//
+//        if(categoryKPIMap.get(categoryKPIsDetails.getCategoryId())!=null) {
+//            categoryKPIMap.get(categoryKPIsDetails.getCategoryId()).forEach(kpi -> {
+//                if (!categoryKPIsDetails.getKpiIds().contains(kpi.getId()))
+//                    kpi.setCategoryId(null);
+//            });
+//        }
+
         categoryKPIsDetails.getKpiIds().forEach(kpiId ->{
             if(categoryKPIsDetails.getCategoryId().equals(kpisIdMap.get(kpiId).getCategoryId()))
                 exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
@@ -320,5 +328,56 @@ public class CounterManagementService extends MongoBaseService{
         });
 
         save(kpis);
+    }
+
+    //settings for KPI-Module configuration
+
+    public InitialKPITabDistDataDTO getInitialTabKPIDataConf(String moduleId, Long countryId){
+        List<KPIAccessPageDTO> kpiTabs= genericIntegrationService.getKPIEnabledTabsForModule(moduleId, countryId);
+        Map<String, List<BigInteger>> tabKPIsMap = new HashMap<>();
+        if(kpiTabs != null && kpiTabs.isEmpty()){
+            exceptionService.dataNotFoundByIdException("error.dist.module_kpi_tabs.not_available");
+        }
+        kpiTabs.forEach(tabKPI -> {
+            tabKPIsMap.put(tabKPI.getModuleId(), new ArrayList<>());
+        });
+
+        List<TabKPIEntry> tabKPIEntries = counterRepository.getTabKPIConfgiurationByTabId(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()));
+        tabKPIEntries.forEach(tabKPI -> {
+            tabKPIsMap.get(tabKPI.getTabId()).add(tabKPI.getKpiId());
+        });
+        return new InitialKPITabDistDataDTO(kpiTabs, tabKPIsMap);
+    }
+
+    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries){
+        List<TabKPIEntry> entries = counterRepository.getTabKPIConfgiurationByTabId(tabKPIEntries.getTabIds());
+        Map<String, Map<BigInteger, BigInteger>> tabKPIsMap = new HashMap<>();
+        List<TabKPIEntry> entriesToSave = new ArrayList<>();
+        tabKPIEntries.getTabIds().forEach(tabId -> {
+            tabKPIsMap.put(tabId, new HashMap<BigInteger, BigInteger>());
+        });
+
+        entries.parallelStream().forEach(tabKPIEntry -> {
+            tabKPIsMap.get(tabKPIEntry.getTabId()).put(tabKPIEntry.getKpiId(), tabKPIEntry.getKpiId());
+        });
+
+        tabKPIEntries.getTabIds().parallelStream().forEach(tabId ->{
+            tabKPIEntries.getKpiIds().forEach(kpiId -> {
+                if(tabKPIsMap.get(tabId).get(kpiId) == null){
+                    entriesToSave.add(new TabKPIEntry(tabId, kpiId));
+                }
+            });
+        });
+        if(!entriesToSave.isEmpty())
+            save(entriesToSave);
+    }
+
+    public void removeTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries){
+        //this is only for single document deletion but the document identification fields are combination of two list.
+        tabKPIEntries.getTabIds().forEach(tabId -> {
+            tabKPIEntries.getKpiIds().forEach(kpiId -> {
+                counterRepository.removeTabKPIConfiguration(new TabKPIEntry(tabId, kpiId));
+            });
+        });
     }
 }

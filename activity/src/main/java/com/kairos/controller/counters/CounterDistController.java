@@ -1,11 +1,9 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.CategoryKPIsDTO;
-import com.kairos.activity.counter.CounterDistDTO;
-import com.kairos.activity.counter.ModuleCounterGroupingDTO;
-import com.kairos.activity.counter.RoleCounterDTO;
+import com.kairos.activity.counter.*;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.counter.TabKPIEntry;
 import com.kairos.service.counter.CounterManagementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -90,6 +88,11 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
+    @GetMapping("/counters")
+    public ResponseEntity<Map<String, Object>> getAvailableCountersList(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList());
+    }
+
     @GetMapping("/category")
     public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionData(){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData());
@@ -100,4 +103,22 @@ public class CounterDistController {
         counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
+
+    @GetMapping("/module/{moduleId}/initials")
+    public ResponseEntity<Map<String, Object>> getInitialDataForTabKPIConfiguration(@PathVariable Long countryId, @PathVariable String moduleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, countryId));
+    }
+
+    @PostMapping("/module/{moduleId}/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntry){
+        counterManagementService.addTabKPIEntries(tabKPIEntry);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping("/module/{moduleId}/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeTabKPIEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntryConfDTO){
+        counterManagementService.removeTabKPIEntries(tabKPIEntryConfDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
 }
