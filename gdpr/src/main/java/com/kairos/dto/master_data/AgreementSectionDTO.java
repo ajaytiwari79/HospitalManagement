@@ -16,13 +16,7 @@ public class AgreementSectionDTO {
     @Pattern(message = "Numebers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    private List<BigInteger> clauses;
-
-    private List<ClauseBasicDTO> clauseList;
-
-    public List<ClauseBasicDTO> getClauseList() {
-        return clauseList;
-    }
+    private List<ClauseBasicDTO> clauses;
 
     public BigInteger getId() {
         return id;
@@ -32,8 +26,12 @@ public class AgreementSectionDTO {
         this.id = id;
     }
 
-    public void setClauseList(List<ClauseBasicDTO> clauseList) {
-        this.clauseList = clauseList;
+    public List<ClauseBasicDTO> getClauses() {
+        return clauses;
+    }
+
+    public void setClauses(List<ClauseBasicDTO> clauses) {
+        this.clauses = clauses;
     }
 
     public String getName() {
@@ -44,13 +42,6 @@ public class AgreementSectionDTO {
         this.name = name;
     }
 
-    public List<BigInteger> getClauses() {
-        return clauses;
-    }
-
-    public void setClauses(List<BigInteger> clauses) {
-        this.clauses = clauses;
-    }
 
     public AgreementSectionDTO() {
     }

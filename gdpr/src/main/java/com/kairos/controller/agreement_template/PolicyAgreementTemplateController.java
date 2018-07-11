@@ -13,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
-import static com.kairos.constants.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 /*
  *
  *  created by bobby 10/5/2018
@@ -21,8 +21,8 @@ import static com.kairos.constants.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 
 
 @RestController
-@RequestMapping(API_AGREEMENT_TEMPLATE_URl)
-@Api(API_AGREEMENT_TEMPLATE_URl)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class PolicyAgreementTemplateController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyAgreementTemplateController.class);
@@ -32,14 +32,14 @@ public class PolicyAgreementTemplateController {
 
 
     @ApiOperation("create Agreement Template")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/agreement_template/create", method = RequestMethod.POST)
     public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createPolicyAgreementTemplate(countryId,organizationId,agreementTemplateDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createBasicPolicyAgreementTemplate(countryId,organizationId,agreementTemplateDto));
 
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/agreement_template/{id}")
     public ResponseEntity<Object> getPolicyAgreementTemplateById(@PathVariable Long countryId,@PathVariable BigInteger id) {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
@@ -49,7 +49,7 @@ public class PolicyAgreementTemplateController {
     }
 
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/agreement_template/delete/{id}")
     public ResponseEntity<Object> deleteById(@PathVariable BigInteger id) {
 
         if (id==null) {
@@ -59,7 +59,7 @@ public class PolicyAgreementTemplateController {
 
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/agreement_template/update/{id}")
     public   ResponseEntity<Object> updateAgreementTemplate(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto ) {
         if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
@@ -75,7 +75,7 @@ public class PolicyAgreementTemplateController {
 
 
 
-    @GetMapping("/all")
+    @GetMapping("/agreement_template/all")
     public   ResponseEntity<Object> getPolicyAgreementTemplateWithData()
     {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,policyAgreementTemplateService.getPolicyAgreementTemplateWithData());

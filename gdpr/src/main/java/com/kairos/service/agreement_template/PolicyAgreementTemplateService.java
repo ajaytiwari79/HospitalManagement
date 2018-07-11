@@ -20,6 +20,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ComparisonUtils;
 import com.kairos.utils.userContext.UserContext;
+import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,14 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private TemplateTypeService templateTypeService;
 
 
+    /**
+     * @description this method creates a basic policy Agreement template with basic detail about organization type,
+     * organizationSubTypes ,service Category and sub service Category.
+     * @param countryId
+     * @param organizationId
+     * @param policyAgreementTemplateDto
+     * @return return object of basic policy agreement template.
+     */
     public PolicyAgreementTemplate createBasicPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
@@ -72,7 +81,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         newPolicyAgreementTemplate.setAccountTypes(accountTypes);
         newPolicyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
         newPolicyAgreementTemplate.setOrganizationId(organizationId);
-        newPolicyAgreementTemplate= policyAgreementTemplateRepository.save(sequenceGenerator(policyAgreementTemplate));
+        try {
+            newPolicyAgreementTemplate = policyAgreementTemplateRepository.save(sequenceGenerator(policyAgreementTemplate));
+        } catch (MongoException e) {
+            LOGGER.info(e.getMessage());
+            throw new RuntimeException(e);
+        }
         return newPolicyAgreementTemplate;
 
     }
@@ -111,7 +125,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
-        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
      /*   } else {
@@ -157,14 +171,15 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 exist.setAccountTypes(accountTypeIds);
                 exist.setName(policyAgreementTemplateDto.getName());
                 exist.setDescription(policyAgreementTemplateDto.getDescription());
-  */          } else {
-                exceptionService.illegalArgumentException("account type not exist ");
-            }
-            return sequenceGenerator(exist);
-
+  */
+        } else {
+            exceptionService.illegalArgumentException("account type not exist ");
         }
-
+        return sequenceGenerator(exist);
 
     }
+
+
+}
 
 

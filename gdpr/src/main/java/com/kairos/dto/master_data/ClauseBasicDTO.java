@@ -15,6 +15,9 @@ public class ClauseBasicDTO {
 
     private String description;
 
+    private Boolean requireUpdate=false;
+
+
     public BigInteger getId() {
         return id;
     }
@@ -37,5 +40,16 @@ public class ClauseBasicDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getRequireUpdate() {
+        return requireUpdate;
+    }
+
+    public void setRequireUpdate(Boolean requireUpdate) {
+        this.requireUpdate = requireUpdate;
+    }
+
+    public ClauseBasicDTO() {
     }
 }

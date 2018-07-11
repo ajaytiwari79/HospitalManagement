@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +28,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     private List<AccountType> accountTypes;
 
-    private List<BigInteger> agreementSections;
+    private List<BigInteger> agreementSections=new ArrayList<>();
 
     private Long countryId;
 

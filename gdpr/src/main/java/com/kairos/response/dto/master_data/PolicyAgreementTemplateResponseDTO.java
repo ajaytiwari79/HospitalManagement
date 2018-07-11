@@ -9,6 +9,7 @@ import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,7 +25,7 @@ public class PolicyAgreementTemplateResponseDTO {
 
     private List<AccountTypeResponseDTO> accountTypes;
 
-    private List<AgreementSectionResponseDTO> agreementSections;
+    private List<AgreementSectionResponseDTO> agreementSections=new ArrayList<>();
 
     private List<OrganizationTypeDTO> organizationTypes;
 
