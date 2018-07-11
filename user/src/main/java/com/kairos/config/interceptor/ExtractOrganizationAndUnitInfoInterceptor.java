@@ -26,8 +26,8 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             HttpServletResponse response,
             Object handler) throws Exception {
 
-
-       final Map<String, String> pathVariables = (Map<String, String>) request
+        if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
+        final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             if(pathVariables==null){
             throw new InvalidRequestException("Url or Parameter is not correct");
