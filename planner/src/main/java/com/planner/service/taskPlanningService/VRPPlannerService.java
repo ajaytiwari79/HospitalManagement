@@ -75,7 +75,7 @@ public class VRPPlannerService {
         int medium = 0;
         int soft = 0;
         for (ConstraintMatchTotal constraintMatchTotal : constraintMatchTotals) {
-            HardMediumSoftLongScore hardMediumSoftLongScore = (HardMediumSoftLongScore)constraintMatchTotal.getScore();
+            HardMediumSoftLongScore hardMediumSoftLongScore = (HardMediumSoftLongScore)constraintMatchTotal.getScoreTotal();
             Score score = new Score((int)hardMediumSoftLongScore.getHardScore(),(int)hardMediumSoftLongScore.getMediumScore(),(int)hardMediumSoftLongScore.getSoftScore());
             constraintScores.add(new ConstraintScore(constraintMatchTotal.getConstraintName(),score));
 

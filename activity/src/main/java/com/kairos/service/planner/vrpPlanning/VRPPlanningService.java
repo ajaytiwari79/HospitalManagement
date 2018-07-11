@@ -145,7 +145,7 @@ public class VRPPlanningService extends MongoBaseService{
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
     }
 
-    public VrpTaskPlanningDTO getSolverConfigurationForUnit(Long unitId, BigInteger solverConfigId){
+    public VrpTaskPlanningDTO getSolutionBySubmition(Long unitId, BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_VRP_SOLUTION,solverConfigId);
 
@@ -156,8 +156,8 @@ public class VRPPlanningService extends MongoBaseService{
         return vrpTaskPlanningDTO;
     }
 
-    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
-        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolverConfigurationForUnit(unitId, solverConfigId);
+    public VrpTaskPlanningDTO getSolutionBySolverConfigByDate(Long unitId, BigInteger solverConfigId, LocalDate date){
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolutionBySubmition(unitId, solverConfigId);
         List<TaskDTO> drivingTimeList = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
         Object[] objects = getTasks(unitId,vrpTaskPlanningDTO,date);
         drivingTimeList.forEach(t->{
@@ -172,6 +172,18 @@ public class VRPPlanningService extends MongoBaseService{
         return vrpTaskPlanningDTO;
     }
 
+
+    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId, BigInteger solverConfigId){
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolutionBySubmition(unitId, solverConfigId);
+        Object[] objects = getTasks(unitId,vrpTaskPlanningDTO,null);
+        vrpTaskPlanningDTO.setTasks((List<TaskDTO>)objects[0]);
+        //vrpTaskPlanningDTO.setEscalatedTaskList((List<TaskDTO>)objects[1]);
+        return vrpTaskPlanningDTO;
+    }
+
+
+
+
     public VRPIndictmentDTO getIndictmentBySolverConfig(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_INDICTMENT,solverConfigId);
@@ -180,7 +192,7 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
     public Object[] getTasks(Long unitId,VrpTaskPlanningDTO vrpTaskPlanningDTO,LocalDate date){
-        List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
+        List<TaskDTO> taskDTOS = date!=null ? vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList()):vrpTaskPlanningDTO.getTasks();
         if(taskDTOS.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
         }
