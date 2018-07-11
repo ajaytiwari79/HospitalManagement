@@ -61,7 +61,7 @@ public class StaffActivitySettingService extends MongoBaseService {
         return activityMongoRepository.findStaffPersonalizedSettings(unitId,activityId);
     }
 
-    public StaffActivitySettingDTO assignActivitySettingToStaffs(Long unitId,StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
+    public StaffAndActivitySettingWrapper assignActivitySettingToStaffs(Long unitId,StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
         List<StaffActivitySetting> staffActivitySettings=new ArrayList<>();
         staffAndActivitySettingWrapper.getStaffIds().forEach(staff->{
             staffAndActivitySettingWrapper.getStaffActivitySettings().forEach(staffActivitySetting -> {
@@ -71,7 +71,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                 staffActivitySettings.add(currentStaffActivitySetting);
             });});
         save(staffActivitySettings);
-        return null;//intentionally returning null
+        return staffAndActivitySettingWrapper;//will return error messages in future
     }
 
     public List<StaffActivitySettingDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId){
