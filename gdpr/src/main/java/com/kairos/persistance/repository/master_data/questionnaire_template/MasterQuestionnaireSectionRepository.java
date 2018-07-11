@@ -22,7 +22,7 @@ public interface MasterQuestionnaireSectionRepository extends MongoRepository<Ma
     MasterQuestionnaireSection findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
     @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
-    List<MasterQuestionnaireSection> getQuestionnniareSectionListByIds(Long countryId,Long organizationId,List<BigInteger> ids);
+    List<MasterQuestionnaireSection> getQuestionnaireSectionListByIds(Long countryId,Long organizationId,List<BigInteger> ids);
 
     MasterQuestionnaireSection findByid(BigInteger id);
 

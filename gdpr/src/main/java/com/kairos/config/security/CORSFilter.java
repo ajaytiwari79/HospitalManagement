@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Its a duplicate filter with CorsFilter and got created as it was not known.
+ * Its a duplicate filter with CORSFilter and got created as it was not known.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)

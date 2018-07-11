@@ -65,9 +65,12 @@ public class VRPPlanningService extends MongoBaseService{
     @Inject private ConstraintRepository constraintRepository;
     @Inject private SolverConfigService solverConfigService;
 
-    public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
+    public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId,SolverConfigDTO configDTO){
         //createShift();
         SolverConfigDTO solverConfigDTO = solverConfigRepository.getOneById(solverConfigId);
+        solverConfigDTO.setPlannerNumber(configDTO.getPlannerNumber());
+        solverConfigDTO.setNumberOfThread(configDTO.getNumberOfThread());
+        solverConfigDTO.setTerminationTime(configDTO.getTerminationTime());
         List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
         Map<BigInteger,ConstraintDTO> constraintDTOMap = constraints.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         solverConfigDTO.getConstraints().forEach(c->{
@@ -79,9 +82,12 @@ public class VRPPlanningService extends MongoBaseService{
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,solverConfigDTO);
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
+        solverConfig.setNumberOfThread(configDTO.getNumberOfThread());
+        solverConfig.setTerminationTime(configDTO.getTerminationTime());
+        solverConfig.setPlannerNumber(configDTO.getPlannerNumber());
         save(solverConfig);
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
+        plannerRestClient.publish(solverConfigDTO.getPlannerNumber(),vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
         return solverConfigDTO;
     }
 
@@ -96,7 +102,7 @@ public class VRPPlanningService extends MongoBaseService{
             c.setDescription(constraintDTO.getDescription());
         });
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,newSolverConfigDTO);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
+        plannerRestClient.publish(solverConfigDTO.getPlannerNumber(),vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
         return newSolverConfigDTO;
     }
 
@@ -137,12 +143,13 @@ public class VRPPlanningService extends MongoBaseService{
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.ON_HOLD);
         save(solverConfig);
-        plannerRestClient.publish(null,unitId, IntegrationOperation.DELETE,PlannerUrl.STOP_VRP_PROBLEM,solverConfigId);
+        plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.DELETE,PlannerUrl.STOP_VRP_PROBLEM,solverConfigId);
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
     }
 
     public VrpTaskPlanningDTO getSolverConfigurationForUnit(Long unitId, BigInteger solverConfigId){
-        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,PlannerUrl.GET_VRP_SOLUTION,solverConfigId);
+        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
+        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_VRP_SOLUTION,solverConfigId);
 
         VrpTaskPlanningDTO vrpTaskPlanningDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VrpTaskPlanningDTO.class);
         if(vrpTaskPlanningDTO==null || vrpTaskPlanningDTO.getTasks().isEmpty()){

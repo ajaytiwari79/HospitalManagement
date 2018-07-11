@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.IDS_LIST;
-import static com.kairos.constants.AppConstant.DATA_EMELENTS_LIST;
+import static com.kairos.constants.AppConstant.DATA_ELEMENTS_LIST;
 
 
 @Service
@@ -39,10 +39,10 @@ public class DataCategoryService extends MongoBaseService {
 
 
     /**
-     *
+     * @descitpion this method create new data category and add new data elements to data Category
      * @param countryId
-     * @param dataCategoryDto
-     * @return
+     * @param dataCategoryDto contain data categoy name and list of data elements
+     * @return return data category object.
      */
     public DataCategory addDataCategoryAndDataElement(Long countryId,Long organizationId,DataCategoryDTO dataCategoryDto) {
 
@@ -52,15 +52,12 @@ public class DataCategoryService extends MongoBaseService {
         }
         Map<String, Object> dataElementList = dataElementService.createDataElements(countryId,organizationId,dataCategoryDto.getDataElements());
         try {
-            DataCategory newDataCategory = new DataCategory();
-            newDataCategory.setCountryId(countryId);
-            newDataCategory.setName(dataCategoryDto.getName());
+            DataCategory newDataCategory = new DataCategory(dataCategoryDto.getName(),(List<BigInteger>) dataElementList.get(IDS_LIST),countryId);
             newDataCategory.setOrganizationId(organizationId);
-            newDataCategory.setDataElements((List<BigInteger>) dataElementList.get(IDS_LIST));
             dataCategory = dataCategoryMongoRepository.save(sequenceGenerator(newDataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_EMELENTS_LIST));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
         }
         return dataCategory;
     }
@@ -77,7 +74,12 @@ public class DataCategoryService extends MongoBaseService {
     }
 
 
-    //get data  category with data element
+    /**
+      * @param countryId
+     * @param organizationId
+     * @param id data category id
+     * @return return data category with its data elements
+     */
     public DataCategoryResponseDto getDataCategoryWithDataElement(Long countryId,Long organizationId,BigInteger id) {
         DataCategoryResponseDto dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementById(countryId,organizationId,id);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
@@ -87,13 +89,23 @@ public class DataCategoryService extends MongoBaseService {
 
     }
 
-    //get data  category with data element
+    /**
+     * @param countryId
+     * @param organizationId
+     * @return return list of Data Category with data Elements
+     */
     public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId) {
         return dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId,organizationId);
     }
 
 
-    //get data  category with data element
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param ids ids of Data category
+     * @return return list of Data category
+     */
     public List<DataCategory> getDataCategoryByIds(Long countryId,Long organizationId,Set<BigInteger> ids) {
         List<DataCategory> dataCategories = dataCategoryMongoRepository.findDataCategoryByIds(countryId,organizationId,ids);
         Set<BigInteger> dataCategoryIds = new HashSet<>();
@@ -110,12 +122,12 @@ public class DataCategoryService extends MongoBaseService {
 
 
     /**
-     *
+     * @description this method update data category , data elements and create new data elements if add to data category
      * @param countryId
      * @param organizationId
      * @param id id of Data Category
      * @param dataCategoryDto request body of Data Category contains List of Existing Data Elements and New Data Elements
-     * @return
+     * @return Data category with updated data elements and new Data Elements
      */
     public DataCategory updateDataCategoryAndDataElement(Long countryId,Long organizationId,BigInteger id, DataCategoryDTO dataCategoryDto) {
 
@@ -132,10 +144,9 @@ public class DataCategoryService extends MongoBaseService {
             dataCategory.setName(dataCategoryDto.getName());
             dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
             dataCategory = dataCategoryMongoRepository.save(sequenceGenerator(dataCategory));
-
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_EMELENTS_LIST));
+            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_ELEMENTS_LIST));
         }
 
         return dataCategory;

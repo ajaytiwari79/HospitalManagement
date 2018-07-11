@@ -43,7 +43,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     @Override
     public DataSubjectMappingResponseDto getDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId, BigInteger id) {
 
-        String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFileds();
+        String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -71,7 +71,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     public List<DataSubjectMappingResponseDto>getAllDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId)
     {
 
-        String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFileds();
+        String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),

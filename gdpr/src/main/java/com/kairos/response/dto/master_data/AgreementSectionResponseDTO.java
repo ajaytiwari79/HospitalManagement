@@ -4,7 +4,7 @@ package com.kairos.response.dto.master_data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
 import java.util.List;

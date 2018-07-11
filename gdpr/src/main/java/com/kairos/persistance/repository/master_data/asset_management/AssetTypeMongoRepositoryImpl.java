@@ -36,8 +36,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     public AssetType findByName(Long countryId, Long organizationId, String name) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(true));
-        ;
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(false));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, AssetType.class);
@@ -49,7 +48,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(true).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(false).and(DELETED).is(false)),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
@@ -63,7 +62,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     public AssetTypeResponseDto getAssetTypesWithSubAssetTypes(Long countryId, Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(true).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(false).and(DELETED).is(false).and("_id").is(id)),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );

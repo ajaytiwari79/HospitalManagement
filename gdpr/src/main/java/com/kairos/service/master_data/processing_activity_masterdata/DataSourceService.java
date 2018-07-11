@@ -30,7 +30,16 @@ public class DataSourceService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
 
-    public Map<String, List<DataSource>> createDataSource(Long countryId,Long organizationId,List<DataSource> dataSources) {
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param dataSources
+     * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
+     * @description this method create new DataSource if DataSource not exist with same name ,
+     * and if exist then simply add  DataSource to existing list and return list ;
+     * findByNamesList()  return list of existing DataSource using collation ,used for case insensitive result
+     */
+    public Map<String, List<DataSource>> createDataSource(Long countryId, Long organizationId, List<DataSource> dataSources) {
 
         Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
@@ -41,11 +50,11 @@ public class DataSourceService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<DataSource> existing = findByNamesList(countryId,organizationId,dataSourceNames,DataSource.class);
+            List<DataSource> existing = findByNamesList(countryId, organizationId, dataSourceNames, DataSource.class);
             dataSourceNames = comparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
-            if (dataSourceNames.size()!=0) {
+            if (dataSourceNames.size() != 0) {
                 for (String name : dataSourceNames) {
 
                     DataSource newDataSource = new DataSource();
@@ -67,14 +76,26 @@ public class DataSourceService extends MongoBaseService {
 
     }
 
-    public List<DataSource> getAllDataSource(Long countryId,Long organizationId) {
-        return dataSourceMongoRepository.findAllDataSources(countryId,organizationId);
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of DataSource
+     */
+    public List<DataSource> getAllDataSource(Long countryId, Long organizationId) {
+        return dataSourceMongoRepository.findAllDataSources(countryId, organizationId);
     }
 
+    /**
+     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of DataSource
+     * @return DataSource object fetch by given id
+     */
+    public DataSource getDataSource(Long countryId, Long organizationId, BigInteger id) {
 
-    public DataSource getDataSource(Long countryId,Long organizationId,BigInteger id) {
-
-        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId,organizationId, id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -84,9 +105,9 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataSource(Long countryId,Long organizationId,BigInteger id) {
+    public Boolean deleteDataSource(Long countryId, Long organizationId, BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -96,29 +117,42 @@ public class DataSourceService extends MongoBaseService {
         }
     }
 
+    /***
+     * @throws DuplicateDataException throw exception if DataSource data not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of DataSource
+     * @param dataSource
+     * @return DataSource updated object
+     */
+    public DataSource updateDataSource(Long countryId, Long organizationId, BigInteger id, DataSource dataSource) {
 
-    public DataSource updateDataSource(Long countryId,Long organizationId,BigInteger id, DataSource dataSource) {
-
-        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId,organizationId,dataSource.getName());
+        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, organizationId, dataSource.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
             }
-            throw new DuplicateDataException("data  exist for  "+dataSource.getName());
+            throw new DuplicateDataException("data  exist for  " + dataSource.getName());
         } else {
-            exist=dataSourceMongoRepository.findByid(id);
+            exist = dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
             return dataSourceMongoRepository.save(sequenceGenerator(exist));
 
         }
     }
 
-
-    public DataSource getDataSourceByName(Long countryId,Long organizationId, String name) {
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param name           name of DataSource
+     * @return DataSource object fetch on basis of  name
+     * @throws DataNotExists throw exception if DataSource not exist for given name
+     */
+    public DataSource getDataSourceByName(Long countryId, Long organizationId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId,organizationId, name);
+            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

@@ -17,7 +17,7 @@ import java.util.List;
 
 @EnableSwagger2
 @Configuration
-public class SwaagerConf {
+public class SwaggerConfig {
 
 
 
@@ -33,7 +33,7 @@ public class SwaagerConf {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select().apis(RequestHandlerSelectors.basePackage("com.kairos.controller"))
                 .paths(PathSelectors.any())
-                .build().pathMapping("/oragnization/24")
+                .build()
                 .globalOperationParameters(aParameters);
 
 
