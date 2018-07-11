@@ -408,7 +408,6 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId,
                                                                 @RequestParam("file") MultipartFile multipartFile,
                                                                 @RequestParam("accessGroupId") Long accessGroupId) {
-        vrpClientService.importClients(unitId,multipartFile);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffService.batchAddStaffToDatabase(unitId, multipartFile, accessGroupId));
     }
