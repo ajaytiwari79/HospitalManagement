@@ -119,11 +119,19 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
+    /**
+     * @description delete questionnaire template ,sections and question related to template.
+     * @param countryId
+     * @param organizationId
+     * @param id - id of questionnaire template
+     * @return true id deletion is successfull
+     */
     public Boolean deleteMasterQuestionnaireTemplate(Long countryId,Long organizationId, BigInteger id) {
         MasterQuestionnaireTemplate exist = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire template", id);
         }
+        masterQuestionnaireSectionService.deleteAll(countryId,organizationId,exist.getSections());
         delete(exist);
         return true;
     }
@@ -138,7 +146,6 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @param templateDto
      * @return updated Questionniare template with basic data (name,decription ,template type)
      */
-
     public MasterQuestionnaireTemplate updateQuestionnaireTemplate(Long countryId, Long orgId,BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
         MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
         if (Optional.ofNullable(existing).isPresent() && !id.equals(existing.getId())) {
@@ -186,7 +193,6 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @param organizationId
      * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
      */
-
     public List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSection(Long countryId,Long organizationId) {
         List<MasterQuestionnaireTemplateResponseDTO> templateResponseDTOs = masterQuestionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(countryId,organizationId);
         templateResponseDTOs.forEach(template -> {

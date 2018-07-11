@@ -13,7 +13,7 @@ public class CustomAggregationQuery {
                 "'description':1," +
                 "'organizationSubServices':1," +
                 "'organizationServices':1," +
-                "'hasSubProcess':1," +
+                "'hasSubProcessingActivity':1," +
                 "'organizationSubTypes':1," +
                 "'organizationTypes':1," +
                 "'countryId':1}}";

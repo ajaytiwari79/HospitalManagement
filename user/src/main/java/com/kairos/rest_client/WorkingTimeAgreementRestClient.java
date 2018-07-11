@@ -137,7 +137,7 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public WTAResponseDTO updateWTAOfUnitPosition(WTADTO wtadto) {
+    public WTAResponseDTO updateWTAOfUnitPosition(WTADTO wtadto, boolean unitPositionPublished) {
         String baseUrl = getBaseUrl(true);
         try {
             HttpEntity<WTADTO> request = new HttpEntity<>(wtadto);
@@ -145,7 +145,7 @@ public class WorkingTimeAgreementRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/wta",
+                            baseUrl + "/wta?unitPositionPublished=" + unitPositionPublished,
                             HttpMethod.PUT, request, typeReference);
 
             RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();

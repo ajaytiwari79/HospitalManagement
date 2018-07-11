@@ -53,10 +53,10 @@ public class AssetTypeService extends MongoBaseService {
 
         Map<String, Object> subAssetTypes = new HashMap<>();
         AssetType assetType = new AssetType();
-        if (assetTypeDto.getSubAssetTypes().size() != 0) {
+        if (!assetTypeDto.getSubAssetTypes().isEmpty()) {
             subAssetTypes = createNewSubAssetTypesList(countryId, organizationId, assetTypeDto.getSubAssetTypes());
             assetType.setSubAssetTypes((List<BigInteger>) subAssetTypes.get(IDS_LIST));
-            assetType.setSubAsset(true);
+            assetType.setHasSubAsset(true);
         }
         assetType.setName(assetTypeDto.getName());
         assetType.setCountryId(countryId);
@@ -84,6 +84,7 @@ public class AssetTypeService extends MongoBaseService {
             assetType.setCountryId(countryId);
             assetType.setName(subAssetTypeDto.getName());
             assetType.setOrganizationId(organizationId);
+            assetType.setSubAsset(true);
             subAssetTypes.add(assetType);
         }
         Map<String, Object> result = new HashMap<>();

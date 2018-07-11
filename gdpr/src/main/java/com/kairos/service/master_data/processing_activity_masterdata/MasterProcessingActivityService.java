@@ -52,7 +52,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         Map<String, Object> subProcessingActivity = new HashMap<>();
         if (Optional.ofNullable(masterProcessingActivityDto.getSubProcessingActivities()).isPresent() && !masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
             subProcessingActivity = createNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
-            masterProcessingActivity.setHasSubProcess(true);
+            masterProcessingActivity.setHasSubProcessingActivity(true);
             masterProcessingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
         }
         masterProcessingActivity.setCountryId(countryId);
