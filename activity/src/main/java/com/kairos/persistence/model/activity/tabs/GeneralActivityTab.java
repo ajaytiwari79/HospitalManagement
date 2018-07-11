@@ -32,7 +32,7 @@ import java.util.List;
         private LocalDate startDate;
         private LocalDate endDate;
 
-        private List<TagDTO> tags = new ArrayList<>();
+        private List<BigInteger> tags = new ArrayList<>();
 
         public GeneralActivityTab() {
         }
@@ -90,11 +90,11 @@ import java.util.List;
             this.endDate=endDate;
         }
 
-        public List<TagDTO> getTags() {
+        public List<BigInteger> getTags() {
             return tags;
         }
 
-        public void setTags(List<TagDTO> tags) {
+        public void setTags(List<BigInteger> tags) {
             this.tags = tags;
         }
 
