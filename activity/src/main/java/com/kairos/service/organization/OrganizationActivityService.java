@@ -169,7 +169,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
-        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityId, activityCategories);
         return activityTabsWrapper;
@@ -222,7 +222,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setTags(generalDTO.getTags());
 
         save(activity);
-        generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+       // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);

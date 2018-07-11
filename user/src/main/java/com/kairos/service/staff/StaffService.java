@@ -16,7 +16,6 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
@@ -77,6 +76,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.employment.EmploymentDTO;
@@ -1698,6 +1698,7 @@ public class StaffService extends UserBaseService {
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
         if(!Optional.ofNullable(staff).isPresent()){
             userAccessRoleDTO.setManagement(true);
+            userAccessRoleDTO.setStaff(false);
         }
         else {
             userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
@@ -1971,7 +1972,7 @@ public class StaffService extends UserBaseService {
         return true;
     }
 
-    public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO, Boolean confirm) {
+    public MainEmploymentResultDTO updateMainEmployment(Long unitId,Long staffId, EmploymentDTO employmentDTO, Boolean confirmMainEmploymentOverriding) {
         if (employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
         }
@@ -1982,6 +1983,11 @@ public class StaffService extends UserBaseService {
             if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
                 exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
             }
+        }
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Boolean userAccessRoleDTO=accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId);
+        if(!userAccessRoleDTO){
+            exceptionService.runtimeException("message.mainemployment.permission");
         }
         List<MainEmploymentQueryResult> mainEmploymentQueryResults = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
         MainEmploymentResultDTO mainEmploymentResultDTO = new MainEmploymentResultDTO();
@@ -2055,7 +2061,7 @@ public class StaffService extends UserBaseService {
                 mainEmploymentResultDTO.getEmploymentOverlapList().add(employmentOverlapDTO);
             }
 
-            if (!confirm) {
+            if (!confirmMainEmploymentOverriding) {
                 mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
                 return mainEmploymentResultDTO;
             } else {
@@ -2074,6 +2080,12 @@ public class StaffService extends UserBaseService {
 
     public Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())){
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentEndDate()))){
+            exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
+        }
         employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
         employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
         employment.setMainEmployment(true);
@@ -2088,6 +2100,12 @@ public class StaffService extends UserBaseService {
     }
 
     public void getAfterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment) {
+        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employment.getMainEmploymentStartDate())){
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate()))){
+            exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
+        }
         employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
         employmentOverlapDTO.setAfterChangeEndDate(employment.getMainEmploymentEndDate());
     }

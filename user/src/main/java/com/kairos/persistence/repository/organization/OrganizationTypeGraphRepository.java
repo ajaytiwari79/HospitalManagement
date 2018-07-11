@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -61,7 +62,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "match(country)<-[:" + BELONGS_TO + "]-(organizationType:OrganizationType{isEnable:true})\n" +
             "optional match(organizationType)-[:" + HAS_SUB_TYPE + "]->(organizationSubType:OrganizationType{isEnable:true}) " +
             "with DISTINCT organizationType, organizationSubType " +
-            "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n" )
+            "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
     List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId);
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
@@ -75,29 +76,21 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return collect({id:id(organizationType),name:organizationType.name,children: subTypes.subTypes}) as organizationTypes")
     OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId, Set<Long> subTypesId);
 
-    @Query("Match (orgType:OrganizationType)-[r:" + ORG_TYPE_HAS_EXPERTISE + "]->(expertise:Expertise) where id(orgType)={0} AND id(expertise)={1} return count(r) as countOfRel")
-    int orgTypeHasAlreadySkill(long orgTypeId, long expertiseId);
 
-    @Query("Match (orgType:OrganizationType),(expertise:Expertise) where id (orgType)={0} AND id(expertise)={1} create (orgType)-[r:" + ORG_TYPE_HAS_EXPERTISE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(expertise) return orgType")
-    void addExpertiseInOrgType(long orgTypeId, long expertiseId, long creationDate, long lastModificationDate);
+    @Query("Match (orgType:OrganizationType),(skill:Skill) where id (orgType)={0} AND id(skill)={1} " +
+            "MERGE (orgType)-[r:" + ORG_TYPE_HAS_SKILL + "]->(skill)" +
+            "ON CREATE SET r.creationDate = {2},r.deleted=false\n" +
+            "ON MATCH SET r.lastModificationDate = {3},r.deleted=false")
+    void addSkillInOrgType(long orgTypeId, long skillId, Long creationDate, Long lastModificationDate);
 
-    @Query("Match (orgType:OrganizationType),(expertise:Expertise) where id (orgType)={0} AND id(expertise) = {1} Match (orgType)-[r:" + ORG_TYPE_HAS_EXPERTISE + "]->(expertise) set r.lastModificationDate={2},r.isEnabled=true return orgType")
-    void updateOrgTypeExpertise(long orgTypeId, long expertiseId, long lastModificationDate);
+    @Query("Match (orgType:OrganizationType),(skill:Skill) where id(orgType)={0} AND id(skill)={1} " +
+            "match (orgType)-[r:" + ORG_TYPE_HAS_SKILL + "]->(skill) set r.deleted=true,r.lastModificationDate={2} return r")
+    void deleteSkillFromOrgType(long orgTypeId, long skillId, Long lastModificationDate);
 
-    @Query("Match (orgType:OrganizationType),(expertise:Expertise) where id(orgType)={0} AND id(expertise)={1} match (orgType)-[r:" + ORG_TYPE_HAS_EXPERTISE + "]->(expertise) set r.isEnabled=false,r.lastModificationDate={2} return r")
-    void deleteOrgTypeExpertise(long orgTypeId, long expertiseId, long lastModificationDate);
-
-    @Query("Match (expertise:Expertise{deleted:false})-[:BELONGS_TO]->(country:Country) where id(country)={0}  AND expertise.startDateMillis<={2} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {2}) with expertise, country\n" +
-            "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} WITH expertise,country,r\n" +
-            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(country)  with r,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
-            "return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as expertise")
-    OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId, Long selectedDateMillis);
-
-   /* @Query("match(ost:OrganizationType) where  id(ost) in {0} match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO_ORG_SUB_TYPE]->(ost)\n" +
-            "MATCH(workingTimeAgreement)-[:HAS_EXPERTISE_IN]-(expertise:Expertise)\n" +
-            "return workingTimeAgreement,expertise")
-    List<WTAAndExpertiseQueryResult> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);*/
-
+    @Query("Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_SKILL{deleted:false}]->(skill) where id(orgType)={0} " +
+            "MATCH (skillCategory:SkillCategory)<-[:HAS_CATEGORY]-(skill) \n" +
+            "return  case when skill is NULL then [] else collect({id:id(skill),name:skill.name}) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description")
+    List<OrgTypeSkillQueryResult> getSkillsOfOrganizationType(long orgTypeId);
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);

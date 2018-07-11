@@ -24,19 +24,17 @@ public class CTAResponseDTO {
     private String name;
     private String description;
     private Expertise expertise;
-    private OrganizationType organizationType;
-    private OrganizationType organizationSubType;
+    private Long organizationType;
+    private Long organizationSubType;
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
-    @DateLong
-    @JsonProperty("startDate")
-    private Date startDateMillis;
-    @DateLong
-    @JsonProperty("endDate")
-    private Date endDateMillis;
+    private Long startDateMillis;
+    private Long endDateMillis;
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
     private PositionCode positionCode;
+    private Long unitPositionId;
+    private Boolean disabled;
 
     public CTAResponseDTO() {
         //Default constructor
@@ -82,19 +80,19 @@ public class CTAResponseDTO {
         this.expertise = expertise;
     }
 
-    public OrganizationType getOrganizationType() {
+    public Long getOrganizationType() {
         return organizationType;
     }
 
-    public void setOrganizationType(OrganizationType organizationType) {
+    public void setOrganizationType(Long organizationType) {
         this.organizationType = organizationType;
     }
 
-    public OrganizationType getOrganizationSubType() {
+    public Long getOrganizationSubType() {
         return organizationSubType;
     }
 
-    public void setOrganizationSubType(OrganizationType organizationSubType) {
+    public void setOrganizationSubType(Long organizationSubType) {
         this.organizationSubType = organizationSubType;
     }
 
@@ -106,19 +104,19 @@ public class CTAResponseDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public Date getStartDateMillis() {
+    public Long getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Date startDateMillis) {
+    public void setStartDateMillis(Long startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public Long getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(Long endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -144,5 +142,21 @@ public class CTAResponseDTO {
 
     public void setPositionCode(PositionCode positionCode) {
         this.positionCode = positionCode;
+    }
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
+
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
     }
 }
