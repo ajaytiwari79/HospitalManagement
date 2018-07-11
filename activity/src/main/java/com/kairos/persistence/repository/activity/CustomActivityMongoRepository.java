@@ -63,6 +63,6 @@ public interface CustomActivityMongoRepository {
 
     List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds);
 
-    StaffActivitySettingDTO findStaffPersonalizedData(Long unitId,BigInteger activityId);
+    StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId,BigInteger activityId);
 
 }

@@ -384,7 +384,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    public StaffActivitySettingDTO findStaffPersonalizedData(Long unitId, BigInteger activityId) {
+    public StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId, BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("_id").is(activityId)),
                 project("rulesActivityTab.shortestTime","rulesActivityTab.longestTime","optaPlannerSettingActivityTab.maxThisActivityPerShift","optaPlannerSettingActivityTab.minLength","optaPlannerSettingActivityTab.eligibleForMove")

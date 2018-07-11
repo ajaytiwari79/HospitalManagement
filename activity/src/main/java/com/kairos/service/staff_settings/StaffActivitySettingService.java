@@ -58,7 +58,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public StaffActivitySettingDTO getDefaultStaffActivitySettings(Long unitId,BigInteger activityId){
-        return activityMongoRepository.findStaffPersonalizedData(unitId,activityId);
+        return activityMongoRepository.findStaffPersonalizedSettings(unitId,activityId);
     }
 
     public StaffActivitySettingDTO assignActivitySettingToStaffs(Long unitId,StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
