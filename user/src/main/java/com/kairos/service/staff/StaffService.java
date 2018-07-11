@@ -2079,10 +2079,7 @@ public class StaffService extends UserBaseService {
     }
 
     public Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
-        Employment employment = employmentGraphRepository.findUnitPostionAndEmploymentByStaff(staffId);
-        if(!Optional.ofNullable(employment).isPresent()){
-                exceptionService.runtimeException("message.mainemployment.unitposition");
-        }
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())){
             exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
         }
@@ -2103,6 +2100,12 @@ public class StaffService extends UserBaseService {
     }
 
     public void getAfterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment) {
+        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employment.getMainEmploymentStartDate())){
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate()))){
+            exceptionService.runtimeException("message.mainemployment.enddate.greaterthan");
+        }
         employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
         employmentOverlapDTO.setAfterChangeEndDate(employment.getMainEmploymentEndDate());
     }
