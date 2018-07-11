@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -105,12 +106,14 @@ public class SolverConfigService extends MongoBaseService {
                 c.setDescription(constraintDTO.getDescription());
             });
         });
-        solverConfigs.sort((s1,s2)-> s1.getLastSubmittedDate().compareTo(s2.getLastSubmittedDate()));
+
+        List<SolverConfigDTO> solverConfigDTOS = solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()!=null).sorted((s1,s2)-> s1.getLastSubmittedDate().compareTo(s2.getLastSubmittedDate())).collect(Collectors.toList());
+        solverConfigDTOS.addAll(solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()==null).collect(Collectors.toList()));
         List<DefaultContraintsDTO> defaultContraints = constraints.stream().collect(Collectors.groupingBy(ConstraintDTO::getCategory,Collectors.toList())).entrySet().stream().map(c->new DefaultContraintsDTO(c.getKey().toValue(),c.getValue())).collect(Collectors.toList());
         defaultContraints.forEach(d->{
             d.getConstraints().sort((c1,c2)->c1.isDisabled().compareTo(c2.isDisabled()));
         });
-        return new SolverConfigConstraintWrapper(defaultContraints, solverConfigs);
+        return new SolverConfigConstraintWrapper(defaultContraints, solverConfigDTOS);
     }
 
 
@@ -121,14 +124,14 @@ public class SolverConfigService extends MongoBaseService {
             exceptionService.duplicateDataException("message.constraints.exists");
         }
         List<Constraint> constraints = new ArrayList<>(40);
-        /*constraints.add(new Constraint("Start in Time window 1", "Longest tasks starts in first time interval", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId,false,true,false));
+        constraints.add(new Constraint("Start in Time window 1", "Longest tasks starts in first time interval", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId,false,true,false));
         constraints.add(new Constraint("First Task in Time window 1 or 2", "Longest tasks should start at first in any interval", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId,false,true,true));
 
         constraints.add(new Constraint("Plan in decending order of duration", "Longest tasks always before shorter on same installation", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId,false,true,true));
         constraints.add(new Constraint("Add switching Time", "If distance between multiple tasks are less than X meters, then add x min to duration as walking time", ConstraintCategory.DURATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
         constraints.add(new Constraint("Plan in same time window", "Staff should not perform meter installations at different intervals for a citizen(i.e. A citizen should ideally only be disturbed once.)", ConstraintCategory.DURATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
         constraints.add(new Constraint("Plan all tasks same day", "Staff should perform all task for a citizen in one day.", ConstraintCategory.DURATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
-        *//*constraints.add(new Constraint("","Staff should perform all task for a citizen in one go without any break.", ConstraintCategory.BREAK_CONSTRAINTS,PlanningType.VRPPLANNING,unitId,false,false,true));*//*
+        constraints.add(new Constraint("","Staff should perform all task for a citizen in one go without any break.", ConstraintCategory.BREAK_CONSTRAINTS,PlanningType.VRPPLANNING,unitId,false,false,true));
         constraints.add(new Constraint("Do not plan break within same installation number", "Breaks should not be planned between two tasks of same installation number", ConstraintCategory.BREAK_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
         constraints.add(new Constraint("Address with even number", "House with even number is always on right while moving in ascending order.", ConstraintCategory.LOCATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
         constraints.add(new Constraint("Address with odd number", "House with odd number is always on left while moving in ascending order.", ConstraintCategory.LOCATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
@@ -148,7 +151,6 @@ public class SolverConfigService extends MongoBaseService {
 
         constraints.add(new Constraint("Minimize overtime", "Minimize using overtime window", ConstraintCategory.DURATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
         constraints.add(new Constraint("Do not allow zig-zag in same time window", "The rule for zig-zag applies to same time window.", ConstraintCategory.LOCATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,true));
-        */
         constraints.add(new Constraint("Task from same installation number", "Same place's installations should happen consecutively(if of same task types) for same employee", ConstraintCategory.LOCATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,false));
         constraints.add(new Constraint("Starts as First task", "Longest task starts as first task of the day", ConstraintCategory.LONGEST_TASK, PlanningType.VRPPLANNING, unitId,false,true,false));
         constraints.add(new Constraint("Plan task from same installation number together", "Same place's installations should be planned(if of same task types) for same employee", ConstraintCategory.LOCATION_CONSTRAINTS, PlanningType.VRPPLANNING, unitId,false,true,false));
