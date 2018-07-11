@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
+
     @NotNull(message = "Organization Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be empty")
     private List<OrganizationTypeDTO>  organizationTypes;
@@ -44,8 +46,7 @@ public class PolicyAgreementTemplateDTO {
     @NotEmpty(message = "Account Type cannot be empty")
     private Set<BigInteger> accountTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private List<AgreementSectionDTO> agreementSections;
+    private List<AgreementSectionDTO> agreementSections=new ArrayList<>();
 
     @NotNull
     private BigInteger templateTypeId;

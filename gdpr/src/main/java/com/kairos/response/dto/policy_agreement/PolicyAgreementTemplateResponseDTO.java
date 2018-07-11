@@ -1,4 +1,4 @@
-package com.kairos.response.dto.master_data;
+package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -6,6 +6,8 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
+import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
+import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
@@ -17,21 +19,29 @@ public class PolicyAgreementTemplateResponseDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty
     private String name;
 
-    @NotNullOrEmpty
     private String description;
 
     private List<AccountTypeResponseDTO> accountTypes;
-
-    private List<AgreementSectionResponseDTO> agreementSections=new ArrayList<>();
 
     private List<OrganizationTypeDTO> organizationTypes;
 
     private List<OrganizationSubTypeDTO> organizationSubTypes;
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
+
+    private List<AgreementSectionResponseDTO> agreementSections=new ArrayList<>();
+
+    private TemplateTypeResponseDTO templateType;
+
+    public TemplateTypeResponseDTO getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(TemplateTypeResponseDTO templateType) {
+        this.templateType = templateType;
+    }
 
     public BigInteger getId() {
         return id;

@@ -184,7 +184,7 @@ public class ClauseService extends MongoBaseService {
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
             Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                     , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
-            clause.setTemplateType(policyAgreementTemplate.getTemplateTypeId());
+            clause.setTemplateType(policyAgreementTemplate.getTemplateType());
             clause.setOrganizationId(organizationId);
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
             newCLauseList.add(clause);

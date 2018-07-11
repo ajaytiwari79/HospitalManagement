@@ -1,4 +1,4 @@
-package com.kairos.response.dto.master_data;
+package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -14,11 +14,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
-
     BigInteger id;
 
     @NotNullOrEmpty
-    private String title;
+    private String name;
 
     @NotNullOrEmpty
     List<ClauseBasicResponseDTO> clauses;
@@ -39,12 +38,12 @@ public class AgreementSectionResponseDTO {
         this.clauses = clauses;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public AgreementSectionResponseDTO()
