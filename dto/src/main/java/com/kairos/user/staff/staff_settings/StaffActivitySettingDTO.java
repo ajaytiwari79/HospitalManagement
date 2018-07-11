@@ -1,6 +1,7 @@
 package com.kairos.user.staff.staff_settings;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 public class StaffActivitySettingDTO {
     private BigInteger id;
@@ -10,6 +11,10 @@ public class StaffActivitySettingDTO {
     private Long unitId;
     private Integer shortestTime;
     private Integer longestTime;
+    private Integer minLength;
+    private Integer maxThisActivityPerShift;
+    private boolean eligibleForMove;
+
 
     public StaffActivitySettingDTO() {
         //Default Constructor
@@ -70,4 +75,29 @@ public class StaffActivitySettingDTO {
     public void setLongestTime(Integer longestTime) {
         this.longestTime = longestTime;
     }
+
+    public Integer getMinLength() {
+        return minLength;
+    }
+
+    public void setMinLength(Integer minLength) {
+        this.minLength = minLength;
+    }
+
+    public Integer getMaxThisActivityPerShift() {
+        return maxThisActivityPerShift;
+    }
+
+    public void setMaxThisActivityPerShift(Integer maxThisActivityPerShift) {
+        this.maxThisActivityPerShift = maxThisActivityPerShift;
+    }
+
+    public boolean isEligibleForMove() {
+        return eligibleForMove;
+    }
+
+    public void setEligibleForMove(boolean eligibleForMove) {
+        this.eligibleForMove = eligibleForMove;
+    }
+
 }

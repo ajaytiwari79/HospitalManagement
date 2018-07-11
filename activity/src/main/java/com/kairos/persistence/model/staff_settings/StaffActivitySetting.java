@@ -11,9 +11,26 @@ public class StaffActivitySetting extends MongoBaseEntity {
     private Long unitId;
     private Integer shortestTime;
     private Integer longestTime;
+    private Integer minLength;
+    private Integer maxThisActivityPerShift;
+    private boolean eligibleForMove;
+
 
     public StaffActivitySetting() {
         //Default Constructor
+    }
+
+    public StaffActivitySetting(Long staffId, BigInteger activityId, Long unitPositionId, Long unitId,
+                                Integer shortestTime, Integer longestTime, Integer minLength, Integer maxThisActivityPerShift, boolean eligibleForMove) {
+        this.staffId = staffId;
+        this.activityId = activityId;
+        this.unitPositionId = unitPositionId;
+        this.unitId = unitId;
+        this.shortestTime = shortestTime;
+        this.longestTime = longestTime;
+        this.minLength = minLength;
+        this.maxThisActivityPerShift = maxThisActivityPerShift;
+        this.eligibleForMove = eligibleForMove;
     }
 
     public Long getStaffId() {
@@ -62,5 +79,29 @@ public class StaffActivitySetting extends MongoBaseEntity {
 
     public void setLongestTime(Integer longestTime) {
         this.longestTime = longestTime;
+    }
+
+    public Integer getMinLength() {
+        return minLength;
+    }
+
+    public void setMinLength(Integer minLength) {
+        this.minLength = minLength;
+    }
+
+    public Integer getMaxThisActivityPerShift() {
+        return maxThisActivityPerShift;
+    }
+
+    public void setMaxThisActivityPerShift(Integer maxThisActivityPerShift) {
+        this.maxThisActivityPerShift = maxThisActivityPerShift;
+    }
+
+    public boolean isEligibleForMove() {
+        return eligibleForMove;
+    }
+
+    public void setEligibleForMove(boolean eligibleForMove) {
+        this.eligibleForMove = eligibleForMove;
     }
 }
