@@ -50,7 +50,7 @@ public class StaffActivitySettingController {
     @ApiOperation("delete Staff Personalized activity settings")
     @DeleteMapping(value = "/staff_activity_setting/{staffActivitySettingId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteShift(@PathVariable Long unitId, @PathVariable BigInteger staffActivitySettingId) {
+    public ResponseEntity<Map<String, Object>> deleteStaffActivitySettings(@PathVariable Long unitId, @PathVariable BigInteger staffActivitySettingId) {
         staffActivitySettingService.deleteStaffActivitySettings(staffActivitySettingId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
