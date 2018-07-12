@@ -1382,7 +1382,7 @@ public class TaskService extends MongoBaseService {
      * This method is use in citizen controller
      */
 
-    public void createTaskFromKMD(Long staffId, KMDShift shift, Long unitId) {
+    public void createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId) {
         try {
             TaskType taskType = taskTypeService.findByExternalId("6123");
             Map<String, Object> taskMetaData = new HashMap<>();
@@ -1439,16 +1439,16 @@ public class TaskService extends MongoBaseService {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject objects = jsonArray.getJSONObject(i);
-            KMDTask kmdTask = JsonUtils.toObject(objects.toString(), KMDTask.class);
+            ImportTaskDTO importTaskDTO = JsonUtils.toObject(objects.toString(), ImportTaskDTO.class);
             Integer grantCount = 0;
             TaskDemand taskDemand = null;
             Client citizen = null;
             // Staff staff = null;
             List<Long> staffIds = new ArrayList<>();
-            TaskAddress taskAddress = createTaskAddress(kmdTask);
+            TaskAddress taskAddress = createTaskAddress(importTaskDTO);
             List<String> taskIds = new ArrayList<>();
-            if (kmdTask.getPatientResourceList() != Collections.EMPTY_LIST) {
-                for (PatientResourceList patientResourceList : kmdTask.getPatientResourceList()) {
+            if (importTaskDTO.getPatientResourceList() != Collections.EMPTY_LIST) {
+                for (PatientResourceList patientResourceList : importTaskDTO.getPatientResourceList()) {
                     for (Grants grants : patientResourceList.getGrants()) {
                         String grantId = grants.getId();
                         taskDemand = taskDemandMongoRepository.findByKmdExternalId(String.valueOf(grantId));
@@ -1457,12 +1457,12 @@ public class TaskService extends MongoBaseService {
                         TaskType taskType = taskTypeMongoRepository.findOne(taskDemand.getTaskTypeId());
                         if (taskDemand == null) return;
                         grantCount += 1;
-                        String staffExternalId = kmdTask.getResourceId();
+                        String staffExternalId = importTaskDTO.getResourceId();
                         staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:") + 13);
                         //anil me will use rest template here
                         //staff = staffGraphRepository.findByKmdExternalId(Long.valueOf(staffExternalId));
                         // staffIds.add(staff.getId());
-                        Task task = createKMDPlannedTask(kmdTask, taskType, taskDemand, taskAddress, staffIds);
+                        Task task = createKMDPlannedTask(importTaskDTO, taskType, taskDemand, taskAddress, staffIds);
                         taskIds.add(task.getId().toString());
                     }
 
@@ -1485,11 +1485,11 @@ public class TaskService extends MongoBaseService {
     }
 
 
-    public Task createKMDPlannedTask(KMDTask kmdTask, TaskType taskType, TaskDemand taskDemand,
+    public Task createKMDPlannedTask(ImportTaskDTO importTaskDTO, TaskType taskType, TaskDemand taskDemand,
                                      TaskAddress taskAddress, List<Long> staffIds) {
         //Single task
 
-        Task task = findByKmdTaskExternalId(kmdTask.getId());
+        Task task = findByKmdTaskExternalId(importTaskDTO.getId());
         if (task == null) task = new Task();
         task.setTaskOriginator(TaskTypeEnum.TaskOriginator.PRE_PLANNING);
         task.setName(taskType.getTitle());
@@ -1506,11 +1506,11 @@ public class TaskService extends MongoBaseService {
         task.setPostProcessingDuration(taskType.getPostProcessingDuration());
         //discuss with Jasgeet not required, as we are not going to sync these tasks with Visitour
         // task.setTeamId(citizen.getVisitourTeamId());
-        task.setDateFrom(kmdTask.getStart());
-        task.setDateTo(kmdTask.getEnd());
-        task.setKmdTaskExternalId(kmdTask.getId());
-        task.setTimeFrom(kmdTask.getStart());
-        task.setTimeTo(kmdTask.getEnd());
+        task.setDateFrom(importTaskDTO.getStart());
+        task.setDateTo(importTaskDTO.getEnd());
+        task.setKmdTaskExternalId(importTaskDTO.getId());
+        task.setTimeFrom(importTaskDTO.getStart());
+        task.setTimeTo(importTaskDTO.getEnd());
         task.setAddress(taskAddress);
         task.setUnitId(taskDemand.getUnitId());
         task.setSlaStartDuration(taskType.getSlaStartDuration());
@@ -1520,9 +1520,9 @@ public class TaskService extends MongoBaseService {
 
     }
 
-    private TaskAddress createTaskAddress(KMDTask kmdTask) {
+    private TaskAddress createTaskAddress(ImportTaskDTO importTaskDTO) {
         TaskAddress taskAddress = new TaskAddress();
-        CurrentAddress currentAddress = kmdTask.getPatientResourceList().get(0).getCurrentAddress();
+        CurrentAddress currentAddress = importTaskDTO.getPatientResourceList().get(0).getCurrentAddress();
         String addressLine1 = currentAddress.getAddressLine1();
         String street = addressLine1.substring(0, addressLine1.indexOf(" "));
         String hnr = addressLine1.substring(addressLine1.indexOf(" "));

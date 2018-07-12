@@ -3,7 +3,7 @@ package com.kairos.user.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KMDTimeSlotDTO {
+public class ImportTimeSlotDTO {
 
     private Long id;
     private String title;
