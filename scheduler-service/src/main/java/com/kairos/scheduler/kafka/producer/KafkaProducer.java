@@ -1,9 +1,9 @@
-package com.kairos.kafka.producer;
+package com.kairos.scheduler.kafka.producer;
 
 
 import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.KairosSchedulerExecutorDTO;
 import com.kairos.dto.QueueDTO;
-import com.kairos.kafka.listener.DefaultKafkaMessageListener;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
@@ -17,7 +17,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +25,15 @@ import java.util.Map;
 public class KafkaProducer {
 
 
-    @Autowired
-    private KafkaTemplate<Integer,KairosScheduleJobDTO> kafkaTemplate;
+    @Inject
+    private KafkaTemplate<Integer,KairosSchedulerExecutorDTO> kafkaTemplate;
 
-    public void pushToQueue(KairosScheduleJobDTO job) {
+    public void pushToQueue(KairosSchedulerExecutorDTO job) {
 
-      kafkaTemplate.send("userSchedulerQueue",1,job);
+      kafkaTemplate.send("SchedulerToUserQueue",1,job);
     }
 
-    public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
+   /* public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
         ContainerProperties containerProps = new ContainerProperties("userSchedulerQueue");
         containerProps.setMessageListener( new DefaultKafkaMessageListener());
 
@@ -45,9 +44,9 @@ public class KafkaProducer {
         container.start();
 
         return container;
-    }
+    }*/
 
-    private Map<String, Object> senderProps() {
+    /*private Map<String, Object> senderProps() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ProducerConfig.RETRIES_CONFIG, 0);
@@ -68,5 +67,5 @@ public class KafkaProducer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return props;
-    }
+    }*/
 }
