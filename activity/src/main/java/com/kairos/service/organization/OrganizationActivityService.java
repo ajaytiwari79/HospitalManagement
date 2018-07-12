@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
+import com.kairos.activity.activity.activity_tabs.PermissionsActivityTabDTO;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
@@ -283,6 +284,9 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
+        PermissionsActivityTabDTO permissionsActivityTabDTO=new PermissionsActivityTabDTO();
+        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(),permissionsActivityTabDTO);
+        activityDTO.setPermissionsActivityTab(permissionsActivityTabDTO);
         return activityDTO;
     }
 
