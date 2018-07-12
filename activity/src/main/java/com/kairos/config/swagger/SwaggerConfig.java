@@ -6,12 +6,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Predicates.or;
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -43,9 +48,22 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.kairos.controller"))
                 .paths(postManagePaths())
-                .build();
+                .build()
+                .globalOperationParameters(additionalParametersCriteria());
     }
 
+    private List<Parameter> additionalParametersCriteria(){
+        ParameterBuilder paramsBuilder = new ParameterBuilder();
+        paramsBuilder
+                .name("Authorization")
+                .modelRef(new ModelRef("string"))
+                .parameterType("header")
+                .required(true)
+                .build();
+        List<Parameter> parametersList = new ArrayList<>();
+        parametersList.add(paramsBuilder.build());
+        return parametersList;
+    }
    /**
    * URL to scan to create documentation,
    * you can set regex to include  matching controller to be documented.
