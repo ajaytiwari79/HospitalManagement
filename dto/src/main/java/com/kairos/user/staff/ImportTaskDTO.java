@@ -10,7 +10,7 @@ import java.util.List;
  * Created by oodles on 25/7/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KMDTask {
+public class ImportTaskDTO {
     @JsonIgnoreProperties
     private Date originalDate;
     @JsonIgnoreProperties

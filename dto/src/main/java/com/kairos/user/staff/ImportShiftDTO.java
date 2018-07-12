@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by oodles on 19/7/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KMDShift {
+public class ImportShiftDTO {
     private Date startTime;
 
     private String id;

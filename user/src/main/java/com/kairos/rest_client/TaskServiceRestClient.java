@@ -5,7 +5,7 @@ import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.staff.KMDShift;
+import com.kairos.user.staff.ImportShiftDTO;
 import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;
@@ -41,10 +41,10 @@ public class TaskServiceRestClient {
      * @param unitId
      * @return
      */
-    public Boolean createTaskFromKMD(Long staffId, KMDShift shift, Long unitId){
+    public Boolean createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId){
         String baseUrl = getBaseUrl(false);
         try {
-            HttpEntity<KMDShift> request = new HttpEntity<>(shift);
+            HttpEntity<ImportShiftDTO> request = new HttpEntity<>(shift);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
