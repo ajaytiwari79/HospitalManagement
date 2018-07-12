@@ -91,6 +91,6 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
 
     @Override
     public int compareTo(SeniorityLevel seniorityLevel) {
-        return seniorityLevel.from - this.from;
+        return this.from - seniorityLevel.from;
     }
 }

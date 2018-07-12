@@ -25,7 +25,6 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
-
     // in Minutes
     private Integer earliestStartTime;
     private Integer latestStartTime;

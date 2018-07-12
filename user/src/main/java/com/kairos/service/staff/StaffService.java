@@ -640,8 +640,21 @@ public class StaffService extends UserBaseService {
         return staffGraphRepository.findAllTeamLeader(organizationId);
 
     }
-
-
+    /*******************************************************************************************************/
+   //Function to validate staff Mandatory Fields
+    private boolean validateStaffData(Row row,int[] mandatoryCellColumnIndexs)
+    {
+        boolean isPerStaffMandatoryFieldsExists = true;
+        for (int i= 0;i<mandatoryCellColumnIndexs.length;i++){
+            Cell cell = row.getCell(mandatoryCellColumnIndexs[i]);
+            if(cell==null){
+                isPerStaffMandatoryFieldsExists =  false;
+                break;
+            }
+        }
+        return isPerStaffMandatoryFieldsExists;
+    }
+   /*******************************************************************************************************/
     public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -733,9 +746,11 @@ public class StaffService extends UserBaseService {
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-                Cell cprHeaderValue = row.getCell(cprHeader);
-                if (cprHeaderValue == null || cprHeaderValue.getCellType() == Cell.CELL_TYPE_BLANK) {
-                    logger.info(" This row has no CRP Number so skipping this %s", row.getRowNum());
+                // to check mandatory fields
+                int[] mandatoryCellColumnIndexs={2,8,19,20,21,23,41};
+                boolean isPerStaffMandatoryFieldsExists=validateStaffData(row,mandatoryCellColumnIndexs);
+                if (!isPerStaffMandatoryFieldsExists) {
+                    logger.info(" This row is missing some mandatory field so skipping this {}", row.getRowNum());
                     staffErrorList.add(row.getRowNum());
 
                 } else {
@@ -747,7 +762,7 @@ public class StaffService extends UserBaseService {
                     cell.setCellType(Cell.CELL_TYPE_STRING);
                     Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this " + externalId);
+                        logger.info(" staff with kmd external id  already found  so we are skipping this {}" + externalId);
                         staffErrorList.add(row.getRowNum());
                         continue;
                     }
@@ -819,7 +834,7 @@ public class StaffService extends UserBaseService {
                     staffGraphRepository.save(staff);
                     staffList.add(staff);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        createEmployment(parent, unit, staff, accessGroupId, null, isEmploymentExist);
+                        createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
                     }
 
                 }
@@ -830,7 +845,7 @@ public class StaffService extends UserBaseService {
         }
         return staffUploadBySheetQueryResult;
     }
-
+/***************************************************************************************************/
 
     private ContactAddress extractContactAddressFromRow(Row row) {
 
@@ -1918,6 +1933,7 @@ public class StaffService extends UserBaseService {
     }
 
     private Integer nextSeniorityLevelInMonths(List<SeniorityLevel> seniorityLevels, int currentExperienceInMonths) {
+        Collections.sort(seniorityLevels);
         Integer nextSeniorityLevelInMonths = null;
         for (int i = 0; i < seniorityLevels.size(); i++) {
             if (currentExperienceInMonths < seniorityLevels.get(i).getFrom() * 12) {
