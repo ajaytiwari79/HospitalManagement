@@ -5,7 +5,6 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.activity.enums.counter.ChartType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
 import com.kairos.enums.CounterType;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -54,7 +52,7 @@ public class CounterDataService {
     GenericIntegrationService genericIntegrationService;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
-        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolverConfigurationForUnit(unitId, solverConfigId);
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
         List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
         Set<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toSet());
         Map<String, EmployeeDTO> employeeDataIdMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(employee -> employee.getId(), employee->employee));

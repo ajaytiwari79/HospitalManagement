@@ -55,6 +55,18 @@ public class SolverConfigController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,null);
     }
 
+    @DeleteMapping(value = "/{solverConfigId}")
+    @ApiOperation("delete solver config")
+    public ResponseEntity<Map<String, Object>> deleteSolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,solverConfigService.deleteSolverConfig(unitId,solverConfigId));
+    }
+
+    @GetMapping(value = "/{solverConfigId}/get_indictment")
+    @ApiOperation("getIndictment")
+    public ResponseEntity<Map<String, Object>> getIndictment(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getIndictmentBySolverConfig(unitId,solverConfigId));
+    }
+
    /* @PostMapping(value = "/{solverConfigId}/stop")
     @ApiOperation("create default solver config")
     public ResponseEntity<Map<String, Object>> stopToPlannerBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
