@@ -92,7 +92,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
             "UNWIND listOfPage as page\n" +
             "Match (c)-[r:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} WITH accessGroup, page\n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(page)")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:r.read, write:r.write}]->(page)")
     void addAccessPageRelationshipForCountryAccessGroups(Long accessPageId, Long countryId, String organizationCategory);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
@@ -110,7 +110,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "UNWIND listOfPage as page\n" +
             "UNWIND allOrg as org \n" +
             "Match (org)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
-            "create unique (accessGroup)-[r:HAS_ACCESS_OF_TABS{isEnabled:false}]->(page)")
+            "create unique (accessGroup)-[r:HAS_ACCESS_OF_TABS{isEnabled:true, read:r.read, write:r.write}]->(page)")
     void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
