@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstant.API_AGREEMENT_SECTION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 /*
  *
  *  created by bobby 10/5/2018
@@ -23,8 +23,8 @@ import static com.kairos.constants.ApiConstant.API_AGREEMENT_SECTION_URL;
 
 
 @RestController
-@RequestMapping(API_AGREEMENT_SECTION_URL)
-@Api(API_AGREEMENT_SECTION_URL)
+@RequestMapping(API_ORGANIZATION_URL)
+@Api(API_ORGANIZATION_URL)
 public class AgreementSectionController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionController.class);
@@ -42,7 +42,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
     }*/
 
 
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/agreement_section/delete/{id}")
     public ResponseEntity<Object>  deleteAgreementSection(@PathVariable BigInteger id )
     { if (id!=null) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(id));
@@ -53,7 +53,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
 
 
 
-    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
+    @GetMapping(value = "/agreement_section/agreement_section/{id}")
     public ResponseEntity<Object>  getAgreementSectionWithDataById(@PathVariable Long countryId,@PathVariable BigInteger id )
     {
         if (id!=null) {
@@ -63,7 +63,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
     }
 
 
-    @RequestMapping(value = "/all",method = RequestMethod.GET)
+    @GetMapping(value = "/agreement_section/all")
     public ResponseEntity<Object>  getAllAgreementSection(@PathVariable Long countryId)
     {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAllAgreementSection(countryId));
@@ -72,7 +72,7 @@ return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionServi
 
 
 
-    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    @PostMapping(value = "/agreement_section/list")
     public ResponseEntity<Object>  getAllAgreementSectionList(@PathVariable Long countryId,@RequestBody Set<BigInteger> ids)
     {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,agreementSectionService.getAgreementSectionWithDataList(countryId,ids));

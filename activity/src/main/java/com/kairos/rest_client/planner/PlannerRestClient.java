@@ -4,6 +4,7 @@ import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
 import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.solver_config.PlannerUrl;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import org.slf4j.Logger;
@@ -27,10 +28,10 @@ public class PlannerRestClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation, Object... pathParams) {
+    public <T, V> RestTemplateResponseEnvelope<V> publish(int plannerNo,T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
         try {
-            String url=baseUrl + unitId + "/"+ getURI(t,integrationOperation,pathParams);
+            String url=+plannerNo+"/api/v1/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
@@ -66,9 +67,9 @@ public class PlannerRestClient {
 
         }
     }
-    public static <T>String getURI(T t,IntegrationOperation integrationOperation,Object... pathParams){
+    public static <T>String getURI(PlannerUrl plannerUrl,Object... pathParams){
         String uri=null;
-        if(t instanceof StaffingLevelDTO){
+        /*if(t instanceof StaffingLevelDTO){
             uri= "staffing_level/";
         }else if(t instanceof ActivityNoTabsDTO){
             uri= "activity/";
@@ -80,13 +81,22 @@ public class PlannerRestClient {
         }
         else if(t instanceof WTAResponseDTO){
             uri= String.format("staff/%s/unitposition/%s/wta",pathParams);
-        }
+        }*/
+        switch (plannerUrl){
+            case GET_VRP_SOLUTION:uri = String.format("/vrp/%s",pathParams);
+                break;
+            case STOP_VRP_PROBLEM:uri = String.format("/vrp/%s",pathParams);
+                break;
+            case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
+                break;
+        }/*
+
         else if (t instanceof VrpTaskPlanningDTO){
             uri = "planner/submitVRPPlanning";
         }
         else if (t==null){
-            uri = String.format("planner/vrp/%s",pathParams);
-        }
+
+        }*/
         return uri;
     }
 }

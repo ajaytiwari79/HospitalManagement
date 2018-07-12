@@ -29,24 +29,36 @@ public class ResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ComparisonUtils comparisonUtils;
 
-    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> rsponsibilityTypes) {
+
+
+    /**
+     * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
+     * and if exist then simply add  ResponsibilityType to existing list and return list ;
+     * findByNamesList()  return list of existing ResponsibilityType using collation ,used for case insensitive result
+     * @param countryId
+     * @param organizationId
+     * @param responsibilityTypes
+     * @return return map which contain list of new ResponsibilityType and list of existing ResponsibilityType if ResponsibilityType already exist
+     *
+     */
+    public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,Long organizationId,List<ResponsibilityType> responsibilityTypes) {
 
         Map<String, List<ResponsibilityType>> result = new HashMap<>();
-        Set<String> rsponsibilityTypesNames = new HashSet<>();
-        if (rsponsibilityTypes.size() != 0) {
-            for (ResponsibilityType responsibilityType : rsponsibilityTypes) {
+        Set<String> responsibilityTypeNames = new HashSet<>();
+        if (responsibilityTypes.size() != 0) {
+            for (ResponsibilityType responsibilityType : responsibilityTypes) {
                 if (!StringUtils.isBlank(responsibilityType.getName())) {
-                    rsponsibilityTypesNames.add(responsibilityType.getName());
+                    responsibilityTypeNames.add(responsibilityType.getName());
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,rsponsibilityTypesNames,ResponsibilityType.class);
-            rsponsibilityTypesNames = comparisonUtils.getNameListForMetadata(existing, rsponsibilityTypesNames);
+            List<ResponsibilityType> existing =  findByNamesList(countryId,organizationId,responsibilityTypeNames,ResponsibilityType.class);
+            responsibilityTypeNames = comparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
-            if (rsponsibilityTypesNames.size() != 0) {
-                for (String name : rsponsibilityTypesNames) {
+            if (responsibilityTypeNames.size() != 0) {
+                for (String name : responsibilityTypeNames) {
 
                     ResponsibilityType newResponsibilityType = new ResponsibilityType();
                     newResponsibilityType.setName(name);
@@ -68,11 +80,23 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
     }
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @return list of ResponsibilityType
+     */
     public List<ResponsibilityType> getAllResponsibilityType(Long countryId,Long organizationId) {
         return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,organizationId);
     }
 
-
+    /**
+     * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of ResponsibilityType
+     * @return ResponsibilityType object fetch by given id
+     */
     public ResponsibilityType getResponsibilityType(Long countryId,Long organizationId,BigInteger id) {
 
         ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
@@ -97,7 +121,14 @@ public class ResponsibilityTypeService extends MongoBaseService {
         }
     }
 
-
+    /***
+     * @throws  DuplicateDataException throw exception if ResponsibilityType data not exist for given id
+     * @param countryId
+     * @param organizationId
+     * @param id id of ResponsibilityType
+     * @param responsibilityType
+     * @return ResponsibilityType updated object
+     */
     public ResponsibilityType updateResponsibilityType(Long countryId,Long organizationId,BigInteger id, ResponsibilityType responsibilityType) {
 
 
@@ -115,7 +146,13 @@ public class ResponsibilityTypeService extends MongoBaseService {
         }
     }
 
-
+    /**
+     * @throws DataNotExists throw exception if ResponsibilityType not exist for given name
+     * @param countryId
+     * @param organizationId
+     * @param name name of ResponsibilityType
+     * @return ResponsibilityType object fetch on basis of  name
+     */
     public ResponsibilityType getResponsibilityTypeByName(Long countryId,Long organizationId,String name) {
 
 

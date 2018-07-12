@@ -18,6 +18,8 @@ import com.planner.service.Client.PlannerRestClient;
 import com.planner.service.vrpService.VRPGeneratorService;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 import org.optaplanner.core.api.score.constraint.Indictment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -26,34 +28,69 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class VRPPlannerService {
+    private static Logger log= LoggerFactory.getLogger(VRPPlannerService.class);
     @Autowired
     private VRPGeneratorService vrpGeneratorService;
-    @Autowired
-    private VRPPlanningMongoRepository vrpPlanningMongoRepository;
-    @Autowired
-    private PlannerRestClient plannerRestClient;
+    @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
+    @Autowired private PlannerRestClient plannerRestClient;
+    //This must not be serialized and this is an active solvers runtimes
+    private transient Map<String,VrpTaskPlanningSolver> runningSolversPerProblem=new ConcurrentHashMap<>();
     @Autowired private AppConfig appConfig;
-
     @Async
-    public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO) {
+    public void startVRPPlanningSolverOnThisVM(VrpTaskPlanningDTO vrpTaskPlanningDTO){
         VrpTaskPlanningSolution solution = vrpGeneratorService.getVRPProblemSolution(vrpTaskPlanningDTO);
         List<File> drlFileList = getDrlFileList(vrpTaskPlanningDTO.getSolverConfig());
-        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList);
-        Object[] objects = solver.solveProblemOnRequest(solution);
-        solution = (VrpTaskPlanningSolution) objects[0];
-        Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task, Indictment>) objects[1]);
-        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(), (List<PlanningShift>) solvedTasks[0], solution.getEmployees(), (List<com.planner.domain.task.Task>) solvedTasks[1], (List<com.planner.domain.task.Task>) solvedTasks[2], (List<com.planner.domain.task.Task>) solvedTasks[3]);
+        VrpTaskPlanningSolver solver = new VrpTaskPlanningSolver(drlFileList,appConfig.getVrpXmlFilePath(),vrpTaskPlanningDTO.getSolverConfig().getTerminationTime(),vrpTaskPlanningDTO.getSolverConfig().getNumberOfThread());
+        runningSolversPerProblem.put(solution.getSolverConfigId().toString(),solver);
+        Object[] solutionAndIndictment=solver.solveProblemOnRequest(solution);
+        runningSolversPerProblem.remove(solution.getSolverConfigId().toString());
+        solution = (VrpTaskPlanningSolution)solutionAndIndictment[0];
+        Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task,Indictment>)solutionAndIndictment[1]);
+        VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
+        vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
-        plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
+        if(!solver.isTerminateEarly()){
+            plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
+        }
     }
 
-    private List<File> getDrlFileList(SolverConfigDTO solverConfigDTO) {
-        Map<String, File> fileMap = Arrays.asList(new File(appConfig.getDroolFilePath()).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
+    //TODO make this run on problemId(submissionId) rather than solverConfigId
+   // @Async
+    public boolean terminateEarlyVrpPlanningSolver(String problemId){
+        try{
+            VrpTaskPlanningSolver solver;
+            log.info("*****Terminating solver for problem id:{}",problemId);
+            if((solver=runningSolversPerProblem.get(problemId))!=null){
+                 solver.terminateEarly();
+                //runningSolversPerProblem.remove(problemId);
+                return true;
+            }
+        }catch (Exception e){
+            log.error("exception stopping solver from different thread.",e);
+            return false;
+        }
+        return true;
+    }
+    //TODO make this run on problemId(submissionId) rather than solverConfigId
+    public boolean clearActiveVrpPlanningSolver(String problemId){
+        try{
+            runningSolversPerProblem.remove(problemId);
+            return true;
+        }catch (Exception e){
+            log.error("exception stopping solver from different thread.",e);
+            return false;
+        }
+    }
+
+    private List<File> getDrlFileList(SolverConfigDTO solverConfigDTO){
         List<File> drlFiles = new ArrayList<>();
+        try{
+        Map<String, File> fileMap = Arrays.asList(new File(appConfig.getDroolFilePath()).listFiles()).stream().collect(Collectors.toMap(k -> k.getName().replace(AppConstants.DROOL_FILE_EXTENTION, ""), v -> v));
         drlFiles.add(fileMap.get(AppConstants.DROOL_BASE_FILE));
         for (ConstraintValueDTO constraintValueDTO : solverConfigDTO.getConstraints()) {
             if (fileMap.containsKey(constraintValueDTO.getName())) {
@@ -61,13 +98,16 @@ public class VRPPlannerService {
             }
             ;
         }
+        }catch(Exception e){
+            e.printStackTrace();
+            log.error("Continuing with no drls.");
+        }
         return drlFiles;
     }
 
     private Object[] getSolvedTasks(List<Shift> shifts, Map<Task, Indictment> indictmentMap) {
         List<com.planner.domain.task.Task> tasks = new ArrayList<>();
         List<com.planner.domain.task.Task> drivedTaskList = new ArrayList<>();
-        List<com.planner.domain.task.Task> excalatedTaskList = new ArrayList<>();
         List<PlanningShift> planningShifts = new ArrayList<>(shifts.size());
         Map<String, Indictment> taskIdAndIndictmentMap = getIndictmentMap(indictmentMap);
         for (Shift shift : shifts) {
@@ -97,8 +137,9 @@ public class VRPPlannerService {
                         task.setStaffId(new Long(shift.getEmployee().getId()));
                         if (indictment != null) {
                             HardMediumSoftLongScore score = ((HardMediumSoftLongScore) indictment.getScoreTotal());
-                            if (score.getHardScore() > 0 || score.getMediumScore() > 0) {
-                                excalatedTaskList.add(task);
+                            if (score.getHardScore() < 0 || score.getMediumScore() < 0) {
+                                //excalatedTaskList.add(task);
+                                task.setEscalated(true);
                             }
                         }
                         tasks.add(task);
@@ -106,8 +147,9 @@ public class VRPPlannerService {
                     nextTask = nextTask.getNextTask();
                     if (nextTask != null) {
                         int drivingMin = nextTask.getDrivingTime();
-                        com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, drivingMin * 60, nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+                        com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, drivingMin, nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
                         drivedTask.setPlannedStartTime(drivingTimeStart);
+                        drivedTask.setDrivingDistance(nextTask.getDrivingDistance());
                         drivedTask.setShiftId(shift.getId());
                         drivedTask.setStaffId(new Long(shift.getEmployee().getId()));
                         drivedTask.setPlannedEndTime(drivingTimeStart.plusMinutes(drivingMin));
@@ -119,7 +161,7 @@ public class VRPPlannerService {
             }
             shift.setNextTask(null);
         }
-        return new Object[]{planningShifts, tasks, drivedTaskList, excalatedTaskList};
+        return new Object[]{planningShifts, tasks, drivedTaskList};
     }
 
 

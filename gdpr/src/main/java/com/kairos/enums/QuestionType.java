@@ -2,7 +2,7 @@ package com.kairos.enums;
 
 public enum  QuestionType {
 
-    TEXT("questionType1"),  YES_NO_MAYBE("Yes No Maybe");
+    TEXTBOX("text_box"),  YES_NO_MAYBE("yes_no_maybe");
     public String value;
     QuestionType(String value) {
         this.value = value;

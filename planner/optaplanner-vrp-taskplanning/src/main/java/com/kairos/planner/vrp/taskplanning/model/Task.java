@@ -230,6 +230,17 @@ public class Task extends TaskOrShift{
         return lpd.getTime();
     }
 
+    public int getDrivingDistance(){
+        if(prevTaskOrShift ==null){
+            throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
+        }
+        if(prevTaskOrShift instanceof Shift || shiftBreak) return 0;
+        Task prevTask=getPreviousValidTask();
+        if(prevTask==null) return 0;
+        LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
+        return lpd.getDistance();
+    }
+
     /**
      * call it using previous task
      * @param task

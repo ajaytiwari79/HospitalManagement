@@ -16,7 +16,6 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
@@ -77,6 +76,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.employment.EmploymentDTO;
@@ -640,8 +640,21 @@ public class StaffService extends UserBaseService {
         return staffGraphRepository.findAllTeamLeader(organizationId);
 
     }
-
-
+    /*******************************************************************************************************/
+   //Function to validate staff Mandatory Fields
+    private boolean validateStaffData(Row row,int[] mandatoryCellColumnIndexs)
+    {
+        boolean isPerStaffMandatoryFieldsExists = true;
+        for (int i= 0;i<mandatoryCellColumnIndexs.length;i++){
+            Cell cell = row.getCell(mandatoryCellColumnIndexs[i]);
+            if(cell==null){
+                isPerStaffMandatoryFieldsExists =  false;
+                break;
+            }
+        }
+        return isPerStaffMandatoryFieldsExists;
+    }
+   /*******************************************************************************************************/
     public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -733,9 +746,11 @@ public class StaffService extends UserBaseService {
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-                Cell cprHeaderValue = row.getCell(cprHeader);
-                if (cprHeaderValue == null || cprHeaderValue.getCellType() == Cell.CELL_TYPE_BLANK) {
-                    logger.info(" This row has no CRP Number so skipping this %s", row.getRowNum());
+                // to check mandatory fields
+                int[] mandatoryCellColumnIndexs={2,8,19,20,21,23,41};
+                boolean isPerStaffMandatoryFieldsExists=validateStaffData(row,mandatoryCellColumnIndexs);
+                if (!isPerStaffMandatoryFieldsExists) {
+                    logger.info(" This row is missing some mandatory field so skipping this {}", row.getRowNum());
                     staffErrorList.add(row.getRowNum());
 
                 } else {
@@ -747,7 +762,7 @@ public class StaffService extends UserBaseService {
                     cell.setCellType(Cell.CELL_TYPE_STRING);
                     Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this " + externalId);
+                        logger.info(" staff with kmd external id  already found  so we are skipping this {}" + externalId);
                         staffErrorList.add(row.getRowNum());
                         continue;
                     }
@@ -819,7 +834,7 @@ public class StaffService extends UserBaseService {
                     staffGraphRepository.save(staff);
                     staffList.add(staff);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        createEmployment(parent, unit, staff, accessGroupId, null, isEmploymentExist);
+                        createEmployment(parent, unit, staff, accessGroupId, DateUtil.getCurrentDateMillis(), isEmploymentExist);
                     }
 
                 }
@@ -830,7 +845,7 @@ public class StaffService extends UserBaseService {
         }
         return staffUploadBySheetQueryResult;
     }
-
+/***************************************************************************************************/
 
     private ContactAddress extractContactAddressFromRow(Row row) {
 
@@ -1692,9 +1707,19 @@ public class StaffService extends UserBaseService {
             //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
-        staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
-        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staffId);
-        staffAdditionalInfoQueryResult.setUserAccessRoleDTO(userAccessRoleDTO);
+        staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        UserAccessRoleDTO userAccessRoleDTO=new UserAccessRoleDTO();
+        Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        if(!Optional.ofNullable(staff).isPresent()){
+            userAccessRoleDTO.setManagement(true);
+            userAccessRoleDTO.setStaff(false);
+        }
+        else {
+            userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
+        }
+
+        staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         return staffAdditionalInfoDTO;
 
     }
@@ -1908,6 +1933,7 @@ public class StaffService extends UserBaseService {
     }
 
     private Integer nextSeniorityLevelInMonths(List<SeniorityLevel> seniorityLevels, int currentExperienceInMonths) {
+        Collections.sort(seniorityLevels);
         Integer nextSeniorityLevelInMonths = null;
         for (int i = 0; i < seniorityLevels.size(); i++) {
             if (currentExperienceInMonths < seniorityLevels.get(i).getFrom() * 12) {
@@ -1962,7 +1988,7 @@ public class StaffService extends UserBaseService {
         return true;
     }
 
-    public MainEmploymentResultDTO updateMainEmployment(Long staffId, EmploymentDTO employmentDTO, Boolean confirm) {
+    public MainEmploymentResultDTO updateMainEmployment(Long unitId,Long staffId, EmploymentDTO employmentDTO, Boolean confirmMainEmploymentOverriding) {
         if (employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
         }
@@ -1973,6 +1999,11 @@ public class StaffService extends UserBaseService {
             if (employmentDTO.getMainEmploymentStartDate().isAfter(employmentDTO.getMainEmploymentEndDate())) {
                 exceptionService.invalidRequestException("message.lastdate.notlessthan.startdate");
             }
+        }
+        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+        Boolean userAccessRoleDTO=accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId);
+        if(!userAccessRoleDTO){
+            exceptionService.runtimeException("message.mainemployment.permission");
         }
         List<MainEmploymentQueryResult> mainEmploymentQueryResults = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
         MainEmploymentResultDTO mainEmploymentResultDTO = new MainEmploymentResultDTO();
@@ -2046,7 +2077,7 @@ public class StaffService extends UserBaseService {
                 mainEmploymentResultDTO.getEmploymentOverlapList().add(employmentOverlapDTO);
             }
 
-            if (!confirm) {
+            if (!confirmMainEmploymentOverriding) {
                 mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
                 return mainEmploymentResultDTO;
             } else {
@@ -2065,6 +2096,12 @@ public class StaffService extends UserBaseService {
 
     public Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())){
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentEndDate()))){
+            exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
+        }
         employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
         employment.setMainEmploymentStartDate(employmentDTO.getMainEmploymentStartDate());
         employment.setMainEmployment(true);
@@ -2079,6 +2116,12 @@ public class StaffService extends UserBaseService {
     }
 
     public void getAfterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment) {
+        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employment.getMainEmploymentStartDate())){
+            exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
+        }
+        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate()))){
+            exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
+        }
         employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
         employmentOverlapDTO.setAfterChangeEndDate(employment.getMainEmploymentEndDate());
     }
@@ -2088,8 +2131,13 @@ public class StaffService extends UserBaseService {
     }
 
     public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId) {
+        UserAccessRoleDTO userAccessRoleDTO=new UserAccessRoleDTO();
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        if(!Optional.ofNullable(staff).isPresent()){
+            userAccessRoleDTO.setManagement(true);
+            return userAccessRoleDTO;
+        }
         return accessGroupService.getStaffAccessRoles(unitId, staff.getId());
     }
 

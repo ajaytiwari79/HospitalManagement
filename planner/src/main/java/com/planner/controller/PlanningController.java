@@ -128,6 +128,12 @@ public class PlanningController {
 		return ResponseHandler.generateResponse(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED);
 	}
 
+	@DeleteMapping(value = "/vrp/{solverConfigId}")
+	ResponseEntity<Map<String, Object>> stopVRPPlanning(@PathVariable BigInteger solverConfigId) {
+		plannerService.stopVRPPlanning(solverConfigId);
+		return ResponseHandler.generateResponse(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED);
+	}
+
 	@GetMapping(value = "/vrp/{solverConfigId}")
 	ResponseEntity<Map<String, Object>> getSolutionBySolverConfigId(@PathVariable BigInteger solverConfigId) {
 		return ResponseHandler.generateResponseWithData(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED,plannerService.getSolutionBySolverConfigId(solverConfigId));

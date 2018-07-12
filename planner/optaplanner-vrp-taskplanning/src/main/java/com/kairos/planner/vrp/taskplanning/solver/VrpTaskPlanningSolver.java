@@ -8,6 +8,7 @@ import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.core.impl.score.director.drools.DroolsScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class VrpTaskPlanningSolver {
+    //public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
     public static String config = "src/main/resources/config/Kamstrup_Vrp_taskPlanning.solver.xml";
     public static String defaultDrl = "optaplanner-vrp-taskplanning/src/main/resources/drl/vrp_task_rules.drl";
     public static String config_on_request = "/opt/kairos/kairos-user/planner/optaplanner-vrp-taskplanning/src/main/resources/config/configuration_for_request.xml";
@@ -35,10 +37,19 @@ public class VrpTaskPlanningSolver {
     }
 
 
-    public VrpTaskPlanningSolver(List<File> drlFileList){
-        solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
+    //public VrpTaskPlanningSolver(List<File> drlFileList){
+      //  solverFactory = SolverFactory.createFromXmlFile(new File(config_on_request));
+        //solverFactory = SolverFactory.createFromXmlFile(new File(config));
+        //solverFactory = SolverFactory.createFromXmlResource("config/Kamstrup_Vrp_taskPlanning.solver.xml");
+    public VrpTaskPlanningSolver(List<File> drlFileList, String vrpXmlFilePath, int terminationTime, int numberOfThread){
+        if(numberOfThread<=0 || numberOfThread>=40){
+            throw new IllegalArgumentException("Invalid threads provided, please provide a sane number."+numberOfThread);
+        }
+        solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
+            solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
+            solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
         }
         solver = solverFactory.buildSolver();
     }
@@ -91,6 +102,13 @@ public class VrpTaskPlanningSolver {
             throw  e;
         }
         getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
+        printSolutionInformation( solution);
+
+    }
+
+    private void printSolutionInformation(VrpTaskPlanningSolution solution) {
+
+        log.info("---------------Printing SOlution Information.-----");
         int totalDrivingTime=0;
         StringBuilder sbs= new StringBuilder("Locs data:\n");
         StringBuilder sbTom= new StringBuilder("Locs data for tomtom:\n");
@@ -109,7 +127,7 @@ public class VrpTaskPlanningSolver {
         log.info("total driving time:"+totalDrivingTime);
 
         log.info("per employee mins:");
-        Map<String,IntSummaryStatistics> map=problem.getShifts().stream().collect(Collectors.groupingBy(s->s.getEmployee().getName(),Collectors.summarizingInt(s->s.getChainDuration())));
+        Map<String,IntSummaryStatistics> map=solution.getShifts().stream().collect(Collectors.groupingBy(s->s.getEmployee().getName(),Collectors.summarizingInt(s->s.getChainDuration())));
         map.entrySet().forEach(e->{
             log.info(e.getKey()+"---"+e.getValue().getSum());
         });
@@ -122,7 +140,7 @@ public class VrpTaskPlanningSolver {
         Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
 
         toDisplayString(new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()});
-
+        log.info("---------------Printing Solution Information Completed-----");
     }
 
     private void printBreaksInfo(List<Shift> shifts) {
@@ -163,6 +181,7 @@ public class VrpTaskPlanningSolver {
             t.setLocationsDistanceMatrix(problem.getLocationsDistanceMatrix());
             t.setLocationsRouteMatrix(problem.getLocationsRouteMatrix());
         });
+        //removeBreaks(problem);
         VrpTaskPlanningSolution solution=null;
         try {
             //TODO put submiss id here
@@ -172,10 +191,24 @@ public class VrpTaskPlanningSolver {
 
             director.setWorkingSolution(solution);
             Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            printSolutionInformation( solution);
+            //log.info(solver.explainBestScore());
+            getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
             return new Object[]{solution,indictmentMap};
         }catch (Exception e){
-            //e.printStackTrace();
-            throw  e;
+            e.printStackTrace();
+            //throw  e;
+        }
+        return null;
+    }
+
+    private void removeBreaks(VrpTaskPlanningSolution problem) {
+        Iterator<Task> iterator = problem.getTasks().iterator();
+        while (iterator.hasNext()){
+            Task task =iterator.next();
+            if(task.isShiftBreak()){
+                iterator.remove();
+            }
         }
     }
 
@@ -247,4 +280,10 @@ public class VrpTaskPlanningSolver {
     }
 
 
+    public boolean terminateEarly() {
+        return solver.terminateEarly();
+    }
+    public boolean isTerminateEarly() {
+        return solver.isTerminateEarly();
+    }
 }

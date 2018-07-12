@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -27,7 +27,7 @@ public class DataSubjectMappingDTO {
     private String description;
 
     @NotNull(message = "Organization  Type  can't be  null")
-    @NotEmpty(message = "Oraganization Type  can't be  empty")
+    @NotEmpty(message = "Organization Type  can't be  empty")
     @Valid
     private List<OrganizationTypeDTO> organizationTypes;
 
@@ -36,7 +36,7 @@ public class DataSubjectMappingDTO {
     @Valid
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
-    @NotEmpty(message = "DataCategorie  can't be  empty")
+    @NotEmpty(message = "Data Category  can't be  empty")
     @NotNull(message = "Data category  can't be  null")
     private Set<BigInteger> dataCategories;
 

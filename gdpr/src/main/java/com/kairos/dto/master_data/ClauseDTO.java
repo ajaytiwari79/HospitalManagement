@@ -5,7 +5,7 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -58,14 +58,14 @@ public class ClauseDTO {
 
     private BigInteger templateType;
 
-    private List<Long> organnizationList;
+    private List<Long> organizationList;
 
-    public List<Long> getOrgannizationList() {
-        return organnizationList;
+    public List<Long> getOrganizationList() {
+        return organizationList;
     }
 
-    public void setOrgannizationList(List<Long> organnizationList) {
-        this.organnizationList = organnizationList;
+    public void setOrganizationList(List<Long> organizationList) {
+        this.organizationList = organizationList;
     }
 
     public BigInteger getTemplateType() { return templateType; }

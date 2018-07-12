@@ -227,11 +227,6 @@ public class RuleTemplateService extends MongoBaseService {
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
-        BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",false,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
-        breaksInShiftWTATemplate.setCountryId(countryDTO.getId());
-        breaksInShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        breaksInShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        wtaBaseRuleTemplates1.add(breaksInShiftWTATemplate);
         save(wtaBaseRuleTemplates1);
 
 

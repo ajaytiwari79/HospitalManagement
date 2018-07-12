@@ -7,10 +7,10 @@ import com.kairos.activity.time_bank.CTARuleTemplateDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.user.country.experties.AppliedFunctionDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.user.country.experties.AppliedFunctionDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;

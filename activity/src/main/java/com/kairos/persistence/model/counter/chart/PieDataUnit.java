@@ -2,14 +2,14 @@ package com.kairos.persistence.model.counter.chart;
 
 public class PieDataUnit {
     private String label;
-    private String value;
+    private double value;
 
     /*
      * @author: mohit.shakya@oodlestechnologies.com
      * @dated: Jun/29/2018
      */
 
-    public PieDataUnit(String label, String value){
+    public PieDataUnit(String label, double value){
         this.label = label;
         this.value = value;
     }
@@ -22,11 +22,11 @@ public class PieDataUnit {
         this.label = label;
     }
 
-    public String getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(double value) {
         this.value = value;
     }
 }

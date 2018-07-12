@@ -2,7 +2,7 @@ package com.kairos.persistance.model.master_data.data_category_element;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
 public class DataElement extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -31,5 +31,13 @@ public class DataElement extends MongoBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public DataElement( String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
+    public DataElement() {
     }
 }

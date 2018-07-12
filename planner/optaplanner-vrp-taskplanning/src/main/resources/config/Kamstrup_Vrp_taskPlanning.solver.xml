@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
+    <moveThreadCount>4</moveThreadCount>
     <!--<environmentMode>FULL_ASSERT</environmentMode>-->
     <!--<environmentMode>FAST_ASSERT</environmentMode>-->
     <solutionClass>com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution</solutionClass>
@@ -7,7 +8,7 @@
     <entityClass>com.kairos.planner.vrp.taskplanning.model.TaskOrShift</entityClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>
     <scoreDirectorFactory>
-        <scoreDrl>drl/vrp_task_rules.drl</scoreDrl>
+        <!--<scoreDrl>drl/vrp_task_rules.drl</scoreDrl>-->
         <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
     </scoreDirectorFactory>
     <constructionHeuristic>
@@ -66,6 +67,6 @@
     </localSearch>
 
     <termination>
-        <secondsSpentLimit>300</secondsSpentLimit>
+        <secondsSpentLimit>600</secondsSpentLimit>
     </termination>
 </solver>

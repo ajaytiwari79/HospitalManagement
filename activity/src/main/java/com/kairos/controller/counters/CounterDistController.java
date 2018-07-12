@@ -1,8 +1,6 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.CounterDistDTO;
-import com.kairos.activity.counter.ModuleCounterGroupingDTO;
-import com.kairos.activity.counter.RoleCounterDTO;
+import com.kairos.activity.counter.*;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.service.counter.CounterManagementService;
@@ -12,10 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -90,5 +85,72 @@ public class CounterDistController {
 
     public ResponseEntity<Map<String, Object>> getInitialCounterSettingsForIndividual(){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    @GetMapping("/counters")
+    public ResponseEntity<Map<String, Object>> getAvailableCountersList(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList());
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionData(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData());
+    }
+
+    @PostMapping("/category")
+    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistribution(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
+        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @GetMapping("/module/{moduleId}/initials")
+    public ResponseEntity<Map<String, Object>> getInitialDataForTabKPIConfiguration(@PathVariable Long countryId, @PathVariable String moduleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, countryId));
+    }
+
+    @PostMapping("/module/{moduleId}/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntry){
+        counterManagementService.addTabKPIEntries(tabKPIEntry);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping("/module/{moduleId}/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeTabKPIEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntryConfDTO){
+        counterManagementService.removeTabKPIEntries(tabKPIEntryConfDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PostMapping("/access_group/initials")
+    public ResponseEntity<Map<String, Object>> getInitialDataForAccessGroupKPIConf(@RequestBody List<Long> accessGroupIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupIds));
+    }
+
+    @PostMapping("/access_group/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addAccessGroupKPIEntry(@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
+        counterManagementService.addAccessGroupKPIEntries(accessGroupKPIConf);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping("/access_group/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntry(@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
+        counterManagementService.removeOrgTypeKPIEntries(accessGroupKPIConf);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @GetMapping("/org_type/{orgTypeId}/initials")
+    public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long orgTypeId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId));
+    }
+
+    @PostMapping("/org_type/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addOrgTypeKPIEntry(@RequestBody OrgTypeKPIConfDTO orgTypeKPIConf){
+        counterManagementService.addOrgTypeKPIEntries(orgTypeKPIConf);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping("/org_type/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeOrgTypeKPIEntry(@RequestBody OrgTypeKPIConfDTO orgTypeKPIConf){
+        counterManagementService.removeOrgTypeKPIEntries(orgTypeKPIConf);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }

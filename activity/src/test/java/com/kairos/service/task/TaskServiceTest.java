@@ -30,7 +30,7 @@ public class TaskServiceTest {
 
     /**
      * this test case doesn't any busy logic in application,
-     * it just check specification pattern rules
+     * it just check rule_validator pattern rules
      */
     @Ignore
     @Test

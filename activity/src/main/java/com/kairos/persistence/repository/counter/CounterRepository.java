@@ -181,6 +181,56 @@ public class CounterRepository {
     //test cases..
     //getCounterListByType for testcases
     public List getEntityItemList(Class claz){
-        return mongoTemplate.findAll(claz);
+        Query query = new Query(Criteria.where("deleted").is(false));
+        return mongoTemplate.find(query, claz);
+    }
+
+    //CounterCategories crud
+
+    public List<KPICategory> getCategoriesByNames(List<String> names){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").in(names).and("deleted").is(false));
+        return mongoTemplate.find(query, KPICategory.class);
+    }
+
+    //categoryKPI crud
+
+    public List<KPI> getKPIsByCategory(List<BigInteger> categoryId){
+        Query query = new Query(Criteria.where("categoryId").in(categoryId).and("deleted").is(false));
+        return mongoTemplate.find(query, KPI.class);
+    }
+
+    //tabKPI distribution crud
+
+    public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds){
+        Query query = new Query(Criteria.where("tabId").in(tabIds));
+        return mongoTemplate.find(query, TabKPIEntry.class);
+    }
+
+    public void removeTabKPIConfiguration(TabKPIEntry entry){
+            Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()));
+            mongoTemplate.remove(query, TabKPIEntry.class);
+    }
+
+    //accessGroupKPI distribution crud
+
+    public List<AccessGroupKPIEntry> getAccessGroupKPIConfigurationByAccessGroupId(List<Long> accessGroupIds){
+        Query query = new Query(Criteria.where("accessGroupId").in(accessGroupIds));
+        return mongoTemplate.find(query, AccessGroupKPIEntry.class);
+    }
+
+    public void removeAccessGroupKPIEntry(AccessGroupKPIEntry entry){
+        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()));
+        mongoTemplate.remove(query, AccessGroupKPIEntry.class);
+    }
+
+    public List<OrgTypeKPIEntry> getOrgTypeKPIConfigurationByOrgTypeId(List<Long> accessGroupIds){
+        Query query = new Query(Criteria.where("orgTypeId").in(accessGroupIds));
+        return mongoTemplate.find(query, OrgTypeKPIEntry.class);
+    }
+
+    public void removeOrgTypeKPIEntry(OrgTypeKPIEntry entry){
+        Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
+        mongoTemplate.remove(query, OrgTypeKPIEntry.class);
     }
 }

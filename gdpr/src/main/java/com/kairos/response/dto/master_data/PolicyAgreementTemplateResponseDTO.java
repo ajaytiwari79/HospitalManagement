@@ -6,7 +6,7 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,10 +16,10 @@ public class PolicyAgreementTemplateResponseDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty
     private String name;
 
-    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
+    @NotNullOrEmpty
     private String description;
 
     private List<AccountTypeResponseDTO> accountTypes;

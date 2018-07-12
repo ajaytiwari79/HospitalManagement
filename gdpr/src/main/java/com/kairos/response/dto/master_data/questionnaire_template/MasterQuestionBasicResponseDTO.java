@@ -1,10 +1,8 @@
 package com.kairos.response.dto.master_data.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,12 +10,22 @@ public class MasterQuestionBasicResponseDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotNullOrEmpty(message = "Name can't be empty")
     private String question;
 
     private String description;
 
     private String questionType;
+
+    private Boolean isRequired;
+
+    public Boolean getRequired() {
+        return isRequired;
+    }
+
+    public void setRequired(Boolean required) {
+        isRequired = required;
+    }
 
     public BigInteger getId() {
         return id;

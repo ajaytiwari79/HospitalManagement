@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
  * Created by prerna on 26/2/18.
  */
 public class PositionCodeDTO {
-
+    private Long id;
     @NotEmpty(message = "error.PositionCode.name.notempty")
     @NotNull(message = "error.position_code.name.notnull")
     private String name;
@@ -17,7 +17,7 @@ public class PositionCodeDTO {
 
     private String timeCareId;
 
-    public PositionCodeDTO(){
+    public PositionCodeDTO() {
         // default constructor
     }
 
@@ -49,5 +49,13 @@ public class PositionCodeDTO {
 
     public void setTimeCareId(String timeCareId) {
         this.timeCareId = timeCareId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
