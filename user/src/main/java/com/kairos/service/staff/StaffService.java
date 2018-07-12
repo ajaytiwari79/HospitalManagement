@@ -779,11 +779,11 @@ public class StaffService extends UserBaseService {
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
                     if (row.getCell(17) != null) {
-                        staff.setBadgeNumber(row.getCell(17).toString());
+                        staff.setBadgeNumber(row.getCell(17).toString().trim());
                     }
-                    staff.setFirstName(row.getCell(20).toString());
-                    staff.setLastName(row.getCell(21).toString());
-                    staff.setFamilyName(row.getCell(21).toString());
+                    staff.setFirstName(row.getCell(20).toString().trim());
+                    staff.setLastName(row.getCell(21).toString().trim());
+                    staff.setFamilyName(row.getCell(21).toString().trim());
                     staff.setUserName(row.getCell(19).toString().trim());
                     ContactAddress contactAddress = extractContactAddressFromRow(row);
                     if (!Optional.ofNullable(contactAddress).isPresent()) {
@@ -812,10 +812,10 @@ public class StaffService extends UserBaseService {
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(row.getCell(20).toString());
-                            user.setLastName(row.getCell(21).toString());
+                            user.setFirstName(row.getCell(20).toString().trim());
+                            user.setLastName(row.getCell(21).toString().trim());
                             Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
-                            user.setCprNumber(cprNumberLong.toString());
+                            user.setCprNumber(cprNumberLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             user.setTimeCareExternalId(cell.getStringCellValue());
