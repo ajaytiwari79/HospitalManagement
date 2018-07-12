@@ -1,10 +1,14 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,6 +19,9 @@ public class NoOfSequenceShiftWTATemplateDTO extends WTABaseRuleTemplateDTO
     private int restingTime;
     private PartOfDay sequenceShiftFrom;
     private PartOfDay sequenceShiftTo;
+
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
     public int getSequence() {
         return sequence;
@@ -61,5 +68,21 @@ public class NoOfSequenceShiftWTATemplateDTO extends WTABaseRuleTemplateDTO
 
     public NoOfSequenceShiftWTATemplateDTO() {
         wtaTemplateType= WTATemplateType.NO_OF_SEQUENCE_SHIFT;
+    }
+
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 }

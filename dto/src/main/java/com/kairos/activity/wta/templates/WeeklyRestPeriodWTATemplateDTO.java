@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,24 +11,41 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE16
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
+public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long durationBetweenShifts;
-
-
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private long continuousWeekRest;
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private float recommendedValue;
-    private MinMaxSetting minMaxSetting;
 
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected float recommendedValue;
+    private MinMaxSetting minMaxSetting;
+    private long intervalLength;
+    private String intervalUnit;
+
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -36,22 +53,6 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
 
     public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
         this.minMaxSetting = minMaxSetting;
-    }
-
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
     }
 
     public List<PartOfDay> getPartOfDays() {
@@ -70,6 +71,7 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
         this.recommendedValue = recommendedValue;
     }
 
+
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -77,25 +79,25 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-
-
-    public long getDurationBetweenShifts() {
-        return durationBetweenShifts;
+    public long getContinuousWeekRest() {
+        return continuousWeekRest;
     }
 
-    public void setDurationBetweenShifts(long durationBetweenShifts) {
-        this.durationBetweenShifts = durationBetweenShifts;
+    public void setContinuousWeekRest(long continuousWeekRest) {
+        this.continuousWeekRest = continuousWeekRest;
     }
 
-    public DurationBetweenShiftsWTATemplateDTO(String name, boolean disabled,
-                                               String description, long durationBetweenShifts) {
+    public WeeklyRestPeriodWTATemplateDTO(String name, boolean disabled,
+                                          String description, long continuousWeekRest) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.durationBetweenShifts = durationBetweenShifts;
+
+        this.continuousWeekRest=continuousWeekRest;
 
     }
-    public DurationBetweenShiftsWTATemplateDTO() {
-        this.wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
+
+    public WeeklyRestPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;;
     }
-    }
+}

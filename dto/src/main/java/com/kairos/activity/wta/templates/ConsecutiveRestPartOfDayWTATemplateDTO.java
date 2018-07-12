@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,22 +11,35 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE11
+ * TEMPLATE4
  */
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
+public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long intervalLength;
-    private String intervalUnit;
+    private long minimumRest;//hh:mm
+    private long daysWorked;
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-
-    private List<PartOfDay> partOfDays = new ArrayList<>();
-    private float recommendedValue;
+    protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
+    private Long consecutiveDays;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
+
 
     public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
@@ -42,14 +55,6 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
         this.timeTypeIds = timeTypeIds;
-    }
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
     }
 
     public List<PartOfDay> getPartOfDays() {
@@ -68,6 +73,7 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.recommendedValue = recommendedValue;
     }
 
+
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -75,43 +81,41 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-
-
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
+    public long getMinimumRest() {
+        return minimumRest;
     }
 
 
-
-    public AverageScheduledTimeWTATemplateDTO(String name, boolean disabled,
-                                              String description, long intervalLength, long validationStartDateMillis
-            , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
-        this.intervalLength = intervalLength;
-        this.name = name;
-        this.disabled = disabled;
-        this.description = description;
-        this.intervalUnit=intervalUnit;
-
+    public void setMinimumRest(long minimumRest) {
+        this.minimumRest = minimumRest;
     }
 
-    public String getIntervalUnit() {
-        return intervalUnit;
+    public long getDaysWorked() {
+        return daysWorked;
     }
 
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
+    public void setDaysWorked(long daysWorked) {
+        this.daysWorked = daysWorked;
     }
 
-
-    public AverageScheduledTimeWTATemplateDTO() {
-        this.wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
+    public Long getConsecutiveDays() {
+        return consecutiveDays;
     }
 
+    public void setConsecutiveDays(Long consecutiveDays) {
+        this.consecutiveDays = consecutiveDays;
+    }
 
+    public ConsecutiveRestPartOfDayWTATemplateDTO(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
+        this.name=name;
+        this.disabled=disabled;
+        this.description=description;
+        this.minimumRest = minimumRest;
+        this.daysWorked = daysWorked;
+
+    }
+    public ConsecutiveRestPartOfDayWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
+    }
 
 }

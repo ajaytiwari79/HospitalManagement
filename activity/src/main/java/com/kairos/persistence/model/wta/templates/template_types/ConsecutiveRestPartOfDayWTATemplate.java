@@ -25,6 +25,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
     private long minimumRest;//hh:mm
     private long daysWorked;
+    private Long consecutiveDays;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -98,6 +99,13 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.daysWorked = daysWorked;
     }
 
+    public Long getConsecutiveDays() {
+        return consecutiveDays;
+    }
+
+    public void setConsecutiveDays(Long consecutiveDays) {
+        this.consecutiveDays = consecutiveDays;
+    }
 
     public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
         this.name=name;

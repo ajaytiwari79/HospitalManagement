@@ -1,4 +1,4 @@
-package com.kairos.activity.wta;
+package com.kairos.activity.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -25,7 +25,7 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private MinMaxSetting minMaxSetting;
     private int numberOfWeeks;
     private LocalDate validationStartDate;
-
+    private Long vetoPerPeriod;
 
     public int getNumberOfWeeks() {
         return numberOfWeeks;
@@ -76,6 +76,13 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.wtaTemplateType = wtaTemplateType;
     }
 
+    public Long getVetoPerPeriod() {
+        return vetoPerPeriod;
+    }
+
+    public void setVetoPerPeriod(Long vetoPerPeriod) {
+        this.vetoPerPeriod = vetoPerPeriod;
+    }
 
     public VetoPerPeriodWTATemplateDTO(String name, boolean disabled,
                                        String description) {

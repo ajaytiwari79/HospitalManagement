@@ -1,7 +1,7 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.activity.wta.templates.AgeRange;
+import com.kairos.activity.wta.AgeRange;
 import com.kairos.enums.WTATemplateType;
 
 import java.math.BigInteger;
