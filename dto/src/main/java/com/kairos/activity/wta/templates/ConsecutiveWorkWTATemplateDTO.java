@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,6 +29,8 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private MinMaxSetting minMaxSetting;
     private int intervalLength;
     private String intervalUnit;
+    private Long consecutiveDays;
+
 
     public int getIntervalLength() {
         return intervalLength;
@@ -87,7 +89,6 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
 
-
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -115,6 +116,14 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public ConsecutiveWorkWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+    }
+
+    public Long getConsecutiveDays() {
+        return consecutiveDays;
+    }
+
+    public void setConsecutiveDays(Long consecutiveDays) {
+        this.consecutiveDays = consecutiveDays;
     }
 
     public ConsecutiveWorkWTATemplateDTO(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {

@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

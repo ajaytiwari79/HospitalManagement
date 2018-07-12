@@ -3,9 +3,7 @@ package com.kairos.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.kairos.activity.wta.*;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.activity.wta.rules.*;
 import com.kairos.activity.wta.templates.*;
 import com.kairos.enums.WTATemplateType;
 

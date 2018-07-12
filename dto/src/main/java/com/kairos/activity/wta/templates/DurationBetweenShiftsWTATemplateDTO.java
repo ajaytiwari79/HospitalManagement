@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.rules;
+package com.kairos.activity.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,23 +11,22 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE4
+ * TEMPLATE16
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateDTO {
+public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long minimumRest;//hh:mm
-    private long daysWorked;
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    private long durationBetweenShifts;
 
+
+    private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    protected float recommendedValue;
+    private float recommendedValue;
     private MinMaxSetting minMaxSetting;
 
 
@@ -38,7 +37,6 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
     public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
         this.minMaxSetting = minMaxSetting;
     }
-
 
     public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;
@@ -72,7 +70,6 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
         this.recommendedValue = recommendedValue;
     }
 
-
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -80,34 +77,25 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public long getMinimumRest() {
-        return minimumRest;
+
+
+    public long getDurationBetweenShifts() {
+        return durationBetweenShifts;
     }
 
-
-    public void setMinimumRest(long minimumRest) {
-        this.minimumRest = minimumRest;
+    public void setDurationBetweenShifts(long durationBetweenShifts) {
+        this.durationBetweenShifts = durationBetweenShifts;
     }
 
-    public long getDaysWorked() {
-        return daysWorked;
-    }
-
-    public void setDaysWorked(long daysWorked) {
-        this.daysWorked = daysWorked;
-    }
-
-
-    public ConsecutiveRestPartOfDayWTATemplateDTO(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
-        this.name=name;
-        this.disabled=disabled;
-        this.description=description;
-        this.minimumRest = minimumRest;
-        this.daysWorked = daysWorked;
+    public DurationBetweenShiftsWTATemplateDTO(String name, boolean disabled,
+                                               String description, long durationBetweenShifts) {
+        this.name = name;
+        this.disabled = disabled;
+        this.description = description;
+        this.durationBetweenShifts = durationBetweenShifts;
 
     }
-    public ConsecutiveRestPartOfDayWTATemplateDTO() {
-        this.wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
+    public DurationBetweenShiftsWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
     }
-
-}
+    }

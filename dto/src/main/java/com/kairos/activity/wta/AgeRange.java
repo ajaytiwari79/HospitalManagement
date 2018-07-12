@@ -1,4 +1,4 @@
-package com.kairos.activity.wta.templates;
+package com.kairos.activity.wta;
 
 /**
  * Created by pavan on 24/4/18.
