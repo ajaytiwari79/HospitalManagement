@@ -226,9 +226,6 @@ public class Task extends TaskOrShift{
         if(prevTaskOrShift instanceof Shift || shiftBreak) return 0;
         Task prevTask=getPreviousValidTask();
         if(prevTask==null) return 0;
-        if(Objects.equals(this.latitude,prevTask.latitude) && Objects.equals(this.longitude,prevTask.longitude)){
-            return 1;
-        }
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
         return lpd.getTime();
     }

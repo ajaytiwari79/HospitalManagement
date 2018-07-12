@@ -360,9 +360,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("Match (u:User) WHERE id(u)={0} \n" +
             "Match (org:Organization{isEnable:true})-[:HAS_EMPLOYMENTS]-(e:Employment)-[:BELONGS_TO]-(s:Staff)-[:BELONGS_TO]-(u) \n" +
-            "OPTIONAL match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with e,org+[unit] as coll\n" +
+            "match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with e,org+[unit] as coll\n" +
             "unwind coll as units with  distinct units,e \n" +
-            "OPTIONAL match  (o:Organization{isEnable:true})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
+            "match  (o:Organization{isEnable:true})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
             "WHERE o.isParentOrganization=true AND o.organizationLevel=\"CITY\" \n" +
             "with o,e, [o]+units as units  unwind units as org  WITH distinct org,o,e\n" +
             "Match (e)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission\n" +

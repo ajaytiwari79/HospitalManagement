@@ -325,15 +325,9 @@ public class PlannerController {
     }
 
     @GetMapping(value = "/{solverConfigId}")
-    @ApiOperation("get solution of solver config by date")
-    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfigByDate(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId,@RequestParam(value = "date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfigByDate(unitId,solverConfigId,date));
-    }
-
-    @GetMapping(value = "/solution_by_week/{solverConfigId}")
     @ApiOperation("get solution of solver config")
-    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId));
+    public ResponseEntity<Map<String, Object>> getSolutionBySolverConfig(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId,@RequestParam(value = "date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.getSolutionBySolverConfig(unitId,solverConfigId,date));
     }
 
     @PostMapping(value = "/vrp_completed/{solverConfigId}")
@@ -341,7 +335,6 @@ public class PlannerController {
     public ResponseEntity<Map<String, Object>> planningCompleted(@PathVariable Long unitId,@PathVariable BigInteger solverConfigId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,vrpPlanningService.planningCompleted(unitId,solverConfigId));
     }
-
 
 
 }

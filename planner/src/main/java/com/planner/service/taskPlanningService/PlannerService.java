@@ -7,7 +7,6 @@ import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.vrp.vrpPlanning.VRPIndictmentDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.domain.taskPlanning.PlanningProblem;
@@ -15,7 +14,6 @@ import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.enums.PlanningStatus;
 import com.planner.repository.config.SolverConfigRepository;
 import com.planner.repository.taskPlanningRepository.PlanningRepository;
-import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
 import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
 import com.planner.service.Client.PlannerRestClient;
@@ -36,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.util.List;
 
 
 @Service
@@ -60,7 +57,6 @@ public class PlannerService {
     @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
     @Autowired private PlannerRestClient plannerRestClient;
     @Autowired private VRPPlannerService vrpPlannerService;
-    @Autowired private IndictmentMongoRepository indictmentMongoRepository;
 
 
     public TaskPlanningDTO getPlanningProblemByid(String id){
@@ -159,11 +155,6 @@ public class PlannerService {
         vrpPlanningMongoRepository.save(vrpPlanningSolution);*/
 /*
         */return ObjectMapperUtils.copyPropertiesByMapper(solution,VrpTaskPlanningDTO.class);
-    }
-
-    public VRPIndictmentDTO getIndictmentBySolverConfigId(BigInteger solverConfigId){
-        VRPIndictmentDTO vrpIndictmentDTO = indictmentMongoRepository.getIndictmentBySolverConfigId(solverConfigId);
-        return vrpIndictmentDTO;
     }
 
 

@@ -31,7 +31,7 @@ public class PlannerRestClient {
     public <T, V> RestTemplateResponseEnvelope<V> publish(int plannerNo,T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
         try {
-            String url=baseUrl+"/"+plannerNo+"/api/v1/"+"unit/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
+            String url=+plannerNo+"/api/v1/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
@@ -89,7 +89,6 @@ public class PlannerRestClient {
                 break;
             case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
                 break;
-            case GET_INDICTMENT:uri=String.format("/vrp/%s/get_indictment",pathParams);
         }/*
 
         else if (t instanceof VrpTaskPlanningDTO){
