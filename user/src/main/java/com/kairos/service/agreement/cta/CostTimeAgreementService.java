@@ -690,7 +690,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public Boolean publishCountryCTAToNewOrganizationByOrgSubType(Long organizationId, List<Long> orgSubTypeId) {
-        List<CostTimeAgreement> costTimeAgreements = collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(orgSubTypeId, false);
+        List<CostTimeAgreement> costTimeAgreements = collectiveTimeAgreementGraphRepository.getAllCTAByOrganizationSubType(orgSubTypeId, false);
         collectiveTimeAgreementGraphRepository.detachAllCTAFromOrganization(organizationId);
         Organization org = organizationGraphRepository.findOne(organizationId);
         org.setCostTimeAgreements(costTimeAgreements);
@@ -896,7 +896,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId) {
-        return collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(organizationSubTypeId);
+        return collectiveTimeAgreementGraphRepository.getAllCTAByOrganizationSubType(organizationSubTypeId);
     }
 
     public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) throws ExecutionException, InterruptedException {

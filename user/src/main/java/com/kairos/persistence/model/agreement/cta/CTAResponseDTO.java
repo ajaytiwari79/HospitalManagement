@@ -24,8 +24,8 @@ public class CTAResponseDTO {
     private String name;
     private String description;
     private Expertise expertise;
-    private Long organizationType;
-    private Long organizationSubType;
+    private OrganizationType organizationType;
+    private OrganizationType organizationSubType;
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
     private Long startDateMillis;
     private Long endDateMillis;
@@ -80,19 +80,19 @@ public class CTAResponseDTO {
         this.expertise = expertise;
     }
 
-    public Long getOrganizationType() {
+    public OrganizationType getOrganizationType() {
         return organizationType;
     }
 
-    public void setOrganizationType(Long organizationType) {
+    public void setOrganizationType(OrganizationType organizationType) {
         this.organizationType = organizationType;
     }
 
-    public Long getOrganizationSubType() {
+    public OrganizationType getOrganizationSubType() {
         return organizationSubType;
     }
 
-    public void setOrganizationSubType(Long organizationSubType) {
+    public void setOrganizationSubType(OrganizationType organizationSubType) {
         this.organizationSubType = organizationSubType;
     }
 
