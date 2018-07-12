@@ -7,23 +7,23 @@ import com.kairos.persistence.model.agreement.cta.CTARuleTemplateDTO;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollectiveTimeAgreementDTO {
     private Long id;
     private String name;
     private String description;
-    @NotNull(message = "error.cta_response.expertise.notNull")
+    @NotNull(message = "error.cta.expertise.notNull")
     private Long expertise;
-    @NotNull(message = "error.cta.organizationType.notNull")
     private Long organizationType;
-    @NotNull(message = "error.cta.organizationSubType.notNull")
     private Long organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
-    @NotNull(message = "error.cta_response.startDate.notNull")
+    @NotNull(message = "error.cta.startDate.notNull")
     private Long startDateMillis;
     private Long endDateMillis;
     private boolean disabled;
+
     public CollectiveTimeAgreementDTO() {
 
     }
@@ -108,7 +108,7 @@ public class CollectiveTimeAgreementDTO {
         this.disabled = disabled;
     }
 
-    public CollectiveTimeAgreementDTO(String name, String description, Long expertiseId, Long organizationTypeId, Long organizationSubTypeId,Long startDateMillis, List<CTARuleTemplateDTO> ruleTemplates) {
+    public CollectiveTimeAgreementDTO(String name, String description, Long expertiseId, Long organizationTypeId, Long organizationSubTypeId, Long startDateMillis, List<CTARuleTemplateDTO> ruleTemplates) {
         this.setName(name);
         this.setDescription(description);
         this.setExpertise(expertiseId);

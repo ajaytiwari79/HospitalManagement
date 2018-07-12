@@ -35,7 +35,7 @@ import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.rest_client.priority_group.PriorityGroupRestClient;
+import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
@@ -96,7 +96,7 @@ public class ExpertiseService extends UserBaseService {
     @Inject
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
     @Inject
-    private PriorityGroupRestClient priorityGroupRestClient;
+    private GenericRestClient genericRestClient;
     @Inject
     private ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
 
@@ -153,7 +153,7 @@ public class ExpertiseService extends UserBaseService {
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
                 null, null, null, null, countryId, expertise.getId());
-        priorityGroupRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
                 "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return expertiseResponseDTO;
     }
@@ -751,7 +751,7 @@ public class ExpertiseService extends UserBaseService {
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
         List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyPropertiesOfListByMapper
-                (priorityGroupRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
+                (genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
 
         countryDetail.put("employmentTypes", employmentTypes);
         countryDetail.put("presenceTypes", presenceTypes);

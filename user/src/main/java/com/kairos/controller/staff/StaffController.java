@@ -408,7 +408,6 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId,
                                                                 @RequestParam("file") MultipartFile multipartFile,
                                                                 @RequestParam("accessGroupId") Long accessGroupId) {
-        vrpClientService.importClients(unitId,multipartFile);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffService.batchAddStaffToDatabase(unitId, multipartFile, accessGroupId));
     }
@@ -646,8 +645,8 @@ public class StaffController {
 
     @ApiOperation(value = "update and set main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
-    public ResponseEntity<Map<String,Object>> updateMainEmployment( @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirm){
-        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(staffId,employmentDTO,confirm));
+    public ResponseEntity<Map<String,Object>> updateMainEmployment(@PathVariable long unitId, @PathVariable long staffId , @RequestBody EmploymentDTO employmentDTO, @QueryParam("confirm") Boolean confirmMainEmploymentOverriding){
+        return  ResponseHandler.generateResponse(HttpStatus.OK,true,staffService.updateMainEmployment(unitId,staffId,employmentDTO,confirmMainEmploymentOverriding));
     }
 
     @ApiOperation(value ="remove main employment")

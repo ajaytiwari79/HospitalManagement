@@ -1,18 +1,25 @@
 package com.kairos.activity.wta.version;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.activity.shift.Expertise;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.user.organization.position_code.PositionCodeDTO;
 
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class WTAVersionDTO {
 
+
     private Date startDate;
     private Date endDate;
+    // TODO fix need to make constant fields for date
+    private Long startDateMillis;
+    private Long endDateMillis;
     private Long expiryDate;
     private String name;
     private BigInteger id;
@@ -20,9 +27,22 @@ public class WTAVersionDTO {
     private Boolean disabled;
     private List<WTAVersionDTO> versions = new ArrayList<>();
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
+    private Long parentUnitId;
+    private Long unitId;
+    private Map<String, Object> unitInfo;
+    private PositionCodeDTO positionCode;
+    private Long unitPositionId;
 
     public WTAVersionDTO() {
         //dc
+    }
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public Boolean getDisabled() {
@@ -95,5 +115,53 @@ public class WTAVersionDTO {
 
     public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
+    }
+
+    public Long getParentUnitId() {
+        return parentUnitId;
+    }
+
+    public void setParentUnitId(Long parentUnitId) {
+        this.parentUnitId = parentUnitId;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public Map<String, Object> getUnitInfo() {
+        return unitInfo;
+    }
+
+    public void setUnitInfo(Map<String, Object> unitInfo) {
+        this.unitInfo = unitInfo;
+    }
+
+    public PositionCodeDTO getPositionCode() {
+        return positionCode;
+    }
+
+    public void setPositionCode(PositionCodeDTO positionCode) {
+        this.positionCode = positionCode;
+    }
+
+    public Long getStartDateMillis() {
+        return startDate.getTime();
+    }
+
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDate.getTime();
+    }
+
+    public Long getEndDateMillis() {
+        return (endDate!=null)?endDate.getTime():null;
+    }
+
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = (endDate!=null)?endDate.getTime():null;
     }
 }

@@ -2,7 +2,7 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ModuleIdDTO {

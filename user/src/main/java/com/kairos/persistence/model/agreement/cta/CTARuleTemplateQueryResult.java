@@ -23,7 +23,7 @@ public class CTARuleTemplateQueryResult {
     public String name;
     public String description;
     public boolean disabled;
-    @NotNull
+    //@NotNull
     public Long ruleTemplateCategory;
     private String ruleTemplateType;
     private String payrollType;
@@ -42,7 +42,7 @@ public class CTARuleTemplateQueryResult {
     private List<Long> staffFunctions = new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
-    private List<Long> activityIds;
+    private List<Long> activityIds = new ArrayList<>();
     private List<Long> timeTypeIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<Long> dayTypeIds;

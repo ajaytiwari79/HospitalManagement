@@ -3,7 +3,9 @@ package com.kairos.service.master_data.questionnaire_template;
 import com.kairos.dto.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
+import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionMongoRepository;
+import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireSectionRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoClientException;
@@ -30,14 +32,17 @@ public class MasterQuestionService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private MasterQuestionnaireSectionRepository masterQuestionnaireSectionRepository;
+
     /**
-     * @description
      * @param countryId
      * @param organizationId
-     * @param masterQuestionDTOs  list of questionDto which belongs to section
+     * @param masterQuestionDTOs list of questionDto which belongs to section
      * @return map contain list of questions and question ids
+     * @description
      */
-    public Map<String, Object> addQuestionsToQuestionSection(Long countryId,Long organizationId,List<MasterQuestionDTO> masterQuestionDTOs) {
+    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs) {
 
         List<BigInteger> questionSectionIds = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
@@ -80,26 +85,42 @@ public class MasterQuestionService extends MongoBaseService {
 
     }
 
-    public Boolean deleteMasterQuestion(Long countryId,Long organizationId,BigInteger id) {
+    /**
+     * @description   deleted question by id ,and also remove id of question from questionnaire section.
+     * @param countryId
+     * @param organizationId
+     * @param id  - id of question
+     * @param sectionId -sectionId id of questionnaire section
+     * @return
+     */
+    public Boolean deleteMasterQuestion(Long countryId, Long organizationId, BigInteger id, BigInteger sectionId) {
 
-        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (exist == null) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " question ", id);
         }
+        MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, organizationId, sectionId);
+        List<BigInteger> questionsIdList = questionnaireSection.getQuestions();
+        if (!questionsIdList.contains(id)) {
+            exceptionService.invalidRequestException("message.invalid", "question  not present in questionnaire section "+questionnaireSection.getTitle()+"");
+        }
+        questionsIdList.remove(id);
+        questionnaireSection.setQuestions(questionsIdList);
+        masterQuestionnaireSectionRepository.save(sequenceGenerator(questionnaireSection));
         delete(exist);
         return true;
 
     }
 
 
-    public List<MasterQuestion> getAllMasterQuestion(Long countryId,Long organizationId) {
-        return questionMongoRepository.getAllMasterQuestion(countryId,organizationId);
+    public List<MasterQuestion> getAllMasterQuestion(Long countryId, Long organizationId) {
+        return questionMongoRepository.getAllMasterQuestion(countryId, organizationId);
 
     }
 
 
-    public MasterQuestion getMasterQuestion(Long countryId,Long organizationId,BigInteger id) {
-        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+    public MasterQuestion getMasterQuestion(Long countryId, Long organizationId, BigInteger id) {
+        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (exist == null) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.master.question", id);
         }
@@ -108,15 +129,14 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-
     /**
-     * @description method update the existing question(if question contain id) and create new question questions(if not contain id)
      * @param countryId
      * @param organizationId
      * @param questionDTOs   contain list of Existing questions and new questions
      * @return map contain list of questions and question ids.
+     * @description method update the existing question(if question contain id) and create new question questions(if not contain id)
      */
-    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId,Long organizationId,List<MasterQuestionDTO> questionDTOs) {
+    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, Long organizationId, List<MasterQuestionDTO> questionDTOs) {
 
         checkForDuplicacyInQuestion(questionDTOs);
         List<MasterQuestionDTO> updateExistingQuestions = new ArrayList<>();
@@ -130,18 +150,18 @@ public class MasterQuestionService extends MongoBaseService {
                     }
                 }
         );
-        Map<String, Object> updatedQuestions,newQuestions ;
+        Map<String, Object> updatedQuestions, newQuestions;
         List<BigInteger> questionIds = new ArrayList<>();
         List<MasterQuestion> masterQuestions = new ArrayList<>();
 
         if (createNewQuestions.size() != 0) {
-            newQuestions = addQuestionsToQuestionSection(countryId,organizationId,createNewQuestions);
+            newQuestions = addQuestionsToQuestionSection(countryId, organizationId, createNewQuestions);
             questionIds.addAll((List<BigInteger>) newQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) newQuestions.get(QUESTION_LIST));
         }
         if (updateExistingQuestions.size() != 0) {
 
-            updatedQuestions = updateQuestionsList(countryId, organizationId,updateExistingQuestions);
+            updatedQuestions = updateQuestionsList(countryId, organizationId, updateExistingQuestions);
             questionIds.addAll((List<BigInteger>) updatedQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) updatedQuestions.get(QUESTION_LIST));
         }
@@ -153,12 +173,11 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-
-    public Map<String, Object> updateQuestionsList(Long countryId,Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs) {
+    public Map<String, Object> updateQuestionsList(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs) {
 
         List<BigInteger> questionIds = new ArrayList<>();
         masterQuestionDTOs.forEach(question -> questionIds.add(question.getId()));
-        List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId,organizationId,questionIds);
+        List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, organizationId, questionIds);
 
         Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
         masterQuestionDTOs.forEach(masterQuestionDto -> {
@@ -189,6 +208,18 @@ public class MasterQuestionService extends MongoBaseService {
         result.put(IDS_LIST, questionIds);
         result.put(QUESTION_LIST, updatedQuestionsList);
         return result;
+
+    }
+
+
+    public Boolean deleteAll(Long countryId, Long orgId, List<BigInteger> questionIdsList) {
+
+        List<MasterQuestion> questions = questionMongoRepository.getMasterQuestionListByIds(countryId, orgId, questionIdsList);
+        questions.forEach(masterQuestion -> {
+            masterQuestion.setDeleted(true);
+        });
+        questionMongoRepository.saveAll(questions);
+        return true;
 
     }
 

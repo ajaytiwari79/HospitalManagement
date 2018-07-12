@@ -170,8 +170,8 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA of UnitPosition")
     @PutMapping(value = UNIT_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody WTADTO wtadto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId, wtadto));
+    public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody WTADTO wtadto, @RequestParam Boolean unitPositionPublished) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId, wtadto, unitPositionPublished));
     }
 
 
@@ -214,8 +214,8 @@ public class WTAController {
 
     @ApiOperation(value = "get Wta with versions By Ids")
     @GetMapping(value = UNIT_URL + "/wta/versions")
-    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@RequestParam List<BigInteger> wtaIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(wtaIds));
+    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId, @RequestParam List<BigInteger> wtaIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId, wtaIds));
     }
 
 

@@ -25,7 +25,7 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
     boolean isDefaultSystemLanguageExists();
 
-    @Query("Match (language:SystemLanguage{defaultLanguage:true,deleted:false, inactive:false}) WHERE NOT(id(language)={0}) \n" +
+    @Query("Match (language:SystemLanguage{defaultLanguage:true,deleted:false, active:true}) WHERE NOT(id(language)={0}) \n" +
             "RETURN CASE WHEN count(language)>0 THEN true ELSE false END")
     boolean isDefaultSystemLanguageExistsExceptId(Long syatemLanguageId);
 

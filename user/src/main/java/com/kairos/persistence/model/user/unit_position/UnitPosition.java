@@ -273,6 +273,7 @@ public class UnitPosition extends UserBaseEntity {
         this.published = published;
     }
 
+
     public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
@@ -285,11 +286,31 @@ public class UnitPosition extends UserBaseEntity {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("UnitEmploymentPosition{");
-        sb.append("startDateMillis=").append(startDateMillis);
-        sb.append(", endDateMillis=").append(endDateMillis);
-        sb.append(", totalWeeklyMinutes=").append(totalWeeklyMinutes);
-        sb.append('}');
-        return sb.toString();
+        return "UnitPosition{" +
+                "expertise=" + expertise +
+                ", cta=" + cta +
+                ", workingTimeAgreementId=" + workingTimeAgreementId +
+                ", positionCode=" + positionCode +
+                ", staff=" + staff +
+                ", union=" + union +
+                ", unit=" + unit +
+                ", reasonCode=" + reasonCode +
+                ", seniorityLevel=" + seniorityLevel +
+                ", functions=" + functions +
+                ", startDateMillis=" + startDateMillis +
+                ", endDateMillis=" + endDateMillis +
+                ", lastWorkingDateMillis=" + lastWorkingDateMillis +
+                ", totalWeeklyMinutes=" + totalWeeklyMinutes +
+                ", fullTimeWeeklyMinutes=" + fullTimeWeeklyMinutes +
+                ", avgDailyWorkingHours=" + avgDailyWorkingHours +
+                ", workingDaysInWeek=" + workingDaysInWeek +
+                ", hourlyWages=" + hourlyWages +
+                ", salary=" + salary +
+                ", timeCareExternalId=" + timeCareExternalId +
+                ", history=" + history +
+                ", editable=" + editable +
+                ", published=" + published +
+                ", parentUnitPosition=" + parentUnitPosition +
+                '}';
     }
 }

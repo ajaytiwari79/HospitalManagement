@@ -6,7 +6,7 @@ import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
@@ -40,14 +40,14 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     private Boolean isSubProcess=false;
 
-    private Boolean hasSubProcess=false;
+    private Boolean hasSubProcessingActivity=false;
 
-    public Boolean getHasSubProcess() {
-        return hasSubProcess;
+    public Boolean getHasSubProcessingActivity() {
+        return hasSubProcessingActivity;
     }
 
-    public void setHasSubProcess(Boolean hasSubProcess) {
-        this.hasSubProcess = hasSubProcess;
+    public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) {
+        this.hasSubProcessingActivity = hasSubProcessingActivity;
     }
 
     public Boolean getSubProcess() {

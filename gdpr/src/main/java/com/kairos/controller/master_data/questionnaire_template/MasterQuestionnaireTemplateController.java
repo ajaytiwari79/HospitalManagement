@@ -105,7 +105,6 @@ public class MasterQuestionnaireTemplateController {
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.deleteMasterQuestionnaireTemplate(countryId, organizationId, id));
-
     }
 
     /**

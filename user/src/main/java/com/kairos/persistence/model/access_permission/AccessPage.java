@@ -26,6 +26,7 @@ public class AccessPage extends UserBaseEntity {
     @NotNull(message = "error.name.notnull")
     private String name;
     private boolean isModule;
+    private boolean kpiEnabled;
     private String moduleId;
     private boolean active;
 
@@ -89,4 +90,11 @@ public class AccessPage extends UserBaseEntity {
         this.active = active;
     }
 
+    public boolean isKpiEnabled() {
+        return kpiEnabled;
+    }
+
+    public void setKpiEnabled(boolean kpiEnabled) {
+        this.kpiEnabled = kpiEnabled;
+    }
 }

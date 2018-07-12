@@ -1,4 +1,6 @@
 package com.kairos.persistence.model.table_settings;
+
+import com.kairos.client.dto.TableConfiguration;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,17 +14,19 @@ import java.util.Optional;
 @Document
 public class TableSetting extends MongoBaseEntity {
 
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public List<TableConfiguration> getTableConfigurations() {
-        return Optional.ofNullable(tableConfigurations).orElse(new ArrayList<>());
-    }
 
     private Long userId;
     private Long organizationId;
     private List<TableConfiguration> tableConfigurations;
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+
+    public List<TableConfiguration> getTableConfigurations() {
+        return Optional.ofNullable(tableConfigurations).orElse(new ArrayList<>());
+    }
 
     public void setUserId(long userId) {
         this.userId = userId;
