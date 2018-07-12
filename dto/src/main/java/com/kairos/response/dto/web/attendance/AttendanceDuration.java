@@ -4,11 +4,6 @@ import java.time.LocalDateTime;
 
 public class AttendanceDuration {
 
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-//
-//    private LocalTime from;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-//    private LocalTime to;
 
     private LocalDateTime from;
     private LocalDateTime to;

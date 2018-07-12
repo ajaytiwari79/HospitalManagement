@@ -15,7 +15,6 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.user.organization.OrganizationCommonDTO;
 import com.kairos.user.reason_code.ReasonCodeDTO;
 import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectUtils;
 import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
@@ -43,10 +42,7 @@ public class AttendanceSettingService extends MongoBaseService {
 
     public AttendanceDTO getAttendanceSetting() {
         AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
-        if (!Optional.ofNullable(attendanceSetting).isPresent()) {
-            exceptionService.actionNotPermittedException("message.attendance.notexists");
-        }
-        return new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
+        return (Optional.ofNullable(attendanceSetting).isPresent())?new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration())):null;
     }
 
     public AttendanceDTO updateAttendanceSetting(Long unitId, Long reasonCodeId,boolean checkIn) {
