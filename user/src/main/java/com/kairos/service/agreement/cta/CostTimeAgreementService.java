@@ -832,6 +832,7 @@ public class CostTimeAgreementService extends UserBaseService {
             oldCTA.setDisabled(true);
             costTimeAgreement.setParent(oldCTA);
             unitPosition.setCta(costTimeAgreement);
+            unitPositionService.save(unitPosition);
             responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName(),oldCTA.getExpertise(),costTimeAgreement.getRuleTemplates(),costTimeAgreement.getStartDateMillis(),costTimeAgreement.getEndDateMillis(), false);
 
         } else {
@@ -844,11 +845,12 @@ public class CostTimeAgreementService extends UserBaseService {
                     .buildCTA(oldCTA, collectiveTimeAgreementDTO, true, ruleTemplateIds);
             // Wait until they are all done
             CompletableFuture.allOf(hasUpdated).join();
+            this.save(oldCTA);
             responseCTA = new CostTimeAgreement(oldCTA.getId(), oldCTA.getName(),oldCTA.getExpertise(),oldCTA.getRuleTemplates(),oldCTA.getStartDateMillis(),oldCTA.getEndDateMillis(), false);
 
         }
 
-        unitPositionService.save(unitPosition);
+
         UnitPositionQueryResult unitPositionQueryResult = unitPositionService.getBasicDetails(unitPosition, null);
         responseCTA.setExpertise(unitPositionQueryResult.getExpertise());
         // for FE compactibility
