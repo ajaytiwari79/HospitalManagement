@@ -47,9 +47,10 @@ public class VrpTaskPlanningSolver {
         }
         solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
+            log.info("no of drool files"+drlFileList.size());
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
             solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
-            solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
+            //solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
         }
         solver = solverFactory.buildSolver();
     }
@@ -193,7 +194,7 @@ public class VrpTaskPlanningSolver {
             Map<Object,Indictment> indictmentMap=(Map)director.getIndictmentMap();
             printSolutionInformation( solution);
             //log.info(solver.explainBestScore());
-            getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
+            //getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
             return new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()};
         }catch (Exception e){
             e.printStackTrace();
