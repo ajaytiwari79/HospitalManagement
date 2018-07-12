@@ -762,7 +762,7 @@ public class StaffService extends UserBaseService {
                     cell.setCellType(Cell.CELL_TYPE_STRING);
                     Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this {}" + externalId);
+                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId,cell.getStringCellValue());
                         staffErrorList.add(row.getRowNum());
                         continue;
                     }
@@ -779,12 +779,12 @@ public class StaffService extends UserBaseService {
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
                     if (row.getCell(17) != null) {
-                        staff.setBadgeNumber(row.getCell(17).toString());
+                        staff.setBadgeNumber(row.getCell(17).toString().trim());
                     }
-                    staff.setFirstName(row.getCell(20).toString());
-                    staff.setLastName(row.getCell(21).toString());
-                    staff.setFamilyName(row.getCell(21).toString());
-                    staff.setUserName(row.getCell(19).toString());
+                    staff.setFirstName(row.getCell(20).toString().trim());
+                    staff.setLastName(row.getCell(21).toString().trim());
+                    staff.setFamilyName(row.getCell(21).toString().trim());
+                    staff.setUserName(row.getCell(19).toString().trim());
                     ContactAddress contactAddress = extractContactAddressFromRow(row);
                     if (!Optional.ofNullable(contactAddress).isPresent()) {
                         contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
@@ -812,10 +812,10 @@ public class StaffService extends UserBaseService {
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(row.getCell(20).toString());
-                            user.setLastName(row.getCell(21).toString());
+                            user.setFirstName(row.getCell(20).toString().trim());
+                            user.setLastName(row.getCell(21).toString().trim());
                             Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
-                            user.setCprNumber(cprNumberLong.toString());
+                            user.setCprNumber(cprNumberLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
                             user.setTimeCareExternalId(cell.getStringCellValue());
@@ -825,6 +825,7 @@ public class StaffService extends UserBaseService {
                             }
                             String defaultPassword = user.getFirstName().trim() + "@kairos";
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+                            user.setAccessToken(defaultPassword);
                         }
                         Client client = createClientObject(staff, user.getCprNumber());  // here client is referred as citizen
 
@@ -911,7 +912,7 @@ public class StaffService extends UserBaseService {
                 if (!Optional.ofNullable(contactDetail).isPresent()) {
                     contactDetail = new ContactDetail();
                 }
-                contactDetail.setPrivateEmail(email.toLowerCase());
+                contactDetail.setPrivateEmail(email.toLowerCase().trim());
             }
         }
         return contactDetail;
