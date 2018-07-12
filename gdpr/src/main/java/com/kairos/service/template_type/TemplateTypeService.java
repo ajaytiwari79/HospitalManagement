@@ -10,10 +10,12 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+
 
 @Service
 public class TemplateTypeService extends MongoBaseService {
@@ -59,8 +61,8 @@ public class TemplateTypeService extends MongoBaseService {
             }
             newDataTemplateList = templateTypeRepository.saveAll(sequenceGenerator(newDataTemplateList));
         }
-        result.put("existing", existing);
-        result.put("new", newDataTemplateList);
+        result.put(EXISTING_DATA_LIST, existing);
+        result.put(NEW_DATA_LIST, newDataTemplateList);
         return result;
     }
 
