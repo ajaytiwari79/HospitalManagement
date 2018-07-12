@@ -6,6 +6,6 @@ package com.kairos.enums.solver_config;
  */
 
 public enum PlannerUrl {
-    SUBMIT_VRP_PROBLEM,STOP_VRP_PROBLEM,GET_VRP_SOLUTION,GET_INDICTMENT;
+    SUBMIT_VRP_PROBLEM,STOP_VRP_PROBLEM,GET_VRP_SOLUTION;
 
 }

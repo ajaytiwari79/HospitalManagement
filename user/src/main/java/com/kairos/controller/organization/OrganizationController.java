@@ -1186,12 +1186,8 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO,
                                                                                  @RequestParam("start") String start, @RequestParam("moduleId") String moduleId,@PathVariable Long organizationId) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getOrganizationClients(unitId));
-
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-//                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start, moduleId,organizationId));
+                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start, moduleId,organizationId));
     }
 
     @RequestMapping(value = UNIT_URL + "/dayTypebydate", method = RequestMethod.GET)
