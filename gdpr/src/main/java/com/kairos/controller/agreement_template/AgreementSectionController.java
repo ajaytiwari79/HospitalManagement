@@ -49,41 +49,47 @@ public class AgreementSectionController {
         if (templateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, templateId, agreementSection.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, templateId, agreementSection.getRequestBody()));
 
     }
 
 
-    @DeleteMapping(value = "/agreement_template/section/delete/{id}")
-    public ResponseEntity<Object> deleteAgreementSection(@PathVariable BigInteger id) {
-        if (id != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(id));
+    @ApiOperation("deleted agreement section by id")
+    @DeleteMapping(value = "/agreement_template/{templateId}/section/delete/{id}")
+    public ResponseEntity<Object> deleteAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger templateId, @PathVariable BigInteger id) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "request id Cannot be null");
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        if (templateId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
+        }
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(countryId,organizationId,templateId,id));
 
     }
 
 
+    @ApiOperation("get agreement section by id")
     @GetMapping(value = "/agreement_section/section/{id}")
-    public ResponseEntity<Object> getAgreementSectionWithDataById(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.getAgreementSectionWithDataById(countryId, id));
+    public ResponseEntity<Object> getAgreementSectionWithDataById(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger id) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "request id Cannot be null");
+        if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.getAgreementSectionWithDataById(countryId, id));
     }
 
 
-    @GetMapping(value = "/agreement_section/all")
-    public ResponseEntity<Object> getAllAgreementSection(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.getAllAgreementSection(countryId));
 
-    }
-
-
-    @PostMapping(value = "/agreement_section/list")
-    public ResponseEntity<Object> getAllAgreementSectionList(@PathVariable Long countryId, @RequestBody Set<BigInteger> ids) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.getAgreementSectionWithDataList(countryId, ids));
-
-    }
 
 }

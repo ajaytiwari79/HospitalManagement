@@ -16,11 +16,13 @@ import com.kairos.service.clause.ClauseService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
+import io.netty.util.collection.LongObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.naming.Name;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -45,8 +47,8 @@ public class AgreementSectionService extends MongoBaseService {
     @Inject
     private ClauseService clauseService;
 
-    //todo add update section function also
-    public PolicyAgreementTemplate createUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
+
+    public PolicyAgreementTemplate createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
@@ -60,19 +62,19 @@ public class AgreementSectionService extends MongoBaseService {
                 break;
             }
         }
-        Map<String, Object> agreementSections = new HashMap<>();
+        List<BigInteger> agreementSectionIdList;
         if (flag) {
-            //todo add updated sections functions also
+            agreementSectionIdList = updateAggrementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
+            policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         } else {
-
-            agreementSections = createAggrementTemplateSectionAndClause(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
-            policyAgreementTemplate.setAgreementSections((List<BigInteger>) agreementSections.get(IDS_LIST));
+            agreementSectionIdList = createAggrementSectionsAndClausesAndAddtoAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
+            policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
         try {
             policyAgreementTemplate = policyAgreementTemplateRepository.save(policyAgreementTemplate);
         } catch (MongoException e) {
             LOGGER.warn("Agreement template exception while saving template " + policyAgreementTemplate.getName());
-            remove((List<BigInteger>) agreementSections.get(IDS_LIST), AgreementSection.class);
+            remove(agreementSectionIdList, AgreementSection.class);
             throw new RuntimeException(e);
         }
 
@@ -88,19 +90,19 @@ public class AgreementSectionService extends MongoBaseService {
      * @param policyAgreementTemplate - object for inheriting properties (orgnaization Types,organization Sub Types,Service Category  and Sub Service Category) for new clauses
      * @return
      */
-    public Map<String, Object> createAggrementTemplateSectionAndClause(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+    public List<BigInteger> createAggrementSectionsAndClausesAndAddtoAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         checkForDuplicacyInTitleOfAgreementSections(agreementSectionDTOS);
         List<AgreementSection> agreementSectionList = new ArrayList<>();
-        List<ClauseBasicDTO> changedClausesList = new ArrayList<>();
+        List<ClauseBasicDTO> changedClausesDTOList = new ArrayList<>();
         List<ClauseBasicDTO> newClauseBasicDTOList = new ArrayList<>();
         List<BigInteger> changedClauseIdsList = new ArrayList<>();
         Map<String, AgreementSectionClauseWrapper> agreementSectionClauseAndClauseDtoHashMap = new HashMap<>();
 
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOS) {
             AgreementSection agreementSection = new AgreementSection(countryId, agreementSectionDTO.getName());
-            AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
             agreementSection.setOrganizationId(organizationId);
+            AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
             if (Optional.ofNullable(agreementSectionDTO.getClauses()).isPresent() && !agreementSectionDTO.getClauses().isEmpty()) {
                 List<BigInteger> unchangedClauseidList = new ArrayList<>();
                 List<ClauseBasicDTO> changedClauseBelongToSection = new ArrayList<>();
@@ -111,7 +113,7 @@ public class AgreementSectionService extends MongoBaseService {
                         newClauseBelongToSection.add(clauseBasicDTO);
                     } else if (clauseBasicDTO.getRequireUpdate()) {
                         changedClauseIdsList.add(clauseBasicDTO.getId());
-                        changedClausesList.add(clauseBasicDTO);
+                        changedClausesDTOList.add(clauseBasicDTO);
                         changedClauseBelongToSection.add(clauseBasicDTO);
                     } else {
                         unchangedClauseidList.add(clauseBasicDTO.getId());
@@ -133,7 +135,6 @@ public class AgreementSectionService extends MongoBaseService {
             agreementSectionList = updateExisitingClauseAndAddToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, exisitingClauseList, agreementSectionList, newCreatedClausesList);
         }
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
-        Map<String, Object> result = new HashMap<>();
         try {
             agreementSectionList = agreementSectionMongoRepository.saveAll(sequenceGenerator(agreementSectionList));
             agreementSectionList.forEach(agreementSection -> {
@@ -143,8 +144,7 @@ public class AgreementSectionService extends MongoBaseService {
             LOGGER.warn("Agreement section exception while saving sections:" + e.getMessage());
             throw new RuntimeException(e);
         }
-        result.put(IDS_LIST, agreementSectionIdList);
-        return result;
+        return agreementSectionIdList;
     }
 
 
@@ -161,25 +161,20 @@ public class AgreementSectionService extends MongoBaseService {
         changedClausesList.forEach(clause -> {
             updateClauseMap.put(clause.getId(), clause);
         });
-
         Map<String, Clause> newCreatedClauseMap = new HashMap<>();
         newClauseList.forEach(clause -> {
             newCreatedClauseMap.put(clause.getTitle(), clause);
         });
-
         List<Clause> updateExisitingClauseList = new ArrayList<>();
         for (AgreementSection agreementSection : agreementSectionList) {
-
             AgreementSectionClauseWrapper agreementSectionClauseWrapper = agreementSectionClauseAndClauseDtoHashMap.get(agreementSection.getName());
             List<ClauseBasicDTO> changedClauseBasicDTOList = agreementSectionClauseWrapper.getChangedClausesList();
             List<ClauseBasicDTO> newClauseBasicDTOList = agreementSectionClauseWrapper.getNewClauses();
             updateExisitingClauseList = agreementSectionUpdateClauseListAndAddIdsToSection(changedClauseBasicDTOList, updateClauseMap, updateExisitingClauseList, agreementSection);
             addNewCreatedClauseIdsToAgreementSections(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
-
         }
-        if (updateExisitingClauseList.isEmpty()) {
+        if (!updateExisitingClauseList.isEmpty()) {
             clauseMongoRepository.saveAll(sequenceGenerator(updateExisitingClauseList));
-
         }
         return agreementSectionList;
 
@@ -188,9 +183,9 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param clauseBasicDTOList        - list of clauses which were changed by user
-     * @param updateClauseMap           map contain clause as value and key is clause id.
-     * @param updateExisitingClauseList List of clauses which are changed and to reflect the changes in clauses
-     * @param agreementSection          contain list clause ids, add updated clauses to agreement sections
+     * @param updateClauseMap           - map contain clause as value and key is clause id.
+     * @param updateExisitingClauseList -List of clauses which are changed and to reflect the changes in clauses
+     * @param agreementSection          -contain list clause ids, add updated clauses to agreement sections
      * @return
      */
     public List<Clause> agreementSectionUpdateClauseListAndAddIdsToSection(List<ClauseBasicDTO> clauseBasicDTOList, Map<BigInteger, Clause> updateClauseMap, List<Clause> updateExisitingClauseList, AgreementSection agreementSection) {
@@ -201,7 +196,6 @@ public class AgreementSectionService extends MongoBaseService {
             clause.setDescription(clauseBasicDTO.getDescription());
             updateExisitingClauseList.add(clause);
             clauseIdList.add(clauseBasicDTO.getId());
-
         });
         return updateExisitingClauseList;
     }
@@ -211,29 +205,144 @@ public class AgreementSectionService extends MongoBaseService {
      * @param clauseBasicDTOS         -dto contain list of clause which are created at the time of section creation
      * @param newCreatedClauseHashMap -contain new created clause value coressponding to its title
      * @param agreementSection        -agreement setion contain name and list ids of clauses,
-     * @description this method is used in updateExisitingClauseAndAddToAgreementSection .this method add ids of new created clause  to section.
+     * @description                   -this method is used in updateExisitingClauseAndAddToAgreementSection .this method add ids of new created clause  to section which clause belong.
      */
     public void addNewCreatedClauseIdsToAgreementSections(List<ClauseBasicDTO> clauseBasicDTOS, Map<String, Clause> newCreatedClauseHashMap, AgreementSection agreementSection) {
-
         List<BigInteger> clauseIdList = agreementSection.getClauses();
         clauseBasicDTOS.forEach(clauseBasicDTO -> {
             Clause clause = newCreatedClauseHashMap.get(clauseBasicDTO.getTitle());
             clauseIdList.add(clause.getId());
         });
         agreementSection.setClauses(clauseIdList);
+    }
+
+
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param agreementSectionDTOS    -agreementSectionDTOS contain List of Agreement section Dto Which were already present and also contain new  Agreement Section
+     *                                 ,Sections contain Exisitng clause and new clause
+     * @param policyAgreementTemplate - new clauses which we need to create inherit it properties from policyAgreementTemplate .
+     * @return
+     */
+    public List<BigInteger> updateAggrementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+
+        checkForDuplicacyInTitleOfAgreementSections(agreementSectionDTOS);
+        List<AgreementSectionDTO> exisitingAgreementSectionDtoList = new ArrayList<>();
+        List<AgreementSectionDTO> newAgreementSectionDTOList = new ArrayList<>();
+        agreementSectionDTOS.forEach(agreementSectionDTO -> {
+            if (Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
+                exisitingAgreementSectionDtoList.add(agreementSectionDTO);
+            } else {
+                newAgreementSectionDTOList.add(agreementSectionDTO);
+            }
+        });
+        List<BigInteger> agreementSectionIdList = new ArrayList<>();
+        if (!newAgreementSectionDTOList.isEmpty()) {
+            agreementSectionIdList.addAll(createAggrementSectionsAndClausesAndAddtoAgreementTemplate(countryId, organizationId, newAgreementSectionDTOList, policyAgreementTemplate));
+
+        }
+        agreementSectionIdList.addAll(updateAggrementSectionsAndClauses(countryId, organizationId, exisitingAgreementSectionDtoList, policyAgreementTemplate));
+        return agreementSectionIdList;
+    }
+
+
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param policyAgreementTemplate - new clauses which we need to create inherit it properties from policyAgreementTemplate .
+     * @return                      - list of Agreement Section ids
+     * @description                - AgreementSectionClauseWrapper class  conatain list of clauses for new creation of clause and Clause which needs to be update.
+     *this method update exisiting Sections with  list of clauses( changed or updated ,unchanged and new clause )
+     * update  exisiting Agreement sections and clauses if exist. or create new clause in exisiting agreement sections
+     */
+    public List<BigInteger> updateAggrementSectionsAndClauses(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOSList, PolicyAgreementTemplate policyAgreementTemplate) {
+
+
+        List<BigInteger> agreementSectionIdList = new ArrayList<>();
+        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOSList) {
+            agreementSectionIdList.add(agreementSectionDTO.getId());
+        }
+        List<AgreementSection> agreementSectionList = agreementSectionMongoRepository.findAgreementSectionByIds(countryId, organizationId, agreementSectionIdList);
+        Map<BigInteger, AgreementSection> agreementSectiosnMap = new HashMap<>();
+        agreementSectionList.forEach(agreementSection -> {
+            agreementSectiosnMap.put(agreementSection.getId(), agreementSection);
+        });
+
+        List<ClauseBasicDTO> changedClausesDTOList = new ArrayList<>();
+        List<ClauseBasicDTO> newClauseBasicDTOList = new ArrayList<>();
+        List<BigInteger> changedClauseIdsList = new ArrayList<>();
+        agreementSectionList.clear();
+        Map<String, AgreementSectionClauseWrapper> agreementSectionClauseAndClauseDtoHashMap = new HashMap<>();
+        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOSList) {
+            AgreementSection agreementSection = agreementSectiosnMap.get(agreementSectionDTO.getId());
+            AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
+            if (Optional.ofNullable(agreementSectionDTO.getClauses()).isPresent() && !agreementSectionDTO.getClauses().isEmpty()) {
+                List<BigInteger> unchangedClauseidList = new ArrayList<>();
+                List<ClauseBasicDTO> changedClauseBelongToSection = new ArrayList<>();
+                List<ClauseBasicDTO> newClauseBelongToSection = new ArrayList<>();
+                agreementSectionDTO.getClauses().forEach(clauseBasicDTO -> {
+                    if (!Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
+                        newClauseBasicDTOList.add(clauseBasicDTO);
+                        newClauseBelongToSection.add(clauseBasicDTO);
+                    } else if (clauseBasicDTO.getRequireUpdate()) {
+                        changedClauseIdsList.add(clauseBasicDTO.getId());
+                        changedClausesDTOList.add(clauseBasicDTO);
+                        changedClauseBelongToSection.add(clauseBasicDTO);
+                    } else {
+                        unchangedClauseidList.add(clauseBasicDTO.getId());
+                    }
+                });
+                sectionClauseAndClauseDtoWrapper.setChangedClausesList(changedClauseBelongToSection);
+                sectionClauseAndClauseDtoWrapper.setNewClauses(newClauseBelongToSection);
+                agreementSection.setClauses(unchangedClauseidList);
+            }
+            agreementSectionClauseAndClauseDtoHashMap.put(agreementSection.getName(), sectionClauseAndClauseDtoWrapper);
+            agreementSectionList.add(agreementSection);
+        }
+
+        if (!newClauseBasicDTOList.isEmpty() || !changedClauseIdsList.isEmpty()) {
+            List<Clause> newCreatedClausesList = new ArrayList<>();
+            if (!newClauseBasicDTOList.isEmpty()) {
+                newCreatedClausesList = clauseService.createNewClauseUsingAgreementTemplateMetadata(countryId, organizationId, newClauseBasicDTOList, policyAgreementTemplate);
+            }
+            List<Clause> exisitingClauseList = clauseMongoRepository.getClauseListByIds(countryId, organizationId, changedClauseIdsList);
+            agreementSectionList = updateExisitingClauseAndAddToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, exisitingClauseList, agreementSectionList, newCreatedClausesList);
+        }
+        try {
+            agreementSectionIdList.clear();
+            agreementSectionList = agreementSectionMongoRepository.saveAll(sequenceGenerator(agreementSectionList));
+            agreementSectionList.forEach(agreementSection -> {
+                agreementSectionIdList.add(agreementSection.getId());
+            });
+        } catch (MongoException e) {
+            LOGGER.warn("Agreement section exception while saving sections:" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return agreementSectionIdList;
+
 
     }
 
 
-    //fixme update method
-    public Boolean deleteAgreementSection(BigInteger id) {
+    /**@param countryId
+     * @param orgId
+     * @param templateId     - Policy Agreement template id
+     * @param id             -agreement section id
+     * @return               -true on successfull deletion of section
+     */
+    public Boolean deleteAgreementSection(Long countryId, Long orgId, BigInteger templateId, BigInteger id) {
 
-        AgreementSection exist = agreementSectionMongoRepository.findByid(id);
-        if (Optional.ofNullable(exist).isPresent()) {
-            return true;
+        AgreementSection exist = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
+        if (!Optional.ofNullable(exist).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + id);
         }
-        throw new DataNotFoundByIdException(" agreement section for id " + id + " not exist");
-
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
+        List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
+        agreementSectionIdList.remove(id);
+        policyAgreementTemplateRepository.save(sequenceGenerator(policyAgreementTemplate));
+        delete(exist);
+        return true;
     }
 
 
@@ -244,19 +353,6 @@ public class AgreementSectionService extends MongoBaseService {
             return exist;
         }
         throw new DataNotFoundByIdException("agreement section for id " + id + " not exist");
-
-    }
-
-
-    public List<AgreementSectionResponseDTO> getAllAgreementSection(Long countryId) {
-
-        return agreementSectionMongoRepository.getAllAgreementSectionWithData(countryId);
-
-    }
-
-
-    public List<AgreementSectionResponseDTO> getAgreementSectionWithDataList(Long countryId, Set<BigInteger> ids) {
-        return agreementSectionMongoRepository.getAgreementSectionWithDataList(countryId, ids);
 
     }
 

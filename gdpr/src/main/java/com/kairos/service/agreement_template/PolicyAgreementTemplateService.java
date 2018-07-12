@@ -134,61 +134,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
 
-    public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+    /*public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
         PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
-     /*   } else {
-            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
-            List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
-            Map<String, Object> sections = new HashMap<>();
-            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
 
-            if (policyAgreementTemplateDto.getTemplateTypeId() != null) {
-                TemplateType exits = templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
-                if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
-                } else {
-                    throw new DataNotExists("Template Id ->" + exits + " Not exists");
-                }
-            } else {
-                throw new DataNotExists("Template Id  Not Null or Empty");
-            }
-
-            if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {
-                policyAgreementTemplate.setAccountTypes(accountTypeIds);
-                if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
-                    policyAgreementTemplate.setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationSubTypes() != null && policyAgreementTemplateDto.getOrganizationSubTypes().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubTypes(policyAgreementTemplateDto.getOrganizationSubTypes());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationServices() != null && policyAgreementTemplateDto.getOrganizationServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationServices(policyAgreementTemplateDto.getOrganizationServices());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
-
-                }
-                if (agreementSection.size() != 0) {
-                    sections = agreementSectionService.createAgreementSections(agreementSection);
-                    policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
-                }
-
-                exist.setAccountTypes(accountTypeIds);
-                exist.setName(policyAgreementTemplateDto.getName());
-                exist.setDescription(policyAgreementTemplateDto.getDescription());
-  */
         } else {
             exceptionService.illegalArgumentException("account type not exist ");
         }
         return sequenceGenerator(exist);
 
-    }
+    }*/
 
 
 }

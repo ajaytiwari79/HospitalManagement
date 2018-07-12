@@ -36,6 +36,12 @@ public class PolicyAgreementTemplateController {
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/agreement_template/create", method = RequestMethod.POST)
     public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null ");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id cannot be null ");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createBasicPolicyAgreementTemplate(countryId, organizationId, agreementTemplateDto));
 
     }
@@ -65,11 +71,11 @@ public class PolicyAgreementTemplateController {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Agreement template id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(countryId,organizationId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(countryId, organizationId, id));
 
     }
 
-    //todo add update policy agreement template
+  /*  //todo add update policy agreement template
     @PutMapping("/agreement_template/update/{id}")
     public ResponseEntity<Object> updateAgreementTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @RequestBody PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
         if (id == null) {
@@ -81,7 +87,7 @@ public class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplate(countryId, organizationId, id, policyAgreementTemplateDto));
 
     }
-
+*/
     @ApiOperation("get All policy agreement Template with sections and Clauses ")
     @GetMapping("/agreement_template/all")
     public ResponseEntity<Object> getPolicyAgreementTemplateWithData(@PathVariable Long countryId, @PathVariable Long organizationId) {
