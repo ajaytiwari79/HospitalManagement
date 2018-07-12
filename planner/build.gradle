@@ -19,6 +19,8 @@ ext {
 	versionslf4j='1.7.23'
 	neo4jversion='3.1.3'
 	springCloudVersion = 'Finchley.M8'
+	versionoptaplannerbom='7.9.0-SNAPSHOT'
+	versionlogback='1.2.3'
 }
 
 apply plugin: 'java'
@@ -43,6 +45,7 @@ repositories {
     maven { url "https://repo.spring.io/snapshot" }
     maven { url "https://repo.spring.io/milestone" }
     maven { url "http://repo.spring.io/release" }
+	maven {url 'https://repository.jboss.org/' }
 }
 /*Closure cl = { task -> println ".............I'm $task.project.name" }
 project("optaplanner-shiftplanning"){
@@ -76,6 +79,47 @@ dependencies {
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 	compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+
+
+
+
+
+
+
+}
+subprojects {
+	repositories {
+		mavenCentral()
+		maven { url 'https://repository.jboss.org/'}
+	}
+	if (!it.name.startsWith('responseWrapper')) {
+		apply plugin: 'java'
+		dependencies {
+			compile project(':dto')
+			compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
+			compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+			compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
+			compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
+			compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
+			compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
+			compile 'org.freemarker:freemarker:2.3.28'
+			compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
+			compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
+			compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+			testCompile group: 'junit', name: 'junit', version: '4.12'
+			compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+		}
+	}else{
+		apply plugin: 'java'
+		dependencies {
+			testCompile group: 'junit', name: 'junit', version: '4.12'
+			compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+			compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.3'
+			compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
+			compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.4'
+		}
+		}
+
 }
 dependencyManagement {
 	imports {

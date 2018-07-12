@@ -8,6 +8,7 @@ import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +48,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shiftWithActivityDTO) {
-        if (Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()).isPresent() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
-            List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
+        List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
             PhaseTemplateValue phaseTemplateValue1 = null;
             for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
                 if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
@@ -57,11 +57,14 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
                 }
             }
             if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                if (!phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
-                    return Collections.singletonList("message.staff.employmentType.absent");
+                if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()){
+                    return Arrays.asList("message.management.authority.phase");
+                }
+                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
+                    return Arrays.asList("message.staff.employmentType.absent");
                 }
             }
-            }
+
         return Collections.emptyList();
     }
 }

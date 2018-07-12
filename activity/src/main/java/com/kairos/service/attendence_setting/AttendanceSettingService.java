@@ -119,6 +119,3 @@ public class AttendanceSettingService extends MongoBaseService {
        return  attendanceDurationDTO;
         }
 }
-
-
-

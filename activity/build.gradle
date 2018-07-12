@@ -1,7 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.0.2.RELEASE'
-        swaggerVersion = '2.5.0'
+        swaggerVersion = '2.6.1'
         jacksonVersion = '2.9.2'
         projectVersion = "0.0.1"
         version = "0.0.1"
@@ -73,7 +73,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion//c
     compile group: 'org.json', name: 'json', version: '20160810'//c
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"//c
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion//c
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swaggerVersion}"//c
     compile 'com.google.api-client:google-api-client:1.22.0'//c
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'//c
     compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'//c

@@ -8,8 +8,6 @@ import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.javers.JaversCommonService;
-import org.javers.spring.annotation.JaversAuditable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,11 +57,11 @@ public class AccountTypeService extends MongoBaseService {
     public List<AccountType> getAccountTypeList(Long countryId, Set<BigInteger> ids) {
         List<AccountType> accountTypes = accountTypeRepository.getAccountTypeList(countryId, ids);
         if (accountTypes.size() != ids.size()) {
-            Set<BigInteger> accounTypeIds = new HashSet<>();
+            Set<BigInteger> accountTypeIds = new HashSet<>();
             accountTypes.forEach(accountType -> {
-                accounTypeIds.add(accountType.getId());
+                accountTypeIds.add(accountType.getId());
             });
-            ids.removeAll(accounTypeIds);
+            ids.removeAll(accountTypeIds);
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "account type ", ids.iterator().next());
         }
         return accountTypes;

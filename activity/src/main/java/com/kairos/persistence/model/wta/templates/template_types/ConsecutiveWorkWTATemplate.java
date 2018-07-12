@@ -37,6 +37,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
     private int intervalLength;
     private String intervalUnit;
+    private Long consecutiveDays;
 
     public int getIntervalLength() {
         return intervalLength;
@@ -124,6 +125,14 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
+    public Long getConsecutiveDays() {
+        return consecutiveDays;
+    }
+
+    public void setConsecutiveDays(Long consecutiveDays) {
+        this.consecutiveDays = consecutiveDays;
+    }
+
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
@@ -135,7 +144,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     shiftQueryResultWithActivities = getShiftsByInterval(dateTimeInterval, shiftQueryResultWithActivities, timeInterval);
                     shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     List<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities, infoWrapper.getShift());
-                    int consecutiveDays = getConsecutiveDays(shiftDates);
+                    int consecutiveDays = getConsecutiveDaysInDate(shiftDates);
                     Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     if (!isValid) {

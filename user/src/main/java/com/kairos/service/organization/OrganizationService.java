@@ -5,7 +5,6 @@ import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
-
 import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
@@ -384,7 +383,7 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 //        accessGroupService.createDefaultAccessGroups(organization);
@@ -498,7 +497,7 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
 
@@ -937,7 +936,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
 
-        workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationBasicDTO.getSubTypeId(), unit.getId(), country.getId());
+//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationBasicDTO.getSubTypeId(), unit.getId(), country.getId());
         vrpClientService.createPreferedTimeWindow(organization.getId());
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
 

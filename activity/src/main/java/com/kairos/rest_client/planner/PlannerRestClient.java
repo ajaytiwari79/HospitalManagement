@@ -28,10 +28,10 @@ public class PlannerRestClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
+    public <T, V> RestTemplateResponseEnvelope<V> publish(int plannerNo,T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
         try {
-            String url=baseUrl + unitId + "/"+ getURI(plannerUrl,pathParams);
+            String url=baseUrl+"/"+plannerNo+"/api/v1/"+"unit/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
@@ -67,7 +67,7 @@ public class PlannerRestClient {
 
         }
     }
-    public static <T>String getURI( PlannerUrl plannerUrl,Object... pathParams){
+    public static <T>String getURI(PlannerUrl plannerUrl,Object... pathParams){
         String uri=null;
         /*if(t instanceof StaffingLevelDTO){
             uri= "staffing_level/";
@@ -83,12 +83,13 @@ public class PlannerRestClient {
             uri= String.format("staff/%s/unitposition/%s/wta",pathParams);
         }*/
         switch (plannerUrl){
-            case GET_VRP_SOLUTION:uri = String.format("planner/vrp/%s",pathParams);
+            case GET_VRP_SOLUTION:uri = String.format("/vrp/%s",pathParams);
                 break;
-            case STOP_VRP_PROBLEM:uri = String.format("planner/vrp/%s",pathParams);
+            case STOP_VRP_PROBLEM:uri = String.format("/vrp/%s",pathParams);
                 break;
-            case SUBMIT_VRP_PROBLEM:uri = "planner/submitVRPPlanning";
+            case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
                 break;
+            case GET_INDICTMENT:uri=String.format("/vrp/%s/get_indictment",pathParams);
         }/*
 
         else if (t instanceof VrpTaskPlanningDTO){

@@ -27,10 +27,7 @@ import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.ObjectUtils;
 import com.kairos.vrp.task.VRPTaskDTO;
-import com.kairos.vrp.vrpPlanning.EmployeeDTO;
-import com.kairos.vrp.vrpPlanning.ShiftDTO;
-import com.kairos.vrp.vrpPlanning.TaskDTO;
-import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
+import com.kairos.vrp.vrpPlanning.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -65,9 +62,12 @@ public class VRPPlanningService extends MongoBaseService{
     @Inject private ConstraintRepository constraintRepository;
     @Inject private SolverConfigService solverConfigService;
 
-    public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId){
+    public SolverConfigDTO submitToPlanner(Long unitId, BigInteger solverConfigId,SolverConfigDTO configDTO){
         //createShift();
         SolverConfigDTO solverConfigDTO = solverConfigRepository.getOneById(solverConfigId);
+        solverConfigDTO.setPlannerNumber(configDTO.getPlannerNumber());
+        solverConfigDTO.setNumberOfThread(configDTO.getNumberOfThread());
+        solverConfigDTO.setTerminationTime(configDTO.getTerminationTime());
         List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
         Map<BigInteger,ConstraintDTO> constraintDTOMap = constraints.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         solverConfigDTO.getConstraints().forEach(c->{
@@ -79,9 +79,13 @@ public class VRPPlanningService extends MongoBaseService{
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,solverConfigDTO);
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
+        solverConfig.setNumberOfThread(configDTO.getNumberOfThread());
+        solverConfig.setTerminationTime(configDTO.getTerminationTime());
+        solverConfig.setPlannerNumber(configDTO.getPlannerNumber());
+        solverConfig.setLastSubmittedDate(new Date());
         save(solverConfig);
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
+        plannerRestClient.publish(solverConfigDTO.getPlannerNumber(),vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
         return solverConfigDTO;
     }
 
@@ -96,7 +100,7 @@ public class VRPPlanningService extends MongoBaseService{
             c.setDescription(constraintDTO.getDescription());
         });
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getVRPTaskPlanningDTO(unitId,newSolverConfigDTO);
-        plannerRestClient.publish(vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
+        plannerRestClient.publish(solverConfigDTO.getPlannerNumber(),vrpTaskPlanningDTO,unitId, IntegrationOperation.CREATE,PlannerUrl.SUBMIT_VRP_PROBLEM);
         return newSolverConfigDTO;
     }
 
@@ -115,7 +119,7 @@ public class VRPPlanningService extends MongoBaseService{
             shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
 
         });*/
-        LocalDate weekStart= LocalDate.of(2018,Month.JULY,9);
+        LocalDate weekStart= LocalDate.of(2018,Month.JULY,16);
         staffs.forEach(s->{
             IntStream.range(0,5).forEachOrdered(i->{
                 Date startDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(LocalTime.of(07,00)).toInstant(ZoneOffset.UTC));
@@ -137,12 +141,13 @@ public class VRPPlanningService extends MongoBaseService{
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.ON_HOLD);
         save(solverConfig);
-        plannerRestClient.publish(null,unitId, IntegrationOperation.DELETE,PlannerUrl.STOP_VRP_PROBLEM,solverConfigId);
+        plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.DELETE,PlannerUrl.STOP_VRP_PROBLEM,solverConfigId);
         return ObjectMapperUtils.copyPropertiesByMapper(solverConfig,SolverConfigDTO.class);
     }
 
-    public VrpTaskPlanningDTO getSolverConfigurationForUnit(Long unitId, BigInteger solverConfigId){
-        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(null,unitId, IntegrationOperation.GET,PlannerUrl.GET_VRP_SOLUTION,solverConfigId);
+    public VrpTaskPlanningDTO getSolutionBySubmition(Long unitId, BigInteger solverConfigId){
+        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
+        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_VRP_SOLUTION,solverConfigId);
 
         VrpTaskPlanningDTO vrpTaskPlanningDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VrpTaskPlanningDTO.class);
         if(vrpTaskPlanningDTO==null || vrpTaskPlanningDTO.getTasks().isEmpty()){
@@ -151,8 +156,8 @@ public class VRPPlanningService extends MongoBaseService{
         return vrpTaskPlanningDTO;
     }
 
-    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId,BigInteger solverConfigId,LocalDate date){
-        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolverConfigurationForUnit(unitId, solverConfigId);
+    public VrpTaskPlanningDTO getSolutionBySolverConfigByDate(Long unitId, BigInteger solverConfigId, LocalDate date){
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolutionBySubmition(unitId, solverConfigId);
         List<TaskDTO> drivingTimeList = vrpTaskPlanningDTO.getDrivingTimeList().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
         Object[] objects = getTasks(unitId,vrpTaskPlanningDTO,date);
         drivingTimeList.forEach(t->{
@@ -167,8 +172,27 @@ public class VRPPlanningService extends MongoBaseService{
         return vrpTaskPlanningDTO;
     }
 
+
+    public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId, BigInteger solverConfigId){
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolutionBySubmition(unitId, solverConfigId);
+        Object[] objects = getTasks(unitId,vrpTaskPlanningDTO,null);
+        vrpTaskPlanningDTO.setTasks((List<TaskDTO>)objects[0]);
+        //vrpTaskPlanningDTO.setEscalatedTaskList((List<TaskDTO>)objects[1]);
+        return vrpTaskPlanningDTO;
+    }
+
+
+
+
+    public VRPIndictmentDTO getIndictmentBySolverConfig(Long unitId,BigInteger solverConfigId){
+        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
+        RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_INDICTMENT,solverConfigId);
+        VRPIndictmentDTO  vrpIndictmentDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VRPIndictmentDTO.class);
+        return vrpIndictmentDTO;
+    }
+
     public Object[] getTasks(Long unitId,VrpTaskPlanningDTO vrpTaskPlanningDTO,LocalDate date){
-        List<TaskDTO> taskDTOS = vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList());
+        List<TaskDTO> taskDTOS = date!=null ? vrpTaskPlanningDTO.getTasks().stream().filter(t->t.getPlannedStartTime().toLocalDate().equals(date)).collect(toList()):vrpTaskPlanningDTO.getTasks();
         if(taskDTOS.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
         }
@@ -255,7 +279,7 @@ public class VRPPlanningService extends MongoBaseService{
         }
         Map<Long,List<TaskTypeSettingDTO>> staffSettingMap = taskTypeSettingDTOS.stream().collect(Collectors.groupingBy(t->t.getStaffId(),toList()));
         List<EmployeeDTO> employees = staffSettingMap.entrySet().stream().map(s->new EmployeeDTO(s.getKey().toString(),"",getSkill(s.getValue()),s.getValue().get(0).getEfficiency())).collect(toList());
-        Map<Long,String> staffNameMap = staffs.stream().collect(Collectors.toMap(StaffDTO::getId,v->v.getFirstName()+""+v.getLastName()));
+        Map<Long,String> staffNameMap = staffs.stream().collect(Collectors.toMap(StaffDTO::getId,v->v.getFirstName()+" "+v.getLastName()));
         employees.forEach(e->e.setName(staffNameMap.get(new Long(e.getId()))));
         return new Object[]{employees,staffIds};
     }

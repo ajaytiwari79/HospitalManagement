@@ -31,7 +31,7 @@ public interface AccessorPartyMongoRepository extends MongoRepository<AccessorPa
     AccessorParty findByid(BigInteger id);
 
     @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<AccessorParty> findAllAccessorPartys(Long countryId,Long organizationId);
+    List<AccessorParty> findAllAccessorParty(Long countryId,Long organizationId);
 
     @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
     List<AccessorParty>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);

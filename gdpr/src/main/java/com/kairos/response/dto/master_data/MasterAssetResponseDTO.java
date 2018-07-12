@@ -5,7 +5,7 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -17,10 +17,10 @@ public class MasterAssetResponseDTO {
     @NotNull
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Name can't be empty")
     private  String name;
 
-    @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
+    @NotNullOrEmpty(message = "Description can't be empty")
     private String description;
 
     public BigInteger getId() {

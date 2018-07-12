@@ -2,7 +2,7 @@ package com.kairos.controller.task;
 
 import com.kairos.activity.task.BulDeleteTaskDTO;
 import com.kairos.activity.task.TaskActiveUpdationDTO;
-import com.kairos.user.staff.KMDShift;
+import com.kairos.user.staff.ImportShiftDTO;
 import com.kairos.constants.ApiConstants;
 import com.kairos.service.kmdNexus.AuthService;
 import com.kairos.service.planner.PlannerService;
@@ -190,7 +190,7 @@ public class TaskController {
      */
     @RequestMapping(value = "/createTask/{staffId}", method = RequestMethod.POST)
     @ApiOperation("createTaskFromKMD")
-    public ResponseEntity<Map<String, Object>> createTaskFromKMD(@PathVariable Long staffId,@RequestBody KMDShift shift,@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> createTaskFromKMD(@PathVariable Long staffId, @RequestBody ImportShiftDTO shift, @PathVariable Long unitId) {
         taskService.createTaskFromKMD(staffId,shift,unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
     }

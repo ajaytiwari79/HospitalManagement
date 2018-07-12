@@ -6,6 +6,7 @@ import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,9 +25,36 @@ public class SolverConfigDTO {
     private BigInteger parentSolverConfigId;
     private Integer terminationTime;
     private List<ConstraintValueDTO> constraints;
+    private int numberOfThread;
+    private int plannerNumber;
     private SolverConfigStatus status;
     private boolean isDefault;
+    private Date lastSubmittedDate;
 
+
+    public Date getLastSubmittedDate() {
+        return lastSubmittedDate;
+    }
+
+    public void setLastSubmittedDate(Date lastSubmittedDate) {
+        this.lastSubmittedDate = lastSubmittedDate;
+    }
+
+    public int getNumberOfThread() {
+        return numberOfThread;
+    }
+
+    public void setNumberOfThread(int numberOfThread) {
+        this.numberOfThread = numberOfThread;
+    }
+
+    public int getPlannerNumber() {
+        return plannerNumber;
+    }
+
+    public void setPlannerNumber(int plannerNumber) {
+        this.plannerNumber = plannerNumber;
+    }
 
     public Long getUnitId() {
         return unitId;

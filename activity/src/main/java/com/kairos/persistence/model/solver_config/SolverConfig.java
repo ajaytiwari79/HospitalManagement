@@ -7,6 +7,7 @@ import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +27,9 @@ public class SolverConfig extends MongoBaseEntity{
     private Integer terminationTime;//In minutes
     private List<ConstraintValue> constraints;
     private boolean isDefault;
+    private int numberOfThread;
+    private int plannerNumber;
+    private Date lastSubmittedDate;
 
 
     public SolverConfig() {
@@ -41,6 +45,30 @@ public class SolverConfig extends MongoBaseEntity{
         this.constraints = constraints;
         this.isDefault = isDefault;
         this.status = status;
+    }
+
+    public Date getLastSubmittedDate() {
+        return lastSubmittedDate;
+    }
+
+    public void setLastSubmittedDate(Date lastSubmittedDate) {
+        this.lastSubmittedDate = lastSubmittedDate;
+    }
+
+    public int getNumberOfThread() {
+        return numberOfThread;
+    }
+
+    public void setNumberOfThread(int numberOfThread) {
+        this.numberOfThread = numberOfThread;
+    }
+
+    public int getPlannerNumber() {
+        return plannerNumber;
+    }
+
+    public void setPlannerNumber(int plannerNumber) {
+        this.plannerNumber = plannerNumber;
     }
 
     public SolverConfigStatus getStatus() {
