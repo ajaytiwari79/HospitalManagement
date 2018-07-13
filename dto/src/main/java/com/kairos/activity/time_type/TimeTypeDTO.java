@@ -66,12 +66,6 @@ public class TimeTypeDTO {
         this.backgroundColor=backgroundColor;
         this.textColor=textColor;
     }
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-        this.label = label;
-        this.description = description;
-    }
 
     public BigInteger getUpperLevelTimeTypeId() {
         return upperLevelTimeTypeId;
