@@ -7,6 +7,7 @@ import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,5 +78,9 @@ public class GenericIntegrationService {
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryOfUnits() {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/unit/parent_org_and_country", null), UnitAndParentOrganizationAndCountryDTO.class);
+    }
+
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModule(String moduleId, Long countryId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
     }
 }

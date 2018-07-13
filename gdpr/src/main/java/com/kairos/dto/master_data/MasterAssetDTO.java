@@ -2,8 +2,11 @@ package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.OrganizationTypeAndServiceBasicDTO;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.dto.OrganizationSubTypeDTO;
+import com.kairos.dto.OrganizationTypeDTO;
+import com.kairos.dto.ServiceCategoryDTO;
+import com.kairos.dto.SubServiceCategoryDTO;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -25,22 +28,22 @@ public class MasterAssetDTO {
     @Valid
     @NotNull(message = "Organization  Type  can't be  null")
     @NotEmpty(message = "Organization Type  can't be  Empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationTypes;
+    private List<OrganizationTypeDTO> organizationTypes;
 
     @Valid
     @NotNull(message = "Organization Sub Type  can't be  null")
     @NotEmpty(message = "Organization Sub Type  can't be  Empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     @Valid
     @NotNull(message = "Service  Type  can't be  null")
     @NotEmpty(message = "Service  Type  can't be  Empty")
-    private List<OrganizationTypeAndServiceBasicDTO> organizationServices;
+    private List<ServiceCategoryDTO> organizationServices;
 
     @NotNull(message = "Service Sub Type  can't be  null")
     @NotEmpty(message = "Service Sub Type  can't be  Empty")
     @Valid
-    private List<OrganizationTypeAndServiceBasicDTO> organizationSubServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
 
     public String getName() {
@@ -59,34 +62,35 @@ public class MasterAssetDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationTypes() {
+    public List<OrganizationTypeDTO> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeAndServiceBasicDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationTypeAndServiceBasicDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationServices() {
+    public List<ServiceCategoryDTO> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationTypeAndServiceBasicDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
         this.organizationServices = organizationServices;
     }
-    public List<OrganizationTypeAndServiceBasicDTO> getOrganizationSubServices() {
+
+    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<OrganizationTypeAndServiceBasicDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 }

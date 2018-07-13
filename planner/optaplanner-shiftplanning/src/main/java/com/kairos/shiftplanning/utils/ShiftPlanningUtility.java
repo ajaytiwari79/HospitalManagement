@@ -94,7 +94,7 @@ public class ShiftPlanningUtility {
     public static boolean checkEmployeeCanWorkThisIntervalUsingDroolsMemory(Employee employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
-        StatefulKnowledgeSessionImpl kieSession = ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
+        StatefulKnowledgeSessionImpl kieSession =null;// ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         for (Object object : kieSession.getObjects()) {
             if (object instanceof AvailabilityRequest && ((AvailabilityRequest) object).getEmployee().getId().equals(employee.getId())
                     && ((AvailabilityRequest) object).containsInterval(interval)) {
@@ -106,7 +106,7 @@ public class ShiftPlanningUtility {
     public static boolean checkDroolsMemory( ScoreDirector<BreaksIndirectAndActivityPlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<BreaksIndirectAndActivityPlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<BreaksIndirectAndActivityPlanningSolution>) ((DroolsScoreDirector<BreaksIndirectAndActivityPlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
-        StatefulKnowledgeSessionImpl kieSession = ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
+        StatefulKnowledgeSessionImpl kieSession = null;//((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         //log.info("working mem size:"+kieSession.getObjects().size());
         for (Object object : kieSession.getObjects()) {
             if(object==director.getWorkingSolution().getStaffingLevelMatrix()){
@@ -121,7 +121,7 @@ public class ShiftPlanningUtility {
     public static boolean checkEmployeeAttemptedToPlanThisInterval(Employee employee, Interval interval, ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
-        StatefulKnowledgeSessionImpl kieSession = ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
+        StatefulKnowledgeSessionImpl kieSession =null;// ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         for (Object object : kieSession.getObjects()) {
             if (object instanceof AvailabilityRequest && ((AvailabilityRequest) object).getEmployee().getId().equals(employee.getId())
                     && ((AvailabilityRequest) object).overlaps(interval)) {
@@ -157,7 +157,7 @@ public class ShiftPlanningUtility {
     public static void updateInsertedAvialabilities(ScoreDirector<ShiftRequestPhasePlanningSolution> director) {
         LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution> scoreDirectorFactory = (LegacyDroolsScoreDirectorFactory<ShiftRequestPhasePlanningSolution>) ((DroolsScoreDirector<ShiftRequestPhasePlanningSolution>) director).getScoreDirectorFactory();
         KnowledgeBaseImpl kbase = (KnowledgeBaseImpl) scoreDirectorFactory.getKieBase();
-        StatefulKnowledgeSessionImpl kieSession = ((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
+        StatefulKnowledgeSessionImpl kieSession = null;//((org.drools.core.impl.StatefulKnowledgeSessionImpl) kbase.getWorkingMemories()[0]);
         StatefulKnowledgeSessionImpl.ObjectStoreWrapper insertedFacts = (StatefulKnowledgeSessionImpl.ObjectStoreWrapper) kieSession.getObjects(new ObjectFilter() {
             @Override
             public boolean accept(Object object) {

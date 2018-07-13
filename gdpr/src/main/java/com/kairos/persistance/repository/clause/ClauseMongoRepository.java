@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.clause;
 
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 
 @Repository
+@JaversSpringDataAuditable
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
 
 
@@ -27,7 +29,7 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     List<ClauseResponseDTO>  findAllClause(Long countryId,Long organizationId);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
-    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, Set<BigInteger> ids);
+    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, List<BigInteger> ClauseIds);
 
 
 

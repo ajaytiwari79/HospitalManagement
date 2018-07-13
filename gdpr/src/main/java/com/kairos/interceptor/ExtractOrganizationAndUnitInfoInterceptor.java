@@ -12,6 +12,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,20 +29,22 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             HttpServletResponse response,
             Object handler) throws Exception {
 
-
+        if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
         if (pathVariables == null) {
             throw new InvalidRequestException("Url or Parameter is not correct");
         }
-        String orgIdStirng = pathVariables.get("organizationId");
+
+        String orgIdString = pathVariables.get("organizationId");
         String unitIdString = pathVariables.get("unitId");
         String countryIdString = pathVariables.get("countryId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI() + "[ orgainzationID ,Unit Id " + orgIdStirng + " ," + unitIdString + " ]");
+                + "]" + request.getRequestURI() + "[ orgainzationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
 
-        if (orgIdStirng != null) {
-            final Long orgId = Long.valueOf(orgIdStirng);
+        if (orgIdString != null) {
+            final Long orgId = Long.valueOf(orgIdString);
             UserContext.setOrgId(orgId);
         }
         if (countryIdString != null) {
@@ -63,6 +66,9 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         }
 
 
+
         return true;
     }
+
+
 }

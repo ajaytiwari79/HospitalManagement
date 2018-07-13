@@ -13,13 +13,14 @@ public class CustomAggregationQuery {
                 "'description':1," +
                 "'organizationSubServices':1," +
                 "'organizationServices':1," +
+                "'hasSubProcessingActivity':1," +
                 "'organizationSubTypes':1," +
                 "'organizationTypes':1," +
                 "'countryId':1}}";
 
     }
 
-    public static String dataSubjectAddNonDeletedDataElementAddFileds() {
+    public static String dataSubjectAddNonDeletedDataElementAddFields() {
         return "{  '$addFields':" +
                 "{'dataCategories.dataElements':" +
                 "{$filter : { " +
@@ -30,18 +31,7 @@ public class CustomAggregationQuery {
     }
 
 
-   /* public static String questionnnaireTemplateAddNonDeletedQuestions()
-    {
-        return "{  '$addFields':" +
-                "{'questions':" +
-                "{$filter : { "+
-                "'input': '$questions',"+
-                "as: 'questions', "+
-                "cond: {$eq: ['$$questions.deleted',"+false+"]}" +
-                "}}}} ";
-    }*/
-
-    public static String questionnnaireTemplateAddNonDeletedQuestions() {
+    public static String questionnaireTemplateAddNonDeletedQuestions() {
         return "{  '$addFields':" +
                 "{'sections.questions':" +
                 "{$filter : { " +
@@ -52,7 +42,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateAddNonDeletedSections() {
+    public static String questionnaireTemplateAddNonDeletedSections() {
         return "{  '$addFields':" +
                 "{'sections':" +
                 "{$filter : { " +
@@ -63,7 +53,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateAddNonDeletedAssetType() {
+    public static String questionnaireTemplateAddNonDeletedAssetType() {
         return "{  '$addFields':" +
                 "{'assetType':" +
                 "{$filter : { " +
@@ -74,7 +64,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnnaireTemplateGroupOperation() {
+    public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
                 "'_id':'$_id','sections':{'$push':{ '$cond': [ { '$eq': [ '$sections.deleted',false ] }, '$sections', {} ] }}," +
                 "'name':{$first:'$name'}," +
@@ -84,7 +74,7 @@ public class CustomAggregationQuery {
                 "}}";
     }
 
-    public static String questionnnaireTemplateProjectionBeforeGroupOperationForAssetType() {
+    public static String questionnaireTemplateProjectionBeforeGroupOperationForAssetType() {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
@@ -122,4 +112,62 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String addNonDeletedAgreementSectionToAgreementTemplate() {
+        return "{  '$addFields':" +
+                "        {'agreementSections':" +
+                "       {'$filter' : { " +
+                "       'input': '$agreementSections'," +
+                "       'as': 'agreementSections', " +
+                "      'cond': {'$eq': ['$$agreementSections.deleted', false ]}" +
+                "     }}}}";
+
+
+    }
+
+
+
+
+    public static String agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero() {
+        return "{'$project':{" +
+                "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
+                "      'name':1," +
+                "      'agreementSections':1," +
+                "      'description':1," +
+                "       'accountTypes':1," +
+                "             'organizationTypes':1," +
+                "             'organizationSubTypes':1," +
+                "             'organizationServices':1," +
+                "              'organizationSubServices':1," +
+                "         }}";
+
+
+    }
+
+    public static String agreementTemplateGroupOperation() {
+        return "{'$group':{"+
+                "   '_id':'$_id'," +
+                "   'agreementSections':{'$push':{ '$cond': [ { '$eq': [ '$agreementSections.deleted',false ] }, '$agreementSections', {} ] }}," +
+                "   'templateType':{'$first':'$templateType'}," +
+                "    'name':{'$first':'$name'}," +
+                "    'description':{'$first':'$description'}," +
+                "     'accountTypes':{'$first':'$accountTypes'}, " +
+                "    'organizationTypes':{'$first':'$organizationTypes'}," +
+                "    'organizationSubTypes':{'$first':'$organizationSubTypes'}," +
+                "    'organizationServices':{'$first':'$organizationServices'}," +
+                "    'organizationSubServices':{'$first':'$organizationSubServices'}} } ";
+
+
+    }
+
+
+    public static String addNonDeletedTemplateTypeToAgreementTemplate() {
+        return  " {  '$addFields':" +
+                "                {'templateType':" +
+                "                {'$filter' : { " +
+                "                'input': '$templateType'," +
+                "                'as': 'templateType', " +
+                "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
+                "                }}}}" ;
+
+    }
 }

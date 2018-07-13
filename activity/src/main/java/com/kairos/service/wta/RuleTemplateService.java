@@ -5,8 +5,7 @@ import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.activity.wta.rule_template_category.RuleTemplateWrapper;
-import com.kairos.activity.wta.templates.AgeRange;
-import com.kairos.activity.wta.templates.BreakTemplateValue;
+import com.kairos.activity.wta.AgeRange;
 import com.kairos.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.RuleTemplateCategoryType;
@@ -227,11 +226,6 @@ public class RuleTemplateService extends MongoBaseService {
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
-        BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",false,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
-        breaksInShiftWTATemplate.setCountryId(countryDTO.getId());
-        breaksInShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        breaksInShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        wtaBaseRuleTemplates1.add(breaksInShiftWTATemplate);
         save(wtaBaseRuleTemplates1);
 
 

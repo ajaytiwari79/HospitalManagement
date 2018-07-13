@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.account_type;
 
 import com.kairos.persistance.model.account_type.AccountType;
-import org.bson.types.ObjectId;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
+@JaversSpringDataAuditable
 public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,BigInteger> {
 
    @Query("{deleted:false,countryId:?0,_id:?1}")
@@ -26,7 +27,6 @@ public interface AccountTypeMongoRepository extends  MongoRepository<AccountType
 
    @Query("{deleted:false,countryId:?0,name:?1}")
   AccountType findByName(Long countryId,String name);
-
 
 
 }

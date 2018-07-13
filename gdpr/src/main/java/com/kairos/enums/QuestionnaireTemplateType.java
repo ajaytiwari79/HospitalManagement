@@ -3,7 +3,7 @@ package com.kairos.enums;
 public enum QuestionnaireTemplateType
 {
 
-    ASSET_TYPE("asset"),  VENDOR("vendor"),  PROCESSING_ACTIVITY("processing-activity"),  GENERAL("general");
+    ASSET_TYPE("asset_type"),  VENDOR("vendor"),  PROCESSING_ACTIVITY("processing_activity"),  GENERAL("general");
 
     public String value;
     QuestionnaireTemplateType(String value) {

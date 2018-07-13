@@ -16,34 +16,10 @@ import java.util.List;
 public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<WTABaseRuleTemplate, BigInteger> {
 
 
-    @Query("{}")
-    RuleTemplateCategoryDTO getRuleTemplateAndCategoryById(BigInteger templateId);
-
-    @Query("{}")
-    List<WTABaseRuleTemplate> getWtaBaseRuleTemplateByIds(List<BigInteger> templateIds);
 
 
     @Query("{ruleTemplateCategoryId:?0,deleted:false}")
     List<WTABaseRuleTemplate> findAllByCategoryId(BigInteger categoryId);
-
-    @Query("{}")
-    void deleteOldCategories(List<BigInteger> ruleTemplateIds);
-
-    @Query("{}")
-    void deleteCategoryFromTemplate(BigInteger ruleTemplateId, BigInteger previousRuleTemplateCategory, String newRuleTemplateCategory);
-
-    @Query("{}")
-    List<BigInteger> findAllWTABelongsByTemplateCategoryId(BigInteger ruleTemplateCategoryId);
-
-    @Query("{}")
-    void deleteRelationOfRuleTemplateCategoryAndWTA(BigInteger ruleTemplateId, List<BigInteger> WTAIds);
-
-    @Query("{}")
-    void setAllWTAWithCategoryNone(BigInteger ruleTemplateId, List<BigInteger> WTAIds);
-
-
-    @Query("{}")
-    List<WTABaseRuleTemplate> getWTABaseRuleTemplateByUnitId(Long unitId);
 
      @Query("{countryId:?0,deleted:false}")
     List<WTABaseRuleTemplate> getWTABaseRuleTemplateByCountryId(Long countryId);

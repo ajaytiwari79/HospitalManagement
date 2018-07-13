@@ -57,6 +57,9 @@ public class SolverConfigService extends MongoBaseService {
         //solverConfigDTO.setName("Copy of "+solverConfigDTO.getName());
         SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class);
         solverConfig.setUnitId(unitId);
+        solverConfig.setPlannerNumber(solverConfigDTO.getPlannerNumber());
+        solverConfig.setTerminationTime(solverConfigDTO.getTerminationTime());
+        solverConfig.setNumberOfThread(solverConfigDTO.getNumberOfThread());
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
         save(solverConfig);
         solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);

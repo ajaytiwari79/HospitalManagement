@@ -33,29 +33,20 @@ public class MongoSequenceRepository {
      * @return sequenceNumber
      * */
     public BigInteger nextSequence(String sequenceName){
-        /**
-         * adding sequence postfix into class name
-         * */
+        //adding sequence postfix into class name
         sequenceName = sequenceName + SEQUENCE_POST_FIX;
 
-        /**
-         *  Find query
-         * */
+        // Find query
         String findQuery = "{'sequenceName':'"+sequenceName+"'}";
-        /**
-         *  Update query
-         * */
+
+        //Update query
         String updateQuery = "{'$inc':{'sequenceNumber':1}}";
         FindAndModifyOptions findAndModifyOptions = new FindAndModifyOptions();
 
-        /**
-         *  return updated value
-         * */
+        // return updated value
         findAndModifyOptions.returnNew(true);
 
-        /**
-         *  create new if not exists
-         * */
+        // create new if not exists
         findAndModifyOptions.upsert(true);
         MongoSequence mongoSequence = mongoTemplate.findAndModify(new BasicQuery(findQuery), new BasicUpdate(updateQuery), findAndModifyOptions, MongoSequence.class);
         return new BigInteger(mongoSequence.getSequenceNumber()+"");

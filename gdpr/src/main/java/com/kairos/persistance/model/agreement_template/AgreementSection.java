@@ -2,24 +2,21 @@ package com.kairos.persistance.model.agreement_template;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
 
 @Document(collection = "agreement_section")
 public class AgreementSection extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Title cannot be empty")
-    private String title;
+    @NotNullOrEmpty(message = "Section Title cannot be empty")
+    private String name;
 
-    @NotNull
-    private List<BigInteger> clauseIds;
+    private List<BigInteger> clauses;
 
     private Long countryId;
 
@@ -31,33 +28,28 @@ public class AgreementSection extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public List<BigInteger> getClauseIds() {
-        return clauseIds;
+    public List<BigInteger> getClauses() {
+        return clauses;
     }
 
-    public void setClauseIds(List<BigInteger> clauseIds) {
-        this.clauseIds = clauseIds;
+    public void setClauses(List<BigInteger> clauses) {
+        this.clauses = clauses;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-
-   public AgreementSection(Long countryId ,String title,List<BigInteger> clauseIds)
+    public AgreementSection(Long countryId , String name)
     {
-        this.title=title;
-        this.clauseIds=clauseIds;
+        this.name=name;
         this.countryId=countryId;
     }
-public AgreementSection()
-{
-
-}
+public AgreementSection(){ }
 
 
 }

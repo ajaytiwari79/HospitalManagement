@@ -8,10 +8,14 @@ import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.ComparisonUtils;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+
 
 @Service
 public class TemplateTypeService extends MongoBaseService {
@@ -23,52 +27,55 @@ public class TemplateTypeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private ComparisonUtils comparisonUtils;
+
     /**
+     * @param countryId
+     * @param templateTypeList
+     * @return list
+     * @throws InvalidRequestException
      * @description Create template type. Create form will have only name field. We can create multiple template type in one go.
      * @author vikash patwal
-     * @param countryId
-     * @param templateType
-     * @throws InvalidRequestException
-     * @return list
      */
-    public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateType> templateType) {
+    public Map<String, List<TemplateType>> createTemplateType(Long countryId, List<TemplateType> templateTypeList) {
         Map<String, List<TemplateType>> result = new HashMap<>();
-        List<TemplateType> existing = new ArrayList<>();
-        List<TemplateType> newDataTemplate = new ArrayList<>();
-        Set<String> templateName = new HashSet<>();
-        for (TemplateType temp : templateType) {
-            if (!org.apache.commons.lang3.StringUtils.isBlank(temp.getTemplateName())) {
-                templateName.add(temp.getTemplateName());
+
+        Set<String> templateNames = new HashSet<>();
+        for (TemplateType templateType : templateTypeList) {
+            if (!org.apache.commons.lang3.StringUtils.isBlank(templateType.getName())) {
+                templateNames.add(templateType.getName());
             } else
                 throw new InvalidRequestException("name could not be empty or null");
         }
-        existing = templateTypeRepository.findByNameList(templateName);
-        existing.forEach(item -> templateName.remove(item.getTemplateName()));
-        if (templateName.size() != 0) {
-            for (String name : templateName) {
+        List<TemplateType> existing = findByNamesList(countryId,countryId,templateNames,TemplateType.class);
+        templateNames = comparisonUtils.getNameListForMetadata(existing, templateNames);
+        List<TemplateType> newDataTemplateList = new ArrayList<>();
+        if (!templateNames.isEmpty()) {
+             for (String name : templateNames) {
 
                 TemplateType templateType1 = new TemplateType();
-                templateType1.setTemplateName(name);
+                templateType1.setName(name);
                 templateType1.setCountryId(countryId);
-                newDataTemplate.add(templateType1);
+                 newDataTemplateList.add(templateType1);
             }
-            newDataTemplate = save(newDataTemplate);
+            newDataTemplateList = templateTypeRepository.saveAll(sequenceGenerator(newDataTemplateList));
         }
-        result.put("existing", existing);
-        result.put("new", newDataTemplate);
+        result.put(EXISTING_DATA_LIST, existing);
+        result.put(NEW_DATA_LIST, newDataTemplateList);
         return result;
     }
 
     /**
-     * @description this method is used for get template by name
-     * @author vikash patwal
      * @param countryId
      * @param templateName
-     * @throws DataNotExists
      * @return TemplateType
+     * @throws DataNotExists
+     * @description this method is used for get template by name
+     * @author vikash patwal
      */
-    public TemplateType getTemplateByName(Long countryId,String templateName) {
-        TemplateType template = templateTypeRepository.findByTemplateNameAndIsDeleted(countryId,templateName);
+    public TemplateType getTemplateByName(Long countryId, String templateName) {
+        TemplateType template = templateTypeRepository.findByTemplateNameAndIsDeleted(countryId, templateName);
         if (java.util.Optional.ofNullable(template).isPresent()) {
             return template;
         } else
@@ -76,8 +83,8 @@ public class TemplateTypeService extends MongoBaseService {
     }
 
 
-    public TemplateType getTemplateByById(BigInteger templateId,Long countryId) {
-        TemplateType template = templateTypeRepository.findByIdAndNonDeleted(templateId,countryId);
+    public TemplateType getTemplateByById(BigInteger templateId, Long countryId) {
+        TemplateType template = templateTypeRepository.findByIdAndNonDeleted(templateId, countryId);
         if (java.util.Optional.ofNullable(template).isPresent()) {
             return template;
         } else
@@ -86,50 +93,49 @@ public class TemplateTypeService extends MongoBaseService {
 
 
     /**
-     * @description this method is used for update template by id
-     * @author vikash patwal
      * @param id
      * @param countryId
      * @param templateType
-     * @throws DuplicateDataException
      * @return TemplateType
+     * @throws DuplicateDataException
+     * @description this method is used for update template by id
+     * @author vikash patwal
      */
-    public TemplateType updateTemplateName(BigInteger id,Long countryId,TemplateType templateType) {
+    public TemplateType updateTemplateName(BigInteger id, Long countryId, TemplateType templateType) {
 
-        TemplateType exists = templateTypeRepository.findByIdAndNameDeleted(templateType.getTemplateName(),countryId);
+        TemplateType exists = templateTypeRepository.findByIdAndNameDeleted(templateType.getName(), countryId);
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
-            throw  new DuplicateDataException("template name exist for  "+templateType.getTemplateName());
+            throw new DuplicateDataException("template name exist for  " + templateType.getName());
         }
-        exists=templateTypeRepository.findByIdAndNonDeleted(id,countryId);
-        exists.setTemplateName(templateType.getTemplateName());
-        save(exists);
+        exists = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
+        exists.setName(templateType.getName());
+        templateTypeRepository.save(sequenceGenerator(exists));
         return exists;
 
     }
 
     /**
+     * @param id
+     * @return TemplateType
+     * @throws DataNotFoundByIdException
      * @description this method is used for delete template type by id.
      * @author vikash patwal
-     * @param id
-     * @throws DataNotFoundByIdException
-     * @return TemplateType
      */
-    public Boolean deleteTemplateType(BigInteger id,Long countryId) {
-        TemplateType exists = templateTypeRepository.findByIdAndNonDeleted(id,countryId);
+    public Boolean deleteTemplateType(BigInteger id, Long countryId) {
+        TemplateType exists = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
         if (!Optional.ofNullable(exists).isPresent()) {
-            throw  new DataNotFoundByIdException("id not exist "+id);
+            throw new DataNotFoundByIdException("id not exist " + id);
         }
-        exists.setDeleted(true);
-        save(exists);
+        delete(exists);
         return true;
 
     }
 
     /**
-     * @description this method is used for get all template type.
-     * @author vikash patwal
      * @param countryId
      * @return List<TemplateType>
+     * @description this method is used for get all template type.
+     * @author vikash patwal
      */
     public List<TemplateType> getAllTemplateType(Long countryId) {
         return templateTypeRepository.getAllTemplateType(countryId);

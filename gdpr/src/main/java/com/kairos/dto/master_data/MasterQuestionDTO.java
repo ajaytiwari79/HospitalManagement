@@ -2,11 +2,8 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.QuestionType;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
@@ -16,7 +13,7 @@ public class MasterQuestionDTO {
     private BigInteger id;
 
     @NotNullOrEmpty(message = "Question title  can't be  empty")
-    @Pattern(message = "numberic and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
+    @Pattern(message = "numeric and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
     private String question;
 
     @NotNullOrEmpty(message = "Description  can't be  Empty")

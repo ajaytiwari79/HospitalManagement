@@ -6,6 +6,9 @@ import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.activity.wta.version.WTATableSettingWrapper;
+import com.kairos.activity.wta.version.WTAVersionDTO;
+import com.kairos.client.dto.TableConfiguration;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
@@ -23,6 +26,7 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
+import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
@@ -36,6 +40,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 
 
 /**
@@ -73,9 +79,12 @@ public class WTAService extends MongoBaseService {
     private PlannerSyncService plannerSyncService;
     @Inject
     private OrganizationRestClient organizationRestClient;
-    @Inject private SolverConfigService solverConfigService;
+    @Inject
+    private SolverConfigService solverConfigService;
     @Autowired
     private ExceptionService exceptionService;
+    @Inject
+    private TableSettingService tableSettingService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -89,7 +98,7 @@ public class WTAService extends MongoBaseService {
     public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO) {
 
         //TODO  API functionality has been changed for now KP-958
-        //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId());
+        //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getSkillId());
         WorkingTimeAgreement wta = wtaRepository.getWtaByName(wtaDTO.getName(), countryId);
         if (Optional.ofNullable(wta).isPresent()) {
             exceptionService.duplicateDataException("message.wta.name.duplicate", wtaDTO.getName());
@@ -172,7 +181,6 @@ public class WTAService extends MongoBaseService {
             save(workingTimeAgreements);
         }
     }
-
 
 
     private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta, WTADTO wtaDTO, WTABasicDetailsDTO wtaBasicDetailsDTO) {
@@ -344,7 +352,6 @@ public class WTAService extends MongoBaseService {
     }
 
 
-
     public Map<String, Object> setWtaWithOrganizationType(Long countryId, BigInteger wtaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
         /*List<WTARuleTemplateDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTARuleTemplateDTO>();*/
@@ -382,50 +389,6 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public WTAResponseDTO updateWtaOfUnitPosition(Long unitId, WTADTO wtadto) {
-        WorkingTimeAgreement oldWta = wtaRepository.findOne(wtadto.getId());
-        if (!Optional.ofNullable(oldWta).isPresent()) {
-            logger.info("wta not found while updating unit Employment Position for staff %d");
-            exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
-        }
-
-
-
-        if (oldWta.getExpertise().getId() != wtadto.getExpertiseId()) {
-            logger.info("Expertise cant be changed :", wtadto.getId());
-            exceptionService.actionNotPermittedException("message.expertise.update");
-        }
-        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
-        newWta.setRuleTemplateIds(null);
-        if (wtadto.getEndDateMillis() != null) {
-            oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
-        }
-        oldWta.setId(null);
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
-        if (wtadto.getRuleTemplates().size() > 0) {
-            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
-            save(wtaBaseRuleTemplates);
-            List<BigInteger> ruleTemplatesIds = wtaBaseRuleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
-            newWta.setRuleTemplateIds(ruleTemplatesIds);
-        }
-        save(oldWta);
-        newWta.setDisabled(false);
-        newWta.setParentWTA(oldWta.getId());
-        save(newWta);
-        //WorkingTimeAgreement workingTimeAgreement = wtaRepository.findOne(newWta.getId());
-        //BeanUtils.copyProperties(workingTimeAgreement,wtaResponseDTO);
-        //WTAResponseDTO parentWta = new WTAResponseDTO();
-        //BeanUtils.copyProperties(oldWta,parentWta);
-        //wtaResponseDTO.setParentWTA(parentWta);
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
-        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
-        wtaResponseDTO.setStartDateMillis(oldWta.getStartDate().getTime());
-        if (oldWta.getEndDate() != null) {
-            wtaResponseDTO.setEndDateMillis(oldWta.getEndDate().getTime());
-        }
-        return wtaResponseDTO;
-    }
-
     public WTADefaultDataInfoDTO getDefaultWtaInfo(Long countryId) {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndCountryId(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
@@ -452,6 +415,22 @@ public class WTAService extends MongoBaseService {
         });
         return wtaResponseDTOS;
     }
+
+
+    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<BigInteger> wtaIds) {
+        List<WTAVersionDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(wtaIds);
+        List<WTAVersionDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(wtaIds);
+        currentWTAList.forEach(currentWTA -> {
+            Optional<WTAVersionDTO> currentObject = versionsOfWTAs.parallelStream().filter(wtaVersionDTO -> currentWTA.getId().equals(wtaVersionDTO.getId())).findFirst();
+            if (currentObject.isPresent()) {
+                currentWTA.setVersions(currentObject.get().getVersions());
+            }
+        });
+        TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
+        WTATableSettingWrapper wtaTableSettingWrapper = new WTATableSettingWrapper(currentWTAList, tableConfiguration);
+        return wtaTableSettingWrapper;
+    }
+
 
     public WTAResponseDTO assignWTAToUnitPosition(BigInteger wtaId) {
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
@@ -485,7 +464,7 @@ public class WTAService extends MongoBaseService {
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w, WTAResponseDTO.class);
             WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
             List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-            if (wtaResponseDTO.getRuleTemplates()!=null && !wtaResponseDTO.getRuleTemplates().isEmpty()) {
+            if (wtaResponseDTO.getRuleTemplates() != null && !wtaResponseDTO.getRuleTemplates().isEmpty()) {
                 ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
                 save(ruleTemplates);
                 List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
@@ -512,5 +491,76 @@ public class WTAService extends MongoBaseService {
         return wtaRepository.findAllByIdsInAndDeletedFalse(wtaIds);
     }
 
+    public WTAResponseDTO updateWtaOfUnitPosition(Long unitId, WTADTO wtadto, Boolean oldUnitPositionPublished) {
+        Optional<WorkingTimeAgreement> oldWta = wtaRepository.findById(wtadto.getId());
+        if (!Optional.ofNullable(oldWta).isPresent()) {
+            logger.info("wta not found while updating at unit %d", wtadto.getId());
+            exceptionService.dataNotFoundByIdException("message.wta.id", wtadto.getId());
+        }
+        WTAResponseDTO wtaResponseDTO;
+        if (oldUnitPositionPublished) {
+            wtaResponseDTO = updateWTAOfPublishedUnitPosition(oldWta.get(), wtadto);
+        } else {
+            wtaResponseDTO = updateWTAOfUnpublishedUnitPosition(oldWta.get(), wtadto);
+        }
+        wtaResponseDTO.setStartDateMillis(oldWta.get().getStartDate().getTime());
+        if (oldWta.get().getEndDate() != null) {
+            wtaResponseDTO.setEndDateMillis(oldWta.get().getEndDate().getTime());
+        }
+        return wtaResponseDTO;
+    }
+
+    private WTAResponseDTO updateWTAOfUnpublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
+        oldWta.setDescription(updateDTO.getDescription());
+        oldWta.setName(updateDTO.getName());
+
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        if (updateDTO.getRuleTemplates().size() > 0) {
+            ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), false);
+            save(ruleTemplates);
+            List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
+            oldWta.setRuleTemplateIds(ruleTemplatesIds);
+        }
+        save(oldWta);
+        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
+        wtaResponseDTO.setStartDateMillis(oldWta.getStartDate().getTime());
+
+        if (oldWta.getEndDate() != null) {
+            wtaResponseDTO.setEndDateMillis(oldWta.getEndDate().getTime());
+        }
+
+        return wtaResponseDTO;
+    }
+
+    private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto) {
+        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
+        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+        newWta.setDescription(wtadto.getDescription());
+        newWta.setName(wtadto.getName());
+        newWta.setStartDate(new Date(wtadto.getStartDateMillis()));
+        newWta.setEndDate(wtadto.getEndDateMillis() != null ? new Date(wtadto.getStartDateMillis()) : null);
+        newWta.setRuleTemplateIds(null);
+        if (wtadto.getEndDateMillis() != null) {
+            oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
+        }
+        oldWta.setId(null);
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        if (wtadto.getRuleTemplates().size() > 0) {
+            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
+            save(wtaBaseRuleTemplates);
+            List<BigInteger> ruleTemplatesIds = wtaBaseRuleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
+            newWta.setRuleTemplateIds(ruleTemplatesIds);
+        }
+        save(oldWta);
+        newWta.setDisabled(false);
+        newWta.setParentWTA(oldWta.getId());
+        save(newWta);
+        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
+        wtaResponseDTO.setParentWTA(oldWta.getId());
+        return wtaResponseDTO;
+    }
 
 }

@@ -6,8 +6,8 @@ import com.kairos.dto.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
-import com.kairos.persistance.model.master_data_management.asset_management.MasterAsset;
-import com.kairos.persistance.model.master_data_management.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.master_data.asset_management.MasterAsset;
+import com.kairos.persistance.model.master_data.processing_activity_masterdata.MasterProcessingActivity;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -33,14 +33,14 @@ import static com.kairos.constants.AppConstant.DELETED;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 
 
-public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
+public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
 
 
     @Inject
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriterias(Long countryId,Long organizationId,List<FilterType> filterTypes) {
+    public Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
         aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         filterTypes.forEach(filterType -> {
@@ -86,8 +86,7 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
                 groupOperation = groupOperation.addToSet(entry.getKey()).as(entry.getKey());
             }
         operations.add(groupOperation);
-        Aggregation aggregation = Aggregation.newAggregation(operations);
-        return aggregation;
+        return Aggregation.newAggregation(operations);
 
     }
 
@@ -95,7 +94,7 @@ public class FilterMongoRepositoryImpl implements CustomeFilterMongoRepository {
     public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
         List<ModuleIdDTO> moduleIdDto = filterGroup.getAccessModule();
-        String domainName = new String();
+        String domainName = null;
         for (ModuleIdDTO moduleIdDto1 : moduleIdDto) {
             if (moduleIdDto1.getModuleId().equalsIgnoreCase(moduleId)) {
                 domainName = moduleIdDto1.getName();

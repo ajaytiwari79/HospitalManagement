@@ -1,8 +1,6 @@
 package com.kairos.utils.codec;
 
-import org.bson.Document;
 import org.bson.codecs.Codec;
-import org.bson.codecs.DocumentCodec;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 
@@ -16,7 +14,7 @@ public class BigIntegerCodecProvider implements CodecProvider {
             return (Codec<T>) new BigIntegerCodec() ;
         }
 
-        // CodecProvider returns null if it's not a provider for the requresed Class
+        // CodecProvider returns null if it's not a provider for the requested Class
         return null;
     }
 }

@@ -14,9 +14,9 @@ import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoReposi
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.spec.Specification;
-import com.kairos.spec.night_worker.NightWorkerAgeEligibilitySpecification;
-import com.kairos.spec.night_worker.StaffNonPregnancySpecification;
+import com.kairos.rule_validator.Specification;
+import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
+import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.user.staff.StaffDTO;
 import com.kairos.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.util.DateUtils;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Created by prerna on 8/5/18.
@@ -106,9 +105,8 @@ public class NightWorkerService extends MongoBaseService {
 
         StaffQuestionnaire staffQuestionnaire = staffQuestionnaireMongoRepository.findByIdAndDeleted(questionnaireId);
 
-        // Predicate to check if any question is unanswered ( null)
-        Predicate<QuestionAnswerDTO> predicate = s -> !Optional.ofNullable(s.getAnswer()).isPresent();
-        if(!staffQuestionnaire.isSubmitted() && ! (answerResponseDTO.getQuestionAnswerPair().stream().anyMatch(predicate)) ){
+        // check if any question is unanswered ( null)
+        if(!staffQuestionnaire.isSubmitted() && ! (answerResponseDTO.getQuestionAnswerPair().stream().anyMatch(questionAnswerPair-> !Optional.ofNullable(questionAnswerPair.getAnswer()).isPresent())) ){
             staffQuestionnaire.setSubmitted(true);
             staffQuestionnaire.setSubmittedOn(DateUtils.getLocalDateFromDate(DateUtils.getDate()));
             answerResponseDTO.setSubmitted(true);

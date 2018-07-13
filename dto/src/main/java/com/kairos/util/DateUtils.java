@@ -592,4 +592,8 @@ public class DateUtils {
     public static LocalDateTime getTimezonedCurrentDate(LocalDateTime dateTime) {
         return  LocalDateTime.of(dateTime.getYear(),dateTime.getMonth(),dateTime.getDayOfMonth(),dateTime.getHour(),dateTime.getMinute());
     }
+
+    public static LocalDateTime getLocalDateTimeFromZoneId(ZoneId unitTimeZone) {
+        return LocalDateTime.now(unitTimeZone);
+    }
 }

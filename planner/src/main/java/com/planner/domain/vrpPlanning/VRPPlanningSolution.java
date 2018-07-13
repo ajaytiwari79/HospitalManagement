@@ -38,6 +38,15 @@ public class VRPPlanningSolution extends MongoBaseEntity {
         this.escalatedTaskList = escalatedTaskList;
     }
 
+
+    public List<Task> getEscalatedTaskList() {
+        return escalatedTaskList;
+    }
+
+    public void setEscalatedTaskList(List<Task> escalatedTaskList) {
+        this.escalatedTaskList = escalatedTaskList;
+    }
+
     public List<Task> getDrivingTimeList() {
         return drivingTimeList;
     }

@@ -26,14 +26,14 @@ import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.system_setting.SystemLanguageService;
-import com.kairos.user.organization.KMDTimeSlotListDTO;
+import com.kairos.user.organization.ImportTimeSlotListDTO;
 import com.kairos.user.patient.CurrentElements;
 import com.kairos.user.patient.PatientGrant;
 import com.kairos.user.patient.PatientRelative;
 import com.kairos.user.patient.PatientWrapper;
 import com.kairos.user.staff.AvailableContacts;
 import com.kairos.user.staff.ColumnResource;
-import com.kairos.user.staff.KMDShift;
+import com.kairos.user.staff.ImportShiftDTO;
 import com.kairos.user.staff.RelativeContacts;
 import com.kairos.user.staff.client.CitizenSupplier;
 import com.kairos.user.staff.staff.StaffDTO;
@@ -490,7 +490,7 @@ public class CitizenService {
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         ColumnResource columnResource = JsonUtils.toObject(jsonObject.get("columnResource").toString(), ColumnResource.class);
-        for(KMDShift shift : columnResource.getShifts()){
+        for(ImportShiftDTO shift : columnResource.getShifts()){
             String staffExternalId = shift.getEventResource().getResourceId();
             staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:")+13);
             logger.info("Staff External Id----> "+staffExternalId);
@@ -581,9 +581,9 @@ public class CitizenService {
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray(responseEntity.getBody());
         jsonObject.put("kmdTimeSlotDTOList", jsonArray);
-        KMDTimeSlotListDTO kmdTimeSlotListDTO = JsonUtils.toObject(jsonObject.toString(), KMDTimeSlotListDTO.class);
+        ImportTimeSlotListDTO importTimeSlotListDTO = JsonUtils.toObject(jsonObject.toString(), ImportTimeSlotListDTO.class);
         Organization unit = organizationGraphRepository.findOne(unitId);
-        kmdTimeSlotListDTO.getKmdTimeSlotDTOList().forEach(kmdTimeSlotDTO -> {
+        importTimeSlotListDTO.getImportTimeSlotDTOList().forEach(kmdTimeSlotDTO -> {
             //timeSlotService.importTimeSlotsFromKMD( unit,  kmdTimeSlotDTO);
         });
         timeSlotService.updateTimeSlotType(unitId,false);

@@ -1,7 +1,7 @@
 package com.kairos.persistance.model.clause_tag;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.springframework.data.mongodb.core.mapping.Document;
 
