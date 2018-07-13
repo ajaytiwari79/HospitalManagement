@@ -654,8 +654,18 @@ public class StaffService extends UserBaseService {
         }
         return isPerStaffMandatoryFieldsExists;
     }
+    /*******************************************************************************************************/
+    // function to convert cell value as String for given cellIndex
+    private String getStringValueOfIndexedCell(Row row,int cellIndex)
+    {
+        Cell cellValue=row.getCell(cellIndex);
+        cellValue.setCellType(Cell.CELL_TYPE_STRING);
+        String cellStringValue=cellValue.getStringCellValue().trim();
+        return cellStringValue;
+    }
    /*******************************************************************************************************/
-    public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
+
+   public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
@@ -754,71 +764,46 @@ public class StaffService extends UserBaseService {
                     staffErrorList.add(row.getRowNum());
 
                 } else {
-
-                    Cell cell = row.getCell(8);
-                    cell.setCellType(Cell.CELL_TYPE_STRING);
-
-                    cell = row.getCell(2);
-                    cell.setCellType(Cell.CELL_TYPE_STRING);
-                    Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
+                    String externalIdValueAsString=getStringValueOfIndexedCell(row,2);
+                    Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId,cell.getStringCellValue());
+                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId,externalIdValueAsString);
                         staffErrorList.add(row.getRowNum());
                         continue;
                     }
-//                    StaffQueryResult staffQueryResult = (Optional.ofNullable(parent).isPresent()) ? staffGraphRepository.getStaffByExternalIdInOrganization(parent.getId(), externalId)
-//                            : staffGraphRepository.getStaffByExternalIdInOrganization(unitId, externalId);
-
-//                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
-//                        staff = staffQueryResult.getStaff();
-//                    } else {
-//                        logger.info("Creating new staff with kmd external id " + externalId + " in unit " + unit.getId());
-
-//                    }
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
+                    staff.setUserName(getStringValueOfIndexedCell(row,19));
+                    staff.setFirstName(getStringValueOfIndexedCell(row,20));
+                    staff.setLastName(getStringValueOfIndexedCell(row,21));
+                    staff.setFamilyName(staff.getLastName());
                     if (row.getCell(17) != null) {
-                        staff.setBadgeNumber(row.getCell(17).toString().trim());
+                        staff.setBadgeNumber(getStringValueOfIndexedCell(row,17));
                     }
-                    staff.setFirstName(row.getCell(20).toString().trim());
-                    staff.setLastName(row.getCell(21).toString().trim());
-                    staff.setFamilyName(row.getCell(21).toString().trim());
-                    staff.setUserName(row.getCell(19).toString().trim());
                     ContactAddress contactAddress = extractContactAddressFromRow(row);
                     if (!Optional.ofNullable(contactAddress).isPresent()) {
                         contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
                     }
                     ContactDetail contactDetail = extractContactDetailFromRow(row);
-//                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
-//
-//                        if (Optional.ofNullable(contactDetail).isPresent()) {
-//                            contactDetail.setId(staffQueryResult.getContactDetailId());
-//                        }
-//
-//                        if (Optional.ofNullable(contactAddress).isPresent()) {
-//                            contactAddress.setId(staffQueryResult.getContactAddressId());
-//                        }
-//                    }
                     staff.setContactDetail(contactDetail);
                     staff.setContactAddress(contactAddress);
-
-                    cell = row.getCell(2);
-                    if (Optional.ofNullable(cell).isPresent()) {
-                        cell.setCellType(Cell.CELL_TYPE_STRING);
-                        User user = null;
-                        user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
+                    if (isPerStaffMandatoryFieldsExists) {
+                        User user =userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row,2)
+                                                                           ,getStringValueOfIndexedCell(row,28).toLowerCase()
+                                                                           ,getStringValueOfIndexedCell(row,28).toLowerCase()
+                                                                           );
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(row.getCell(20).toString().trim());
-                            user.setLastName(row.getCell(21).toString().trim());
+                            user.setFirstName(getStringValueOfIndexedCell(row,20));
+                            user.setLastName(getStringValueOfIndexedCell(row,21));
                             Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
                             user.setCprNumber(cprNumberLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
                             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
-                            user.setTimeCareExternalId(cell.getStringCellValue());
+                            user.setTimeCareExternalId(externalIdValueAsString);
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
