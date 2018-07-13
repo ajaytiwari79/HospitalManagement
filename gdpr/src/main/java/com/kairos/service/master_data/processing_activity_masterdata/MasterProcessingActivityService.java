@@ -66,7 +66,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
         }
-
         return masterProcessingActivity;
     }
 

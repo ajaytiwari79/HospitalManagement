@@ -13,10 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+
 
 @Service
 public class ProcessingLegalBasisService extends MongoBaseService {
@@ -69,8 +71,8 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(sequenceGenerator(newProcessingLegalBasisList));
             }
-            result.put("existing", existing);
-            result.put("new", newProcessingLegalBasisList);
+            result.put(EXISTING_DATA_LIST, existing);
+            result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");

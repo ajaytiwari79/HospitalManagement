@@ -20,16 +20,16 @@ public class TemplateType extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "templateName cannot be empty ")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
-    private String templateName;
+    private String name;
 
     private Long countryId;
 
-    public String getTemplateName() {
-        return templateName;
+    public String getName() {
+        return name;
     }
 
-    public void setTemplateName(String templateName) {
-        this.templateName = templateName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Long getCountryId() {
