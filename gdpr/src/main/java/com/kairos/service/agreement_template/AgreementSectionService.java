@@ -78,9 +78,7 @@ public class AgreementSectionService extends MongoBaseService {
             remove(agreementSectionIdList, AgreementSection.class);
             throw new RuntimeException(e);
         }
-
         return policyAgreementTemplate;
-
     }
 
 
@@ -94,7 +92,7 @@ public class AgreementSectionService extends MongoBaseService {
     //updated for section and sub section creations
     public List<BigInteger> createAggrementSectionsAndClausesAndAddtoAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
-        checkForDuplicacyInTitleOfAgreementSections(agreementSectionDTOS);
+        checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOS);
         List<AgreementSection> agreementSectionList = new ArrayList<>();
         List<ClauseBasicDTO> changedClausesDTOList = new ArrayList<>();
         List<ClauseBasicDTO> newClauseBasicDTOList = new ArrayList<>();
@@ -160,11 +158,10 @@ public class AgreementSectionService extends MongoBaseService {
             agreementSection.setClauses(unchangedClauseidList);
         }
         if (!agreementSectionDTO.getSubAgreementSections().isEmpty()) {
-            List<AgreementSection> agreementSubSectionList=buildAgreementSubSectionAndClause(newClauseBasicDTOList,changedClausesDTOList,changedClauseIdsList,agreementSectionDTO.getSubAgreementSections(),
+            List<AgreementSection> agreementSubSectionList = buildAgreementSubSectionAndClause(newClauseBasicDTOList, changedClausesDTOList, changedClauseIdsList, agreementSectionDTO.getSubAgreementSections(),
                     agreementSubSectionClauseAndClauseDtoHashMap);
             sectionClauseAndClauseDtoWrapper.setAgreementSubSections(agreementSubSectionList);
         }
-
         result.put(AGREEMENT_SECTION, agreementSection);
         result.put(AGREEMENT_SECTION_WRAPPER, sectionClauseAndClauseDtoWrapper);
         return result;
@@ -172,10 +169,8 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-
-    public  List<AgreementSection>  buildAgreementSubSectionAndClause(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,List<AgreementSectionDTO> agreementSubSectionDTOList
-                                                   , Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap)
-    {
+    public List<AgreementSection> buildAgreementSubSectionAndClause(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList, List<AgreementSectionDTO> agreementSubSectionDTOList
+            , Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap) {
         List<AgreementSection> agreementSubSectionList = new ArrayList<>();
         agreementSubSectionDTOList.forEach(agreementSubSectionDTO -> {
 
@@ -211,8 +206,6 @@ public class AgreementSectionService extends MongoBaseService {
 
         return agreementSubSectionList;
     }
-
-
 
 
     /**
@@ -325,7 +318,7 @@ public class AgreementSectionService extends MongoBaseService {
      */
     public List<BigInteger> updateAggrementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
-        checkForDuplicacyInTitleOfAgreementSections(agreementSectionDTOS);
+        checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOS);
         List<AgreementSectionDTO> exisitingAgreementSectionDtoList = new ArrayList<>();
         List<AgreementSectionDTO> newAgreementSectionDTOList = new ArrayList<>();
         agreementSectionDTOS.forEach(agreementSectionDTO -> {
@@ -343,7 +336,6 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSectionIdList.addAll(updateAggrementSectionsAndClauses(countryId, organizationId, exisitingAgreementSectionDtoList, policyAgreementTemplate));
         return agreementSectionIdList;
     }
-
 
 
     /**
@@ -401,7 +393,7 @@ public class AgreementSectionService extends MongoBaseService {
         }
 
         if (!newClauseBasicDTOList.isEmpty() || !changedClauseIdsList.isEmpty()) {
-            List<Clause> newCreatedClausesList ;
+            List<Clause> newCreatedClausesList;
             if (!newClauseBasicDTOList.isEmpty()) {
                 newCreatedClausesList = clauseService.createNewClauseUsingAgreementTemplateMetadata(countryId, organizationId, newClauseBasicDTOList, policyAgreementTemplate);
             }
@@ -457,13 +449,19 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    public void checkForDuplicacyInTitleOfAgreementSections(List<AgreementSectionDTO> agreementSectionDTOS) {
+    public void checkForDuplicacyInTitleOfAgreementSectionAndSubSection(List<AgreementSectionDTO> agreementSectionDTOS) {
         List<String> titles = new ArrayList<>();
-        for (AgreementSectionDTO questionnaireSectionDto : agreementSectionDTOS) {
-            if (titles.contains(questionnaireSectionDto.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "questionnaire section", questionnaireSectionDto.getName());
+        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOS) {
+            if (titles.contains(agreementSectionDTO.getName().toLowerCase())) {
+                exceptionService.duplicateDataException("message.duplicate", "questionnaire section", agreementSectionDTO.getName());
             }
-            titles.add(questionnaireSectionDto.getName().toLowerCase());
+            agreementSectionDTO.getSubAgreementSections().forEach(agreementSubSectionDTO -> {
+                if (titles.contains(agreementSubSectionDTO.getName().toLowerCase())) {
+                    exceptionService.duplicateDataException("message.duplicate", "questionnaire section", agreementSubSectionDTO.getName());
+                }
+                titles.add(agreementSubSectionDTO.getName());
+            });
+            titles.add(agreementSectionDTO.getName().toLowerCase());
         }
     }
 
