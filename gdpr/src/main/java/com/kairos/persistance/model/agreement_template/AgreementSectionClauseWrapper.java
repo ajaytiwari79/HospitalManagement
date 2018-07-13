@@ -3,16 +3,17 @@ package com.kairos.persistance.model.agreement_template;
 import com.kairos.dto.master_data.AgreementSectionDTO;
 import com.kairos.dto.master_data.ClauseBasicDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AgreementSectionClauseWrapper {
 
 
-    private List<AgreementSection> agreementSubSections;
+    private List<AgreementSection> agreementSubSections=new ArrayList<>();
 
-    private List<ClauseBasicDTO> changedClausesList;
+    private List<ClauseBasicDTO> changedClausesList=new ArrayList<>();
 
-    private List<ClauseBasicDTO> newClauses;
+    private List<ClauseBasicDTO> newClauses=new ArrayList<>();
 
     public List<AgreementSection> getAgreementSubSections() { return agreementSubSections; }
 
