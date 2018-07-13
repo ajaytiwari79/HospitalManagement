@@ -18,6 +18,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
@@ -2166,8 +2167,8 @@ public class StaffService extends UserBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs,StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsByUserId(Long UserId){
-        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserId(UserId);
+    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId){
+        List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(UserId, ReasonCodeType.ATTENDANCE);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers,StaffResultDTO.class);
     }
 
