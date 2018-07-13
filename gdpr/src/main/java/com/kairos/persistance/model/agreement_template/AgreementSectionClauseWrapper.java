@@ -8,15 +8,15 @@ import java.util.List;
 public class AgreementSectionClauseWrapper {
 
 
-    private List<AgreementSectionDTO> agreementSubSections;
+    private List<AgreementSection> agreementSubSections;
 
     private List<ClauseBasicDTO> changedClausesList;
 
     private List<ClauseBasicDTO> newClauses;
 
-    public List<AgreementSectionDTO> getAgreementSubSections() { return agreementSubSections; }
+    public List<AgreementSection> getAgreementSubSections() { return agreementSubSections; }
 
-    public void setAgreementSubSections(List<AgreementSectionDTO> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
+    public void setAgreementSubSections(List<AgreementSection> agreementSubSections) { this.agreementSubSections = agreementSubSections; }
 
     public List<ClauseBasicDTO> getChangedClausesList() {
         return changedClausesList;
@@ -37,7 +37,7 @@ public class AgreementSectionClauseWrapper {
         this.newClauses = newClauses;
     }
 
-    public AgreementSectionClauseWrapper(List<AgreementSectionDTO> agreementSubSections, List<ClauseBasicDTO> changedClausesList, List<ClauseBasicDTO> newClauses) {
+    public AgreementSectionClauseWrapper(List<AgreementSection> agreementSubSections, List<ClauseBasicDTO> changedClausesList, List<ClauseBasicDTO> newClauses) {
         this.agreementSubSections = agreementSubSections;
         this.changedClausesList = changedClausesList;
         this.newClauses = newClauses;
