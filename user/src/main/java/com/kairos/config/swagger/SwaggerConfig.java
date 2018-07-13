@@ -43,7 +43,7 @@ public class SwaggerConfig {
     @Bean
     public Docket postApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("kairos-api")
+                .groupName("kairos-user-api")
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.kairos.controller"))
@@ -54,14 +54,21 @@ public class SwaggerConfig {
 
     private List<Parameter> additionalParametersCriteria(){
         ParameterBuilder paramsBuilder = new ParameterBuilder();
-        paramsBuilder
-                .name("Authorization")
-                .modelRef(new ModelRef("string"))
-                .parameterType("header")
-                .required(true)
-                .build();
         List<Parameter> parametersList = new ArrayList<>();
-        parametersList.add(paramsBuilder.build());
+        parametersList.add(
+                paramsBuilder
+                        .name("organizationId")
+                        .modelRef(new ModelRef("long"))
+                        .parameterType("path")
+                        .required(true)
+                        .build());
+        parametersList.add(
+                paramsBuilder
+                        .name("Authorization")
+                        .modelRef(new ModelRef("string"))
+                        .parameterType("header")
+                        .required(true)
+                        .build());
         return parametersList;
     }
 
