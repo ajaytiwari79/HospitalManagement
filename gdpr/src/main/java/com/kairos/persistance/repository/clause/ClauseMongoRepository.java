@@ -29,7 +29,7 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     List<ClauseResponseDTO>  findAllClause(Long countryId,Long organizationId);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
-    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, Set<BigInteger> ids);
+    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, List<BigInteger> ClauseIds);
 
 
 
