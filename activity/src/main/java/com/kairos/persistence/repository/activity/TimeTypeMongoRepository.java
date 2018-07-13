@@ -20,8 +20,8 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     @Query("{'upperLevelTimeTypeId':{'$exists':true},'deleted' : false,'countryId':?0}")
     List<TimeType> findAllLowerLevelTimeType(Long countryId);
 
-    @Query("{countryId:?1,label:{$in:?0},deleted : false}")
-    TimeType findAllByLabel(List<String> label, Long countryId);
+    @Query("{label:{$in:?0},countryId:?1,deleted : false}")
+    TimeType findByLabelsAndCountryId(List<String> label, Long countryId);
 
     @Query("{upperLevelTimeTypeId:?0,deleted : false,countryId:?1}")
     List<TimeType> findAllChildByParentId(BigInteger id, Long countryId);
@@ -41,12 +41,12 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     @Query("{upperLevelTimeTypeId:{$in:?0},deleted : false}")
     List<TimeTypeResponseDTO> findAllChildByParentId(List<BigInteger> id);
 
-    @Query("{id: { $nin:?0},countryId:?2,label:{ $in:?1},deleted : false}")
-    List<TimeType> findByIdNotEqualAndLabelAndCountryId(List<BigInteger> timeTypeIds,List<String> timeTypeNames, Long countryId);
+    @Query(value = "{id: { $nin:?0},label:{ $in:?1},countryId:?2,deleted : false}",exists = true)
+    Boolean findByIdNotEqualAndLabelAndCountryId(List<BigInteger> timeTypeIds,List<String> timeTypeNames, Long countryId);
 
     @Query("{id:{$in:?0},deleted : false}")
     List<TimeType> findAllByTimeTypeIds(List<BigInteger> id);
 
     @Query("{upperLevelTimeTypeId:{ $in:?0},deleted : false}")
-    List<TimeType> findAllChildTimeTypeByParentId(List<BigInteger> ids);
+    List<TimeType> findAllChildTimeTypeByParentId(List<BigInteger> timeTypeIds);
 }

@@ -32,16 +32,14 @@ public class TimeTypeService extends MongoBaseService {
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels=timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
-        TimeType timeTypeResult=timeTypeMongoRepository.findAllByLabel(timeTypeLabels,countryId);
+        TimeType timeTypeResult=timeTypeMongoRepository.findByLabelsAndCountryId(timeTypeLabels,countryId);
         if(Optional.ofNullable(timeTypeResult).isPresent()){
             exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
         }
         timeTypeDTOs.forEach(timeTypeDTO -> {
             TimeType timeType;
             if (timeTypeDTO.getTimeTypes() != null) {
-               timeType = timeTypeResult;
-                if (timeType == null) {
-                    timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(),timeTypeDTO.getBackgroundColor(),timeTypeDTO.getTextColor());
+                timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(),timeTypeDTO.getBackgroundColor(),timeTypeDTO.getTextColor());
                     timeType.setCountryId(countryId);
                     if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                         timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
@@ -54,7 +52,6 @@ public class TimeTypeService extends MongoBaseService {
                         save(parentTimeType);
                     }
                     timeTypeDTO.setId(timeType.getId());
-                }
             }
         });
         return timeTypeDTOs;
@@ -62,19 +59,19 @@ public class TimeTypeService extends MongoBaseService {
 
     public List<TimeTypeDTO> updateTimeType(List<TimeTypeDTO> timeTypeDTOS, Long countryId) {
         List<TimeType> timeTypes=new ArrayList<>();
-        List<BigInteger> timeTypeIds = timeTypeDTOS.stream().map(t->t.getId()).collect(Collectors.toList());
-        List<String> timeTypeLabels = timeTypeDTOS.stream().map(t->t.getLabel()).collect(Collectors.toList());
-        List<TimeType> timeTypesResult = timeTypeMongoRepository.findByIdNotEqualAndLabelAndCountryId(timeTypeIds,timeTypeLabels, countryId);
-        if(!timeTypesResult.isEmpty()){
+        List<BigInteger> timeTypeIds = timeTypeDTOS.stream().map(timeTypeId->timeTypeId.getId()).collect(Collectors.toList());
+        List<String> timeTypeLabels = timeTypeDTOS.stream().map(timeTypeId->timeTypeId.getLabel()).collect(Collectors.toList());
+        Boolean timeTypesExists = timeTypeMongoRepository.findByIdNotEqualAndLabelAndCountryId(timeTypeIds,timeTypeLabels, countryId);
+        if(timeTypesExists){
             exceptionService.duplicateDataException("message.timetype.name.alreadyexist");
         }
-        timeTypesResult = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
-        Map<BigInteger,TimeType> timeTypeMap = timeTypesResult.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        List<TimeType> timeTypesResult = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
+        Map<BigInteger,TimeType> timeTypeMap = timeTypesResult.stream().collect(Collectors.toMap(timetype->timetype.getId(),timetype->timetype));
         List<TimeType> childTimeTypes=timeTypeMongoRepository.findAllChildTimeTypeByParentId(timeTypeIds);
         Map<BigInteger,List<TimeType>> childTimeTypesMap = childTimeTypes.stream().collect(Collectors.groupingBy(t->t.getUpperLevelTimeTypeId(),Collectors.toList()));
-        List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(t->t.getId()).collect(Collectors.toList());
+        List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(timetype->timetype.getId()).collect(Collectors.toList());
         List<TimeType> leafTimeTypes =timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
-        Map<BigInteger,List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(t->t.getUpperLevelTimeTypeId(),Collectors.toList()));
+        Map<BigInteger,List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype->timetype.getUpperLevelTimeTypeId(),Collectors.toList()));
         timeTypeDTOS.forEach(timeTypeDTO -> {
                 TimeType timeType = timeTypeMap.get(timeTypeDTO.getId());
                 if (Optional.ofNullable(timeType).isPresent()) {
