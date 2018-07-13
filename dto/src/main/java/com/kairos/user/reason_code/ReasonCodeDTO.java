@@ -1,8 +1,10 @@
-package com.kairos.wrapper;
+package com.kairos.user.reason_code;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.ReasonCodeType;
+import com.kairos.enums.reason_code.ReasonCodeType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Created by pavan on 23/3/18.
@@ -66,5 +68,33 @@ public class ReasonCodeDTO {
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ReasonCodeDTO that = (ReasonCodeDTO) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(name, that.name)
+                .append(code, that.code)
+                .append(description, that.description)
+                .append(reasonCodeType, that.reasonCodeType)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .append(code)
+                .append(description)
+                .append(reasonCodeType)
+                .toHashCode();
     }
 }

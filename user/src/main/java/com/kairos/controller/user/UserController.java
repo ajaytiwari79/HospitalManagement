@@ -127,8 +127,8 @@ public class UserController {
 
     @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staffs")
     @ApiOperation("get staff ids by userid")
-    ResponseEntity<Map<String, Object>> getStaffIdsByUserId(@PathVariable long userId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsByUserId(userId));
+    ResponseEntity<Map<String, Object>> getStaffIdsAndReasonCodeByUserId(@PathVariable long userId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsAndReasonCodeByUserId(userId));
     }
 
 }
