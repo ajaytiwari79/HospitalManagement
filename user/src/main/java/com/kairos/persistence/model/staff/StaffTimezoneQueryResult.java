@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.staff;
 
-import com.kairos.response.dto.web.organization.OrganizationIdAndNameResult;
+import com.kairos.user.reason_code.ReasonCodeDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.time.ZoneId;
+import java.util.List;
 
 @QueryResult
 public class StaffTimezoneQueryResult {
@@ -11,7 +11,7 @@ public class StaffTimezoneQueryResult {
     private Long unitId;
     private String unitName;
     private String timeZone;
-
+    private List<ReasonCodeDTO> reasonCodes;
 
     public Long getStaffId() {
         return staffId;
@@ -43,5 +43,13 @@ public class StaffTimezoneQueryResult {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public List<ReasonCodeDTO> getReasonCodes() {
+        return reasonCodes;
+    }
+
+    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
+        this.reasonCodes = reasonCodes;
     }
 }
