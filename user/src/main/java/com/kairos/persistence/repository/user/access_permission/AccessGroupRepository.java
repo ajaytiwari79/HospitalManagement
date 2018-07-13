@@ -53,17 +53,17 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForHub=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForHubAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForUnion=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForUnionAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForOrganization=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForOrganizationAccessGroup(Long countryId, Long accessGroupId);
 
 
@@ -78,7 +78,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
             "UNWIND listOfPage as page\n" +
             "Match (c)-[r:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} WITH accessGroup, page\n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:r.read, write:r.write}]->(page)")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(page)")
     void addAccessPageRelationshipForCountryAccessGroups(Long accessPageId, Long countryId, String organizationCategory);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
@@ -95,8 +95,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "OPTIONAL Match (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  where childOrg.isKairosHub ={2} AND childOrg.union={3} with org+[childOrg] as allOrg,listOfPage \n" +
             "UNWIND listOfPage as page\n" +
             "UNWIND allOrg as org \n" +
-            "Match (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WHERE accessGroup.name <> "+ AG_COUNTRY_ADMIN +" WITH accessGroup, page \n"+
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:r.read, write:r.write}]->(page)")
+            "Match (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(page)")
     void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
