@@ -909,6 +909,7 @@ public class CostTimeAgreementService extends UserBaseService {
             Integer lastSuffixNumber = collectiveTimeAgreementGraphRepository.getLastSuffixNumberOfCTAName("(?i)" + collectiveTimeAgreementDTO.getName());
             String name = collectiveTimeAgreementDTO.getName();
             collectiveTimeAgreementDTO.setName(name.contains("-") ? name.replace(name.substring(name.lastIndexOf("-") + 1, name.length()), (++lastSuffixNumber).toString()) : collectiveTimeAgreementDTO.getName() + "-" + ++lastSuffixNumber);
+            Long OrganizationTypeId=organizationTypeGraphRepository.
             collectiveTimeAgreementDTO.setOrganizationSubType(organizationSubTypeId);
             return createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
         } else {
