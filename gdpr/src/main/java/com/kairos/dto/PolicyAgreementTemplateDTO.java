@@ -3,13 +3,15 @@ package com.kairos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.master_data.AgreementSectionDTO;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +25,7 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
+
     @NotNull(message = "Organization Type cannot be null")
     @NotEmpty(message = "Organization Type cannot be empty")
     private List<OrganizationTypeDTO>  organizationTypes;
@@ -43,8 +46,7 @@ public class PolicyAgreementTemplateDTO {
     @NotEmpty(message = "Account Type cannot be empty")
     private Set<BigInteger> accountTypes;
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
-    private List<AgreementSection> agreementSections;
+    private List<AgreementSectionDTO> agreementSections=new ArrayList<>();
 
     @NotNull
     private BigInteger templateTypeId;
@@ -57,12 +59,11 @@ public class PolicyAgreementTemplateDTO {
         this.templateTypeId = templateTypeId;
     }
 
-    @NotEmpty(message = "error.message.list.cannot.be.empty")
-    public List<AgreementSection> getAgreementSections() {
+    public List<AgreementSectionDTO> getAgreementSections() {
         return agreementSections;
     }
 
-    public void setAgreementSections(List<AgreementSection> agreementSections) {
+    public void setAgreementSections(List<AgreementSectionDTO> agreementSections) {
         this.agreementSections = agreementSections;
     }
 

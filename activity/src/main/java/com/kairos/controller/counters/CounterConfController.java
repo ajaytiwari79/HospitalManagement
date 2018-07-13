@@ -1,6 +1,7 @@
 package com.kairos.controller.counters;
 
 import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.counter.KPICategoryUpdationDTO;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPICategory;
 import com.kairos.service.counter.CounterConfService;
@@ -52,7 +53,7 @@ public class CounterConfController {
     }
 
     @PutMapping(value = "/category")
-    public ResponseEntity<Map<String, Object>> updateCategories(@RequestBody List<KPICategory> categories){
+    public ResponseEntity<Map<String, Object>> updateCategories(@RequestBody KPICategoryUpdationDTO categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories));
     }
 }

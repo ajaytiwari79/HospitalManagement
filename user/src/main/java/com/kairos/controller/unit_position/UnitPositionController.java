@@ -121,6 +121,6 @@ public class UnitPositionController {
     @ApiOperation(value = "get all cta version for a staff")
     @RequestMapping(value = "/staff/{staffId}/cta", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllCTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllCTAOfStaff(staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllCTAOfStaff(unitId, staffId));
     }
 }

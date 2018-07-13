@@ -33,7 +33,7 @@ public class UnitPositionQueryResult {
     private float avgDailyWorkingHours;
     private int fullTimeWeeklyMinutes;
     private float hourlyWages;
-    private long id;
+    private Long id;
 
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
@@ -50,7 +50,6 @@ public class UnitPositionQueryResult {
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
 
-    private WTAVersionDTO workingTimeAgreementVersion;    // Its for version of the WTA
 
     private Boolean history;
     private Boolean editable;
@@ -297,12 +296,8 @@ public class UnitPositionQueryResult {
         this.published = published;
     }
 
-    public WTAVersionDTO getWorkingTimeAgreementVersion() {
-        return workingTimeAgreementVersion;
-    }
-
-    public void setWorkingTimeAgreementVersion(WTAVersionDTO workingTimeAgreementVersion) {
-        this.workingTimeAgreementVersion = workingTimeAgreementVersion;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public UnitPositionQueryResult() {

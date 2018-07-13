@@ -6,13 +6,13 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ColumnResource {
-    private List<KMDShift> shifts;
+    private List<ImportShiftDTO> shifts;
 
-    public List<KMDShift> getShifts() {
+    public List<ImportShiftDTO> getShifts() {
         return shifts;
     }
 
-    public void setShifts(List<KMDShift> shifts) {
+    public void setShifts(List<ImportShiftDTO> shifts) {
         this.shifts = shifts;
     }
 }

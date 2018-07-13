@@ -75,10 +75,8 @@ public class TemplateTypeController {
     @ApiOperation(value="update template")
     @PutMapping(value = "/updateTemplate/{id}")
     public ResponseEntity<Object> updateTemplate(@PathVariable BigInteger id,@PathVariable Long countryId, @Valid @RequestBody TemplateType templateType) {
-        if (StringUtils.isBlank(templateType.getTemplateName())) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "templateName parameter is null or empty");
-        }
-        else if(id==null){
+
+         if(id==null){
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id parameter is null or empty");
 
         }

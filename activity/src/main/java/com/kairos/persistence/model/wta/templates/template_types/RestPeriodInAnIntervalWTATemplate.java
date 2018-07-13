@@ -10,6 +10,8 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
@@ -27,6 +29,8 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
     public long getIntervalLength() {
@@ -81,6 +85,22 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
     public RestPeriodInAnIntervalWTATemplate() {
         wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
+    }
+
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
     @Override

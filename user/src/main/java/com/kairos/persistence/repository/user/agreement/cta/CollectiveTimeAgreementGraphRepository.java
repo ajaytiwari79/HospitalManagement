@@ -91,7 +91,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("match(ost:OrganizationType) where  id(ost) in {0} \n" +
             "match(cta:CostTimeAgreement)-[:"+ BELONGS_TO_ORG_SUB_TYPE+"]->(ost) WHERE cta.deleted={1}\n" +
             "return cta")
-    List<CostTimeAgreement> getAllCTAByOrganiationSubType(List<Long> organizationSubTypeIds, Boolean deleted);
+    List<CostTimeAgreement> getAllCTAByOrganizationSubType(List<Long> organizationSubTypeIds, Boolean deleted);
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization"+
             "Match (organization)-[r:HAS_CTA]->(cta:CostTimeAgreement)  WHERE id(cta) = {1} DELETE r")
@@ -250,7 +250,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions," +
             "ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned," +
             "employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
-    List<CTAResponseDTO> getAllCTAByOrganiationSubType(Long organizationSubTypeId);
+    List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId);
 
     @Query("MATCH(c:Country)-[:" + BELONGS_TO + "]-(cta:CostTimeAgreement{deleted:false})  where cta.name =~'.*{0}.*' with \n" +
             "toInt(last(split(cta.name,'-'))) as num " +

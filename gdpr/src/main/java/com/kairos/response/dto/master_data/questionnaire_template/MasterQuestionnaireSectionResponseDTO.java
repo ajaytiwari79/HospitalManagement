@@ -2,7 +2,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -17,7 +17,6 @@ public class MasterQuestionnaireSectionResponseDTO {
 
     private List<MasterQuestionBasicResponseDTO> questions;
 
-    private Long countryId;
 
     public BigInteger getId() {
         return id;
@@ -41,14 +40,6 @@ public class MasterQuestionnaireSectionResponseDTO {
 
     public void setQuestions(List<MasterQuestionBasicResponseDTO> questions) {
         this.questions = questions;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
 
