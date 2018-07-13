@@ -206,6 +206,8 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
+        generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
+        generalDTO.setTextColor(activity.getGeneralActivityTab().getTextColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO,generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {

@@ -278,9 +278,11 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
+        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
+        generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
+        generalDTO.setTextColor(activity.getGeneralActivityTab().getTextColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO, generalTab);
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }
