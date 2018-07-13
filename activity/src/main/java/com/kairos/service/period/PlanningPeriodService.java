@@ -334,11 +334,11 @@ public class PlanningPeriodService extends MongoBaseService {
     public boolean validateStartDateForPeriodCreation(LocalDate startDate, DurationType durationType){
         switch (durationType){
             // Weekly Planning Period must start on monday
-            case MONTHS:{
+            case WEEKS:{
                 return startDate.getDayOfWeek().equals(DayOfWeek.MONDAY);
             }
             // Monthly Planning Period must start from first day of month
-            case WEEKS:{
+            case MONTHS:{
                 return startDate.equals(startDate.withDayOfMonth(1));
             }
             default : return false;
