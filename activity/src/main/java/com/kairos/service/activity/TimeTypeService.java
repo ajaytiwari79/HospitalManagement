@@ -209,20 +209,3 @@ public class TimeTypeService extends MongoBaseService {
 
 
 }
-//
-//
-// if(Optional.ofNullable(timeType.getChildTimeTypeIds().isEmpty()).isPresent()){
-//         List<TimeType> childTimeTypes=timeTypeMongoRepository.findAllByTimeTypeIds(timeType.getChildTimeTypeIds());
-//        childTimeTypes.forEach(childTimeType ->{
-//        childTimeType.setTextColor(timeTypeDTO.getTextColor());
-//        childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-//        if(Optional.ofNullable(childTimeType.getChildTimeTypeIds().isEmpty()).isPresent()){
-//        List<TimeType> subChildTimeTypes=timeTypeMongoRepository.findAllByTimeTypeIds(childTimeType.getChildTimeTypeIds());
-//        subChildTimeTypes.forEach(subChildTimeType ->
-//        {
-//        subChildTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-//        subChildTimeType.setTextColor(timeTypeDTO.getTextColor());
-//        });
-//        }
-//        });
-//        }
