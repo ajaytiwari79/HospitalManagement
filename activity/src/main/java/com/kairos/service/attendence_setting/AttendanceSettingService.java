@@ -59,7 +59,7 @@ public class AttendanceSettingService extends MongoBaseService {
             attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
         } else {
             List<OrganizationCommonDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new OrganizationCommonDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
-            Set<ReasonCodeDTO> reasonCode=staffAndOrganizationIds.stream().flatMap(s->s.getReasonCode().stream()).collect(Collectors.toSet());
+            Set<ReasonCodeDTO> reasonCode=staffAndOrganizationIds.stream().flatMap(s->s.getReasonCodes().stream()).collect(Collectors.toSet());
             attendanceDTO = new AttendanceDTO(unitIdAndNames,reasonCode);
         }
         return attendanceDTO;
