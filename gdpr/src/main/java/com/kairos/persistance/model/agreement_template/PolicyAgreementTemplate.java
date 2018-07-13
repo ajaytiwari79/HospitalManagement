@@ -37,15 +37,17 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private List<ServiceCategoryDTO> organizationServices;
     private List<SubServiceCategoryDTO> organizationSubServices;
 
+    private List<BigInteger> clauses;
+
     private BigInteger templateType;
 
-    public BigInteger getTemplateType() {
-        return templateType;
-    }
+    public BigInteger getTemplateType() { return templateType; }
 
-    public void setTemplateType(BigInteger templateType) {
-        this.templateType = templateType;
-    }
+    public void setTemplateType(BigInteger templateType) { this.templateType = templateType; }
+
+    public List<BigInteger> getClauses() { return clauses; }
+
+    public void setClauses(List<BigInteger> clauses) { this.clauses = clauses; }
 
     public String getName() {
         return name;
