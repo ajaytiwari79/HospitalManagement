@@ -1,4 +1,5 @@
-package com.kairos.persistance.model.master_data.processing_activity_masterdata;
+package com.kairos.persistance.model.master_data.default_proc_activity_setting;
+
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
@@ -6,9 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
 
-
-@Document(collection = "party_location")
-public class PartyLocation  extends MongoBaseEntity {
+@Document(collection = "dataSubject")
+public class DataSubject extends  MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")

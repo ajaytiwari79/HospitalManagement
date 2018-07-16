@@ -1,5 +1,4 @@
-package com.kairos.persistance.model.master_data.processing_activity_masterdata;
-
+package com.kairos.persistance.model.master_data.default_proc_activity_setting;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
@@ -7,8 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
 
-@Document(collection = "transfer_method")
-public class TransferMethod extends MongoBaseEntity {
+@Document(collection = "dataSource")
+public class DataSource extends  MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "Name can't be empty")
@@ -24,7 +23,6 @@ public class TransferMethod extends MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
-
     public String getName() {
         return name;
     }
