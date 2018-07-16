@@ -1,7 +1,7 @@
 package com.kairos.scheduler.controller;
 
+import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
-import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelServiceTemp;
 import com.kairos.scheduler.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
@@ -26,9 +27,9 @@ public class SchedulerPanelController {
 
     @RequestMapping(value = "/{schedulerPanelId}", method = RequestMethod.GET)
     @ApiOperation("Get Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable long controlPanelId) throws IOException {
+    public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable BigInteger controlPanelId) throws IOException {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getSchedulerPanelById(controlPanelId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.findSchedulerPanelById(controlPanelId));
 
     }
 
@@ -42,41 +43,42 @@ public class SchedulerPanelController {
 
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    @ApiOperation("Create Control Panel ")
-    public ResponseEntity<Map<String, Object>> addControlPanel(@RequestParam(value = "integrationConfigurationId", required = true) Long integrationConfigurationId, @PathVariable  long unitId, @RequestBody ControlPanel controlPanel) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createControlPanel(unitId, controlPanel, integrationConfigurationId));
+    @ApiOperation("Create Scheduler Panel ")
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = true) BigInteger integrationConfigurationId, @PathVariable  long unitId, @RequestBody SchedulerPanel schedulerPanel) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanel, integrationConfigurationId));
     }
 
     @RequestMapping(value = "", method = RequestMethod.PUT)
-    @ApiOperation("Update Control Panel ")
-    public ResponseEntity<Map<String, Object>> updateControlPanel(@RequestBody ControlPanel controlPanel) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateControlPanel(controlPanel));
+    @ApiOperation("Update Scheduler Panel ")
+    public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanel schedulerPanel) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanel));
     }
 
-    @RequestMapping(value = "/jobDetails/{controlPanelId}", method = RequestMethod.GET)
-    @ApiOperation("Update Control Panel ")
-    public ResponseEntity<Map<String, Object>> getJobDetails(@PathVariable long controlPanelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(controlPanelId));
+    @RequestMapping(value = "/jobDetails/{schedulerPanelId}", method = RequestMethod.GET)
+    @ApiOperation("Get job details ")
+    public ResponseEntity<Map<String, Object>> getJobDetails(@PathVariable BigInteger schedulerPanelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(schedulerPanelId));
     }
 
-    @RequestMapping(value = "/delete/{controlPanelId}", method = RequestMethod.DELETE)
-    @ApiOperation("Update Control Panel ")
-    public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable long controlPanelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(controlPanelId));
+    @RequestMapping(value = "/delete/{schedulerPanelId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete Scheduler Panel ")
+    public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
     }
 
     /**
      * this end point will be called from
      * activity micro service
-     * @param controlPanelId
+     * @param schedulerPanelId
      * @return
      */
-    @RequestMapping(value = "/{controlPanelId}/control_panel_details", method = RequestMethod.GET)
-    @ApiOperation("Update Control Panel ")
-    public ResponseEntity<Map<String, Object>> getRequiredControlPanelDataForTask(@PathVariable long controlPanelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getSchedulerPanelData(controlPanelId));
+  //Dont Remove
+    /*@RequestMapping(value = "/{schedulerPanelId}/control_panel_details", method = RequestMethod.GET)
+    @ApiOperation("Get scheduler panel details ")
+    public ResponseEntity<Map<String, Object>> getRequiredControlPanelDataForTask(@PathVariable BigInteger schedulerPanelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getControlPanelData(schedulerPanelId));
     }
-
+*/
 
 
 

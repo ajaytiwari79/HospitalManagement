@@ -2,8 +2,12 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.enums.EmploymentStatus;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
+import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.auth.User;
@@ -100,6 +104,8 @@ public class EmploymentService extends UserBaseService {
     private ExceptionService exceptionService;
     @Inject
     private UserGraphRepository userGraphRepository;
+    @Inject
+    private KafkaProducer kafkaProducer;
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
@@ -769,13 +775,6 @@ public class EmploymentService extends UserBaseService {
         List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
         int currentElement;
         Employment employment;
-        //List<Organization> organizationsNew = expiredEmploymentsQueryResults.stream().flatMap(e->e.getOrganizations().stream()).collect(Collectors.toList());
-       /*
-        List<Organization> organizationsNew = new ArrayList<Organization>();
-        for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult :expiredEmploymentsQueryResults) {
-            organizationsNew.addAll(expiredEmploymentsQueryResult.getOrganizations());
-        }*/
-       //List<Long> orgIds =  organizationsNew.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
             organizations = expiredEmploymentsQueryResult.getOrganizations();
@@ -811,8 +810,6 @@ public class EmploymentService extends UserBaseService {
         if(Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
-
-        // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDate()?maxEndDate:unitPositionDTO.getEndDate());
         return saveEmploymentEndDate(unit,employmentEndDate,staffId,reasonCodeId,endDateMillis,accessGroupId);
     }
 
@@ -848,6 +845,14 @@ public class EmploymentService extends UserBaseService {
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);
+        KairosScheduleJobDTO scheduledJob = new KairosScheduleJobDTO();
+        /*scheduledJob.setJobType(JobType.FUNCTIONAL);
+        scheduledJob.setJobSubType(JobSubType.EMPLOYMENT_END);
+        scheduledJob.set*/
+        if(Optional.ofNullable(employment.getEndDateMillis()).isPresent()) {
+
+
+        }
         employment.setEndDateMillis(employmentEndDate);
         if(!Optional.ofNullable(employmentEndDate).isPresent()) {
             employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);

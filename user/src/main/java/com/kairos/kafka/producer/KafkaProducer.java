@@ -2,6 +2,7 @@ package com.kairos.kafka.producer;
 
 
 import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.KairosSchedulerLogsDTO;
 import com.kairos.dto.QueueDTO;
 import com.kairos.kafka.listener.DefaultKafkaMessageListener;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -26,12 +27,19 @@ import java.util.Map;
 public class KafkaProducer {
 
 
-    @Autowired
-    private KafkaTemplate<Integer,KairosScheduleJobDTO> kafkaTemplate;
+    @Inject
+    private KafkaTemplate<Integer,KairosScheduleJobDTO> kafkaTemplateJobQueue;
+    @Inject
+    private KafkaTemplate<Integer,KairosSchedulerLogsDTO> kafkaTemplateLogsQueue;
 
-    public void pushToQueue(KairosScheduleJobDTO job) {
+    public void pushToJobQueue(KairosScheduleJobDTO job) {
 
-      kafkaTemplate.send("userSchedulerQueue",1,job);
+      kafkaTemplateJobQueue.send("UserToSchedulerJobQueue",job);
+    }
+
+    public void pushToSchedulerLogsQueue(KairosSchedulerLogsDTO logs) {
+
+        kafkaTemplateLogsQueue.send("UserToSchedulerLogsQueue",logs);
     }
 
     public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {

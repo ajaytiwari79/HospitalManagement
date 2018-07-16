@@ -8,15 +8,52 @@ import java.math.BigInteger;
 
 public class KairosSchedulerExecutorDTO {
 
+    private BigInteger id;
+    private Long unitId;
     private JobType jobType;
     private JobSubType jobSubType;
     private BigInteger entityId;
+    private String filterId;
     private OperationType operationType;
     private IntegrationConfigurationDTO integrationConfigurationDTO;
 
+    public KairosSchedulerExecutorDTO() {
+
+    }
     public KairosSchedulerExecutorDTO(JobType jobType,JobSubType jobSubType, BigInteger entityId, OperationType operationType,
                                       IntegrationConfigurationDTO integrationConfigurationDTO) {
 
+    }
+
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+    public String getFilterId() {
+        return filterId;
+    }
+
+    public void setFilterId(String filterId) {
+        this.filterId = filterId;
+    }
+    public IntegrationConfigurationDTO getIntegrationConfigurationDTO() {
+        return integrationConfigurationDTO;
+    }
+
+    public void setIntegrationConfigurationDTO(IntegrationConfigurationDTO integrationConfigurationDTO) {
+        this.integrationConfigurationDTO = integrationConfigurationDTO;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
     public JobType getJobType() {

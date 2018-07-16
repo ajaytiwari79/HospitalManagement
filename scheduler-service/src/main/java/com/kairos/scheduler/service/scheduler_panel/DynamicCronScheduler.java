@@ -1,6 +1,5 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.IntegrationConfigurationDTO;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
 import com.kairos.enums.scheduler.JobSubType;
@@ -9,7 +8,6 @@ import com.kairos.enums.scheduler.OperationType;
 //import com.kairos.persistence.model.organization.Organization;
 //import com.kairos.persistence.model.user.control_panel.ControlPanel;
 //import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.scheduler.config.env.EnvConfig;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationConfiguration;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -58,8 +56,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
     @Inject
     private SchedulerPanelService schedulerPanelService;
 
-    @Inject
-    private EnvConfig envConfig;
+
 
     @Inject
     private KafkaProducer kafkaProducer;
@@ -73,13 +70,24 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     public String setCronScheduling(SchedulerPanel schedulerPanel){
         logger.debug("cron----> " + schedulerPanel.getCronExpression());
-        CronTrigger trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone("Denmark"));
+        CronTrigger trigger = null;
+        if(!schedulerPanel.isOneTimeTrigger()) {
+            trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone("Asia/Kolkata"));
+        }
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setThreadNamePrefix(schedulerPanel.getIntegrationConfigurationId().toString());
+        //threadPoolTaskScheduler.setThreadNamePrefix(schedulerPanel.getIntegrationConfigurationId().toString());
+        threadPoolTaskScheduler.setThreadNamePrefix(schedulerPanel.getJobSubType().toString());
+
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
         threadPoolTaskScheduler.initialize();
-        Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone("Denmark"));
-        threadPoolTaskScheduler.schedule(runnable, trigger);
+        Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone("Asia/Kolkata"));
+
+        if(!schedulerPanel.isOneTimeTrigger()) {
+            threadPoolTaskScheduler.schedule(runnable, trigger);
+        }
+        else {
+            threadPoolTaskScheduler.schedule(runnable,DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+        }
 
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), threadPoolTaskScheduler);
@@ -127,15 +135,23 @@ public class DynamicCronScheduler implements  DisposableBean  {
         try {
             String scheduler = "scheduler"+schedulerPanel.getId();
             logger.info("Start scheduler from BootStrap--> "+scheduler);
-            CronTrigger trigger = new CronTrigger(schedulerPanel.getCronExpression(),  TimeZone.getTimeZone("Denmark"));
-            Runnable task = getTask(schedulerPanel,  trigger, TimeZone.getTimeZone("Denmark"));
+            CronTrigger trigger = null;
+            if(!schedulerPanel.isOneTimeTrigger()) {
+                trigger = new CronTrigger(schedulerPanel.getCronExpression(),  TimeZone.getTimeZone("Asia/Kolkata"));
+            }
+            Runnable task = getTask(schedulerPanel,  trigger, TimeZone.getTimeZone("Asia/Kolkata"));
 
             ThreadPoolTaskScheduler scheduler2 = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean(scheduler, ThreadPoolTaskScheduler.class);
             logger.info("scheduler2-----> "+scheduler2);
             if (scheduler2 != null){
                 scheduler2.initialize();
-                scheduler2.schedule(task, trigger);
+                if(!schedulerPanel.isOneTimeTrigger()) {
+                    scheduler2.schedule(task, trigger);
+                }
+                else {
+                    scheduler2.schedule(task,DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+                }
             }
         }catch (NoSuchBeanDefinitionException exception){
             logger.error("No bean registered for cron job, May be this is your first time to scheduling cron job!!");
@@ -149,14 +165,21 @@ public class DynamicCronScheduler implements  DisposableBean  {
             public void run() {
                 logger.info("control pannel exist--> " + schedulerPanel.getId());
                 schedulerPanel.setLastRunTime(DateUtils.getCurrentDate());
-                schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
+                if(!schedulerPanel.isOneTimeTrigger()) {
+                    schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
+                }
+                else {
+                    schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
+                }
                 schedulerPanelService.setScheduleLastRunTime(schedulerPanel);
-                IntegrationConfigurationDTO integrationConfigurationDTO = new IntegrationConfigurationDTO();
+                IntegrationConfigurationDTO integrationConfigurationDTO = null;
                 if(Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
+                    integrationConfigurationDTO = new IntegrationConfigurationDTO();
                     Optional<IntegrationConfiguration> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
                     ObjectMapperUtils.copyProperties(integrationConfiguration.get(),integrationConfigurationDTO);
                 }
-                KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(JobType.FUNCTIONAL, JobSubType.INTEGRATION,null,OperationType.EXECUTE,
+
+                KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getJobType(), schedulerPanel.getJobSubType(),null,OperationType.EXECUTE,
                         integrationConfigurationDTO);
 
                 kafkaProducer.pushToQueue(jobToExecute);

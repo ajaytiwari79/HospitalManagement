@@ -30,7 +30,7 @@ public class KafkaProducer {
 
     public void pushToQueue(KairosSchedulerExecutorDTO job) {
 
-      kafkaTemplate.send("SchedulerToUserQueue",1,job);
+      kafkaTemplate.send("SchedulerToUserQueue",job);
     }
 
    /* public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {

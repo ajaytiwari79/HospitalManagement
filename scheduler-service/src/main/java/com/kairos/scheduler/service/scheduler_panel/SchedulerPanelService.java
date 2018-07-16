@@ -1,7 +1,9 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.client.dto.ControlPanelDTO;
-import com.kairos.config.scheduler.DynamicCronScheduler;
+//import com.kairos.config.scheduler.DynamicCronScheduler;
+import com.kairos.dto.KairosScheduleJobDTO;
+/*
 import com.kairos.dto.QueueDTO;
 //import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
@@ -12,18 +14,28 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRepository;
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
+*/
+import com.kairos.dto.KairosSchedulerLogsDTO;
+import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationConfiguration;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
+import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
 import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
+import com.kairos.scheduler.persistence.repository.JobDetailsRepository;
 import com.kairos.scheduler.persistence.repository.SchedulerPanelRepository;
 import com.kairos.scheduler.service.MongoBaseService;
+/*
 import com.kairos.service.UserBaseService;
 import com.kairos.service.integration.IntegrationService;
+*/
+import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
+/*
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+*/
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -38,8 +50,8 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_INTERVAL_STRING;
-import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_RUN_ONCE_STRING;
+import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_INTERVAL_STRING;
+import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ONCE_STRING;
 
 
 import com.kairos.scheduler.service.MongoBaseService;
@@ -53,8 +65,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     @Inject
     private SchedulerPanelRepository schedulerPanelRepository;
-    @Inject
-    OrganizationGraphRepository organizationGraphRepository;
+
     @Inject
     IntegrationConfigurationRepository integrationConfigurationRepository;
     @Inject
@@ -62,15 +73,13 @@ public class SchedulerPanelService extends MongoBaseService {
     @Inject
     JobDetailsRepository jobDetailsRepository;
     @Inject
-    IntegrationService integrationService;
-    @Inject
     private KafkaProducer kafkaProducer;
 
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
 
-    public SchedulerPanel createControlPanel(long unitId, SchedulerPanel schedulerPanel, BigInteger integrationConfigurationId) {
+    public SchedulerPanel createSchedulerPanel(long unitId, SchedulerPanel schedulerPanel, BigInteger integrationConfigurationId) {
         logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
         Optional<IntegrationConfiguration> integrationConfigurationOpt = integrationConfigurationRepository.findById(integrationConfigurationId);
         IntegrationConfiguration integrationConfiguration = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
@@ -79,11 +88,16 @@ public class SchedulerPanelService extends MongoBaseService {
         String interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
         schedulerPanel.setInterval(interval);
         String cronExpression;
-        if(schedulerPanel.getRunOnce() == null) {
-            cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
-        } else
-            cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
-        schedulerPanel.setCronExpression(cronExpression);
+
+        if(!schedulerPanel.isOneTimeTrigger()) {
+            if (schedulerPanel.getRunOnce() == null) {
+                cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
+            } else
+                cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
+            schedulerPanel.setCronExpression(cronExpression);
+        }
+
+
         schedulerPanel.setActive(true);
 
         schedulerPanel.setUnitId(unitId);
@@ -94,8 +108,8 @@ public class SchedulerPanelService extends MongoBaseService {
         return schedulerPanel;
     }
 
-    public SchedulerPanel updateControlPanel(SchedulerPanel schedulerPanel) throws IOException {
-        logger.info("controlPanel.getId()-------------> "+schedulerPanel.getId());
+    public SchedulerPanel updateSchedulerPanel(SchedulerPanel schedulerPanel) throws IOException {
+        logger.info("schedulerPanel.getId()-------------> "+schedulerPanel.getId());
         Optional<SchedulerPanel> panelOpt = schedulerPanelRepository.findById(schedulerPanel.getId());
         SchedulerPanel panel;
         if(!panelOpt.isPresent()){
@@ -124,9 +138,9 @@ public class SchedulerPanelService extends MongoBaseService {
         return  panel;
     }
 
-    public Map<String, Object> getControlPanelById(BigInteger schedulerPanelId) {
+    public Map<String, Object> findSchedulerPanelById(BigInteger schedulerPanelId) {
 
-        logger.info("controlPanelId ----> "+schedulerPanelId);
+        logger.info("schedulerPanelId ----> "+schedulerPanelId);
         Optional<SchedulerPanel> schedulerPanelOpt = schedulerPanelRepository.findById(schedulerPanelId);
         SchedulerPanel schedulerPanel = schedulerPanelOpt.get();
 
@@ -135,23 +149,24 @@ public class SchedulerPanelService extends MongoBaseService {
         return map;
     }
 
-    public Map<String, Object> getControlPanelByUnitId(long unitId) {
-            List<Map<String, Object>> controlPanels = controlPanelGraphRepository.getControlPanelByUnitId(unitId);
-            List<Object> response = new ArrayList<>();
+    public Map<String, Object> getSchedulerPanelByUnitId(long unitId) {
+            //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
+            List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitId(unitId);
+            /* List<Object> response = new ArrayList<>();
             for (Map<String, Object> map : controlPanels) {
                 Object o = map.get("result");
                 response.add(o);
-            }
+            }*/
             
             Map<String, Object> map = new HashMap<>();
-            map.put("controlPanels", response);
+            map.put("controlPanels",  schedulerPanels);
             return map;
 
     }
 
 
-    public List<ControlPanel> getAllControlPanels() {
-        List<ControlPanel> controlPanels = controlPanelGraphRepository.findByActive(true);
+    public List<SchedulerPanel> getAllControlPanels() {
+        List<SchedulerPanel> controlPanels = schedulerPanelRepository.findByActive(true);
 
 
         return controlPanels;
@@ -163,9 +178,9 @@ public class SchedulerPanelService extends MongoBaseService {
 
         String interval;
         if(runOnce == null)
-            interval  = days.toString().replaceAll(regex, "")+ MessageFormat.format(CONTROL_PANEL_INTERVAL_STRING, repeat);
+            interval  = days.toString().replaceAll(regex, "")+ MessageFormat.format(SCHEDULER_PANEL_INTERVAL_STRING, repeat);
         else
-            interval  = days.toString().replaceAll(regex, "")+ MessageFormat.format(CONTROL_PANEL_RUN_ONCE_STRING, runOnce);
+            interval  = days.toString().replaceAll(regex, "")+ MessageFormat.format(SCHEDULER_PANEL_RUN_ONCE_STRING, runOnce);
         logger.info("Interval--> "+interval);
         return interval;
     }
@@ -202,22 +217,24 @@ public class SchedulerPanelService extends MongoBaseService {
         return intervalString;
     }
 
-    public SchedulerPanel setScheduleLastRunTime(SchedulerPanel controlPanel){
-        SchedulerPanel panel = schedulerPanelRepository.findById(controlPanel.getId());
-        if(panel == null){
-            return null;
+    public SchedulerPanel setScheduleLastRunTime(SchedulerPanel schedulerPanel){
+        Optional<SchedulerPanel> panelOptional = schedulerPanelRepository.findById(schedulerPanel.getId());
+        SchedulerPanel panel = null;
+        if(panelOptional.isPresent()){
+            panel = panelOptional.get();
+            panel.setLastRunTime(schedulerPanel.getLastRunTime());
+            panel.setNextRunTime(schedulerPanel.getNextRunTime());
+            schedulerPanelRepository.save(panel);
         }
-        panel.setLastRunTime(controlPanel.getLastRunTime());
-        panel.setNextRunTime(controlPanel.getNextRunTime());
-        controlPanelGraphRepository.save(panel);
+
         return panel;
 
     }
 
-    public void createJobScheduleDetails(ControlPanel controlPanel, Transstatus transstatus, Date started, Date stopped) throws IOException {
+    public void createJobScheduleDetails(KairosSchedulerLogsDTO logs) throws IOException {
         JobDetails jobDetails = new JobDetails();
-        jobDetails.setControlPanelId(controlPanel.getId());
-        String loggingString = StringEscapeUtils.escapeHtml4(transstatus.getLogging_string());
+        ObjectMapperUtils.copyProperties(logs,jobDetails);
+        /*String loggingString = StringEscapeUtils.escapeHtml4(transstatus.getLogging_string());
         loggingString = loggingString.substring(loggingString.indexOf("[CDATA[")+7,loggingString.indexOf("]]&gt"));
         byte[] bytes = Base64.decodeBase64(loggingString);
         GZIPInputStream zi = null;
@@ -227,33 +244,31 @@ public class SchedulerPanelService extends MongoBaseService {
             unzipped = IOUtils.toString(zi);
         } finally {
             IOUtils.closeQuietly(zi);
-        }
-        jobDetails.setLog(unzipped);
-        jobDetails.setStarted(started);
-        jobDetails.setStopped(stopped);
-        jobDetails.setProcessName(controlPanel.getProcessType());
-        String result = "Success";
-        if(transstatus.getResult().getNr_errors() > 0) result = "Error";
-        jobDetails.setResult(result);
+        }*/
+
+       // jobDetails.setProcessName(logs.getJobSubType());
+        /*String result = "Success";
+        if(transstatus.getResult().getNr_errors() > 0) result = "Error";*/
         logger.info("============>>Job logs get saved<<============");
-        jobDetailsRepository.save(jobDetails);
+        save(jobDetails);
 
     }
 
-    public List<JobDetails> getJobDetails(long controlPanelId){
-        return jobDetailsRepository.findByControlPanelId(controlPanelId, new Sort(Sort.Direction.DESC, "started"));
+    public List<JobDetails> getJobDetails(BigInteger schedulerPanelId){
+        return jobDetailsRepository.findAllBySchedulerPanelIdOrderByStartedDesc(schedulerPanelId);
     }
 
-    public Boolean deleteJob(long controlPanelId){
+    public Boolean deleteJob(BigInteger schedulerPanelId){
         try {
-            ControlPanel panel = controlPanelGraphRepository.findOne(controlPanelId);
-            List<JobDetails> jobDetailsList = jobDetailsRepository.findByControlPanelId(controlPanelId);
+            Optional<SchedulerPanel> panelOptional = schedulerPanelRepository.findById(schedulerPanelId);
+            SchedulerPanel panel = panelOptional.get();
+            List<JobDetails> jobDetailsList = jobDetailsRepository.findAll();
             for (JobDetails jobDetails : jobDetailsList) {
                 jobDetailsRepository.delete(jobDetails);
             }
             dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
             panel.setActive(false);
-            controlPanelGraphRepository.save(panel);
+            schedulerPanelRepository.save(panel);
             return true;
         }catch (Exception exception){
             return false;
@@ -266,7 +281,7 @@ public class SchedulerPanelService extends MongoBaseService {
      * @param controlPanelId
      * @return
      */
-    public String getRecentJobId(Long controlPanelId){
+    public String getRecentJobId(BigInteger controlPanelId){
        /* Aggregation aggregation = Aggregation.newAggregation(
                 match(
                         Criteria.where("controlPanelId").is(controlPanelId)
@@ -291,28 +306,29 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
 
-    public Long getControlPanelUnitId(Long controlPanelId){
-        ControlPanel panel = controlPanelGraphRepository.findOne(controlPanelId);
-        return panel.getUnitId();
+    public Long getControlPanelUnitId(BigInteger schedulerPanelId){
+        Optional<SchedulerPanel> panel = schedulerPanelRepository.findById(schedulerPanelId);
+        return panel.get().getUnitId();
     }
-
-    public ControlPanelDTO getControlPanelData(long controlPanelId){
-        String jobId = getRecentJobId(controlPanelId);
-        Long unitId = getControlPanelUnitId(controlPanelId);
+//Dont remove
+   /* public ControlPanelDTO getControlPanelData(BigInteger schedulerPanelId){
+        String jobId = getRecentJobId(schedulerPanelId);
+        Long unitId = getControlPanelUnitId(schedulerPanelId);
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         ControlPanelDTO controlPanelDTO = new ControlPanelDTO();
         controlPanelDTO.setFlsCredentails(flsCredentials);
         controlPanelDTO.setJobId(jobId);
         controlPanelDTO.setUnitId(unitId);
         return controlPanelDTO;
-    }
+    }*/
 
     public void pushToQueue() {
 
-        ControlPanel panel = controlPanelGraphRepository.findOne(14491L);
-        QueueDTO job = new QueueDTO();
-        ObjectMapperUtils.copyProperties(panel,job);
-         kafkaProducer.pushToQueue(job);
+        logger.info("Inside push toQueue Method"+ DateUtils.getCurrentDate());
+       /* Optional<SchedulerPanel> panel = schedulerPanelRepository.findById(BigInteger.valueOf(1441L));
+        KairosScheduleJobDTO job = new KairosScheduleJobDTO();
+        ObjectMapperUtils.copyProperties(panel.get(),job);*/
+        // kafkaProducer.pushToQueue(job);
 
 
     }

@@ -5,6 +5,7 @@ import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.dto.QueueDTO;
+import com.kairos.enums.scheduler.Result;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
@@ -38,6 +39,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
+import static com.kairos.enums.scheduler.Result.SUCCESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_INTERVAL_STRING;
 import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_RUN_ONCE_STRING;
 
@@ -229,7 +231,7 @@ public class ControlPanelService extends UserBaseService {
         jobDetails.setProcessName(controlPanel.getProcessType());
         String result = "Success";
         if(transstatus.getResult().getNr_errors() > 0) result = "Error";
-        jobDetails.setResult(result);
+        jobDetails.setResult(SUCCESS);
         logger.info("============>>Job logs get saved<<============");
         jobDetailsRepository.save(jobDetails);
 
@@ -307,7 +309,7 @@ public class ControlPanelService extends UserBaseService {
         ControlPanel panel = controlPanelGraphRepository.findOne(14491L);
         KairosScheduleJobDTO job = new KairosScheduleJobDTO();
         ObjectMapperUtils.copyProperties(panel,job);
-         kafkaProducer.pushToQueue(job);
+       //  kafkaProducer.pushToQueue(job);
 
 
     }

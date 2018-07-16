@@ -1,4 +1,4 @@
-package com.kairos.scheduler.config.mongo.com.kairos.scheduler.config.mongo.mongo_converter;
+package com.kairos.scheduler.config.mongo.mongo_converter;
 
 import com.kairos.util.DateUtils;
 import org.springframework.core.convert.converter.Converter;

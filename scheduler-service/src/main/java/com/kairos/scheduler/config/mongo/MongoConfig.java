@@ -1,6 +1,6 @@
 package com.kairos.scheduler.config.mongo;
 
-import com.kairos.scheduler.config.mongo.com.kairos.scheduler.config.mongo.mongo_converter.*;
+import com.kairos.scheduler.config.mongo.mongo_converter.*;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;

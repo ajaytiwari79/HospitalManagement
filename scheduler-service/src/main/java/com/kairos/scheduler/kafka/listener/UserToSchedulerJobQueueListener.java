@@ -8,11 +8,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserToSchedulerQueueListener {
+public class UserToSchedulerJobQueueListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerQueueListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserToSchedulerJobQueueListener.class);
 
-    @KafkaListener(topics="UserToSchedulerQueue")
+    @KafkaListener(topics="UserToSchedulerJobQueue")
     public void processMessage(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

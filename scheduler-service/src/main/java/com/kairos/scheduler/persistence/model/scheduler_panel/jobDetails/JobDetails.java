@@ -1,37 +1,49 @@
-package com.kairos.persistence.model.user.control_panel.jobDetails;
+package com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.math.BigInteger;
 
 /**
  * Created by Jasgeet on 17/1/17.
  */
-@NodeEntity
-public class JobDetails extends UserBaseEntity {
+@Document
+public class JobDetails extends MongoBaseEntity {
 
-    private Long controlPanelId;
-    private Date started;
-    private Date stopped;
+
+    private BigInteger schedulerPanelId;
+    private LocalDateTime started;
+    private LocalDateTime stopped;
     private Result result;
     private String processName;
     private String name;
     private String log;
 
+    public LocalDateTime getStarted() {
+        return started;
+    }
+
+    public void setStarted(LocalDateTime started) {
+        this.started = started;
+    }
+
+    public LocalDateTime getStopped() {
+        return stopped;
+    }
+
+    public void setStopped(LocalDateTime stopped) {
+        this.stopped = stopped;
+    }
+
     public Result getResult() {
         return result;
     }
+
     public void setResult(Result result) {
         this.result = result;
-    }
-    public Long getControlPanelId() {
-        return controlPanelId;
-    }
-
-    public void setControlPanelId(Long controlPanelId) {
-        this.controlPanelId = controlPanelId;
     }
 
     public String getProcessName() {
@@ -42,6 +54,13 @@ public class JobDetails extends UserBaseEntity {
         this.processName = processName;
     }
 
+    public BigInteger getSchedulerPanelId() {
+        return schedulerPanelId;
+    }
+
+    public void setSchedulerPanelId(BigInteger schedulerPanelId) {
+        this.schedulerPanelId = schedulerPanelId;
+    }
 
     public String getName() {
         return name;
@@ -49,22 +68,6 @@ public class JobDetails extends UserBaseEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Date getStarted() {
-        return started;
-    }
-
-    public void setStarted(Date started) {
-        this.started = started;
-    }
-
-    public Date getStopped() {
-        return stopped;
-    }
-
-    public void setStopped(Date stopped) {
-        this.stopped = stopped;
     }
 
 
@@ -79,7 +82,7 @@ public class JobDetails extends UserBaseEntity {
     @Override
     public String toString() {
         return "JobDetails{" +
-                "controlPanelId=" + controlPanelId +
+                "schedulerPanelId=" + schedulerPanelId +
                 ", started=" + started +
                 ", stopped=" + stopped +
                 ", result='" + result + '\'' +
