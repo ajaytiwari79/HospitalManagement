@@ -711,6 +711,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return country")
     Country getCountry(Long organizationId);
 
+    @Query("MATCH (organization:Organization)  WHERE id(organization)={0} \n" +
+            " match(organization)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Organization{isKairosHub:false}) \n" +
+            " match(parentOrganization)-[r:BELONGS_TO] -> (country:Country)\n" +
+            " return country limit 1")
+    Country getCountryByParentOrganization(Long organizationId);
     @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
             "OPTIONAL Match (org)-[:"+HAS_COMPANY_CATEGORY+"]->(companyCategory:CompanyCategory) with companyCategory, org\n"+
             "Match (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org,companyCategory\n" +

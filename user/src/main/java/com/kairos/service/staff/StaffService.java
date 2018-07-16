@@ -379,9 +379,9 @@ public class StaffService extends UserBaseService {
         }
         organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
 
-        if (Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
+        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
             expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId(), DateUtil.getCurrentDateMillis());
-        } else {
+        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
             expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), DateUtil.getCurrentDateMillis());
         }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
@@ -641,15 +641,15 @@ public class StaffService extends UserBaseService {
         return staffGraphRepository.findAllTeamLeader(organizationId);
 
     }
+
     /*******************************************************************************************************/
-   //Function to validate staff Mandatory Fields
-    private boolean validateStaffData(Row row,int[] mandatoryCellColumnIndexs)
-    {
+    //Function to validate staff Mandatory Fields
+    private boolean validateStaffData(Row row, int[] mandatoryCellColumnIndexs) {
         boolean isPerStaffMandatoryFieldsExists = true;
-        for (int i= 0;i<mandatoryCellColumnIndexs.length;i++){
+        for (int i = 0; i < mandatoryCellColumnIndexs.length; i++) {
             Cell cell = row.getCell(mandatoryCellColumnIndexs[i]);
-            if(cell==null){
-                isPerStaffMandatoryFieldsExists =  false;
+            if (cell == null) {
+                isPerStaffMandatoryFieldsExists = false;
                 break;
             }
         }
@@ -657,6 +657,9 @@ public class StaffService extends UserBaseService {
     }
     /*******************************************************************************************************/
     // function to convert cell value as String for given cellIndex
+
+    /*******************************************************************************************************/
+
     private String getStringValueOfIndexedCell(Row row,int cellIndex)
     {
         Cell cellValue=row.getCell(cellIndex);
@@ -664,10 +667,9 @@ public class StaffService extends UserBaseService {
         String cellStringValue=cellValue.getStringCellValue().trim();
         return cellStringValue;
     }
-   /*******************************************************************************************************/
 
-   public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
-
+    /*******************************************************************************************************/
+    public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
@@ -758,8 +760,8 @@ public class StaffService extends UserBaseService {
                     continue;
                 }
                 // to check mandatory fields
-                int[] mandatoryCellColumnIndexs={2,8,19,20,21,23,41};
-                boolean isPerStaffMandatoryFieldsExists=validateStaffData(row,mandatoryCellColumnIndexs);
+                int[] mandatoryCellColumnIndexs = {2, 8, 19, 20, 21, 23, 41};
+                boolean isPerStaffMandatoryFieldsExists = validateStaffData(row, mandatoryCellColumnIndexs);
                 if (!isPerStaffMandatoryFieldsExists) {
                     logger.info(" This row is missing some mandatory field so skipping this {}", row.getRowNum());
                     staffErrorList.add(row.getRowNum());
@@ -832,7 +834,8 @@ public class StaffService extends UserBaseService {
         }
         return staffUploadBySheetQueryResult;
     }
-/***************************************************************************************************/
+
+    /***************************************************************************************************/
 
     private ContactAddress extractContactAddressFromRow(Row row) {
 
@@ -1079,12 +1082,12 @@ public class StaffService extends UserBaseService {
         }
 
         // Check if Staff exists in organization with CPR Number
-        if(staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)){
-            exceptionService.invalidRequestException("error.staff.exists.same.cprNumber",payload.getCprNumber());
+        if (staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)) {
+            exceptionService.invalidRequestException("error.staff.exists.same.cprNumber", payload.getCprNumber());
         }
         User user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
 
-        if(!Optional.ofNullable(user).isPresent()){
+        if (!Optional.ofNullable(user).isPresent()) {
             user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
         }
 
@@ -1096,8 +1099,8 @@ public class StaffService extends UserBaseService {
         setBasicDetailsOfUser(user, payload);
 
         // Set default language of User
-        Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId );
-        SystemLanguage  systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
+        Long countryId = organizationGraphRepository.getCountryId(Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId);
+        SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
         staff = createStaffObject(parent, unit, payload);
         Client client = createClientObject(staff, payload.getCprNumber());
@@ -1113,7 +1116,7 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData){
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
             SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organizationId);
@@ -1270,7 +1273,7 @@ public class StaffService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organizationId);
         }
-        if(!Optional.ofNullable(parent).isPresent()){
+        if (!Optional.ofNullable(parent).isPresent()) {
             parentOrganization = true;
             parent = organization;
         }
@@ -1696,13 +1699,12 @@ public class StaffService extends UserBaseService {
         }
         staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        UserAccessRoleDTO userAccessRoleDTO=new UserAccessRoleDTO();
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-        if(!Optional.ofNullable(staff).isPresent()){
+        if (!Optional.ofNullable(staff).isPresent()) {
             userAccessRoleDTO.setManagement(true);
             userAccessRoleDTO.setStaff(false);
-        }
-        else {
+        } else {
             userAccessRoleDTO = accessGroupService.getStaffAccessRoles(unitId, staff.getId());
         }
 
@@ -1975,7 +1977,7 @@ public class StaffService extends UserBaseService {
         return true;
     }
 
-    public MainEmploymentResultDTO updateMainEmployment(Long unitId,Long staffId, EmploymentDTO employmentDTO, Boolean confirmMainEmploymentOverriding) {
+    public MainEmploymentResultDTO updateMainEmployment(Long unitId, Long staffId, EmploymentDTO employmentDTO, Boolean confirmMainEmploymentOverriding) {
         if (employmentDTO.getMainEmploymentStartDate().isBefore(LocalDate.now())) {
             exceptionService.invalidRequestException("message.startdate.notlessthan.currentdate");
         }
@@ -1988,8 +1990,8 @@ public class StaffService extends UserBaseService {
             }
         }
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        Boolean userAccessRoleDTO=accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(),staffId);
-        if(!userAccessRoleDTO){
+        Boolean userAccessRoleDTO = accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(), staffId);
+        if (!userAccessRoleDTO) {
             exceptionService.runtimeException("message.mainemployment.permission");
         }
         List<MainEmploymentQueryResult> mainEmploymentQueryResults = staffGraphRepository.getAllMainEmploymentByStaffId(staffId, mainEmploymentStartDate, mainEmploymentEndDate);
@@ -2083,10 +2085,10 @@ public class StaffService extends UserBaseService {
 
     public Employment getEmployment(Long staffId, EmploymentDTO employmentDTO) {
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())){
+        if (employment.getStartDateMillis() > DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentStartDate())) {
             exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
         }
-        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentEndDate()))){
+        if (employment.getEndDateMillis() != null && (employment.getEndDateMillis() < DateUtils.getLongFromLocalDate(employmentDTO.getMainEmploymentEndDate()))) {
             exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
         }
         employment.setMainEmploymentEndDate(employmentDTO.getMainEmploymentEndDate());
@@ -2103,10 +2105,10 @@ public class StaffService extends UserBaseService {
     }
 
     public void getAfterChangeMainEmployment(EmploymentOverlapDTO employmentOverlapDTO, Employment employment) {
-        if(employment.getStartDateMillis()>DateUtils.getLongFromLocalDate(employment.getMainEmploymentStartDate())){
+        if (employment.getStartDateMillis() > DateUtils.getLongFromLocalDate(employment.getMainEmploymentStartDate())) {
             exceptionService.runtimeException("message.mainemployment.startdate.notlessthan");
         }
-        if(employment.getEndDateMillis()!=null&&(employment.getEndDateMillis()<DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate()))){
+        if (employment.getEndDateMillis() != null && (employment.getEndDateMillis() < DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate()))) {
             exceptionService.runtimeException("message.mainemployment.enddate.notgreaterthan");
         }
         employmentOverlapDTO.setAfterChangeStartDate(employment.getMainEmploymentStartDate());
@@ -2118,10 +2120,10 @@ public class StaffService extends UserBaseService {
     }
 
     public UserAccessRoleDTO getAccessRolesOfStaffByUserId(Long unitId) {
-        UserAccessRoleDTO userAccessRoleDTO=new UserAccessRoleDTO();
+        UserAccessRoleDTO userAccessRoleDTO = new UserAccessRoleDTO();
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.findByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-        if(!Optional.ofNullable(staff).isPresent()){
+        if (!Optional.ofNullable(staff).isPresent()) {
             userAccessRoleDTO.setManagement(true);
             return userAccessRoleDTO;
         }
@@ -2147,14 +2149,15 @@ public class StaffService extends UserBaseService {
         staff.setUser_id(chatDetails.getUser_id());
     }
 
-    public List<StaffDTO> getStaffByUnit(Long unitId){
+    public List<StaffDTO> getStaffByUnit(Long unitId) {
         List<Staff> staffs = staffGraphRepository.getAllStaffByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs,StaffDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs, StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId){
+    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId) {
         List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(UserId, ReasonCodeType.ATTENDANCE);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers,StaffResultDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
+
     }
 
 }

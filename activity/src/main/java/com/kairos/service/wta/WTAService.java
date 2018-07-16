@@ -449,7 +449,6 @@ public class WTAService extends MongoBaseService {
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());
-        workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
         save(workingTimeAgreement);
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
