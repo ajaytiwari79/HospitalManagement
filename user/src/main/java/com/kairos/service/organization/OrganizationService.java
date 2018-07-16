@@ -1682,7 +1682,7 @@ public class OrganizationService extends UserBaseService {
 
     public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long organizationTypeId, Long expertiseId) {
         WTABasicDetailsDTO wtaBasicDetailsDTO = new WTABasicDetailsDTO();
-        if (expertiseId != null) {
+        if (Optional.ofNullable(expertiseId).isPresent()) {
             Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
             if (expertise != null) {
                 ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
@@ -1690,7 +1690,7 @@ public class OrganizationService extends UserBaseService {
                 wtaBasicDetailsDTO.setExpertiseResponse(expertiseResponseDTO);
             }
         }
-        if (organizationId != null) {
+        if (Optional.ofNullable(organizationId).isPresent()) {
             Organization organization = organizationGraphRepository.findOne(organizationId, 0);
             if (organization != null) {
                 OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
@@ -1698,7 +1698,7 @@ public class OrganizationService extends UserBaseService {
                 wtaBasicDetailsDTO.setOrganization(organizationBasicDTO);
             }
         }
-        if (countryId != null) {
+        if (Optional.ofNullable(countryId).isPresent()) {
             Country country = countryGraphRepository.findOne(countryId, 0);
             if (country != null) {
                 CountryDTO countryDTO = new CountryDTO();
@@ -1709,21 +1709,21 @@ public class OrganizationService extends UserBaseService {
 
             Long orgTypeId=organizationTypeGraphRepository.findOrganizationTypeIdBySubTypeId(organizationSubTypeId);
             OrganizationType organizationType = organizationTypeGraphRepository.findOne(orgTypeId, 0);
-            if (organizationType != null) {
+            if (Optional.ofNullable(organizationType).isPresent()) {
                 OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
                 BeanUtils.copyProperties(organizationType, organizationTypeDTO);
                 wtaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
             }
 
-        if (organizationSubTypeId != null) {
+        if (Optional.ofNullable(organizationSubTypeId).isPresent()) {
             OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
             List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
-            if (organizationSubType != null) {
+            if (Optional.ofNullable(organizationSubType).isPresent()) {
                 OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
                 BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
                 wtaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
             }
-            if (organizations != null) {
+            if (Optional.ofNullable(organizations).isPresent()) {
                 List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
                 organizations.forEach(organization -> {
                     OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
