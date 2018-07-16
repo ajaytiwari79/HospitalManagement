@@ -182,8 +182,10 @@ public class TimeBankCalculationService {
                     if (ruleTemplate.getAccountType() == null) continue;
                     if (ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)) {
                         int ctaTimeBankMin = 0;
-                        if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())))) {
-                            if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                        boolean activityValid = ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
+                        if (activityValid) {
+                            boolean ruleTemplateValid = (ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart())) && (ruleTemplate.getEmploymentTypes()==null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId())));
+                            if (ruleTemplateValid) {
                                 if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
                                     dailyScheduledMin += shift.getScheduledMinutes();
                                     totalDailyTimebank+=dailyScheduledMin;

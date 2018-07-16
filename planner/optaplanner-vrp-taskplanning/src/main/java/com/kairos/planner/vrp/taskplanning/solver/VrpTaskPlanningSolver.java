@@ -49,7 +49,7 @@ public class VrpTaskPlanningSolver {
         if(drlFileList!=null && !drlFileList.isEmpty()){
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
             solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
-            solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
+          //  solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
         }
         solver = solverFactory.buildSolver();
     }
