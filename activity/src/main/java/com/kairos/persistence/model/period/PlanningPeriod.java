@@ -26,6 +26,7 @@ public class PlanningPeriod extends MongoBaseEntity {
     private BigInteger nextPhaseId;
     private List<PeriodPhaseFlippingDate> phaseFlippingDate = new ArrayList<>();
     private Type type;
+    private boolean active=true;
 
 
     public PlanningPeriod(){
@@ -95,6 +96,21 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.name = name;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     public enum Type {
 

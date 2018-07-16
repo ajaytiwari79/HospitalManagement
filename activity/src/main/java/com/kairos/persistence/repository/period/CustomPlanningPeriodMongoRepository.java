@@ -26,5 +26,5 @@ public interface CustomPlanningPeriodMongoRepository {
 //    boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence);
     boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startDate, LocalDate endDate, int sequence);
     boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
-    List<PlanningPeriodDTO> findAllPeriodsOfUnitByCurrentPhaseId(Long unitId, BigInteger currentPhaseId);
+    List<PlanningPeriod> findAllPeriodsOfUnitByCurrentPhaseId(Long unitId, BigInteger currentPhaseId);
 }

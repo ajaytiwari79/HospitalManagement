@@ -138,43 +138,33 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     /// API END Point
-    public void migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO){
-        Phase requestPhase = phaseMongoRepository.findBySequenceAndOrganizationIdAndDeletedFalse(1, unitId);
-        List<PlanningPeriodDTO> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByCurrentPhaseId(unitId, requestPhase.getId());
+    public Boolean migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO){
+        Phase requestPhase = phaseMongoRepository.findBySequenceAndOrganizationIdAndDeletedFalse(AppConstants.REQUEST_PHASE_SEQUENCE, unitId);
+        List<PlanningPeriod> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByCurrentPhaseId(unitId, requestPhase.getId());
 
         if(requestPlanningPeriods.size() > 0 ){
             Map<LocalDate,LocalDate> requestPlanningPeriodsDateRanges = new HashMap<>();
-            LocalDate endDate = requestPlanningPeriods.get(0).getEndDate();
-            LocalDate startDate = null;
             // Prepare Date Range for Planning Periods of Request Phase
-            for (PlanningPeriodDTO planningPeriod : requestPlanningPeriods){
-
-                if(Duration.between(startDate.atStartOfDay(),planningPeriod.getEndDate().atStartOfDay()).toDays()>1){
-                    requestPlanningPeriodsDateRanges.put(startDate, endDate);
-                    endDate = planningPeriod.getEndDate();
-                    startDate = planningPeriod.getStartDate();
+            for (PlanningPeriod planningPeriod : requestPlanningPeriods){
+                 if(Duration.between(planningPeriod.getStartDate().atStartOfDay(),planningPeriod.getEndDate().atStartOfDay()).toDays()>1){
+                    requestPlanningPeriodsDateRanges.put(planningPeriod.getStartDate(), planningPeriod.getEndDate());
                 } else {
-                    startDate = planningPeriod.getStartDate();
+                    requestPlanningPeriodsDateRanges.put(planningPeriod.getStartDate(),null);
                 }
+                planningPeriod.setActive(false);
             }
-            requestPlanningPeriodsDateRanges.put(startDate,endDate);
-
             List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);;
             if(!Optional.ofNullable(phases).isPresent()){
                 exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
             }
-
             List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>();
-
             // Create planning period of request phase after deletion of older one
             requestPlanningPeriodsDateRanges.forEach((k,v)->{
                 createMigratedPlanningPeriodForTimeDuration(k,v, unitId, planningPeriodDTO, phases, planningPeriods);
             });
         }
-
-
-
-
+        save(requestPlanningPeriods);
+    return true;
     }
 
     public void createPlanningPeriodOnMigration(Long unitId, LocalDate startDate, List<PlanningPeriod> planningPeriods, List<PhaseDTO> applicablePhases, PlanningPeriodDTO planningPeriodDTO, int recurringNumber){
@@ -1036,5 +1026,49 @@ public class PlanningPeriodService extends MongoBaseService {
         save(planningPeriod);
     }*/
 
+    // not delete this code
+/*
+  public Boolean migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO){
+        Phase requestPhase = phaseMongoRepository.findBySequenceAndOrganizationIdAndDeletedFalse(AppConstants.REQUEST_PHASE_SEQUENCE, unitId);
+        List<PlanningPeriod> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByCurrentPhaseId(unitId, requestPhase.getId());
+
+        if(requestPlanningPeriods.size() > 0 ){
+            Map<LocalDate,LocalDate> requestPlanningPeriodsDateRanges = new HashMap<>();
+            LocalDate endDate = null;
+            LocalDate startDate = null;
+            // Prepare Date Range for Planning Periods of Request Phase
+            for (PlanningPeriod planningPeriod : requestPlanningPeriods){
+
+                if(Duration.between(planningPeriod.getStartDate().atStartOfDay(),planningPeriod.getEndDate().atStartOfDay()).toDays()>1){
+                    //requestPlanningPeriodsDateRanges.put(startDate, endDate);
+                    endDate = planningPeriod.getEndDate();
+                    startDate = planningPeriod.getStartDate();
+                } else {
+                    startDate = planningPeriod.getStartDate();
+                }
+                requestPlanningPeriodsDateRanges.put(startDate, endDate);
+               // planningPeriod.setActive(false);
+            }
+            requestPlanningPeriodsDateRanges.put(startDate,endDate);
+
+            List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);;
+            if(!Optional.ofNullable(phases).isPresent()){
+                exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
+            }
+
+            List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>();
+
+            // Create planning period of request phase after deletion of older one
+            requestPlanningPeriodsDateRanges.forEach((k,v)->{
+                createMigratedPlanningPeriodForTimeDuration(k,v, unitId, planningPeriodDTO, phases, planningPeriods);
+            });
+        }
+
+    return  true;
+
+
+    }
+
+ */
 
 }
