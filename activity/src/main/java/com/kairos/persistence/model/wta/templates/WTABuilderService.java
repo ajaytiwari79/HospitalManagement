@@ -130,7 +130,10 @@ public class WTABuilderService extends MongoBaseService {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>) wtaBaseRuleTemplateMongoRepository.findAllById(oldWta.getRuleTemplateIds());
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
         // copyProperties(wtaBaseRuleTemplates,wtaBaseRuleTemplates1);
-        save(wtaBaseRuleTemplates1);
+        if(!wtaBaseRuleTemplates1.isEmpty()){
+            save(wtaBaseRuleTemplates1);
+        }
+
     }
 
 
