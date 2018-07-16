@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.master_data.asset_management;
+package com.kairos.persistance.model.master_data.default_asset_setting;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
@@ -6,8 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Pattern;
 
-@Document(collection = "data_disposal")
-public class DataDisposal extends MongoBaseEntity {
+@Document(collection = "storage_format")
+public class StorageFormat extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
@@ -30,5 +30,4 @@ public class DataDisposal extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
-
 }
