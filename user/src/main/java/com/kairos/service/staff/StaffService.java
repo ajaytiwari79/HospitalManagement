@@ -1109,7 +1109,7 @@ public class StaffService extends UserBaseService {
         staff.setClient(client);
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
+        createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
 //        staff.setGender(user.getGender());
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
