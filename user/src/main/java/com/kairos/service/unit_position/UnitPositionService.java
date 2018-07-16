@@ -388,7 +388,7 @@ public class UnitPositionService extends UserBaseService {
                 List<UnitPosition> oldUnitPositions
                         = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
 
-i-                validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+                validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
                 oldUnitPosition.setPublished(true);
             }
             save(oldUnitPosition);
