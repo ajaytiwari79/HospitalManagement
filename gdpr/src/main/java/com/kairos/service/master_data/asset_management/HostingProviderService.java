@@ -3,7 +3,6 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.asset_management.HostingProvider;
@@ -14,10 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class HostingProviderService extends MongoBaseService {
@@ -68,8 +68,8 @@ public class HostingProviderService extends MongoBaseService {
 
                 newHostingProviders = hostingProviderMongoRepository.saveAll(sequenceGenerator(newHostingProviders));
             }
-            result.put("existing", existing);
-            result.put("new", newHostingProviders);
+            result.put(EXISTING_DATA_LIST, existing);
+            result.put(NEW_DATA_LIST, newHostingProviders);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");

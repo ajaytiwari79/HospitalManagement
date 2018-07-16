@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.open_shift;
 
+import com.kairos.activity.open_shift.Priority;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.AllowedLength;
 import com.kairos.enums.OpenShiftRuleTemplateType;
@@ -30,6 +31,7 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BigInteger openShiftIntervalId;
     private PlannerNotificationInfo plannerNotificationInfo;
+    private Priority priority;
 
     public OpenShiftRuleTemplate() {
         //Default Constructor
@@ -178,5 +180,13 @@ public class OpenShiftRuleTemplate extends MongoBaseEntity {
 
     public void setRuleTemplateType(OpenShiftRuleTemplateType ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
     }
 }

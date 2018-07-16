@@ -3,7 +3,6 @@ package com.kairos.service.phase;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationPhaseDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -102,10 +101,7 @@ public class PhaseService extends MongoBaseService {
         return true;
     }
 
-    //TODO
-    public List<OrganizationPhaseDTO> getPhasesGroupByOrganization() {
-        return phaseMongoRepository.getPhasesGroupByOrganization();
-    }
+
 
     public PhaseDTO getUnitPhaseByDate(Long unitId, Date date) {
         PhaseDTO phaseDTO = new PhaseDTO();
