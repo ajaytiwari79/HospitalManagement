@@ -1706,14 +1706,15 @@ public class OrganizationService extends UserBaseService {
                 wtaBasicDetailsDTO.setCountryDTO(countryDTO);
             }
         }
-        if (organizationTypeId != null) {
-            OrganizationType organizationType = organizationTypeGraphRepository.findOne(organizationTypeId, 0);
+
+            Long orgTypeId=organizationTypeGraphRepository.findOrganizationTypeIdBySubTypeId(organizationSubTypeId);
+            OrganizationType organizationType = organizationTypeGraphRepository.findOne(orgTypeId, 0);
             if (organizationType != null) {
                 OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
                 BeanUtils.copyProperties(organizationType, organizationTypeDTO);
                 wtaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
             }
-        }
+
         if (organizationSubTypeId != null) {
             OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
             List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);

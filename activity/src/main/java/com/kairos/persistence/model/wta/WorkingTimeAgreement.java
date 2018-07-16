@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 //@JsonIgnoreProperties(ignoreUnknown = true)
@@ -56,7 +57,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     private Date expiryDate;
 
     public List<BigInteger> getRuleTemplateIds() {
-        return ruleTemplateIds;
+        return ruleTemplateIds=Optional.ofNullable(ruleTemplateIds).orElse(new ArrayList<>());
     }
 
     public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
