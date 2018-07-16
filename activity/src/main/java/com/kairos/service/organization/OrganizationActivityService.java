@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
+import com.kairos.activity.activity.activity_tabs.PermissionsActivityTabDTO;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
@@ -169,7 +170,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         logger.info("activity.getTags() ================ > " + activity.getTags());
-        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityId, activityCategories);
         return activityTabsWrapper;
@@ -207,6 +208,8 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
+        generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
+        generalDTO.setTextColor(activity.getGeneralActivityTab().getTextColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO, generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
@@ -222,7 +225,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setTags(generalDTO.getTags());
 
         save(activity);
-        generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+       // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);
@@ -283,6 +286,9 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
+        PermissionsActivityTabDTO permissionsActivityTabDTO=new PermissionsActivityTabDTO();
+        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(),permissionsActivityTabDTO);
+        activityDTO.setPermissionsActivityTab(permissionsActivityTabDTO);
         return activityDTO;
     }
 

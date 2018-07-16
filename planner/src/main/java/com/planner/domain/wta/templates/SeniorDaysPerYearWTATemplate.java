@@ -1,7 +1,7 @@
 package com.planner.domain.wta.templates;
 
 import com.kairos.enums.WTATemplateType;
-import com.kairos.activity.wta.templates.AgeRange;
+import com.kairos.activity.wta.AgeRange;
 import com.planner.domain.wta.WTABaseRuleTemplate;
 
 import java.util.List;

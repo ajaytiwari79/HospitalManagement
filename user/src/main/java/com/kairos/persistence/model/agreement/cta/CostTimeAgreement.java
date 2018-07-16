@@ -50,11 +50,22 @@ public class CostTimeAgreement extends UserBaseEntity {
     public CostTimeAgreement() {
     }
 
-    public CostTimeAgreement(Long id, String name) {
+    public CostTimeAgreement(Long id, String name,boolean disabled) {
         this.id = id;
         this.name = name;
+        this.disabled=disabled;
+
     }
 
+    public CostTimeAgreement(Long id,String name, Expertise expertise, List<RuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, boolean disabled) {
+        this.id=id;
+        this.name = name;
+        this.expertise = expertise;
+        this.ruleTemplates = ruleTemplates;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.disabled = disabled;
+    }
 
     public String getName() {
         return name;

@@ -13,10 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class OrganizationalSecurityMeasureService extends MongoBaseService {
@@ -68,8 +69,8 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                 }
                 newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(sequenceGenerator(newOrgSecurityMeasures));
             }
-            result.put("existing", existing);
-            result.put("new", newOrgSecurityMeasures);
+            result.put(EXISTING_DATA_LIST, existing);
+            result.put(NEW_DATA_LIST, newOrgSecurityMeasures);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");

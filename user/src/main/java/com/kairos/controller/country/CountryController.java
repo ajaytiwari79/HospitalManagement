@@ -31,7 +31,7 @@ import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.user.country.experties.CountryExpertiseDTO;
 import com.kairos.user.country.experties.ExpertiseUpdateDTO;
 import com.kairos.user.country.skill.SkillDTO;
-import com.kairos.user.organization.OrgTypeExpertiseDTO;
+import com.kairos.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.OrganizationRequestWrapper;
 import com.kairos.user.organization.OrganizationTypeDTO;
@@ -1000,20 +1000,24 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> addSkillInExpertise(@PathVariable long countryId, @PathVariable long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseSkills(expertiseId, countryId));
     }
+    /**
+     * @Id KP-3683
+     * @Changed By vipul
+     * making it for skill instead of expertise
+    **/
 
-    @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/expertise", method = RequestMethod.POST)
-    @ApiOperation("linking of expertise with an organization type")
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/skill_category", method = RequestMethod.POST)
+    @ApiOperation("linking of skill with an organization type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addExpertiseInOrgType(@PathVariable long orgTypeId, @RequestBody OrgTypeExpertiseDTO orgTypeExpertiseDTO) {
-        organizationTypeService.addExpertiseInOrgType(orgTypeId, orgTypeExpertiseDTO.getExpertiseId(), orgTypeExpertiseDTO.isSelected());
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    public ResponseEntity<Map<String, Object>> addExpertiseInOrgType(@PathVariable long orgTypeId, @RequestBody OrgTypeSkillDTO orgTypeSkillDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.addExpertiseInOrgType(orgTypeId, orgTypeSkillDTO.getSkillId(), orgTypeSkillDTO.isSelected()));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/expertise", method = RequestMethod.GET)
-    @ApiOperation("get expertise list for particular organization type")
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/skill_category", method = RequestMethod.GET)
+    @ApiOperation("get Skill list for particular organization type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertise(@PathVariable long countryId, @PathVariable long orgTypeId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId, orgTypeId, selectedDate));
+    public ResponseEntity<Map<String, Object>> getExpertise(@PathVariable long countryId, @PathVariable long orgTypeId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getSkillsByOrganizationTypeId(countryId, orgTypeId));
     }
 
     @RequestMapping(value = "/country/organizaton_service/{organizationServiceId}", method = RequestMethod.GET)

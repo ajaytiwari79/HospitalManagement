@@ -59,6 +59,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
@@ -278,9 +279,11 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
+        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
+        generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
+        generalDTO.setTextColor(activity.getGeneralActivityTab().getTextColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO, generalTab);
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }
@@ -295,7 +298,7 @@ public class ActivityService extends MongoBaseService {
         save(activity);
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
-        generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+     //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
         return activityTabsWrapper;
@@ -309,7 +312,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timecare.id", activityId);
         }
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
-        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+//        generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
         return activityTabsWrapper;
@@ -343,17 +346,13 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
         }
-        //TODO optimize below db query by harish
         TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
-        while(Optional.ofNullable(timeType.getUpperLevelTimeTypeId()).isPresent()) {
-            timeType=timeTypeMongoRepository.findOneById(timeType.getUpperLevelTimeTypeId());
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.timetype.notfound");
         }
-        if(!Optional.ofNullable(activity.getGeneralActivityTab().getTextColor()).isPresent()&&
-           !Optional.ofNullable(activity.getGeneralActivityTab().getBackgroundColor()).isPresent()){
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
         activity.getGeneralActivityTab().setColorPresent(true);
-        }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
         Long countryId = activity.getCountryId();
@@ -1090,6 +1089,9 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
+        PermissionsActivityTabDTO permissionsActivityTabDTO=new PermissionsActivityTabDTO();
+        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(),permissionsActivityTabDTO);
+        activityDTO.setPermissionsActivityTab(permissionsActivityTabDTO);
         return activityDTO;
     }
 

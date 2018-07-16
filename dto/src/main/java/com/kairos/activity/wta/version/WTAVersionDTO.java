@@ -1,5 +1,6 @@
 package com.kairos.activity.wta.version;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.activity.shift.Expertise;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.user.organization.position_code.PositionCodeDTO;
@@ -15,6 +16,9 @@ public class WTAVersionDTO {
 
     private Date startDate;
     private Date endDate;
+    // TODO fix need to make constant fields for date
+    private Long startDateMillis;
+    private Long endDateMillis;
     private Long expiryDate;
     private String name;
     private BigInteger id;
@@ -26,9 +30,18 @@ public class WTAVersionDTO {
     private Long unitId;
     private Map<String, Object> unitInfo;
     private PositionCodeDTO positionCode;
+    private Long unitPositionId;
 
     public WTAVersionDTO() {
         //dc
+    }
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public Boolean getDisabled() {
@@ -133,5 +146,21 @@ public class WTAVersionDTO {
 
     public void setPositionCode(PositionCodeDTO positionCode) {
         this.positionCode = positionCode;
+    }
+
+    public Long getStartDateMillis() {
+        return startDate.getTime();
+    }
+
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDate.getTime();
+    }
+
+    public Long getEndDateMillis() {
+        return (endDate!=null)?endDate.getTime():null;
+    }
+
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = (endDate!=null)?endDate.getTime():null;
     }
 }

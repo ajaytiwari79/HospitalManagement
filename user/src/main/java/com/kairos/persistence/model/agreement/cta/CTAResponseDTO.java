@@ -27,16 +27,14 @@ public class CTAResponseDTO {
     private OrganizationType organizationType;
     private OrganizationType organizationSubType;
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
-    @DateLong
-    @JsonProperty("startDate")
-    private Date startDateMillis;
-    @DateLong
-    @JsonProperty("endDate")
-    private Date endDateMillis;
+    private Long startDateMillis;
+    private Long endDateMillis;
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
     private PositionCode positionCode;
+    private Long unitPositionId;
+    private Boolean disabled;
 
     public CTAResponseDTO() {
         //Default constructor
@@ -106,19 +104,19 @@ public class CTAResponseDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public Date getStartDateMillis() {
+    public Long getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Date startDateMillis) {
+    public void setStartDateMillis(Long startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public Long getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(Long endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -144,5 +142,21 @@ public class CTAResponseDTO {
 
     public void setPositionCode(PositionCode positionCode) {
         this.positionCode = positionCode;
+    }
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
+
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
     }
 }

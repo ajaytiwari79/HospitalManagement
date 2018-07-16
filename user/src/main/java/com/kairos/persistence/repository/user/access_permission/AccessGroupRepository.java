@@ -51,35 +51,21 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<AccessGroup> getAccessGroupsForUnit(long unitId);
 
 
-    @Query("Match (root:Organization) where id(root)={0} with root\n" +
-            "Match (root)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={1} with employment\n" +
-            "Match (employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitEmployment:UnitEmployment)-[:"+ APPLICABLE_IN_UNIT +"]->(unit:Organization) with unitEmployment\n" +
-            "MATCH (unitEmployment)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) with accessPermission\n" +
-            "Match (accessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage:AccessPage{moduleId:{2}}) return {readPermission:collect(r.isRead),writePermission:collect(r.isWrite)} as data")
-    Map<String,Object> getAccessPermission(long organizationId, long userId, String pageId);
-
-    @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup)={0}\n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
-    List<Map<String,Object>> setAccessPagePermission(long accessGroupId);
-
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForHub=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForHubAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForUnion=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForUnionAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForOrganization=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForOrganizationAccessGroup(Long countryId, Long accessGroupId);
 
-    @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup) IN {0}\n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
-    List<Map<String,Object>> setAccessPagePermission(List<Long> accessGroupIds);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={0} WITH accessGroup\n" +
             "Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage)  WITH accessPage, r \n" +
@@ -92,34 +78,34 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
             "UNWIND listOfPage as page\n" +
             "Match (c)-[r:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} WITH accessGroup, page\n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(page)")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(page)")
     void addAccessPageRelationshipForCountryAccessGroups(Long accessPageId, Long countryId, String organizationCategory);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage \n" +
             "UNWIND listOfPage as page \n" +
-            "Match (c)-[r:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} WITH accessGroup, page \n" +
+            "Match (c)-[r:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} AND accessGroup.name<> '"+AG_COUNTRY_ADMIN+"' WITH accessGroup, page \n" +
             "MATCH (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(page) DELETE r")
     void removeAccessPageRelationshipForCountryAccessGroup(Long accessPageId, Long countryId, String organizationCategory);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
-            "Match (org:Organization)-[:BELONGS_TO]-(c:Country) where id(c)={1} AND org.isKairosHub ={2} AND org.union={3} with org,listOfPage \n" +
+            "Match (org:Organization)-[:"+BELONGS_TO+"]-(c:Country) where id(c)={1} AND org.isKairosHub ={2} AND org.union={3} with org,listOfPage \n" +
             "OPTIONAL Match (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  where childOrg.isKairosHub ={2} AND childOrg.union={3} with org+[childOrg] as allOrg,listOfPage \n" +
             "UNWIND listOfPage as page\n" +
             "UNWIND allOrg as org \n" +
-            "Match (org)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
-            "create unique (accessGroup)-[r:HAS_ACCESS_OF_TABS{isEnabled:false}]->(page)")
+            "Match (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:true, write:true}]->(page)")
     void addAccessPageRelationshipForOrganizationAccessGroups(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
-            "Match (org:Organization)-[:BELONGS_TO]-(c:Country) where id(c)={1} AND org.isKairosHub ={2} AND org.union={3} with org,listOfPage \n" +
+            "Match (org:Organization)-[:"+BELONGS_TO+"]-(c:Country) where id(c)={1} AND org.isKairosHub ={2} AND org.union={3} with org,listOfPage \n" +
             "OPTIONAL Match (org)-[:HAS_SUB_ORGANIZATION*]->(childOrg:Organization)  where childOrg.isKairosHub ={2} AND childOrg.union={3} with org+[childOrg] as allOrg,listOfPage \n" +
             "UNWIND listOfPage as page\n" +
             "UNWIND allOrg as org \n" +
-            "Match (org)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]-(accessGroup:AccessGroup) WITH accessGroup, page \n"+
+            "Match (org)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(accessGroup:AccessGroup) WHERE accessGroup.name <> '"+ AG_COUNTRY_ADMIN +"' WITH accessGroup, page \n"+
             "MATCH (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(page) DELETE r")
     void removeAccessPageRelationshipForOrganizationAccessGroup(Long accessPageId, Long countryId, Boolean isKairosHub, Boolean isUnion);
 
@@ -140,28 +126,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4},r.read={5},r.write={6} return true")
     List<Map<String,Object>> updateAccessPagePermission(long accessGroupId, List<Long> pageIds, boolean isSelected, long creationDate, long lastModificationDate, Boolean read, Boolean write);
 
-    @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
-            "optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +
-            "unwind coll as accessPage with distinct accessPage,accessGroup\n" +
-            "Match (n:Organization),(staff:Staff),(accessPage:AccessPage) where id(n)={0} AND id(staff)={1} with n,staff,accessPage,accessGroup\n" +
-            "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
-            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
-            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with ap,accessPage\n" +
-            "Merge (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage)\n" +
-            "ON CREATE SET r.isRead={5},r.isWrite={6}\n" +
-            "ON MATCH SET  r.isRead={5},r.isWrite={6} return distinct true")
-    void setPermissionForTab(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
 
-    @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
-            "optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +
-            "unwind coll as accessPage with distinct accessPage,accessGroup\n" +
-            "Match (n:Organization),(staff:Staff),(accessPage:AccessPage) where id(n)={0} AND id(staff)={1} with n,staff,accessPage,accessGroup\n" +
-            "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
-            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
-           "MERGE (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
-            "ON CREATE SET r.read={5},r.write={6}\n" +
-            "ON MATCH SET r.read={5},r.write={6} return distinct true")
-    void setCustomPermissionForTabAndChildren(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
+
 
     @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
             "optional match (accessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage, accessGroup\n" +
@@ -197,15 +163,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     void deleteCustomPermissionForTab(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId);
 
 
-    @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
-            "optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +
-            "unwind coll as accessPage with distinct accessPage,accessGroup\n" +
-            "Match (n:Organization),(staff:Staff),(accessPage:AccessPage) where id(n)={0} AND id(staff)={1} with n,staff,accessPage,accessGroup\n" +
-            "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
-            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
-            "MATCH (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
-            "DELETE r")
-    void deleteCustomPermissionForTabAndChild(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId);
+
 
     @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
             "optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +
@@ -217,26 +175,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "DELETE r")
     void deleteCustomPermissionForChildren(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId);
 
-
-    @Query("Match (employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with employment\n" +
-            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={0} with unitEmployment \n" +
-            "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION{isEnabled:true}]->(ap:AccessPermission) with ap\n" +
-            "Match (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(tab:AccessPage{moduleId:{2}}) with collect(r.isRead) as permission\n" +
-            "return true in permission")
-    boolean hasReadPermission(long unitId, long userId, String tabId);
-
-    @Query("Match (employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with employment\n" +
-            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={0} with unitEmployment\n" +
-            "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION{isEnabled:true}]->(ap:AccessPermission) with ap\n" +
-            "Match (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(tab:AccessPage{moduleId:{2}}) with collect(r.isWrite) as permission\n" +
-            "return true in permission")
-    boolean hasWritePermission(long unitId, long userId, String tabId);
-
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage")
     List<AccessPage> getAccessPageByGroup(long accessGroupId);
-
-    @Query("MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) IN {0} return accessGroup")
-    List<AccessGroup> getAccessGroupById(List<Long> accessGrpIds);
 
     @Query("Match (n:Organization)-[:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag:AccessGroup{typeOfTaskGiver:true}) where id(n)={0} return ag")
     AccessGroup findTaskGiverAccessGroup(Long organizationId);
@@ -283,27 +223,17 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage LIMIT 1")
     Long getAccessPageIdByAccessGroup(long accessGroupId);
 
-    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {name:{1}}) WHERE id(o)={0} return ag")
-    AccessGroup getAccessGroupOfOrganizationByName(long organizationId, String name);
-
-    @Query("Match(emp:Employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org:Organization) where id(emp) = {0} and id(org) = {1} \n" +
-            "Match(up)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(up)-[r2:HAS_CUSTOMIZED_PERMISSION]-(accesspage:AccessPage) delete r1, r2")
-    void deleteAccessGroupAndCustomizedPermission(Long employmentId, Long organizationId);
 
     @Query("Match(employment:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]-(unitPermission:UnitPermission) where id(employment) in {0} \n"+
             "Match(unitPermission)-[rel_has_access_group:" + HAS_ACCESS_GROUP + " ]-(ag:AccessGroup) optional Match(unitPermission)-[rel_has_customized_permission:" + HAS_CUSTOMIZED_PERMISSION + "]-" +
             "(accesspage:AccessPage) delete rel_has_access_group, rel_has_customized_permission")
     void deleteAccessGroupRelationAndCustomizedPermissionRelation(List<Long> empIds );
 
-    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {deleted:false}) WHERE id(o)={0} AND ag.role={1} return ag LIMIT 1")
-    AccessGroup getAccessGroupOfOrganizationByRole(Long orgId, String role);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false,enabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND id(ag)={2} \n" +
             "RETURN COUNT(ag)>0")
     boolean isCountryAccessGroupExistsByOrgCategory(Long countryId, String orgCategory, Long accessGroupId);
 
-    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup) WHERE id(o)={0} AND id(ag)={1} return COUNT(ag)>0")
-    boolean isAccessGroupOfOrganizationExists(long organizationId, Long accessGroupId);
 
     @Query("Match(org:Organization) where id(org) in {0} Match(ag:AccessGroup) where id(ag)={1} \n" +
      "merge(org)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag)")

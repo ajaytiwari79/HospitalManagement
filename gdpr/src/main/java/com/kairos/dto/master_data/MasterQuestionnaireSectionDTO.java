@@ -2,11 +2,9 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
@@ -16,12 +14,10 @@ public class MasterQuestionnaireSectionDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Title  can't be empty")
+    @NotNullOrEmpty(message = "Section Title  can't be empty")
     @Pattern(message = "Special character or Numbers data not excepted in section title",regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
-    @NotNull(message = "Question  can't be null")
-    @NotEmpty(message = "Question  can't be  empty")
     @Valid
     private List<MasterQuestionDTO> questions;
 

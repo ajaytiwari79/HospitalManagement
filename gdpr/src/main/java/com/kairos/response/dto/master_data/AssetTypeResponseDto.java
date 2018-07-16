@@ -17,7 +17,7 @@ public class AssetTypeResponseDto {
 
     private List<AssetTypeResponseDto> subAssetTypes=new ArrayList<>();
 
-    private Boolean isSubAsset;
+    private Boolean hasSubAsset;
 
     public BigInteger getId() {
         return id;
@@ -43,11 +43,11 @@ public class AssetTypeResponseDto {
         this.subAssetTypes = subAssetTypes;
     }
 
-    public Boolean getSubAsset() {
-        return isSubAsset;
+    public Boolean getHasSubAsset() {
+        return hasSubAsset;
     }
 
-    public void setSubAsset(Boolean subAsset) {
-        isSubAsset = subAsset;
+    public void setHasSubAsset(Boolean hasSubAsset) {
+        this.hasSubAsset = hasSubAsset;
     }
 }

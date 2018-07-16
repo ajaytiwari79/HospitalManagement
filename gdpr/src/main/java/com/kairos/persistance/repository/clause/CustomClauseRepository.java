@@ -18,4 +18,6 @@ public interface CustomClauseRepository {
 
     Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
 
+    List<Clause> findClausesByTitle(Long countryId,Long orgId,List<String> clauseTitles);
+
 }

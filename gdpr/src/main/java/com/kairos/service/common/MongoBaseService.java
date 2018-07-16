@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
@@ -168,6 +169,30 @@ public class MongoBaseService {
         mongoTemplate.save(entity);
         return entity;
     }
+
+
+
+    public Boolean remove(List<BigInteger> ids,Class entity) {
+
+        Assert.notNull(entity, "Entity must not be null!");
+        Assert.notEmpty(ids,"List cannot be empty");
+
+        // Get class name for sequence class
+        String className = entity.getClass().getSimpleName();
+
+        Query query=new Query();
+        query.addCriteria(Criteria.where("_id").in(ids));
+
+
+        mongoTemplate.remove(query,className);
+        return true;
+
+    }
+
+
+
+
+
 
 
 }

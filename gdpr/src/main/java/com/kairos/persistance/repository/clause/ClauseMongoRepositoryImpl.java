@@ -38,6 +38,16 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         return mongoTemplate.findOne(query, Clause.class);
     }
 
+
+    @Override
+    public List<Clause> findClausesByTitle(Long countryId, Long orgId, List<String> clauseTitles) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").in(clauseTitles).and(ORGANIZATION_ID).is(orgId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.find(query, Clause.class);
+    }
+
     @Override
     public List<Clause> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId));

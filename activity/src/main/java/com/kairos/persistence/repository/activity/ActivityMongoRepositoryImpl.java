@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
@@ -382,4 +383,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<TimeTypeAndActivityIdDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, TimeTypeAndActivityIdDTO.class);
         return result.getMappedResults();
     }
+
+    public StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId, BigInteger activityId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("_id").is(activityId)),
+                project("rulesActivityTab.shortestTime","rulesActivityTab.longestTime","optaPlannerSettingActivityTab.maxThisActivityPerShift","optaPlannerSettingActivityTab.minLength","optaPlannerSettingActivityTab.eligibleForMove")
+        );
+        AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
+        return (result.getMappedResults().isEmpty())?null:result.getMappedResults().get(0);
+    }
+
+
 }

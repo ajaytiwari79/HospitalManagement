@@ -175,6 +175,7 @@ public abstract class RelationshipConstants {
     public final static String VAT_TYPE = "VAT_TYPE";
     public final static String EXPERTISE_HAS_SKILLS = "EXPERTISE_HAS_SKILLS";
     public final static String ORG_TYPE_HAS_EXPERTISE = "ORG_TYPE_HAS_EXPERTISE";
+    public final static String ORG_TYPE_HAS_SKILL = "ORG_TYPE_HAS_SKILL";
     public final static String NEXT_TO_KIN = "NEXT_TO_KIN";
     public final static String PEOPLE_IN_HOUSEHOLD_LIST = "PEOPLE_IN_HOUSEHOLD_LIST";
     public final static String MUNICIPALITY = "MUNICIPALITY";

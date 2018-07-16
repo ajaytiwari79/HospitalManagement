@@ -1,6 +1,6 @@
 package com.kairos.dto;
 
-import com.kairos.utils.custome_annotation.NotNullOrEmpty;
+import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
 import java.util.List;
