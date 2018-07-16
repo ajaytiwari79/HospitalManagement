@@ -388,7 +388,7 @@ public class UnitPositionService extends UserBaseService {
                 List<UnitPosition> oldUnitPositions
                         = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
 
-                validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+i-                validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
                 oldUnitPosition.setPublished(true);
             }
             save(oldUnitPosition);
@@ -626,10 +626,7 @@ public class UnitPositionService extends UserBaseService {
 
             }
         }
-        if (unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
 
-        }
         oldUnitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
 
         if (Optional.ofNullable(unitPositionDTO.getEndLocalDate()).isPresent()) {
