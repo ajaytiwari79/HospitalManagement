@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -75,5 +76,19 @@ public class StaffActivitySettingController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffSpecificActivitySettings( @PathVariable Long unitId,@PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffSpecificActivitySettings(unitId,staffId));
+    }
+
+    @ApiOperation("Get Staff Personalized activity settings")
+    @GetMapping(value = "/staff_activity_setting/{staffActivitySettingId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffActivitySettings( @PathVariable Long unitId,@PathVariable BigInteger staffActivitySettingId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffActivitySettingsById(unitId,staffActivitySettingId));
+    }
+
+    @ApiOperation("update bulk Staff Personalized activity settings")
+    @PutMapping(value = "/staff_activity_setting/staff/{staffId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateStaffActivitySettings(@PathVariable Long unitId,@PathVariable Long staffId, @RequestBody @Valid List<StaffActivitySettingDTO> staffActivitySettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.updateBulkStaffActivitySettings(unitId,staffId,staffActivitySettingDTO));
     }
 }
