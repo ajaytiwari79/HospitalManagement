@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 16/12/17.
@@ -32,9 +33,10 @@ public class ActivityTagDTO {
     private PermissionsActivityTab permissionsActivityTab;
     private LocalDate startDate;
     private LocalDate endDate;
-    private CompositeShiftActivityTab compositeShiftActivityTab;
+    private Set<BigInteger> restrictedActivitiesBefore;
+    private Set<BigInteger> restrictedActivitiesAfter;
     private TimeCalculationActivityTab timeCalculationActivityTab;
-    private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
+
     private Long parentId;
     private ActivityStateEnum state;
 
@@ -146,13 +148,6 @@ public class ActivityTagDTO {
         this.generalActivityTab = generalActivityTab;
     }
 
-    public List<ActivityTagDTO> getCompositeActivities() {
-        return compositeActivities;
-    }
-
-    public void setCompositeActivities(List<ActivityTagDTO> compositeActivities) {
-        this.compositeActivities = compositeActivities;
-    }
 
     public Long getParentId() {
         return parentId;
@@ -186,12 +181,20 @@ public class ActivityTagDTO {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 
-    public CompositeShiftActivityTab getCompositeShiftActivityTab() {
-        return compositeShiftActivityTab;
+    public Set<BigInteger> getRestrictedActivitiesBefore() {
+        return restrictedActivitiesBefore;
     }
 
-    public void setCompositeShiftActivityTab(CompositeShiftActivityTab compositeShiftActivityTab) {
-        this.compositeShiftActivityTab = compositeShiftActivityTab;
+    public void setRestrictedActivitiesBefore(Set<BigInteger> restrictedActivitiesBefore) {
+        this.restrictedActivitiesBefore = restrictedActivitiesBefore;
+    }
+
+    public Set<BigInteger> getRestrictedActivitiesAfter() {
+        return restrictedActivitiesAfter;
+    }
+
+    public void setRestrictedActivitiesAfter(Set<BigInteger> restrictedActivitiesAfter) {
+        this.restrictedActivitiesAfter = restrictedActivitiesAfter;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

@@ -406,19 +406,15 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public ActivityTabsWrapper updateCompositeShiftTabOfActivity(CompositeShiftActivityDTO compositeShiftActivityDTO) {
-
-
+    public CompositeShiftActivityDTO updateCompositeShiftTabOfActivity(CompositeShiftActivityDTO compositeShiftActivityDTO) {
         Activity activity = activityMongoRepository.findOne(compositeShiftActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", compositeShiftActivityDTO.getActivityId());
         }
-
         Set<BigInteger> compositeShiftIds = new HashSet<>();
         compositeShiftIds.addAll(compositeShiftActivityDTO.getRestrictedActivitiesAfter());
         compositeShiftIds.addAll(compositeShiftActivityDTO.getRestrictedActivitiesBefore());
         Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(compositeShiftIds);
-
         if (activityMatchedCount != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
@@ -426,8 +422,7 @@ public class ActivityService extends MongoBaseService {
         activity.setRestrictedActivitiesBefore(compositeShiftActivityDTO.getRestrictedActivitiesBefore());
         activity.setRestrictedActivitiesAfter(compositeShiftActivityDTO.getRestrictedActivitiesAfter());
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper();
-        return activityTabsWrapper;
+        return compositeShiftActivityDTO;
 
     }
 

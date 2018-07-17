@@ -42,7 +42,7 @@ public class ActivityTabsWrapper {
     private BigInteger activityId;
     private PresenceTypeWithTimeTypeDTO presenceTypeWithTimeType;
     private List<DayType> dayTypes;
-    private Set<BigInteger> compositeActivities;
+
     private List<TimeTypeDTO> timeTypes;
     private  LocationActivityTab locationActivityTab;
     private PermissionsActivityTab permissionsActivityTab;
@@ -143,25 +143,12 @@ public class ActivityTabsWrapper {
 
     }
 
-    public ActivityTabsWrapper(CompositeShiftActivityTab compositeShiftActivityTab) {
-        this.compositeShiftActivityTab = compositeShiftActivityTab;
-    }
+
 
     public ActivityTabsWrapper(LocationActivityTab locationActivityTab) {
         this.locationActivityTab = locationActivityTab;
     }
 
-    public ActivityTabsWrapper(Set<BigInteger> compositeActivities) {
-        this.compositeActivities = compositeActivities;
-    }
-
-    public Set<BigInteger> getCompositeActivities() {
-        return compositeActivities;
-    }
-
-    public void setCompositeActivities(Set<BigInteger> compositeActivities) {
-        this.compositeActivities = compositeActivities;
-    }
 
     public ActivityTabsWrapper(NotesActivityTab notesActivityTab) {
         this.notesActivityTab = notesActivityTab;

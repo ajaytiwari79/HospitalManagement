@@ -34,8 +34,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private MongoTemplate mongoTemplate;
 
     public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
-        ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime").and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart").and("id").as("id").and("name")
-                .as("name")
+        ProjectionOperation projectionOperation = Aggregation.project().and("timeCalculationActivityTab.methodForCalculatingTime").as("timeCalculationActivityTab.methodForCalculatingTime")
+                .and("timeCalculationActivityTab.fullWeekStart").as("timeCalculationActivityTab.fullWeekStart")
+                .and("id").as("id").and("name").as("name")
                 .and("activity_type_category.id").as("categoryId").and("activity_type_category.name")
                 .as("categoryName");
 
@@ -161,11 +162,14 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<OrganizationActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, OrganizationActivityDTO.class);
         return result.getMappedResults();
     }
-
+//
+//private Set<ActivityDTO> restrictedActivitiesBefore;
+  //  private Set<ActivityDTO> restrictedActivitiesAfter;
+    // TODO FIX VIPUL
     public List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
+              //  graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
                 project("name", "generalActivityTab", "compositeActivities", "permissionsActivityTab"));
 
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
@@ -173,7 +177,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     }
 
-
+// TODO fix
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(long unitId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
