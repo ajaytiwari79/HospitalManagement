@@ -151,26 +151,35 @@ public class PlanningPeriodService extends MongoBaseService {
     public void createMigratedPlanningPeriodForTimeDuration(LocalDate startDate, LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases, List<PlanningPeriod> planningPeriods){
         //delete planning periods between given dates done in  migratePlanningPeriods and set active property false
         //  create new periods with the update planning period type
-        LocalDate CalculateEndDate = DateUtils.addDurationInLocalDateExcludingLastDate(startDate, planningPeriodDTO.getDuration(),
-                planningPeriodDTO.getDurationType(),1);
-        if(!planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDateTT(unitId, startDate)){
-            createPlanningPeriodOnMigration(startDate,CalculateEndDate, unitId, planningPeriodDTO, phases, planningPeriods);
-        }
+        boolean isExist=planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDateTT(unitId, startDate);
+//        if(!planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDateTT(unitId, startDate)){
+//            createPlanningPeriodOnMigration(startDate,CalculateEndDate, unitId, planningPeriodDTO, phases, planningPeriods);
+//        }
 
 
         //TODO Check if start date id correct date ( either monday or 1st day of month)
 
         LocalDate nextStartDate = startDate;
-        if(!validateStartDateForPeriodCreation(startDate, planningPeriodDTO.getDurationType())){
+        if(validateStartDateForPeriodCreation(startDate, planningPeriodDTO.getDurationType())){
             // Add planning period
+            if(!isExist){
+                createPlanningPeriodOnMigration(nextStartDate, unitId, planningPeriodDTO, phases, planningPeriods);
+            }
+        }else{
             nextStartDate = getNextValidStartDateForPlanningPeriod(startDate, planningPeriodDTO.getDurationType());
+            if(!isExist){
+                createPlanningPeriodOnMigration(nextStartDate, unitId, planningPeriodDTO, phases, planningPeriods);
+            }
         }
+
 
         // TODO Add planning period for earlier days from monday or first day of month
         // TODO Add planning period for last days till monday or first day of month
     }
-
-    public void createPlanningPeriodOnMigration(LocalDate startDate, LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> applicablePhases, List<PlanningPeriod> planningPeriods){
+,
+    public void createPlanningPeriodOnMigration(LocalDate startDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> applicablePhases, List<PlanningPeriod> planningPeriods){
+        LocalDate CalculateEndDate = DateUtils.addDurationInLocalDateExcludingLastDate(startDate, planningPeriodDTO.getDuration(),
+                planningPeriodDTO.getDurationType(),1);
         BigInteger currentPhaseId = null;
         BigInteger nextPhaseId = null;
         List<PeriodPhaseFlippingDate> tempPhaseFlippingDate = new ArrayList<>();
