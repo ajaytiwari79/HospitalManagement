@@ -14,12 +14,14 @@ import java.util.Set;
 public class CompositeShiftActivityDTO {
 
     private BigInteger activityId;
-    private Set<BigInteger> restrictedActivitiesBefore;
-    private Set<BigInteger> restrictedActivitiesAfter;
-    public CompositeShiftActivityDTO(){
+    private boolean restrictedBefore;
+    private boolean restrictedAfter;
+
+    public CompositeShiftActivityDTO() {
         // DC
     }
-    public BigInteger getActivityId(){
+
+    public BigInteger getActivityId() {
         return this.activityId;
     }
 
@@ -27,19 +29,19 @@ public class CompositeShiftActivityDTO {
         this.activityId = activityId;
     }
 
-    public Set<BigInteger> getRestrictedActivitiesBefore() {
-        return restrictedActivitiesBefore=Optional.ofNullable(restrictedActivitiesBefore).orElse(new HashSet<>()) ;
+    public boolean isRestrictedBefore() {
+        return restrictedBefore;
     }
 
-    public void setRestrictedActivitiesBefore(Set<BigInteger> restrictedActivitiesBefore) {
-        this.restrictedActivitiesBefore = restrictedActivitiesBefore;
+    public void setRestrictedBefore(boolean restrictedBefore) {
+        this.restrictedBefore = restrictedBefore;
     }
 
-    public Set<BigInteger> getRestrictedActivitiesAfter() {
-        return restrictedActivitiesAfter=Optional.ofNullable(restrictedActivitiesAfter).orElse(new HashSet<>()) ;
+    public boolean isRestrictedAfter() {
+        return restrictedAfter;
     }
 
-    public void setRestrictedActivitiesAfter(Set<BigInteger> restrictedActivitiesAfter) {
-        this.restrictedActivitiesAfter = restrictedActivitiesAfter;
+    public void setRestrictedAfter(boolean restrictedAfter) {
+        this.restrictedAfter = restrictedAfter;
     }
 }

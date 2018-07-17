@@ -44,7 +44,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private RulesActivityTab rulesActivityTab;
     private IndividualPointsActivityTab individualPointsActivityTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
-
+    private List<CompositeShiftActivityTab> compositeShiftActivityTab;
 
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
@@ -148,20 +148,12 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
     }
 
-    public Set<BigInteger> getRestrictedActivitiesBefore() {
-        return restrictedActivitiesBefore=Optional.ofNullable(restrictedActivitiesBefore).orElse(new HashSet<>()) ;
+    public List<CompositeShiftActivityTab> getCompositeShiftActivityTab() {
+        return compositeShiftActivityTab=Optional.ofNullable(compositeShiftActivityTab).orElse(new ArrayList<>());
     }
 
-    public void setRestrictedActivitiesBefore(Set<BigInteger> restrictedActivitiesBefore) {
-        this.restrictedActivitiesBefore = restrictedActivitiesBefore;
-    }
-
-    public Set<BigInteger> getRestrictedActivitiesAfter() {
-        return restrictedActivitiesAfter=Optional.ofNullable(restrictedActivitiesAfter).orElse(new HashSet<>()) ;
-    }
-
-    public void setRestrictedActivitiesAfter(Set<BigInteger> restrictedActivitiesAfter) {
-        this.restrictedActivitiesAfter = restrictedActivitiesAfter;
+    public void setCompositeShiftActivityTab(List<CompositeShiftActivityTab> compositeShiftActivityTab) {
+        this.compositeShiftActivityTab = compositeShiftActivityTab;
     }
 
     public NotesActivityTab getNotesActivityTab() {

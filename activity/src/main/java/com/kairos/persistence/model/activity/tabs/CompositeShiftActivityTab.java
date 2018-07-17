@@ -12,8 +12,8 @@ import java.util.Set;
 public class CompositeShiftActivityTab implements Serializable {
 
     private BigInteger activityId;
-    private boolean canBeUsedBefore;
-    private boolean canBeUsedAfter;
+    private boolean restrictedBefore;
+    private boolean restrictedAfter;
 
     public CompositeShiftActivityTab() {
         // DC
@@ -27,19 +27,19 @@ public class CompositeShiftActivityTab implements Serializable {
         this.activityId = activityId;
     }
 
-    public boolean isCanBeUsedBefore() {
-        return canBeUsedBefore;
+    public boolean isRestrictedBefore() {
+        return restrictedBefore;
     }
 
-    public void setCanBeUsedBefore(boolean canBeUsedBefore) {
-        this.canBeUsedBefore = canBeUsedBefore;
+    public void setRestrictedBefore(boolean restrictedBefore) {
+        this.restrictedBefore = restrictedBefore;
     }
 
-    public boolean isCanBeUsedAfter() {
-        return canBeUsedAfter;
+    public boolean isRestrictedAfter() {
+        return restrictedAfter;
     }
 
-    public void setCanBeUsedAfter(boolean canBeUsedAfter) {
-        this.canBeUsedAfter = canBeUsedAfter;
+    public void setRestrictedAfter(boolean restrictedAfter) {
+        this.restrictedAfter = restrictedAfter;
     }
 }

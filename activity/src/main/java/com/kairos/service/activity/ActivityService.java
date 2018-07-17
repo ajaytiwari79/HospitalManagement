@@ -412,15 +412,11 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", compositeShiftActivityDTO.getActivityId());
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
-        compositeShiftIds.addAll(compositeShiftActivityDTO.getRestrictedActivitiesAfter());
-        compositeShiftIds.addAll(compositeShiftActivityDTO.getRestrictedActivitiesBefore());
         Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(compositeShiftIds);
         if (activityMatchedCount != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
 
-        activity.setRestrictedActivitiesBefore(compositeShiftActivityDTO.getRestrictedActivitiesBefore());
-        activity.setRestrictedActivitiesAfter(compositeShiftActivityDTO.getRestrictedActivitiesAfter());
         save(activity);
         return compositeShiftActivityDTO;
 
