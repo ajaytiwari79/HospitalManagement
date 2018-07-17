@@ -51,14 +51,8 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @Service
 public class TimeBankCalculationService {
 
-    @Inject
-    private OrderService orderService;
-    @Inject private OrderMongoRepository orderMongoRepository;
-    @Inject
-    private GenericIntegrationService genericIntegrationService;
-    @Inject private TimeBankRestClient timeBankRestClient;
-    @Inject private ActivityMongoRepository activityMongoRepository;
-    @Inject private StaffRestClient staffRestClient;
+
+
 
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
 
@@ -74,7 +68,7 @@ public class TimeBankCalculationService {
             DateTime dateTime = new DateTime().withTimeAtStartOfDay().plusDays(i);
             Interval interval = new Interval(dateTime, dateTime.plusDays(1));
             List<ShiftWithActivityDTO> shiftQueryResults = shiftQueryResultMap.get(interval.toString());
-            //int totalTimeBank = getTimeBankByInterval(ctaDto, interval, shiftQueryResults, null).getTotalTimeBankMin();
+            //int totalTimeBank = getPayOutByInterval(ctaDto, interval, shiftQueryResults, null).getTotalTimeBankMin();
            // calculatedTimeBankByDateDTOS.add(new CalculatedTimeBankByDateDTO(interval.getStart().toLocalDate(), totalTimeBank));
         }
         return calculatedTimeBankByDateDTOS;

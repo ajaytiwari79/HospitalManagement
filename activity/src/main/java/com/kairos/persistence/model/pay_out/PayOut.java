@@ -2,6 +2,7 @@ package com.kairos.persistence.model.pay_out;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,10 +11,11 @@ import java.util.List;
 *  Date-27/01/2018
 *
 * */
-public class DailyPayOutEntry extends MongoBaseEntity{
+public class PayOut extends MongoBaseEntity{
 
     private Long unitPositionId;
     private Long staffId;
+    private BigInteger shiftId;
     //In minutes
     private int totalPayOutMin;
     private int contractualMin;
@@ -24,10 +26,19 @@ public class DailyPayOutEntry extends MongoBaseEntity{
     private List<PayOutCTADistribution> payOutCTADistributionList;
 
 
-    public DailyPayOutEntry(Long unitPositionId, Long staffId, int unitWorkingDaysInWeek, LocalDate date) {
+    public PayOut(BigInteger shiftId,Long unitPositionId, Long staffId, LocalDate date) {
+        this.shiftId = shiftId;
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.date = date;
+    }
+
+    public BigInteger getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(BigInteger shiftId) {
+        this.shiftId = shiftId;
     }
 
     public List<PayOutCTADistribution> getPayOutCTADistributionList() {
@@ -39,7 +50,7 @@ public class DailyPayOutEntry extends MongoBaseEntity{
     }
 
 
-    public DailyPayOutEntry() {
+    public PayOut() {
     }
 
     public LocalDate getDate() {

@@ -21,7 +21,8 @@ public class PayOutCTADistribution {
     public PayOutCTADistribution() {
     }
 
-    public PayOutCTADistribution(Long ctaRuleTemplateId, int minutes) {
+    public PayOutCTADistribution(String ctaName, int minutes,Long ctaRuleTemplateId) {
+        this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
     }

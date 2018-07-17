@@ -218,7 +218,7 @@ public class AppConstants {
     public static final String FULL_TIME_WEEKLY_HOURS_TYPE = "FULL_TIME_WEEKLY_HOURS";
     public static final String WEEKLY_HOURS_TYPE = "WEEKLY_HOURS_TYPE";
     public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
-    public static final String PAIDOUT_ACCOUNT = "PAIDOUT_ACCOUNT";
+    public static final String PAIDOUT_ACCOUNT = "PAID_OUT";
 
     //TimeCare date importing constants
     public static final String CALCULATED_TIME = "CalculatedTime";

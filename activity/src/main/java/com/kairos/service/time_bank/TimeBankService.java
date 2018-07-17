@@ -100,7 +100,7 @@ public class TimeBankService extends MongoBaseService {
             shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
             shifts = filterSubshifts(shifts);
             if (shifts != null && !shifts.isEmpty()) {
-                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getTimeBankByInterval(unitPositionWithCtaDetailsDTO, interval, shifts);
+                DailyTimeBankEntry dailyTimeBank = timeBankCalculationService.getPayOutByInterval(unitPositionWithCtaDetailsDTO, interval, shifts);
                 dailyTimeBanks.add(dailyTimeBank);
             }
         }*/
@@ -111,7 +111,7 @@ public class TimeBankService extends MongoBaseService {
 
 
 
-    @Deprecated
+    /*@Deprecated
     public Boolean createBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         DateTime startDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay();
         startDate = startDate.plusDays(1);//Todo this should be removed
@@ -131,8 +131,8 @@ public class TimeBankService extends MongoBaseService {
         }
         return null;
     }
-
-    public Boolean updateBlankTimebank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+*/
+    /*public Boolean updateBlankTimebank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         DateTime startDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay();
         DateTime endDate = startDate.plusYears(3);
         List<DailyTimeBankEntry> newDailyTimeBankEntries = new ArrayList<>();
@@ -149,7 +149,7 @@ public class TimeBankService extends MongoBaseService {
             save(newDailyTimeBankEntries);
         }
         return null;
-    }
+    }*/
 
 
     public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
