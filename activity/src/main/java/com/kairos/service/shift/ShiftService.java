@@ -800,30 +800,31 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
+    // TODO FIX VIPUL
     private List<Shift> verifyCompositeShifts(ShiftDTO shiftDTO, BigInteger shiftId, Activity activity) {
         if (shiftDTO.getSubShifts().size() == 0) {
             exceptionService.invalidRequestException("message.sub-shift.create");
         }
 
-        if (!Optional.ofNullable(activity.getCompositeActivities()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.sub-shift.activity.create");
-        }
-        validateTimingOfShifts(shiftDTO);
-        List<ShiftDTO> subShiftDTOS = shiftDTO.getSubShifts();
-
-        Set<BigInteger> activityIds = subShiftDTOS.parallelStream().map(ShiftDTO::getActivityId).collect(Collectors.toSet());
-
-        activity.getCompositeActivities().add(shiftDTO.getActivityId());
-        if (!activity.getCompositeActivities().containsAll(activityIds)) {
-            exceptionService.invalidRequestException("message.activity.multishift");
-        }
+//        if (!Optional.ofNullable(activity.getCompositeActivities()).isPresent()) {
+//            exceptionService.dataNotFoundByIdException("message.sub-shift.activity.create");
+//        }
+//        validateTimingOfShifts(shiftDTO);
+//        List<ShiftDTO> subShiftDTOS = shiftDTO.getSubShifts();
+//
+//        Set<BigInteger> activityIds = subShiftDTOS.parallelStream().map(ShiftDTO::getActivityId).collect(Collectors.toSet());
+//
+//        activity.getCompositeActivities().add(shiftDTO.getActivityId());
+//        if (!activity.getCompositeActivities().containsAll(activityIds)) {
+//            exceptionService.invalidRequestException("message.activity.multishift");
+//        }
 
         List<Shift> shifts = new ArrayList<>(shiftDTO.getSubShifts().size());
-        for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
-            Shift subShifts = buildShift(shiftDTO.getSubShifts().get(i));
-            subShifts.setMainShift(false);
-            shifts.add(subShifts);
-        }
+//        for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
+//            Shift subShifts = buildShift(shiftDTO.getSubShifts().get(i));
+//            subShifts.setMainShift(false);
+//            shifts.add(subShifts);
+//        }
         return shifts;
 
     }

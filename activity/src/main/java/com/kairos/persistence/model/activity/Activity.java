@@ -12,9 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by pawanmandhan on 17/8/17.
@@ -34,7 +32,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> levels;
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
-    private ActivityStateEnum state=ActivityStateEnum.DRAFT;
+    private ActivityStateEnum state = ActivityStateEnum.DRAFT;
 
     @Indexed
     private Long unitId;
@@ -46,8 +44,10 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private RulesActivityTab rulesActivityTab;
     private IndividualPointsActivityTab individualPointsActivityTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
-    private CompositeShiftActivityTab compositeShiftActivityTab;
-    private Set<BigInteger> compositeActivities;
+
+    private Set<BigInteger> restrictedActivitiesBefore;
+    private Set<BigInteger> restrictedActivitiesAfter;
+
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;
@@ -150,12 +150,20 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
     }
 
-    public CompositeShiftActivityTab getCompositeShiftActivityTab() {
-        return compositeShiftActivityTab;
+    public Set<BigInteger> getRestrictedActivitiesBefore() {
+        return restrictedActivitiesBefore=Optional.ofNullable(restrictedActivitiesBefore).orElse(new HashSet<>()) ;
     }
 
-    public void setCompositeShiftActivityTab(CompositeShiftActivityTab compositeShiftActivityTab) {
-        this.compositeShiftActivityTab = compositeShiftActivityTab;
+    public void setRestrictedActivitiesBefore(Set<BigInteger> restrictedActivitiesBefore) {
+        this.restrictedActivitiesBefore = restrictedActivitiesBefore;
+    }
+
+    public Set<BigInteger> getRestrictedActivitiesAfter() {
+        return restrictedActivitiesAfter=Optional.ofNullable(restrictedActivitiesAfter).orElse(new HashSet<>()) ;
+    }
+
+    public void setRestrictedActivitiesAfter(Set<BigInteger> restrictedActivitiesAfter) {
+        this.restrictedActivitiesAfter = restrictedActivitiesAfter;
     }
 
     public NotesActivityTab getNotesActivityTab() {
@@ -290,14 +298,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.parentId = parentId;
     }
 
-    public Set<BigInteger> getCompositeActivities() {
-        return compositeActivities;
-    }
-
-    public void setCompositeActivities(Set<BigInteger> compositeActivities) {
-        this.compositeActivities = compositeActivities;
-    }
-
     public ActivityStateEnum getState() {
         return state;
     }
@@ -335,6 +335,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     public void setExternalId(String externalId) {
         this.externalId = externalId;
     }
+
 
     @Override
     public String toString() {

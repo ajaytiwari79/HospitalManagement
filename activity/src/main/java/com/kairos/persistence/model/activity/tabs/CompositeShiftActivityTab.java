@@ -10,17 +10,36 @@ import java.util.Set;
  */
 
 public class CompositeShiftActivityTab implements Serializable {
-    private Set<BigInteger> activityTypeList;
 
-    public CompositeShiftActivityTab(Set<BigInteger> activityTypeList) {
-        this.activityTypeList = activityTypeList;
+    private BigInteger activityId;
+    private boolean canBeUsedBefore;
+    private boolean canBeUsedAfter;
+
+    public CompositeShiftActivityTab() {
+        // DC
     }
 
-    public Set<BigInteger> getActivityList() {
-        return activityTypeList;
+    public BigInteger getActivityId() {
+        return activityId;
     }
 
-    public void setActivityTypeList(Set<BigInteger> activityTypeList) {
-        this.activityTypeList = activityTypeList;
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
+    }
+
+    public boolean isCanBeUsedBefore() {
+        return canBeUsedBefore;
+    }
+
+    public void setCanBeUsedBefore(boolean canBeUsedBefore) {
+        this.canBeUsedBefore = canBeUsedBefore;
+    }
+
+    public boolean isCanBeUsedAfter() {
+        return canBeUsedAfter;
+    }
+
+    public void setCanBeUsedAfter(boolean canBeUsedAfter) {
+        this.canBeUsedAfter = canBeUsedAfter;
     }
 }
