@@ -1,6 +1,6 @@
 package com.kairos.service.position_code;
 
-import com.kairos.persistence.model.enums.ReasonCodeType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.OrganizationHierarchyData;

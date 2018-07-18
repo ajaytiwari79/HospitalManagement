@@ -2,7 +2,7 @@ package com.kairos.persistence.model.country.reason_code;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.enums.ReasonCodeType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**

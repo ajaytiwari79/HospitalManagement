@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistance.model.master_data.asset_management.StorageFormat;
+import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.master_data.asset_management.StorageFormatMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -13,10 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
 @Service
 public class StorageFormatService extends MongoBaseService {
@@ -68,8 +69,8 @@ public class StorageFormatService extends MongoBaseService {
 
                 newStorageFormats = storageFormatMongoRepository.saveAll(sequenceGenerator(newStorageFormats));
             }
-            result.put("existing", existing);
-            result.put("new", newStorageFormats);
+            result.put(EXISTING_DATA_LIST, existing);
+            result.put(NEW_DATA_LIST, newStorageFormats);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");

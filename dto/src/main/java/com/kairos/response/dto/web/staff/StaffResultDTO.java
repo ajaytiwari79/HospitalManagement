@@ -1,10 +1,8 @@
 package com.kairos.response.dto.web.staff;
 
-import com.kairos.response.dto.web.organization.OrganizationIdAndNameResult;
+import com.kairos.user.reason_code.ReasonCodeDTO;
 
-import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
 
 
 public class StaffResultDTO {
@@ -12,6 +10,7 @@ public class StaffResultDTO {
     private Long unitId;
     private String unitName;
     private String timeZone;
+    private List<ReasonCodeDTO> reasonCodes;
     public Long getStaffId() {
         return staffId;
     }
@@ -42,5 +41,13 @@ public class StaffResultDTO {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public List<ReasonCodeDTO> getReasonCodes() {
+        return reasonCodes;
+    }
+
+    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
+        this.reasonCodes = reasonCodes;
     }
 }

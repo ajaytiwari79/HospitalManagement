@@ -175,9 +175,17 @@ public class VRPPlanningService extends MongoBaseService{
 
     public VrpTaskPlanningDTO getSolutionBySolverConfig(Long unitId, BigInteger solverConfigId){
         VrpTaskPlanningDTO vrpTaskPlanningDTO = getSolutionBySubmition(unitId, solverConfigId);
+
+        List<TaskDTO> drivingTimeList = vrpTaskPlanningDTO.getDrivingTimeList();
+        drivingTimeList.forEach(t->{
+            t.setStartTime(Date.from(t.getPlannedStartTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
+            t.setEndTime(Date.from(t.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
+        });
+
         Object[] objects = getTasks(unitId,vrpTaskPlanningDTO,null);
         vrpTaskPlanningDTO.setTasks((List<TaskDTO>)objects[0]);
         //vrpTaskPlanningDTO.setEscalatedTaskList((List<TaskDTO>)objects[1]);
+        vrpTaskPlanningDTO.setDrivingTimeList(drivingTimeList);
         return vrpTaskPlanningDTO;
     }
 
@@ -214,6 +222,7 @@ public class VRPPlanningService extends MongoBaseService{
                     task.setCitizenName(vrpTaskDTO.getCitizenName());
                     EmployeeDTO employeeDTO = employeeDTOMap.get(taskDTO.getStaffId().toString());
                     int taskDuration = (int)Math.ceil(vrpTaskDTO.getDuration()/(employeeDTO.getEfficiency()/100d));
+                    task.setActualDuration(vrpTaskDTO.getDuration());
                     task.setDuration(taskDuration);
                     updatedStartTime = updatedStartTime.plusMinutes(taskDuration);
                     task.setEndTime(Date.from(updatedStartTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());

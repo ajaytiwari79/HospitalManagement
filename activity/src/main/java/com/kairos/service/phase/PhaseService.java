@@ -3,7 +3,6 @@ package com.kairos.service.phase;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationPhaseDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -102,10 +101,7 @@ public class PhaseService extends MongoBaseService {
         return true;
     }
 
-    //TODO
-    public List<OrganizationPhaseDTO> getPhasesGroupByOrganization() {
-        return phaseMongoRepository.getPhasesGroupByOrganization();
-    }
+
 
     public PhaseDTO getUnitPhaseByDate(Long unitId, Date date) {
         PhaseDTO phaseDTO = new PhaseDTO();
@@ -207,7 +203,7 @@ public class PhaseService extends MongoBaseService {
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
 
         Collections.sort(phases, (Phase p1, Phase p2) -> {
-            if (p1.getSequence() < p2.getSequence())
+            if (p1.getSequence() > p2.getSequence())
                 return 1;
             else
                 return -1;
@@ -236,7 +232,7 @@ public class PhaseService extends MongoBaseService {
             phase = phases.get(phases.size() - 1);
             return phase;
         }
-        //logger.info(phase.getName());
+        logger.info(phase.getName());
         return phase;
     }
 
